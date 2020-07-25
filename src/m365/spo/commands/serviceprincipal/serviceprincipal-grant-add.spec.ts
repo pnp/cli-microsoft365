@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -10,7 +10,6 @@ import config from '../../../../config';
 import Utils from '../../../../Utils';
 
 describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -24,7 +23,6 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -40,7 +38,6 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -56,11 +53,11 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SERVICEPRINCIPAL_GRANT_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.SERVICEPRINCIPAL_GRANT_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('grants the specified API permission (debug)', (done) => {
@@ -147,7 +144,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
     });
     cmdInstance.action({ options: { debug: false, resource: 'Microsoft Graph1', scope: 'Mail.Read' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('A service principal with the name Microsoft Graph1 could not be found.\r\nParameter name: resourceName')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('A service principal with the name Microsoft Graph1 could not be found.\r\nParameter name: resourceName')));
         done();
       }
       catch (e) {
@@ -168,7 +165,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
     });
     cmdInstance.action({ options: { debug: false, resource: 'Microsoft Graph', scope: 'Calendar.Read' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An OAuth permission with the scope Calendar.Read could not be found.\r\nParameter name: permissionRequest')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An OAuth permission with the scope Calendar.Read could not be found.\r\nParameter name: permissionRequest')));
         done();
       }
       catch (e) {
@@ -189,7 +186,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
     });
     cmdInstance.action({ options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An OAuth permission with the resource Microsoft Graph and scope Mail.Read already exists.\r\nParameter name: permissionRequest')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An OAuth permission with the resource Microsoft Graph and scope Mail.Read already exists.\r\nParameter name: permissionRequest')));
         done();
       }
       catch (e) {
@@ -202,7 +199,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
     cmdInstance.action({ options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -213,7 +210,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
 
   it('defines alias', () => {
     const alias = command.alias();
-    assert.notEqual(typeof alias, 'undefined');
+    assert.notStrictEqual(typeof alias, 'undefined');
   });
 
   it('supports debug mode', () => {
@@ -225,54 +222,5 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('fails validation if the resource option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { scope: 'Mail.Read' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the scope option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { resource: 'Microsoft Graph' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation when the resource and scope are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { resource: 'Microsoft Graph', scope: 'Mail.Read' } });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SERVICEPRINCIPAL_GRANT_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

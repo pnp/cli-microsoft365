@@ -11,7 +11,6 @@ import auth from '../../../../Auth';
 import config from '../../../../config';
 
 describe(commands.THEME_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -26,7 +25,6 @@ describe(commands.THEME_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -43,7 +41,6 @@ describe(commands.THEME_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       fs.readFileSync,
       fs.existsSync,
       fs.lstatSync,
@@ -63,11 +60,11 @@ describe(commands.THEME_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.THEME_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.THEME_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('adds theme when correct parameters are passed', (done) => {
@@ -89,10 +86,10 @@ describe(commands.THEME_SET, () => {
       }
     }, () => {
       try {
-        assert.equal(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
-        assert.equal(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
-        assert.equal(postStub.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":false,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`);
-        assert.equal(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
+        assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
+        assert.strictEqual(postStub.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":false,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`);
+        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -120,10 +117,10 @@ describe(commands.THEME_SET, () => {
       }
     }, () => {
       try {
-        assert.equal(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
-        assert.equal(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
-        assert.equal(postStub.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":true,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`);
-        assert.notEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE'), -1);
+        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
+        assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
+        assert.strictEqual(postStub.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">{"isInverted":true,"name":"Contoso","palette":123}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`);
+        assert.notStrictEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
       catch (e) {
@@ -149,7 +146,7 @@ describe(commands.THEME_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
         done();
       }
       catch (e) {
@@ -175,7 +172,7 @@ describe(commands.THEME_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -184,15 +181,10 @@ describe(commands.THEME_SET, () => {
     });
   });
 
-  it('fails validation if file path not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', isInverted: false } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if file path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc', isInverted: false } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if file path points to a directory', () => {
@@ -201,7 +193,7 @@ describe(commands.THEME_SET, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc', isInverted: false } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if file does not contain a valid theme', () => {
@@ -213,7 +205,7 @@ describe(commands.THEME_SET, () => {
     readFileSyncStub.callsFake(() => theme);
     sinon.stub(Utils, 'isValidTheme').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'contoso-blue.json', isInverted: false } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when path points to a valid file', () => {
@@ -249,7 +241,7 @@ describe(commands.THEME_SET, () => {
     sinon.stub(Utils, 'isValidTheme').callsFake(() => true);
     const actual = (command.validate() as CommandValidate)({ options: { name: 'contoso-blue', filePath: 'contoso-blue.json', isInverted: false } });
 
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -261,32 +253,5 @@ describe(commands.THEME_SET, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.THEME_SET));
-  });
-
-  it('fails validation if name is not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: '' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if path is not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { fullPath: '' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation when inverted parameter is not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'abc', filePath: 'abc' } });
-    assert.notEqual(actual, true);
   });
 });

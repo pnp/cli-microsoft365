@@ -17,7 +17,7 @@ describe('FN010007_YORC_isDomainIsolated', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if isDomainIsolated is already up-to-date', () => {
@@ -30,6 +30,6 @@ describe('FN010007_YORC_isDomainIsolated', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

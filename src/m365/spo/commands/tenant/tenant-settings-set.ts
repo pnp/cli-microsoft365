@@ -10,7 +10,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 export interface CommandArgs {
   options: Options;
@@ -751,23 +751,6 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       default:
         return -1;
     }
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-    
-  Examples:
-  
-    Sets single tenant global setting
-      m365 ${this.name} --UserVoiceForFeedbackEnabled true
-
-    Sets multiple tenant global settings at once
-      m365 ${this.name} --UserVoiceForFeedbackEnabled true --HideSyncButtonOnODB true --DisabledWebPartIds c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201
-  ` );
   }
 }
 

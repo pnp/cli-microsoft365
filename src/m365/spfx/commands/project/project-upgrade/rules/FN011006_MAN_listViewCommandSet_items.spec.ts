@@ -13,7 +13,7 @@ describe('FN011006_MAN_listViewCommandSet_items', () => {
   });
 
   it('has empty resolution', () => {
-    assert.equal(rule.resolution, '');
+    assert.strictEqual(rule.resolution, '');
   });
 
   it('doesn\'t return notifications if items property is in the manifest', () => {
@@ -27,7 +27,7 @@ describe('FN011006_MAN_listViewCommandSet_items', () => {
       } as CommandSetManifest]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if items is not in the manifest', () => {
@@ -40,7 +40,7 @@ describe('FN011006_MAN_listViewCommandSet_items', () => {
       } as Manifest]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('returns notification if commands has to be converted to items', () => {
@@ -64,7 +64,7 @@ describe('FN011006_MAN_listViewCommandSet_items', () => {
     };
     
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('should correctly convert commands schema to items schema', () => {
@@ -91,10 +91,10 @@ describe('FN011006_MAN_listViewCommandSet_items', () => {
     const resolution: any = JSON.parse(findings[0].occurrences[0].resolution);
     const command1: any = resolution.items.COMMAND_1;
     
-    assert.notEqual(command1, undefined);
-    assert.equal(command1.title.default, 'Command One');
-    assert.equal(command1.iconImageUrl, 'icons/request.png');
-    assert.equal(command1.type, 'command');
+    assert.notStrictEqual(command1, undefined);
+    assert.strictEqual(command1.title.default, 'Command One');
+    assert.strictEqual(command1.iconImageUrl, 'icons/request.png');
+    assert.strictEqual(command1.type, 'command');
   });
 
   it('exits if no manifest json', () => {
@@ -103,6 +103,6 @@ describe('FN011006_MAN_listViewCommandSet_items', () => {
       manifests: []
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

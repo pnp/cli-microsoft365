@@ -17,7 +17,7 @@ describe('FN011005_MAN_webpart_defaultGroup', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if web part is in a custom group', () => {
@@ -33,6 +33,6 @@ describe('FN011005_MAN_webpart_defaultGroup', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

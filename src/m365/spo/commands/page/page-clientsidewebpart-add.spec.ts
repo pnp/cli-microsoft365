@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   const clientSideWebParts = {
@@ -47,7 +46,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -62,7 +60,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       request.get
     ]);
@@ -77,11 +74,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.PAGE_CLIENTSIDEWEBPART_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.PAGE_CLIENTSIDEWEBPART_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('checks out page if not checked out by the current user', (done) => {
@@ -264,7 +261,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -359,7 +356,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -454,7 +451,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -548,7 +545,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -684,7 +681,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -820,7 +817,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -955,7 +952,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1131,7 +1128,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1307,7 +1304,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1483,7 +1480,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1658,7 +1655,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1793,7 +1790,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1878,7 +1875,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1997,7 +1994,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/sitepages/foo.aspx does not exist')));
+          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/sitepages/foo.aspx does not exist')));
           done();
         } catch (e) {
           done(e);
@@ -2033,7 +2030,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
           done();
         } catch (e) {
           done(e);
@@ -2073,7 +2070,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
           done();
         } catch (e) {
           done(e);
@@ -2120,7 +2117,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -2253,7 +2250,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`There is no available WebPart with Id e377ea37-9047-43b9-8cdb-aaaaaaaaaa.`)));
+          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`There is no available WebPart with Id e377ea37-9047-43b9-8cdb-aaaaaaaaaa.`)));
           done();
         } catch (e) {
           done(e);
@@ -2292,7 +2289,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`This page does not have the site page content type. Only site pages can be served with this API.`)));
+          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`This page does not have the site page content type. Only site pages can be served with this API.`)));
           done();
         }
         catch (e) {
@@ -2330,7 +2327,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Invalid section '8'")));
+          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid section '8'")));
           done();
         } catch (e) {
           done(e);
@@ -2368,7 +2365,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Invalid column '7'")));
+          assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid column '7'")));
           done();
         } catch (e) {
           done(e);
@@ -2415,7 +2412,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       () => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -2546,7 +2543,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       () => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -2677,7 +2674,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       () => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -2814,7 +2811,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -3001,25 +2998,11 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     assert(containsOption);
   });
 
-  it('fails validation if page name not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: { webUrl: 'https://contoso.sharepoint.com', webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1' }
-    });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if webUrl not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: { pageName: 'page.aspx', webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1' }
-    });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if webUrl is not an absolute URL', () => {
     const actual = (command.validate() as CommandValidate)({
       options: { pageName: 'page.aspx', webUrl: 'foo', webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1' }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', () => {
@@ -3030,14 +3013,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if either webPartId or standardWebPart parameters are not specified', () => {
     const actual = (command.validate() as CommandValidate)({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webPartId and standardWebPart parameters are both specified', () => {
@@ -3049,7 +3032,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         standardWebPart: 'BingMap'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webPartId value is not valid GUID', () => {
@@ -3060,7 +3043,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         webPartId: 'FooBar'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webPartProperties and webPartData are specified', () => {
@@ -3073,7 +3056,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         webPartData: '{}'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webPartProperties value is not valid JSON', () => {
@@ -3085,7 +3068,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         webPartProperties: '{Foo:bar'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when webPartProperties value is valid JSON', () => {
@@ -3097,7 +3080,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         webPartProperties: '{}'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if webPartData value is not valid JSON', () => {
@@ -3109,7 +3092,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         webPartData: '{Foo:bar'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when webPartData value is valid JSON', () => {
@@ -3121,14 +3104,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         webPartData: '{}'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if standardWebPart is not valid', () => {
     const actual = (command.validate() as CommandValidate)({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'Foo' }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and webPartId is specified', () => {
@@ -3139,14 +3122,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and standardWebPart is specified instead of webPartId', () => {
     const actual = (command.validate() as CommandValidate)({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'BingMap' }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when name has no extension', () => {
@@ -3157,14 +3140,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if standardWebPart is valid', () => {
     const actual = (command.validate() as CommandValidate)({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'BingMap' }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if section has invalid (negative) value', () => {
@@ -3176,7 +3159,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         section: -1
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if section has invalid (non number) value', () => {
@@ -3188,7 +3171,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         section: 'foobar'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if column has invalid (negative) value', () => {
@@ -3200,7 +3183,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         column: -1
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if column has invalid (non number) value', () => {
@@ -3212,40 +3195,6 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         column: 'foobar'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.PAGE_CLIENTSIDEWEBPART_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach((l) => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.notStrictEqual(actual, true);
   });
 });

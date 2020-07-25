@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.FEATURE_ENABLE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let requests: any[];
@@ -21,7 +20,6 @@ describe(commands.FEATURE_ENABLE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     requests = [];
     cmdInstance = {
@@ -37,7 +35,6 @@ describe(commands.FEATURE_ENABLE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -51,68 +48,22 @@ describe(commands.FEATURE_ENABLE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.FEATURE_ENABLE), true);
+    assert.strictEqual(command.name.startsWith(commands.FEATURE_ENABLE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
-  });
-
-  it('fails validation if the url is not provided', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        force: false,
-        scope: "web",
-        featureId: "00bfea71-5932-4f9c-ad71-1557e5751100"
-      }
-    });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the url is empty', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        url: '',
-        force: false,
-        scope: "web",
-        featureId: "00bfea71-5932-4f9c-ad71-1557e5751100"
-      }
-    });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the featureId is not provided', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/sales',
-        force: false,
-        scope: "web"
-      }
-    });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the featureId is empty', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        url: 'https://contoso.sharepoint.com/sites/sales',
-        force: false,
-        scope: "web",
-        featureId: ""
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('configures command types', () => {
-    assert.notEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
+    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
   });
 
   it('configures scope as string option', () => {
     const types = (command.types() as CommandTypes);
     ['s', 'scope'].forEach(o => {
-      assert.notEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
+      assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
   });
 
@@ -209,7 +160,7 @@ describe(commands.FEATURE_ENABLE, () => {
       }
     }, (error?: any) => {
       try {
-        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
+        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -236,7 +187,7 @@ describe(commands.FEATURE_ENABLE, () => {
         url: 'foo'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the required options specified', () => {
@@ -247,7 +198,7 @@ describe(commands.FEATURE_ENABLE, () => {
         featureId: "00bfea71-5932-4f9c-ad71-1557e5751100"
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts scope to be Site', () => {
@@ -259,7 +210,7 @@ describe(commands.FEATURE_ENABLE, () => {
         scope: 'Site'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts scope to be Web', () => {
@@ -271,7 +222,7 @@ describe(commands.FEATURE_ENABLE, () => {
         scope: 'Web'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('rejects invalid string scope', () => {
@@ -283,7 +234,7 @@ describe(commands.FEATURE_ENABLE, () => {
         scope: scope
       }
     });
-    assert.equal(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
+    assert.strictEqual(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
   });
   
   it('doesn\'t fail validation if the optional scope option not specified', () => {
@@ -295,62 +246,6 @@ describe(commands.FEATURE_ENABLE, () => {
           url: "https://contoso.sharepoint.com"
         }
       });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.FEATURE_ENABLE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
-  });
-
-  it('has help with remarks', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsRemarks: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Remarks:') > -1) {
-        containsRemarks = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsRemarks);
+    assert.strictEqual(actual, true);
   });
 });

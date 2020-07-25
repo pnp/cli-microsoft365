@@ -1,9 +1,10 @@
+import * as chalk from 'chalk';
 import auth from '../../../../Auth';
+import { CommandInstance } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
-const vorpal: Vorpal = require('../../../../vorpal-init');
 
 class TenantServiceListCommand extends Command {
   public get name(): string {
@@ -47,25 +48,10 @@ class TenantServiceListCommand extends Command {
           }));
         }
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
-  }
-
-  public commandHelp(args: any, log: (help: string) => void): void {
-    log(vorpal.find(commands.TENANT_SERVICE_LIST).helpInformation());
-    log(
-      `  Examples:
-
-    Get services available in Microsoft 365
-      m365 ${commands.TENANT_SERVICE_LIST}
-      
-  More information:
-
-    Microsoft 365 Service Communications API reference
-      https://docs.microsoft.com/office/office-365-management-api/office-365-service-communications-api-reference#get-messages
-`);
   }
 }
 

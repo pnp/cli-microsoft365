@@ -3,12 +3,12 @@ import commands from '../../commands';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import { CommandOption, CommandValidate, CommandCancel } from '../../../../Command';
+import { CommandOption, CommandValidate } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import { SpoOperation } from './SpoOperation';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -87,7 +87,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
 
           cb();
@@ -111,14 +111,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
           removeSite();
         }
       });
-    }
-  }
-
-  public cancel(): CommandCancel {
-    return (): void => {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-      }
     }
   }
 
@@ -237,49 +229,8 @@ class SpoSiteRemoveCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required parameter url missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.url);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-
-  Remarks:
-
-    Deleting a site collection is by default asynchronous and depending on the
-    current state of Microsoft 365, might take up to few minutes.
-    If you're building a script with steps that require the site to be
-    fully deleted, you should use the ${chalk.blue('--wait')} flag. When using this flag,
-    the ${chalk.blue(this.getCommandName())} command will keep running until it received
-    confirmation from Microsoft 365 that the site has been fully deleted.
-
-  Examples:
-
-    Remove the specified site and place it in the Recycle Bin
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/demosite 
-
-    Remove the site without moving it to the Recycle Bin
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
-
-    Remove the previously deleted site from the Recycle Bin
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/demosite --fromRecycleBin
-
-    Remove the site without moving it to the Recycle Bin and wait for completion 
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/demosite --wait --skipRecycleBin
-`);
   }
 }
 

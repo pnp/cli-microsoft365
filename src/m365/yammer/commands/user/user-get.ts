@@ -3,8 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -100,36 +99,6 @@ class YammerUserGetCommand extends YammerCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks
-
-    ${chalk.yellow('Attention:')} In order to use this command, you need to grant the Azure AD
-    application used by the CLI for Microsoft 365 the permission to the Yammer API.
-    To do this, execute the ${chalk.blue('cli consent --service yammer')} command.
-    
-    All operations return a single user object. Operations executed with the
-    ${chalk.blue('email')} parameter return an array of user objects.
-      
-  Examples:
-  
-    Returns the current user
-      ${this.name}
-
-    Returns the user with the ID 1496550697
-      ${this.name} --userId 1496550697
-
-    Returns an array of users matching the e-mail john.smith@contoso.com
-      ${this.name} --email john.smith@contoso.com
-
-    Returns an array of users matching the e-mail john.smith@contoso.com in
-    JSON. The JSON output returns a full user object
-      ${this.name} --email john.smith@contoso.com --output json
-    `);
   }
 }
 

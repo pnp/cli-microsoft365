@@ -12,8 +12,8 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { FieldLink } from './FieldLink';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -230,14 +230,14 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
           cb();
         }
       }, (error: any): void => {
         if (error === 'DONE') {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
           cb();
         }
@@ -425,18 +425,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return `Missing required option webUrl`;
-      }
-
-      if (!args.options.contentTypeId) {
-        return 'Missing required option contentTypeId';
-      }
-
-      if (!args.options.fieldId) {
-        return 'Missing required option fieldId';
-      }
-
       if (!Utils.isValidGuid(args.options.fieldId)) {
         return `${args.options.fieldId} is not a valid GUID`;
       }
@@ -457,31 +445,6 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CONTENTTYPE_FIELD_SET).helpInformation());
-    log(
-      `  Remarks:
-
-    If the field reference already exists, the command will update its ${chalk.grey(`required`)}
-    and ${chalk.grey(`hidden`)} properties as specified in the command.
-
-  Examples:
-  
-    Add the specified site column to the specified content type as an optional
-    and visible field
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5
-
-    Add the specified site column to the specified content type as a required
-    field
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5 --required true
-
-    Update the existing site column reference in the specified content type
-    to optional
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5 --required false
-`);
   }
 }
 

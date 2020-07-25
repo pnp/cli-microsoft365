@@ -11,8 +11,7 @@ import { SpoPropertyBagBaseCommand } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 export interface CommandArgs {
   options: Options;
@@ -156,29 +155,6 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.PROPERTYBAG_REMOVE).helpInformation());
-    log(
-      `  Examples:
-
-    Removes the value of the ${chalk.grey('key1')} property from the property bag located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1
-
-    Removes the value of the ${chalk.grey('key1')} property from the property bag located in site root folder ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder / --confirm
-
-    Removes the value of the ${chalk.grey('key1')} property from the property bag located in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
-    
-    Removes property bag value located in folder in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
-
-    Removes the value of the ${chalk.grey('key1')} property from the property bag located in site list ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList
-    `);
   }
 }
 

@@ -7,8 +7,7 @@ import { CommandOption, CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import { SPOSitePropertiesEnumerable } from './SPOSitePropertiesEnumerable';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -120,43 +119,6 @@ class SiteClassicListCommand extends SpoCommand {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-   
-  Remarks:
-
-    Using the ${chalk.blue('-t, --webTemplate')} option you can specify which sites you want
-    to retrieve. For example, to get sites with the ${chalk.grey('STS#0')} as their web template,
-    use ${chalk.grey("--webTemplate STS#0")} as the option.
-
-    Using the ${chalk.blue('-f, --filter')} option you can specify which sites you want
-    to retrieve. For example, to get sites with ${chalk.grey('project')} in their URL, use
-    ${chalk.grey("Url -like 'project'")} as the filter.
-
-    Using the ${chalk.blue('--includeOneDriveSites')} option you can specify whether you want
-    to retrieve OneDrive sites or not. For example, to retrieve OneDrive sites,
-    add ${chalk.grey('--includeOneDriveSites')} as an option.
-  
-  Examples:
-  
-    List all sites in the tenant you're logged in to
-      m365 ${this.name}
-
-      List all sites (including OneDrive sites) in the tenant you're logged in to
-      m365 ${this.name} --includeOneDriveSites    
-
-    List all classic team sites in the tenant you're logged in to
-      m365 ${this.name} --webTemplate STS#0
-
-    List all classic project sites that contain 'project' in the URL
-      m365 ${this.name} --webTemplate PROJECTSITE#0 --filter "Url -like 'project'"
-`);
   }
 }
 

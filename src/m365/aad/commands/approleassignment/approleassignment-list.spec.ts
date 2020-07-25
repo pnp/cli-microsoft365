@@ -406,7 +406,6 @@ class RequestStub {
 
 
 describe(commands.APPROLEASSIGNMENT_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -445,7 +444,6 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -461,7 +459,6 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -475,11 +472,11 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.APPROLEASSIGNMENT_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.APPROLEASSIGNMENT_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('retrieves App Role assignments for the specified displayName', (done) => {
@@ -544,7 +541,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
 
     cmdInstance.action({ options: { appId: CommandActionParameters.invalidAppId } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('app registration not found')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('app registration not found')));
         done();
       }
       catch (e) {
@@ -558,7 +555,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
 
     cmdInstance.action({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('app registration not found')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('app registration not found')));
         done();
       }
       catch (e) {
@@ -583,7 +580,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
 
     cmdInstance.action({ options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
         done();
       }
       catch (e) {
@@ -594,32 +591,32 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
 
   it('fails validation if neither appId nor displayName are not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the appId is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appId: '123' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the objectId is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { objectId: '123' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both appId and displayName are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments, displayName: CommandActionParameters.appNameWithRoleAssignments } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   })
 
   it('fails validation if objectId and displayName are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: CommandActionParameters.appNameWithRoleAssignments, objectId: CommandActionParameters.objectIdWithRoleAssigments } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   })
 
   it('passes validation when the appId option specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -653,40 +650,6 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.APPROLEASSIGNMENT_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });
 

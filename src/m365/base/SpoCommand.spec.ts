@@ -7,6 +7,7 @@ import Utils from '../../Utils';
 import { CommandError } from '../../Command';
 import { FormDigestInfo } from '../spo/spo';
 import appInsights from '../../appInsights';
+import { CommandInstance } from '../../cli';
 
 class MockCommand extends SpoCommand {
   public get name(): string {
@@ -82,7 +83,7 @@ describe('SpoCommand', () => {
 
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -226,7 +227,7 @@ describe('SpoCommand', () => {
       .ensureFormDigest('https://contoso.sharepoint.com', cmdInstance, undefined, false)
       .then(ctx => {
         try {
-          assert.notEqual(typeof ctx, 'undefined');
+          assert.notStrictEqual(typeof ctx, 'undefined');
           done();
         }
         catch (e) {
@@ -382,7 +383,7 @@ describe('SpoCommand', () => {
       .getSpoUrl(cmdInstance, false)
       .then((spoUrl: string) => {
         try {
-          assert.equal(spoUrl, 'https://contoso.sharepoint.com');
+          assert.strictEqual(spoUrl, 'https://contoso.sharepoint.com');
           done();
         }
         catch (e) {
@@ -415,7 +416,7 @@ describe('SpoCommand', () => {
       .getSpoUrl(cmdInstance, true)
       .then((spoUrl: string) => {
         try {
-          assert.equal(spoUrl, 'https://contoso.sharepoint.com');
+          assert.strictEqual(spoUrl, 'https://contoso.sharepoint.com');
           done();
         }
         catch (e) {
@@ -448,7 +449,7 @@ describe('SpoCommand', () => {
       .getSpoUrl(cmdInstance, false)
       .then((spoUrl: string) => {
         try {
-          assert.equal(spoUrl, 'https://contoso.sharepoint.com');
+          assert.strictEqual(spoUrl, 'https://contoso.sharepoint.com');
           done();
         }
         catch (e) {
@@ -482,7 +483,7 @@ describe('SpoCommand', () => {
         done('Expected error');
       }, (err: string) => {
         try {
-          assert.equal(err, 'An error has occurred');
+          assert.strictEqual(err, 'An error has occurred');
           done();
         }
         catch (e) {
@@ -509,7 +510,7 @@ describe('SpoCommand', () => {
         done('Expected error');
       }, (err: string) => {
         try {
-          assert.equal(err, 'An error has occurred');
+          assert.strictEqual(err, 'An error has occurred');
           done();
         }
         catch (e) {
@@ -546,7 +547,7 @@ describe('SpoCommand', () => {
       .getTenantId(cmdInstance, false)
       .then((tenantId: string) => {
         try {
-          assert.equal(tenantId, 'tenantId');
+          assert.strictEqual(tenantId, 'tenantId');
           done();
         }
         catch (e) {
@@ -583,7 +584,7 @@ describe('SpoCommand', () => {
       .getTenantId(cmdInstance, true)
       .then((tenantId: string) => {
         try {
-          assert.equal(tenantId, 'tenantId');
+          assert.strictEqual(tenantId, 'tenantId');
           done();
         }
         catch (e) {
@@ -620,7 +621,7 @@ describe('SpoCommand', () => {
       .getTenantId(cmdInstance, false)
       .then((tenantId: string) => {
         try {
-          assert.equal(tenantId, 'tenantId');
+          assert.strictEqual(tenantId, 'tenantId');
           done();
         }
         catch (e) {
@@ -650,7 +651,7 @@ describe('SpoCommand', () => {
         done('Error expected');
       }, (err: any) => {
         try {
-          assert.equal(err, 'An error has occurred');
+          assert.strictEqual(err, 'An error has occurred');
           done();
         }
         catch (e) {

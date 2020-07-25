@@ -6,8 +6,8 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -41,7 +41,7 @@ class SpoSiteGetCommand extends SpoCommand {
         cmd.log(res);
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -60,10 +60,6 @@ class SpoSiteGetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required parameter url missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -71,22 +67,6 @@ class SpoSiteGetCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-  
-    This command can retrieve information for both classic and modern sites.
-   
-  Examples:
-  
-    Return information about the ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-    site collection.
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/project-x
-`);
   }
 }
 

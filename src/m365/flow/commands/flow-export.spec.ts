@@ -10,7 +10,6 @@ import Utils from '../../../Utils';
 import * as fs from 'fs';
 
 describe(commands.FLOW_EXPORT, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -122,7 +121,6 @@ describe(commands.FLOW_EXPORT, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -138,7 +136,6 @@ describe(commands.FLOW_EXPORT, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.post,
       fs.writeFileSync
@@ -154,11 +151,11 @@ describe(commands.FLOW_EXPORT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.FLOW_EXPORT), true);
+    assert.strictEqual(command.name.startsWith(commands.FLOW_EXPORT), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('exports the specified flow (debug)', (done) => {
@@ -184,7 +181,7 @@ describe(commands.FLOW_EXPORT, () => {
 
     cmdInstance.action({ options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
       try {
-        assert.equal(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
+        assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
         done();
       }
       catch (e) {
@@ -264,7 +261,7 @@ describe(commands.FLOW_EXPORT, () => {
 
     cmdInstance.action({ options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
       try {
-        assert.equal(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
+        assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
         done();
       }
       catch (e) {
@@ -296,7 +293,7 @@ describe(commands.FLOW_EXPORT, () => {
 
     cmdInstance.action({ options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } }, () => {
       try {
-        assert.equal(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
+        assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
         done();
       }
       catch (e) {
@@ -311,7 +308,7 @@ describe(commands.FLOW_EXPORT, () => {
 
     cmdInstance.action({ options: { debug: false, environment: `Default-${notFoundEnvironmentId}`, id: `${foundFlowId}` } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-${notFoundEnvironmentId}' is denied.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-${notFoundEnvironmentId}' is denied.`)));
         done();
       }
       catch (e) {
@@ -326,7 +323,7 @@ describe(commands.FLOW_EXPORT, () => {
 
     cmdInstance.action({ options: { debug: false, environment: `Default-${foundEnvironmentId}`, id: notFoundFlowId } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The caller with object id '${foundEnvironmentId}' does not have permission for connection '${notFoundFlowId}' under Api 'shared_logicflows'.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The caller with object id '${foundEnvironmentId}' does not have permission for connection '${notFoundFlowId}' under Api 'shared_logicflows'.`)));
         done();
       }
       catch (e) {
@@ -335,61 +332,51 @@ describe(commands.FLOW_EXPORT, () => {
     });
   });
 
-  it('fails validation if the id is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { environment: 'abc' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the environment is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: `${foundFlowId}` } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if the id is not a GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { environment: `Default-${foundEnvironmentId}`, id: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if format is specified as neither JSON nor ZIP', () => {
     const actual = (command.validate() as CommandValidate)({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'text' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if format is specified as JSON and packageCreatedBy parameter is specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageCreatedBy: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if format is specified as JSON and packageDescription parameter is specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageDescription: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if format is specified as JSON and packageDisplayName parameter is specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageDisplayName: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if format is specified as JSON and packageSourceEnvironment parameter is specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json', packageSourceEnvironment: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if specified path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, path: '/path/not/found.zip' } });
     Utils.restore(fs.existsSync);
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the id and environment specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}` } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the id and environment specified and format set to JSON', () => {
     const actual = (command.validate() as CommandValidate)({ options: { environment: `Default-${foundEnvironmentId}`, id: `${foundFlowId}`, format: 'json' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -478,39 +465,5 @@ describe(commands.FLOW_EXPORT, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.FLOW_EXPORT));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

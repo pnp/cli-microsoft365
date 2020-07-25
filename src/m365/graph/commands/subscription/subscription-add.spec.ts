@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.SUBSCRIPTION_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -22,7 +21,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -39,7 +37,6 @@ describe(commands.SUBSCRIPTION_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       Date.now
     ]);
@@ -54,11 +51,11 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SUBSCRIPTION_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.SUBSCRIPTION_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('adds subscription', (done) => {
@@ -92,7 +89,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     }, () => {
       try {
-        assert.equal(JSON.stringify(log[0]), JSON.stringify({
+        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
           "@odata.context": "https://graph.microsoft.com/beta/$metadata#subscriptions/$entity",
           "id": "7f105c7d-2dc5-4530-97cd-4e7ae6534c07",
           "resource": "me/mailFolders('Inbox')/messages",
@@ -267,7 +264,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
         const expected = '2019-01-03T22:29:00.000Z';
         const actual = requestBodyArg.expirationDateTime;
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -347,7 +344,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     }, () => {
       try {
         // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
-        // assert.equal(log[4], expectedLog);
+        // assert.strictEqual(log[4], expectedLog);
         assert(cmdInstanceLogSpy.calledWith("Actual expiration date time: 2019-01-03T22:29:00.000Z"));
         done();
       }
@@ -374,7 +371,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -394,35 +391,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         expirationDateTime: 'foo'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if resource is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        debug: false,
-        resource: null,
-        changeType: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        expirationDateTime: '2016-11-20T18:23:45.935Z'
-      }
-    });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if notificationUrl is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        debug: false,
-        resource: "me/mailFolders('Inbox')/messages",
-        changeType: 'updated',
-        clientState: 'secretClientValue',
-        notificationUrl: null,
-        expirationDateTime: '2016-11-20T18:23:45.935Z'
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if notificationUrl is not valid', () => {
@@ -436,21 +405,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         expirationDateTime: '2016-11-20T18:23:45.935Z'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if changeType is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        debug: false,
-        resource: "me/mailFolders('Inbox')/messages",
-        changeType: null,
-        clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
-        expirationDateTime: '2016-11-20T18:23:45.935Z'
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if changeType is not valid', () => {
@@ -464,7 +419,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         expirationDateTime: '2016-11-20T18:23:45.935Z'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the clientState exceeds maximum allowed length', () => {
@@ -478,7 +433,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         expirationDateTime: null
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the expirationDateTime is not specified', () => {
@@ -492,7 +447,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         expirationDateTime: null
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -504,39 +459,5 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SUBSCRIPTION_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -8,9 +8,9 @@ import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import config from '../../../../config';
+import * as chalk from 'chalk';
 
 describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -27,7 +27,6 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -48,7 +47,6 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -64,11 +62,11 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.ORGASSETSLIBRARY_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.ORGASSETSLIBRARY_REMOVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('prompts before removing the Org Assets Library when confirm option is not passed', (done) => {
@@ -168,7 +166,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
 
     cmdInstance.action({ options: { libraryUrl: '/sites/branding/assets', debug: true, verbose: true, confirm: true } }, () => {
       try {
-        assert(orgAssetLibRemoveCallIssued && cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(orgAssetLibRemoveCallIssued && cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -233,7 +231,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
 
     cmdInstance.action({ options: { libraryUrl: '/sites/branding/assets', debug: true, confirm: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Run Add-SPOOrgAssetsLibrary first to set up the organization assets library feature for your organization.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Run Add-SPOOrgAssetsLibrary first to set up the organization assets library feature for your organization.`)));
         done();
       }
       catch (e) {
@@ -251,7 +249,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
         done();
       }
       catch (e) {
@@ -259,17 +257,6 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       }
     });
   });
-
-  it('fails validation if the libraryUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation if the libraryUrl option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { libraryUrl: '/sites/branding/assets' } });
-    assert.strictEqual(actual, true);
-  });
-
 
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
@@ -280,39 +267,5 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.ORGASSETSLIBRARY_REMOVE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

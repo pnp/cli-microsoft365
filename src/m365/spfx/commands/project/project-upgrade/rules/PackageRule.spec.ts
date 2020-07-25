@@ -45,7 +45,7 @@ describe('PackageRule', () => {
       } as PackageJson
     };
     packageRule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('doesn\'t return any notifications package.json has the property', () => {
@@ -56,7 +56,7 @@ describe('PackageRule', () => {
       } as any
     };
     packageRule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if the packege.json property is being removed already', () => {
@@ -67,7 +67,7 @@ describe('PackageRule', () => {
       } as PackageJson
     };
     packageRule2.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if the packege.json property has to be removed', () => {
@@ -78,7 +78,7 @@ describe('PackageRule', () => {
       } as any
     };
     packageRule2.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('doesn\'t return notification if the packege.json is missing', () => {
@@ -87,6 +87,6 @@ describe('PackageRule', () => {
       packageJson: undefined
     };
     packageRule2.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

@@ -22,7 +22,7 @@ describe('FN012006_TSC_types_es6_collections', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if es6-collection should be added and is already present', () => {
@@ -36,7 +36,7 @@ describe('FN012006_TSC_types_es6_collections', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if es6-collection should be added but is not present', () => {
@@ -50,7 +50,7 @@ describe('FN012006_TSC_types_es6_collections', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('doesn\'t return notification if tsconfig is not available', () => {
@@ -58,6 +58,6 @@ describe('FN012006_TSC_types_es6_collections', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

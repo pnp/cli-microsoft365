@@ -9,8 +9,8 @@ import AadCommand from '../../../base/AadCommand';
 import Utils from '../../../../Utils';
 import { ServicePrincipal } from './ServicePrincipal';
 import * as os from 'os';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface AppRole {
   objectId: string;
@@ -170,7 +170,7 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -234,14 +234,6 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
         return 'Specify either appId, objectId or displayName';
       }
 
-      if (!args.options.resource) {
-        return 'Required option resource missing';
-      }
-
-      if (!args.options.scope) {
-        return 'Required option scope missing';
-      }
-
       if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
         return `${args.options.appId} is not a valid GUID`;
       }
@@ -252,46 +244,6 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.APPROLEASSIGNMENT_ADD).helpInformation());
-    log(
-      `  Remarks:
-
-    This command requires tenant administrator permissions.
-    
-    Specify either the ${chalk.grey('appId')}, ${chalk.grey('objectId')} or ${chalk.grey('displayName')}. If you specify
-    more than one option value, the command will fail with an error.
-
-    Autocomplete values for the ${chalk.grey('resource')} option do not mean allowed values. 
-    The autocomplete will just suggest some known names, but that doesn't
-    restrict you to use name of your own custom application or other
-    application within your tenant.
-
-    This command can also be used to assign permissions to system- or
-    user-assigned managed identity.
-   
-  Examples:
-  
-    Adds SharePoint ${chalk.grey('Sites.Read.All')} application permissions to Azure AD
-    application with app id ${chalk.grey('57907bf8-73fa-43a6-89a5-1f603e29e451')}
-      m365 ${this.name} --appId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "SharePoint" --scope "Sites.Read.All"
-
-    Adds multiple Microsoft Graph application permissions to an Azure AD
-    application with name ${chalk.grey('MyAppName')}
-      m365 ${this.name} --displayName "MyAppName" --resource "Microsoft Graph" --scope "Mail.Read,Mail.Send"
-
-    Adds Microsoft Graph ${chalk.grey('Mail.Read')} application permissions to a system-managed
-    identity app with objectId ${chalk.grey('57907bf8-73fa-43a6-89a5-1f603e29e451')}
-      m365 ${this.name} --objectId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "Microsoft Graph" --scope "Mail.Read"
-
-  More information:
-  
-    Microsoft Graph permissions reference: 
-      https://docs.microsoft.com/en-us/graph/permissions-reference
-`);
   }
 }
 

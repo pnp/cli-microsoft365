@@ -8,9 +8,9 @@ import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { SpoPropertyBagBaseCommand } from '../propertybag/propertybag-base';
+import * as chalk from 'chalk';
 
 describe(commands.WEB_REINDEX, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -23,7 +23,6 @@ describe(commands.WEB_REINDEX, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -39,7 +38,6 @@ describe(commands.WEB_REINDEX, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.post,
       SpoPropertyBagBaseCommand.isNoScriptSite,
@@ -58,11 +56,11 @@ describe(commands.WEB_REINDEX, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.WEB_REINDEX), true);
+    assert.strictEqual(command.name.startsWith(commands.WEB_REINDEX), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('requests reindexing site that is not a no-script site for the first time', (done) => {
@@ -104,8 +102,8 @@ describe(commands.WEB_REINDEX, () => {
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled, 'Something has been logged');
-        assert.equal(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
-        assert.equal(propertyValue, '1', 'Incorrect property value stored in the property bag');
+        assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
+        assert.strictEqual(propertyValue, '1', 'Incorrect property value stored in the property bag');
         done();
       }
       catch (e) {
@@ -154,9 +152,9 @@ describe(commands.WEB_REINDEX, () => {
 
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
-        assert.equal(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
-        assert.equal(propertyValue, '2', 'Incorrect property value stored in the property bag');
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
+        assert.strictEqual(propertyValue, '2', 'Incorrect property value stored in the property bag');
         done();
       }
       catch (e) {
@@ -245,10 +243,10 @@ describe(commands.WEB_REINDEX, () => {
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
         assert(cmdInstanceLogSpy.notCalled, 'Something has been logged');
-        assert.equal(propertyName[0], 'vti_searchversion');
-        assert.equal(propertyName[1], 'vti_searchversion');
-        assert.equal(propertyValue[0], '1');
-        assert.equal(propertyValue[1], '2');
+        assert.strictEqual(propertyName[0], 'vti_searchversion');
+        assert.strictEqual(propertyName[1], 'vti_searchversion');
+        assert.strictEqual(propertyValue[0], '1');
+        assert.strictEqual(propertyValue[1], '2');
         done();
       }
       catch (e) {
@@ -337,10 +335,10 @@ describe(commands.WEB_REINDEX, () => {
     cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
         assert(cmdInstanceLogSpy.called, 'Nothing has been logged');
-        assert.equal(propertyName[0], 'vti_searchversion');
-        assert.equal(propertyName[1], 'vti_searchversion');
-        assert.equal(propertyValue[0], '1');
-        assert.equal(propertyValue[1], '2');
+        assert.strictEqual(propertyName[0], 'vti_searchversion');
+        assert.strictEqual(propertyName[1], 'vti_searchversion');
+        assert.strictEqual(propertyValue[0], '1');
+        assert.strictEqual(propertyValue[1], '2');
         done();
       }
       catch (e) {
@@ -421,7 +419,7 @@ describe(commands.WEB_REINDEX, () => {
 
     cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -441,52 +439,13 @@ describe(commands.WEB_REINDEX, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if webUrl not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if webUrl is not a valid SharePoint URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if webUrl is valid', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.WEB_REINDEX));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

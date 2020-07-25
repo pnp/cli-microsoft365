@@ -22,7 +22,7 @@ describe('FN012012_TSC_include', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if include has the required elements', () => {
@@ -36,7 +36,7 @@ describe('FN012012_TSC_include', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if object is missing', () => {
@@ -45,6 +45,6 @@ describe('FN012012_TSC_include', () => {
       tsConfigJson: undefined
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

@@ -1,11 +1,11 @@
 import commands from '../../commands';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
-import { CommandOption, CommandValidate, CommandCancel } from '../../../../Command';
+import { CommandOption, CommandValidate } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { FormDigestInfo } from '../../spo';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -27,7 +27,6 @@ interface SiteRenameJob {
 
 class SpoSiteRenameCommand extends SpoCommand {
   private context?: FormDigestInfo;
-  private timeout?: NodeJS.Timer;
   private operationData?: SiteRenameJob;
   private static readonly checkIntervalInMs: number = 5000;
 
@@ -129,7 +128,7 @@ class SpoSiteRenameCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb()
@@ -162,21 +161,13 @@ class SpoSiteRenameCommand extends SpoCommand {
           return;
         }
 
-        command.timeout = setTimeout(() => {
+        setTimeout(() => {
           command.waitForRenameCompletion(command, isVerbose, spoAdminUrl, siteUrl, resolve, reject, iteration);
         }, SpoSiteRenameCommand.checkIntervalInMs);
       })
       .catch((ex: any) => {
         reject(ex);
       });
-  }
-
-  public cancel(): CommandCancel {
-    return (): void => {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-      }
-    }
   }
 
   public options(): CommandOption[] {
@@ -223,39 +214,6 @@ class SpoSiteRenameCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you must have permissions to access
-    the tenant admin site.
-  
-  Remarks:
-
-    Renaming site collections is by default asynchronous and depending on the
-    current state of Microsoft 365, might take up to few minutes. If you're
-    building a script with steps that require the operation to complete fully,
-    you should use the  ${chalk.blue('--wait')} flag. When using this flag, the ${chalk.blue(this.getCommandName())}
-    command  will keep running until it receives confirmation from Microsoft 365 
-    that the site rename operation has completed.
-
-  Examples:
-  
-    Starts the rename of the site collection with name "samplesite" to "renamed"
-    without modifying the title
-      m365 ${this.name}  --siteUrl http://contoso.sharepoint.com/samplesite --newSiteUrl http://contoso.sharepoint.com/renamed
-
-    Starts the rename of the site collection with name "samplesite" to "renamed"
-    modifying the title of the site to "New Title"
-      m365 ${this.name} --siteUrl http://contoso.sharepoint.com/samplesite --newSiteUrl http://contoso.sharepoint.com/renamed --newSiteTitle "New Title"
-
-    Renames the specified site collection and waits for the operation to
-    complete
-      m365 ${this.name} --siteUrl http://contoso.sharepoint.com/samplesite --newSiteUrl http://contoso.sharepoint.com/renamed --newSiteTitle "New Title" --wait
-`);
   }
 }
 

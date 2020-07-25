@@ -22,6 +22,6 @@ describe('FN001008_DEP_react', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

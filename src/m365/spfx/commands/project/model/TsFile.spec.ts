@@ -28,22 +28,22 @@ describe('TsFile', () => {
 
   it('returns undefined source if the specified file doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    assert.equal(tsFile.source, undefined);
+    assert.strictEqual(tsFile.source, undefined);
   });
 
   it('returns undefined sourceFile if the specified file doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    assert.equal(tsFile.sourceFile, undefined);
+    assert.strictEqual(tsFile.sourceFile, undefined);
   });
 
   it('returns undefined nodes if the specified file doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    assert.equal(tsFile.nodes, undefined);
+    assert.strictEqual(tsFile.nodes, undefined);
   });
 
   it('doesn\'t fail when creating TS file fails', () => {
     (tsFile as any)._source = '123';
     sinon.stub(ts, 'createSourceFile').callsFake(() => { throw new Error('An exception has occurred'); })
-    assert.equal(tsFile.sourceFile, undefined);
+    assert.strictEqual(tsFile.sourceFile, undefined);
   });
 });

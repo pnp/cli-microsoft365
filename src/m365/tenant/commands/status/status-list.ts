@@ -4,8 +4,8 @@ import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import Command, { CommandOption } from '../../../../Command';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TenantStatusListCommand extends Command {
   public get name(): string {
-    return `${commands.TENANT_STATUS_LIST}`;
+    return commands.TENANT_STATUS_LIST;
   }
 
   public get description(): string {
@@ -63,7 +63,7 @@ class TenantStatusListCommand extends Command {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
@@ -79,31 +79,6 @@ class TenantStatusListCommand extends Command {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    To get the name of the particular workload for use with the ${chalk.grey('workload')}
-    option, execute ${chalk.grey(`${commands.TENANT_STATUS_LIST} --output json`)} and get
-    the value of the ${chalk.grey('Workload')} property for the particular service.
-      
-  Examples:
-  
-    Gets health status of all services in Microsoft 365
-      m365 ${this.name}
-
-    Gets health status for SharePoint Online
-      m365 ${this.name} --workload "SharePoint"
-
-  More information:
-    
-    Microsoft 365 Service Communications API reference:
-      https://docs.microsoft.com/en-us/office/office-365-management-api/office-365-service-communications-api-reference#get-current-status
-  ` );
   }
 }
 

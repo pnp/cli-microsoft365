@@ -3,12 +3,12 @@ import commands from '../../commands';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import { CommandOption, CommandValidate, CommandCancel } from '../../../../Command';
+import { CommandOption, CommandValidate } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import { SpoOperation } from './SpoOperation';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -236,19 +236,11 @@ class SpoSiteClassicSetCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
-  }
-
-  public cancel(): CommandCancel {
-    return (): void => {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-      }
-    }
   }
 
   private setAdmin(cmd: CommandInstance, siteUrl: string, principal: string): Promise<void> {
@@ -342,10 +334,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required option url missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -407,65 +395,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-
-  Remarks:
-
-    The value of the ${chalk.blue('--resourceQuota')} option must not exceed
-    the company's aggregate available Sandboxed Solutions quota.
-    For more information, see Resource Usage Limits on Sandboxed Solutions
-    in SharePoint 2010: http://msdn.microsoft.com/en-us/library/gg615462.aspx.
-
-    The value of the ${chalk.blue('--resourceQuotaWarningLevel')} option
-    must not exceed the value of the ${chalk.blue('--resourceQuota')} option
-    or the current value of the ${chalk.grey(`UserCodeMaximumLevel`)} property.
-
-    The value of the ${chalk.blue('--storageQuota')} option must not exceed
-    the company's available quota.
-
-    The value of the ${chalk.blue('--storageQuotaWarningLevel')} option must not
-    exceed the the value of the ${chalk.blue('--storageQuota')} option or
-    the current value of the ${chalk.gray('StorageMaximumLevel')} property.
-
-    When updating site owners using the ${chalk.blue('--owners')} option,
-    the command doesn't remove existing users but adds the users specified
-    in the option to the list of already configured owners.
-    When specifying owners, you can specify both users and groups.
-
-    For more information on locking classic sites see
-    https://technet.microsoft.com/en-us/library/cc263238.aspx.
-
-    For more information on configuring no script sites see
-    https://support.office.com/en-us/article/Turn-scripting-capabilities-on-or-off-1f2c515f-5d7e-448a-9fd7-835da935584f.
-
-    Setting site properties is by default asynchronous and depending on
-    the current state of Microsoft 365, might take up to few minutes. If you're
-    building a script with steps that require the site to be fully configured,
-    you should use the ${chalk.blue('--wait')} flag. When using this flag,
-    the ${chalk.blue(this.getCommandName())} command will keep running until
-    it received confirmation from Microsoft 365 that the site has been fully
-    configured.
-
-  Examples:
-
-    Change the title of the site collection. Don't wait for the configuration
-    to complete
-      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team
-
-    Add the specified user accounts as site collection administrators
-      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --owners "joe@contoso.com,steve@contoso.com"
-
-    Lock the site preventing users from accessing it. Wait for the configuration
-    to complete
-      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --LockState NoAccess --wait
-`);
   }
 }
 

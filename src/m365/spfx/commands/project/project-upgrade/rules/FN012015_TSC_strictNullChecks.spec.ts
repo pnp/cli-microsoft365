@@ -22,7 +22,7 @@ describe('FN012015_TSC_strictNullChecks', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if object is missing', () => {
@@ -31,7 +31,7 @@ describe('FN012015_TSC_strictNullChecks', () => {
       tsConfigJson: undefined
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if strictNullChecks has the wrong value', () => {
@@ -44,7 +44,7 @@ describe('FN012015_TSC_strictNullChecks', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('returns notification if strictNullChecks is missing', () => {
@@ -56,6 +56,6 @@ describe('FN012015_TSC_strictNullChecks', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

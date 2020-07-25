@@ -6,6 +6,7 @@ import auth from '../../../../Auth';
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 const command: Command = require('./contenttype-field-remove');
 const WEB_URL = 'https://contoso.sharepoint.com';
@@ -18,7 +19,6 @@ const SITE_ID = "50720268-eff5-48e0-835e-de588b007927";
 const LIST_TITLE = "TEST";
 
 describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -137,7 +137,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -163,7 +162,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.post
     ]);
@@ -180,16 +178,16 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CONTENTTYPE_FIELD_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.CONTENTTYPE_FIELD_REMOVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('configures command types', () => {
-    assert.notEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
+    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
   });
 
   it('supports debug mode', () => {
@@ -206,20 +204,8 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   it('configures contentTypeId as string option', () => {
     const types = (command.types() as CommandTypes);
     ['i', 'contentTypeId'].forEach(o => {
-      assert.notEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
+      assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.CONTENTTYPE_FIELD_REMOVE));
   });
 
   // WEB CT
@@ -333,7 +319,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     }, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -385,7 +371,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     }, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -528,7 +514,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -728,7 +714,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     }, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -777,7 +763,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     }, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -823,7 +809,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
       }
       catch (e) {
@@ -837,7 +823,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     cmdInstance.action({ options: { debug: true, webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID, updateChildContentTypes: true, confirm: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
       }
       catch (e) {
@@ -862,7 +848,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
       }
       catch (e) {
@@ -883,7 +869,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -893,34 +879,29 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   });
 
   // Fails validation
-  it('fails validation if contentTypeId is not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: WEB_URL, fieldLinkId: FIELD_LINK_ID } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if fieldLinkId is not passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webUrl is not passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webUrl is not correct', () => {
     const actual = (command.validate() as CommandValidate)({ options: { fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: "test" } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if fieldLinkId is not valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { fieldLinkId: 'xxx', webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   // Passes validation
   it('passes validation', () => {
     const actual = (command.validate() as CommandValidate)({ options: { listId: LIST_ID, fieldLinkId: FIELD_LINK_ID, contentTypeId: CONTENT_TYPE_ID, webUrl: WEB_URL, debug: true } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 });

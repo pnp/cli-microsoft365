@@ -10,7 +10,6 @@ import Utils from '../../../../Utils';
 import TemplateInstantiator from '../../template-instantiator';
 
 describe(commands.SOLUTION_INIT, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let trackEvent: any;
@@ -23,7 +22,6 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -39,7 +37,6 @@ describe(commands.SOLUTION_INIT, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       path.basename,
       fs.readdirSync,
       fs.existsSync,
@@ -54,11 +51,11 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SOLUTION_INIT), true);
+    assert.strictEqual(command.name.startsWith(commands.SOLUTION_INIT), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('calls telemetry', () => {
@@ -71,7 +68,7 @@ describe(commands.SOLUTION_INIT, () => {
   it('logs correct telemetry event', () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
-      assert.equal(telemetry.name, commands.SOLUTION_INIT);
+      assert.strictEqual(telemetry.name, commands.SOLUTION_INIT);
     });
   });
 
@@ -99,90 +96,90 @@ describe(commands.SOLUTION_INIT, () => {
 
   it('passes validation when valid publisherName and publisherPrefix are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when the project directory contains relative paths', () => {
     sinon.stub(path, 'basename').callsFake(() => 'rootPath1\\.\\..\\rootPath2');
 
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the project directory equals invalid text sequences (like COM1 or LPT6)', () => {
     sinon.stub(path, 'basename').callsFake(() => 'COM1');
 
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails when the project directory name is emtpy', () => {
     sinon.stub(path, 'basename').callsFake(() => '');
 
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the publisherName option isn\'t specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { publisherPrefix: 'prefix' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the publisherPrefix option isn\'t specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix is less than 2', () => {
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'p' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix is more than 8', () => {
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'verylongprefix' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix starts with a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: '1prefix' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix starts with an underscore', () => {
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: '_prefix' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix starts with \'mscrm\'', () => {
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'mscrmpr' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix contains a special character', () => {
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'préfix' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherName starts with a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: '1ExamplePublisher', publisherPrefix: 'prefix' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherName contains a special character', () => {
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePùblisher', publisherPrefix: 'prefix' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the current directory doesn\'t contain any files with extension proj', () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.xml', 'file3.json'] as any);
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when the current directory contains files with extension proj', () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.cdsproj', 'file3.json'] as any);
     const actual = (command.validate() as CommandValidate)({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('TemplateInstantiator.instantiate is called exactly twice in an empty directory', () => {
@@ -266,39 +263,5 @@ describe(commands.SOLUTION_INIT, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SOLUTION_INIT));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

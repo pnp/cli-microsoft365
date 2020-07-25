@@ -22,6 +22,6 @@ describe('FN001021_DEP_microsoft_sp_property_pane', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

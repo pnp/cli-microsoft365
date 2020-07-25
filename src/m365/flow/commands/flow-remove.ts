@@ -7,8 +7,8 @@ import {
 import request from '../../../request';
 import AzmgmtCommand from '../../base/AzmgmtCommand';
 import Utils from '../../../Utils';
-
-const vorpal: Vorpal = require('../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -58,12 +58,12 @@ class FlowRemoveCommand extends AzmgmtCommand {
           // handle 204 and throw error message to cmd when invalid flow id is passed
           // https://github.com/pnp/cli-microsoft365/issues/1063#issuecomment-537218957
           if (rawRes.statusCode === 204) {
-            cmd.log(vorpal.chalk.red(`Error: Resource '${args.options.name}' does not exist in environment '${args.options.environment}'`));
+            cmd.log(chalk.red(`Error: Resource '${args.options.name}' does not exist in environment '${args.options.environment}'`));
             cb();
           }
           else {
             if (this.verbose) {
-              cmd.log(vorpal.chalk.green('DONE'));
+              cmd.log(chalk.green('DONE'));
             }
             cb();
           }
@@ -115,55 +115,12 @@ class FlowRemoveCommand extends AzmgmtCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.name) {
-        return 'Required option name missing';
-      }
-
       if (!Utils.isValidGuid(args.options.name)) {
         return `${args.options.name} is not a valid GUID`;
       }
 
-      if (!args.options.environment) {
-        return 'Required option environment missing';
-      }
-
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.FLOW_REMOVE).helpInformation());
-    log(
-      `  Remarks:
-  
-    By default, the command will try to remove a Microsoft Flow you own.
-    If you want to remove a Microsoft Flow owned by another user, use the 
-    ${chalk.blue('asAdmin')} flag.
-
-    If the environment with the name you specified doesn't exist, you will get
-    the ${chalk.grey('Access to the environment \'xyz\' is denied.')} error.
-
-    If the Microsoft Flow with the name you specified doesn't exist, you will
-    get the ${chalk.grey(`Error: Resource \'abc\' does not exist in environment \'xyz\'`)}
-    error.
-   
-  Examples:
-  
-    Removes the specified Microsoft Flow owned by the currently signed-in user
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d
-
-    Removes the specified Microsoft Flow owned by the currently signed-in user
-    without confirmation
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --confirm
-
-    Removes the specified Microsoft Flow owned by another user
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin
-
-    Removes the specified Microsoft Flow owned by another user without
-    confirmation
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin --confirm
-`);
   }
 }
 

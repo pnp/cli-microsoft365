@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
 describe(commands.THEME_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -22,7 +21,6 @@ describe(commands.THEME_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.THEME_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -53,11 +50,11 @@ describe(commands.THEME_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.THEME_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.THEME_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('uses correct API url', (done) => {
@@ -75,9 +72,9 @@ describe(commands.THEME_LIST, () => {
       }
     }, () => {
       try {
-        assert.equal(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/GetTenantThemingOptions');
-        assert.equal(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.equal(postStub.lastCall.args[0].json, true);
+        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/GetTenantThemingOptions');
+        assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
+        assert.strictEqual(postStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {
@@ -100,10 +97,10 @@ describe(commands.THEME_LIST, () => {
       }
     }, () => {
       try {
-        assert.equal(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/GetTenantThemingOptions');
-        assert.equal(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.equal(postStub.lastCall.args[0].json, true);
-        assert.equal(cmdInstanceLogSpy.called, true);
+        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/GetTenantThemingOptions');
+        assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
+        assert.strictEqual(postStub.lastCall.args[0].json, true);
+        assert.strictEqual(cmdInstanceLogSpy.called, true);
         done();
       }
       catch (e) {
@@ -193,7 +190,7 @@ describe(commands.THEME_LIST, () => {
 
     cmdInstance.action({ options: { debug: true, verbose: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -211,17 +208,5 @@ describe(commands.THEME_LIST, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.THEME_LIST));
   });
 });

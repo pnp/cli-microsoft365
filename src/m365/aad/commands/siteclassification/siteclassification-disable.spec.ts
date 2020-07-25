@@ -7,9 +7,9 @@ const command: Command = require('./siteclassification-disable');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 describe(commands.SITECLASSIFICATION_DISABLE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -22,7 +22,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -43,7 +42,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.delete
     ]);
@@ -59,11 +57,11 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITECLASSIFICATION_DISABLE), true);
+    assert.strictEqual(command.name.startsWith(commands.SITECLASSIFICATION_DISABLE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('supports debug mode', () => {
@@ -75,40 +73,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITECLASSIFICATION_DISABLE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 
   it('prompts before disabling siteclassification when confirm option not passed', (done) => {
@@ -143,7 +107,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Site classification is not enabled.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Site classification is not enabled.')));
         done();
       }
       catch (e) {
@@ -226,7 +190,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\"")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\"")));
         done();
       }
       catch (e) {
@@ -309,7 +273,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Missing UnifiedGroupSettting id")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Missing UnifiedGroupSettting id")));
         done();
       }
       catch (e) {
@@ -392,7 +356,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Missing UnifiedGroupSettting id")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Missing UnifiedGroupSettting id")));
         done();
       }
       catch (e) {
@@ -587,7 +551,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err: any) => {
       try {
-        assert(deleteRequestIssued && cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(deleteRequestIssued && cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

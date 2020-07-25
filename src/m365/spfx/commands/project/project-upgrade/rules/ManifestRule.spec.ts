@@ -36,6 +36,6 @@ describe('ManifestRule', () => {
   })
 
   it('rule has empty file', () => {
-    assert.equal('', rule.file);
+    assert.strictEqual('', rule.file);
   });
 });

@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.TEAMS_USER_APP_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -52,11 +49,11 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_USER_APP_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_USER_APP_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('fails validation if the userId is not a valid guid.', () => {
@@ -66,16 +63,7 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
         appId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the userId is not provided.', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        appId: '61703ac8-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the appId is not a valid guid.', () => {
@@ -85,16 +73,7 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
         userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the appId is not provided.', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        userId: '61703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the input is correct', () => {
@@ -104,7 +83,7 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
         userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('adds app from the catalog for the specified user', (done) => {
@@ -175,7 +154,7 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -193,39 +172,5 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_USER_APP_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

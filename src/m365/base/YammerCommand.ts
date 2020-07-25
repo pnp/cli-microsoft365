@@ -1,4 +1,5 @@
 import Command, { CommandError } from "../../Command";
+import { CommandInstance } from "../../cli";
 
 export default abstract class YammerCommand extends Command {
   protected get resource(): string {

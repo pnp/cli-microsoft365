@@ -3,8 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -247,55 +246,6 @@ class YammerMessageListCommand extends YammerCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-  
-    ${chalk.yellow('Attention:')} In order to use this command, you need to grant the Azure AD
-    application used by the CLI for Microsoft 365 the permission to the Yammer API.
-    To do this, execute the ${chalk.blue('cli consent --service yammer')} command.
-
-    Feed types:
-  
-      - All: Corresponds to “All” conversations in the Yammer web interface
-      - Top: The algorithmic feed for the user that corresponds to "Top"
-        conversations. The Top conversations feed is the feed currently shown in
-        the Yammer mobile apps
-      - My: The user’s feed, based on the selection they have made between
-        "Following" and "Top" conversations
-      - Following: The "Following" feed which is conversations involving people
-        and topics that the user is following
-      - Sent: All messages sent by the user
-      - Private: Private messages received by the user
-      - Received: All messages received by the user
-    
-  Examples:
-    
-    Returns all Yammer network messages
-      ${this.name}
-    
-    Returns all Yammer network messages older than the message ID 5611239081
-      ${this.name} --olderThanId 5611239081
-
-    Returns all Yammer network thread starter (first message) for each thread
-      ${this.name} --threaded
-
-    Returns the first 10 Yammer network messages
-      ${this.name} --limit 10
-
-    Returns the first 10 Yammer network messages from the Yammer group 312891231
-      ${this.name} --groupId 312891231 --limit 10
-
-    Returns the first 10 Yammer network messages from thread 5611239081
-      ${this.name} --threadId 5611239081 --limit 10
-    
-    Returns the first 20 Yammer message from the sent feed of the user
-      ${this.name} --feedType Sent --limit 20
-`);
   }
 }
 

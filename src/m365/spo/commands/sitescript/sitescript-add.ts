@@ -6,8 +6,8 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -61,7 +61,7 @@ class SpoSiteScriptAddCommand extends SpoCommand {
         cmd.log(res);
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -90,14 +90,6 @@ class SpoSiteScriptAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.title) {
-        return 'Required parameter title missing';
-      }
-
-      if (!args.options.content) {
-        return 'Required parameter content missing';
-      }
-
       try {
         JSON.parse(args.options.content);
       }
@@ -107,29 +99,6 @@ class SpoSiteScriptAddCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    Each time you execute the ${chalk.blue(this.name)} command, it will create
-    a new site script with a unique ID. Before creating a site script, be sure
-    that another script with the same name doesn't already exist.
-
-  Examples:
-  
-    Create new site script for use with site designs. Script contents are stored
-    in the ${chalk.grey('$script')} variable
-      ${this.name} --title "Contoso" --description "Contoso theme script" --content $script
-
-  More information:
-
-    SharePoint site design and site script overview
-      https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-overview
-`);
   }
 }
 

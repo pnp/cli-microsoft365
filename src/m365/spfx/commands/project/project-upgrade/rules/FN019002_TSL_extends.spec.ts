@@ -20,6 +20,6 @@ describe('FN019002_TSL_extends', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

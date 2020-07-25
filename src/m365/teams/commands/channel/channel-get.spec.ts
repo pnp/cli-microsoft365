@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.TEAMS_CHANNEL_GET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -52,21 +49,11 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_CHANNEL_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_CHANNEL_GET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
-  });
-
-  it('fails validation if the teamId is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
+    assert.notStrictEqual(command.description, null);
   });
 
   it('fails validation if the teamId is not a valid guid.', () => {
@@ -76,17 +63,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
         channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation when no channelId is specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
+    assert.notStrictEqual(actual, true);
   });
 
   it('correctly validates the when all options are valid', () => {
@@ -96,7 +73,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
         channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails to get channel information due to wrong channel id', (done) => {
@@ -125,7 +102,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Failed to execute Skype backend request GetThreadS2SRequest.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Failed to execute Skype backend request GetThreadS2SRequest.`)));
         done();
       }
       catch (e) {
@@ -157,11 +134,11 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
     }, () => {
       try {
         const call: sinon.SinonSpyCall = cmdInstanceLogSpy.lastCall;
-        assert.equal(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
-        assert.equal(call.args[0].displayName, 'channel1');
-        assert.equal(call.args[0].description, null);
-        assert.equal(call.args[0].email, '');
-        assert.equal(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/channel1?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
+        assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
+        assert.strictEqual(call.args[0].displayName, 'channel1');
+        assert.strictEqual(call.args[0].description, null);
+        assert.strictEqual(call.args[0].email, '');
+        assert.strictEqual(call.args[0].webUrl, 'https://teams.microsoft.com/l/channel/19%3a493665404ebd4a18adb8a980a31b4986%40thread.skype/channel1?groupId=39958f28-eefb-4006-8f83-13b6ac2a4a7f&tenantId=ea1787c6-7ce2-4e71-be47-5e0deb30f9e4');
         done();
       }
       catch (e) {
@@ -194,7 +171,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
     }, () => {
       try {
         const call: sinon.SinonSpyCall = cmdInstanceLogSpy.getCall(cmdInstanceLogSpy.callCount - 2);
-        assert.equal(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
+        assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
         done();
       }
       catch (e) {
@@ -212,39 +189,5 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_CHANNEL_GET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

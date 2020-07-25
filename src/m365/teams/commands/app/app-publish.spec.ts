@@ -8,9 +8,9 @@ import Command, { CommandOption, CommandError, CommandValidate } from '../../../
 import auth from '../../../../Auth';
 const command: Command = require('./app-publish');
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 describe(commands.TEAMS_APP_PUBLISH, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -22,7 +22,6 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -39,7 +38,6 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       fs.readFileSync,
       fs.existsSync
@@ -55,19 +53,11 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_APP_PUBLISH), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_APP_PUBLISH), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
-  });
-
-  it('fails validation if the filePath is not provided', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {}
-    });
-    assert.notEqual(actual, true);
-    done();
+    assert.notStrictEqual(command.description, null);
   });
 
   it('fails validation if the filePath does not exist', (done) => {
@@ -75,7 +65,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
     const actual = (command.validate() as CommandValidate)({
       options: { filePath: 'invalid.zip' }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -91,7 +81,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
     Utils.restore([
       fs.lstatSync
     ]);
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -109,7 +99,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
     Utils.restore([
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
     done();
   });
 
@@ -162,7 +152,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
     cmdInstance.action({ options: { debug: true, filePath: 'teamsapp.zip' } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
 
         done();
       } catch (e) {
@@ -181,7 +171,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, filePath: 'teamsapp.zip' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       } catch (e) {
         done(e);
@@ -198,39 +188,5 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_APP_PUBLISH));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

@@ -6,8 +6,8 @@ import {
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import Utils from '../../../../Utils';
 import { Message } from '../../Message';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -49,7 +49,7 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
         }
         
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
         cb();
     }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
@@ -77,14 +77,6 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
-      }
-
-      if (!args.options.channelId) {
-        return 'Required parameter channelId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.teamId)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
@@ -103,31 +95,6 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
 
       return true;
     };
-  }
-  
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
-
-    You can list all the messages from a Microsoft Teams team if you are
-    a member of that team.
-
-  Examples:
-  
-    Lists all the messages from a channel of the Microsoft Teams team
-      ${this.name} --teamId fce9e580-8bba-4638-ab5c-ab40016651e3 --channelId 19:eb30973b42a847a2a1df92d91e37c76a@thread.skype
-
-    List the messages from a channel of the Microsoft Teams team that have been
-    created or modified since the date specified by the ${chalk.blue('--since')} parameter
-    (WARNING: only captures the last 8 months of data) 
-      ${this.name} --teamId fce9e580-8bba-4638-ab5c-ab40016651e3 --channelId 19:eb30973b42a847a2a1df92d91e37c76a@thread.skype --since 2019-12-31T14:00:00Z
-`   );
   }
 }
 

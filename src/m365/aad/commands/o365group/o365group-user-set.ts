@@ -8,8 +8,8 @@ import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import Utils from '../../../../Utils';
 import { GroupUser } from './GroupUser';
 import request from '../../../../request';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -124,7 +124,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -191,44 +191,12 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
         return `${args.options.groupId} is not a valid GUID`;
       }
 
-      if (!args.options.userName) {
-        return 'Required parameter userName missing';
-      }
-
-      if (!args.options.role) {
-        return 'Required parameter role missing';
-      }
-
       if (['Owner', 'Member'].indexOf(args.options.role) === -1) {
         return `${args.options.role} is not a valid role value. Allowed values Owner|Member`;
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(`  Remarks:
-
-    The command will return an error if the user already has the specified role
-    in the given Microsoft 365 Group or Microsoft Teams team.
-
-  Examples:
-
-    Promote the specified user to owner of the given Microsoft 365 Group
-      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
-
-    Demote the specified user from owner to member in the given Microsoft 365 Group
-      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
-
-    Promote the specified user to owner of the given Microsoft Teams team
-      ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
-
-    Demote the specified user from owner to member in the given Microsoft Teams
-    team
-      ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
-`);
   }
 }
 

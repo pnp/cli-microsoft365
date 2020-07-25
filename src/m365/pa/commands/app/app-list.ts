@@ -1,8 +1,7 @@
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -46,23 +45,6 @@ class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string, properties
 
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.APP_LIST).helpInformation());
-    log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently
-    in preview and is subject to change once the API reaches general
-    availability.
-  
-  Examples:
-  
-    List all apps
-      ${this.getCommandName()}
-`);
   }
 }
 

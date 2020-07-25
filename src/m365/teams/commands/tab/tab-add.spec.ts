@@ -8,9 +8,9 @@ import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import Sinon = require('sinon');
+import * as chalk from 'chalk';
 
 describe(commands.TEAMS_TAB_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -22,7 +22,6 @@ describe(commands.TEAMS_TAB_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -39,7 +38,6 @@ describe(commands.TEAMS_TAB_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -53,7 +51,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_TAB_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_TAB_ADD), true);
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
@@ -66,74 +64,17 @@ describe(commands.TEAMS_TAB_ADD, () => {
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
       }
     });
-    assert.notEqual(actual, true);
-    done();
-  });
-  it('fails validation if the appName is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        appId: 'com.microsoft.teamspace.tab.web',
-        contentUrl: '/',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the teamId is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
-        appId: 'com.microsoft.teamspace.tab.web',
-        appName: 'test',
-        contentUrl: '/'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the channelId is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        appId: 'com.microsoft.teamspace.tab.web',
-        appName: 'test',
-        contentUrl: '/'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-  it('fails validation if the appId is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
-        appName: 'test',
-        contentUrl: '/'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-  it('fails validation if the contentUrl is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
-        appId: 'com.microsoft.teamspace.tab.web',
-        appName: 'test',
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
+  });
+
+  it('allows unknown properties', () => {
+    const allowUnknownOptions = command.allowUnknownOptions();
+    assert.strictEqual(allowUnknownOptions, true);
   });
 
   it('fails validates for a incorrect channelId missing leading 19:.', (done) => {
@@ -146,7 +87,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
         contentUrl: '/'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -160,7 +101,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
         contentUrl: '/'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -174,7 +115,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
         contentUrl: '/',
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
     done();
   });
 
@@ -207,7 +148,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
           "displayName": "testweb",
           "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
         }));
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -250,7 +191,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
           "displayName": "testweb",
           "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
         }));
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -327,7 +268,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -345,39 +286,5 @@ describe(commands.TEAMS_TAB_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_TAB_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

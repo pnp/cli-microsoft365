@@ -6,8 +6,8 @@ import {
 import Utils from '../../../../Utils';
 import { Tab } from '../../Tab';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -47,7 +47,7 @@ class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -72,14 +72,6 @@ class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
-      }
-
-      if (!args.options.channelId) {
-        return 'Required parameter channelId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.teamId as string)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
@@ -90,26 +82,6 @@ class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    You can only retrieve tabs for teams of which you are a member.
-
-    Tabs 'Conversations' and 'Files' are present in every team and therefore not
-    included in the list of available tabs.
-
-  Examples:
-  
-    List all tabs in a Microsoft Teams channel
-      ${this.name} --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype
-
-    Include all the values from the tab configuration and associated teams app
-      ${this.name} --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --output json
-`);
   }
 }
 

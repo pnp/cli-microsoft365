@@ -3,8 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -76,10 +75,6 @@ class YammerGroupUserAddCommand extends YammerCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.id) {
-        return 'Required id value is missing';
-      }
-
       if (args.options.id && typeof args.options.id !== 'number') {
         return `${args.options.id} is not a number`;
       }
@@ -90,33 +85,6 @@ class YammerGroupUserAddCommand extends YammerCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-  
-    ${chalk.yellow('Attention:')} In order to use this command, you need to grant the Azure AD
-    application used by the CLI for Microsoft 365 the permission to the Yammer API.
-    To do this, execute the ${chalk.blue('cli consent --service yammer')} command.
-
-    If the specified user is not a member of the network, the command will
-    return an HTTP 400 error message.
-
-  Examples:
-    
-    Adds the current user to the group with the ID ${chalk.grey('5611239081')}
-      ${this.name} --id 5611239081
-    
-    Adds the user with ID ${chalk.grey('66622349')} to the group with ID ${chalk.grey('5611239081')}
-      ${this.name} --id 5611239081 --userId 66622349
-
-    Adds the user with e-mail ${chalk.grey('suzy@contoso.com')} to the group with ID
-    ${chalk.grey('5611239081')}
-      ${this.name} --id 5611239081 --email suzy@contoso.com
-  `);
   }
 }
 

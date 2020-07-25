@@ -7,9 +7,9 @@ const command: Command = require('./funsettings-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 describe(commands.TEAMS_FUNSETTINGS_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +21,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +37,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.patch
     ]);
@@ -53,11 +51,11 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_FUNSETTINGS_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_FUNSETTINGS_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('sets allowGiphy settings to false', (done) => {
@@ -78,7 +76,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: 'false' }
     }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -105,7 +103,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowGiphy: 'true' }
     }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -132,7 +130,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'moderate' }
     }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -159,7 +157,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', giphyContentRating: 'strict' }
     }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -186,7 +184,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: 'true' }
     }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -213,7 +211,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowStickersAndMemes: 'false' }
     }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -241,7 +239,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: 'true' }
     }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -268,7 +266,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { debug: true, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: 'false' }
     }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -295,7 +293,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { debug: true, teamId: '6703ac8a-c49b-4fd4-8223-11f09f201302', allowCustomMemes: 'false' }
     }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -324,7 +322,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -347,7 +345,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -356,25 +354,18 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
     });
   });
 
-  it('fails validation if teamId is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {}
-    });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if teamId is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({
       options: { teamId: 'invalid' }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when teamId is a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66' }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when allowGiphy is a valid boolean', () => {
@@ -385,13 +376,13 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowGiphy: 'false' }
     });
     const actual = actualTrue && actualFalse;
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
   it('fails validation when allowGiphy is not a valid boolean', () => {
     const actual = (command.validate() as CommandValidate)({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowGiphy: 'trueish' }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
   it('passes validation when giphyContentRating is moderate or strict', () => {
     const actualModerate = (command.validate() as CommandValidate)({
@@ -401,13 +392,13 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', giphyContentRating: 'strict' }
     });
     const actual = actualModerate && actualStrict;
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
   it('fails validation when giphyContentRating is not moderate or strict', () => {
     const actual = (command.validate() as CommandValidate)({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', giphyContentRating: 'somethingelse' }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
   it('passes validation when allowStickersAndMemes is a valid boolean', () => {
     const actualTrue = (command.validate() as CommandValidate)({
@@ -417,13 +408,13 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowStickersAndMemes: 'false' }
     });
     const actual = actualTrue && actualFalse;
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
   it('fails validation when allowStickersAndMemes is not a valid boolean', () => {
     const actual = (command.validate() as CommandValidate)({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowStickersAndMemes: 'somethingelse' }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
   it('passes validation when allowCustomMemes is a valid boolean', () => {
     const actualTrue = (command.validate() as CommandValidate)({
@@ -433,13 +424,13 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowCustomMemes: 'false' }
     });
     const actual = actualTrue && actualFalse;
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
   it('fails validation when allowCustomMemes is not a valid boolean', () => {
     const actual = (command.validate() as CommandValidate)({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66', allowCustomMemes: 'somethingelse' }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -451,39 +442,5 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_FUNSETTINGS_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

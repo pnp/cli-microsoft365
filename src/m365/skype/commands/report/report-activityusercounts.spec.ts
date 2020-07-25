@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import request from '../../../../request';
 
 describe(commands.SKYPE_REPORT_ACTIVITYUSERCOUNTS, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
 
@@ -20,7 +19,6 @@ describe(commands.SKYPE_REPORT_ACTIVITYUSERCOUNTS, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -36,7 +34,6 @@ describe(commands.SKYPE_REPORT_ACTIVITYUSERCOUNTS, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -50,11 +47,11 @@ describe(commands.SKYPE_REPORT_ACTIVITYUSERCOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SKYPE_REPORT_ACTIVITYUSERCOUNTS), true);
+    assert.strictEqual(command.name.startsWith(commands.SKYPE_REPORT_ACTIVITYUSERCOUNTS), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('gets the report for the last week', (done) => {
@@ -70,26 +67,14 @@ describe(commands.SKYPE_REPORT_ACTIVITYUSERCOUNTS, () => {
 
     cmdInstance.action({ options: { debug: false, period: 'D7' } }, () => {
       try {
-        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getSkypeForBusinessActivityUserCounts(period='D7')");
-        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getSkypeForBusinessActivityUserCounts(period='D7')");
+        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.strictEqual(requestStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SKYPE_REPORT_ACTIVITYUSERCOUNTS));
   });
 });

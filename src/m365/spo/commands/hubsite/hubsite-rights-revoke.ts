@@ -10,8 +10,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -78,7 +78,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
           }
           else {
             if (this.verbose) {
-              cmd.log(vorpal.chalk.green('DONE'));
+              cmd.log(chalk.green('DONE'));
             }
           }
           cb();
@@ -127,53 +127,8 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required parameter url missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      if (!args.options.principals) {
-        return 'Required parameter principals missing';
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.url);
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.HUBSITE_RIGHTS_REVOKE).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-
-  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on a SharePoint API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
-
-  Examples:
-
-    Revoke rights to join sites to the hub site with URL
-    ${chalk.grey('https://contoso.sharepoint.com/sites/sales')} from user with alias ${chalk.grey('PattiF')}.
-    Will prompt for confirmation before revoking the rights
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --principals PattiF
-
-    Revoke rights to join sites to the hub site with URL
-    ${chalk.grey('https://contoso.sharepoint.com/sites/sales')} from user with aliases ${chalk.grey('PattiF')}
-    and ${chalk.grey('AdeleV')} without prompting for confirmation
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --confirm
-
-  More information:
-
-    SharePoint hub sites new in Microsoft 365
-      https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547
-`);
   }
 }
 

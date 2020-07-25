@@ -10,7 +10,6 @@ import Utils from '../../../../Utils';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
 
 describe(commands.PROPERTYBAG_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -90,7 +89,6 @@ describe(commands.PROPERTYBAG_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -106,7 +104,6 @@ describe(commands.PROPERTYBAG_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       (command as any).getWebPropertyBag,
       (command as any).getFolderPropertyBag,
@@ -124,11 +121,11 @@ describe(commands.PROPERTYBAG_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.PROPERTYBAG_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.PROPERTYBAG_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('should call getWebPropertyBag when folder is not specified', (done) => {
@@ -191,7 +188,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(getFolderPropertyBagSpy.calledOnce === true);
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
         done();
       }
       catch (e) {
@@ -211,7 +208,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(getWebPropertyBagSpy.calledOnce === true);
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc1')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc1')));
         done();
       }
       catch (e) {
@@ -233,7 +230,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(getFolderPropertyBagSpy.calledOnce === true);
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('getFolderPropertyBag error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getFolderPropertyBag error')));
         done();
       }
       catch (e) {
@@ -253,7 +250,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(getWebPropertyBagSpy.calledOnce === true);
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('getWebPropertyBag error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getWebPropertyBag error')));
         done();
       }
       catch (e) {
@@ -274,7 +271,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(requestObjectIdentitySpy.calledOnce === true);
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -295,7 +292,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(requestObjectIdentitySpy.calledOnce === true);
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -320,28 +317,28 @@ describe(commands.PROPERTYBAG_LIST, () => {
         const out = cmdInstanceLogSpy.lastCall.args[0];
         const expectedDate = new Date(2017, 10, 7, 11, 29, 31, 0);
 
-        assert.equal(out[0].key, 'vti_folderitemcount');
-        assert.equal(out[0].value, 0);
-        assert.equal(out[1].key, 'vti_level');
-        assert.equal(out[1].value, 1);
-        assert.equal(out[2].key, 'vti_parentid');
-        assert.equal(out[2].value, '{1C5271C8-DB93-459E-9C18-68FC33EFD856}');
-        assert.equal(out[3].key, 'vti_winfileattribs');
-        assert.equal(out[3].value, '00000012');
-        assert.equal(out[4].key, 'vti_candeleteversion');
-        assert.equal(out[4].value, true);
-        assert.equal(out[5].key, 'vti_foldersubfolderitemcount');
-        assert.equal(out[5].value, 0);
-        assert.equal(out[6].key, 'vti_timelastmodified');
-        assert.equal(Object.prototype.toString.call(out[6].value), '[object Date]');
-        assert.equal((out[6].value as Date).getUTCMonth(), expectedDate.getUTCMonth(), 'getUTCMonth');
-        assert.equal((out[6].value as Date).getUTCFullYear(), expectedDate.getUTCFullYear(), 'getUTCFullYear');
-        assert.equal((out[6].value as Date).getUTCDate(), expectedDate.getUTCDate(), 'getUTCDate');
-        assert.equal((out[6].value as Date).getUTCHours(), expectedDate.getUTCHours(), 'getUTCHours');
-        assert.equal((out[6].value as Date).getUTCMinutes(), expectedDate.getUTCMinutes(), 'getUTCMinutes');
-        assert.equal((out[6].value as Date).getSeconds(), expectedDate.getSeconds(), 'getSeconds');
-        assert.equal(out[8].key, 'vti_isscriptable');
-        assert.equal(out[8].value, false);
+        assert.strictEqual(out[0].key, 'vti_folderitemcount');
+        assert.strictEqual(out[0].value, 0);
+        assert.strictEqual(out[1].key, 'vti_level');
+        assert.strictEqual(out[1].value, 1);
+        assert.strictEqual(out[2].key, 'vti_parentid');
+        assert.strictEqual(out[2].value, '{1C5271C8-DB93-459E-9C18-68FC33EFD856}');
+        assert.strictEqual(out[3].key, 'vti_winfileattribs');
+        assert.strictEqual(out[3].value, '00000012');
+        assert.strictEqual(out[4].key, 'vti_candeleteversion');
+        assert.strictEqual(out[4].value, true);
+        assert.strictEqual(out[5].key, 'vti_foldersubfolderitemcount');
+        assert.strictEqual(out[5].value, 0);
+        assert.strictEqual(out[6].key, 'vti_timelastmodified');
+        assert.strictEqual(Object.prototype.toString.call(out[6].value), '[object Date]');
+        assert.strictEqual((out[6].value as Date).getUTCMonth(), expectedDate.getUTCMonth(), 'getUTCMonth');
+        assert.strictEqual((out[6].value as Date).getUTCFullYear(), expectedDate.getUTCFullYear(), 'getUTCFullYear');
+        assert.strictEqual((out[6].value as Date).getUTCDate(), expectedDate.getUTCDate(), 'getUTCDate');
+        assert.strictEqual((out[6].value as Date).getUTCHours(), expectedDate.getUTCHours(), 'getUTCHours');
+        assert.strictEqual((out[6].value as Date).getUTCMinutes(), expectedDate.getUTCMinutes(), 'getUTCMinutes');
+        assert.strictEqual((out[6].value as Date).getSeconds(), expectedDate.getSeconds(), 'getSeconds');
+        assert.strictEqual(out[8].key, 'vti_isscriptable');
+        assert.strictEqual(out[8].value, false);
         done();
       }
       catch (e) {
@@ -381,26 +378,21 @@ describe(commands.PROPERTYBAG_LIST, () => {
 
   it('should properly format integer property', () => {
     const prop = (command as any).formatProperty('vti_folderitemcount$  Int32', 0);
-    assert.equal(prop.key, 'vti_folderitemcount');
-    assert.equal(prop.value, 0);
+    assert.strictEqual(prop.key, 'vti_folderitemcount');
+    assert.strictEqual(prop.value, 0);
   });
 
   it('should properly format date property', () => {
     const prop = (command as any).formatProperty('vti_timecreated', '\/Date(2017,10,7,11,29,31,0)\/');
-    assert.equal(prop.key, 'vti_timecreated');
-    assert.equal(Object.prototype.toString.call(prop.value), '[object Date]');
-    assert.equal((prop.value as Date).toISOString(), new Date(2017, 10, 7, 11, 29, 31, 0).toISOString());
+    assert.strictEqual(prop.key, 'vti_timecreated');
+    assert.strictEqual(Object.prototype.toString.call(prop.value), '[object Date]');
+    assert.strictEqual((prop.value as Date).toISOString(), new Date(2017, 10, 7, 11, 29, 31, 0).toISOString());
   });
 
   it('should properly format boolean property', () => {
     const prop = (command as any).formatProperty('vti_timecreated', 'false');
-    assert.equal(prop.key, 'vti_timecreated');
-    assert.equal(prop.value, false);
-  });
-
-  it('fails validation if the url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, "Missing required option url");
+    assert.strictEqual(prop.key, 'vti_timecreated');
+    assert.strictEqual(prop.value, false);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
@@ -410,7 +402,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
           webUrl: 'foo'
         }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the url option specified', () => {
@@ -420,7 +412,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
           webUrl: "https://contoso.sharepoint.com"
         }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the url and folder options specified', () => {
@@ -431,7 +423,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
           folder: "/"
         }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('doesn\'t fail validation if the optional folder option not specified', () => {
@@ -442,40 +434,6 @@ describe(commands.PROPERTYBAG_LIST, () => {
             webUrl: "https://contoso.sharepoint.com"
           }
       });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.PROPERTYBAG_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

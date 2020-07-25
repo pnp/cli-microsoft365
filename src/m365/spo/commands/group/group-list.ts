@@ -8,7 +8,7 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import { GroupPropertiesCollection } from "./GroupPropertiesCollection";
 import { GroupProperties } from "./GroupProperties";
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -77,21 +77,8 @@ class SpoGroupListCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-
-    Lists all the groups within specific web
-      m365 ${this.name} --webUrl "https://contoso.sharepoint.com/sites/contoso"  
-    `);
   }
 }
 

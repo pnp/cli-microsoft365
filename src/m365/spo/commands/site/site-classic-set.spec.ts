@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate, CommandCancel } from '../../../../Command';
+import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import config from '../../../../config';
@@ -8,9 +8,9 @@ const command: Command = require('./site-classic-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 describe(commands.SITE_CLASSIC_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -28,7 +28,6 @@ describe(commands.SITE_CLASSIC_SET, () => {
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
 
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -45,7 +44,6 @@ describe(commands.SITE_CLASSIC_SET, () => {
   afterEach(() => {
     (command as any).currentContext = undefined;
     Utils.restore([
-      vorpal.find,
       request.post,
       global.setTimeout,
       (command as any).ensureFormDigest
@@ -63,11 +61,11 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITE_CLASSIC_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.SITE_CLASSIC_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('updates site title. doesn\'t wait for completion', (done) => {
@@ -131,7 +129,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
     cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -442,7 +440,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
       }
       catch (e) {
@@ -539,7 +537,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
     cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -570,7 +568,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
       }
       catch (e) {
@@ -595,7 +593,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
       }
       catch (e) {
@@ -665,7 +663,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
     cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -696,7 +694,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
       }
       catch (e) {
@@ -887,7 +885,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
     cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -937,7 +935,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
     cmdInstance.action({ options: { debug: false, verbose: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -1030,7 +1028,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
       }
       catch (e) {
@@ -1153,24 +1151,6 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
-  it('can be cancelled', () => {
-    assert(command.cancel());
-  });
-
-  it('clears pending connection on cancel', () => {
-    (command as any).timeout = {};
-    const clearTimeoutSpy = sinon.spy(global, 'clearTimeout');
-    (command.cancel() as CommandCancel)();
-    Utils.restore(global.clearTimeout);
-    assert(clearTimeoutSpy.called);
-  });
-
-  it('doesn\'t fail on cancel if no connection pending', () => {
-    (command as any).timeout = undefined;
-    (command.cancel() as CommandCancel)();
-    assert(true);
-  });
-
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsDebugOption = false;
@@ -1182,22 +1162,13 @@ describe(commands.SITE_CLASSIC_SET, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if the url is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        title: 'Team'
-      }
-    });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if the url is not a valid url', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         url: 'abc', title: 'Team'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the url is not a valid SharePoint url', () => {
@@ -1206,7 +1177,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'http://contoso', title: 'Team'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the resourceQuota is not a number', () => {
@@ -1215,7 +1186,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the resourceQuotaWarningLevel is not a number', () => {
@@ -1224,7 +1195,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', () => {
@@ -1234,7 +1205,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         owner: 'admin@contoso.com', resourceQuotaWarningLevel: 10, resourceQuota: 5
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the storageQuota is not a number', () => {
@@ -1244,7 +1215,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         storageQuota: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the storageQuotaWarningLevel is not a number', () => {
@@ -1254,7 +1225,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         storageQuotaWarningLevel: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', () => {
@@ -1264,7 +1235,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         storageQuotaWarningLevel: 10, storageQuota: 5
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if sharing is invalid', () => {
@@ -1273,7 +1244,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Invalid'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if sharing is set to Disabled', () => {
@@ -1282,7 +1253,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Disabled'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if sharing is set to ExternalUserSharingOnly', () => {
@@ -1291,7 +1262,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', sharing: 'ExternalUserSharingOnly'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if sharing is set to ExternalUserAndGuestSharing', () => {
@@ -1300,7 +1271,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', sharing: 'ExternalUserAndGuestSharing'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if sharing is set to ExistingExternalUserSharingOnly', () => {
@@ -1309,7 +1280,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', sharing: 'ExistingExternalUserSharingOnly'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if allowSelfServiceUpgrade is invalid', () => {
@@ -1318,7 +1289,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'Invalid'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if allowSelfServiceUpgrade is set to true', () => {
@@ -1327,7 +1298,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'true'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if allowSelfServiceUpgrade is set to false', () => {
@@ -1336,7 +1307,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'false'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if lockState is invalid', () => {
@@ -1345,7 +1316,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Invalid'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if lockState is set to Unlock', () => {
@@ -1354,7 +1325,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Unlock'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if lockState is set to NoAdditions', () => {
@@ -1363,7 +1334,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAdditions'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if lockState is set to ReadOnly', () => {
@@ -1372,7 +1343,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'ReadOnly'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if lockState is set to NoAccess', () => {
@@ -1381,7 +1352,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if the required options are correct', () => {
@@ -1390,7 +1361,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if noScriptSite is invalid', () => {
@@ -1399,7 +1370,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'Invalid'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if noScriptSite is set to true', () => {
@@ -1408,7 +1379,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'true'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if noScriptSite is set to false', () => {
@@ -1417,7 +1388,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
         url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'false'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if all options are correct', () => {
@@ -1430,40 +1401,6 @@ describe(commands.SITE_CLASSIC_SET, () => {
         owners: 'admin@contoso.com', lockState: 'Unlock', noScriptSite: 'true'
       }
     });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITE_CLASSIC_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

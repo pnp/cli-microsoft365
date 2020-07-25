@@ -7,8 +7,7 @@ import Command, {
 } from '../../../../Command';
 import auth from '../../../../Auth';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -70,25 +69,6 @@ class TenantIdGetCommand extends Command {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public commandHelp(args: any, log: (help: string) => void): void {
-    log(vorpal.find(commands.TENANT_ID_GET).helpInformation());
-    log(
-      `  Remarks:
-
-    If no domain name is specified, the command will return the tenant ID of
-    the tenant to which you are currently logged in.
-
-  Examples:
-
-    Get Microsoft 365 tenant ID for the specified domain
-      m365 ${this.name} --domainName contoso.com
-
-    Get Microsoft 365 tenant ID of the the tenant to which you are currently logged
-    in
-      m365 ${this.name}
-`);
   }
 }
 

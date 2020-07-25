@@ -20,6 +20,6 @@ describe('FN014002_CODE_extensions', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

@@ -27,6 +27,6 @@ describe('FN001020_DEP_types_knockout', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

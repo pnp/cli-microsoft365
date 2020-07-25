@@ -9,7 +9,6 @@ import commands from '../../commands';
 
 const command: Command = require('./message-like-set');
 describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let promptOptions: any;
@@ -22,7 +21,6 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -42,7 +40,6 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.delete,
       request.post
     ]);
@@ -57,11 +54,11 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.YAMMER_MESSAGE_LIKE_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.YAMMER_MESSAGE_LIKE_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('correctly handles error', (done) => {
@@ -75,7 +72,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
 
     cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
       }
       catch (e) {
@@ -84,34 +81,29 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
     });
   });
 
-  it('fails validation without parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
   it('passes validation with parameters', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 10123123 } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('id must be a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('enable must be true or false', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 10123123, enable: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('enable must be true or false', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 10123123, enable: 'false' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('enable must be true or false', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 10123123, enable: 'fals' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -123,40 +115,6 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.YAMMER_MESSAGE_LIKE_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 
   it('prompts when confirmation argument not passed', (done) => {

@@ -9,8 +9,7 @@ import AadCommand from '../../../base/AadCommand';
 import request from '../../../../request';
 import { AppRoleAssignment } from './AppRoleAssignment';
 import { ServicePrincipal, AppRole } from './ServicePrincipal';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -181,38 +180,6 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.APPROLEASSIGNMENT_LIST).helpInformation());
-    log(
-      `  Remarks:
-  
-    Specify either the ${chalk.grey('appId')}, ${chalk.grey('objectId')} or ${chalk.grey('displayName')}. 
-    If you specify more than one option value, the command will fail
-    with an error.
-   
-  Examples:
-  
-    List app roles assigned to service principal with Application (client) ID
-    ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}.
-      m365 ${this.name} --appId b2307a39-e878-458b-bc90-03bc578531d6
-
-    List app roles assigned to service principal with Application display name
-    ${chalk.grey('MyAppName')}.
-      m365 ${this.name} --displayName 'MyAppName'
-
-    List app roles assigned to service principal with ObjectId
-    ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531dd')}.
-      m365 ${this.name} --objectId b2307a39-e878-458b-bc90-03bc578531dd
-
-  More information:
-  
-    Application and service principal objects in Azure Active Directory
-    (Azure AD): 
-      https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-application-objects
-`);
   }
 }
 

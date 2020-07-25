@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
 describe(commands.STORAGEENTITY_GET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -66,7 +65,6 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -80,13 +78,6 @@ describe(commands.STORAGEENTITY_GET, () => {
     cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
   });
 
-  afterEach(() => {
-    Utils.restore([
-      vorpal.find
-    ]);
-  });
-
-
   after(() => {
     Utils.restore([
       auth.restoreAuth,
@@ -98,11 +89,11 @@ describe(commands.STORAGEENTITY_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.STORAGEENTITY_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.STORAGEENTITY_GET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('retrieves the details of an existing tenant property', (done) => {
@@ -159,7 +150,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   it('handles a non-existent tenant property', (done) => {
     cmdInstance.action({ options: { debug: false, key: 'nonexistingproperty' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }, () => {
       try {
-        assert.equal(log.length, 0);
+        assert.strictEqual(log.length, 0);
         done();
       }
       catch (e) {
@@ -234,40 +225,6 @@ describe(commands.STORAGEENTITY_GET, () => {
     assert(options.length > 0);
   });
 
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.STORAGEENTITY_GET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
-  });
-
   it('handles promise rejection', (done) => {
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake(() => Promise.reject('error'));
@@ -276,7 +233,7 @@ describe(commands.STORAGEENTITY_GET, () => {
       options: { options: { debug: true, key: '#myprop' }, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error')));
         done();
       }
       catch (e) {

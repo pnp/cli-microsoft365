@@ -10,7 +10,6 @@ import Utils from '../../../../Utils';
 import * as fs from 'fs';
 
 describe(commands.OUTLOOK_MAIL_SEND, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
 
@@ -21,7 +20,6 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -37,7 +35,6 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       fs.readFileSync,
       fs.existsSync,
@@ -54,16 +51,16 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.OUTLOOK_MAIL_SEND), true);
+    assert.strictEqual(command.name.startsWith(commands.OUTLOOK_MAIL_SEND), true);
   });
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.equal((alias && alias.indexOf(commands.OUTLOOK_SENDMAIL) > -1), true);
+    assert.strictEqual((alias && alias.indexOf(commands.OUTLOOK_SENDMAIL) > -1), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('sends email using the basic properties', (done) => {
@@ -90,7 +87,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
 
     cmdInstance.action({ options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -123,7 +120,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
 
     cmdInstance.action({ options: { debug: true, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -157,7 +154,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
 
     cmdInstance.action({ options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContentsFilePath: 'file.txt' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -191,7 +188,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
 
     cmdInstance.action({ options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem <b>ipsum</b>', bodyContentType: 'HTML' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -228,7 +225,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
 
     cmdInstance.action({ options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -262,7 +259,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
 
     cmdInstance.action({ options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'false' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -287,7 +284,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
 
     cmdInstance.action({ options: { debug: false, subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
         done();
       }
       catch (e) {
@@ -296,30 +293,20 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     });
   });
 
-  it('fails validation if subject is missing', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if to is missing', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', bodyContents: 'Lorem ipsum' } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if neither bodyContents nor bodyContentsFilePath specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if bodyContents and bodyContentsFilePath specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentsFilePath: 'file.txt' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the specified bodyContentsFilePath doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContentsFilePath: 'file.txt' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the specified bodyContentsFilePath points to a folder', () => {
@@ -328,32 +315,32 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContentsFilePath: 'file' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if bodyContentType is invalid', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if saveToSentItems is invalid', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'Invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when subject, to and bodyContents are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when multiple to emails are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com,mail2@domain.com', bodyContents: 'Lorem ipsum' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when multiple to emails separated with command and space are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com, mail2@domain.com', bodyContents: 'Lorem ipsum' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the specified bodyContentsFilePath points to a file', () => {
@@ -362,27 +349,27 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com, mail2@domain.com', bodyContentsFilePath: 'file.txt' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when bodyContentType is set to Text', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Text' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when bodyContentType is set to HTML', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'HTML' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when saveToSentItems is set to false', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'false' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when saveToSentItems is set to true', () => {
     const actual = (command.validate() as CommandValidate)({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', saveToSentItems: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -394,39 +381,5 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.OUTLOOK_MAIL_SEND));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

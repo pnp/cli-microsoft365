@@ -13,7 +13,7 @@ describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
   });
 
   it('has empty resolution', () => {
-    assert.equal(rule.resolution, '');
+    assert.strictEqual(rule.resolution, '');
   });
 
   it('doesn\'t return notifications if no manifests found', () => {
@@ -22,7 +22,7 @@ describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
       manifests: []
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if no extension manifests found', () => {
@@ -35,7 +35,7 @@ describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if no ListViewCommandSet manifests found', () => {
@@ -49,7 +49,7 @@ describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if commands property is not in the manifest', () => {
@@ -62,7 +62,7 @@ describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
       } as CommandSetManifest]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if commands property is in the manifest', () => {
@@ -86,6 +86,6 @@ describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
     };
     
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

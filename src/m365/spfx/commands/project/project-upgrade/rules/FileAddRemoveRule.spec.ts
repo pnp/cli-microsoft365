@@ -35,7 +35,7 @@ describe('FileAddRemoveRule', () => {
       path: '/usr/tmp',
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if the file exists and should be added', () => {
@@ -45,7 +45,7 @@ describe('FileAddRemoveRule', () => {
       path: '/usr/tmp',
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('adjusts description when the file should be created', () => {

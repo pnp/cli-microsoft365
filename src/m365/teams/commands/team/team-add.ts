@@ -1,14 +1,14 @@
 import commands from '../../commands';
-import aadcommands from '../../../aad/commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandOption, CommandValidate, CommandCancel
+  CommandOption, CommandValidate
 } from '../../../../Command';
 import GraphCommand from '../../../base/GraphCommand';
 import * as fs from 'fs';
 import * as path from 'path';
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 enum TeamsAsyncOperationStatus {
   Invalid = "invalid",
@@ -148,7 +148,7 @@ class TeamsTeamAddCommand extends GraphCommand {
       .then((output: any) => {
         cmd.log(output);
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => {
@@ -180,14 +180,6 @@ class TeamsTeamAddCommand extends GraphCommand {
           this.waitUntilFinished(requestOptions, resolve, reject, cmd, dots)
         }, this.pollingInterval);
       }).catch(err => reject(err));
-  }
-
-  public cancel(): CommandCancel {
-    return (): void => {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-      }
-    }
   }
 
   public options(): CommandOption[] {
@@ -232,48 +224,6 @@ class TeamsTeamAddCommand extends GraphCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently in preview
-    and is subject to change once the API reached general availability.
-
-    If you want to add a Team to an existing Microsoft 365 Group use the
-    ${chalk.blue(aadcommands.O365GROUP_TEAMIFY)} command instead.
-
-    This command will return different responses based on the presence of
-    the ${chalk.grey('--wait')} option. If present, the command will return a ${chalk.grey('group')}
-    resource in the response. If not present, the command will return
-    a ${chalk.grey('teamsAsyncOperation')} resource in the response.
-
-  Examples:
-  
-    Add a new Microsoft Teams team 
-      ${this.name} --name 'Architecture' --description 'Architecture Discussion'
-
-    Add a new Microsoft Teams team using a template
-      ${this.name} --name 'Architecture' --description 'Architecture Discussion' --templatePath 'template.json'
-
-    Add a new Microsoft Teams team using a template and wait for the team
-    to be provisioned
-      ${this.name} --name 'Architecture' --description 'Architecture Discussion' --templatePath 'template.json' --wait
-
-  More information:
-
-    Get started with Teams templates
-      https://docs.microsoft.com/en-us/MicrosoftTeams/get-started-with-teams-templates
-
-    group resource type
-      https://docs.microsoft.com/en-gb/graph/api/resources/group?view=graph-rest-beta
-
-    teamsAsyncOperation resource type
-      https://docs.microsoft.com/en-gb/graph/api/resources/teamsasyncoperation?view=graph-rest-beta
-  `);
   }
 }
 

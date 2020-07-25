@@ -24,7 +24,7 @@ describe('FN016004_TS_property_pane_property_import', () => {
   });
 
   it('returns empty resolution by default', () => {
-    assert.equal(rule.resolution, '');
+    assert.strictEqual(rule.resolution, '');
   });
 
   it('doesn\'t return notifications if no .ts files found', () => {
@@ -33,7 +33,7 @@ describe('FN016004_TS_property_pane_property_import', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if specified .ts file not found', () => {
@@ -45,7 +45,7 @@ describe('FN016004_TS_property_pane_property_import', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if @microsoft/sp-webpart-base import has values that are suppose to be there', () => {
@@ -60,7 +60,7 @@ describe('FN016004_TS_property_pane_property_import', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if @microsoft/sp-webpart-base import has values that are not suppose to be there', () => {
@@ -94,7 +94,7 @@ describe('FN016004_TS_property_pane_property_import', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings[0].occurrences[0].resolution, 'import { IPropertyPaneField, PropertyPaneFieldType } from "@microsoft/sp-property-pane";');
+    assert.strictEqual(findings[0].occurrences[0].resolution, 'import { IPropertyPaneField, PropertyPaneFieldType } from "@microsoft/sp-property-pane";');
   });
 
   it('does not add PropertyPaneCustomField when it is not used', () => {
@@ -107,6 +107,6 @@ describe('FN016004_TS_property_pane_property_import', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings[0].occurrences[0].resolution, 'import { IPropertyPaneCustomFieldProps } from "@microsoft/sp-property-pane";');
+    assert.strictEqual(findings[0].occurrences[0].resolution, 'import { IPropertyPaneCustomFieldProps } from "@microsoft/sp-property-pane";');
   });
 });

@@ -10,8 +10,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -71,7 +71,7 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         if (response.ErrorInfo) {
           if (this.verbose && response.ErrorInfo.ErrorMessage.indexOf('Access denied.') > -1) {
             cmd.log('');
-            cmd.log(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the m365 ${this.name} command is a valid app catalog URL and try again.`);
+            cmd.log(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the ${commands.STORAGEENTITY_SET} command is a valid app catalog URL and try again.`);
             cmd.log('');
           }
 
@@ -80,7 +80,7 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
         }
         cb();
@@ -125,38 +125,6 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         return result;
       }
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.STORAGEENTITY_SET).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-    
-  Remarks:
-
-    Tenant properties are stored in the app catalog site associated with that
-    tenant. To set a property, you have to specify the absolute URL of the app
-    catalog site without a trailing slash. If you specify the URL with trailing
-    slash you get the error ${chalk.grey('The managed path sites/apps is not a managed path')}
-    ${chalk.grey('in this tenant.')}
-
-    If you specify the URL of a site different than the app catalog, you will
-    get an access denied error.
-
-  Examples:
-  
-    Set ${chalk.grey('123')} as the value of the ${chalk.grey('AnalyticsId')} tenant property. Also include
-    a description and a comment for additional clarification of the usage
-    of the property.
-      m365 ${this.name} --key AnalyticsId --value 123 --description 'Web analytics ID' --comment 'Use on all sites' --appCatalogUrl https://contoso.sharepoint.com/sites/appcatalog
-
-  More information:
-
-    SharePoint Framework Tenant Properties
-      https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties
-`);
   }
 }
 

@@ -2,15 +2,15 @@ import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
-  CommandError, CommandOption, CommandValidate
+  CommandError, CommandOption
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import { SPOWebAppServicePrincipalPermissionGrant } from './SPOWebAppServicePrincipalPermissionGrant';
 import GlobalOptions from '../../../../GlobalOptions';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -72,7 +72,7 @@ class SpoServicePrincipalGrantAddCommand extends SpoCommand {
           cmd.log(result);
 
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
         }
         cb();
@@ -93,38 +93,6 @@ class SpoServicePrincipalGrantAddCommand extends SpoCommand {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.resource) {
-        return 'Required parameter resource missing';
-      }
-
-      if (!args.options.scope) {
-        return 'Required parameter scope missing';
-      }
-
-      return true;
-    };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.SERVICEPRINCIPAL_GRANT_ADD).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-        
-  Examples:
-  
-    Grant the service principal permission to read email using the Microsoft
-    Graph
-      m365 ${this.name} --resource 'Microsoft Graph' --scope 'Mail.Read'
-
-    Grant the service principal permission to a custom API
-      m365 ${this.name} --resource 'contoso-api' --scope 'user_impersonation'
-`);
   }
 }
 

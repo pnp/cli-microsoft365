@@ -62,7 +62,7 @@ describe('DependencyRule', () => {
       path: '/usr/tmp'
     };
     depRule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notifications if no dev dependencies defined but dev dependency required', () => {
@@ -73,7 +73,7 @@ describe('DependencyRule', () => {
       }
     };
     devDepRule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('doesn\'t return notification if dependency is already up-to-date', () => {
@@ -87,7 +87,7 @@ describe('DependencyRule', () => {
       }
     };
     depRule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if newer dependency already installed (major)', () => {
@@ -101,7 +101,7 @@ describe('DependencyRule', () => {
       }
     };
     depRule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if newer dependency already installed (minor)', () => {
@@ -115,7 +115,7 @@ describe('DependencyRule', () => {
       }
     };
     depRule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if newer dependency already installed (patch)', () => {
@@ -129,7 +129,7 @@ describe('DependencyRule', () => {
       }
     };
     depRule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification even if version range satisfies package requirement', () => {
@@ -143,7 +143,7 @@ describe('DependencyRule', () => {
       }
     };
     depRule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('returns notification even if semver version satisfies package requirement', () => {
@@ -158,7 +158,7 @@ describe('DependencyRule', () => {
       }
     };
     depRule2.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('doesn\'t return notification if the current version is invalid', () => {
@@ -172,11 +172,11 @@ describe('DependencyRule', () => {
       }
     };
     depRule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns uninstall resolution for uninstall a dev dependency', () => {
     const rule: DependencyRule = new DevDepRule2();
-    assert.equal(rule.resolution, 'uninstallDev test-package');
+    assert.strictEqual(rule.resolution, 'uninstallDev test-package');
   });
 });

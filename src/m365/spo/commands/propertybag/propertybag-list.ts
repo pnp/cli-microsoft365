@@ -8,8 +8,7 @@ import { ContextInfo } from '../../spo';
 import { SpoPropertyBagBaseCommand, Property } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 export interface CommandArgs {
   options: Options;
@@ -85,29 +84,6 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.PROPERTYBAG_LIST).helpInformation());
-    log(
-      `  Examples:
-
-    Return property bag values located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test
-
-    Return property bag values located in site root folder ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test -f /
-
-    Return property bag values located in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --folder '/Shared Documents'
-
-    Return property bag values located in folder in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} -w https://contoso.sharepoint.com/sites/test -f '/Shared Documents/MyFolder'
-
-    Return property bag values located in site list ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --folder /Lists/MyList
-    `);
   }
 
   /**

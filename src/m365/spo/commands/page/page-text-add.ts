@@ -11,8 +11,8 @@ import { ContextInfo } from '../../spo';
 import { isNumber } from 'util';
 import { Page } from './Page';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -96,7 +96,7 @@ class SpoPageTextAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
         cb();
       })
@@ -171,18 +171,6 @@ class SpoPageTextAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
-      if (!args.options.pageName) {
-        return 'Required option pageName is missing';
-      }
-
-      if (!args.options.text) {
-        return 'Required option text is missing';
-      }
-
       if (args.options.section && (!isNumber(args.options.section) || args.options.section < 1)) {
         return 'The value of parameter section must be 1 or higher';
       }
@@ -193,29 +181,6 @@ class SpoPageTextAddCommand extends SpoCommand {
 
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    If the specified ${chalk.grey('pageName')} doesn't refer to an existing modern page,
-    you will get a ${chalk.grey("File doesn't exists")} error.
-
-  Examples:
-
-    Add text to a modern page in the first available location on the page
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world'
-
-    Add text to a modern page in the third column of the second section
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world' --section 2 --column 3
-
-    Add text at the beginning of the default column on a modern page
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world' --order 1
-      `
-    );
   }
 }
 

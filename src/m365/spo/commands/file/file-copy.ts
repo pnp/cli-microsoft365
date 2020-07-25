@@ -3,14 +3,12 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import {
   CommandOption,
-  CommandValidate,
-  CommandCancel
+  CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import { ContextInfo } from '../../spo';
 import * as url from 'url';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -26,7 +24,6 @@ interface Options extends GlobalOptions {
 
 class SpoFileCopyCommand extends SpoCommand {
   private dots?: string;
-  private timeout?: NodeJS.Timer;
 
   public get name(): string {
     return commands.FILE_COPY;
@@ -96,8 +93,8 @@ class SpoFileCopyCommand extends SpoCommand {
           const copyJobInfo: any = jobInfo.value[0];
           const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
-          this.timeout = setTimeout(() => {
-            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, cmd, this.dots, this.timeout)
+          setTimeout(() => {
+            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, cmd, this.dots)
           }, progressPollInterval);
         });
       })
@@ -186,14 +183,6 @@ class SpoFileCopyCommand extends SpoCommand {
     });
   }
 
-  public cancel(): CommandCancel {
-    return (): void => {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-      }
-    }
-  }
-
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -224,58 +213,8 @@ class SpoFileCopyCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      if (!args.options.sourceUrl) {
-        return 'Required parameter sourceUrl missing';
-      }
-
-      if (!args.options.targetUrl) {
-        return 'Required parameter targetUrl missing';
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    When you copy a file using the ${chalk.grey(this.name)} command,
-    only the latest version of the file is copied.
-
-  Examples:
-
-    Copy file to a document library in another site collection
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
-
-    Copy file to a document library in the same site collection
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
-
-    Copy file to a document library in another site collection. If a file with
-    the same name already exists in the target document library, move it
-    to the recycle bin
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
-  
-    Copy file to a document library in another site collection. Will ignore
-    any missing fields in the target destination and copy anyway
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
-
-  More information:
-
-    Copy items from a SharePoint document library
-      https://support.office.com/en-us/article/move-or-copy-items-from-a-sharepoint-document-library-00e2f483-4df3-46be-a861-1f5f0c1a87bc
-    `);
   }
 }
 

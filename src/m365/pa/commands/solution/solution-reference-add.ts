@@ -9,8 +9,7 @@ import Command, {
   CommandError
 } from '../../../../Command';
 import CdsProjectMutator from "../../cds-project-mutator";
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -37,7 +36,6 @@ class PaSolutionReferenceAddCommand extends Command {
   public action(): CommandAction {
     const cmd: Command = this;
     return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
-      args = (cmd as any).processArgs(args);
       (cmd as any).initAction(args, this);
       cmd.commandAction(this, args, cb);
     }
@@ -125,31 +123,6 @@ class PaSolutionReferenceAddCommand extends Command {
       const ext: string = path.extname(fn).toLowerCase();
       return ext === '.pcfproj' || ext === '.csproj';
     }).map(entry => path.join(rootPath, entry));
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.SOLUTION_REFERENCE_ADD).helpInformation());
-    log(
-      `  Remarks:
-
-    This commands expects a CDS solution project in the current directory, and
-    references a PowerApps component framework project.
-    
-    The CDS solution project and the PowerApps component framework project
-    cannot have the same name.
-
-  Examples:
-
-    Adds a reference inside the CDS Solution project in the current directory
-    to the PowerApps component framework project at ${chalk.grey('./projects/ExampleProject')}
-      m365 ${this.name} --path ./projects/ExampleProject
-
-  More information:
-
-    Create and build a custom component
-      https://docs.microsoft.com/en-us/powerapps/developer/component-framework/create-custom-controls-using-pcf
-`);
   }
 }
 

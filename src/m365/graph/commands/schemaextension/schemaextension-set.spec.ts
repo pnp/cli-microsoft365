@@ -7,9 +7,9 @@ const command: Command = require('./schemaextension-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 describe(commands.SCHEMAEXTENSION_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +21,6 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +37,6 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.patch
     ]);
   });
@@ -52,11 +50,11 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SCHEMAEXTENSION_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.SCHEMAEXTENSION_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('updates schema extension', (done) => {
@@ -99,7 +97,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       }
     }, () => {
       try {
-        assert.equal(log.length, 0);
+        assert.strictEqual(log.length, 0);
         done();
       }
       catch (e) {
@@ -160,7 +158,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -186,33 +184,13 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('fails validation if the id is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        debug: false,
-        id: null
-      }
-    });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if owner is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        debug: false,
-        id: 'TestSchemaExtension'
-      }
-    });
-    assert.notEqual(actual, true);
   });
 
   it('fails validation if the owner is not a valid GUID', () => {
@@ -226,7 +204,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if no update information is specified', () => {
@@ -237,7 +215,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if properties is not valid JSON string', () => {
@@ -251,7 +229,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         properties: 'foobar'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if properties have no valid type', () => {
@@ -265,7 +243,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         properties: '[{"name":"MyInt","type":"Foo"},{"name":"MyString","type":"String"}]'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if a specified property has missing type', () => {
@@ -279,7 +257,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         properties: '[{"name":"MyInt"},{"name":"MyString","type":"String"}]'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if a specified property has missing name', () => {
@@ -293,7 +271,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         properties: '[{"type":"Integer"},{"name":"MyString","type":"String"}]'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if properties JSON string is not an array', () => {
@@ -307,7 +285,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         properties: '{}'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if status is not valid', () => {
@@ -320,7 +298,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         status: 'invalid'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if required parameters are set and at least one property to update (description) is specified', () => {
@@ -332,7 +310,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         description: 'test',
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if the property type is Binary', () => {
@@ -346,7 +324,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         properties: '[{"name":"MyInt","type":"Binary"}]'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if the property type is Boolean', () => {
@@ -360,7 +338,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         properties: '[{"name":"MyInt","type":"Boolean"}]'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if the property type is DateTime', () => {
@@ -374,7 +352,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         properties: '[{"name":"MyInt","type":"DateTime"}]'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if the property type is Integer', () => {
@@ -388,7 +366,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         properties: '[{"name":"MyInt","type":"Integer"}]'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if the property type is String', () => {
@@ -402,7 +380,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         properties: '[{"name":"MyInt","type":"String"}]'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -414,39 +392,5 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SCHEMAEXTENSION_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

@@ -10,8 +10,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -134,7 +134,7 @@ class SpoFieldSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
@@ -195,10 +195,6 @@ class SpoFieldSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -228,30 +224,6 @@ class SpoFieldSetCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    Specify properties to update using their names, eg.
-    ${chalk.grey("--Title 'New Title' --JSLink jslink.js")}.
-
-  Examples:
-  
-    Update the title of the site column specified by its internal name and push
-    changes to existing lists
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --name 'MyColumn' --updateExistingLists --Title 'My column'
-
-    Update the title of the list column specified by its ID
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --id 330f29c5-5c4c-465f-9f4b-7903020ae1ce --Title 'My column'
-  
-    Update column formatting of the specified list column
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --name 'MyColumn' --CustomFormatter '\`{"schema":"https://developer.microsoft.com/json-schemas/sp/column-formatting.schema.json", "elmType": "div", "txtContent": "@currentField"}\`'
-
-`);
   }
 }
 

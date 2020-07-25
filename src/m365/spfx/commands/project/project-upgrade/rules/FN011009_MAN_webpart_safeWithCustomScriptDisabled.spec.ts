@@ -17,7 +17,7 @@ describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if no safeWithCustomScriptDisabled found while it should be removed', () => {
@@ -33,7 +33,7 @@ describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if safeWithCustomScriptDisabled found while it should be added', () => {
@@ -50,6 +50,6 @@ describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

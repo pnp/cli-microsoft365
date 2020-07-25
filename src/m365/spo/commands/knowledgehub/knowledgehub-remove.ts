@@ -8,8 +8,8 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
+import * as chalk from 'chalk';
 
 interface CommandArgs {
   options: Options;
@@ -69,7 +69,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
             cmd.log(json[json.length - 1]);
 
             if (this.verbose) {
-              cmd.log(vorpal.chalk.green('DONE'));
+              cmd.log(chalk.green('DONE'));
             }
             cb();
           }
@@ -109,23 +109,6 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.KNOWLEDGEHUB_REMOVE).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-
-  Examples:
-  
-    Removes the Knowledge Hub Site setting for your tenant
-      m365 ${this.name}
-    
-    Removes the Knowledge Hub Site setting for your tenant without confirmation
-      m365 ${this.name} --confirm
-`);
   }
 }
 

@@ -4,6 +4,7 @@ import request from '../../request';
 import { SpoOperation } from '../spo/commands/site/SpoOperation';
 import config from '../../config';
 import { FormDigestInfo, ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../spo/spo';
+import { CommandInstance } from '../../cli';
 const csomDefs = require('../../../csom.json');
 
 export interface FormDigest {

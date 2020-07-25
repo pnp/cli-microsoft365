@@ -4,8 +4,8 @@ import { CommandError, CommandOption, CommandValidate, CommandTypes } from '../.
 import * as child_process from 'child_process';
 import AnonymousCommand from '../../base/AnonymousCommand';
 import { satisfies } from 'semver';
-
-const vorpal: Vorpal = require('../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -659,7 +659,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       process.env.TERM === 'xterm-256color';
     const success: string = primarySupported ? '✔' : '√';
     const failure: string = primarySupported ? '✖' : '×';
-    return `${result === CheckStatus.Success ? vorpal.chalk.green(success) : vorpal.chalk.red(failure)} ${message}`;
+    return `${result === CheckStatus.Success ? chalk.green(success) : chalk.red(failure)} ${message}`;
   }
 
   public options(): CommandOption[] {
@@ -692,54 +692,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.DOCTOR).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} checks ran by this command are based on what is officially
-    supported by Microsoft. It's possible that using different package managers
-    or packages versions will work just fine.
-      
-  Remarks:
-  
-    This commands helps you to verify if your environment meets all
-    prerequisites for building solutions using a particular version of the
-    SharePoint Framework.
-
-    The command starts by detecting the version of SharePoint Framework that
-    you want to use. First, it looks at the current project. If you didn't run
-    the command in the context of a SharePoint Framework project, the command
-    will try to determine the SharePoint Framework version based on the
-    SharePoint Framework Yeoman generator that you have installed either in the
-    current directory or globally.
-
-    Based on the determined version of the SharePoint Framework, the command
-    will look at other dependencies such as Node.js, npm, Yeoman, Gulp, React
-    and TypeScript to verify if their meet the requirements of that particular
-    version of the SharePoint Framework.
-
-    If you miss any required tools or use a version that doesn't meet the
-    SharePoint Framework requirements, the command will give you a list of
-    recommendation how to address these issues.
-
-    Next to verifying the readiness of your environment to use a particular
-    version of the SharePoint Framework, you can also check if the version
-    of the SharePoint Framework that you use is compatible with the specific
-    version of SharePoint. Supported versions are ${chalk.grey('sp2016')}, ${chalk.grey('sp2019')} and ${chalk.grey('spo')}.
-    
-  Examples:
-  
-    Verify if your environment meets the requirements to work with
-    the SharePoint Framework
-      ${this.getCommandName()}
-
-    Verify if your environment meets the requirements to work with
-    the SharePoint Framework and also if the version of the SharePoint Framework
-    that you're using is compatible with SharePoint 2019
-      ${this.getCommandName()} --env sp2019
-`);
   }
 }
 

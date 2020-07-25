@@ -17,6 +17,6 @@ describe('FN011004_MAN_fieldCustomizer_schema', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

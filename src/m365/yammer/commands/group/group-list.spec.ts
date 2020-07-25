@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.YAMMER_GROUP_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -185,7 +184,6 @@ describe(commands.YAMMER_GROUP_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -202,7 +200,6 @@ describe(commands.YAMMER_GROUP_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -216,11 +213,11 @@ describe(commands.YAMMER_GROUP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.YAMMER_GROUP_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.YAMMER_GROUP_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('correctly handles error', (done) => {
@@ -234,7 +231,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
 
     cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
       }
       catch (e) {
@@ -245,22 +242,22 @@ describe(commands.YAMMER_GROUP_LIST, () => {
 
   it('passes validation without parameters', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation with parameters', () => {
     const actual = (command.validate() as CommandValidate)({ options: { limit: 10 } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('limit must be a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { limit: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('userId must be a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { userId: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -274,40 +271,6 @@ describe(commands.YAMMER_GROUP_LIST, () => {
     assert(containsOption);
   });
 
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.YAMMER_GROUP_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
-  });
-
   it('returns groups without more results', function (done) {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/groups.json?page=1') {
@@ -317,7 +280,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
     });
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 4708910)
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 4708910)
         done();
       }
       catch (e) {
@@ -344,7 +307,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
     });
     cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0].length, 3);
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].length, 3);
         done();
       }
       catch (e) {
@@ -359,7 +322,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
     });
     cmdInstance.action({ options: { limit: 1, output: 'json' } }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0].length, 1);
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].length, 1);
         done();
       }
       catch (e) {
@@ -390,7 +353,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
     });
     cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
       }
       catch (e) {
@@ -408,7 +371,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
     });
     cmdInstance.action({ options: { userId: 10123190123128, output: 'json' } }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 4708910)
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 4708910)
         done();
       }
       catch (e) {

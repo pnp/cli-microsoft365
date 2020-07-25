@@ -12,8 +12,8 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { HubSiteProperties } from './HubSiteProperties';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -89,7 +89,7 @@ class SpoHubSiteSetCommand extends SpoCommand {
           cmd.log(hubSite);
 
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
         }
         cb();
@@ -122,10 +122,6 @@ class SpoHubSiteSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.id) {
-        return 'Required option id missing';
-      }
-
       if (!Utils.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
       }
@@ -145,37 +141,6 @@ class SpoHubSiteSetCommand extends SpoCommand {
     return {
       string: ['t', 'title', 'd', 'description', 'l', 'logoUrl']
     }
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.HUBSITE_SET).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-        
-  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on a SharePoint API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
-
-    If the specified ${chalk.grey('id')} doesn't refer to an existing hub site, you will get
-    an ${chalk.grey('Unknown Error')} error.
-
-  Examples:
-  
-    Update hub site's title
-      ${this.name} --id 255a50b2-527f-4413-8485-57f4c17a24d1 --title Sales
-
-    Update hub site's title and description
-      ${this.name} --id 255a50b2-527f-4413-8485-57f4c17a24d1 --title Sales --description "All things sales"
-
-  More information:
-
-    SharePoint hub sites new in Microsoft 365
-      https://techcommunity.microsoft.com/t5/SharePoint-Blog/SharePoint-hub-sites-new-in-Office-365/ba-p/109547
-`);
   }
 }
 

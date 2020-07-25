@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.FEATURE_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -37,7 +35,6 @@ describe(commands.FEATURE_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -51,11 +48,11 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.FEATURE_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.FEATURE_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('retrieves available features from site collection', (done) => {
@@ -279,7 +276,7 @@ describe(commands.FEATURE_LIST, () => {
 
     cmdInstance.action({ options: options }, () => {
       try {
-        assert.equal(log.length, 0);
+        assert.strictEqual(log.length, 0);
         done();
       }
       catch (e) {
@@ -305,7 +302,7 @@ describe(commands.FEATURE_LIST, () => {
 
     cmdInstance.action({ options: options }, () => {
       try {
-        assert.equal(log.length, 0);
+        assert.strictEqual(log.length, 0);
         done();
       }
       catch (e) {
@@ -404,7 +401,7 @@ describe(commands.FEATURE_LIST, () => {
       }
     }, (error?: any) => {
       try {
-        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
+        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -432,7 +429,7 @@ describe(commands.FEATURE_LIST, () => {
       }
     }, (error?: any) => {
       try {
-        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
+        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -468,11 +465,6 @@ describe(commands.FEATURE_LIST, () => {
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
-  });
-
-  it('fails validation if the url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, "Required parameter url missing");
   });
 
   it('retrieves all Web features', (done) => {
@@ -545,7 +537,7 @@ describe(commands.FEATURE_LIST, () => {
         url: 'foo'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the url options specified', () => {
@@ -555,7 +547,7 @@ describe(commands.FEATURE_LIST, () => {
         url: "https://contoso.sharepoint.com"
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the url and scope options specified', () => {
@@ -566,7 +558,7 @@ describe(commands.FEATURE_LIST, () => {
         scope: "Site"
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts scope to be Site', () => {
@@ -577,7 +569,7 @@ describe(commands.FEATURE_LIST, () => {
         scope: 'Site'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts scope to be Web', () => {
@@ -588,7 +580,7 @@ describe(commands.FEATURE_LIST, () => {
         scope: 'Web'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('rejects invalid string scope', () => {
@@ -599,7 +591,7 @@ describe(commands.FEATURE_LIST, () => {
         scope: scope
       }
     });
-    assert.equal(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
+    assert.strictEqual(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
   });
 
   it('rejects invalid scope value specified as number', () => {
@@ -610,7 +602,7 @@ describe(commands.FEATURE_LIST, () => {
         scope: scope
       }
     });
-    assert.equal(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
+    assert.strictEqual(actual, `${scope} is not a valid Feature scope. Allowed values are Site|Web`);
   });
 
   it('doesn\'t fail validation if the optional scope option not specified', () => {
@@ -621,40 +613,6 @@ describe(commands.FEATURE_LIST, () => {
           url: "https://contoso.sharepoint.com"
         }
       });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.FEATURE_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

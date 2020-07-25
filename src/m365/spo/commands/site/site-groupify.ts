@@ -5,8 +5,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -76,7 +76,7 @@ class SpoSiteGroupifyCommand extends SpoCommand {
         cmd.log(res);
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -121,61 +121,8 @@ class SpoSiteGroupifyCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.siteUrl) {
-        return 'Required option siteUrl missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.siteUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      if (!args.options.alias) {
-        return 'Required option alias missing';
-      }
-
-      if (!args.options.displayName) {
-        return 'Required option displayName missing';
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on a SharePoint API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
-
-    When connecting site collection to an Microsoft 365 Group, SharePoint will
-    create a new group using the specified information. If a group with the same
-    name already exists, you will get a ${chalk.grey('The group alias already exists.')}
-    error.
-
-  Examples:
-  
-    Connect site collection to an Microsoft 365 Group
-      ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A'
-
-    Connect site collection to an Microsoft 365 Group and make the group public
-      ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --isPublic
-
-    Connect site collection to an Microsoft 365 Group and set the group classification
-      ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --classification HBI
-
-    Connect site collection to an Microsoft 365 Group and keep the old home page
-      ${this.name} --siteUrl https://contoso.sharepoin.com/sites/team-a --alias team-a --displayName 'Team A' --keepOldHomepage
-
-  More information:
-
-    Overview of the "Connect to new Microsoft 365 group" feature
-      https://docs.microsoft.com/en-us/sharepoint/dev/features/groupify/groupify-overview
-`);
   }
 }
 

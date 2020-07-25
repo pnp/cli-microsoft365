@@ -8,8 +8,7 @@ import { ContextInfo } from '../../spo';
 import { SpoPropertyBagBaseCommand } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 export interface CommandArgs {
   options: Options;
@@ -129,35 +128,6 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.PROPERTYBAG_SET).helpInformation());
-    log(
-      `  Examples:
-
-    Sets the value of the ${chalk.grey('key1')} property in the property bag of site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1
-
-    Sets the value of the ${chalk.grey('key1')} property in the property bag of the root folder
-    of site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /
-
-    Sets the value of the ${chalk.grey('key1')} property in the property bag of a document
-    library located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents'
-    
-    Sets the value of the ${chalk.grey('key1')} property in the property bag of a folder
-    in a document library located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents/MyFolder'
-
-    Sets the value of the ${chalk.grey('key1')} property in the property bag of a list in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /Lists/MyList
-    `);
   }
 }
 

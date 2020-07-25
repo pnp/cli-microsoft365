@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.YAMMER_GROUP_USER_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
 
@@ -20,7 +19,6 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -35,7 +33,6 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -49,11 +46,11 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.YAMMER_GROUP_USER_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.YAMMER_GROUP_USER_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('correctly handles error', (done) => {
@@ -67,7 +64,7 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
 
     cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
       }
       catch (e) {
@@ -76,24 +73,19 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
     });
   });
 
-  it('fails validation without parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {  } });
-    assert.notEqual(actual, true);
-  });
-
   it('passes validation with parameters', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 10123123 } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('id must be a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('userId must be a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: 10, userId: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -105,40 +97,6 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.YAMMER_GROUP_USER_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 
   it('calls the service if the current user is added to the group', (done) => {

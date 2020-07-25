@@ -7,8 +7,8 @@ import GraphCommand from '../../../base/GraphCommand';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 import { Channel } from '../../Channel';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -43,7 +43,7 @@ class TeamsChannelGetCommand extends GraphCommand {
         cmd.log(res);
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -68,32 +68,12 @@ class TeamsChannelGetCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.teamId)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
 
-      if (!args.options.channelId) {
-        return 'Required parameter channelId missing';
-      }
-
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-
-    Get information about Microsoft Teams team channel with id
-    ${chalk.grey('19:493665404ebd4a18adb8a980a31b4986@thread.skype')}
-      ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --channelId '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
-    `);
   }
 }
 

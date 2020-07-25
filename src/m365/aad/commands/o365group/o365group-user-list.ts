@@ -7,8 +7,8 @@ import {
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import Utils from '../../../../Utils';
 import { GroupUser } from './GroupUser';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -69,7 +69,7 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
           cmd.log(this.items);
 
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green("DONE"));
+            cmd.log(chalk.green("DONE"));
           }
 
           cb();
@@ -145,29 +145,6 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-
-    List all users and their role in the specified Microsoft 365 group
-      ${this.name} --groupId '00000000-0000-0000-0000-000000000000'
-
-    List all owners and their role in the specified Microsoft 365 group
-      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --role Owner
-
-    List all guests and their role in the specified Microsoft 365 group
-      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --role Guest
-
-    List all users and their role in the specified team
-      ${teamsCommands.TEAMS_USER_LIST} --teamId '00000000-0000-0000-0000-000000000000'
-
-    List all owners and their role in the specified team
-      ${teamsCommands.TEAMS_USER_LIST} --teamId '00000000-0000-0000-0000-000000000000' --role Owner
-
-`);
   }
 }
 

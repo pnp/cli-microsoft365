@@ -10,8 +10,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { DraftVisibilityType } from './DraftVisibilityType';
 import { ListExperience } from './ListExperience';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -566,14 +565,6 @@ class SpoListSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.id) {
-        return 'Required parameter id missing';
-      }
-
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -651,43 +642,6 @@ class SpoListSetCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Update the ${chalk.grey('allowContentTypes')} property of the list with id
-    ${chalk.grey('3EA5A977-315E-4E25-8B0F-E4F949BF6B8F')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --allowContentTypes true
-
-    Enable versioning and set the number of major versions to keep on the list
-    with id ${chalk.grey('3EA5A977-315E-4E25-8B0F-E4F949BF6B8F')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --enableVersioning true --majorVersionLimit 50
-    
-    Enable content types and versioning in the list with id
-    ${chalk.grey('3EA5A977-315E-4E25-8B0F-E4F949BF6B8F')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --contentTypesEnabled true --enableVersioning true --majorVersionLimit 50 --majorWithMinorVersionsLimit 100
-
-  More information:
-
-    SPList Class Members information
-      https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.list_members.aspx
-
-    ListTemplateType enum information
-      https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.listtemplatetype.aspx
-
-    DraftVersionVisibilityType enum information
-      https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.draftvisibilitytype.aspx
-
-    ListExperience enum information
-      https://msdn.microsoft.com/en-us/library/microsoft.sharepoint.client.listexperience.aspx
-      `);
   }
 
   private mapRequestBody(options: Options): any {

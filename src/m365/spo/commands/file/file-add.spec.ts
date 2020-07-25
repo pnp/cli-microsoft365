@@ -11,7 +11,6 @@ import * as fs from 'fs';
 import { FolderExtensions } from '../../FolderExtensions';
 
 describe(commands.FILE_ADD, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -157,7 +156,6 @@ describe(commands.FILE_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -177,7 +175,6 @@ describe(commands.FILE_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       request.get,
       fs.existsSync,
@@ -200,16 +197,16 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name, commands.FILE_ADD);
+    assert.strictEqual(command.name, commands.FILE_ADD);
   });
 
   it('allows unknown options', () => {
     const actual = command.allowUnknownOptions();
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('should call ensure folder when folder not found', (done) => {
@@ -230,7 +227,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.equal(ensureFolderStub.called, true);
+        assert.strictEqual(ensureFolderStub.called, true);
         done();
       }
       catch (e) {
@@ -256,7 +253,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -284,7 +281,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
         done();
       }
       catch (e) {
@@ -312,7 +309,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
         done();
       }
       catch (e) {
@@ -340,7 +337,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
         done();
       }
       catch (e) {
@@ -368,7 +365,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
         done();
       }
       catch (e) {
@@ -394,7 +391,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.equal(cmdInstanceLogSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
+        assert.strictEqual(cmdInstanceLogSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
         done();
       }
       catch (e) {
@@ -420,7 +417,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.equal(cmdInstanceLogSpy.calledWith(`file name: TEST''FILE.txt...`), true);
+        assert.strictEqual(cmdInstanceLogSpy.calledWith(`file name: TEST''FILE.txt...`), true);
         done();
       }
       catch (e) {
@@ -444,7 +441,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Specified content type \'abc\' doesn\'t exist on the target list')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified content type \'abc\' doesn\'t exist on the target list')));
         done();
       }
       catch (e) {
@@ -472,7 +469,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
         done();
       }
       catch (e) {
@@ -500,7 +497,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
       try {
         const error: string = `Update field value error: ${JSON.stringify(expectedResult.value)}`;
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(error)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)));
         done();
       }
       catch (e) {
@@ -529,7 +526,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
         done();
       }
       catch (e) {
@@ -557,7 +554,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
         done();
       }
       catch (e) {
@@ -585,7 +582,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedError)));
         done();
       }
       catch (e) {
@@ -611,7 +608,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file cannot be published without approval. Moderation for this list is enabled. Use the --approve option instead of --publish to approve and publish the file')));
         done();
       }
       catch (e) {
@@ -634,7 +631,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {
@@ -691,7 +688,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.notEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
+        assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf(`/GetFolderByServerRelativeUrl('%2Fsites%2Fproject-x%2FShared%2520Documents%2Ft1')/Files/Add`), -1);
         done();
       }
       catch (e) {
@@ -717,9 +714,9 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.notEqual(postRequests.firstCall.args[0].url.indexOf('/StartUpload'), -1);
-        assert.notEqual(postRequests.getCalls()[2].args[0].url.indexOf('/ContinueUpload'), -1);
-        assert.notEqual(postRequests.lastCall.args[0].url.indexOf('/FinishUpload'), -1);
+        assert.notStrictEqual(postRequests.firstCall.args[0].url.indexOf('/StartUpload'), -1);
+        assert.notStrictEqual(postRequests.getCalls()[2].args[0].url.indexOf('/ContinueUpload'), -1);
+        assert.notStrictEqual(postRequests.lastCall.args[0].url.indexOf('/FinishUpload'), -1);
         done();
       }
       catch (e) {
@@ -762,7 +759,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(err.message, '123');
+        assert.strictEqual(err.message, '123');
         done();
       }
       catch (e) {
@@ -789,7 +786,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(err.message, 'openSync error');
+        assert.strictEqual(err.message, 'openSync error');
         done();
       }
       catch (e) {
@@ -818,7 +815,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(err.message, 'readSync error');
+        assert.strictEqual(err.message, 'readSync error');
         done();
       }
       catch (e) {
@@ -844,7 +841,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {
@@ -868,7 +865,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -945,7 +942,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -967,7 +964,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -1001,7 +998,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedFileAddError)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedFileAddError)));
         done();
       }
       catch (e) {
@@ -1033,7 +1030,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(expectedFileAddError)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(expectedFileAddError)));
         done();
       }
       catch (e) {
@@ -1042,24 +1039,9 @@ describe(commands.FILE_ADD, () => {
     });
   });
 
-  it('fails validation if the webUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if the webUrl option not valid url', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'abc' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the path option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', folder: 'abc' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the folder option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', path: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the wrong path option specified', () => {
@@ -1071,7 +1053,7 @@ describe(commands.FILE_ADD, () => {
         path: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if --approveComment specified, but not --approve', () => {
@@ -1084,7 +1066,7 @@ describe(commands.FILE_ADD, () => {
         approveComment: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if --publishComment specified, but not --publish', () => {
@@ -1097,7 +1079,7 @@ describe(commands.FILE_ADD, () => {
         publishComment: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passed validation if options correct', () => {
@@ -1109,7 +1091,7 @@ describe(commands.FILE_ADD, () => {
         path: 'abc'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -1132,39 +1114,5 @@ describe(commands.FILE_ADD, () => {
       }
     });
     assert(containsTypeOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.FILE_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

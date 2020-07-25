@@ -7,8 +7,8 @@ import {
 import GraphCommand from '../../../base/GraphCommand';
 import { DirectorySetting } from './DirectorySetting';
 import { DirectorySettingTemplatesRsp } from './DirectorySettingTemplatesRsp';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -76,7 +76,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
 
           cb();
@@ -113,31 +113,6 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
-
-  Examples:
-  
-    Disable site classification 
-      ${this.name}  
-
-    Disable site classification without confirmation
-      ${this.name} --confirm
-
-  More information:
-
-    SharePoint "modern" sites classification
-      https://docs.microsoft.com/en-us/sharepoint/dev/solution-guidance/modern-experience-site-classification
-    `);
   }
 }
 

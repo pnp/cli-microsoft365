@@ -7,9 +7,9 @@ const command: Command = require('./channel-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 describe(commands.TEAMS_CHANNEL_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +21,6 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +37,6 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.patch
     ]);
@@ -53,11 +51,11 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_CHANNEL_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_CHANNEL_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('correctly validates the arguments', () => {
@@ -69,7 +67,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
         description: 'this is a new description'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if the teamId is not a valid guid.', () => {
@@ -81,31 +79,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
         description: 'this is a new description'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the teamId is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        channelName: 'Reviews',
-        newChannelName: 'Gen',
-        description: 'this is a new description'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation when no channelName is specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        newChannelName: 'Reviews',
-        description: 'this is a new description'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when channelName is General', (done) => {
@@ -117,7 +91,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
         description: 'this is a new description'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -140,7 +114,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
         done();
       }
       catch (e) {
@@ -227,7 +201,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -245,39 +219,5 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_CHANNEL_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

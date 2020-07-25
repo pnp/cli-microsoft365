@@ -13,7 +13,7 @@ describe('FN011008_MAN_requiresCustomScript', () => {
   });
 
   it('has empty resolution', () => {
-    assert.equal(rule.resolution, '');
+    assert.strictEqual(rule.resolution, '');
   });
 
   it('doesn\'t return notifications if no manifests collected', () => {
@@ -21,7 +21,7 @@ describe('FN011008_MAN_requiresCustomScript', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if safeWithCustomScriptDisabled not defined', () => {
@@ -34,6 +34,6 @@ describe('FN011008_MAN_requiresCustomScript', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

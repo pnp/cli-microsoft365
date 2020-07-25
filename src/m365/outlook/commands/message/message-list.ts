@@ -1,5 +1,6 @@
 import commands from '../../commands';
 import * as os from 'os';
+import * as chalk from 'chalk';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -8,8 +9,7 @@ import {
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import { Message } from '../../Message';
 import { Outlook } from '../../Outlook';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -58,7 +58,7 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -137,27 +137,6 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-
-    List all messages in the folder with the specified name
-      m365 ${this.name} --folderName Archive 
-  
-    List all messages in the folder with the specified ID
-      m365 ${this.name} --folderId AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAFNAAA=
-    
-    List all messages in the folder with the specified well-known name
-      m365 ${this.name} --folderName inbox
-  
-  More information:
-
-    Well-known folder names
-      https://docs.microsoft.com/en-us/graph/api/resources/mailfolder?view=graph-rest-1.0
-`);
   }
 }
 

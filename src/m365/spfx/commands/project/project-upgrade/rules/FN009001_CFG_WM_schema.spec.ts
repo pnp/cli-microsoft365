@@ -17,7 +17,7 @@ describe('FN009001_CFG_WM_schema', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if schema is already up-to-date', () => {
@@ -28,6 +28,6 @@ describe('FN009001_CFG_WM_schema', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

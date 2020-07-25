@@ -9,8 +9,7 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { ListItemInstance } from './ListItemInstance';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -118,10 +117,6 @@ class SpoListItemGetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -140,32 +135,12 @@ class SpoListItemGetCommand extends SpoCommand {
         return `${args.options.listId} in option listId is not a valid GUID`;
       }
 
-      if (!args.options.id) {
-        return `Specify id`;
-      }
-      else {
-        if (isNaN(parseInt(args.options.id))) {
-          return `${args.options.id} is not a number`;
-        }
+      if (isNaN(parseInt(args.options.id))) {
+        return `${args.options.id} is not a number`;
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-
-    Get the item with ID of ${chalk.grey('147')} in list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x
-
-    Get the items Title and Created column and with ID of ${chalk.grey('147')} in list with title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --fields "Title,Created"
-
-   `);
   }
 
 }

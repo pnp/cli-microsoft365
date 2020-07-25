@@ -17,7 +17,7 @@ describe('FN010006_YORC_framework', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if framework is already up-to-date', () => {
@@ -31,7 +31,7 @@ describe('FN010006_YORC_framework', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if framework not found and should be removed', () => {
@@ -44,7 +44,7 @@ describe('FN010006_YORC_framework', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if framework not found while it should be added', () => {
@@ -57,7 +57,7 @@ describe('FN010006_YORC_framework', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('returns notification if framework found while it should be removed', () => {
@@ -71,6 +71,6 @@ describe('FN010006_YORC_framework', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

@@ -23,7 +23,7 @@ describe('FN012013_TSC_exclude', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if exclude has the exact same elements in different order', () => {
@@ -37,7 +37,7 @@ describe('FN012013_TSC_exclude', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if exclude has all required elements', () => {
@@ -52,7 +52,7 @@ describe('FN012013_TSC_exclude', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if object is missing', () => {
@@ -61,6 +61,6 @@ describe('FN012013_TSC_exclude', () => {
       tsConfigJson: undefined
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

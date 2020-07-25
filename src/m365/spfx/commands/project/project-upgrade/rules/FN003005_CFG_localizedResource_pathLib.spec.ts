@@ -13,7 +13,7 @@ describe('FN003005_CFG_localizedResource_pathLib', () => {
   });
 
   it('has empty resolution', () => {
-    assert.equal(rule.resolution, '');
+    assert.strictEqual(rule.resolution, '');
   });
 
   it('doesn\'t return notification if no config.json', () => {
@@ -21,7 +21,7 @@ describe('FN003005_CFG_localizedResource_pathLib', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if no localized resources', () => {
@@ -30,7 +30,7 @@ describe('FN003005_CFG_localizedResource_pathLib', () => {
       configJson: {}
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if localized resource path starts with lib/', () => {
@@ -43,7 +43,7 @@ describe('FN003005_CFG_localizedResource_pathLib', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if localized resource path doesn\'t start with lib/', () => {
@@ -56,7 +56,7 @@ describe('FN003005_CFG_localizedResource_pathLib', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('returned notification has correct resolution', () => {
@@ -69,7 +69,7 @@ describe('FN003005_CFG_localizedResource_pathLib', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings[0].occurrences[0].resolution, JSON.stringify({
+    assert.strictEqual(findings[0].occurrences[0].resolution, JSON.stringify({
       localizedResources: {
         'HelloWorldWebPartStrings': 'lib/webparts/helloWorld/loc/{locale}.js'
       }

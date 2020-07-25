@@ -6,8 +6,8 @@ import {
 import { Team } from '../../Team';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import request from '../../../../request';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -54,7 +54,7 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
         cmd.log(this.items);
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -107,24 +107,6 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    You can only see the details or archived status of the Microsoft Teams
-    you are a member of.
-
-  Examples:
-  
-    List all Microsoft Teams in the tenant
-      ${this.name}
-
-    List all Microsoft Teams in the tenant you are a member of
-      ${this.name} --joined
-`);
   }
 }
 

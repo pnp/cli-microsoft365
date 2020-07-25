@@ -27,7 +27,7 @@ describe('DynamicRule', () => {
       packageJson: undefined
     };
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 0);
+    assert.strictEqual(findings.entries.length, 0);
   });
 
   it('returns something is package.json is here', async () => {
@@ -54,7 +54,7 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.reject());
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 1);
+    assert.strictEqual(findings.entries.length, 1);
   });
   it('doesnt return anything is package is unsupported', async () => {
     const project: Project = {
@@ -81,7 +81,7 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.reject());
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 0);
+    assert.strictEqual(findings.entries.length, 0);
   });
   it('doesn\'t return anything if both module and main are missing', async () => {
     const project: Project = {
@@ -104,7 +104,7 @@ describe('DynamicRule', () => {
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 0);
+    assert.strictEqual(findings.entries.length, 0);
   });
 
   it('doesn\'t return anything if file is not present on CDN', async () => {
@@ -131,7 +131,7 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.reject());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD' }));
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 0);
+    assert.strictEqual(findings.entries.length, 0);
   });
   it('doesn\'t return anything if module type is not supported', async () => {
     const project: Project = {
@@ -157,7 +157,7 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'CommonJs' }));
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 0);
+    assert.strictEqual(findings.entries.length, 0);
   });
   it('adds missing file extension', async () => {
     const project: Project = {
@@ -183,7 +183,7 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD' }));
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 1);
+    assert.strictEqual(findings.entries.length, 1);
   });
   it('uses exports from API', async () => {
     const project: Project = {
@@ -209,8 +209,8 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD', exports: ['pnpjs'] }));
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 1);
-    assert.equal(findings.entries[0].globalName, 'pnpjs');
+    assert.strictEqual(findings.entries.length, 1);
+    assert.strictEqual(findings.entries[0].globalName, 'pnpjs');
   });
   it('considers all package entries', async () => {
     const project: Project = {
@@ -244,7 +244,7 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'UMD' }));
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 1);
+    assert.strictEqual(findings.entries.length, 1);
   });
   it('doesnt return anything if package json is missing', async () => {
     const project: Project = {
@@ -265,7 +265,7 @@ describe('DynamicRule', () => {
       }
     });
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 0);
+    assert.strictEqual(findings.entries.length, 0);
   });
   it('returns something for es2015 modules', async () => {
     const project: Project = {
@@ -291,7 +291,7 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'ES2015' }));
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 1);
+    assert.strictEqual(findings.entries.length, 1);
   });
   it('returns something for AMD modules', async () => {
     const project: Project = {
@@ -317,6 +317,6 @@ describe('DynamicRule', () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve({ scriptType: 'AMD' }));
     const findings = await rule.visit(project);
-    assert.equal(findings.entries.length, 1);
+    assert.strictEqual(findings.entries.length, 1);
   });
 });

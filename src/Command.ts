@@ -3,8 +3,8 @@ import GlobalOptions from './GlobalOptions';
 import request from './request';
 import auth from './Auth';
 import { GraphResponseError } from './m365/base/GraphResponseError';
-
-const vorpal: Vorpal = require('./vorpal-init');
+import { CommandInstance } from './cli/CommandInstance';
+import * as chalk from 'chalk';
 
 export interface CommandOption {
   option: string;
@@ -22,10 +22,6 @@ export interface CommandValidate {
 
 export interface CommandHelp {
   (args: any, cbOrLog: (msg?: string) => void): void
-}
-
-export interface CommandCancel {
-  (): void
 }
 
 export interface CommandTypes {
@@ -68,11 +64,10 @@ export default abstract class Command {
   public abstract get description(): string;
 
   public abstract commandAction(cmd: CommandInstance, args: any, cb: () => void): void;
-  public abstract commandHelp(args: any, log: (message: string) => void): void;
 
   protected showDeprecationWarning(cmd: CommandInstance, deprecated: string, recommended: string): void {
     if (cmd.commandWrapper.command.indexOf(deprecated) === 0) {
-      cmd.log(vorpal.chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
+      cmd.log(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
     }
   }
 
@@ -106,7 +101,6 @@ export default abstract class Command {
       auth
         .restoreAuth()
         .then((): void => {
-          args = cmd.processArgs(args);
           cmd.initAction(args, this);
 
           if (!auth.service.connected) {
@@ -162,65 +156,12 @@ export default abstract class Command {
     ];
   }
 
-  public help(): CommandHelp {
-    const cmd: Command = this;
-    return function (this: CommandInstance, args: CommandArgs, cbOrLog: () => void) {
-      const ranFromHelpCommand: boolean =
-        typeof vorpal._command !== 'undefined' &&
-        typeof vorpal._command.command !== 'undefined' &&
-        vorpal._command.command.indexOf('help ') === 0;
-
-      const log = ranFromHelpCommand ? cbOrLog : this.log.bind(this);
-
-      cmd.commandHelp(args, log);
-
-      if (!ranFromHelpCommand) {
-        cbOrLog();
-      }
-    }
-  }
-
   public validate(): CommandValidate | undefined {
-    return;
-  }
-
-  public cancel(): CommandCancel | undefined {
     return;
   }
 
   public types(): CommandTypes | undefined {
     return;
-  }
-
-  public init(vorpal: Vorpal): void {
-    const cmd: VorpalCommand = vorpal
-      .command(this.name, this.description, this.autocomplete())
-      .action(this.action());
-    const options: CommandOption[] = this.options();
-    options.forEach((o: CommandOption): void => {
-      cmd.option(o.option, o.description, o.autocomplete);
-    });
-    const alias: string[] | undefined = this.alias();
-    if (alias) {
-      cmd.alias(alias);
-    }
-    const validate: CommandValidate | undefined = this.validate();
-    if (validate) {
-      cmd.validate(validate);
-    }
-    const cancel: CommandCancel | undefined = this.cancel();
-    if (cancel) {
-      cmd.cancel(cancel);
-    }
-    const allowUnknownOptions: boolean | undefined = this.allowUnknownOptions();
-    if (allowUnknownOptions) {
-      cmd.allowUnknownOptions();
-    }
-    cmd.help(this.help());
-    const types: CommandTypes | undefined = this.types();
-    if (types) {
-      cmd.types(types);
-    }
   }
 
   public getCommandName(): string {
@@ -343,40 +284,6 @@ export default abstract class Command {
       properties: this.getTelemetryProperties(args)
     });
     appInsights.flush();
-  }
-
-  protected processArgs(args: CommandArgs): CommandArgs {
-    if (!this.allowUnknownOptions()) {
-      return args;
-    }
-
-    const commandData = vorpal.util.parseCommand(process.argv.slice(2).join(' '), vorpal.commands);
-    const cmd = commandData.match;
-    // required for tests not to fail.
-    // Can't happen on runtime because we are already inside a command
-    if (!cmd) {
-      return args;
-    }
-
-    if (!cmd._types) {
-      cmd._types = {};
-    }
-    if (!cmd._types.string) {
-      cmd._types.string = [];
-    }
-    process.argv.slice(2).forEach(a => {
-      if (!a.startsWith('--')) {
-        return;
-      }
-
-      if (!cmd.options.find((o: any) => o.long === a)) {
-        cmd._types.string.push(a.substr(2));
-      }
-    });
-
-    args = vorpal.util.buildCommandArgs(commandData.matchArgs, cmd, undefined, vorpal.isCommandArgKeyPairNormalized);
-
-    return args;
   }
 
   protected getUnknownOptions(options: any): any {

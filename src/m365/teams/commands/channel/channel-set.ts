@@ -7,8 +7,8 @@ import GraphCommand from '../../../base/GraphCommand';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 import { Channel } from '../../Channel';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -69,7 +69,7 @@ class TeamsChannelSetCommand extends GraphCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -102,16 +102,8 @@ class TeamsChannelSetCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.teamId)) {
         return `${args.options.teamId} is not a valid GUID`;
-      }
-
-      if (!args.options.channelName) {
-        return 'Required parameter channelName missing';
       }
 
       if (args.options.channelName.toLowerCase() === "general") {
@@ -134,20 +126,6 @@ class TeamsChannelSetCommand extends GraphCommand {
     }
 
     return requestBody;
-  }
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-
-    Set new description and display name for the specified channel in the given
-    Microsoft Teams team
-      ${this.name} --teamId "00000000-0000-0000-0000-000000000000" --channelName Reviews --newChannelName Projects --description "Channel for new projects"
-
-    Set new display name for the specified channel in the given Microsoft Teams
-    team
-      ${this.name} --teamId "00000000-0000-0000-0000-000000000000" --channelName Reviews --newChannelName Projects
-`);
   }
 }
 

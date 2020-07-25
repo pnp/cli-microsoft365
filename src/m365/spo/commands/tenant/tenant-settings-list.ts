@@ -6,7 +6,7 @@ import {
   CommandError
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 class SpoTenantSettingsListCommand extends SpoCommand {
   public get name(): string {
@@ -76,20 +76,6 @@ class SpoTenantSettingsListCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-    
-  Examples:
-  
-    Lists the settings of the tenant
-      m365 ${this.name}
-  ` );
   }
 }
 

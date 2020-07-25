@@ -7,8 +7,8 @@ import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -90,7 +90,7 @@ class SpoSiteDesignAddCommand extends SpoCommand {
         cmd.log(res);
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -136,21 +136,9 @@ class SpoSiteDesignAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.title) {
-        return 'Required parameter title missing';
-      }
-
-      if (!args.options.webTemplate) {
-        return 'Required parameter webTemplate missing';
-      }
-
       if (args.options.webTemplate !== 'TeamSite' &&
         args.options.webTemplate !== 'CommunicationSite') {
         return `${args.options.webTemplate} is not a valid web template type. Allowed values TeamSite|CommunicationSite`;
-      }
-
-      if (!args.options.siteScripts) {
-        return 'Required parameter siteScripts missing';
       }
 
       const siteScripts = args.options.siteScripts.split(',');
@@ -163,41 +151,6 @@ class SpoSiteDesignAddCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    Each time you execute the ${chalk.blue(this.name)} command, it will create
-    a new site design with a unique ID. Before creating a site design, be sure
-    that another design with the same name doesn't already exist.
-
-    When specifying IDs of site scripts to use with your site design, ensure
-    that the IDs refer to existing site scripts or provisioning sites using
-    the design will lead to unexpected results.
-
-  Examples:
-
-    Create new site design for provisioning modern team sites
-      ${this.name} --title "Contoso team site" --webTemplate TeamSite --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e,b2307a39-e878-458b-bc90-03bc578531d6"
-
-    Create new default site design for provisioning modern communication sites
-      ${this.name} --title "Contoso communication site" --webTemplate CommunicationSite --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e" --isDefault
-
-  More information:
-
-    SharePoint site design and site script overview
-      https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-overview
-
-    Customize a default site design
-      https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/customize-default-site-design
-
-    Site design JSON schema
-      https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-json-schema
-`);
   }
 }
 

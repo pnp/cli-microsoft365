@@ -69,7 +69,7 @@ describe('FolderExtensions', () => {
 
       }, (err: any) => {
 
-        assert.equal(err, 'webFullUrl is not a valid URL');
+        assert.strictEqual(err, 'webFullUrl is not a valid URL');
         done();
       });
   });
@@ -85,7 +85,7 @@ describe('FolderExtensions', () => {
 
       }, (err: any) => {
 
-        assert.equal(err, 'folderToEnsure cannot be empty');
+        assert.strictEqual(err, 'folderToEnsure cannot be empty');
         done();
       });
   });
@@ -112,7 +112,7 @@ describe('FolderExtensions', () => {
         done('Should not resolve, but reject');
       }, (err: any) => {
 
-        assert.equal(JSON.stringify(err), JSON.stringify(expectedError));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(expectedError));
         done();
       });
   });
@@ -139,7 +139,7 @@ describe('FolderExtensions', () => {
         done('Should not resolve, but reject');
       }, (err: any) => {
 
-        assert.equal(JSON.stringify(err), JSON.stringify(expectedError));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(expectedError));
         done();
       });
   });
@@ -156,7 +156,7 @@ describe('FolderExtensions', () => {
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0], 'All sub-folders exist');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0], 'All sub-folders exist');
         done();
 
       }, (err: any) => {
@@ -176,7 +176,7 @@ describe('FolderExtensions', () => {
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.equal(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
         done();
 
       }, (err: any) => {
@@ -193,7 +193,7 @@ describe('FolderExtensions', () => {
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.equal(cmdInstanceLogSpy.called, true);
+        assert.strictEqual(cmdInstanceLogSpy.called, true);
         done();
 
       }, (err: any) => {
@@ -210,7 +210,7 @@ describe('FolderExtensions', () => {
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.equal(cmdInstanceLogSpy.called, false);
+        assert.strictEqual(cmdInstanceLogSpy.called, false);
         done();
 
       }, (err: any) => {
@@ -230,7 +230,7 @@ describe('FolderExtensions', () => {
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "/folder2/folder3")
       .then(res => {
 
-        assert.equal(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Ffolder2%27&@a2=%27folder3%27');
+        assert.strictEqual(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Ffolder2%27&@a2=%27folder3%27');
         done();
       }, (err: any) => {
 
@@ -249,7 +249,7 @@ describe('FolderExtensions', () => {
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3")
       .then(res => {
-        assert.equal(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
+        assert.strictEqual(postStubs.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
         done();
       }, (err: any) => {
 
@@ -268,8 +268,8 @@ describe('FolderExtensions', () => {
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3")
       .then(res => {
-        assert.equal(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
-        assert.equal(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
+        assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
+        assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
         done();
       }, (err: any) => {
 
@@ -288,8 +288,8 @@ describe('FolderExtensions', () => {
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1/", "/folder2/folder3/")
       .then(res => {
-        assert.equal(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
-        assert.equal(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
+        assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%27&@a2=%27folder2%27');
+        assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2FSite1%2Ffolder2%27&@a2=%27folder3%27');
         done();
       }, (err: any) => {
 
@@ -308,8 +308,8 @@ describe('FolderExtensions', () => {
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/site1/", "PnP1/Folder2/")
       .then(res => {
-        assert.equal(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%27&@a2=%27PnP1%27');
-        assert.equal(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%2FPnP1%27&@a2=%27Folder2%27');
+        assert.strictEqual(postStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%27&@a2=%27PnP1%27');
+        assert.strictEqual(postStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/site1/_api/web/GetFolderByServerRelativePath(DecodedUrl=@a1)/AddSubFolderUsingPath(DecodedUrl=@a2)?@a1=%27%2Fsites%2Fsite1%2FPnP1%27&@a2=%27Folder2%27');
         done();
       }, (err: any) => {
 
@@ -326,8 +326,8 @@ describe('FolderExtensions', () => {
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3")
       .then(res => {
-        assert.equal(getStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2FSite1%2Ffolder2\')');
-        assert.equal(getStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2FSite1%2Ffolder2%2Ffolder3\')');
+        assert.strictEqual(getStubs.getCall(0).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2FSite1%2Ffolder2\')');
+        assert.strictEqual(getStubs.getCall(1).args[0].url, 'https://contoso.sharepoint.com/sites/Site1/_api/web/GetFolderByServerRelativeUrl(\'%2Fsites%2FSite1%2Ffolder2%2Ffolder3\')');
         done();
       }, (err: any) => {
 

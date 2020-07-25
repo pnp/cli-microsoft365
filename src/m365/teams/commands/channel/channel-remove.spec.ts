@@ -7,9 +7,9 @@ const command: Command = require('./channel-remove');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 describe(commands.TEAMS_CHANNEL_REMOVE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -22,7 +22,6 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -43,7 +42,6 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.delete
     ]);
@@ -58,11 +56,11 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_CHANNEL_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_CHANNEL_REMOVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('passes validation when valid channelId & teamId is specified', () => {
@@ -72,7 +70,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when channelName & teamId is specified', () => {
@@ -82,7 +80,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if the teamId & channelId are not provided', (done) => {
@@ -91,7 +89,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
 
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -101,27 +99,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
 
       }
     });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the teamId is not provided', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the channelId is not provided', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -132,7 +110,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
         channelId: 'invalid'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -143,7 +121,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both channelName and channelId are provided', () => {
@@ -154,7 +132,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
         channelName: 'channelname'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails to remove channel when channel does not exists', (done) => {
@@ -175,7 +153,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
         done();
       }
       catch (e) {
@@ -343,7 +321,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -369,7 +347,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
         confirm: true
       }
     }, () => {
-      assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+      assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
       done();
     }, (err: any) => done(err));
   });
@@ -403,7 +381,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(err.message, "Failed to execute Skype backend request GetThreadS2SRequest.");
+        assert.strictEqual(err.message, "Failed to execute Skype backend request GetThreadS2SRequest.");
         done();
       }
       catch (e) {
@@ -421,40 +399,6 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_CHANNEL_REMOVE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 
 });

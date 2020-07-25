@@ -5,8 +5,8 @@ import { TeamsApp } from '../../TeamsApp'
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand'
 import { TeamsAppInstallation } from '../../TeamsAppInstallation';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -78,7 +78,7 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -109,33 +109,6 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-
-    log(
-      `  Remarks:
-
-    To list apps installed in the specified Microsoft Teams team, specify that
-    team's ID using the ${chalk.grey('teamId')} option. If the ${chalk.grey('teamId')} option
-    is not specified, the command will list apps available in the Teams app
-    catalog.
-
-  Examples:
-
-    List all Microsoft Teams apps from your organization's app catalog only
-      m365 ${this.name}
-         
-    List all apps from the Microsoft Teams app catalog and the Microsoft Teams
-    store
-      m365 ${this.name} --all
-
-    List your organization's apps installed in the specified Microsoft Teams
-    team
-      m365 ${this.name} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
-`);
   }
 }
 

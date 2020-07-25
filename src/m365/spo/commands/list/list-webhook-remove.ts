@@ -7,8 +7,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -126,14 +125,6 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
-      if (!args.options.id) {
-        return 'Required parameter id missing';
-      }
-
       if (!Utils.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
       }
@@ -159,34 +150,6 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-  
-    If the specified ${chalk.grey('id')} doesn't refer to an existing webhook,
-    you will get a ${chalk.grey('404 - "404 FILE NOT FOUND"')} error.
-        
-  Examples:
-  
-    Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
-    list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
-    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81
-
-    Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
-    list with title ${chalk.grey('Documents')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81
-
-    Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
-    list with title ${chalk.grey('Documents')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} without being asked for confirmation
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
-      `);
   }
 }
 

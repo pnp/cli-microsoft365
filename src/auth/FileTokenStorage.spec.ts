@@ -24,7 +24,7 @@ describe('FileTokenStorage', () => {
         done('Expected fail but passed instead');
       }, (err) => {
         try {
-          assert.equal(err, 'File not found');
+          assert.strictEqual(err, 'File not found');
           done();
         }
         catch (e) {
@@ -46,7 +46,7 @@ describe('FileTokenStorage', () => {
       .get()
       .then((connectionInfo) => {
         try {
-          assert.equal(connectionInfo, JSON.stringify(tokensFile));
+          assert.strictEqual(connectionInfo, JSON.stringify(tokensFile));
           done();
         }
         catch (e) {
@@ -69,7 +69,7 @@ describe('FileTokenStorage', () => {
       .set(JSON.stringify(expected))
       .then(() => {
         try {
-          assert.equal(actual, JSON.stringify(expected));
+          assert.strictEqual(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
@@ -93,7 +93,7 @@ describe('FileTokenStorage', () => {
       .set(JSON.stringify(expected))
       .then(() => {
         try {
-          assert.equal(actual, JSON.stringify(expected));
+          assert.strictEqual(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
@@ -117,7 +117,7 @@ describe('FileTokenStorage', () => {
       .set(JSON.stringify(expected))
       .then(() => {
         try {
-          assert.equal(actual, JSON.stringify(expected));
+          assert.strictEqual(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
@@ -141,7 +141,7 @@ describe('FileTokenStorage', () => {
       .set(JSON.stringify(expected))
       .then(() => {
         try {
-          assert.equal(actual, JSON.stringify(expected));
+          assert.strictEqual(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
@@ -175,7 +175,7 @@ describe('FileTokenStorage', () => {
       .set(JSON.stringify(expected))
       .then(() => {
         try {
-          assert.equal(actual, JSON.stringify(expected));
+          assert.strictEqual(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
@@ -193,7 +193,7 @@ describe('FileTokenStorage', () => {
         done('Fail expected but passed instead');
       }, (err) => {
         try {
-          assert.equal(err, 'An error has occurred');
+          assert.strictEqual(err, 'An error has occurred');
           done();
         }
         catch (e) {
@@ -288,7 +288,7 @@ describe('FileTokenStorage', () => {
         done('Fail expected but passed instead');
       }, (err) => {
         try {
-          assert.equal(err, 'An error has occurred');
+          assert.strictEqual(err, 'An error has occurred');
           done();
         }
         catch (e) {

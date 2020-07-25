@@ -5,6 +5,7 @@ import auth from '../../Auth';
 import Utils from '../../Utils';
 import { CommandError } from '../../Command';
 import appInsights from '../../appInsights';
+import { CommandInstance } from '../../cli';
 
 class MockCommand extends GraphCommand {
   public get name(): string {
@@ -49,7 +50,7 @@ describe('GraphCommand', () => {
     };
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -131,6 +132,6 @@ describe('GraphCommand', () => {
 
   it('returns correct resource', () => {
     const command = new MockCommand();
-    assert.equal((command as any).resource, 'https://graph.microsoft.com');
+    assert.strictEqual((command as any).resource, 'https://graph.microsoft.com');
   });
 });

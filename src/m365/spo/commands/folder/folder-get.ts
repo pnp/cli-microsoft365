@@ -5,8 +5,7 @@ import { CommandOption, CommandValidate, CommandError } from '../../../../Comman
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { FolderProperties } from './FolderProperties';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -75,40 +74,8 @@ class SpoFolderGetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
-      if (!args.options.folderUrl) {
-        return 'Required parameter folderUrl missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-  
-    If no folder exists at the specified URL, you will get a
-    ${chalk.grey(`Please check the folder URL. Folder might not exist on the specified URL`)}
-    error.
-        
-  Examples:
-  
-    Get folder properties for folder with site-relative url
-    ${chalk.grey('/Shared Documents')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents'
-    `);
   }
 }
 

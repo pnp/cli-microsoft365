@@ -7,8 +7,8 @@ import {
 } from '../../../../Command';
 import Utils from '../../../../Utils';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -98,7 +98,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -166,56 +166,6 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.APP_DEPLOY).helpInformation());
-    log(
-      `  Remarks:
-  
-    When adding an app to the tenant app catalog, it's not necessary to specify
-    the tenant app catalog URL. When the URL is not specified, the CLI will
-    try to resolve the URL itself. Specifying the app catalog URL is required
-    when you want to add the app to a site collection app catalog.
-
-    When specifying site collection app catalog, you can specify the URL either
-    with our without the ${chalk.grey('AppCatalog')} part, for example
-    ${chalk.grey('https://contoso.sharepoint.com/sites/team-a/AppCatalog')} or
-    ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}. CLI will accept both formats.
-
-    If the app with the specified ID doesn't exist in the app catalog,
-    the command will fail with an error. Before you can deploy an app,
-    you have to add it to the app catalog first
-    using the ${chalk.blue(commands.APP_ADD)} command.
-   
-  Examples:
-  
-    Deploy the specified app in the tenant app catalog. Try to resolve the URL
-    of the tenant app catalog automatically.
-      m365 ${this.name} --id 058140e3-0e37-44fc-a1d3-79c487d371a3
-
-    Deploy the specified app in the site collection app catalog 
-    of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      m365 ${this.name} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
-
-    Deploy the app with the specified name in the tenant app catalog.
-    Try to resolve the URL of the tenant app catalog automatically.
-      m365 ${this.name} --name solution.sppkg
-
-    Deploy the specified app in the tenant app catalog located at
-    ${chalk.grey('https://contoso.sharepoint.com/sites/apps')}
-      m365 ${this.name} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
-
-    Deploy the specified app to the whole tenant at once. Features included in
-    the solution will not be activated.
-      m365 ${this.name} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --skipFeatureDeployment
-    
-  More information:
-  
-    Application Lifecycle Management (ALM) APIs
-      https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins
-`);
   }
 }
 

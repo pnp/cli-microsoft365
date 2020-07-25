@@ -17,7 +17,7 @@ describe('FN010002_YORC_isCreatingSolution', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if isCreatingSolution is already up-to-date', () => {
@@ -30,6 +30,6 @@ describe('FN010002_YORC_isCreatingSolution', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

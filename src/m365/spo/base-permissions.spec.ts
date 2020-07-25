@@ -21,8 +21,8 @@ describe('BasePermissions', () => {
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
 
-    assert.equal(result.low, 10);
-    assert.equal(result.high, 0);
+    assert.strictEqual(result.low, 10);
+    assert.strictEqual(result.high, 0);
   });
 
   it('has correct permissions set with ManageLists, AddListItems and DeleteListItems', () => {
@@ -32,8 +32,8 @@ describe('BasePermissions', () => {
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
 
-    assert.equal(result.low, 2058);
-    assert.equal(result.high, 0);
+    assert.strictEqual(result.low, 2058);
+    assert.strictEqual(result.high, 0);
   });
 
   it('has correct permissions set with ManageLists', () => {
@@ -42,8 +42,8 @@ describe('BasePermissions', () => {
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
 
-    assert.equal(result.low, 2048);
-    assert.equal(result.high, 0);
+    assert.strictEqual(result.low, 2048);
+    assert.strictEqual(result.high, 0);
   });
 
   it('has correct permissions set with FullMask', () => {
@@ -52,8 +52,8 @@ describe('BasePermissions', () => {
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
 
-    assert.equal(result.low, 65535);
-    assert.equal(result.high, 32767);
+    assert.strictEqual(result.low, 65535);
+    assert.strictEqual(result.high, 32767);
   });
 
   it('has correct permissions set with EmptyMask', () => {
@@ -62,8 +62,8 @@ describe('BasePermissions', () => {
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
 
-    assert.equal(result.low, 0);
-    assert.equal(result.high, 0);
+    assert.strictEqual(result.low, 0);
+    assert.strictEqual(result.high, 0);
   });
 
   it('has correct permissions set with EmptyMask and AddListItems', () => {
@@ -72,8 +72,8 @@ describe('BasePermissions', () => {
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
 
-    assert.equal(result.low, 2);
-    assert.equal(result.high, 0);
+    assert.strictEqual(result.low, 2);
+    assert.strictEqual(result.high, 0);
   });
 
   it('has correct permissions set with AddListItems, DeleteListItems and FullMask', () => {
@@ -83,8 +83,8 @@ describe('BasePermissions', () => {
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
 
-    assert.equal(result.low, 65535);
-    assert.equal(result.high, 32767);
+    assert.strictEqual(result.low, 65535);
+    assert.strictEqual(result.high, 32767);
   });
 
   it('has correct permissions set with ManagePermissions', () => {
@@ -93,8 +93,8 @@ describe('BasePermissions', () => {
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
 
-    assert.equal(result.low, 33554432);
-    assert.equal(result.high, 0);
+    assert.strictEqual(result.low, 33554432);
+    assert.strictEqual(result.high, 0);
   });
 
   it('has correct permissions set with ManageWeb', () => {
@@ -103,8 +103,8 @@ describe('BasePermissions', () => {
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
 
-    assert.equal(result.low, 1073741824);
-    assert.equal(result.high, 0);
+    assert.strictEqual(result.low, 1073741824);
+    assert.strictEqual(result.high, 0);
   });
 
   it('has correct permissions set with ManageWeb and FullMask', () => {
@@ -113,8 +113,8 @@ describe('BasePermissions', () => {
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
 
-    assert.equal(result.low, 65535);
-    assert.equal(result.high, 32767);
+    assert.strictEqual(result.low, 65535);
+    assert.strictEqual(result.high, 32767);
   });
 
   it('has correct permissions set with EnumeratePermissions', () => {
@@ -123,23 +123,23 @@ describe('BasePermissions', () => {
     ];
     const result: BasePermissions = getPermissions(delegatedPermissions);
 
-    assert.equal(result.low, 0);
-    assert.equal(result.high, 1073741824);
+    assert.strictEqual(result.low, 0);
+    assert.strictEqual(result.high, 1073741824);
   });
 
   it('exits correctly on incorrect permissions set', () => {
     basePermissions.set((-1 as PermissionKind));
 
-    assert.equal(basePermissions.low, 0);
-    assert.equal(basePermissions.high, 0);
+    assert.strictEqual(basePermissions.low, 0);
+    assert.strictEqual(basePermissions.high, 0);
   });
 
   it('has correct high and low value set', () => {
     basePermissions.high = 32767;
     basePermissions.low = 65535;
 
-    assert.equal(basePermissions.high, 32767);
-    assert.equal(basePermissions.low, 65535);
+    assert.strictEqual(basePermissions.high, 32767);
+    assert.strictEqual(basePermissions.low, 65535);
   });
 
   it('checks the permission correctly for the actual FullMask', () => {
@@ -149,9 +149,9 @@ describe('BasePermissions', () => {
     basePermissions.high = 2147483647;
     basePermissions.low = 4294967295;
 
-    assert.equal(basePermissions.has(PermissionKind.AddAndCustomizePages), true);
-    assert.equal(basePermissions.has(PermissionKind.ManageWeb), true);
-    assert.equal(basePermissions.has(PermissionKind.EnumeratePermissions), true);
+    assert.strictEqual(basePermissions.has(PermissionKind.AddAndCustomizePages), true);
+    assert.strictEqual(basePermissions.has(PermissionKind.ManageWeb), true);
+    assert.strictEqual(basePermissions.has(PermissionKind.EnumeratePermissions), true);
   });
 
   it('checks the permission correctly for the online FullMask', () => {
@@ -160,6 +160,6 @@ describe('BasePermissions', () => {
     basePermissions.high = 32767;
     basePermissions.low = 65535;
 
-    assert.equal(basePermissions.has(PermissionKind.FullMask), true);
+    assert.strictEqual(basePermissions.has(PermissionKind.FullMask), true);
   });
 });

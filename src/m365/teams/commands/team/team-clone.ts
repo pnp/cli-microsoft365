@@ -5,8 +5,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandValidate } from '../../../../Command';
 import GraphCommand from '../../../base/GraphCommand';
 import request from '../../../../request';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -68,7 +68,7 @@ class TeamsCloneCommand extends GraphCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -111,21 +111,8 @@ class TeamsCloneCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.teamId)) {
         return `${args.options.teamId} is not a valid GUID`;
-      }
-
-      if (!args.options.displayName) {
-        return 'Required option displayName missing';
-      }
-
-      if (!args.options.partsToClone) {
-        return 'Required option partsToClone missing';
       }
 
       const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');
@@ -151,30 +138,6 @@ class TeamsCloneCommand extends GraphCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-          
-    Using this command, global admins and Microsoft Teams service admins can
-    access teams that they are not a member of.
-
-    When tabs are cloned, they are put into an unconfigured state. The first
-    time you open them, you'll go through the configuration screen.
-    If the person opening the tab does not have permission to configure apps,
-    they will see a message explaining that the tab hasn't been configured.
-
-  Examples:
-    
-    Creates a clone of a Microsoft Teams team with mandatory parameters
-      m365 ${this.name} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" 
-    
-    Creates a clone of a Microsoft Teams team with mandatory and optional
-    parameters
-      m365 ${this.name} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public" 
-    `);
   }
 
   /**

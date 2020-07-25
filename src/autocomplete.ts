@@ -4,6 +4,9 @@ const omelette: (template: string) => Omelette = require('omelette');
 import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Cli } from './cli/Cli';
+import { CommandInfo } from './cli/CommandInfo';
+import { CommandOptionInfo } from './cli/CommandOptionInfo';
 
 class Autocomplete {
   private static autocompleteFilePath: string = path.join(__dirname, `..${path.sep}commands.json`);
@@ -82,8 +85,9 @@ class Autocomplete {
     data.reply(replies);
   }
 
-  public generateShCompletion(vorpal: Vorpal): void {
-    const commandsInfo: any = this.getCommandsInfo(vorpal);
+  public generateShCompletion(): void {
+    const cli: Cli = Cli.getInstance();
+    const commandsInfo: any = this.getCommandsInfo(cli);
     fs.writeFileSync(Autocomplete.autocompleteFilePath, JSON.stringify(commandsInfo));
   }
 
@@ -91,8 +95,9 @@ class Autocomplete {
     this.omelette.setupShellInitFile();
   }
 
-  public getClinkCompletion(vorpal: Vorpal): string {
-    const cmd: any = this.getCommandsInfo(vorpal);
+  public getClinkCompletion(): string {
+    const cli: Cli = Cli.getInstance();
+    const cmd: any = this.getCommandsInfo(cli);
     const lua: string[] = ['local parser = clink.arg.new_parser'];
     const functions: any = {};
 
@@ -169,13 +174,14 @@ class Autocomplete {
     return functionName.replace(/-/g, '_');
   }
 
-  private getCommandsInfo(vorpal: Vorpal): any {
+  private getCommandsInfo(cli: Cli): any {
     const commandsInfo: any = {};
-    const commands: CommandInfo[] = vorpal.commands;
-    const visibleCommands: CommandInfo[] = commands.filter(c => !c._hidden);
-    visibleCommands.forEach(c => {
-      Autocomplete.processCommand(c._name, c, commandsInfo);
-      c._aliases.forEach(a => Autocomplete.processCommand(a, c, commandsInfo));
+    const commands: CommandInfo[] = cli.commands;
+    commands.forEach(c => {
+      Autocomplete.processCommand(c.name, c, commandsInfo);
+      if (c.aliases) {
+        c.aliases.forEach(a => Autocomplete.processCommand(a, c, commandsInfo));
+      }
     });
 
     return commandsInfo;
@@ -186,9 +192,6 @@ class Autocomplete {
     let parent: any = autocomplete;
     for (let i: number = 0; i < chunks.length; i++) {
       const current: any = chunks[i];
-      if (current === 'exit' || current === 'quit') {
-        continue;
-      }
 
       if (!parent[current]) {
         if (i < chunks.length - 1) {
@@ -196,12 +199,17 @@ class Autocomplete {
         }
         else {
           // last chunk, add options
-          const optionsArr: string[] = commandInfo.options.map(o => o.short)
-            .concat(commandInfo.options.map(o => o.long)).filter(o => o != null);
+          const optionsArr: string[] = commandInfo.options
+            .map(o => o.short)
+            .concat(commandInfo.options.map(o => o.long))
+            .filter(o => o != null)
+            .map(o => (o as string).length === 1 ? `-${o}` : `--${o}`);
           optionsArr.push('--help');
+          optionsArr.push('-h');
           const optionsObj: any = {};
           optionsArr.forEach(o => {
-            const option: CommandOption = commandInfo.options.filter(opt => opt.long === o || opt.short === o)[0];
+            const optionName: string = o.replace(/^-+/, '');
+            const option: CommandOptionInfo = commandInfo.options.filter(opt => opt.long === optionName || opt.short === optionName)[0];
             if (option && option.autocomplete) {
               optionsObj[o] = option.autocomplete;
             }

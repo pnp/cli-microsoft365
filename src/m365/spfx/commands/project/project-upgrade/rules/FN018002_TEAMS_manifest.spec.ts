@@ -21,7 +21,7 @@ describe('FN018002_TEAMS_manifest', () => {
   });
 
   it('returns empty file name by default', () => {
-    assert.equal(rule.file, '');
+    assert.strictEqual(rule.file, '');
   });
 
   it(`doesn't return notifications if no web part manifests are present`, () => {
@@ -29,7 +29,7 @@ describe('FN018002_TEAMS_manifest', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it(`looks for Teams manifest for a web part using the correct path`, () => {
@@ -62,7 +62,7 @@ describe('FN018002_TEAMS_manifest', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns undefined packageName if no preconfigured entries specified in the web part', () => {
@@ -76,8 +76,8 @@ describe('FN018002_TEAMS_manifest', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1, 'No findings reported while expected');
-    assert.equal(findings[0].occurrences.length, 1, 'No occurrences reported while expected');
+    assert.strictEqual(findings.length, 1, 'No findings reported while expected');
+    assert.strictEqual(findings[0].occurrences.length, 1, 'No occurrences reported while expected');
     assert(findings[0].occurrences[0].resolution.indexOf('"packageName": "undefined",') > -1);
   });
 
@@ -93,8 +93,8 @@ describe('FN018002_TEAMS_manifest', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1, 'No findings reported while expected');
-    assert.equal(findings[0].occurrences.length, 1, 'No occurrences reported while expected');
+    assert.strictEqual(findings.length, 1, 'No findings reported while expected');
+    assert.strictEqual(findings[0].occurrences.length, 1, 'No occurrences reported while expected');
     assert(findings[0].occurrences[0].resolution.indexOf('"packageName": "undefined",') > -1);
   });
 
@@ -110,8 +110,8 @@ describe('FN018002_TEAMS_manifest', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1, 'No findings reported while expected');
-    assert.equal(findings[0].occurrences.length, 1, 'No occurrences reported while expected');
+    assert.strictEqual(findings.length, 1, 'No findings reported while expected');
+    assert.strictEqual(findings[0].occurrences.length, 1, 'No occurrences reported while expected');
     assert(findings[0].occurrences[0].resolution.indexOf('"short": "undefined",') > -1);
   });
 
@@ -127,8 +127,8 @@ describe('FN018002_TEAMS_manifest', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1, 'No findings reported while expected');
-    assert.equal(findings[0].occurrences.length, 1, 'No occurrences reported while expected');
+    assert.strictEqual(findings.length, 1, 'No findings reported while expected');
+    assert.strictEqual(findings[0].occurrences.length, 1, 'No occurrences reported while expected');
     assert(findings[0].occurrences[0].resolution.indexOf('"full": "undefined"') > -1);
   });
 
@@ -144,8 +144,8 @@ describe('FN018002_TEAMS_manifest', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1, 'No findings reported while expected');
-    assert.equal(findings[0].occurrences.length, 1, 'No occurrences reported while expected');
+    assert.strictEqual(findings.length, 1, 'No findings reported while expected');
+    assert.strictEqual(findings[0].occurrences.length, 1, 'No occurrences reported while expected');
     assert(findings[0].occurrences[0].resolution.indexOf('"id": "undefined",') > -1);
   });
 
@@ -161,7 +161,7 @@ describe('FN018002_TEAMS_manifest', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings[0].occurrences[0].file, path.join('teams', 'manifest_webpart.json'));
+    assert.strictEqual(findings[0].occurrences[0].file, path.join('teams', 'manifest_webpart.json'));
   });
 
   it('creates manifest with a unique name following the web part name (multiple web parts)', () => {
@@ -184,7 +184,7 @@ describe('FN018002_TEAMS_manifest', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings[0].occurrences[0].file, path.join('teams', 'manifest_webpart1.json'), 'Incorrect manifest path for web part 1');
-    assert.equal(findings[0].occurrences[1].file, path.join('teams', 'manifest_webpart2.json'), 'Incorrect manifest path for web part 2');
+    assert.strictEqual(findings[0].occurrences[0].file, path.join('teams', 'manifest_webpart1.json'), 'Incorrect manifest path for web part 1');
+    assert.strictEqual(findings[0].occurrences[1].file, path.join('teams', 'manifest_webpart2.json'), 'Incorrect manifest path for web part 2');
   });
 });

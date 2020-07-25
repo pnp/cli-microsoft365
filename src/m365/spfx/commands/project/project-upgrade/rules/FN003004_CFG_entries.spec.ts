@@ -13,7 +13,7 @@ describe('FN003004_CFG_entries', () => {
   });
 
   it('has empty resolution', () => {
-    assert.equal(rule.resolution, '');
+    assert.strictEqual(rule.resolution, '');
   });
 
   it('returns notification if entries is present', () => {
@@ -29,7 +29,7 @@ describe('FN003004_CFG_entries', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('should show the entries schema in the resolution', () => {
@@ -49,10 +49,10 @@ describe('FN003004_CFG_entries', () => {
     const resolution: any = JSON.parse(findings[0].occurrences[0].resolution);
     const entries: any = resolution.entries;
 
-    assert.notEqual(entries, undefined);
-    assert.equal(entries[0].entry, './lib/extensions/helloWorld/HelloWorldApplicationCustomizer.js');
-    assert.equal(entries[0].manifest, './src/extensions/helloWorld/HelloWorldApplicationCustomizer.manifest.json');
-    assert.equal(entries[0].outputPath, './dist/hello-world.bundle.js');
+    assert.notStrictEqual(entries, undefined);
+    assert.strictEqual(entries[0].entry, './lib/extensions/helloWorld/HelloWorldApplicationCustomizer.js');
+    assert.strictEqual(entries[0].manifest, './src/extensions/helloWorld/HelloWorldApplicationCustomizer.manifest.json');
+    assert.strictEqual(entries[0].outputPath, './dist/hello-world.bundle.js');
   });
 
   it('doesn\'t return notification if no config.json', () => {
@@ -60,7 +60,7 @@ describe('FN003004_CFG_entries', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if no entries', () => {
@@ -69,6 +69,6 @@ describe('FN003004_CFG_entries', () => {
       configJson: {}
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

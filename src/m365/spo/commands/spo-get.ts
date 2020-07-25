@@ -6,8 +6,7 @@ import {
 } from '../../../Command';
 import SpoCommand from '../../base/SpoCommand';
 import auth from '../../../Auth';
-
-const vorpal: Vorpal = require('../../../vorpal-init');
+import { CommandInstance } from '../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -47,21 +46,6 @@ class SpoGetCommand extends SpoCommand {
     return (args: CommandArgs): boolean | string => {
       return true;
     };
-  }
-
-  public commandHelp(args: any, log: (help: string) => void): void {
-    log(vorpal.find(commands.GET).helpInformation());
-    log(` Remarks:
-
-    CLI for Microsoft 365 automatically discovers the URL of the root SharePoint site
-    collection/SharePoint tenant admin site (whichever is needed to run
-    the particular command). Using this command you can see which URLs the CLI has discovered.
-      
-  Examples:
-  
-    Get the context URL for the root SharePoint site collection and SharePoint tenant admin site
-      m365 ${this.name} --output json
-`);
   }
 }
 

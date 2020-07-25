@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.HIDEDEFAULTTHEMES_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let requests: any[];
@@ -22,7 +21,6 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -53,11 +50,11 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.HIDEDEFAULTTHEMES_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.HIDEDEFAULTTHEMES_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('sets the value of the HideDefaultThemes setting', (done) => {
@@ -151,7 +148,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -171,26 +168,14 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     assert(containsDebugOption);
   });
 
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.HIDEDEFAULTTHEMES_SET));
-  });
-
   it('fails validation if hideDefaultThemes is not set', () => {
     const actual = (command.validate() as CommandValidate)({ options: { } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if hideDefaultThemes is not a valid boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { hideDefaultThemes: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when hideDefaultThemes is true', () => {

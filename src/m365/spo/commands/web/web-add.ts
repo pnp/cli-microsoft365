@@ -10,7 +10,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import { PermissionKind, BasePermissions } from '../../base-permissions';
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -146,7 +147,7 @@ class SpoWebAddCommand extends SpoCommand {
           cmd.log(siteInfo);
 
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
         }
         cb();
@@ -155,7 +156,7 @@ class SpoWebAddCommand extends SpoCommand {
           cmd.log(siteInfo);
 
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
 
           cb();
@@ -215,29 +216,11 @@ class SpoWebAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-
-      if (!args.options.title) {
-        return 'Required option title missing';
+      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.parentWebUrl);
+      if (isValidSharePointUrl !== true) {
+        return isValidSharePointUrl;
       }
-
-      if (!args.options.webUrl) {
-        return 'Required option webUrl missing';
-      }
-
-      if (!args.options.webTemplate) {
-        return 'Required option webTemplate missing';
-      }
-
-      if (!args.options.parentWebUrl) {
-        return 'Required option parentWebUrl missing';
-      }
-      else {
-        const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.parentWebUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-      }
-
+      
       if (args.options.locale) {
         const locale: number = parseInt(args.options.locale);
         if (isNaN(locale)) {
@@ -247,23 +230,6 @@ class SpoWebAddCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-    
-      Create subsite using the ${chalk.grey('Team site')} template in the ${chalk.grey('en-US')} locale
-        m365 ${this.name} --title Subsite --description Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033
-
-      Create subsite with unique permissions using the default ${chalk.grey('en-US')} locale
-        m365 ${this.name} --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --breakInheritance
-
-      Create subsite with the same navigation as the parent site
-        m365 ${this.name} --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --inheritNavigation
-  ` );
   }
 }
 

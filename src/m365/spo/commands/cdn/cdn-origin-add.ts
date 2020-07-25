@@ -10,8 +10,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -76,7 +76,7 @@ class SpoCdnOriginAddCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
           cb();
         }
@@ -111,31 +111,6 @@ class SpoCdnOriginAddCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CDN_ORIGIN_ADD).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-        
-  Remarks:
-
-    Using the ${chalk.blue('-t, --type')} option you can choose whether you want
-    to manage the settings of the Public (default) or Private CDN. If you don't
-    use the option, the command will use the Public CDN.
-
-  Examples:
-  
-    Add ${chalk.grey('*/CDN')} to the list of origins of the Public CDN
-      m365 ${this.name} --type Public --origin */CDN
-
-  More information:
-
-    General availability of Microsoft 365 CDN
-      https://dev.office.com/blogs/general-availability-of-office-365-cdn
-`);
   }
 }
 

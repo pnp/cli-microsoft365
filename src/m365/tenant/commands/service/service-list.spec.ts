@@ -9,10 +9,8 @@ import commands from '../../commands';
 const command: Command = require('./service-list');
 
 describe(commands.TENANT_SERVICE_LIST, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
-
   let cmdInstanceLogSpy: sinon.SinonSpy;
 
   const textOutput = [
@@ -78,7 +76,6 @@ describe(commands.TENANT_SERVICE_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -94,7 +91,6 @@ describe(commands.TENANT_SERVICE_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -125,39 +121,6 @@ describe(commands.TENANT_SERVICE_LIST, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TENANT_SERVICE_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    assert(containsExamples);
   });
 
   it('handles promise error while getting services available in Microsoft 365', (done) => {

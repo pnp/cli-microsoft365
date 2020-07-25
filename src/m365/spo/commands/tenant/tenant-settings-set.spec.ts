@@ -10,7 +10,6 @@ import config from '../../../../config';
 import auth from '../../../../Auth';
 
 describe(commands.TENANT_SETTINGS_SET, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -39,7 +38,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -55,7 +53,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -72,11 +69,11 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TENANT_SETTINGS_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.TENANT_SETTINGS_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('supports debug mode', () => {
@@ -88,40 +85,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TENANT_SETTINGS_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 
   it('handles client.svc promise error', (done) => {
@@ -138,7 +101,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -157,7 +120,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args, 'DONE');
+        assert(cmdInstanceLogSpy.calledWith('DONE'));
         done();
       }
       catch (e) {
@@ -175,7 +138,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -193,7 +156,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, () => {
       try {
-        assert.equal(request.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="ExcludedFileExtensionsForSyncClient"><Parameter Type="Array"><Object Type="String">xml</Object><Object Type="String">xslt</Object><Object Type="String">xsd</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
+        assert.strictEqual(request.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="ExcludedFileExtensionsForSyncClient"><Parameter Type="Array"><Object Type="String">xml</Object><Object Type="String">xslt</Object><Object Type="String">xsd</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
         done();
       }
       catch (e) {
@@ -211,7 +174,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, () => {
       try {
-        assert.equal(request.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="AllowedDomainListForSyncClient"><Parameter Type="Array"><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b79}</Object><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b77}</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
+        assert.strictEqual(request.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="AllowedDomainListForSyncClient"><Parameter Type="Array"><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b79}</Object><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b77}</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
         done();
       }
       catch (e) {
@@ -229,7 +192,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, () => {
       try {
-        assert.equal(request.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="DisabledWebPartIds"><Parameter Type="Array"><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b79}</Object><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b77}</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
+        assert.strictEqual(request.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="DisabledWebPartIds"><Parameter Type="Array"><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b79}</Object><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b77}</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
         done();
       }
       catch (e) {
@@ -251,7 +214,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, () => {
       try {
-        assert.equal(request.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="DisabledWebPartIds"><Parameter Type="Array"><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b79}</Object><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b77}</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /><SetProperty Id="44" ObjectPathId="7" Name="ExcludedFileExtensionsForSyncClient"><Parameter Type="Array"><Object Type="String">xsl</Object><Object Type="String">doc</Object><Object Type="String">ttf</Object></Parameter></SetProperty><Method Name="Update" Id="45" ObjectPathId="7" /><SetProperty Id="46" ObjectPathId="7" Name="OfficeClientADALDisabled"><Parameter Type="String">true</Parameter></SetProperty><SetProperty Id="47" ObjectPathId="7" Name="OneDriveStorageQuota"><Parameter Type="String">256</Parameter></SetProperty><SetProperty Id="48" ObjectPathId="7" Name="OrgNewsSiteUrl"><Parameter Type="String">https://contoso-admin.sharepoint.com</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
+        assert.strictEqual(request.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="DisabledWebPartIds"><Parameter Type="Array"><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b79}</Object><Object Type="Guid">{6648899e-a042-6000-ee90-5bfa05d08b77}</Object></Parameter></SetProperty><Method Name="Update" Id="43" ObjectPathId="7" /><SetProperty Id="44" ObjectPathId="7" Name="ExcludedFileExtensionsForSyncClient"><Parameter Type="Array"><Object Type="String">xsl</Object><Object Type="String">doc</Object><Object Type="String">ttf</Object></Parameter></SetProperty><Method Name="Update" Id="45" ObjectPathId="7" /><SetProperty Id="46" ObjectPathId="7" Name="OfficeClientADALDisabled"><Parameter Type="String">true</Parameter></SetProperty><SetProperty Id="47" ObjectPathId="7" Name="OneDriveStorageQuota"><Parameter Type="String">256</Parameter></SetProperty><SetProperty Id="48" ObjectPathId="7" Name="OrgNewsSiteUrl"><Parameter Type="String">https://contoso-admin.sharepoint.com</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
         done();
       }
       catch (e) {
@@ -282,7 +245,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Timed out')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Timed out')));
         done();
       }
       catch (e) {
@@ -332,7 +295,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Timed out')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Timed out')));
         done();
       }
       catch (e) {
@@ -362,7 +325,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, () => {
       try {
-        assert.equal(stubRequest.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="SharingCapability"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="43" ObjectPathId="7" Name="SharingDomainRestrictionMode"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="44" ObjectPathId="7" Name="DefaultSharingLinkType"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="45" ObjectPathId="7" Name="ODBMembersCanShare"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="46" ObjectPathId="7" Name="ODBAccessRequests"><Parameter Type="String">2</Parameter></SetProperty><SetProperty Id="47" ObjectPathId="7" Name="FileAnonymousLinkType"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="48" ObjectPathId="7" Name="FolderAnonymousLinkType"><Parameter Type="String">2</Parameter></SetProperty><SetProperty Id="49" ObjectPathId="7" Name="DefaultLinkPermission"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="50" ObjectPathId="7" Name="ConditionalAccessPolicy"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="51" ObjectPathId="7" Name="LimitedAccessFileType"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="52" ObjectPathId="7" Name="SpecialCharactersStateInFileFolderNames"><Parameter Type="String">1</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
+        assert.strictEqual(stubRequest.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><SetProperty Id="42" ObjectPathId="7" Name="SharingCapability"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="43" ObjectPathId="7" Name="SharingDomainRestrictionMode"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="44" ObjectPathId="7" Name="DefaultSharingLinkType"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="45" ObjectPathId="7" Name="ODBMembersCanShare"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="46" ObjectPathId="7" Name="ODBAccessRequests"><Parameter Type="String">2</Parameter></SetProperty><SetProperty Id="47" ObjectPathId="7" Name="FileAnonymousLinkType"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="48" ObjectPathId="7" Name="FolderAnonymousLinkType"><Parameter Type="String">2</Parameter></SetProperty><SetProperty Id="49" ObjectPathId="7" Name="DefaultLinkPermission"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="50" ObjectPathId="7" Name="ConditionalAccessPolicy"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="51" ObjectPathId="7" Name="LimitedAccessFileType"><Parameter Type="String">1</Parameter></SetProperty><SetProperty Id="52" ObjectPathId="7" Name="SpecialCharactersStateInFileFolderNames"><Parameter Type="String">1</Parameter></SetProperty></Actions><ObjectPaths><Identity Id="7" Name="6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee&#xA;Tenant" /></ObjectPaths></Request>`);
         done();
       }
       catch (e) {
@@ -376,7 +339,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       SharingCapability: 'abc'
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
-    assert.equal(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
+    assert.strictEqual(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
   });
 
   it('validation passes if right enum value', () => {
@@ -395,7 +358,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       SpecialCharactersStateInFileFolderNames: 'Allowed',
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('validation fails if wrong enum value', () => {
@@ -403,13 +366,13 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       SharingCapability: 'abc'
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
-    assert.equal(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
+    assert.strictEqual(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
   });
 
   it('validation fails if wrong enum key', () => {
 
     const actual = (command as any).mapEnumToInt('abc', 'abc');
-    assert.equal(actual, -1);
+    assert.strictEqual(actual, -1);
   });
 
   it('validation passes if right prop value', () => {
@@ -417,7 +380,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       OrgNewsSiteUrl: 'abc'
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('validation false if boolean option has non boolean value', () => {
@@ -425,7 +388,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       ShowAllUsersClaim: 'abc'
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
-    assert.equal(actual, 'ShowAllUsersClaim option has invalid value of abc. Allowed values are ["true","false"]');
+    assert.strictEqual(actual, 'ShowAllUsersClaim option has invalid value of abc. Allowed values are ["true","false"]');
   });
 
   it('validation fails if no options specified', () => {
@@ -434,7 +397,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       verbose: true
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
-    assert.equal(actual, `You must specify at least one option`);
+    assert.strictEqual(actual, `You must specify at least one option`);
   });
 
   it('validation passes autocomplete check if has the right value specified', () => {
@@ -442,6 +405,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       ShowAllUsersClaim: true
     }
     const actual = (command.validate() as CommandValidate)({ options: options });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 });

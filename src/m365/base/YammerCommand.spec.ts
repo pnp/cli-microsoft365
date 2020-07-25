@@ -5,6 +5,7 @@ import auth from '../../Auth';
 import Utils from '../../Utils';
 import { CommandError } from '../../Command';
 import appInsights from '../../appInsights';
+import { CommandInstance } from '../../cli';
 
 class MockCommand extends YammerCommand {
   public get name(): string {
@@ -53,7 +54,7 @@ describe('YammerCommand', () => {
     };
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -135,7 +136,7 @@ describe('YammerCommand', () => {
 
   it('returns correct resource', () => {
     const command = new MockCommand();
-    assert.equal((command as any).resource, 'https://www.yammer.com/api');
+    assert.strictEqual((command as any).resource, 'https://www.yammer.com/api');
   });
 
   it('displays error message coming from Yammer', () => {
@@ -152,7 +153,7 @@ describe('YammerCommand', () => {
         base: 'abc'
       }
     }, cmd, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
     });
 
   });
@@ -169,7 +170,7 @@ describe('YammerCommand', () => {
     mock.handlePromiseError({
       statusCode: 404
     }, cmd, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Not found (404)")));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Not found (404)")));
     });
   });
 
@@ -185,7 +186,7 @@ describe('YammerCommand', () => {
     mock.handlePromiseError({
       error: 'not from Yammer'
     }, cmd, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify({ "message": { "error": "not from Yammer" } }));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify({ "message": { "error": "not from Yammer" } }));
     });
   });
 
@@ -201,7 +202,7 @@ describe('YammerCommand', () => {
     mock.handlePromiseError({
       message: "test"
     }, cmd, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify({ "message": { "message": "test" } }));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify({ "message": { "message": "test" } }));
     });
   });
 });

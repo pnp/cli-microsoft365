@@ -33,7 +33,7 @@ describe('FN022001_SCSS_remove_fabric_react', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notifications if import is not removed', () => {
@@ -46,7 +46,7 @@ describe('FN022001_SCSS_remove_fabric_react', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('doesn\'t return notifications if scss is not in react web part', () => {
@@ -63,7 +63,7 @@ describe('FN022001_SCSS_remove_fabric_react', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if no scss files', () => {
@@ -75,7 +75,7 @@ describe('FN022001_SCSS_remove_fabric_react', () => {
       scssFiles: []
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('rule file name is empy', () => {
@@ -87,6 +87,6 @@ describe('FN022001_SCSS_remove_fabric_react', () => {
       scssFiles: []
     };
     rule.visit(project, findings);
-    assert.equal(rule.file, '');
+    assert.strictEqual(rule.file, '');
   });
 });

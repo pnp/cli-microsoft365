@@ -6,8 +6,8 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -67,7 +67,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         cmd.log(res);
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -109,10 +109,6 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required option webUrl missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -124,43 +120,14 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         }
       }
       else {
-        if (!args.options.location) {
-          return 'Required option location missing';
+        if (args.options.location !== 'QuickLaunch' &&
+          args.options.location !== 'TopNavigationBar') {
+          return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
         }
-        else {
-          if (args.options.location !== 'QuickLaunch' &&
-            args.options.location !== 'TopNavigationBar') {
-            return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
-          }
-        }
-      }
-
-      if (!args.options.title) {
-        return 'Required option title missing';
-      }
-
-      if (!args.options.url) {
-        return 'Required option url missing';
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (message: string) => void): void {
-    log(vorpal.find(commands.NAVIGATION_NODE_ADD).helpInformation());
-    log(
-      `  Examples:
-  
-    Add a navigation node pointing to a SharePoint page to the top navigation
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx
-
-    Add a navigation node pointing to an external page to the quick launch
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
-
-    Add a navigation node below an existing node
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx
-`);
   }
 }
 

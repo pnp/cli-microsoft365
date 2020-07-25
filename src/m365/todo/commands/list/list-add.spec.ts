@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -7,9 +7,9 @@ const command: Command = require('./list-add');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 describe(commands.LIST_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
 
@@ -20,7 +20,6 @@ describe(commands.LIST_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -36,7 +35,6 @@ describe(commands.LIST_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       Date.now
     ]);
@@ -51,11 +49,11 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.LIST_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.LIST_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('adds To Do task list', (done) => {
@@ -83,7 +81,7 @@ describe(commands.LIST_ADD, () => {
       }
     }, () => {
       try {
-        assert.equal(JSON.stringify(log[0]), JSON.stringify({
+        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
           "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists/$entity",
           "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGlTQ==\"",
           "displayName": "FooList",
@@ -126,8 +124,8 @@ describe(commands.LIST_ADD, () => {
       }
     }, () => {
       try {
-        const expected = vorpal.chalk.green('DONE');
-        assert.equal(log.filter(l => l == expected).length, 1);
+        const expected = chalk.green('DONE');
+        assert.strictEqual(log.filter(l => l == expected).length, 1);
         done();
       }
       catch (e) {
@@ -149,7 +147,7 @@ describe(commands.LIST_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -157,28 +155,6 @@ describe(commands.LIST_ADD, () => {
       }
     });
   });
-
-  it('fails validation if name is not set', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        debug: false,
-        name: null
-      }
-    });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation when all parameters are valid', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        debug: false,
-        name: 'Foo'
-      }
-    });
-
-    assert.equal(actual, true);
-  });
-
 
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
@@ -189,39 +165,5 @@ describe(commands.LIST_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.LIST_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

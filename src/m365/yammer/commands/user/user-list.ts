@@ -3,8 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -191,32 +190,6 @@ class YammerUserListCommand extends YammerCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-  
-    ${chalk.yellow('Attention:')} In order to use this command, you need to grant the Azure AD
-    application used by the CLI for Microsoft 365 the permission to the Yammer API.
-    To do this, execute the ${chalk.blue('cli consent --service yammer')} command.
-    
-  Examples:
-    
-    Returns all Yammer network users
-      ${this.name}
-
-    Returns all Yammer network users with usernames beginning with "a"
-      ${this.name} --letter a
-
-    Returns all Yammer network users sorted alphabetically in descending order
-      ${this.name} --reverse
-
-    Returns the first 10 Yammer network users within the group 5785177.
-      ${this.name} --groupId 5785177 --limit 10
-    `);
   }
 }
 

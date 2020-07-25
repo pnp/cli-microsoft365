@@ -13,8 +13,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { TermStore } from './TermStore';
 import { TermGroup } from './TermGroup';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -162,10 +161,6 @@ class SpoTermGroupAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.name) {
-        return 'Required option name missing';
-      }
-
       if (args.options.id) {
         if (!Utils.isValidGuid(args.options.id)) {
           return `${args.options.id} is not a valid GUID`;
@@ -174,26 +169,6 @@ class SpoTermGroupAddCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.TERM_GROUP_ADD).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-  
-  Examples:
-  
-    Add a new taxonomy term group with the specified name
-      m365 ${this.name} --name PnPTermSets
-
-    Add a new taxonomy term group with the specified name and id
-      m365 ${this.name} --name PnPTermSets --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
-
-    Add a new taxonomy term group with the specified name and description
-      m365 ${this.name} --name PnPTermSets --description 'Term sets for PnP'
-`);
   }
 }
 

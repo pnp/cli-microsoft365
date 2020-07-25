@@ -17,7 +17,7 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if no supportedHosts found while it should be removed', () => {
@@ -33,7 +33,7 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if supportedHosts found while it should be added', () => {
@@ -50,7 +50,7 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notifications if supportedHosts not found while it should be added', () => {
@@ -66,7 +66,7 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('returns notifications if supportedHosts found while it should be removed', () => {
@@ -83,6 +83,6 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

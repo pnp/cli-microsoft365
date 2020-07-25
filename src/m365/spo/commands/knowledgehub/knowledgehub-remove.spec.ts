@@ -10,7 +10,6 @@ import config from '../../../../config';
 import Utils from '../../../../Utils';
 
 describe(commands.KNOWLEDGEHUB_REMOVE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let requests: any[];
@@ -43,7 +42,6 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -62,12 +60,6 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
     promptOptions = undefined;
   });
 
-  afterEach(() => {
-    Utils.restore([
-      vorpal.find
-    ]);
-  });
-
   after(() => {
     Utils.restore([
       auth.restoreAuth,
@@ -81,11 +73,11 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.KNOWLEDGEHUB_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.KNOWLEDGEHUB_REMOVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('removes Knowledge Hub settings from tenant without prompting with confirmation argument', (done) => {
@@ -219,7 +211,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
 
     cmdInstance.action({ options: { debug: true, confirm: true } }, (err?: any) => {
       try {
-        assert.equal(err.message, 'An error has occurred');
+        assert.strictEqual(err.message, 'An error has occurred');
         done();
       }
       catch (e) {
@@ -239,7 +231,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
 
     cmdInstance.action({ options: { debug: false, confirm: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -278,39 +270,5 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.KNOWLEDGEHUB_REMOVE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

@@ -2,6 +2,7 @@ import request from '../../../../request';
 import { PageItem } from './PageItem';
 import { ClientSidePage, CanvasSection, CanvasColumn, ClientSidePart } from './clientsidepages';
 import Utils from '../../../../Utils';
+import { CommandInstance } from '../../../../cli';
 
 export class Page {
   public static getPage(name: string, webUrl: string, cmd: CommandInstance, debug: boolean, verbose: boolean): Promise<ClientSidePage> {

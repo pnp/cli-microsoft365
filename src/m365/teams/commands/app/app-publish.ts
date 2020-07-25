@@ -5,8 +5,8 @@ import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandValidate } from '../../../../Command';
 import GraphCommand from '../../../base/GraphCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -48,7 +48,7 @@ class TeamsAppPublishCommand extends GraphCommand {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -69,10 +69,6 @@ class TeamsAppPublishCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.filePath) {
-        return 'Missing required option filePath';
-      }
-
       const fullPath: string = path.resolve(args.options.filePath);
 
       if (!fs.existsSync(fullPath)) {
@@ -85,21 +81,6 @@ class TeamsAppPublishCommand extends GraphCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    You can only publish a Teams app as a global administrator.
-
-  Examples:
-
-    Add the ${chalk.grey('teams-manifest.zip')} file to the organization's app catalog
-      ${this.name} --filePath ./teams-manifest.zip
-`);
   }
 }
 

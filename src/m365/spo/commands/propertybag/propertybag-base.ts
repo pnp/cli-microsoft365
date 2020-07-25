@@ -5,6 +5,7 @@ import config from '../../../../config';
 import SpoCommand from '../../../base/SpoCommand';
 import { IdentityResponse, ClientSvc } from '../../ClientSvc';
 import { BasePermissions, PermissionKind } from '../../base-permissions';
+import { CommandInstance } from '../../../../cli';
 
 export interface Property {
   key: string;

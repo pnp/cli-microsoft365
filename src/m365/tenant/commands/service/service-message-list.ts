@@ -4,8 +4,8 @@ import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import Command, { CommandOption } from '../../../../Command';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
+import * as chalk from 'chalk';
 
 interface CommandArgs {
   options: Options;
@@ -58,7 +58,7 @@ class TenantServiceMessageListCommand extends Command {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -75,24 +75,6 @@ class TenantServiceMessageListCommand extends Command {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public commandHelp(args: any, log: (help: string) => void): void {
-    log(vorpal.find(commands.TENANT_SERVICE_MESSAGE_LIST).helpInformation());
-    log(
-      `  Examples:
-
-    Get service messages of all services in Microsoft 365
-      m365 ${commands.TENANT_SERVICE_MESSAGE_LIST}
-
-    Get service messages for Microsoft Teams
-      m365 ${commands.TENANT_SERVICE_MESSAGE_LIST} --workload microsoftteams
-
-  More information:
-
-    Microsoft 365 Service Communications API reference
-      https://docs.microsoft.com/office/office-365-management-api/office-365-service-communications-api-reference#get-messages
-    `);
   }
 }
 

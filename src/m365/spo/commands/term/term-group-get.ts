@@ -11,8 +11,7 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { TermGroup } from './TermGroup';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -118,23 +117,6 @@ class SpoTermGroupGetCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.TERM_GROUP_GET).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-    
-  Examples:
-  
-    Get information about a taxonomy term group using its ID
-      m365 ${this.name} --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
-
-    Get information about a taxonomy term group using its name
-      m365 ${this.name} --name PnPTermSets
-`);
   }
 }
 

@@ -10,8 +10,8 @@ import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Connector } from './Connector';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -166,7 +166,7 @@ class PaConnectorExportCommand extends AzmgmtCommand {
           }
         }
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
@@ -194,14 +194,6 @@ class PaConnectorExportCommand extends AzmgmtCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.environment) {
-        return 'Required option environment missing';
-      }
-
-      if (!args.options.connector) {
-        return 'Required option connector missing';
-      }
-
       if (args.options.outputFolder &&
         !fs.existsSync(path.resolve(args.options.outputFolder))) {
         return `Specified output folder ${args.options.outputFolder} doesn't exist`;
@@ -214,31 +206,6 @@ class PaConnectorExportCommand extends AzmgmtCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CONNECTOR_EXPORT).helpInformation());
-    log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
-
-    If no output folder has been specified, the ${chalk.blue(this.getCommandName())} command
-    will create a folder named after the connector in the current folder.
-    If the output folder has been specified, the folder named after
-    the connector will be created in that folder.
-  
-  Examples:
-  
-    Export the specified custom connector
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --connector shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa
-
-    Export the specified custom connector to the specific directory
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --connector shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa --outputFolder connector
-`);
   }
 }
 

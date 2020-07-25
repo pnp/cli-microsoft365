@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.TEAMS_MESSAGE_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -37,7 +35,6 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -51,45 +48,11 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_MESSAGE_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_MESSAGE_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_MESSAGE_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('fails validation if teamId and channelId are not specified', () => {
@@ -98,17 +61,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
         debug: false,
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if channelId is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        debug: false,
-        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3"
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the teamId is not a valid guid', () => {
@@ -118,7 +71,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validatation for a incorrect channelId missing leading 19:.', (done) => {
@@ -128,7 +81,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
         channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -139,7 +92,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -151,7 +104,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
         since: "2019.12.31"
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation for since date too far in the past (> 8 months)', () => {
@@ -164,7 +117,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
         since: d.toISOString()
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -185,7 +138,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('validates for a correct input (with optional --since param)', () => {
@@ -198,7 +151,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
         since: d.toISOString()
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('lists messages (debug)', (done) => {
@@ -723,7 +676,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

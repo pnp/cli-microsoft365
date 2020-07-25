@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.TEAMS_TAB_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.TEAMS_TAB_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.TEAMS_TAB_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -52,7 +49,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_TAB_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_TAB_LIST), true);
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
@@ -62,32 +59,12 @@ describe(commands.TEAMS_TAB_LIST, () => {
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
       }
     });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the teamId is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
-      }
-    });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the channelId is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('fails validates for a incorrect channelId missing leading 19:.', (done) => {
@@ -97,7 +74,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
         channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -108,7 +85,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -119,7 +96,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
     done();
   });
 
@@ -149,7 +126,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
       }
     }, (error?: any) => {
       try {
-        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError("Channel id is not in a valid format: 29:d09d9792d59544af846fa19c98b6acc6@thread.skype")));
+        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError("Channel id is not in a valid format: 29:d09d9792d59544af846fa19c98b6acc6@thread.skype")));
         done();
       }
       catch (e) {
@@ -383,39 +360,5 @@ describe(commands.TEAMS_TAB_LIST, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_TAB_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

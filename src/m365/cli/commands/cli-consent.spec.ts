@@ -8,7 +8,6 @@ import Utils from '../../../Utils';
 import config from '../../../config';
 
 describe(commands.CONSENT, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: any;
@@ -22,7 +21,6 @@ describe(commands.CONSENT, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -37,7 +35,6 @@ describe(commands.CONSENT, () => {
   });
 
   afterEach(() => {
-    Utils.restore(vorpal.find);
     config.tenant = originalTenant;
     config.cliAadAppId = originalAadAppId;
   });
@@ -49,11 +46,11 @@ describe(commands.CONSENT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CONSENT), true);
+    assert.strictEqual(command.name.startsWith(commands.CONSENT), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('shows consent URL for yammer permissions for the default multi-tenant app', (done) => {
@@ -95,52 +92,13 @@ describe(commands.CONSENT, () => {
     assert(containsOption);
   });
 
-  it('fails validation if service is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if specified service is invalid ', () => {
     const actual = (command.validate() as CommandValidate)({ options: { service: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if service is set to yammer ', () => {
     const actual = (command.validate() as CommandValidate)({ options: { service: 'yammer' } });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.CONSENT));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

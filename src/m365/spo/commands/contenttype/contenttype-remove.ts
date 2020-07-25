@@ -5,8 +5,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -103,7 +103,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
           }
           else {
             if (this.verbose) {
-              cmd.log(vorpal.chalk.green('DONE'));
+              cmd.log(chalk.green('DONE'));
             }
           }
 
@@ -154,10 +154,6 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -173,35 +169,6 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    If the specified content type is in use by a list and cannot be removed, 
-    you will be returned the error:
-    ${chalk.grey('Another site or list is still using this content type.')}
-    SharePoint will not allow a content type to be removed unless any 
-    dependent objects are also emptied from the recycle bin including 
-    the second-stage recycle bin.
-
-    The content type you wish to remove can be selected by the ID or Name 
-    of the content type. Either ID or Name parameter must be specified.
-
-  Examples:
-  
-    Remove a site content type by ID
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 0x01007926A45D687BA842B947286090B8F67D
-    
-    Remove a site content type by Name
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'My Content Type'
-
-    Remove a site content type without prompting for confirmation
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'My Content Type' --confirm
-    `);
   }
 }
 

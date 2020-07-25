@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandCancel, CommandError, CommandValidate } from '../../../../Command';
+import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -7,9 +7,9 @@ const command: Command = require('./site-rename');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 describe(commands.SITE_RENAME, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -31,7 +31,6 @@ describe(commands.SITE_RENAME, () => {
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
 
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -47,7 +46,6 @@ describe(commands.SITE_RENAME, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.post,
       (command as any).ensureFormDigest
@@ -66,11 +64,11 @@ describe(commands.SITE_RENAME, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITE_RENAME), true);
+    assert.strictEqual(command.name.startsWith(commands.SITE_RENAME), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('creates a site rename job using new url parameter', (done) => {
@@ -99,7 +97,7 @@ describe(commands.SITE_RENAME, () => {
 
     cmdInstance.action({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -185,7 +183,7 @@ describe(commands.SITE_RENAME, () => {
 
     cmdInstance.action({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressMarketplaceAppCheck: true, verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -222,7 +220,7 @@ describe(commands.SITE_RENAME, () => {
 
     cmdInstance.action({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressWorkflow2013Check: true, verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -259,7 +257,7 @@ describe(commands.SITE_RENAME, () => {
 
     cmdInstance.action({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', newSiteTitle: "RenamedSite", suppressWorkflow2013Check: true, suppressMarketplaceAppCheck: true, verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -357,7 +355,7 @@ describe(commands.SITE_RENAME, () => {
 
     cmdInstance.action({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', wait: true, debug: true, verbose: true } }, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -429,7 +427,7 @@ describe(commands.SITE_RENAME, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
         done();
       }
       catch (e) {
@@ -475,7 +473,7 @@ describe(commands.SITE_RENAME, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Invalid request")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid request")));
         done();
       }
       catch (e) {
@@ -518,32 +516,13 @@ describe(commands.SITE_RENAME, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
         done();
       }
       catch (e) {
         done(e);
       }
     });
-
-  });
-
-  it('can be cancelled', () => {
-    assert(command.cancel());
-  });
-
-  it('clears pending connection on cancel', () => {
-    (command as any).timeout = {};
-    const clearTimeoutSpy = sinon.spy(global, 'clearTimeout');
-    (command.cancel() as CommandCancel)();
-    Utils.restore(global.clearTimeout);
-    assert(clearTimeoutSpy.called);
-  });
-
-  it('doesn\'t fail on cancel if no connection pending', () => {
-    (command as any).timeout = undefined;
-    (command.cancel() as CommandCancel)();
-    assert(true);
   });
 
   it('supports debug mode', () => {
@@ -559,70 +538,36 @@ describe(commands.SITE_RENAME, () => {
 
   it('accepts newSiteUrl parameter', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: "http://contoso.sharepoint.com/", newSiteUrl: "http://contoso.sharepoint.com/sites/new" } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts both newSiteUrl and newSiteTitle', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: "http://contoso.sharepoint.com/", newSiteUrl: "http://contoso.sharepoint.com/sites/new", newSiteTitle: "New Site" } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts suppressMarketplaceAppCheck flag', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: "http://contoso.sharepoint.com/", newSiteUrl: "http://contoso.sharepoint.com/sites/new", newSiteTitle: "New Site", suppressMarketplaceAppCheck: true } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts suppressWorkflow2013Check flag', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: "http://contoso.sharepoint.com/", newSiteUrl: "http://contoso.sharepoint.com/sites/new", newSiteTitle: "New Site", suppressWorkflow2013Check: true } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts wait flag', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: "http://contoso.sharepoint.com/", newSiteUrl: "http://contoso.sharepoint.com/sites/new", newSiteTitle: "New Site", wait: true } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('rejects missing newSiteUrl', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: "http://contoso.sharepoint.com", newSiteTitle: "New Site" } });
-    assert.equal(actual, `A new url must be provided.`);
+    assert.strictEqual(actual, `A new url must be provided.`);
   });
 
   it('rejects when newSiteUrl is the same as siteUrl', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: "http://contoso.sharepoint.com/sites/target", newSiteUrl: "http://contoso.sharepoint.com/sites/target" } });
-    assert.equal(actual, `The new URL cannot be the same as the target URL.`);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITE_RENAME));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, `The new URL cannot be the same as the target URL.`);
   });
 });

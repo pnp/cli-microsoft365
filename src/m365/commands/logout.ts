@@ -3,8 +3,8 @@ import commands from './commands';
 import Command, {
   CommandError, CommandAction, CommandArgs,
 } from '../../Command';
-
-const vorpal: Vorpal = require('../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../cli';
 
 class LogoutCommand extends Command {
   public get name(): string {
@@ -16,8 +16,6 @@ class LogoutCommand extends Command {
   }
 
   public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
-    const chalk = vorpal.chalk;
-
     if (this.verbose) {
       cmd.log('Logging out from Microsoft 365...');
     }
@@ -49,34 +47,12 @@ class LogoutCommand extends Command {
       auth
         .restoreAuth()
         .then((): void => {
-          args = (cmd as any).processArgs(args);
           (cmd as any).initAction(args, this);
-
           cmd.commandAction(this, args, cb);
         }, (error: any): void => {
           cb(new CommandError(error));
         });
     }
-  }
-
-  public commandHelp(args: any, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.LOGOUT).helpInformation());
-    log(
-      `  Remarks:
-
-    The ${chalk.blue(commands.LOGOUT)} command logs out from Microsoft 365
-    and removes any access and refresh tokens from memory.
-
-  Examples:
-  
-    Log out from Microsoft 365
-      m365 ${this.name}
-
-    Log out from Microsoft 365 in debug mode including detailed debug
-    information in the console output
-      m365 ${this.name} --debug
-`);
   }
 }
 

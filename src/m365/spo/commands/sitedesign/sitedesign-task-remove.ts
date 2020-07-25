@@ -6,8 +6,8 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -53,7 +53,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
@@ -96,39 +96,12 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.taskId) {
-        return 'Required parameter taskId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.taskId)) {
         return `${args.options.taskId} is not a valid GUID`;
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-    
-    Removes the specified site design task with taskId
-    ${chalk.grey('6ec3ca5b-d04b-4381-b169-61378556d76e')} scheduled for execution without
-    prompting confirmation
-      ${this.name} --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e --confirm
-
-    Removes the specified site design task with taskId
-    ${chalk.grey('6ec3ca5b-d04b-4381-b169-61378556d76e')} scheduled for execution with
-    prompt for confirmation before removing
-      ${this.name} --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e 
-
-  More information:
-
-    SharePoint site design and site script overview
-      https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-overview
-`);
   }
 }
 

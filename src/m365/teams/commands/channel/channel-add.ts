@@ -6,8 +6,8 @@ import {
 import GraphCommand from "../../../base/GraphCommand";
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -54,7 +54,7 @@ class TeamsChannelAddCommand extends GraphCommand {
         cmd.log(res);
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -83,35 +83,12 @@ class TeamsChannelAddCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.teamId as string)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
 
-      if (!args.options.name) {
-        return 'Required parameter name missing';
-      }
-
       return true;
     };
-  }
-
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    You can only add a channel to the Microsoft Teams team you are a member of.
-
-  Examples:
-  
-    Add channel to the specified Microsoft Teams team
-      ${this.name} --teamId 6703ac8a-c49b-4fd4-8223-28f0ac3a6402 --name office365cli --description development
-`   );
   }
 }
 
