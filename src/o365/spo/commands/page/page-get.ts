@@ -8,7 +8,6 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { PageItem } from './PageItem';
 import { ClientSidePage } from './clientsidepages';
 import Utils from '../../../../Utils';
-//import { relative } from 'path';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -40,8 +39,10 @@ class SpoPageGetCommand extends SpoCommand {
       pageName += '.aspx';
     }
 
+    let ListItemAllFieldsString: string = this.verbose ? 'ListItemAllFields,' : '';
+
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
+      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=${ListItemAllFieldsString}ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
       headers: {
         'content-type': 'application/json;charset=utf-8',
         accept: 'application/json;odata=nometadata'
@@ -57,26 +58,31 @@ class SpoPageGetCommand extends SpoCommand {
           return;
         }
 
-        const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
-        let numControls: number = 0;
-        clientSidePage.sections.forEach(s => {
-          s.columns.forEach(c => {
-            numControls += c.controls.length;
-          });
-        });
-
-        const page: any = {
-          commentsDisabled: res.ListItemAllFields.CommentsDisabled,
-          numSections: clientSidePage.sections.length,
-          numControls: numControls,
-          title: res.ListItemAllFields.Title
-        };
-
-        if (res.ListItemAllFields.PageLayoutType) {
-          page.layoutType = res.ListItemAllFields.PageLayoutType;
+        if (this.verbose) {
+          cmd.log(res);
         }
+        else {
+          const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
+          let numControls: number = 0;
+          clientSidePage.sections.forEach(s => {
+            s.columns.forEach(c => {
+              numControls += c.controls.length;
+            });
+          });
 
-        cmd.log(page);
+          const page: any = {
+            commentsDisabled: res.ListItemAllFields.CommentsDisabled,
+            numSections: clientSidePage.sections.length,
+            numControls: numControls,
+            title: res.ListItemAllFields.Title
+          };
+
+          if (res.ListItemAllFields.PageLayoutType) {
+            page.layoutType = res.ListItemAllFields.PageLayoutType;
+          }
+
+          cmd.log(page);
+        }
 
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
