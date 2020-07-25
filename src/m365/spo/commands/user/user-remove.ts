@@ -6,7 +6,8 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -64,7 +65,7 @@ class SpoUserRemoveCommand extends SpoCommand {
         .post(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
 
           cb();
@@ -117,39 +118,16 @@ class SpoUserRemoveCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required option webUrl missing';
-      }
-
       if (!args.options.id && !args.options.loginName) {
         return 'Required option id or loginName missing, one is required';
       }
-
+      
       if (args.options.id && args.options.loginName) {
         return 'Use either id or loginName, but not both';
       }
 
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks
-
-    Use either 'id' or 'loginName', but not both
-
-  Examples:
-  
-    Removes user with id 10 from web https://contoso.sharepoint.com/sites/HR 
-    without prompting for confirmation
-      m365 ${this.name} --webUrl "https://contoso.sharepoint.com/sites/HR" --id 10 --confirm
-
-    Removes user with login name i:0#.f|membership|john.doe@mytenant.onmicrosoft.com 
-    from web https://contoso.sharepoint.com/sites/HR
-      m365 ${this.name} --webUrl "https://contoso.sharepoint.com/sites/HR" --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
-  `);
   }
 }
 

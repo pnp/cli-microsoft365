@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { PcfInitVariables } from "./commands/pcf/pcf-init/pcf-init-variables";
 import { SolutionInitVariables } from "./commands/solution/solution-init/solution-init-variables";
+import { CommandInstance } from "../../cli";
 
 /*
  * Logic extracted from bolt.cli.dll

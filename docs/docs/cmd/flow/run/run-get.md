@@ -10,16 +10,29 @@ m365 flow run get [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-n, --name <name>`|The name of the run to get information about
-`-f, --flow <flow>`|The name of the Microsoft Flow for which to retrieve information
-`-e, --environment <environment>`|The name of the environment where the Flow is located
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-n, --name <name>`
+: The name of the run to get information about
+
+`-f, --flow <flow>`
+: The name of the Microsoft Flow for which to retrieve information
+
+`-e, --environment <environment>`
+: The name of the environment where the Flow is located
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

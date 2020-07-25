@@ -12,7 +12,7 @@ m365 spo group list [options]
 
 Option|Description
 ------|-----------
-`--help`|output usage information
+`-h, --help`|output usage information
 `-u, --webUrl <webUrl>`|Url of the web to list the group within
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--verbose`|Runs command with verbose logging

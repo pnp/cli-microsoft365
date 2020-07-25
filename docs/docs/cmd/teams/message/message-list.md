@@ -10,16 +10,29 @@ m365 teams message list [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-i, --teamId <teamId>`|The ID of the team where the channel is located
-`-c, --channelId <channelId>`|The ID of the channel for which to list messages
-`-s, --since [since]`|Date (ISO standard, dash separator) to get delta of messages from (in last 8 months)
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-i, --teamId <teamId>`
+: The ID of the team where the channel is located
+
+`-c, --channelId <channelId>`
+: The ID of the channel for which to list messages
+
+`-s, --since [since]`
+: Date (ISO standard, dash separator) to get delta of messages from (in last 8 months)
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

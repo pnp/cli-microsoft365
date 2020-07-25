@@ -7,8 +7,7 @@ import { DirectorySetting } from './DirectorySetting';
 import { DirectorySettingValue } from './DirectorySettingValue';
 import { SiteClassificationSettings } from './SiteClassificationSettings'
 import { CommandError } from '../../../../Command';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -98,28 +97,6 @@ class AadSiteClassificationGetCommand extends GraphCommand {
 
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
-
-  Examples:
-  
-    Get information about the Microsoft 365 Tenant site classification
-      ${this.name}
-
-  More information:
-
-    SharePoint "modern" sites classification
-      https://docs.microsoft.com/en-us/sharepoint/dev/solution-guidance/modern-experience-site-classification
-    `);
   }
 }
 

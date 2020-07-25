@@ -10,16 +10,29 @@ m365 spo theme set [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-n, --name <name>`|Name of the theme to add or update
-`-p, --filePath <filePath>`|Absolute or relative path to the theme json file
-`--isInverted`|Set to specify that the theme is inverted
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-n, --name <name>`
+: Name of the theme to add or update
+
+`-p, --filePath <filePath>`
+: Absolute or relative path to the theme json file
+
+`--isInverted`
+: Set to specify that the theme is inverted
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 !!! important
     To use this command you have to have permissions to access the tenant admin site.

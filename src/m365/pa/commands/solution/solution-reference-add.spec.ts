@@ -10,7 +10,6 @@ import Utils from '../../../../Utils';
 import CdsProjectMutator from '../../cds-project-mutator';
 
 describe(commands.SOLUTION_REFERENCE_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let trackEvent: any;
@@ -23,7 +22,6 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -39,7 +37,6 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       fs.existsSync,
       fs.readFileSync,
       fs.writeFileSync,
@@ -56,11 +53,11 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SOLUTION_REFERENCE_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.SOLUTION_REFERENCE_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('calls telemetry', () => {
@@ -73,7 +70,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
   it('logs correct telemetry event', () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
-      assert.equal(telemetry.name, commands.SOLUTION_REFERENCE_ADD);
+      assert.strictEqual(telemetry.name, commands.SOLUTION_REFERENCE_ADD);
     });
   });
 
@@ -92,21 +89,21 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => []);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when more than one *.cdsproj exists in the current directory', () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.cdsproj', 'file2.cdsproj'] as any);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the path option isn\'t specified', () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.cdsproj'] as any);
 
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the specified path option doesn\'t exist', () => {
@@ -114,7 +111,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the specified path contains no *.pcfproj or *.csproj file', () => {
@@ -127,7 +124,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the specified path contains no *.pcfproj or *.csproj file', () => {
@@ -140,7 +137,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the specified path contains two *.pcfproj files', () => {
@@ -153,7 +150,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the specified path contains two *.csproj files', () => {
@@ -166,7 +163,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the specified path contains both *.pcfproj and *.csproj files', () => {
@@ -179,7 +176,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when current directory contains exactly one *.cdsproj file and the specified path contains exactly one *.pcfproj files', () => {
@@ -192,7 +189,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when current directory contains exactly one *.cdsproj file and the specified path contains exactly one *.csproj files', () => {
@@ -205,7 +202,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when current directory contains exactly one *.cdsproj file and the specified path contains exactly one *.pcfproj file with the same name', () => {
@@ -218,7 +215,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when current directory contains exactly one *.cdsproj file and the specified path contains exactly one *.csproj file with the same name', () => {
@@ -231,7 +228,7 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
 
     const actual = (command.validate() as CommandValidate)({ options: { path: 'path/to/project' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('Creates an instance of CdsProjectMutator, adds project reference and saves updated file', () => {
@@ -273,39 +270,5 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SOLUTION_REFERENCE_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

@@ -1,5 +1,6 @@
 export default {
   LOGIN: `login`,
   LOGOUT: `logout`,
-  STATUS: `status`
+  STATUS: `status`,
+  VERSION: 'version'
 };

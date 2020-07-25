@@ -6,8 +6,8 @@ import {
 } from '../../../../Command';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -60,7 +60,7 @@ class GraphSchemaExtensionAdd extends GraphCommand {
         cmd.log(res);
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -97,24 +97,8 @@ class GraphSchemaExtensionAdd extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.id) {
-        return 'Required option id is missing';
-      }
-
-      if (!args.options.owner) {
-        return 'Required option owner is missing';
-      }
-
       if (args.options.owner && !Utils.isValidGuid(args.options.owner)) {
         return `The specified owner '${args.options.owner}' is not a valid App Id`;
-      }
-
-      if (!args.options.targetTypes) {
-        return 'Required option targetTypes is missing';
-      }
-
-      if (!args.options.properties) {
-        return 'Required option targetTypes is missing';
       }
 
       return this.validateProperties(args.options.properties);
@@ -166,56 +150,6 @@ class GraphSchemaExtensionAdd extends GraphCommand {
     }
 
     return ['Binary', 'Boolean', 'DateTime', 'Integer', 'String'].indexOf(propertyType) > -1;
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    To create a schema extension, you have to specify a unique ID for the schema
-    extension. You can assign a value in one of two ways:
-
-    - concatenate the name of one of your verified domains with a name for
-      the schema extension to form a unique string in format
-      ${chalk.grey(`{domainName}_{schemaName}`)}, eg. ${chalk.grey(`contoso_mySchema`)}. 
-
-      NOTE: Only verified domains under the following top-level domains are
-      supported: .com,.net, .gov, .edu or .org.
-
-    - provide a schema name, and let Microsoft Graph use that schema name to
-      complete the id assignment in this format:
-      ${chalk.grey(`ext{8-random-alphanumeric-chars}_{schema-name}`)}, eg.
-      ${chalk.grey(`extkvbmkofy_mySchema`)}.
-      
-    The schema extension ID cannot be changed after creation.
-
-    The schema extension owner is the ID of the Azure AD application that is
-    the owner of the schema extension. Once set, this property is read-only
-    and cannot be changed.
-
-    The target types are the set of Microsoft Graph resource types (that support
-    schema extensions) that this schema extension definition can be applied to
-    This option is specified as a comma-separated list.
-
-    When specifying the JSON string of properties on Windows, you
-    have to escape double quotes in a specific way. Considering the following
-    value for the properties option: {"Foo":"Bar"},
-    you should specify the value as ${chalk.grey('\`"{""Foo"":""Bar""}"\`')}.
-    In addition, when using PowerShell, you should use the --% argument.
-
-  Examples:
-  
-    Create a schema extension
-      ${this.name} --id MySchemaExtension --description "My schema extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
-
-    Create a schema extension with a verified domain
-      ${this.name} --id contoso_MySchemaExtension --description "My schema extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
-
-    Create a schema extension in PowerShell
-      ${this.name} --id MySchemaExtension --description "My schema extension" --targetTypes Group --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --% --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
-`);
   }
 }
 

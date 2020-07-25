@@ -11,9 +11,9 @@ import Utils from '../../../../Utils';
 import * as spoSiteClassicSetCommand from './site-classic-set';
 import * as aadO365GroupSetCommand from '../../../aad/commands/o365group/o365group-set';
 import * as spoSiteDesignApplyCommand from '../sitedesign/sitedesign-apply';
+import { Cli } from '../../../../cli';
 
 describe(commands.SITE_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -27,7 +27,6 @@ describe(commands.SITE_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -43,10 +42,9 @@ describe(commands.SITE_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       request.get,
-      Utils.executeCommand,
+      Cli.executeCommand,
       (command as any).getSpoAdminUrl
     ]);
   });
@@ -61,11 +59,11 @@ describe(commands.SITE_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITE_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.SITE_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('updates the classification of the specified site', (done) => {
@@ -673,7 +671,7 @@ describe(commands.SITE_SET, () => {
 
     cmdInstance.action({ options: { debug: false, isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The isPublic option can't be set on a site that is not groupified`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The isPublic option can't be set on a site that is not groupified`)));
         done();
       }
       catch (e) {
@@ -693,7 +691,7 @@ describe(commands.SITE_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    executeCommandSpy = sinon.stub(Utils, 'executeCommand').callsFake(() => Promise.resolve());
+    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
 
     cmdInstance.action({ options: { debug: false, title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
@@ -703,9 +701,10 @@ describe(commands.SITE_SET, () => {
           owners: undefined,
           wait: true,
           debug: false,
-          verbose: false
+          verbose: false,
+          _: []
         };
-        assert(executeCommandSpy.calledWith(spoSiteClassicSetCommand, options));
+        assert(executeCommandSpy.calledWith('spo site classic set', spoSiteClassicSetCommand, { options: options }));
         done();
       }
       catch (e) {
@@ -725,7 +724,7 @@ describe(commands.SITE_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    executeCommandSpy = sinon.stub(Utils, 'executeCommand').callsFake(() => Promise.resolve());
+    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
 
     cmdInstance.action({ options: { debug: false, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
@@ -735,9 +734,10 @@ describe(commands.SITE_SET, () => {
           owners: 'admin@contoso.onmicrosoft.com',
           wait: true,
           debug: false,
-          verbose: false
+          verbose: false,
+          _: []
         };
-        assert(executeCommandSpy.calledWith(spoSiteClassicSetCommand, options));
+        assert(executeCommandSpy.calledWith('spo site classic set', spoSiteClassicSetCommand, { options: options }));
         done();
       }
       catch (e) {
@@ -757,11 +757,11 @@ describe(commands.SITE_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    executeCommandSpy = sinon.stub(Utils, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
+    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
 
     cmdInstance.action({ options: { debug: false, title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -797,7 +797,7 @@ describe(commands.SITE_SET, () => {
 
     cmdInstance.action({ options: { debug: false, title: 'New title', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -817,7 +817,7 @@ describe(commands.SITE_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    executeCommandSpy = sinon.stub(Utils, 'executeCommand').callsFake(() => Promise.resolve());
+    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
 
     cmdInstance.action({ options: { debug: false, isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
@@ -825,10 +825,11 @@ describe(commands.SITE_SET, () => {
           id: 'e10a459e-60c8-4000-8240-a68d6a12d39e',
           isPrivate: 'false',
           debug: false,
-          verbose: false
+          verbose: false,
+          _: []
         };
-        assert(executeCommandSpy.calledWith(aadO365GroupSetCommand, options));
-        assert.equal(typeof err, 'undefined');
+        assert(executeCommandSpy.calledWith('aad o365group set', aadO365GroupSetCommand, { options: options }));
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -848,11 +849,11 @@ describe(commands.SITE_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    executeCommandSpy = sinon.stub(Utils, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
+    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
 
     cmdInstance.action({ options: { debug: false, isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -891,7 +892,7 @@ describe(commands.SITE_SET, () => {
 
     cmdInstance.action({ options: { debug: false, owners: 'admin@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -973,7 +974,7 @@ describe(commands.SITE_SET, () => {
 
     cmdInstance.action({ options: { debug: false, owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -1016,7 +1017,7 @@ describe(commands.SITE_SET, () => {
 
     cmdInstance.action({ options: { debug: false, owners: ' admin1@contoso.onmicrosoft.com , admin2@contoso.onmicrosoft.com ', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -1055,7 +1056,7 @@ describe(commands.SITE_SET, () => {
 
     cmdInstance.action({ options: { debug: false, owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -1085,7 +1086,7 @@ describe(commands.SITE_SET, () => {
 
     cmdInstance.action({ options: { debug: false, owners: 'admin1@contoso.onmicrosoft.com,admin2@contoso.onmicrosoft.com', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err?: any) => {
       try {
-        assert.equal(typeof err, 'undefined');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -1105,7 +1106,7 @@ describe(commands.SITE_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    executeCommandSpy = sinon.stub(Utils, 'executeCommand').callsFake(() => Promise.resolve());
+    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
 
     cmdInstance.action({ options: { debug: false, siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
@@ -1114,9 +1115,10 @@ describe(commands.SITE_SET, () => {
           id: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e',
           asTask: false,
           debug: false,
-          verbose: false
+          verbose: false,
+          _: []
         };
-        assert(executeCommandSpy.calledWith(spoSiteDesignApplyCommand, options));
+        assert(executeCommandSpy.calledWith('spo sitedesign apply', spoSiteDesignApplyCommand, { options: options }));
         done();
       }
       catch (e) {
@@ -1125,7 +1127,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('applies site design to the specified gropified site', (done) => {
+  it('applies site design to the specified groupified site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1136,7 +1138,7 @@ describe(commands.SITE_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    executeCommandSpy = sinon.stub(Utils, 'executeCommand').callsFake(() => Promise.resolve());
+    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
 
     cmdInstance.action({ options: { debug: false, siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
@@ -1145,9 +1147,10 @@ describe(commands.SITE_SET, () => {
           id: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e',
           asTask: false,
           debug: false,
-          verbose: false
+          verbose: false,
+          _: []
         };
-        assert(executeCommandSpy.calledWith(spoSiteDesignApplyCommand, options));
+        assert(executeCommandSpy.calledWith('spo sitedesign apply', spoSiteDesignApplyCommand, { options: options }));
         done();
       }
       catch (e) {
@@ -1167,11 +1170,11 @@ describe(commands.SITE_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    executeCommandSpy = sinon.stub(Utils, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
+    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.reject(new CommandError('An error has occurred')));
 
     cmdInstance.action({ options: { debug: false, siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e', url: 'https://contoso.sharepoint.com/sites/Sales' } }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -1191,7 +1194,7 @@ describe(commands.SITE_SET, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', classification: 'HBI' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("404 - \"404 FILE NOT FOUND\"")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("404 - \"404 FILE NOT FOUND\"")));
         done();
       }
       catch (e) {
@@ -1227,7 +1230,7 @@ describe(commands.SITE_SET, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1', classification: 'HBI' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
       }
       catch (e) {
@@ -1264,7 +1267,7 @@ describe(commands.SITE_SET, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', sharingCapability: 'Invalid' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
       }
       catch (e) {
@@ -1274,14 +1277,14 @@ describe(commands.SITE_SET, () => {
   });
 
   it('configures command types', () => {
-    assert.notEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
+    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
   });
 
   it('configures classification as string option', () => {
     const types = (command.types() as CommandTypes);
     ['classification'].forEach(o => {
-      assert.notEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
+      assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
   });
 
@@ -1329,144 +1332,100 @@ describe(commands.SITE_SET, () => {
     assert(containsOption);
   });
 
-  it('fails validation if URL not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { classification: 'HBI' } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if URL is not a valid SharePoint URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'Invalid', classification: 'HBI' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if specified id is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', id: 'abc' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if no property to update specified (id not specified)', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if no property to update specified (id specified)', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if invalid value specified for disableFlows', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'Invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if url and classification specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', classification: 'HBI' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if url and empty classification specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', classification: '' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if url and disableFlows true specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if url and disableFlows false specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', disableFlows: 'false' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if url, id, classification and disableFlows specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', url: 'https://contoso.sharepoint.com', classification: 'HBI', disableFlows: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if invalid value specified for isPublic', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'Invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if true specified for isPublic', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if false specified for isPublic', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', isPublic: 'false' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if invalid value specified for shareByEmailEnabled', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'Invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if true specified for shareByEmailEnabled', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if false specified for shareByEmailEnabled', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', shareByEmailEnabled: 'false' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if non-GUID value specified for siteDesignId', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', siteDesignId: 'Invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if a valid GUID specified for siteDesignId', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if non existing sharingCapability specified', () => {
     const sharingCapabilityvalue = 'nonExistentSharingCapabilityValue';
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if correct sharingCapability specified', () => {
     const sharingCapabilityvalue = 'ExternalUserSharingOnly';
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITE_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

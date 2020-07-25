@@ -24,7 +24,7 @@ describe('FN016001_TS_msgraphclient_packageName', () => {
   });
 
   it('returns empty resolution', () => {
-    assert.equal(rule.resolution, '');
+    assert.strictEqual(rule.resolution, '');
   });
 
   it('doesn\'t return notifications if no .ts files found', () => {
@@ -33,7 +33,7 @@ describe('FN016001_TS_msgraphclient_packageName', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if specified .ts file not found', () => {
@@ -45,7 +45,7 @@ describe('FN016001_TS_msgraphclient_packageName', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if couldn\'t retrieve the import declaration', () => {
@@ -59,7 +59,7 @@ describe('FN016001_TS_msgraphclient_packageName', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if MSGraphClient is already imported from the correct package', () => {
@@ -72,6 +72,6 @@ describe('FN016001_TS_msgraphclient_packageName', () => {
       ]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

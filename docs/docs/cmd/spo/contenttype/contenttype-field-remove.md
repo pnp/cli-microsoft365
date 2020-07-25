@@ -10,19 +10,38 @@ m365 spo contenttype field remove [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|Absolute URL of the site where the content type is located
-`-l, --listTitle [listTitle]`|Title of the list where the content type is located (if it is a list content type)
-`-i, --contentTypeId <contentTypeId>`|The ID of the content type to remove the column from
-`-f, --fieldLinkId <fieldLinkId>`|The ID of the column to remove
-`-c, --updateChildContentTypes`|Update child content types
-`--confirm`|Don't prompt for confirming removal of a column from content type
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: Absolute URL of the site where the content type is located
+
+`-l, --listTitle [listTitle]`
+: Title of the list where the content type is located (if it is a list content type)
+
+`-i, --contentTypeId <contentTypeId>`
+: The ID of the content type to remove the column from
+
+`-f, --fieldLinkId <fieldLinkId>`
+: The ID of the column to remove
+
+`-c, --updateChildContentTypes`
+: Update child content types
+
+`--confirm`
+: Don't prompt for confirming removal of a column from content type
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

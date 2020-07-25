@@ -10,15 +10,26 @@ m365 flow list [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-e, --environment <environment>`|The name of the environment for which to retrieve available Flows
-`--asAdmin`|Set, to list all Flows as admin. Otherwise will return only your own Flows
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-e, --environment <environment>`
+: The name of the environment for which to retrieve available Flows
+
+`--asAdmin`
+: Set, to list all Flows as admin. Otherwise will return only your own Flows
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

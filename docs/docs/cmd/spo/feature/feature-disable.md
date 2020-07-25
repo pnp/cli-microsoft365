@@ -12,7 +12,7 @@ m365 spo feature disable [options]
 
 Option|Description
 ------|-----------
-`--help`|output usage information
+`-h, --help`|output usage information
 `-u, --url <url>`|The URL of the site or web for which to disable the feature
 `-f, --featureId <id>`|The ID of the feature to disable
 `-s, --scope [scope]`|Scope of the Feature to disable. Allowed values `Site,Web`. Default `Web`

@@ -6,8 +6,8 @@ import {
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -47,7 +47,7 @@ class TeamsRemoveCommand extends GraphCommand {
         .delete(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
 
           cb();
@@ -92,40 +92,12 @@ class TeamsRemoveCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.teamId)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    When deleted, Microsoft 365 groups are moved to a temporary container and
-    can be restored within 30 days. After that time, they are permanently
-    deleted. This applies only to Microsoft 365 groups.
-
-  Examples:
-  
-    Removes the specified team 
-      ${this.name} --teamId '00000000-0000-0000-0000-000000000000'
-
-    Removes the specified team without confirmation
-      ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --confirm
-
-  More information:
-
-    directory resource type (deleted items)
-      https://docs.microsoft.com/en-us/graph/api/resources/directory?view=graph-rest-1.0
-  `);
   }
 }
 

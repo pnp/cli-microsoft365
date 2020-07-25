@@ -7,8 +7,8 @@ import {
   CommandOption
 } from "../../../../Command";
 import request from "../../../../request";
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -65,7 +65,7 @@ class SpoFeatureDisableCommand extends SpoCommand {
       .post(requestOptions)
       .then((res: any): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
@@ -105,14 +105,6 @@ class SpoFeatureDisableCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required parameter url missing';
-      }
-
-      if (!args.options.featureId) {
-        return 'Required parameter featureId missing';
-      }
-
       if (args.options.scope) {
         if (['site', 'web'].indexOf(args.options.scope.toLowerCase()) < 0) {
           return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
@@ -121,25 +113,6 @@ class SpoFeatureDisableCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.FEATURE_DISABLE).helpInformation());
-    log(
-      `  Remarks:
-
-    If the specified ${chalk.grey('url')} doesn't refer to an existing site collection,
-    you will get a ${chalk.grey('"404 FILE NOT FOUND"')} error.
-      
-  Examples:
-  
-    Disable site feature
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --featureId 915c240e-a6cc-49b8-8b2c-0bff8b553ed3 --scope Site
-
-    Disable web feature (with force to ignore errors)
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --featureId 00bfea71-5932-4f9c-ad71-1557e5751100 --scope Web --force
-    `);
   }
 }
 

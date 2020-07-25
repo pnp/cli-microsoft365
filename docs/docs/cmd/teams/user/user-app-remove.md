@@ -12,7 +12,7 @@ m365 teams user app remove [options]
 
 Option|Description
 ------|-----------
-`--help`|output usage information
+`-h, --help`|output usage information
 `--appId <appId>`|The unique id of the app instance installed for the user
 `--userId <userId>`|The ID of the user to uninstall the app for
 `--confirm`|Confirm removal of app for user

@@ -1,12 +1,10 @@
 import commands from '../commands';
 import GlobalOptions from '../../../GlobalOptions';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../Command';
 import { AzmgmtItemsListCommand } from '../../base/AzmgmtItemsListCommand';
-
-const vorpal: Vorpal = require('../../../vorpal-init');
+import { CommandInstance } from '../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -75,42 +73,6 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, properties:
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.environment) {
-        return 'Required option environment missing';
-      }
-
-      return true;
-    };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.FLOW_LIST).helpInformation());
-    log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
-  
-    If the environment with the name you specified doesn't exist, you will get
-    the ${chalk.grey('Access to the environment \'xyz\' is denied.')} error.
-
-    By default, the ${chalk.blue(this.getCommandName())} command returns only your
-    Flows. To list all Flows, use the ${chalk.blue('asAdmin')} option.
-   
-  Examples:
-  
-    List all your Flows in the given environment
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5
-
-    List all Flows in the given environment
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
-`);
   }
 }
 

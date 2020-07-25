@@ -8,8 +8,7 @@ import {
 import { AppMetadata } from './AppMetadata';
 import Utils from '../../../../Utils';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -149,49 +148,6 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.APP_GET).helpInformation());
-    log(
-      `  Remarks:
-  
-    When getting information about an app from the tenant app catalog,
-    it's not necessary to specify the tenant app catalog URL. When the URL
-    is not specified, the CLI will try to resolve the URL itself.
-    Specifying the app catalog URL is required when you want to get information
-    about an app from a site collection app catalog.
-
-    When specifying site collection app catalog, you can specify the URL either
-    with our without the ${chalk.grey('AppCatalog')} part, for example
-    ${chalk.grey('https://contoso.sharepoint.com/sites/team-a/AppCatalog')} or
-    ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}. CLI will accept both formats.
-   
-  Examples:
-  
-    Return details about the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
-    available in the tenant app catalog.
-      m365 ${this.name} --id b2307a39-e878-458b-bc90-03bc578531d6
-
-    Return details about the app with name ${chalk.grey('solution.sppkg')}
-    available in the tenant app catalog. Will try to detect the app catalog URL
-      m365 ${this.name} --name solution.sppkg
-
-    Return details about the app with name ${chalk.grey('solution.sppkg')}
-    available in the tenant app catalog using the specified app catalog URL
-      m365 ${this.name} --name solution.sppkg --appCatalogUrl https://contoso.sharepoint.com/sites/apps
-
-    Return details about the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
-    available in the site collection app catalog
-    of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      m365 ${this.name} --id b2307a39-e878-458b-bc90-03bc578531d6 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
-
-  More information:
-  
-    Application Lifecycle Management (ALM) APIs
-      https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins
-`);
   }
 }
 

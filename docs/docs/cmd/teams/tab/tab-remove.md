@@ -10,17 +10,32 @@ m365 teams tab remove [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-i, --teamId <teamId>`|The ID of the team where the tab exists
-`-c, --channelId <channelId>`|The ID of the channel to remove the tab from
-`-t, --tabId <tabId>`|The ID of the tab to remove
-`--confirm`|Don't prompt for confirmation
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-i, --teamId <teamId>`
+: The ID of the team where the tab exists
+
+`-c, --channelId <channelId>`
+: The ID of the channel to remove the tab from
+
+`-t, --tabId <tabId>`
+: The ID of the tab to remove
+
+`--confirm`
+: Don't prompt for confirmation
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json|text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

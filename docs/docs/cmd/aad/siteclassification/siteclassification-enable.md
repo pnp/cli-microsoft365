@@ -10,17 +10,32 @@ m365 aad siteclassification enable [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-c, --classifications <classifications>`|Comma-separated list of classifications to enable in the tenant
-`-d, --defaultClassification <defaultClassification>`|Classification to use by default
-`-u, --usageGuidelinesUrl [usageGuidelinesUrl]`|URL with usage guidelines for members
-`-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]`|URL with usage guidelines for guests
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-c, --classifications <classifications>`
+: Comma-separated list of classifications to enable in the tenant
+
+`-d, --defaultClassification <defaultClassification>`
+: Classification to use by default
+
+`-u, --usageGuidelinesUrl [usageGuidelinesUrl]`
+: URL with usage guidelines for members
+
+`-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]`
+: URL with usage guidelines for guests
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

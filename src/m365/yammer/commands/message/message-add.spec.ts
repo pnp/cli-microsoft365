@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.YAMMER_MESSAGE_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -22,7 +21,6 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -52,36 +49,31 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.YAMMER_MESSAGE_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.YAMMER_MESSAGE_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('repliedToId must be a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { body: "test", repliedToId: 'nonumber' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('groupId must be a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { body: "test", groupId: 'nonumber' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('networkId must be a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { body: "test", networkId: 'nonumber' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('body is required', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('has all fields', () => {
     const actual = (command.validate() as CommandValidate)({ options: { body: "test" } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('posts a message', function (done) {
@@ -93,7 +85,7 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
     });
     cmdInstance.action({ options: { body: "send a letter to me", debug: true } }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0].id, 470839661887488)
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].id, 470839661887488)
         done();
       }
       catch (e) {
@@ -111,7 +103,7 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
     });
     cmdInstance.action({ options: { body: "send a letter to me", debug: true, output: "json" } }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0].id, 470839661887488)
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].id, 470839661887488)
         done();
       }
       catch (e) {
@@ -131,7 +123,7 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
       }
       catch (e) {
@@ -149,39 +141,5 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.YAMMER_MESSAGE_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

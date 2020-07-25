@@ -2,14 +2,14 @@ import config from '../../../../config';
 import request from '../../../../request';
 import commands from '../../commands';
 import {
-  CommandError, CommandOption, CommandValidate
+  CommandError, CommandOption
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -66,7 +66,7 @@ class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
         }
         cb();
@@ -81,36 +81,6 @@ class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.grantId) {
-        return 'Required parameter grantId missing';
-      }
-
-      return true;
-    };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.SERVICEPRINCIPAL_GRANT_REVOKE).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-        
-  Remarks:
-
-    The permission grant you want to revoke is denoted using its ${chalk.grey('ObjectId')}.
-    You can retrieve it using the ${chalk.grey(`${commands.SERVICEPRINCIPAL_GRANT_LIST}`)} command.
-
-  Examples:
-  
-    Revoke permission grant with ObjectId
-    ${chalk.grey('50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA')}
-      m365 ${this.name} --grantId 50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA
-`);
   }
 }
 

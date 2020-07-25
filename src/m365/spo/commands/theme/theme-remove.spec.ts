@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 const command: Command = require('./theme-remove');
@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
 describe(commands.THEME_REMOVE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let promptOptions: any;
@@ -23,7 +22,6 @@ describe(commands.THEME_REMOVE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -44,7 +42,6 @@ describe(commands.THEME_REMOVE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -59,11 +56,11 @@ describe(commands.THEME_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.THEME_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.THEME_REMOVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('should prompt before removing theme when confirmation argument not passed', (done) => {
@@ -102,11 +99,11 @@ describe(commands.THEME_REMOVE, () => {
       }
     }, () => {
       try {
-        assert.equal(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
-        assert.equal(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.equal(postStub.lastCall.args[0].body.name, 'Contoso');
-        assert.equal(postStub.lastCall.args[0].json, true);
-        assert.equal(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
+        assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
+        assert.strictEqual(postStub.lastCall.args[0].body.name, 'Contoso');
+        assert.strictEqual(postStub.lastCall.args[0].json, true);
+        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -133,11 +130,11 @@ describe(commands.THEME_REMOVE, () => {
       }
     }, () => {
       try {
-        assert.equal(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
-        assert.equal(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.equal(postStub.lastCall.args[0].body.name, 'Contoso');
-        assert.equal(postStub.lastCall.args[0].json, true);
-        assert.notEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE'), -1);
+        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
+        assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
+        assert.strictEqual(postStub.lastCall.args[0].body.name, 'Contoso');
+        assert.strictEqual(postStub.lastCall.args[0].json, true);
+        assert.notStrictEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
       catch (e) {
@@ -167,11 +164,11 @@ describe(commands.THEME_REMOVE, () => {
       }
     }, () => {
       try {
-        assert.equal(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
-        assert.equal(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.equal(postStub.lastCall.args[0].body.name, 'Contoso');
-        assert.equal(postStub.lastCall.args[0].json, true);
-        assert.notEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE'), -1);
+        assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
+        assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
+        assert.strictEqual(postStub.lastCall.args[0].body.name, 'Contoso');
+        assert.strictEqual(postStub.lastCall.args[0].json, true);
+        assert.notStrictEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
       catch (e) {
@@ -202,7 +199,7 @@ describe(commands.THEME_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -220,27 +217,5 @@ describe(commands.THEME_REMOVE, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.THEME_REMOVE));
-  });
-
-  it('fails validation if name is not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: '' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation when name is passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'Contoso-Blue' } });
-    assert.equal(actual, true);
   });
 });

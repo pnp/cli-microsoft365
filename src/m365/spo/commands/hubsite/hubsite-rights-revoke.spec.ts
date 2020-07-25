@@ -8,9 +8,9 @@ import * as assert from 'assert';
 import request from '../../../../request';
 import config from '../../../../config';
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -25,7 +25,6 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -46,7 +45,6 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -62,11 +60,11 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.HUBSITE_RIGHTS_REVOKE), true);
+    assert.strictEqual(command.name.startsWith(commands.HUBSITE_RIGHTS_REVOKE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('revokes rights to join the specified hub site without prompting for confirmation when confirm option specified', (done) => {
@@ -114,7 +112,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
 
     cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -304,7 +302,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
       }
       catch (e) {
@@ -320,7 +318,7 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
 
     cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin', confirm: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -373,72 +371,28 @@ describe(commands.HUBSITE_RIGHTS_REVOKE, () => {
     assert(containsOption);
   });
 
-  it('fails validation if url not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { principals: 'admin' } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if url is not a valid SharePoint URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'abc', principals: 'admin' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if principals not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com/sites/sales' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when all parameters are valid', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when all parameters are valid (multiple principals)', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin,user' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when all parameters are valid (multiple principals separated with an extra space)', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin, user' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when all parameters are valid (multiple principals with email address)', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com/sites/Sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.HUBSITE_RIGHTS_REVOKE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

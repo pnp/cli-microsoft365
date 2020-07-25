@@ -4,8 +4,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandValidate } from '../../../../Command';
 import GraphCommand from '../../../base/GraphCommand';
 import request from '../../../../request';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -70,7 +70,7 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
       .patch(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -107,10 +107,6 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.teamId)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
@@ -139,26 +135,6 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-
-    Allow giphy usage within a given Microsoft Teams team, setting the content
-    rating for giphy to Moderate
-      ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy true --giphyContentRating Moderate
-    
-    Disable usage of giphy within the given Microsoft Teams team
-      ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy false
-
-    Allow usage of stickers and memes within a given Microsoft Teams team
-      ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowStickersAndMemes true
-
-    Disable usage custom memes within a given Microsoft Teams team
-      ${this.name} --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowCustomMemes false
-`);
   }
 }
 

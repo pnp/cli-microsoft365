@@ -3,6 +3,7 @@ import {
 } from '../../Command';
 import PeriodBasedReport from './PeriodBasedReport';
 import GlobalOptions from '../../GlobalOptions';
+import { CommandInstance } from '../../cli';
 
 interface CommandArgs {
   options: DateAndPeriodBasedOptions;

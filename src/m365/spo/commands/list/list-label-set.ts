@@ -8,8 +8,8 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { ListInstance } from './ListInstance';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -98,7 +98,7 @@ class SpoListLabelSetCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -147,14 +147,6 @@ class SpoListLabelSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.label) {
-        return 'Required parameter label missing';
-      }
-
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       if (!args.options.listId && !args.options.listTitle && !args.options.listUrl) {
         return `Specify listId or listTitle or listUrl.`;
       }
@@ -165,23 +157,6 @@ class SpoListLabelSetCommand extends SpoCommand {
 
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Sets classification label "Confidential" for list ${chalk.grey('Shared Documents')}
-    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --label 'Confidential'
-
-    Sets classification label "Confidential" and disables editing and deleting
-    items on the list and all existing items for list ${chalk.grey('Documents')}
-    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --label 'Confidential' --blockEdit --blockDelete --syncToItems
-`);
   }
 }
 

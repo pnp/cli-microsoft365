@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -8,9 +8,9 @@ import * as assert from 'assert';
 import request from '../../../../request';
 import config from '../../../../config';
 import Utils from '../../../../Utils';
+import * as chalk from 'chalk';
 
 describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -24,7 +24,6 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -40,7 +39,6 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -56,11 +54,11 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SERVICEPRINCIPAL_GRANT_REVOKE), true);
+    assert.strictEqual(command.name.startsWith(commands.SERVICEPRINCIPAL_GRANT_REVOKE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('revokes the specified permission grant (debug)', (done) => {
@@ -90,7 +88,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
     });
     cmdInstance.action({ options: { debug: true, grantId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -147,7 +145,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
     });
     cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The given key was not present in the dictionary.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The given key was not present in the dictionary.')));
         done();
       }
       catch (e) {
@@ -160,7 +158,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
     cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -171,7 +169,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
 
   it('defines alias', () => {
     const alias = command.alias();
-    assert.notEqual(typeof alias, 'undefined');
+    assert.notStrictEqual(typeof alias, 'undefined');
   });
 
   it('supports debug mode', () => {
@@ -194,49 +192,5 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('fails validation if the grantId option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation when the grantId is specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { grantId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SERVICEPRINCIPAL_GRANT_REVOKE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

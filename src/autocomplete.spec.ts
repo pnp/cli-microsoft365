@@ -6,6 +6,58 @@ import * as os from 'os';
 import Utils from './Utils';
 import { SinonSandbox } from 'sinon';
 import { fail } from 'assert';
+import { Cli, CommandInstance } from './cli';
+import Command, { CommandOption } from './Command';
+
+class SimpleCommand extends Command {
+  public get name(): string {
+    return 'cli mock';
+  }
+  public get description(): string {
+    return 'Mock command'
+  }
+  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
+    cb();
+  }
+}
+
+class CommandWithOptions extends Command {
+  public get name(): string {
+    return 'cli mock2';
+  }
+  public get description(): string {
+    return 'Mock command 2'
+  }
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-l, --longOption <longOption>',
+        description: 'Long option'
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
+    cb();
+  }
+}
+
+class CommandWithAlias extends Command {
+  public get name(): string {
+    return 'cli mock';
+  }
+  public get description(): string {
+    return 'Mock command'
+  }
+  public alias(): string[] | undefined {
+    return ['cli alias'];
+  }
+  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
+    cb();
+  }
+}
 
 describe('autocomplete', () => {
   let autocomplete: any;
@@ -54,10 +106,16 @@ describe('autocomplete', () => {
       }
     }
   };
+  let cli: Cli;
 
   before(() => {
+    cli = Cli.getInstance();
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     autocomplete = require('./autocomplete').autocomplete;
+  });
+
+  afterEach(() => {
+    (cli as any).commands = []
   });
 
   after(() => {
@@ -70,21 +128,18 @@ describe('autocomplete', () => {
 
   it('writes sh completion to disk', () => {
     const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake((path, contents) => { });
-    autocomplete.generateShCompletion({
-      commands: [
-        {
-          options: [],
-          _args: [],
-          _aliases: [],
-          _name: 'spo connect',
-          _hidden: false
-        }
-      ]
-    });
+    (cli as any).loadCommand(new SimpleCommand());
+    autocomplete.generateShCompletion();
     assert(writeFileSyncStub.calledWith(path.join(__dirname, `..${path.sep}commands.json`), JSON.stringify({
-      spo: {
-        connect: {
-          '--help': {}
+      cli: {
+        mock: {
+          "-o": ["json", "text"],
+          "--query": {},
+          "--output": ["json", "text"],
+          "--verbose": {},
+          "--debug": {},
+          "--help": {},
+          "-h": {}
         }
       }
     })));
@@ -111,79 +166,12 @@ describe('autocomplete', () => {
   });
 
   it('builds clink completion', () => {
-    const clink: string = autocomplete.getClinkCompletion({
-      commands: [
-        {
-          options: [],
-          _args: [],
-          _aliases: [],
-          _name: 'spo connect',
-          _hidden: false
-        }
-      ]
-    });
+    (cli as any).loadCommand(new SimpleCommand());
+    const clink: string = autocomplete.getClinkCompletion();
 
-    assert.equal(clink, [
+    assert.strictEqual(clink, [
       'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"spo"..parser({"connect"..parser({},"--help")})})',
-      '',
-      'clink.arg.register_parser("m365", m365_parser)',
-      'clink.arg.register_parser("microsoft365", m365_parser)'
-    ].join(os.EOL));
-  });
-
-  it('ignores the exit command in clink completion', () => {
-    const clink: string = autocomplete.getClinkCompletion({
-      commands: [
-        {
-          options: [],
-          _args: [],
-          _aliases: [],
-          _name: 'spo connect',
-          _hidden: false
-        },
-        {
-          options: [],
-          _args: [],
-          _aliases: [],
-          _name: 'exit',
-          _hidden: false
-        }
-      ]
-    });
-
-    assert.equal(clink, [
-      'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"spo"..parser({"connect"..parser({},"--help")})})',
-      '',
-      'clink.arg.register_parser("m365", m365_parser)',
-      'clink.arg.register_parser("microsoft365", m365_parser)'
-    ].join(os.EOL));
-  });
-
-  it('ignores the quit command in clink completion', () => {
-    const clink: string = autocomplete.getClinkCompletion({
-      commands: [
-        {
-          options: [],
-          _args: [],
-          _aliases: [],
-          _name: 'spo connect',
-          _hidden: false
-        },
-        {
-          options: [],
-          _args: [],
-          _aliases: [],
-          _name: 'quit',
-          _hidden: false
-        }
-      ]
-    });
-
-    assert.equal(clink, [
-      'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"spo"..parser({"connect"..parser({},"--help")})})',
+      'local m365_parser = parser({"cli"..parser({"mock"..parser({},"--debug", "--help", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-o"..parser({"json","text"}))})})',
       '',
       'clink.arg.register_parser("m365", m365_parser)',
       'clink.arg.register_parser("microsoft365", m365_parser)'
@@ -191,27 +179,12 @@ describe('autocomplete', () => {
   });
 
   it('includes long options in clink completion', () => {
-    const clink: string = autocomplete.getClinkCompletion({
-      commands: [
-        {
-          options: [
-            {
-              autocomplete: null,
-              long: '--appCatalogUrl',
-              short: null
-            }
-          ],
-          _args: [],
-          _aliases: [],
-          _name: 'spo app list',
-          _hidden: false
-        }
-      ]
-    });
+    (cli as any).loadCommand(new CommandWithOptions());
+    const clink: string = autocomplete.getClinkCompletion();
 
-    assert.equal(clink, [
+    assert.strictEqual(clink, [
       'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"spo"..parser({"app"..parser({"list"..parser({},"--appCatalogUrl", "--help")})})})',
+      'local m365_parser = parser({"cli"..parser({"mock2"..parser({},"--debug", "--help", "--longOption", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-l", "-o"..parser({"json","text"}))})})',
       '',
       'clink.arg.register_parser("m365", m365_parser)',
       'clink.arg.register_parser("microsoft365", m365_parser)'
@@ -219,27 +192,12 @@ describe('autocomplete', () => {
   });
 
   it('includes short options in clink completion', () => {
-    const clink: string = autocomplete.getClinkCompletion({
-      commands: [
-        {
-          options: [
-            {
-              autocomplete: [],
-              long: null,
-              short: "-u"
-            }
-          ],
-          _args: [],
-          _aliases: [],
-          _name: 'spo app list',
-          _hidden: false
-        }
-      ]
-    });
+    (cli as any).loadCommand(new CommandWithOptions());
+    const clink: string = autocomplete.getClinkCompletion();
 
-    assert.equal(clink, [
+    assert.strictEqual(clink, [
       'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"spo"..parser({"app"..parser({"list"..parser({},"--help", "-u")})})})',
+      'local m365_parser = parser({"cli"..parser({"mock2"..parser({},"--debug", "--help", "--longOption", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-l", "-o"..parser({"json","text"}))})})',
       '',
       'clink.arg.register_parser("m365", m365_parser)',
       'clink.arg.register_parser("microsoft365", m365_parser)'
@@ -247,27 +205,12 @@ describe('autocomplete', () => {
   });
 
   it('includes autocomplete for options in clink completion', () => {
-    const clink: string = autocomplete.getClinkCompletion({
-      commands: [
-        {
-          options: [
-            {
-              autocomplete: ['json', 'text'],
-              long: null,
-              short: "-o"
-            }
-          ],
-          _args: [],
-          _aliases: [],
-          _name: 'spo app list',
-          _hidden: false
-        }
-      ]
-    });
+    (cli as any).loadCommand(new CommandWithOptions());
+    const clink: string = autocomplete.getClinkCompletion();
 
-    assert.equal(clink, [
+    assert.strictEqual(clink, [
       'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"spo"..parser({"app"..parser({"list"..parser({},"--help", "-o"..parser({"json","text"}))})})})',
+      'local m365_parser = parser({"cli"..parser({"mock2"..parser({},"--debug", "--help", "--longOption", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-l", "-o"..parser({"json","text"}))})})',
       '',
       'clink.arg.register_parser("m365", m365_parser)',
       'clink.arg.register_parser("microsoft365", m365_parser)'
@@ -275,21 +218,12 @@ describe('autocomplete', () => {
   });
 
   it('includes command alias in clink completion', () => {
-    const clink: string = autocomplete.getClinkCompletion({
-      commands: [
-        {
-          options: [],
-          _args: [],
-          _aliases: ['spo c'],
-          _name: 'spo connect',
-          _hidden: false
-        }
-      ]
-    });
+    (cli as any).loadCommand(new CommandWithAlias());
+    const clink: string = autocomplete.getClinkCompletion();
 
-    assert.equal(clink, [
+    assert.strictEqual(clink, [
       'local parser = clink.arg.new_parser',
-      'local m365_parser = parser({"spo"..parser({"c"..parser({},"--help"),"connect"..parser({},"--help")})})',
+      'local m365_parser = parser({"cli"..parser({"alias"..parser({},"--debug", "--help", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-o"..parser({"json","text"})),"mock"..parser({},"--debug", "--help", "--output"..parser({"json","text"}), "--query", "--verbose", "-h", "-o"..parser({"json","text"}))})})',
       '',
       'clink.arg.register_parser("m365", m365_parser)',
       'clink.arg.register_parser("microsoft365", m365_parser)'
@@ -322,7 +256,7 @@ describe('autocomplete', () => {
     const readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => '');
     (autocomplete as any).init();
     try {
-      assert.equal(JSON.stringify((autocomplete as any).commands), JSON.stringify({}));
+      assert.strictEqual(JSON.stringify((autocomplete as any).commands), JSON.stringify({}));
     }
     catch (e) {
       fail(e);

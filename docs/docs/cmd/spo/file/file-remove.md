@@ -10,18 +10,35 @@ m365 spo file remove [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-w, --webUrl <webUrl>`|URL of the site where the file to remove is located
-`-i, --id [id]`|The ID of the file to remove. Specify either `id` or `url` but not both
-`-u, --url [url]`|The server- or site-relative URL of the file to remove. Specify either `id` or `url` but not both
-`--recycle`|Recycle the file instead of actually deleting it
-`--confirm`|Don't prompt for confirming removing the file
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-w, --webUrl <webUrl>`
+: URL of the site where the file to remove is located
+
+`-i, --id [id]`
+: The ID of the file to remove. Specify either `id` or `url` but not both
+
+`-u, --url [url]`
+: The server- or site-relative URL of the file to remove. Specify either `id` or `url` but not both
+
+`--recycle`
+: Recycle the file instead of actually deleting it
+
+`--confirm`
+: Don't prompt for confirming removing the file
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

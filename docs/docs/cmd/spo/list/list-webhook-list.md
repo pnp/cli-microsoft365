@@ -10,18 +10,35 @@ m365 spo list webhook list [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|URL of the site where the list to retrieve webhooks for is located
-`-i, --listId [listId]`|ID of the list to retrieve all webhooks for. Specify either `listId` or `listTitle` but not both
-`-t, --listTitle [listTitle]`|Title of the list to retrieve all webhooks for. Specify either `listId` or `listTitle` but not both
-`--id [id]`|(deprecated. Use `listId` instead) ID of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
-`--title [title]`|(deprecated. Use `listTitle` instead) Title of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: URL of the site where the list to retrieve webhooks for is located
+
+`-i, --listId [listId]`
+: ID of the list to retrieve all webhooks for. Specify either `listId` or `listTitle` but not both
+
+`-t, --listTitle [listTitle]`
+: Title of the list to retrieve all webhooks for. Specify either `listId` or `listTitle` but not both
+
+`--id [id]`
+: (deprecated. Use `listId` instead) ID of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
+
+`--title [title]`
+: (deprecated. Use `listTitle` instead) Title of the list to retrieve all webhooks for. Specify either `id` or `title` but not both
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

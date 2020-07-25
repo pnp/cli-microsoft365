@@ -10,17 +10,32 @@ m365 teams team add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-n, --name [name]`|Display name for the Microsoft Teams team. Required if `templatePath` not supplied
-`-d, --description [description]`|Description for the Microsoft Teams team. Required if `templatePath` not supplied
-`--templatePath [templatePath]`|Local path to the file containing the template. If `name` or `description` are supplied, these take precedence over the template values
-`--wait`|Wait for the team to be provisioned before completing the command
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-n, --name [name]`
+: Display name for the Microsoft Teams team. Required if `templatePath` not supplied
+
+`-d, --description [description]`
+: Description for the Microsoft Teams team. Required if `templatePath` not supplied
+
+`--templatePath [templatePath]`
+: Local path to the file containing the template. If `name` or `description` are supplied, these take precedence over the template values
+
+`--wait`
+: Wait for the team to be provisioned before completing the command
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

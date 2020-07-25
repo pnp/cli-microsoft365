@@ -7,8 +7,8 @@ import {
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -85,7 +85,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
 
           cb();
@@ -154,33 +154,8 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
         return `${args.options.groupId} is not a valid GUID`;
       }
 
-      if (!args.options.userName) {
-        return 'Required parameter userName missing';
-      }
-
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    You can remove users from a Microsoft 365 Group or Microsoft Teams team if you
-    are owner of that group or team.
-
-  Examples:
-
-    Removes user from the specified Microsoft 365 Group
-      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
-
-    Removes user from the specified Microsoft 365 Group without confirmation
-      ${this.name} --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --confirm
-
-    Removes user from the specified Microsoft Teams team
-      ${(this.alias() as string[])[0]} --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
-`);
   }
 }
 

@@ -46,7 +46,7 @@ describe('ResolutionRule', () => {
       path: '/usr/tmp'
     };
     depRule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return any notifications if the custom condition fails', () => {
@@ -57,7 +57,7 @@ describe('ResolutionRule', () => {
       }
     };
     depRule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if the resolution is already up-to-date', () => {
@@ -71,6 +71,6 @@ describe('ResolutionRule', () => {
       }
     };
     depRule2.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

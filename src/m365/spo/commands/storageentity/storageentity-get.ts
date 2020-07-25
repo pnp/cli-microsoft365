@@ -6,8 +6,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import { TenantProperty } from './TenantProperty';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -66,29 +65,6 @@ class SpoStorageEntityGetCommand extends SpoCommand {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.STORAGEENTITY_GET).helpInformation());
-    log(
-      `  Remarks:
-
-    Tenant properties are stored in the app catalog site associated with
-    the site to which you are currently logged in. When retrieving the specified
-    tenant property, SharePoint will automatically find the associated app
-    catalog and try to retrieve the property from it.
-
-  Examples:
-  
-    Show the value, description and comment of the ${chalk.grey('AnalyticsId')} tenant property
-      m365 ${this.name} --key AnalyticsId
-
-  More information:
-
-    SharePoint Framework Tenant Properties
-      https://docs.microsoft.com/en-us/sharepoint/dev/spfx/tenant-properties
-`);
   }
 }
 

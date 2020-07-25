@@ -10,7 +10,6 @@ import Utils from '../../../../Utils';
 import * as fs from 'fs';
 
 describe(commands.O365GROUP_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -23,7 +22,6 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -39,7 +37,6 @@ describe(commands.O365GROUP_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       request.put,
       request.get,
@@ -57,11 +54,11 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.O365GROUP_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.O365GROUP_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('creates Microsoft 365 Group using basic info', (done) => {
@@ -577,7 +574,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -640,7 +637,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -1019,7 +1016,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -1028,86 +1025,71 @@ describe(commands.O365GROUP_ADD, () => {
     });
   });
 
-  it('fails validation if the displayName is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { description: 'My awesome group', mailNickname: 'my_group' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the description is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', mailNickname: 'my_group' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the mailNickname is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group' } });
-    assert.notEqual(actual, true);
-  });
-
   it('passes validation when the displayName, description and mailNickname are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if one of the owners is invalid', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the owner is valid', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation with multiple owners, comma-separated', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation with multiple owners, comma-separated with an additional space', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if one of the members is invalid', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the member is valid', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation with multiple members, comma-separated', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation with multiple members, comma-separated with an additional space', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if isPrivate is invalid boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if isPrivate is true', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if isPrivate is false', () => {
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'false' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if logoPath points to a non-existent file', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'invalid' } });
     Utils.restore(fs.existsSync);
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if logoPath points to a folder', () => {
@@ -1120,7 +1102,7 @@ describe(commands.O365GROUP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if logoPath points to an existing file', () => {
@@ -1133,7 +1115,7 @@ describe(commands.O365GROUP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -1222,39 +1204,5 @@ describe(commands.O365GROUP_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.O365GROUP_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

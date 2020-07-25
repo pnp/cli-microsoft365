@@ -10,8 +10,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -72,7 +72,7 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
         }
         cb();
@@ -104,20 +104,6 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
 
       return SpoCommand.isValidSharePointUrl(args.options.url);
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.SITE_COMMSITE_ENABLE).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-                
-  Examples:
-  
-    Enable communication site features on an existing site
-      m365 ${this.name} --url https://contoso.sharepoint.com
-`);
   }
 }
 

@@ -11,8 +11,7 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { TermCollection } from './TermCollection';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -157,23 +156,6 @@ class SpoTermListCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.TERM_LIST).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-    
-  Examples:
-  
-    List taxonomy terms from the term group and term set with the given name
-      m365 ${this.name} --termGroupName PnPTermSets --termSetName PnP-Organizations
-
-    List taxonomy terms from the term group and term set with the given ID
-      m365 ${this.name} --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termSetId 0e8f395e-ff58-4d45-9ff7-e331ab728bec
-`);
   }
 }
 

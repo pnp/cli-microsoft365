@@ -13,7 +13,6 @@ import { ExternalizeEntry, FileEdit } from './project-externalize/';
 import * as requestNative from 'request-promise-native';
 
 describe(commands.PROJECT_EXTERNALIZE, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let trackEvent: any;
@@ -28,7 +27,6 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -44,7 +42,6 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       (command as any).getProjectRoot,
       (command as any).getProjectVersion,
       fs.existsSync,
@@ -62,11 +59,11 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.PROJECT_EXTERNALIZE), true);
+    assert.strictEqual(command.name.startsWith(commands.PROJECT_EXTERNALIZE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('calls telemetry', (done) => {
@@ -86,7 +83,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, commands.PROJECT_EXTERNALIZE);
+        assert.strictEqual(telemetry.name, commands.PROJECT_EXTERNALIZE);
         done();
       }
       catch (ex) {
@@ -101,7 +98,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
         done();
       }
       catch (ex) {
@@ -123,7 +120,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
         done();
       }
       catch (ex) {
@@ -163,7 +160,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(getProjectVersionSpy.lastCall.returnValue, '1.8.1');
+        assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.8.1');
         done();
       }
       catch (ex) {
@@ -203,7 +200,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(getProjectVersionSpy.lastCall.returnValue, '0.4.1');
+        assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '0.4.1');
         done();
       }
       catch (ex) {
@@ -265,7 +262,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
+        assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
         done();
       }
       catch (ex) {
@@ -288,7 +285,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, 3)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, 3)));
         done();
       }
       catch (ex) {
@@ -396,7 +393,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.notEqual(typeof (project.configJson), 'undefined');
+    assert.notStrictEqual(typeof (project.configJson), 'undefined');
   });
 
   it('doesn\'t fail if package.json not available', () => {
@@ -412,7 +409,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.packageJson), 'undefined');
+    assert.strictEqual(typeof (project.packageJson), 'undefined');
   });
 
   it('doesn\'t fail if tsconfig.json not available', () => {
@@ -428,7 +425,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.tsConfigJson), 'undefined');
+    assert.strictEqual(typeof (project.tsConfigJson), 'undefined');
   });
 
   it('doesn\'t fail if config.json is empty', () => {
@@ -444,7 +441,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.configJson), 'undefined');
+    assert.strictEqual(typeof (project.configJson), 'undefined');
   });
 
   it('doesn\'t fail if package.json is empty', () => {
@@ -460,7 +457,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.packageJson), 'undefined');
+    assert.strictEqual(typeof (project.packageJson), 'undefined');
   });
 
   it('doesn\'t fail if .yo-rc.json is empty', () => {
@@ -476,7 +473,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.yoRcJson), 'undefined');
+    assert.strictEqual(typeof (project.yoRcJson), 'undefined');
   });
 
   //#region findings
@@ -507,7 +504,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action({ options: { output: 'json', debug: true } }, (err?: any) => {
       try {
         const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[logEntryToCheck + 3]; //because debug is enabled
-        assert.equal((findings.externalConfiguration.externals['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js');
+        assert.strictEqual((findings.externalConfiguration.externals['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js');
         done();
       }
       catch (ex) {
@@ -551,7 +548,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action({ options: { output: 'json', debug: false } }, (err?: any) => {
       try {
         const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[0];
-        assert.notEqual(findings.edits.length, 0);
+        assert.notStrictEqual(findings.edits.length, 0);
         done();
       }
       catch (ex) {
@@ -621,7 +618,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { output: 'json', debug: true } }, (err?: any) => {
       try {
-        assert.notEqual(typeof err, 'undefined');
+        assert.notStrictEqual(typeof err, 'undefined');
         done();
       }
       catch (ex) {
@@ -685,7 +682,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.notEqual(log[1].indexOf('externalConfiguration'), -1);
+        assert.notStrictEqual(log[1].indexOf('externalConfiguration'), -1);
         done();
       }
       catch (ex) {
@@ -724,39 +721,5 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.PROJECT_EXTERNALIZE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

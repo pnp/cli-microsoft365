@@ -10,14 +10,23 @@ m365 spfx doctor [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-e, --env [env]`|Version of SharePoint for which to check compatibility: `sp2016|sp2019|spo`
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text,md`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-e, --env [env]`
+: Version of SharePoint for which to check compatibility: `sp2016|sp2019|spo`
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text,md`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 !!! important
     Checks ran by this command are based on what is officially supported by Microsoft. It's possible that using different package managers or packages versions will work just fine.

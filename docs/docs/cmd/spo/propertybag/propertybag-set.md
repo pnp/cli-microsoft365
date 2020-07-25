@@ -10,17 +10,32 @@ m365 spo propertybag set [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|The URL of the site in which the property should be set
-`-k, --key <key>`|Key of the property to be set. Case-sensitive
-`-v, --value <value>`|Value of the property to be set
-`-f, --folder [folder]`|Site-relative URL of the folder on which the property should be set
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: The URL of the site in which the property should be set
+
+`-k, --key <key>`
+: Key of the property to be set. Case-sensitive
+
+`-v, --value <value>`
+: Value of the property to be set
+
+`-f, --folder [folder]`
+: Site-relative URL of the folder on which the property should be set
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

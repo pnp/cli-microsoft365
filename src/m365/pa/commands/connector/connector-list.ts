@@ -2,12 +2,10 @@ import commands from '../../commands';
 import flowCommands from '../../../flow/commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
 import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -69,33 +67,6 @@ class PaConnectorListCommand extends AzmgmtItemsListCommand<{ name: string, prop
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.environment) {
-        return 'Required option environment missing';
-      }
-
-      return true;
-    };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CONNECTOR_LIST).helpInformation());
-    log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
-  
-  Examples:
-  
-    List all custom connectors in the given environment
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5
-`);
   }
 }
 

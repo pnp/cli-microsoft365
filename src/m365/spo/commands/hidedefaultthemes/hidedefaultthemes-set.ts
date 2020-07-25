@@ -6,8 +6,8 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -55,7 +55,7 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -76,10 +76,6 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (typeof args.options.hideDefaultThemes === 'undefined') {
-        return 'Required parameter hideDefaultThemes missing';
-      }
-
       if (args.options.hideDefaultThemes !== 'false' &&
         args.options.hideDefaultThemes !== 'true') {
         return `${args.options.hideDefaultThemes} is not a valid boolean`;
@@ -87,25 +83,6 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-  
-  Examples:
-
-    Hide default themes and allow users to use organization themes only
-      m365 ${this.name} --hideDefaultThemes true
-
-  More information:
-
-    SharePoint site theming
-      https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-theming/sharepoint-site-theming-overview
-      `);
   }
 }
 

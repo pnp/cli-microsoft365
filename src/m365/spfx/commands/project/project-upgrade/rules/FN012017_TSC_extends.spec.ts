@@ -20,7 +20,7 @@ describe('FN012017_TSC_extends', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if extends has the exact same elements in different order', () => {
@@ -31,7 +31,7 @@ describe('FN012017_TSC_extends', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if extends has all required elements', () => {
@@ -42,7 +42,7 @@ describe('FN012017_TSC_extends', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if object is missing', () => {
@@ -51,7 +51,7 @@ describe('FN012017_TSC_extends', () => {
       tsConfigJson: undefined
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if extends value has to be changed', () => {
@@ -62,6 +62,6 @@ describe('FN012017_TSC_extends', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

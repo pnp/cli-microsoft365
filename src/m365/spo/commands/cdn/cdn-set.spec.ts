@@ -10,7 +10,6 @@ import config from '../../../../config';
 import Utils from '../../../../Utils';
 
 describe(commands.CDN_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let requests: any[];
@@ -41,7 +40,6 @@ describe(commands.CDN_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -56,8 +54,7 @@ describe(commands.CDN_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore(vorpal.find);
-  });
+    });
 
   after(() => {
     Utils.restore([
@@ -71,11 +68,11 @@ describe(commands.CDN_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CDN_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.CDN_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('enables public CDN when Public type specified and enabled set to true', (done) => {
@@ -593,7 +590,7 @@ describe(commands.CDN_SET, () => {
 
     cmdInstance.action({ options: { debug: false, enabled: 'true' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -636,102 +633,63 @@ describe(commands.CDN_SET, () => {
 
   it('accepts Public SharePoint Online CDN type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'Public', enabled: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'Private', enabled: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts Both SharePoint Online CDN type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'Both', enabled: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', () => {
     const type = 'foo';
     const actual = (command.validate() as CommandValidate)({ options: { type: type, enabled: 'true' } });
-    assert.equal(actual, `${type} is not a valid CDN type. Allowed values are Public|Private|Both`);
+    assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private|Both`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts true SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'true' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
-  it('accepts True SharePoint Online CDN enabled state', () => {
+  it('does not accept True SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'True' } });
-    assert.equal(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
-  it('accepts TRUE SharePoint Online CDN enabled state', () => {
+  it('does not accept TRUE SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'TRUE' } });
-    assert.equal(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('accepts false SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'false' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
-  it('accepts False SharePoint Online CDN enabled state', () => {
+  it('does not accept False SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'False' } });
-    assert.equal(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
-  it('accepts FALSE SharePoint Online CDN enabled state', () => {
+  it('does not accept FALSE SharePoint Online CDN enabled state', () => {
     const actual = (command.validate() as CommandValidate)({ options: { enabled: 'FALSE' } });
-    assert.equal(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN enabled state', () => {
     const enabled = 'foo';
     const actual = (command.validate() as CommandValidate)({ options: { enabled: enabled } });
-    assert.equal(actual, `${enabled} is not a valid boolean value. Allowed values are true|false`);
-  });
-
-  it('fails validation if the required enabled state option is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, 'undefined is not a valid boolean value. Allowed values are true|false');
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.CDN_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, `${enabled} is not a valid boolean value. Allowed values are true|false`);
   });
 });

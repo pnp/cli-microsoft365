@@ -13,7 +13,7 @@ describe('FN010004_YORC_componentType', () => {
   });
 
   it('has empty resolution', () => {
-    assert.equal(rule.resolution, '');
+    assert.strictEqual(rule.resolution, '');
   });
 
   it('doesn\'t return notification if no .yo-rc.json found', () => {
@@ -21,7 +21,7 @@ describe('FN010004_YORC_componentType', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if componentType is already up-to-date', () => {
@@ -34,7 +34,7 @@ describe('FN010004_YORC_componentType', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('suggests setting componentType to webpart for a project with a web part', () => {

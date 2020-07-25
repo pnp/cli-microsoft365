@@ -10,21 +10,44 @@ m365 spo listitem list [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|URL of the site from which the item should be retrieved
-`-i, --id <id>`|ID of the list to retrieve items from. Specify `id` or `title` but not both
-`-t, --title [listTitle]`|Title of the list from which to retrieve the item. Specify `id` or `title` but not both
-`-q, --query [camlQuery]`|CAML query to use to query the list of items with
-`-f, --fields [fields]`|Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested. Specify `query` or `fields` but not both
-`-l, --filter [odataFilter]`|OData filter to use to query the list of items with. Specify `query` or `filter` but not both
-`-p, --pageSize [pageSize]`|Number of list items to return. Specify `query` or `pageSize` but not both
-`-n, --pageNumber [pageNumber]`|Page number to return if `pageSize` is specified (first page is indexed as value of 0)
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: URL of the site from which the item should be retrieved
+
+`-i, --id <id>`
+: ID of the list to retrieve items from. Specify `id` or `title` but not both
+
+`-t, --title [listTitle]`
+: Title of the list from which to retrieve the item. Specify `id` or `title` but not both
+
+`-q, --query [camlQuery]`
+: CAML query to use to query the list of items with
+
+`-f, --fields [fields]`
+: Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested. Specify `query` or `fields` but not both
+
+`-l, --filter [odataFilter]`
+: OData filter to use to query the list of items with. Specify `query` or `filter` but not both
+
+`-p, --pageSize [pageSize]`
+: Number of list items to return. Specify `query` or `pageSize` but not both
+
+`-n, --pageNumber [pageNumber]`
+: Page number to return if `pageSize` is specified (first page is indexed as value of 0)
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

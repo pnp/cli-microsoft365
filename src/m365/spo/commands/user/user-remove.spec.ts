@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
 describe(commands.USER_REMOVE, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let requests: any[];
   let cmdInstance: any;
@@ -23,7 +22,6 @@ describe(commands.USER_REMOVE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -45,7 +43,6 @@ describe(commands.USER_REMOVE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -59,11 +56,11 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.USER_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.USER_REMOVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('supports debug mode', () => {
@@ -77,22 +74,13 @@ describe(commands.USER_REMOVE, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if the webUrl option is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-
-      }
-    });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if id or loginName options are not passed', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         webUrl: 'https://contoso.sharepoint.com'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails valiation if id or loginname oprions are passed', () => {
@@ -103,7 +91,7 @@ describe(commands.USER_REMOVE, () => {
         loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   })
 
   it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
@@ -114,41 +102,7 @@ describe(commands.USER_REMOVE, () => {
         id: 10
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.USER_REMOVE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.notStrictEqual(actual, true);
   });
 
   it('should prompt before removing user using id from web when confirmation argument not passed ', (done) => {
@@ -421,7 +375,7 @@ describe(commands.USER_REMOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

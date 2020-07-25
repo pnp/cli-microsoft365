@@ -27,6 +27,6 @@ describe('FN001019_DEP_knockout', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

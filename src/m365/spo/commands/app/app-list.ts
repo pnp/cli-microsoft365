@@ -7,8 +7,7 @@ import {
 import { AppMetadata } from './AppMetadata';
 import GlobalOptions from '../../../../GlobalOptions';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -126,45 +125,6 @@ class SpoAppListCommand extends SpoAppBaseCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.APP_LIST).helpInformation());
-    log(
-      `  Remarks:
-
-    When listing information about apps available in the tenant app catalog,
-    it's not necessary to specify the tenant app catalog URL. When the URL
-    is not specified, the CLI will try to resolve the URL itself.
-    Specifying the app catalog URL is required when you want to list information
-    about apps in a site collection app catalog.
-
-    When specifying site collection app catalog, you can specify the URL either
-    with our without the ${chalk.grey('AppCatalog')} part, for example
-    ${chalk.grey('https://contoso.sharepoint.com/sites/team-a/AppCatalog')} or
-    ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}. CLI will accept both formats.
-
-    When using the text output type (default), the command lists only the values
-    of the ${chalk.grey('Title')}, ${chalk.grey('ID')}, ${chalk.grey('Deployed')} and ${chalk.grey('AppCatalogVersion')} properties of the app.
-    When setting the output type to JSON, all available properties are included
-    in the command output.
-   
-  Examples:
-  
-    Return the list of available apps from the tenant app catalog.
-    Show the installed version in the site if applicable.
-      m365 ${this.name}
-
-    Return the list of available apps from a site collection app catalog
-    of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      m365 ${this.name} --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
-
-  More information:
-  
-    Application Lifecycle Management (ALM) APIs
-      https://docs.microsoft.com/en-us/sharepoint/dev/apis/alm-api-for-spfx-add-ins
-`);
   }
 }
 

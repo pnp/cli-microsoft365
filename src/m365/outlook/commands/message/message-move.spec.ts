@@ -10,7 +10,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.OUTLOOK_MESSAGE_MOVE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
 
@@ -21,7 +20,6 @@ describe(commands.OUTLOOK_MESSAGE_MOVE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -37,7 +35,6 @@ describe(commands.OUTLOOK_MESSAGE_MOVE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.post
     ]);
@@ -399,11 +396,6 @@ describe(commands.OUTLOOK_MESSAGE_MOVE, () => {
     });
   });
 
-  it('fails validation if messageId not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { sourceFolderId: 'inbox', targetFolderId: 'archive' } });
-    assert.notStrictEqual(actual, true);
-  });
-
   it('passes validation if all required options specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { messageId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALvuv07AAA', sourceFolderId: 'inbox', targetFolderId: 'archive' } });
     assert.strictEqual(actual, true);
@@ -458,39 +450,5 @@ describe(commands.OUTLOOK_MESSAGE_MOVE, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.OUTLOOK_MESSAGE_MOVE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

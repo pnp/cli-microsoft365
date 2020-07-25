@@ -19,6 +19,6 @@ describe('FN019001_TSL_rulesDirectory', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

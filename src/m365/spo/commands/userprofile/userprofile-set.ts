@@ -3,12 +3,11 @@ import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -70,7 +69,7 @@ class SpoUserProfileSetCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.debug) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
         
         cb();
@@ -95,43 +94,6 @@ class SpoUserProfileSetCommand extends SpoCommand {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.userName) {
-        return 'Required parameter userName missing';
-      }
-
-      if (!args.options.propertyName) {
-        return 'Required parameter propertyName missing';
-      }
-
-      if (!args.options.propertyValue) {
-        return 'Required parameter propertyValue missing';
-      }
-
-      return true;
-    };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    You have to have tenant admin permissions in order to use this command to
-    update profile properties of other users.
-
-  Examples:
-  
-    Updates the single-value ${chalk.grey('AboutMe')} property
-      m365 ${this.name} --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'AboutMe' --propertyValue 'Working as a Microsoft 365 developer'
-  
-    Updates the multi-value ${chalk.grey('SPS-Skills')} property
-      m365 ${this.name} --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'SPS-Skills' --propertyValue 'CSS, HTML'
-`);
   }
 }
 

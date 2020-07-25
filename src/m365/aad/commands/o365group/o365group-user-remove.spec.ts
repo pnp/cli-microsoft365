@@ -10,7 +10,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.O365GROUP_USER_REMOVE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let promptOptions: any;
@@ -22,7 +21,6 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -42,7 +40,6 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.delete,
       global.setTimeout
@@ -58,21 +55,21 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.O365GROUP_USER_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.O365GROUP_USER_REMOVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('defines alias', () => {
     const alias = command.alias();
-    assert.notEqual(typeof alias, 'undefined');
+    assert.notStrictEqual(typeof alias, 'undefined');
   });
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.equal((alias && alias.indexOf(teamsCommands.TEAMS_USER_REMOVE) > -1), true);
+    assert.strictEqual((alias && alias.indexOf(teamsCommands.TEAMS_USER_REMOVE) > -1), true);
   });
 
   it('fails validation if the groupId is not a valid guid.', (done) => {
@@ -81,7 +78,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -91,17 +88,17 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
-  it('fails validation if the groupId is not provided.', (done) => {
+  it('fails validation if neither the groupId nor the teamID are provided.', (done) => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         userName: 'anne.matthews@contoso.onmicrosoft.com'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -112,17 +109,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
       }
     });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation when the userName is not specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -133,7 +120,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         userName: 'anne.matthews@contoso.onmicrosoft.com'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
     done();
   });
 
@@ -325,7 +312,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     };
     cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Invalid object identifier'))); done();
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid object identifier'))); done();
       }
       catch (e) {
 
@@ -378,39 +365,5 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.O365GROUP_USER_REMOVE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

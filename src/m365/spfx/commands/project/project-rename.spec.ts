@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 const command: Command = require('./project-rename');
@@ -9,7 +9,6 @@ import * as path from 'path';
 import Utils from '../../../../Utils';
 
 describe(commands.PROJECT_RENAME, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let trackEvent: any;
@@ -24,7 +23,6 @@ describe(commands.PROJECT_RENAME, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -41,7 +39,6 @@ describe(commands.PROJECT_RENAME, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       (command as any).generateNewId,
       (command as any).getProjectRoot,
       (command as any).getProject,
@@ -58,11 +55,11 @@ describe(commands.PROJECT_RENAME, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.PROJECT_RENAME), true);
+    assert.strictEqual(command.name.startsWith(commands.PROJECT_RENAME), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('calls telemetry', () => {
@@ -77,18 +74,8 @@ describe(commands.PROJECT_RENAME, () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
     cmdInstance.action({ options: { newName: 'spfx-react' } }, () => {
-      assert.equal(telemetry.name, commands.PROJECT_RENAME);
+      assert.strictEqual(telemetry.name, commands.PROJECT_RENAME);
     });
-  });
-
-  it('fails validation if newName is not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation if newName is passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { newName: 'spfx-react' } });
-    assert.equal(actual, true);
   });
 
   it('shows error if the project path couldn\'t be determined', (done) => {
@@ -96,7 +83,7 @@ describe(commands.PROJECT_RENAME, () => {
 
     cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
         done();
       }
       catch (ex) {
@@ -142,7 +129,7 @@ describe(commands.PROJECT_RENAME, () => {
     sinon.stub(fs, 'readFileSync').callsFake(() => { throw 'error'; });
     cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error')));
         done();
       } catch (ex) {
         done(ex);
@@ -407,39 +394,5 @@ gulp package-solution - TODO
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.PROJECT_RENAME));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

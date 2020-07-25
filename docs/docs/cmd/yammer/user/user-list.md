@@ -10,18 +10,35 @@ m365 yammer user list [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-g, --groupId [groupId]`|Returns users within a given group
-`-l, --letter [letter]`|Returns users with usernames beginning with the given character
-`--reverse`|Returns users in reverse sorting order
-`--limit [limit]`|Limits the users returned
-`--sortBy [sortBy]`|Returns users sorted by a number of messages or followers, instead of the default behavior of sorting alphabetically. Allowed values are `messages,followers`
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-g, --groupId [groupId]`
+: Returns users within a given group
+
+`-l, --letter [letter]`
+: Returns users with usernames beginning with the given character
+
+`--reverse`
+: Returns users in reverse sorting order
+
+`--limit [limit]`
+: Limits the users returned
+
+`--sortBy [sortBy]`
+: Returns users sorted by a number of messages or followers, instead of the default behavior of sorting alphabetically. Allowed values are `messages,followers`
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

@@ -10,19 +10,38 @@ m365 spo page text add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|URL of the site where the page to add the text to is located
-`-n, --pageName <pageName>`|Name of the page to which add the text
-`-t, --text <text>`|Text to add to the page
-`--section [section]`|Number of the section to which the text should be added (1 or higher)
-`--column [column]`|Number of the column in which the text should be added (1 or higher)
-`--order [order]`|Order of the text in the column
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: URL of the site where the page to add the text to is located
+
+`-n, --pageName <pageName>`
+: Name of the page to which add the text
+
+`-t, --text <text>`
+: Text to add to the page
+
+`--section [section]`
+: Number of the section to which the text should be added (1 or higher)
+
+`--column [column]`
+: Number of the column in which the text should be added (1 or higher)
+
+`--order [order]`
+: Order of the text in the column
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

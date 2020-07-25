@@ -7,8 +7,8 @@ import {
   CommandOption, CommandValidate
 } from '../../../../Command';
 import GraphCommand from '../../../base/GraphCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -81,7 +81,7 @@ class OutlookSendmailCommand extends GraphCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -123,14 +123,6 @@ class OutlookSendmailCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.subject) {
-        return 'Required option subject missing';
-      }
-
-      if (!args.options.to) {
-        return 'Required option to missing';
-      }
-
       if (!args.options.bodyContents && !args.options.bodyContentsFilePath) {
         return 'Specify either bodyContents or bodyContentsFilePath';
       }
@@ -165,27 +157,6 @@ class OutlookSendmailCommand extends GraphCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-
-    Send a text e-mail to the specified e-mail address
-      ${this.name} --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site"
-
-    Send an HTML e-mail to the specified e-mail addresses
-      ${this.name} --to "chris@contoso.com,brian@contoso.com" --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the <a href='https://contoso.sharepoint.com/sites/marketing'>team site</a>" --bodyContentType HTML
-
-    Send an HTML e-mail to the specified e-mail address loading e-mail contents
-    from a file on disk
-      ${this.name} --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContentsFilePath email.html --bodyContentType HTML
-
-    Send a text e-mail to the specified e-mail address. Don't store the e-mail
-    in sent items
-      ${this.name} --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site" --saveToSentItems false
-`);
   }
 }
 

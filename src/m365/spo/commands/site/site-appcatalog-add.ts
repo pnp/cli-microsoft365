@@ -6,8 +6,7 @@ import Utils from '../../../../Utils';
 import { CommandOption, CommandError, CommandValidate } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -88,37 +87,8 @@ class SpoSiteAppCatalogAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required option url missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.url);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-   
-  Examples:
-  
-    Add a site collection app catalog to the specified site
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/site
-
-  More information:
-    
-    Use the site collection app catalog
-      https://docs.microsoft.com/en-us/sharepoint/dev/general-development/site-collection-app-catalog
-    `);
   }
 }
 

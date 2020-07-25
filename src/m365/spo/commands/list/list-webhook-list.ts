@@ -7,8 +7,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -42,11 +42,11 @@ class SpoListWebhookListCommand extends SpoCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     if (args.options.title && this.verbose) {
-      cmd.log(vorpal.chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead`));
+      cmd.log(chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead`));
     }
 
     if (args.options.id && this.verbose) {
-      cmd.log(vorpal.chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead`));
+      cmd.log(chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead`));
     }
 
     if (this.verbose) {
@@ -136,10 +136,6 @@ class SpoListWebhookListCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -173,22 +169,6 @@ class SpoListWebhookListCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    List all webhooks for a list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
-    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
-
-    List all webhooks for a list with title ${chalk.grey('Documents')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
-      `);
   }
 }
 

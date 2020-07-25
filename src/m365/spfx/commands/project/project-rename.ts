@@ -1,14 +1,13 @@
 import commands from '../../commands';
 import Command, {
-  CommandOption, CommandAction, CommandError, CommandValidate
+  CommandOption, CommandAction, CommandError
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { BaseProjectCommand } from './base-project-command';
 import * as path from 'path';
 import * as fs from 'fs';
 import { v4 } from 'uuid';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -52,20 +51,9 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.newName) {
-        return 'Required parameter newName missing';
-      }
-
-      return true;
-    };
-  }
-
   public action(): CommandAction {
     const cmd: Command = this;
     return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
-      args = (cmd as any).processArgs(args);
       (cmd as any).initAction(args, this);
       cmd.commandAction(this, args, cb);
     }
@@ -252,29 +240,6 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
         cmd.log(`Updated ${path.basename(filePath)}`);
       }
     }
-  }
-
-  public commandHelp(args: any, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.PROJECT_RENAME).helpInformation());
-    log(
-      `   ${chalk.yellow('Important:')} Run this command in the folder where the project that you want to
-    rename is located.
-
-  Remarks:
-
-    This command will update the project name in: package.json, .yo-rc.json,
-    package-solution.json, deploy-azure-storage.json and README.md.
-
-
-  Examples:
-
-    Renames SharePoint Framework project to contoso
-      m365 ${this.name} --newName contoso
-
-    Renames SharePoint Framework project to contoso with new solution ID
-      m365 ${this.name} --newName contoso --generateNewId
-`);
   }
 }
 

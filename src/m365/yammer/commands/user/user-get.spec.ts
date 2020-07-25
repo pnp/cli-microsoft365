@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.YAMMER_USER_GET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.YAMMER_USER_GET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.YAMMER_USER_GET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -52,11 +49,11 @@ describe(commands.YAMMER_USER_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.YAMMER_USER_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.YAMMER_USER_GET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('calls user by e-mail', function (done) {
@@ -70,7 +67,7 @@ describe(commands.YAMMER_USER_GET, () => {
     });
     cmdInstance.action({ options: { email: "pl@nubo.eu" } }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -90,7 +87,7 @@ describe(commands.YAMMER_USER_GET, () => {
     });
     cmdInstance.action({ options: { userId: 1496550646 } }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0].id, 1496550646)
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -110,7 +107,7 @@ describe(commands.YAMMER_USER_GET, () => {
     });
     cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0].id, 1496550646)
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -130,7 +127,7 @@ describe(commands.YAMMER_USER_GET, () => {
 
     cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
       }
       catch (e) {
@@ -148,7 +145,7 @@ describe(commands.YAMMER_USER_GET, () => {
 
     cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Not found (404)")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Not found (404)")));
         done();
       }
       catch (e) {
@@ -159,22 +156,22 @@ describe(commands.YAMMER_USER_GET, () => {
 
   it('passes validation without parameters', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation with parameters', () => {
     const actual = (command.validate() as CommandValidate)({ options: { userId: 1496550646 } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation with parameters', () => {
     const actual = (command.validate() as CommandValidate)({ options: { email: "pl@nubo.eu" } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('does not pass with userId and e-mail', () => {
     const actual = (command.validate() as CommandValidate)({ options: { userId: 1496550646, email: "pl@nubo.eu" } });
-    assert.equal(actual, "You are only allowed to search by ID or e-mail but not both");
+    assert.strictEqual(actual, "You are only allowed to search by ID or e-mail but not both");
   });
 
   it('supports debug mode', () => {
@@ -186,39 +183,5 @@ describe(commands.YAMMER_USER_GET, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.YAMMER_USER_GET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

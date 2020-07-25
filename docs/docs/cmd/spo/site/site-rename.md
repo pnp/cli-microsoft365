@@ -10,19 +10,38 @@ m365 spo site rename [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --siteUrl <siteUrl>`|The URL of the site to rename
-`--newSiteUrl <newSiteUrl>`|New URL for the site collection
-`--newSiteTitle [newSiteTitle]`|New title for the site
-`--suppressMarketplaceAppCheck`|Suppress marketplace app check
-`--suppressWorkflow2013Check`|Suppress 2013 workflow check
-`--wait`|Wait for the job to complete
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --siteUrl <siteUrl>`
+: The URL of the site to rename
+
+`--newSiteUrl <newSiteUrl>`
+: New URL for the site collection
+
+`--newSiteTitle [newSiteTitle]`
+: New title for the site
+
+`--suppressMarketplaceAppCheck`
+: Suppress marketplace app check
+
+`--suppressWorkflow2013Check`
+: Suppress 2013 workflow check
+
+`--wait`
+: Wait for the job to complete
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 !!! important
     To use this command you must have permissions to access the tenant admin site.

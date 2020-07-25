@@ -6,8 +6,8 @@ import {
 } from '../../../../Command';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -41,7 +41,7 @@ class AadGroupSettingGetCommand extends GraphCommand {
         cmd.log(res);
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -62,27 +62,12 @@ class AadGroupSettingGetCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.id) {
-        return 'Required parameter id missing';
-      }
-
       if (!Utils.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Get information about the group setting with id ${chalk.grey(`1caf7dcd-7e83-4c3a-94f7-932a1299c844`)}
-      ${this.name} --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
-`);
   }
 }
 

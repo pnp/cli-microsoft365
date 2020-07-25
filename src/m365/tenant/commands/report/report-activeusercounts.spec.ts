@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import request from '../../../../request';
 
 describe(commands.TENANT_REPORT_ACTIVEUSERCOUNTS, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
 
@@ -20,7 +19,6 @@ describe(commands.TENANT_REPORT_ACTIVEUSERCOUNTS, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -36,7 +34,6 @@ describe(commands.TENANT_REPORT_ACTIVEUSERCOUNTS, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -50,11 +47,11 @@ describe(commands.TENANT_REPORT_ACTIVEUSERCOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TENANT_REPORT_ACTIVEUSERCOUNTS), true);
+    assert.strictEqual(command.name.startsWith(commands.TENANT_REPORT_ACTIVEUSERCOUNTS), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('gets the number of Microsoft Teams activities by activity type for the given period', (done) => {
@@ -70,48 +67,14 @@ describe(commands.TENANT_REPORT_ACTIVEUSERCOUNTS, () => {
 
     cmdInstance.action({ options: { debug: false, period: 'D7' } }, () => {
       try {
-        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActiveUserCounts(period='D7')");
-        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActiveUserCounts(period='D7')");
+        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.strictEqual(requestStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TENANT_REPORT_ACTIVEUSERCOUNTS));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.SITECLASSIFICATION_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
 
@@ -20,7 +19,6 @@ describe(commands.SITECLASSIFICATION_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -35,7 +33,6 @@ describe(commands.SITECLASSIFICATION_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.patch,
       request.get
     ]);
@@ -50,11 +47,11 @@ describe(commands.SITECLASSIFICATION_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITECLASSIFICATION_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.SITECLASSIFICATION_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('supports debug mode', () => {
@@ -68,47 +65,13 @@ describe(commands.SITECLASSIFICATION_SET, () => {
     assert(containsOption);
   });
 
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITECLASSIFICATION_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
-  });
-
   it('fails validation if none of the options are specified', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         debug: false,
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if at least one option is specified', () => {
@@ -117,7 +80,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
         debug: false, classifications: "Confidential"
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if all options are passed', () => {
@@ -126,7 +89,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
         debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "https://aka.ms/pnp", guestUsageGuidelinesUrl: "https://aka.ms/pnp"
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('handles Microsoft 365 Tenant siteclassification has not been enabled', (done) => {
@@ -142,7 +105,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
 
     cmdInstance.action({ options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("There is no previous defined site classification which can updated.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("There is no previous defined site classification which can updated.")));
         done();
       }
       catch (e) {

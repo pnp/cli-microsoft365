@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.CUSTOMACTION_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -37,7 +35,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -51,11 +48,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CUSTOMACTION_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.CUSTOMACTION_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('getCustomActions called once when scope is Web', (done) => {
@@ -310,7 +307,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       }
     }, (error?: any) => {
       try {
-        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
+        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -342,7 +339,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
       }
     }, (error?: any) => {
       try {
-        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
+        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -378,11 +375,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
     const options = (command.options() as CommandOption[]);
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
-  });
-
-  it('fails validation if the url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, "Missing required option url");
   });
 
   it('retrieves all available user custom actions', (done) => {
@@ -515,7 +507,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
           url: 'foo'
         }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the url options specified', () => {
@@ -525,7 +517,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
           url: "https://contoso.sharepoint.com"
         }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the url and scope options specified', () => {
@@ -536,7 +528,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
           scope: "Site"
         }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('humanize scope shows correct value when scope odata is 2', () => {
@@ -562,7 +554,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
           scope: 'All'
         }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts scope to be Site', () => {
@@ -573,7 +565,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
           scope: 'Site'
         }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts scope to be Web', () => {
@@ -584,7 +576,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
           scope: 'Web'
         }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('rejects invalid string scope', () => {
@@ -595,7 +587,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
         scope: scope
       }
     });
-    assert.equal(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
+    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
   });
 
   it('rejects invalid scope value specified as number', () => {
@@ -606,7 +598,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
         scope: scope
       }
     });
-    assert.equal(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
+    assert.strictEqual(actual, `${scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
   });
 
   it('doesn\'t fail validation if the optional scope option not specified', () => {
@@ -617,40 +609,6 @@ describe(commands.CUSTOMACTION_LIST, () => {
             url: "https://contoso.sharepoint.com"
           }
       });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.CUSTOMACTION_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

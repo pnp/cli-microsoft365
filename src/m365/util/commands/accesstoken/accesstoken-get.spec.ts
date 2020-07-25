@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 const command: Command = require('./accesstoken-get');
 import * as assert from 'assert';
@@ -8,7 +8,6 @@ import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 
 describe(commands.UTIL_ACCESSTOKEN_GET, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstanceLogSpy: sinon.SinonSpy;
   let cmdInstance: any;
@@ -20,7 +19,6 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -36,7 +34,6 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       auth.ensureAccessToken
     ]);
     auth.service.accessTokens = {};
@@ -50,11 +47,11 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.UTIL_ACCESSTOKEN_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.UTIL_ACCESSTOKEN_GET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('retrieves access token for the specified resource', (done) => {
@@ -81,33 +78,13 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
 
     cmdInstance.action({ options: { debug: false, resource: 'https://graph.microsoft.com' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('fails validation if resource is not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if resource is undefined', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { resource: undefined } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if resource is blank', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { resource: '' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation when resource is specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { resource: 'https://graph.microsoft.com' } });
-    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -119,39 +96,5 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.UTIL_ACCESSTOKEN_GET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

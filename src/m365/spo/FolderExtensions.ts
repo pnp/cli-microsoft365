@@ -1,6 +1,7 @@
 import request from '../../request';
 import Utils from '../../Utils';
 import * as url from 'url';
+import { CommandInstance } from '../../cli';
 
 /**
  * Folder methods that are shared among multiple commands.

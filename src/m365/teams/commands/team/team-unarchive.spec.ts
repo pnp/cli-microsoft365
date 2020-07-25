@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.TEAMS_TEAM_UNARCHIVE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.TEAMS_TEAM_UNARCHIVE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.TEAMS_TEAM_UNARCHIVE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -52,11 +49,11 @@ describe(commands.TEAMS_TEAM_UNARCHIVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_TEAM_UNARCHIVE), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_TEAM_UNARCHIVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('fails validation if the teamId is not a valid guid.', () => {
@@ -65,15 +62,7 @@ describe(commands.TEAMS_TEAM_UNARCHIVE, () => {
         teamId: 'invalid'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the teamId is not provided.', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the input is correct', () => {
@@ -82,7 +71,7 @@ describe(commands.TEAMS_TEAM_UNARCHIVE, () => {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('restores an archived Microsoft Team', (done) => {
@@ -136,7 +125,7 @@ describe(commands.TEAMS_TEAM_UNARCHIVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(err.message, 'No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6');
+        assert.strictEqual(err.message, 'No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6');
         done();
       }
       catch (e) {
@@ -180,39 +169,5 @@ describe(commands.TEAMS_TEAM_UNARCHIVE, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_TEAM_UNARCHIVE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

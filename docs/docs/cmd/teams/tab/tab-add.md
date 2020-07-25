@@ -10,21 +10,44 @@ m365 teams tab add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`| output usage information
-`-i, --teamId <teamId>`|The ID of the team to where the channel exists
-`-c, --channelId <channelId>`| The ID of the channel to add a tab to
-`--appId <appId>`|The ID of the Teams app that contains the Tab
-`--appName <appName>`|The name of the Teams app that contains the Tab
-`--contentUrl <contentUrl>`|The URL used for rendering Tab contents
-`--entityId [entityId]`|A unique identifier for the Tab
-`--removeUrl [removeUrl]`|The URL displayed when a Tab is removed
-`--websiteUrl [websiteUrl]`|The URL for showing tab contents outside of Teams
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-i, --teamId <teamId>`
+: The ID of the team to where the channel exists
+
+`-c, --channelId <channelId>`
+: The ID of the channel to add a tab to
+
+`--appId <appId>`
+: The ID of the Teams app that contains the Tab
+
+`--appName <appName>`
+: The name of the Teams app that contains the Tab
+
+`--contentUrl <contentUrl>`
+: The URL used for rendering Tab contents
+
+`--entityId [entityId]`
+: A unique identifier for the Tab
+
+`--removeUrl [removeUrl]`
+: The URL displayed when a Tab is removed
+
+`--websiteUrl [websiteUrl]`
+: The URL for showing tab contents outside of Teams
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

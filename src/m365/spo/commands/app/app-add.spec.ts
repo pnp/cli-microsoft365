@@ -10,7 +10,6 @@ import Utils from '../../../../Utils';
 import * as fs from 'fs';
 
 describe(commands.APP_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -24,7 +23,6 @@ describe(commands.APP_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -42,7 +40,6 @@ describe(commands.APP_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       request.get,
       fs.readFileSync
@@ -59,11 +56,11 @@ describe(commands.APP_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.APP_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.APP_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('adds new app to the tenant app catalog', (done) => {
@@ -243,7 +240,7 @@ describe(commands.APP_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.')));
         done();
       }
       catch (e) {
@@ -280,7 +277,7 @@ describe(commands.APP_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800.')));
         done();
       }
       catch (e) {
@@ -315,7 +312,7 @@ describe(commands.APP_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -350,7 +347,7 @@ describe(commands.APP_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -385,7 +382,7 @@ describe(commands.APP_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -420,7 +417,7 @@ describe(commands.APP_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, filePath: 'spfx.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -447,7 +444,7 @@ describe(commands.APP_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -485,7 +482,7 @@ describe(commands.APP_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -507,7 +504,7 @@ describe(commands.APP_ADD, () => {
 
   it('fails validation on invalid scope', () => {
     const actual = (command.validate() as CommandValidate)({ options: { scope: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation on valid \'tenant\' scope', () => {
@@ -521,7 +518,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation on valid \'Tenant\' scope', () => {
@@ -535,7 +532,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation on valid \'SiteCollection\' scope', () => {
@@ -549,7 +546,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('submits to tenant app catalog when scope not specified', (done) => {
@@ -678,16 +675,11 @@ describe(commands.APP_ADD, () => {
     });
   });
 
-  it('fails validation if file path not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if file path doesn\'t exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({ options: { filePath: 'abc' } });
     Utils.restore(fs.existsSync);
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if file path points to a directory', () => {
@@ -700,7 +692,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when invalid scope is specified', () => {
@@ -715,7 +707,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when path points to a valid file', () => {
@@ -730,7 +722,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when no scope is specified', () => {
@@ -745,7 +737,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the scope is specified with \'tenant\'', () => {
@@ -760,7 +752,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
 
@@ -776,7 +768,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the scope is specified with \'tenant\'', () => {
@@ -791,7 +783,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', () => {
@@ -806,7 +798,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('should not fail when \'tenant\' scope, but also appCatalogUrl specified', () => {
@@ -821,7 +813,7 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('should fail when \'sitecollection\' scope, but bad appCatalogUrl format specified', () => {
@@ -836,40 +828,6 @@ describe(commands.APP_ADD, () => {
       fs.existsSync,
       fs.lstatSync
     ]);
-    assert.notEqual(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.APP_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.notStrictEqual(actual, true);
   });
 });

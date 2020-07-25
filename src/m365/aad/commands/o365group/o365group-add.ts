@@ -9,8 +9,8 @@ import {
 } from '../../../../Command';
 import GraphCommand from '../../../base/GraphCommand';
 import { Group } from './Group';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -179,7 +179,7 @@ class AadO365GroupAddCommand extends GraphCommand {
         cmd.log(group);
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -254,18 +254,6 @@ class AadO365GroupAddCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.displayName) {
-        return 'Required option displayName missing';
-      }
-
-      if (!args.options.description) {
-        return 'Required option description missing';
-      }
-
-      if (!args.options.mailNickname) {
-        return 'Required option mailNickname missing';
-      }
-
       if (args.options.owners) {
         let owners: string[] = args.options.owners.split(',').map(o => o.trim());
         for (let i = 0; i < owners.length; i++) {
@@ -304,34 +292,6 @@ class AadO365GroupAddCommand extends GraphCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    When specifying the path to the logo image you can use both relative and
-    absolute paths. Note, that ~ in the path, will not be resolved and will most
-    likely result in an error.
-
-  Examples:
-
-    Create a public Microsoft 365 Group
-      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance
-
-    Create a private Microsoft 365 Group
-      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --isPrivate true
-
-    Create a public Microsoft 365 Group and set specified users as its owners
-      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
-
-    Create a public Microsoft 365 Group and set specified users as its members
-      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
-
-    Create a public Microsoft 365 Group and set its logo
-      ${this.name} --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --logoPath images/logo.png
-`);
   }
 }
 

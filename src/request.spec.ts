@@ -47,7 +47,7 @@ describe('Request', () => {
         done('Error expected');
       }, (err: any) => {
         try {
-          assert.equal(err, 'Command reference not set on the request object');
+          assert.strictEqual(err, 'Command reference not set on the request object');
           done();
         }
         catch (err) {
@@ -144,7 +144,7 @@ describe('Request', () => {
         done('Error expected');
       }, () => {
         try {
-          assert.equal(typeof (_options.headers as request.Headers)['authorization'], 'undefined');
+          assert.strictEqual(typeof (_options.headers as request.Headers)['authorization'], 'undefined');
           done();
         }
         catch (err) {
@@ -170,7 +170,7 @@ describe('Request', () => {
         done('Error expected');
       }, () => {
         try {
-          assert.equal(typeof (_options.headers as request.Headers)['x-anonymous'], 'undefined');
+          assert.strictEqual(typeof (_options.headers as request.Headers)['x-anonymous'], 'undefined');
           done();
         }
         catch (err) {
@@ -191,7 +191,7 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert.equal(_options.method, 'GET');
+          assert.strictEqual(_options.method, 'GET');
           done();
         }
         catch (err) {
@@ -214,7 +214,7 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert.equal(_options.method, 'HEAD');
+          assert.strictEqual(_options.method, 'HEAD');
           done();
         }
         catch (err) {
@@ -237,7 +237,7 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert.equal(_options.method, 'POST');
+          assert.strictEqual(_options.method, 'POST');
           done();
         }
         catch (err) {
@@ -260,7 +260,7 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert.equal(_options.method, 'PATCH');
+          assert.strictEqual(_options.method, 'PATCH');
           done();
         }
         catch (err) {
@@ -283,7 +283,7 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert.equal(_options.method, 'PUT');
+          assert.strictEqual(_options.method, 'PUT');
           done();
         }
         catch (err) {
@@ -306,7 +306,7 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert.equal(_options.method, 'DELETE');
+          assert.strictEqual(_options.method, 'DELETE');
           done();
         }
         catch (err) {
@@ -348,7 +348,7 @@ describe('Request', () => {
         cb('Error expected');
       }, (err) => {
         try {
-          assert.equal(err, 'Error');
+          assert.strictEqual(err, 'Error');
           cb();
         }
         catch (e) {
@@ -388,7 +388,7 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert.equal(timeout, 60000);
+          assert.strictEqual(timeout, 60000);
           done();
         }
         catch (err) {
@@ -428,7 +428,7 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert.equal(timeout, 10000);
+          assert.strictEqual(timeout, 10000);
           done();
         }
         catch (err) {
@@ -470,7 +470,7 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert.equal(timeout, 10000);
+          assert.strictEqual(timeout, 10000);
           done();
         }
         catch (err) {
@@ -508,7 +508,7 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert.equal(i, 4);
+          assert.strictEqual(i, 4);
           done();
         }
         catch (err) {
@@ -546,7 +546,7 @@ describe('Request', () => {
       })
       .then(() => {
         try {
-          assert.equal(i, 4);
+          assert.strictEqual(i, 4);
           done();
         }
         catch (err) {
@@ -586,7 +586,7 @@ describe('Request', () => {
         done('Expected error')
       }, (err) => {
         try {
-          assert.equal(err, 'Error');
+          assert.strictEqual(err, 'Error');
           done();
         }
         catch (e) {

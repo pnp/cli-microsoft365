@@ -10,20 +10,41 @@ m365 spo file get [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-w, --webUrl <webUrl>`|The URL of the site where the file is located
-`-u, --url [url]`|The server-relative URL of the file to retrieve. Specify either `url` or `id` but not both
-`-i, --id [id]`|The UniqueId (GUID) of the file to retrieve. Specify either `url` or `id` but not both
-`--asString`|Set to retrieve the contents of the specified file as string
-`--asListItem`|Set to retrieve the underlying list item
-`--asFile`|Set to save the file to the path specified in the path option
-`-p, --path [path]`|The local path where to save the retrieved file. Must be specified when the `--asFile` option is used
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-w, --webUrl <webUrl>`
+: The URL of the site where the file is located
+
+`-u, --url [url]`
+: The server-relative URL of the file to retrieve. Specify either `url` or `id` but not both
+
+`-i, --id [id]`
+: The UniqueId (GUID) of the file to retrieve. Specify either `url` or `id` but not both
+
+`--asString`
+: Set to retrieve the contents of the specified file as string
+
+`--asListItem`
+: Set to retrieve the underlying list item
+
+`--asFile`
+: Set to save the file to the path specified in the path option
+
+`-p, --path [path]`
+: The local path where to save the retrieved file. Must be specified when the `--asFile` option is used
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

@@ -10,20 +10,41 @@ m365 spo sitedesign add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-t, --title <title>`|The display name of the site design
-`-w, --webTemplate <webTemplate>`|Identifies which base template to add the design to. Allowed values `TeamSite,CommunicationSite`
-`-s, --siteScripts <siteScripts>`|Comma-separated list of site script IDs. The scripts will run in the order listed
-`-d, --description [description]`|The display description of site design
-`-m, --previewImageUrl [previewImageUrl]`|The URL of a preview image. If none is specified SharePoint will use a generic image
-`-a, --previewImageAltText [previewImageAltText]`|The alt text description of the image for accessibility
-`--isDefault`|Set if the site design is applied as the default site design
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-t, --title <title>`
+: The display name of the site design
+
+`-w, --webTemplate <webTemplate>`
+: Identifies which base template to add the design to. Allowed values `TeamSite,CommunicationSite`
+
+`-s, --siteScripts <siteScripts>`
+: Comma-separated list of site script IDs. The scripts will run in the order listed
+
+`-d, --description [description]`
+: The display description of site design
+
+`-m, --previewImageUrl [previewImageUrl]`
+: The URL of a preview image. If none is specified SharePoint will use a generic image
+
+`-a, --previewImageAltText [previewImageAltText]`
+: The alt text description of the image for accessibility
+
+`--isDefault`
+: Set if the site design is applied as the default site design
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

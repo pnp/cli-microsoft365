@@ -8,9 +8,9 @@ import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import config from '../../../../config';
+import * as chalk from 'chalk';
 
 describe(commands.ORGASSETSLIBRARY_ADD, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -26,7 +26,6 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -42,7 +41,6 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -58,11 +56,11 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.ORGASSETSLIBRARY_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.ORGASSETSLIBRARY_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('adds a new library as org assets library (debug)', (done) => {
@@ -84,7 +82,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets' } }, () => {
       try {
-        assert(orgAssetLibAddCallIssued && cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(orgAssetLibAddCallIssued && cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -114,7 +112,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public' } }, () => {
       try {
-        assert(orgAssetLibAddCallIssued && cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(orgAssetLibAddCallIssued && cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -144,7 +142,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } }, () => {
       try {
-        assert(orgAssetLibAddCallIssued && cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(orgAssetLibAddCallIssued && cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -174,7 +172,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`This library is already an organization assets library.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`This library is already an organization assets library.`)));
 
         done();
       }
@@ -207,7 +205,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
     }, (err?: any) => {
       try {
         assert(svcListRequest.called);
-        assert.equal(err.message, 'An error has occurred');
+        assert.strictEqual(err.message, 'An error has occurred');
         done();
       }
       catch (e) {
@@ -221,7 +219,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -230,19 +228,14 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
     });
   });
 
-  it('fails validation if the libraryUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if the libraryUrl is not valid', () => {
     const actual = (command.validate() as CommandValidate)({ options: { libraryUrl: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the thumbnail is not valid', () => {
     const actual = (command.validate() as CommandValidate)({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets', thumbnailUrl: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the libraryUrl option is a valid SharePoint site URL', () => {
@@ -259,39 +252,5 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.ORGASSETSLIBRARY_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

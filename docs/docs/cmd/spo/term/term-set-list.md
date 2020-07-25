@@ -10,15 +10,26 @@ m365 spo term set list [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`--termGroupId [termGroupId]`|ID of the term group from which to retrieve term sets. Specify `termGroupName` or `termGroupId` but not both
-`--termGroupName [termGroupName]`|Name of the term group from which to retrieve term sets. Specify `termGroupName` or `termGroupId` but not both
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`--termGroupId [termGroupId]`
+: ID of the term group from which to retrieve term sets. Specify `termGroupName` or `termGroupId` but not both
+
+`--termGroupName [termGroupName]`
+: Name of the term group from which to retrieve term sets. Specify `termGroupName` or `termGroupId` but not both
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 !!! important
     To use this command you have to have permissions to access the tenant admin site.

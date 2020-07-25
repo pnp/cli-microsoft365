@@ -6,7 +6,8 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -23,7 +24,6 @@ interface Options extends GlobalOptions {
   webUrl: string;
   footerEnabled?: string;
   searchScope?: string;
-  welcomePage?: string;
 }
 
 class SpoWebSetCommand extends SpoCommand {
@@ -49,7 +49,6 @@ class SpoWebSetCommand extends SpoCommand {
     telemetryProps.quickLaunchEnabled = typeof args.options.quickLaunchEnabled !== 'undefined';
     telemetryProps.footerEnabled = typeof args.options.footerEnabled !== 'undefined';
     telemetryProps.searchScope = args.options.searchScope !== 'undefined';
-    telemetryProps.welcomePage = args.options.welcomePage !== 'undefined';
     this.trackUnknownOptions(telemetryProps, args.options);
     return telemetryProps;
   }
@@ -104,32 +103,9 @@ class SpoWebSetCommand extends SpoCommand {
 
     request
       .patch(requestOptions)
-      .then((): Promise<void> => {
-        if (typeof args.options.welcomePage === 'undefined') {
-          return Promise.resolve();
-        }
-
-        if (this.verbose) {
-          cmd.log(`Updating Welcome page for the site ${args.options.webUrl}`);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/rootfolder`,
-          headers: {
-            'Content-Type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata',
-            'IF-MATCH': '*',
-            'X-HTTP-Method': 'PATCH'
-          },
-          body: { WelcomePage: args.options.welcomePage },
-          json: true
-        };
-
-        return request.patch(requestOptions)
-      })
       .then((): void => {
         if (this.debug) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -186,10 +162,6 @@ class SpoWebSetCommand extends SpoCommand {
         option: '--searchScope [searchScope]',
         description: 'Search scope to set in the site. Allowed values DefaultScope|Tenant|Hub|Site',
         autocomplete: SpoWebSetCommand.searchScopeOptions
-      },
-      {
-        option: '--welcomePage [welcomePage]',
-        description: 'Site-relative URL of the welcome page for the site'
       }
     ];
 
@@ -199,16 +171,11 @@ class SpoWebSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required option webUrl missing';
+      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+      if (isValidSharePointUrl !== true) {
+        return isValidSharePointUrl;
       }
-      else {
-        const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-      }
-
+      
       if (typeof args.options.quickLaunchEnabled !== 'undefined') {
         if (args.options.quickLaunchEnabled !== 'true' &&
           args.options.quickLaunchEnabled !== 'false') {
@@ -254,50 +221,6 @@ class SpoWebSetCommand extends SpoCommand {
 
       return this.validateUnknownOptions(args.options, 'web', 'set');
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    Next to updating web properties corresponding to the options of this
-    command, you can update the value of any other web property using its
-    CSOM name, eg. ${chalk.grey('--AllowAutomaticASPXPageIndexing')}. At this
-    moment, the CLI supports properties of types Boolean, String and Int32.
-
-  Examples:
-
-    Update subsite title
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --title Team-a
-
-    Hide quick launch on the subsite
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --quickLaunchEnabled false
-
-    Set site header layout to compact
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --headerLayout compact
-
-    Set site header color to primary theme background color
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --headerEmphasis 0
-
-    Enable megamenu in the site
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --megaMenuEnabled true
-    
-    Hide footer in the site
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --footerEnabled false
-
-    Set search scope to tenant scope
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
-  
-    Set welcome page for the web
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --welcomePage "SitePages/new-home.aspx"
-
-  More information:
-    
-    Web properties
-      https://docs.microsoft.com/en-us/previous-versions/office/sharepoint-server/ee545886(v=office.15)
-  ` );
   }
 }
 

@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
 describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -37,7 +35,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -51,33 +48,11 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.WEB_CLIENTSIDEWEBPART_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.WEB_CLIENTSIDEWEBPART_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('supports debug mode', () => {
@@ -91,15 +66,6 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if the webUrl option is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-
-      }
-    });
-    assert.notEqual(actual, true);
-  });
-
   it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({
       options:
@@ -107,7 +73,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
         webUrl: 'foo'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if all required options are specified', () => {
@@ -116,7 +82,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
         webUrl: "https://contoso.sharepoint.com/subsite"
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('handles error when calling client side webparts', (done) => {
@@ -135,7 +101,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Error')));
         done();
       }
       catch (e) {

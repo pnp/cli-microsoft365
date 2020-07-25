@@ -22,6 +22,6 @@ describe('FN001006_DEP_types_react_dom', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.SITE_GROUPIFY, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.SITE_GROUPIFY, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -37,7 +35,6 @@ describe(commands.SITE_GROUPIFY, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -51,11 +48,11 @@ describe(commands.SITE_GROUPIFY, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITE_GROUPIFY), true);
+    assert.strictEqual(command.name.startsWith(commands.SITE_GROUPIFY), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('connects site to an Microsoft 365 Group', (done) => {
@@ -309,7 +306,7 @@ describe(commands.SITE_GROUPIFY, () => {
 
     cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The group alias already exists.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The group alias already exists.')));
         done();
       }
       catch (e) {
@@ -335,7 +332,7 @@ describe(commands.SITE_GROUPIFY, () => {
 
     cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('This site already has an O365 Group attached.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('This site already has an O365 Group attached.')));
         done();
       }
       catch (e) {
@@ -351,7 +348,7 @@ describe(commands.SITE_GROUPIFY, () => {
 
     cmdInstance.action({ options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -371,67 +368,18 @@ describe(commands.SITE_GROUPIFY, () => {
     assert(containsOption);
   });
 
-  it('fails validation if siteUrl not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { alias: 'team-a', displayName: 'Team A' } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if siteUrl is not an absolute URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: '/sites/team-a', alias: 'team-a', displayName: 'Team A' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if siteUrl is not a SharePoint URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'http://contoso/sites/team-a', alias: 'team-a', displayName: 'Team A' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if alias is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', displayName: 'Team A' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if displayName is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if all required options are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITE_GROUPIFY));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

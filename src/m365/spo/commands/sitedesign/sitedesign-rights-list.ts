@@ -8,8 +8,8 @@ import Utils from '../../../../Utils';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
 import { SiteDesignPrincipal } from './SiteDesignPrincipal';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -58,7 +58,7 @@ class SpoSiteDesignRightsListCommand extends SpoCommand {
         }));
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -79,41 +79,12 @@ class SpoSiteDesignRightsListCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.id) {
-        return 'Required parameter id missing';
-      }
-
       if (!Utils.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    If the specified ${chalk.grey('id')} doesn't refer to an existing site design, you will get
-    a ${chalk.grey('File not found')} error.
-
-    If no permissions are listed, it means that the particular site design is
-    visible to everyone.
-
-  Examples:
-  
-    Get information about rights granted for the site design with ID
-    ${chalk.grey('2c1ba4c4-cd9b-4417-832f-92a34bc34b2a')}
-      ${this.name} --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
-
-  More information:
-
-    SharePoint site design and site script overview
-      https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-design-overview
-`);
   }
 }
 

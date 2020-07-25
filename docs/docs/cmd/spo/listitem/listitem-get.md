@@ -10,18 +10,35 @@ m365 spo listitem get [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|URL of the site from which the item should be retrieved
-`-i, --id <id>`|ID of the item to retrieve.
-`-l, --listId [listId]`|ID of the list from which to retrieve the item. Specify `listId` or `listTitle` but not both
-`-t, --listTitle [listTitle]`|Title of the list from which to retrieve the item. Specify `listId` or `listTitle` but not both
-`-f, --fields [fields]`|Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: URL of the site from which the item should be retrieved
+
+`-i, --id <id>`
+: ID of the item to retrieve.
+
+`-l, --listId [listId]`
+: ID of the list from which to retrieve the item. Specify `listId` or `listTitle` but not both
+
+`-t, --listTitle [listTitle]`
+: Title of the list from which to retrieve the item. Specify `listId` or `listTitle` but not both
+
+`-f, --fields [fields]`
+: Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

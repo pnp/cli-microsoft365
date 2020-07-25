@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError, CommandCancel } from '../../../../Command';
+import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.FOLDER_MOVE, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -74,7 +73,6 @@ describe(commands.FOLDER_MOVE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -90,7 +88,6 @@ describe(commands.FOLDER_MOVE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       request.get
     ]);
@@ -106,11 +103,11 @@ describe(commands.FOLDER_MOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.FOLDER_MOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.FOLDER_MOVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('should command complete successfully (verbose)', (done) => {
@@ -218,7 +215,7 @@ describe(commands.FOLDER_MOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
         done();
       }
       catch (e) {
@@ -244,7 +241,7 @@ describe(commands.FOLDER_MOVE, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('error2')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error2')));
         done();
       }
       catch (e) {
@@ -289,7 +286,7 @@ describe(commands.FOLDER_MOVE, () => {
       }
     }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -334,7 +331,7 @@ describe(commands.FOLDER_MOVE, () => {
       }
     }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -379,31 +376,13 @@ describe(commands.FOLDER_MOVE, () => {
       }
     }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('can be cancelled', () => {
-    assert(command.cancel());
-  });
-
-  it('clears pending connection on cancel', () => {
-    (command as any).timeout = {};
-    const clearTimeoutSpy = sinon.spy(global, 'clearTimeout');
-    (command.cancel() as CommandCancel)();
-    Utils.restore(global.clearTimeout);
-    assert(clearTimeoutSpy.called);
-  });
-
-  it('doesn\'t fail on cancel if no connection pending', () => {
-    (command as any).timeout = undefined;
-    (command.cancel() as CommandCancel)();
-    assert(true);
   });
 
   it('supports debug mode', () => {
@@ -428,62 +407,13 @@ describe(commands.FOLDER_MOVE, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if the webUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', sourceUrl: 'abc', targetUrl: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', sourceUrl: 'abc', targetUrl: 'abc' } });
-    assert.equal(actual, true);
-  });
-
-  it('fails validation if the sourceUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the targetUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', sourceUrl: 'abc' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.FOLDER_MOVE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

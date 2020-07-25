@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.SCHEMAEXTENSION_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -53,11 +50,11 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
 
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SCHEMAEXTENSION_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.SCHEMAEXTENSION_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
   it('lists schema extensions', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -514,35 +511,35 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   });
   it('passes validation if the owner is a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { owner: '68be84bf-a585-4776-80b3-30aa5207aa22' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
   it('fails validation if the owner is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { owner: '123' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
   it('fails validation if the status is not a valid status', () => {
     const actual = (command.validate() as CommandValidate)({ options: { status: 'test' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
   it('passes validation if the status is a valid status', () => {
     const actual = (command.validate() as CommandValidate)({ options: { status: 'InDevelopment' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
   it('fails validation if the pageNumber is not positive number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { pageNumber: '-1' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
   it('passes validation if the pageNumber is a positive number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { pageNumber: '2' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
   it('fails validation if the pageSize is not positive number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { pageSize: '-1' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
   it('passes validation if the pageSize is a positive number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { pageSize: '2' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -554,39 +551,5 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SCHEMAEXTENSION_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

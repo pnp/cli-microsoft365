@@ -7,8 +7,8 @@ import {
 } from '../../../../Command';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -49,7 +49,7 @@ class AadO365GroupRestoreCommand extends GraphCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -70,32 +70,12 @@ class AadO365GroupRestoreCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.id) {
-        return 'Required option id missing';
-      }
-
       if (!Utils.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    If the specified ${chalk.grey('id')} doesn't refer to a deleted group, you will get
-    a ${chalk.grey('File not found')} error.
-
-  Examples:
-
-    Restore group with ID ${chalk.grey('28beab62-7540-4db1-a23f-29a6018a3848')}.
-      ${this.name} --id 28beab62-7540-4db1-a23f-29a6018a3848
-  `);
   }
 }
 

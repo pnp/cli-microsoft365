@@ -1,6 +1,6 @@
 import commands from '../../commands';
 import flowCommands from '../../../flow/commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -10,7 +10,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.CONNECTOR_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -22,7 +21,6 @@ describe(commands.CONNECTOR_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.CONNECTOR_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -52,21 +49,21 @@ describe(commands.CONNECTOR_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CONNECTOR_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.CONNECTOR_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('defines alias', () => {
     const alias = command.alias();
-    assert.notEqual(typeof alias, 'undefined');
+    assert.notStrictEqual(typeof alias, 'undefined');
   });
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.equal((alias && alias.indexOf(flowCommands.CONNECTOR_LIST) > -1), true);
+    assert.strictEqual((alias && alias.indexOf(flowCommands.CONNECTOR_LIST) > -1), true);
   });
 
   it('retrieves custom connectors (debug)', (done) => {
@@ -216,7 +213,7 @@ describe(commands.CONNECTOR_LIST, () => {
 
     cmdInstance.action({ options: { debug: false, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' could not be found in the tenant '0d645e38-ec52-4a4f-ac58-65f2ac4015f6'.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The environment 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' could not be found in the tenant '0d645e38-ec52-4a4f-ac58-65f2ac4015f6'.`)));
         done();
       }
       catch (e) {
@@ -273,7 +270,7 @@ describe(commands.CONNECTOR_LIST, () => {
 
     cmdInstance.action({ options: { debug: false, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -314,23 +311,13 @@ describe(commands.CONNECTOR_LIST, () => {
 
     cmdInstance.action({ options: { debug: false, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('fails validation if the environment name is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation when the environment name option specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } });
-    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -353,39 +340,5 @@ describe(commands.CONNECTOR_LIST, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.CONNECTOR_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

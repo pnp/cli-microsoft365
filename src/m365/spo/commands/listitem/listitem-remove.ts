@@ -7,8 +7,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -135,14 +134,6 @@ class SpoListItemRemoveCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
-      if (!args.options.id) {
-        return 'Required parameter id missing';
-      }
-
       const id: number = parseInt(args.options.id);
       if (isNaN(id)) {
         return `${args.options.id} is not a valid list item ID`;
@@ -168,24 +159,6 @@ class SpoListItemRemoveCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Remove the list item with ID ${chalk.grey(1)} from list with ID
-    ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
-
-    Remove the list item with with ID ${chalk.grey(1)} from list with title
-    ${chalk.grey('List 1')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --id 1
-      `);
   }
 }
 

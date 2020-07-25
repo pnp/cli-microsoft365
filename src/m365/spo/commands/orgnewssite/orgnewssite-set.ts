@@ -10,8 +10,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -60,7 +60,7 @@ class SpoOrgNewsSiteSetCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
         }
         cb();
@@ -81,36 +81,8 @@ class SpoOrgNewsSiteSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required parameter url missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.url);
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.ORGNEWSSITE_SET).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-        
-  Remarks:
-
-    Using the ${chalk.blue('-u, --url')} option you can specify which site to add to the list of
-    organizational news sites.
-
-  Examples:
-  
-    Set a site as an organizational news site
-      ${chalk.grey(config.delimiter)} m365 ${this.name} --url https://contoso.sharepoint.com/sites/site1
-  `);
   }
 }
 

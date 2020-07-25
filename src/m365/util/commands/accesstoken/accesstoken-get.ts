@@ -2,12 +2,10 @@ import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import Command, {
   CommandOption,
-  CommandValidate,
   CommandError
 } from '../../../../Command';
 import auth from '../../../../Auth';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -50,38 +48,6 @@ class AccessTokenGetCommand extends Command {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.resource) {
-        return 'Required parameter resource missing';
-      }
-
-      return true;
-    };
-  }
-
-  public commandHelp(args: any, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-    
-    The ${chalk.blue(this.name)} command returns an access token for the specified
-    resource. If an access token has been previously retrieved and is still
-    valid, the command will return the cached token. If you want to ensure that
-    the returned access token is valid for as long as possible, you can force
-    the command to retrieve a new access token by using the ${chalk.grey('--new')} option.
-      
-  Examples:
-  
-    Get access token for the Microsoft Graph
-      ${this.name} --resource https://graph.microsoft.com
-
-    Get a new access token for SharePoint Online
-      ${this.name} --resource https://contoso.sharepoint.com --new
-`);
   }
 }
 

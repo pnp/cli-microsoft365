@@ -10,18 +10,35 @@ m365 outlook message move [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`--messageId <messageId>`|ID of the message to move
-`--sourceFolderName [sourceFolderName]`|Name of the folder to move the message from
-`--sourceFolderId [sourceFolderId]`|ID of the folder to move the message from
-`--targetFolderName [targetFolderName]`|Name of the folder to move the message to
-`--targetFolderId [targetFolderId]`|ID of the folder to move the message to
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`--messageId <messageId>`
+: ID of the message to move
+
+`--sourceFolderName [sourceFolderName]`
+: Name of the folder to move the message from
+
+`--sourceFolderId [sourceFolderId]`
+: ID of the folder to move the message from
+
+`--targetFolderName [targetFolderName]`
+: Name of the folder to move the message to
+
+`--targetFolderId [targetFolderId]`
+: ID of the folder to move the message to
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

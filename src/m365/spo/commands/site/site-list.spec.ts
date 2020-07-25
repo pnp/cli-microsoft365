@@ -10,7 +10,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.SITE_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -24,7 +23,6 @@ describe(commands.SITE_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -40,7 +38,6 @@ describe(commands.SITE_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -56,11 +53,11 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITE_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.SITE_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('retrieves list of modern teams sites when no type and no filter specified', (done) => {
@@ -570,7 +567,7 @@ describe(commands.SITE_LIST, () => {
 
     cmdInstance.action({ options: { debug: true, filter: "Url like 'mtest'" } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Syntax error in the filter expression 'Url like 'test''.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Syntax error in the filter expression 'Url like 'test''.")));
         done();
       }
       catch (e) {
@@ -643,7 +640,7 @@ describe(commands.SITE_LIST, () => {
 
     cmdInstance.action({ options: { debug: true, filter: "Url like 'mtest'" } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
         done();
       }
       catch (e) {
@@ -665,56 +662,22 @@ describe(commands.SITE_LIST, () => {
 
   it('accepts TeamSite site type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'TeamSite' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts CommunicationSite site type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'CommunicationSite' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('rejects invalid site type', () => {
     const type = 'foo';
     const actual = (command.validate() as CommandValidate)({ options: { type: type } });
-    assert.equal(actual, `${type} is not a valid modern site type. Allowed types are TeamSite and CommunicationSite`);
+    assert.strictEqual(actual, `${type} is not a valid modern site type. Allowed types are TeamSite and CommunicationSite`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITE_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

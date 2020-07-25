@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.ORGNEWSSITE_LIST, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -25,7 +24,6 @@ describe(commands.ORGNEWSSITE_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -41,7 +39,6 @@ describe(commands.ORGNEWSSITE_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -57,11 +54,11 @@ describe(commands.ORGNEWSSITE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.ORGNEWSSITE_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.ORGNEWSSITE_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('returns a result', (done) => {
@@ -77,7 +74,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
 
     cmdInstance.action({ options: { debug: false, verbose: true } }, () => {
       try {
-        assert.equal(svcListRequest.callCount, 1);
+        assert.strictEqual(svcListRequest.callCount, 1);
         assert(cmdInstanceLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1']));
         done();
       }
@@ -100,7 +97,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
 
     cmdInstance.action({ options: { debug: false, verbose: false } }, () => {
       try {
-        assert.equal(svcListRequest.callCount, 1);
+        assert.strictEqual(svcListRequest.callCount, 1);
         assert(cmdInstanceLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1', 'http://contoso.sharepoint.com/sites/site2']));
         done();
       }
@@ -135,7 +132,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
     }, (err?: any) => {
       try {
         assert(svcListRequest.called);
-        assert.equal(err.message, 'An error has occurred');
+        assert.strictEqual(err.message, 'An error has occurred');
         done();
       }
       catch (e) {
@@ -149,7 +146,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
 
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -167,39 +164,5 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.ORGNEWSSITE_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

@@ -10,21 +10,44 @@ m365 spo list label set  [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|The URL of the site where the list is located
-`--label <label>`|The label to set on the list
-`-t, --listTitle [listTitle]`|The title of the list on which to set the label. Specify only one of `listTitle`, `listId` or `listUrl`
-`-l, --listId [listId]`|The ID of the list on which to set the label. Specify only one of `listTitle`, `listId` or `listUrl`
-`--listUrl [listUrl]`|Server- or web-relative URL of the list on which to set the label. Specify only one of `listTitle`, `listId` or `listUrl`
-`--syncToItems`|Specify, to set the label on all items in the list
-`--blockDelete`|Specify, to disallow deleting items in the list
-`--blockEdit`|Specify, to disallow editing items in the list
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: The URL of the site where the list is located
+
+`--label <label>`
+: The label to set on the list
+
+`-t, --listTitle [listTitle]`
+: The title of the list on which to set the label. Specify only one of `listTitle`, `listId` or `listUrl`
+
+`-l, --listId [listId]`
+: The ID of the list on which to set the label. Specify only one of `listTitle`, `listId` or `listUrl`
+
+`--listUrl [listUrl]`
+: Server- or web-relative URL of the list on which to set the label. Specify only one of `listTitle`, `listId` or `listUrl`
+
+`--syncToItems`
+: Specify, to set the label on all items in the list
+
+`--blockDelete`
+: Specify, to disallow deleting items in the list
+
+`--blockEdit`
+: Specify, to disallow editing items in the list
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

@@ -8,7 +8,6 @@ import Utils from '../../../Utils';
 import auth from '../../../Auth';
 
 describe(commands.GET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.GET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -36,9 +34,6 @@ describe(commands.GET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([
-      vorpal.find
-    ]);
     auth.service.spoUrl = undefined;
   });
 
@@ -52,11 +47,11 @@ describe(commands.GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.GET), true);
+    assert.strictEqual(command.name.startsWith(commands.GET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('gets SPO URL when no URL was get previously', (done) => {
@@ -106,8 +101,8 @@ describe(commands.GET, () => {
 
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Log in to Microsoft 365 first")));
-        assert.equal(auth.service.spoUrl, undefined);
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Log in to Microsoft 365 first")));
+        assert.strictEqual(auth.service.spoUrl, undefined);
         done();
       }
       catch (e) {
@@ -144,40 +139,6 @@ describe(commands.GET, () => {
 
   it('passes validation without any extra options', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.GET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

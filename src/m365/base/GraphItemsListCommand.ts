@@ -1,6 +1,7 @@
 import GraphCommand from "./GraphCommand";
 import request from '../../request';
 import { GraphResponse } from './GraphResponse';
+import { CommandInstance } from "../../cli";
 
 export abstract class GraphItemsListCommand<T> extends GraphCommand {
   protected items: T[];

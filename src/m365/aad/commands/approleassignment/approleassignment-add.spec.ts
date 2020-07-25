@@ -10,7 +10,6 @@ import Utils from '../../../../Utils';
 import * as os from 'os';
 
 describe(commands.APPROLEASSIGNMENT_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -48,7 +47,6 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -64,7 +62,6 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.post
     ]);
@@ -79,11 +76,11 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.APPROLEASSIGNMENT_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.APPROLEASSIGNMENT_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('sets App Role assignments for service principal with specified displayName', (done) => {
@@ -92,9 +89,9 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     cmdInstance.action({ options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].objectId, '-HuQV_pzpkOJpR9gPinkUtHqOUvb9FRKurxnugdMSPs');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].principalDisplayName, 'VM2');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].resourceDisplayName, 'Microsoft Graph');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].objectId, '-HuQV_pzpkOJpR9gPinkUtHqOUvb9FRKurxnugdMSPs');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].principalDisplayName, 'VM2');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].resourceDisplayName, 'Microsoft Graph');
         done();
       }
       catch (e) {
@@ -109,12 +106,12 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     cmdInstance.action({ options: { objectId: '77907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'SharePoint', scope: 'Sites.Read.All,Sites.ReadWrite.All' } }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].objectId, '-HuQV_pzpkOJpR9gPinkUtHqOUvb9FRKurxnugdMSPs');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].principalDisplayName, 'VM2');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].resourceDisplayName, 'Microsoft Graph');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][1].objectId, '-HuQV_pzpkOJpR9gPinkUtHqOUvb9FRKurxnugdMSPs');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][1].principalDisplayName, 'VM2');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][1].resourceDisplayName, 'Microsoft Graph');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].objectId, '-HuQV_pzpkOJpR9gPinkUtHqOUvb9FRKurxnugdMSPs');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].principalDisplayName, 'VM2');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].resourceDisplayName, 'Microsoft Graph');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][1].objectId, '-HuQV_pzpkOJpR9gPinkUtHqOUvb9FRKurxnugdMSPs');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][1].principalDisplayName, 'VM2');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][1].resourceDisplayName, 'Microsoft Graph');
         done();
       }
       catch (e) {
@@ -129,13 +126,13 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     cmdInstance.action({ options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', output: 'json' } }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].objectId, '-HuQV_pzpkOJpR9gPinkUtHqOUvb9FRKurxnugdMSPs');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].principalDisplayName, 'VM2');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].resourceDisplayName, 'Microsoft Graph');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].id, 'fff194f1-7dce-4428-8301-1badb5518201');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].principalId, '57907bf8-73fa-43a6-89a5-1f603e29e452');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].principalType, 'ServicePrincipal');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0].resourceId, '1a3413b4-c588-45db-a77f-da44a564c495');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].objectId, '-HuQV_pzpkOJpR9gPinkUtHqOUvb9FRKurxnugdMSPs');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].principalDisplayName, 'VM2');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].resourceDisplayName, 'Microsoft Graph');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 'fff194f1-7dce-4428-8301-1badb5518201');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].principalId, '57907bf8-73fa-43a6-89a5-1f603e29e452');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].principalType, 'ServicePrincipal');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].resourceId, '1a3413b4-c588-45db-a77f-da44a564c495');
         done();
       }
       catch (e) {
@@ -150,7 +147,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, appId: 'fff194f1-7dce-4428-8301-1badb5518201', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
         done();
       }
       catch (e) {
@@ -165,7 +162,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, appId: 'fff194f1-7dce-4428-8301-1badb5518201', resource: 'intune', scope: 'Sites.Read.All' } }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
         done();
       }
       catch (e) {
@@ -180,7 +177,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, appId: 'fff194f1-7dce-4428-8301-1badb5518201', resource: 'exchange', scope: 'Sites.Read.All' } }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
         done();
       }
       catch (e) {
@@ -195,7 +192,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, appId: 'fff194f1-7dce-4428-8301-1badb5518201', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scope: 'Sites.Read.All' } }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
         done();
       }
       catch (e) {
@@ -224,7 +221,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, appId: 'fff194f1-7dce-4428-8301-1badb5518201', resource: 'SharePoint', scope: 'Sites.Read.All' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The resource 'SharePoint' does not have any application permissions available.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The resource 'SharePoint' does not have any application permissions available.`)));
         done();
       }
       catch (e) {
@@ -253,7 +250,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, appId: 'fff194f1-7dce-4428-8301-1badb5518201', resource: 'SharePoint', scope: 'Sites.Read.All' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`The scope value 'Sites.Read.All' you have specified does not exist for SharePoint. ${os.EOL}Available scopes (application permissions) are: ${os.EOL}Scope1${os.EOL}Scope2`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The scope value 'Sites.Read.All' you have specified does not exist for SharePoint. ${os.EOL}Available scopes (application permissions) are: ${os.EOL}Scope1${os.EOL}Scope2`)));
         done();
       }
       catch (e) {
@@ -283,7 +280,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, appId: 'fff194f1-7dce-4428-8301-1badb5518201', resource: 'SharePoint', scope: 'Sites.Read.All' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("More than one service principal found. Please use the appId or objectId option to make sure the right service principal is specified.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("More than one service principal found. Please use the appId or objectId option to make sure the right service principal is specified.")));
         done();
       }
       catch (e) {
@@ -308,7 +305,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
         done();
       }
       catch (e) {
@@ -319,47 +316,37 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
   it('fails validation if neither appId, objectId nor displayName are not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { resource: 'abc', scope: 'abc' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if resource is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', scope: 'abc' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if scope is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the appId is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appId: '123', resource: 'abc', scope: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the objectId is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { objectId: '123', resource: 'abc', scope: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both appId and displayName are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both objectId and displayName are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { objectId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both objectId, appId and displayName are specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appId: '123', objectId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   })
 
   it('passes validation when the appId option specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'abc', scope: 'abc' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -393,40 +380,6 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.APPROLEASSIGNMENT_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });
 

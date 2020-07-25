@@ -6,8 +6,8 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -46,7 +46,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
       })()
         .then((): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
           cb();
         }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
@@ -60,7 +60,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to clear all the user custom actions with scope ${vorpal.chalk.yellow(args.options.scope || 'All')}?`,
+        message: `Are you sure you want to clear all the user custom actions with scope ${chalk.yellow(args.options.scope || 'All')}?`,
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -147,27 +147,6 @@ class SpoCustomActionClearCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CUSTOMACTION_CLEAR).helpInformation());
-    log(
-      `  Examples:
-  
-    Clears all user custom actions for both site and site collection
-    ${chalk.grey('https://contoso.sharepoint.com/sites/test')}. Skips the confirmation prompt
-    message.
-      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test --confirm
-
-    Clears all user custom actions for site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -s Web
-
-    Clears all user custom actions for site collection
-    ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test --scope Site
-    `);
   }
 }
 

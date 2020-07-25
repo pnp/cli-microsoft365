@@ -10,18 +10,35 @@ m365 graph schemaextension add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-i, --id <id>`|The unique identifier for the schema extension definition
-`-d, --description [description]`|Description of the schema extension
-`--owner <owner>`|The Id ID the Azure AD application that is the owner of the schema extension
-`-t, --targetTypes <targetTypes>`|Comma-separated list of Microsoft Graph resource types the schema extension targets
-`-p, --properties`|The collection of property names and types that make up the schema extension definition formatted as a JSON string
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-i, --id <id>`
+: The unique identifier for the schema extension definition
+
+`-d, --description [description]`
+: Description of the schema extension
+
+`--owner <owner>`
+: The Id ID the Azure AD application that is the owner of the schema extension
+
+`-t, --targetTypes <targetTypes>`
+: Comma-separated list of Microsoft Graph resource types the schema extension targets
+
+`-p, --properties`
+: The collection of property names and types that make up the schema extension definition formatted as a JSON string
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

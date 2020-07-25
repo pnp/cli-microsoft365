@@ -10,8 +10,7 @@ import Utils from '../../../../Utils';
 import * as fs from 'fs';
 import * as path from 'path';
 import { FileProperties } from './FileProperties';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -154,10 +153,6 @@ class SpoFileGetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -199,52 +194,6 @@ class SpoFileGetCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Get file properties for file with id (UniqueId) ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
-    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6'
-
-    Get contents of the file with id (UniqueId) ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
-    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asString
-
-    Get list item properties for file with id (UniqueId)
-    ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asListItem   
-
-    Save file with id (UniqueId) ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')} located
-    in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} to local file
-    ${chalk.grey('/Users/user/documents/SavedAsTest1.docx')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' --asFile --path /Users/user/documents/SavedAsTest1.docx
-    
-    Return file properties for file with server-relative url
-    ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx'
-
-    Return file as string for file with server-relative url
-    ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asString
-
-    Return list item properties for file with server-relative url
-    ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asListItem   
-
-    Save file with server-relative url ${chalk.grey('/sites/project-x/documents/Test1.docx')}
-    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-    to local file ${chalk.grey('/Users/user/documentsSavedAsTest1.docx')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --url '/sites/project-x/documents/Test1.docx' --asFile --path /Users/user/documents/SavedAsTest1.docx
-      `);
   }
 }
 

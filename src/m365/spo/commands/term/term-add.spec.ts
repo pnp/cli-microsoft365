@@ -10,7 +10,6 @@ import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
 describe(commands.TERM_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -24,7 +23,6 @@ describe(commands.TERM_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -40,7 +38,6 @@ describe(commands.TERM_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -56,11 +53,11 @@ describe(commands.TERM_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TERM_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.TERM_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('adds term with the specified name to the term set and term group specified by name', (done) => {
@@ -207,7 +204,7 @@ describe(commands.TERM_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, name: 'IT', termSetName: 'Department', termGroupName: 'People' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -235,7 +232,7 @@ describe(commands.TERM_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, name: 'IT', id: '47fdacfe-ff64-4a05-b611-e84e767f04de', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
       }
       catch (e) {
@@ -263,7 +260,7 @@ describe(commands.TERM_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, name: 'IT', termSetName: 'Department', termGroupName: 'People' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
       }
       catch (e) {
@@ -291,7 +288,7 @@ describe(commands.TERM_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, name: 'IT', termSetName: 'Department', termGroupName: 'People' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
       }
       catch (e) {
@@ -319,7 +316,7 @@ describe(commands.TERM_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, name: 'IT', id: '47fdacfe-ff64-4a05-b611-e84e767f04de', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
       }
       catch (e) {
@@ -341,7 +338,7 @@ describe(commands.TERM_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, name: 'IT', termSetName: 'Department', termGroupName: 'People' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('There is already a term with the same default label and parent term.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('There is already a term with the same default label and parent term.')));
         done();
       }
       catch (e) {
@@ -363,7 +360,7 @@ describe(commands.TERM_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, name: 'IT', id: '47fdacfe-ff64-4a05-b611-e84e767f04de', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.')));
         done();
       }
       catch (e) {
@@ -395,7 +392,7 @@ describe(commands.TERM_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, name: 'IT', description: 'IT term', termSetName: 'Department', termGroupName: 'People' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -427,7 +424,7 @@ describe(commands.TERM_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, name: 'IT', customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: 'Department', termGroupName: 'People' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -459,7 +456,7 @@ describe(commands.TERM_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, name: 'IT', customProperties: '{"Prop1": "Value1"}', localCustomProperties: '{"LocalProp1": "LocalValue1"}', termSetName: 'Department', termGroupName: 'People' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -624,94 +621,89 @@ describe(commands.TERM_ADD, () => {
     });
   });
 
-  it('fails validation if name not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { termGroupName: 'PnPTermSets' } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if id is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { termGroupName: 'PnPTermSets', name: 'PnP-Organizations', id: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if neither termGroupId nor termGroupName specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'PnP-Organizations' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both termGroupId and termGroupName specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'PnP-Organizations', termGroupName: 'PnPTermSets', termGroupId: 'aca21974-139c-44fd-813c-6bbe6f25e658' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if termGroupId is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: 'invalid', termSetName: 'Department' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if neither termSetId nor termSetName specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both termSetId and termSetName specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: '9e54299e-208a-4000-8546-cc4139091b28', termSetName: 'Department' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both parentTermId and termSetName specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: '9e54299e-208a-4000-8546-cc4139091b28', termSetName: 'Department' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both parentTermId and termSetId specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: '9e54299e-208a-4000-8546-cc4139091b28', termSetId: '9e54299e-208a-4000-8546-cc4139091b29' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both parentTermId is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', parentTermId: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if termSetId is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if custom properties is not a valid JSON string', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', customProperties: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if local custom properties is not a valid JSON string', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', localCustomProperties: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when id, termSetId and termGroupId specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: '9e54299e-208a-4000-8546-cc4139091b28' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when id, termSetName and termGroupName specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupName: 'People', termSetName: 'Department' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when id, parentTermId and termGroupName specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupName: 'People', parentTermId: '9e54299e-208a-4000-8546-cc4139091b26' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when custom properties is a valid JSON string', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', customProperties: '{}' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when local custom properties is a valid JSON string', () => {
     const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department', localCustomProperties: '{}' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -723,39 +715,5 @@ describe(commands.TERM_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TERM_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

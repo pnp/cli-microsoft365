@@ -10,15 +10,26 @@ m365 yammer message like set [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`--id <id>`|The id of the Yammer message
-`--enable [enable]`|Set to `true` to like a message. Set to `false` to unlike it. Default `true`
-`--confirm`|Don't prompt for confirmation before unliking a message
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`--id <id>`
+: The id of the Yammer message
+
+`--enable [enable]`
+: Set to `true` to like a message. Set to `false` to unlike it. Default `true`
+
+`--confirm`
+: Don't prompt for confirmation before unliking a message
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

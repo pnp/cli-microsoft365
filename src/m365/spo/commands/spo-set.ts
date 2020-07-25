@@ -7,8 +7,7 @@ import {
 } from '../../../Command';
 import SpoCommand from '../../base/SpoCommand';
 import auth from '../../../Auth';
-
-const vorpal: Vorpal = require('../../../vorpal-init');
+import { CommandInstance } from '../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -50,36 +49,8 @@ class SpoSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required parameter url missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.url);
     };
-  }
-
-  public commandHelp(args: any, log: (help: string) => void): void {
-    log(vorpal.find(commands.SET).helpInformation());
-    log(` Remarks:
-
-    CLI for Microsoft 365 automatically discovers the URL of the root SharePoint site
-    collection/SharePoint tenant admin site (whichever is needed to run
-    the particular command). In specific cases, like when managing multi-geo
-    Microsoft 365 tenants, it could be desirable to make the CLI manage
-    the specific geography. For such cases, you can use this command
-    to explicitly specify the SPO URL that should be used when executing SPO
-    commands.
-      
-  Examples:
-  
-    Set SPO URL to the specified URL
-      m365 ${this.name} --url https://contoso.sharepoint.com
-`);
   }
 }
 

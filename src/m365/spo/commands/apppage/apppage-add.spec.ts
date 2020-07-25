@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.APPPAGE_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.APPPAGE_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -37,7 +35,6 @@ describe(commands.APPPAGE_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -51,11 +48,11 @@ describe(commands.APPPAGE_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.APPPAGE_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.APPPAGE_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('creates a single-part app page', (done) => {
@@ -111,7 +108,7 @@ describe(commands.APPPAGE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Failed to create a single-part app page`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Failed to create a single-part app page`)));
         done();
       }
       catch (e) {
@@ -163,58 +160,12 @@ describe(commands.APPPAGE_ADD, () => {
     });
     assert(containsOption);
   });
-
-  it('fails validation if title not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webPartData: JSON.stringify({ "abc": "def" }), webUrl: 'https://contoso.sharepoint.com' } });
-    assert.notEqual(actual, true);
-  });
-  it('fails validation if webPartData not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { title: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } });
-    assert.notEqual(actual, true);
-  });
-  it('fails validation if webUrl not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webPartData: JSON.stringify({ "abc": "def" }), title: 'page.aspx' } });
-    assert.notEqual(actual, true);
-  });
   it('fails validation if webPartData is not a valid JSON string', () => {
     const actual = (command.validate() as CommandValidate)({ options: { title: 'Contoso', webUrl: 'https://contoso', webPartData: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
   it('validation passes on all required options', () => {
     const actual = (command.validate() as CommandValidate)({ options: { title: 'Contoso', webPartData: '{}', webUrl: 'https://contoso.sharepoint.com' } });
-    assert.equal(actual, true);
-  });
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.APPPAGE_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

@@ -3,14 +3,14 @@ import * as assert from 'assert';
 import auth from './Auth';
 import Command, {
   CommandValidate,
-  CommandCancel,
   CommandOption,
   CommandTypes,
   CommandError
 } from './Command';
 import Utils from './Utils';
 import appInsights from './appInsights';
-const vorpal: Vorpal = require('./vorpal-init');
+import { CommandInstance } from './cli/CommandInstance';
+import * as chalk from 'chalk';
 
 class MockCommand1 extends Command {
   public get name(): string {
@@ -54,10 +54,6 @@ class MockCommand1 extends Command {
     return () => {
       return true;
     };
-  }
-
-  public cancel(): CommandCancel | undefined {
-    return () => { };
   }
 
   public types(): CommandTypes | undefined {
@@ -142,54 +138,7 @@ class MockCommand3 extends Command {
   }
 }
 
-class MockCommand4 extends Command {
-  public get name(): string {
-    return 'mock-command';
-  }
-
-  public get description(): string {
-    return 'Mock command description';
-  }
-
-  public allowUnknownOptions(): boolean {
-    return true;
-  }
-
-  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
-    cb();
-  }
-
-  public commandHelp(args: any, log: (message: string) => void): void {
-  }
-
-  public options(): CommandOption[] {
-    return [
-      {
-        option: '--debug',
-        description: 'Runs command with debug logging'
-      }
-    ];
-  }
-}
-
 describe('Command', () => {
-  const vcmd = {
-    action: () => vcmd,
-    alias: () => vcmd,
-    option: () => vcmd,
-    validate: () => vcmd,
-    cancel: () => vcmd,
-    help: () => vcmd,
-    types: () => vcmd,
-    allowUnknownOptions: () => vcmd
-  };
-  let actionSpy: sinon.SinonSpy;
-  let aliasSpy: sinon.SinonSpy;
-  let optionSpy: sinon.SinonSpy;
-  let validateSpy: sinon.SinonSpy;
-  let cancelSpy: sinon.SinonSpy;
-  let helpSpy: sinon.SinonSpy;
-  let typesSpy: sinon.SinonSpy;
   let telemetry: any;
 
   before(() => {
@@ -200,33 +149,14 @@ describe('Command', () => {
   });
 
   beforeEach(() => {
-    actionSpy = sinon.spy(vcmd, 'action');
-    aliasSpy = sinon.spy(vcmd, 'alias');
-    optionSpy = sinon.spy(vcmd, 'option');
-    validateSpy = sinon.spy(vcmd, 'validate');
-    cancelSpy = sinon.spy(vcmd, 'cancel');
-    helpSpy = sinon.spy(vcmd, 'help');
-    typesSpy = sinon.spy(vcmd, 'types');
     telemetry = null;
     auth.service.connected = true;
   });
 
   afterEach(() => {
     Utils.restore([
-      vcmd.action,
-      vcmd.alias,
-      vcmd.option,
-      vcmd.validate,
-      vcmd.cancel,
-      vcmd.help,
-      vcmd.types,
-      vcmd.allowUnknownOptions,
-      vorpal.command,
-      process.exit,
-      vorpal.util.parseCommand
+      process.exit
     ]);
-    vorpal.commands = [];
-    (vorpal as any)._command = undefined;
     auth.service.connected = false;
   });
 
@@ -235,159 +165,26 @@ describe('Command', () => {
       appInsights.trackEvent,
       auth.restoreAuth
     ]);
-  })
-
-  it('initiates command 1 with vorpal', () => {
-    const cmd = new MockCommand1();
-    const vorpalCommandStub = sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(vorpalCommandStub.calledOnce);
   });
 
-  it('initiates command 2 with vorpal', () => {
+  it('has no autocomplete by default', () => {
     const cmd = new MockCommand2();
-    const vorpalCommandStub = sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(vorpalCommandStub.calledOnce);
+    assert.strictEqual(typeof cmd.autocomplete(), 'undefined');
   });
 
-  it('initiates command with command name', () => {
-    const cmd = new MockCommand1();
-    let name;
-    sinon.stub(vorpal, 'command').callsFake((_name) => {
-      name = _name;
-      return vcmd as any;
-    });
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert.equal(name, cmd.name);
-  });
-
-  it('initiates command with command description', () => {
-    const cmd = new MockCommand1();
-    let description;
-    sinon.stub(vorpal, 'command').callsFake((_name, _description) => {
-      description = _description;
-      return vcmd as any;
-    });
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert.equal(description, cmd.description);
-  });
-
-  it('initiates command with command autocomplete', () => {
-    const cmd = new MockCommand1();
-    let autocomplete;
-    sinon.stub(vorpal, 'command').callsFake((_name, _description, _autocomplete) => {
-      autocomplete = _autocomplete;
-      return vcmd as any;
-    });
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert.deepEqual(autocomplete, cmd.autocomplete());
-  });
-
-  it('configures command action', () => {
-    const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(actionSpy.calledOnce);
-  });
-
-  it('configures options when available', () => {
-    const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(optionSpy.calledThrice); // there are three options
-  });
-
-  it('configures alias when available', () => {
-    const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(aliasSpy.calledOnce);
-  });
-
-  it('configures validation when available', () => {
-    const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(validateSpy.calledOnce);
-  });
-
-  it('doesn\'t configure validation when unavailable', () => {
+  it('has no validation logic by default', () => {
     const cmd = new MockCommand2();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(validateSpy.notCalled);
+    assert.strictEqual(typeof cmd.validate(), 'undefined');
   });
 
-  it('configures cancellation when available', () => {
-    const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(cancelSpy.calledOnce);
-  });
-
-  it('doesn\'t configure cancellation when unavailable', () => {
+  it('does not define option types by default', () => {
     const cmd = new MockCommand2();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(cancelSpy.notCalled);
+    assert.strictEqual(typeof cmd.types(), 'undefined');
   });
 
-  it('configures help when available', () => {
-    const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(helpSpy.calledOnce);
-  });
-
-  it('configures types when available', () => {
-    const cmd = new MockCommand1();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(typesSpy.calledOnce);
-  });
-
-  it('doesn\'t configure type when unavailable', () => {
+  it('removes optional arguments from command name', () => {
     const cmd = new MockCommand2();
-    sinon.stub(vorpal, 'command').callsFake(() => vcmd as any);
-    cmd.init(vorpal);
-    Utils.restore(vorpal.command);
-    assert(typesSpy.notCalled);
-  });
-
-  it('returns command name without arguments', () => {
-    const cmd = new MockCommand2();
-    assert.equal(cmd.getCommandName(), 'Mock command 2');
-  });
-
-  it('prints help using the log argument when called from the help command', () => {
-    const sandbox = sinon.createSandbox();
-    sandbox.stub(vorpal, '_command').value({
-      command: 'help mock2'
-    });
-    const log = (msg?: string) => { };
-    const logSpy = sinon.spy(log);
-    const mock = new MockCommand2();
-    const cmd = {
-      help: mock.help()
-    };
-    cmd.help({}, logSpy);
-    sandbox.restore();
-    assert(logSpy.called);
+    assert.strictEqual(cmd.getCommandName(), 'Mock command 2');
   });
 
   it('displays error message when it\'s serialized in the error property', () => {
@@ -406,7 +203,7 @@ describe('Command', () => {
         }
       })
     }, cmd, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
     });
   });
 
@@ -426,7 +223,7 @@ describe('Command', () => {
         }
       })
     }, cmd, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(JSON.stringify({
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(JSON.stringify({
         error: {
           id: '123'
         }
@@ -446,7 +243,7 @@ describe('Command', () => {
     mock.handlePromiseError({
       error: 'abc'
     }, cmd, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
     });
   });
 
@@ -462,7 +259,7 @@ describe('Command', () => {
     mock.handlePromiseError({
       error: { error_description: 'abc' }
     }, cmd, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
     });
   });
 
@@ -477,7 +274,7 @@ describe('Command', () => {
     const cmdLogSpy: sinon.SinonSpy = sinon.spy(cmd, 'log');
     const mock = new MockCommand1();
     mock.commandAction(cmd, {}, (err?: any): void => {
-      assert(cmdLogSpy.calledWith(vorpal.chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)))
+      assert(cmdLogSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)))
     });
   });
 
@@ -493,7 +290,7 @@ describe('Command', () => {
     };
     cmd.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, 'mock-command');
+        assert.strictEqual(telemetry.name, 'mock-command');
         done();
       }
       catch (e) {
@@ -514,7 +311,7 @@ describe('Command', () => {
     };
     cmd.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, 'mc1');
+        assert.strictEqual(telemetry.name, 'mc1');
         done();
       }
       catch (e) {
@@ -535,140 +332,20 @@ describe('Command', () => {
     };
     cmd.action({ options: {} }, () => {
       try {
-        assert.equal(telemetry.name, '');
+        assert.strictEqual(telemetry.name, '');
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('doesn\'t remove leading zeroes from unknown options', (done) => {
-    const cmd = new MockCommand1();
-    const delimiter = (vorpal as any)._delimiter;
-    const argv = process.argv;
-    vorpal.delimiter('');
-    sinon.stub(cmd as any, 'initAction').callsFake((args) => {
-      try {
-        assert.strictEqual(args.options.option3, '00123');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        vorpal.delimiter(delimiter);
-        process.argv = argv;
-      }
-    });
-    sinon.stub(process, 'exit');
-    cmd.init(vorpal);
-    process.argv = ['node', 'm365', 'mock-command', '--option3', '00123'];
-    vorpal.parse(['node', 'm365', 'mock-command', '--option3', '00123']);
-  });
-
-  it('removes leading zeroes from known options that aren\'t a string', (done) => {
-    const cmd = new MockCommand1();
-    const delimiter = (vorpal as any)._delimiter;
-    const argv = process.argv;
-    vorpal.delimiter('');
-    sinon.stub(cmd as any, 'initAction').callsFake((args) => {
-      try {
-        assert.strictEqual(args.options.option1, 123);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        vorpal.delimiter(delimiter);
-        process.argv = argv;
-      }
-    });
-    sinon.stub(process, 'exit');
-    cmd.init(vorpal);
-    process.argv = ['node', 'm365', 'mock-command', '--option1', '00123'];
-    vorpal.parse(['node', 'm365', 'mock-command', '--option1', '00123']);
-  });
-
-  it('doesn\'t remove leading zeroes from known options that are a string', (done) => {
-    const cmd = new MockCommand1();
-    const delimiter = (vorpal as any)._delimiter;
-    const argv = process.argv;
-    vorpal.delimiter('');
-    sinon.stub(cmd as any, 'initAction').callsFake((args) => {
-      try {
-        assert.strictEqual(args.options.option2, '00123');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        vorpal.delimiter(delimiter);
-        process.argv = argv;
-      }
-    });
-    sinon.stub(process, 'exit');
-    cmd.init(vorpal);
-    process.argv = ['node', 'm365', 'mock-command', '--option2', '00123'];
-    vorpal.parse(['node', 'm365', 'mock-command', '--option2', '00123']);
-  });
-
-  it('doesn\'t remove leading zeroes from unknown options where no types specified', (done) => {
-    const cmd = new MockCommand4();
-    const delimiter = (vorpal as any)._delimiter;
-    const argv = process.argv;
-    vorpal.delimiter('');
-    sinon.stub(cmd as any, 'initAction').callsFake((args) => {
-      try {
-        assert.strictEqual(args.options.option1, '00123');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        vorpal.delimiter(delimiter);
-        process.argv = argv;
-      }
-    });
-    sinon.stub(process, 'exit');
-    cmd.init(vorpal);
-    process.argv = ['node', 'm365', 'mock-command', '--option1', '00123'];
-    vorpal.parse(['node', 'm365', 'mock-command', '--option1', '00123']);
-  });
-
-  it('removes leading zeroes from known options when the command doesn\'t support unknown options', (done) => {
-    const cmd = new MockCommand3();
-    const delimiter = (vorpal as any)._delimiter;
-    const argv = process.argv;
-    vorpal.delimiter('');
-    sinon.stub(cmd as any, 'initAction').callsFake((args) => {
-      try {
-        assert.strictEqual(args.options.option1, 123);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        vorpal.delimiter(delimiter);
-        process.argv = argv;
-      }
-    });
-    sinon.stub(process, 'exit');
-    cmd.init(vorpal);
-    process.argv = ['node', 'm365', 'mock-command', '--option1', '00123'];
-    vorpal.parse(['node', 'm365', 'mock-command', '--option1', '00123']);
   });
 
   it('correctly handles error when instance of error returned from the promise', (done) => {
     const cmd = new MockCommand3();
     (cmd as any).handleRejectedODataPromise(new Error('An error has occurred'), undefined, (msg: any): void => {
       try {
-        assert.equal(JSON.stringify(msg), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(msg), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -683,7 +360,7 @@ describe('Command', () => {
     const cmd = new MockCommand3();
     (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage, code: errorCode } } }, undefined, (msg: any): void => {
       try {
-        assert.equal(JSON.stringify(msg), JSON.stringify(new CommandError(errorCode + " - " + errorMessage)));
+        assert.strictEqual(JSON.stringify(msg), JSON.stringify(new CommandError(errorCode + " - " + errorMessage)));
         done();
       }
       catch (e) {
@@ -697,7 +374,7 @@ describe('Command', () => {
     const cmd = new MockCommand3();
     (cmd as any).handleRejectedODataPromise({ error: { error: { message: errorMessage } } }, undefined, (msg: any): void => {
       try {
-        assert.equal(JSON.stringify(msg), JSON.stringify(new CommandError(errorMessage)));
+        assert.strictEqual(JSON.stringify(msg), JSON.stringify(new CommandError(errorMessage)));
         done();
       }
       catch (e) {
@@ -719,7 +396,7 @@ describe('Command', () => {
       Prop2: true
     });
     command.trackUnknownOptionsPublic(actual, { Prop2: false });
-    assert.equal(JSON.stringify(actual), expected);
+    assert.strictEqual(JSON.stringify(actual), expected);
   });
 
   it('adds unknown options to payload', () => {
@@ -732,6 +409,6 @@ describe('Command', () => {
       Prop2: false
     });
     command.addUnknownOptionsToPayloadPublic(actual, { Prop2: false })
-    assert.equal(JSON.stringify(actual), expected);
+    assert.strictEqual(JSON.stringify(actual), expected);
   });
 });

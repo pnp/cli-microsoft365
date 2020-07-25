@@ -7,8 +7,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -127,10 +126,6 @@ class SpoListViewRemoveCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -166,34 +161,6 @@ class SpoListViewRemoveCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Remove view with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from the list
-    with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --viewId cc27a922-8224-4296-90a5-ebbc54da2e81
-    
-    Remove view with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from the list
-    with title ${chalk.grey('Documents')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewId cc27a922-8224-4296-90a5-ebbc54da2e81
-    
-    Remove view with title ${chalk.grey('MyView')} from a list with title ${chalk.grey('Documents')}
-    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle MyView
-    
-    Remove view with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a list
-    with title ${chalk.grey('Documents')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} without being asked
-    for confirmation
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewId cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
-      `);
   }
 }
 

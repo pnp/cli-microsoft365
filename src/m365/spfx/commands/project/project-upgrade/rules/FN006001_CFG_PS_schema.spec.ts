@@ -17,7 +17,7 @@ describe('FN006001_CFG_PS_schema', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if schema is already up-to-date', () => {
@@ -29,6 +29,6 @@ describe('FN006001_CFG_PS_schema', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

@@ -10,18 +10,23 @@ m365 tenant status list [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-w, --workload [workload]`|Retrieve service status for the specified service. If not provided, will list the current service status of all services
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json|text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
 
-## Remarks
+`-w, --workload [workload]`
+: Retrieve service status for the specified service. If not provided, will list the current service status of all services
 
-To get the name of the particular workload for use with the `workload` option, execute `tenant status list --output json` and get the value of the `Workload` property for the particular service.
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json|text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

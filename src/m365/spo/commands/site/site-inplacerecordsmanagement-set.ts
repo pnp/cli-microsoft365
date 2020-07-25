@@ -7,7 +7,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -56,7 +57,7 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -81,36 +82,12 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.siteUrl) {
-        return 'Required option siteUrl missing';
-      }
-
-      if (!args.options.enabled) {
-        return 'Required option enabled missing';
-      }
-
       if (!Utils.isValidBoolean(args.options.enabled)) {
         return 'Invalid "enabled" option value. Specify "true" or "false"';
       }
 
       return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Activates in-place records management for site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}
-      m365 ${this.name} --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled true
-
-    Deactivates in-place records management for site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}
-      m365 ${this.name} --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled false
-  ` );
   }
 }
 

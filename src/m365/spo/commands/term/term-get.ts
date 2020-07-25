@@ -11,8 +11,7 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { Term } from './Term';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -186,34 +185,6 @@ class SpoTermGetCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.TERM_GET).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-      
-  Remarks:
-
-    When retrieving term by its ID, it's sufficient to specify just the ID.
-    When retrieving it by its name however, you need to specify the parent
-    term group and term set using either their names or IDs.
-
-  Examples:
-  
-    Get information about a taxonomy term using its ID
-      m365 ${this.name} --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
-
-    Get information about a taxonomy term using its name, retrieving the parent
-    term group and term set using their names
-      m365 ${this.name} --name IT --termGroupName People --termSetName Department
-
-    Get information about a taxonomy term using its name, retrieving the parent
-    term group and term set using their IDs
-      m365 ${this.name} --name IT --termGroupId 5c928151-c140-4d48-aab9-54da901c7fef --termSetId 8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f
-`);
   }
 }
 

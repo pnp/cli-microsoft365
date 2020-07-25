@@ -8,7 +8,6 @@ import * as assert from 'assert';
 import Utils from '../../Utils';
 
 describe(commands.LOGOUT, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let authClearConnectionInfoStub: sinon.SinonStub;
@@ -20,7 +19,6 @@ describe(commands.LOGOUT, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -32,12 +30,6 @@ describe(commands.LOGOUT, () => {
     };
   });
 
-  afterEach(() => {
-    Utils.restore([
-      vorpal.find
-    ]);
-  });
-
   after(() => {
     Utils.restore([
       auth.restoreAuth,
@@ -46,11 +38,11 @@ describe(commands.LOGOUT, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.LOGOUT), true);
+    assert.strictEqual(command.name.startsWith(commands.LOGOUT), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('logs out from Microsoft 365 when logged in', (done) => {
@@ -93,40 +85,6 @@ describe(commands.LOGOUT, () => {
         done(e);
       }
     });
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.LOGOUT));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 
   it('correctly handles error while clearing persisted connection info', (done) => {
@@ -180,7 +138,7 @@ describe(commands.LOGOUT, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

@@ -10,7 +10,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.LISTITEM_SET, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
 
@@ -89,7 +88,7 @@ describe(commands.LISTITEM_SET, () => {
       return Promise.resolve({ value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] });
     }
     if ((opts.url as string).indexOf('/items(') > -1) {
-      actualId = opts.url.match(/\/items\((\d+)\)/i)[1];
+      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
       return Promise.resolve(
         {
           "Attachments": false,
@@ -120,7 +119,6 @@ describe(commands.LISTITEM_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -135,7 +133,6 @@ describe(commands.LISTITEM_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       request.get
     ]);
@@ -150,11 +147,11 @@ describe(commands.LISTITEM_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.LISTITEM_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.LISTITEM_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('supports debug mode', () => {
@@ -180,28 +177,23 @@ describe(commands.LISTITEM_SET, () => {
   });
 
   it('configures command types', () => {
-    assert.notEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
+    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
   });
 
   it('fails validation if listTitle and listId option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if listTitle and listId are specified together', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the webUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { title: 'Demo List' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', listTitle: 'Demo List' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
@@ -211,7 +203,7 @@ describe(commands.LISTITEM_SET, () => {
 
   it('fails validation if the listId option is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listId option is a valid GUID', () => {
@@ -235,7 +227,7 @@ describe(commands.LISTITEM_SET, () => {
 
     cmdInstance.action({ options: options }, () => {
       try {
-        assert.equal(actualId, 0);
+        assert.strictEqual(actualId, 0);
         done();
       }
       catch (e) {
@@ -261,7 +253,7 @@ describe(commands.LISTITEM_SET, () => {
 
     cmdInstance.action({ options: options }, () => {
       try {
-        assert.equal(actualId, expectedId);
+        assert.strictEqual(actualId, expectedId);
         done();
       }
       catch (e) {
@@ -363,7 +355,7 @@ describe(commands.LISTITEM_SET, () => {
 
     cmdInstance.action({ options: options }, () => {
       try {
-        assert.equal(actualId, expectedId);
+        assert.strictEqual(actualId, expectedId);
         done();
       }
       catch (e) {
@@ -478,39 +470,5 @@ describe(commands.LISTITEM_SET, () => {
         done(e);
       }
     });
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.LISTITEM_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

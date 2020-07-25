@@ -7,8 +7,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -116,43 +115,8 @@ class SpoFolderRemoveCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      if (!args.options.folderUrl) {
-        return 'Required parameter folderUrl missing';
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-  
-    The ${chalk.blue(this.name)} command will remove folder only if it is empty.
-    If the folder contains any files, deleting the folder will fail.
-        
-  Examples:
-
-    Removes a folder with site-relative URL ${chalk.grey('/Shared Documents/My Folder')} located
-    in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder'
-
-    Moves a folder with site-relative URL ${chalk.grey('/Shared Documents/My Folder')} located in
-    site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-    to the site recycle bin
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder' --recycle
-    `)
   }
 }
 

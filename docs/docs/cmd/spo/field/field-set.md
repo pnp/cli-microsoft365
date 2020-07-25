@@ -10,19 +10,38 @@ m365 spo field set [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|Absolute URL of the site where the field is located
-`--listId [listId]`|ID of the list where the field is located (if list column). Specify `listTitle` or `listId` but not both
-`--listTitle [listTitle]`|Title of the list where the field is located (if list column). Specify `listTitle` or `listId` but not both
-`-i|--id [id]`|ID of the field to update. Specify `name` or `id` but not both
-`-n|--name [name]`|Title or internal name of the field to update. Specify `name` or `id` but not both
-`--updateExistingLists`|Set, to push the update to existing lists. Otherwise, the changes will apply to new lists only
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: Absolute URL of the site where the field is located
+
+`--listId [listId]`
+: ID of the list where the field is located (if list column). Specify `listTitle` or `listId` but not both
+
+`--listTitle [listTitle]`
+: Title of the list where the field is located (if list column). Specify `listTitle` or `listId` but not both
+
+`-i
+: --id [id]`|ID of the field to update. Specify `name` or `id` but not both
+
+`-n
+: --name [name]`|Title or internal name of the field to update. Specify `name` or `id` but not both
+
+`--updateExistingLists`
+: Set, to push the update to existing lists. Otherwise, the changes will apply to new lists only
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

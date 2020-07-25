@@ -2,6 +2,7 @@ import AzmgmtCommand from "./AzmgmtCommand";
 import request from '../../request';
 import { AzmgmtResponse } from './AzmgmtResponse';
 import * as url from 'url';
+import { CommandInstance } from "../../cli";
 
 export abstract class AzmgmtItemsListCommand<T> extends AzmgmtCommand {
   protected items: T[];

@@ -10,7 +10,6 @@ import config from '../../../../config';
 import Utils from '../../../../Utils';
 
 describe(commands.EXTERNALUSER_LIST, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -24,7 +23,6 @@ describe(commands.EXTERNALUSER_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -40,7 +38,6 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -56,11 +53,11 @@ describe(commands.EXTERNALUSER_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.EXTERNALUSER_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.EXTERNALUSER_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('lists first page of 10 tenant external users (debug)', (done) => {
@@ -661,7 +658,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
         done();
       }
       catch (e) {
@@ -676,7 +673,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -753,105 +750,71 @@ describe(commands.EXTERNALUSER_LIST, () => {
 
   it('passes validation when no options have been specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when page size is not a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { pageSize: 'a' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when page size is a negative number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { pageSize: '-10' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when page size is > 50', () => {
     const actual = (command.validate() as CommandValidate)({ options: { pageSize: '51' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when page size is 0 < x <= 50 (min)', () => {
     const actual = (command.validate() as CommandValidate)({ options: { pageSize: '1' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when page size is 0 < x <= 50 (max)', () => {
     const actual = (command.validate() as CommandValidate)({ options: { pageSize: '50' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when page number is not a number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { position: 'a' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when page number is a negative number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { position: '-1' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when page number is a positive number', () => {
     const actual = (command.validate() as CommandValidate)({ options: { position: '1' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when sort order contains invalid value', () => {
     const actual = (command.validate() as CommandValidate)({ options: { sortOrder: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when sort order is set to asc', () => {
     const actual = (command.validate() as CommandValidate)({ options: { sortOrder: 'asc' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when sort order is set to desc', () => {
     const actual = (command.validate() as CommandValidate)({ options: { sortOrder: 'desc' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when site URL is not a valid SharePoint URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when site URL is a valid SharePoint URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'https://contoso.sharepoint.com' } });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.EXTERNALUSER_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

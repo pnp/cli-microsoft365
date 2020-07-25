@@ -29,7 +29,7 @@ describe('FN014004_CODE_settings_jsonSchemas_configJson_url', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if vscode folder doesn\'t exist', () => {
@@ -37,7 +37,7 @@ describe('FN014004_CODE_settings_jsonSchemas_configJson_url', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if .vscode/settings.json doesn\'t exist', () => {
@@ -46,7 +46,7 @@ describe('FN014004_CODE_settings_jsonSchemas_configJson_url', () => {
       vsCode: {}
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if json.schemas in .vscode/settings.json not defined', () => {
@@ -57,7 +57,7 @@ describe('FN014004_CODE_settings_jsonSchemas_configJson_url', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if config.json JSON schema in .vscode/settings.json not defined', () => {
@@ -77,7 +77,7 @@ describe('FN014004_CODE_settings_jsonSchemas_configJson_url', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if config.json doesn\'t have correct URL', () => {
@@ -97,6 +97,6 @@ describe('FN014004_CODE_settings_jsonSchemas_configJson_url', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

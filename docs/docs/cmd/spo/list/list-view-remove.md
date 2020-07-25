@@ -10,19 +10,38 @@ m365 spo list view remove [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|URL of the site where the list to remove the view from is located
-`--listId [listId]`|ID of the list from which the view should be removed. Specify either `listId` or `listTitle` but not both
-`--listTitle [listTitle]`|Title of the list from which the view should be removed. Specify either `listId` or `listTitle` but not both
-`--viewId [viewId]`|ID of the view to remove. Specify either `viewId` or `viewTitle` but not both
-`--viewTitle [viewTitle]`|Title of the view to remove. Specify either `viewId` or `viewTitle` but not both
-`--confirm`|Don't prompt for confirming removing the view
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: URL of the site where the list to remove the view from is located
+
+`--listId [listId]`
+: ID of the list from which the view should be removed. Specify either `listId` or `listTitle` but not both
+
+`--listTitle [listTitle]`
+: Title of the list from which the view should be removed. Specify either `listId` or `listTitle` but not both
+
+`--viewId [viewId]`
+: ID of the view to remove. Specify either `viewId` or `viewTitle` but not both
+
+`--viewTitle [viewTitle]`
+: Title of the view to remove. Specify either `viewId` or `viewTitle` but not both
+
+`--confirm`
+: Don't prompt for confirming removing the view
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

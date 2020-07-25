@@ -10,21 +10,44 @@ m365 flow export [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-i, --id <id>`|The id of the Microsoft Flow to export
-`-e, --environment <environment>`|The name of the environment for which to export the flow
-`-n, --packageDisplayName [packageDisplayName]`|The display name to use in the exported package
-`-d, --packageDescription [packageDescription]`|The description to use in the exported package
-`-c, --packageCreatedBy [packageCreatedBy]`|The name of the person to be used as the creator of the exported package
-`-s, --packageSourceEnvironment [packageSourceEnvironment]`|The name of the source environment from which the exported package was taken
-`-f, --format [format]`|Export format type. `json,zip`. Default `zip`
-`-p, --path [path]`|The path to save the exported package to
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-i, --id <id>`
+: The id of the Microsoft Flow to export
+
+`-e, --environment <environment>`
+: The name of the environment for which to export the flow
+
+`-n, --packageDisplayName [packageDisplayName]`
+: The display name to use in the exported package
+
+`-d, --packageDescription [packageDescription]`
+: The description to use in the exported package
+
+`-c, --packageCreatedBy [packageCreatedBy]`
+: The name of the person to be used as the creator of the exported package
+
+`-s, --packageSourceEnvironment [packageSourceEnvironment]`
+: The name of the source environment from which the exported package was taken
+
+`-f, --format [format]`
+: Export format type. `json,zip`. Default `zip`
+
+`-p, --path [path]`
+: The path to save the exported package to
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

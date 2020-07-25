@@ -14,6 +14,7 @@ nav:
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
     - status: 'cmd/status.md'
+    - version: 'cmd/version.md'
     - Azure Active Directory Graph (aad):
       - approleassignment:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
@@ -568,6 +569,7 @@ markdown_extensions:
   - toc:
       permalink: true
   - pymdownx.superfences
+  - def_list
 extra:
   social:
     - type: 'twitter'

@@ -7,8 +7,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';  
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -82,16 +81,6 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
           cb();
         }
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Retrieve the Content Type Hub URL
-      m365 ${this.name}
-    `);
   }
 }
 

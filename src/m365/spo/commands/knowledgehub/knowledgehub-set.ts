@@ -10,8 +10,8 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -64,7 +64,7 @@ class SpoKnowledgehubSetCommand extends SpoCommand {
           cmd.log(json[json.length - 1]);
 
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
 
           cb();
@@ -87,36 +87,8 @@ class SpoKnowledgehubSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required parameter url missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.url);
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.KNOWLEDGEHUB_SET).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-      
-  Remarks:
-
-    If the specified ${chalk.grey('url')} doesn't refer to an existing site collection,
-    you will get a ${chalk.grey('404 - "404 FILE NOT FOUND"')} error.
-
-  Examples:
-  
-    Sets the Knowledge Hub Site for your tenant
-      ${this.name} --url https://contoso.sharepoint.com/sites/knowledgesite
-`);
   }
 }
 

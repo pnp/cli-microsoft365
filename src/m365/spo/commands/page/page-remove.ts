@@ -5,8 +5,8 @@ import SpoCommand from '../../../base/SpoCommand';
 import { ContextInfo } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -61,7 +61,7 @@ class SpoPageRemoveCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
           cb();
         },
@@ -114,44 +114,8 @@ class SpoPageRemoveCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.name) {
-        return 'Required parameter name missing';
-      }
-
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    If you try to remove a page with that does not exist, you will get
-    a ${chalk.grey('The file does not exist')} error.
-
-    If you set the ${chalk.grey('--confirm')}  flag, you will not be prompted for confirmation
-    before the page is actually removed.
-
-  Examples:
-
-    Remove a modern page.
-      ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
-
-    Remove a modern page without a confirmation prompt.
-      ${this.name} --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --confirm
-    `
-    );
   }
 }
 

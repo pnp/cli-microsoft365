@@ -1,7 +1,7 @@
 import request from '../../../../request';
 import commands from '../../commands';
 import SpoCommand from '../../../base/SpoCommand';
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
   public get name(): string {
@@ -38,16 +38,6 @@ class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Get the URL of the tenant app catalog
-      m365 ${this.name}
-  ` );
   }
 }
 

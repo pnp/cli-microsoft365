@@ -7,9 +7,9 @@ const command: Command = require("./apppage-set");
 import * as assert from "assert";
 import request from "../../../../request";
 import Utils from "../../../../Utils";
+import * as chalk from 'chalk';
 
 describe(commands.APPPAGE_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +21,6 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require("../../../../vorpal-init");
     log = [];
     cmdInstance = {
       commandWrapper: { command: command.name },
@@ -34,7 +33,7 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   afterEach(() => {
-    Utils.restore([vorpal.find, request.post]);
+    Utils.restore([request.post]);
   });
 
   after(() => {
@@ -43,11 +42,11 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("has correct name", () => {
-    assert.equal(command.name.startsWith(commands.APPPAGE_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.APPPAGE_SET), true);
   });
 
   it("has a description", () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it("updates the single-part app page", done => {
@@ -75,7 +74,7 @@ describe(commands.APPPAGE_SET, () => {
           return;
         }
         try {
-          assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+          assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
           done();
         }
         catch (e) {
@@ -105,7 +104,7 @@ describe(commands.APPPAGE_SET, () => {
       },
       (err?: any) => {
         try {
-          assert.equal(
+          assert.strictEqual(
             JSON.stringify(err),
             JSON.stringify(
               new CommandError(`Failed to update the single-part app page`)
@@ -170,7 +169,7 @@ describe(commands.APPPAGE_SET, () => {
         webUrl: "https://contoso.sharepoint.com"
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it("fails validation if webPartData not specified", () => {
@@ -180,7 +179,7 @@ describe(commands.APPPAGE_SET, () => {
         webUrl: "https://contoso.sharepoint.com"
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it("fails validation if webUrl not specified", () => {
@@ -190,7 +189,7 @@ describe(commands.APPPAGE_SET, () => {
         pageName: "page.aspx"
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it("fails validation if webPartData is not a valid JSON string", () => {
@@ -201,7 +200,7 @@ describe(commands.APPPAGE_SET, () => {
         webPartData: "abc"
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it("validation passes on all required options", () => {
@@ -212,40 +211,6 @@ describe(commands.APPPAGE_SET, () => {
         webUrl: "https://contoso.sharepoint.com"
       }
     });
-    assert.equal(actual, true);
-  });
-
-  it("has help referring to the right command", () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, "find").callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.APPPAGE_SET));
-  });
-
-  it("has help with examples", () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, "find").callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf("Examples:") > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

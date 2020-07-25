@@ -7,8 +7,7 @@ import { CommandOption, CommandValidate, CommandError } from '../../../../Comman
 import GlobalOptions from '../../../../GlobalOptions';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import { SPOSitePropertiesEnumerable } from './SPOSitePropertiesEnumerable';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -138,42 +137,6 @@ class SpoSiteListCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-   
-  Remarks:
-
-    Using the ${chalk.blue('-f, --filter')} option you can specify which sites you want to retrieve.
-    For example, to get sites with ${chalk.grey('project')} in their URL, use ${chalk.grey("Url -like 'project'")}
-    as the filter.
-
-    When using the text output type (default), the command lists only the values
-    of the ${chalk.grey('Title')}, and ${chalk.grey('Url')} properties of the site. When setting the output type to JSON,
-    all available properties are included in the command output.
-  
-  Examples:
-  
-    List all modern team sites in the tenant you're logged in to
-      m365 ${this.name}
-
-    List all modern team sites in the tenant you're logged in to
-      m365 ${this.name} --type TeamSite
-
-    List all modern communication sites in the tenant you're logged in to
-      m365 ${this.name} --type CommunicationSite
-
-    List all modern team sites that contain 'project' in the URL
-      m365 ${this.name} --type TeamSite --filter "Url -like 'project'"
-
-    List all deleted sites in the tenant you're logged in to
-      m365 ${this.name} --deleted
-`);
   }
 }
 

@@ -10,19 +10,38 @@ m365 spo term set add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-n, --name <name>`|Name of the term set to add
-`--termGroupId [termGroupId]`|ID of the term group in which to create the term set. Specify `termGroupId` or `termGroupName` but not both
-`--termGroupName [termGroupName]`|Name of the term group in which to create the term set. Specify `termGroupId` or `termGroupName` but not both
-`-i, --id [id]`|ID of the term set to add
-`-d, --description [description]`|Description of the term set to add
-`--customProperties [customProperties]`|JSON string with key-value pairs representing custom properties to set on the term set
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-n, --name <name>`
+: Name of the term set to add
+
+`--termGroupId [termGroupId]`
+: ID of the term group in which to create the term set. Specify `termGroupId` or `termGroupName` but not both
+
+`--termGroupName [termGroupName]`
+: Name of the term group in which to create the term set. Specify `termGroupId` or `termGroupName` but not both
+
+`-i, --id [id]`
+: ID of the term set to add
+
+`-d, --description [description]`
+: Description of the term set to add
+
+`--customProperties [customProperties]`
+: JSON string with key-value pairs representing custom properties to set on the term set
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 !!! important
     To use this command you have to have permissions to access the tenant admin site.

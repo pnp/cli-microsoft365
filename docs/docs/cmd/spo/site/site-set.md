@@ -10,22 +10,47 @@ m365 spo site set [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --url <url>`|The URL of the site collection to update
-`--classification [classification]`|The new classification for the site collection
-`--disableFlows [disableFlows]`|Set to `true` to disable using Microsoft Flow in this site collection
-`--isPublic [isPublic]`|Set to `true` to make the group linked to the site public or to `false` to make it private
-`--owners [owners]`|Comma-separated list of users to add as site collection administrators
-`--shareByEmailEnabled [shareByEmailEnabled]`|Set to true to allow to share files with guests and to false to disallow it
-`--siteDesignId [siteDesignId]`|Id of the custom site design to apply to the site
-`--title [title]`|The new title for the site collection
-`--sharingCapability [sharingCapability]`|The sharing capability for the site. Allowed values:  `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --url <url>`
+: The URL of the site collection to update
+
+`--classification [classification]`
+: The new classification for the site collection
+
+`--disableFlows [disableFlows]`
+: Set to `true` to disable using Microsoft Flow in this site collection
+
+`--isPublic [isPublic]`
+: Set to `true` to make the group linked to the site public or to `false` to make it private
+
+`--owners [owners]`
+: Comma-separated list of users to add as site collection administrators
+
+`--shareByEmailEnabled [shareByEmailEnabled]`
+: Set to true to allow to share files with guests and to false to disallow it
+
+`--siteDesignId [siteDesignId]`
+: Id of the custom site design to apply to the site
+
+`--title [title]`
+: The new title for the site collection
+
+`--sharingCapability [sharingCapability]`
+: The sharing capability for the site. Allowed values:  `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 !!! important
     To use this command you have to have permissions to access the tenant admin site.

@@ -10,18 +10,35 @@ m365 login [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-t, --authType [authType]`|The type of authentication to use. Allowed values `certificate,deviceCode,password,identity`. Default `deviceCode`
-`-u, --userName [userName]`|Name of the user to authenticate. Required when `authType` is set to `password`
-`-p, --password [password]`|Password for the user. Required when `authType` is set to `password`
-`-c, --certificateFile [certificateFile]`|Path to the file with certificate private key. Required when `authType` is set to `certificate`
-`--thumbprint [thumbprint]`|Certificate thumbprint. Required when `authType` is set to `certificate`
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-t, --authType [authType]`
+: The type of authentication to use. Allowed values `certificate,deviceCode,password,identity`. Default `deviceCode`
+
+`-u, --userName [userName]`
+: Name of the user to authenticate. Required when `authType` is set to `password`
+
+`-p, --password [password]`
+: Password for the user. Required when `authType` is set to `password`
+
+`-c, --certificateFile [certificateFile]`
+: Path to the file with certificate private key. Required when `authType` is set to `certificate`
+
+`--thumbprint [thumbprint]`
+: Certificate thumbprint. Required when `authType` is set to `certificate`
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

@@ -11,7 +11,6 @@ import config from '../../../../config';
 import { IdentityResponse } from '../../ClientSvc';
 
 describe(commands.PROPERTYBAG_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   const stubAllPostRequests = (
@@ -114,7 +113,6 @@ describe(commands.PROPERTYBAG_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -129,7 +127,6 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       (command as any).setProperty
     ]);
@@ -144,11 +141,11 @@ describe(commands.PROPERTYBAG_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.PROPERTYBAG_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.PROPERTYBAG_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('should call setProperty when folder is not specified', (done) => {
@@ -306,7 +303,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -327,7 +324,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
         done();
       }
       catch (e) {
@@ -348,7 +345,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
         done();
       }
       catch (e) {
@@ -370,7 +367,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -392,7 +389,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -412,7 +409,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
         done();
       }
       catch (e) {
@@ -449,7 +446,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Site has NoScript enabled, and setting property bag values is not supported')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Site has NoScript enabled, and setting property bag values is not supported')));
         done();
       }
       catch (e) {
@@ -470,7 +467,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('getEffectiveBasePermissions abc')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getEffectiveBasePermissions abc')));
         done();
       }
       catch (e) {
@@ -492,7 +489,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('getEffectiveBasePermissions error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getEffectiveBasePermissions error')));
         done();
       }
       catch (e) {
@@ -514,7 +511,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -534,7 +531,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. EffectiveBasePermissions not found')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. EffectiveBasePermissions not found')));
         done();
       }
       catch (e) {
@@ -557,7 +554,7 @@ describe(commands.PROPERTYBAG_SET, () => {
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(setPropertySpy.calledOnce === true);
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('setProperty promise error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('setProperty promise error')));
         done();
       }
       catch (e) {
@@ -579,7 +576,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('setProperty error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('setProperty error')));
         done();
       }
       catch (e) {
@@ -601,7 +598,7 @@ describe(commands.PROPERTYBAG_SET, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -639,11 +636,6 @@ describe(commands.PROPERTYBAG_SET, () => {
     assert(options.length > 0);
   });
 
-  it('fails validation if the url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, "Missing required option url");
-  });
-
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({
       options:
@@ -653,7 +645,7 @@ describe(commands.PROPERTYBAG_SET, () => {
           value: 'value1'
         }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the property value option valid', () => {
@@ -664,7 +656,7 @@ describe(commands.PROPERTYBAG_SET, () => {
           key: 'key1'
         }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the key option is not valid', () => {
@@ -674,7 +666,7 @@ describe(commands.PROPERTYBAG_SET, () => {
           webUrl: 'https://contoso.sharepoint.com'
         }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the url option specified', () => {
@@ -686,7 +678,7 @@ describe(commands.PROPERTYBAG_SET, () => {
           value: 'value1'
         }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the url and folder options specified', () => {
@@ -699,7 +691,7 @@ describe(commands.PROPERTYBAG_SET, () => {
           folder: '/'
         }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('doesn\'t fail validation if the optional folder option not specified', () => {
@@ -712,40 +704,6 @@ describe(commands.PROPERTYBAG_SET, () => {
             value: 'value1'
           }
       });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.PROPERTYBAG_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

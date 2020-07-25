@@ -1,6 +1,7 @@
 import * as request from 'request-promise-native';
 import { RequestError } from 'request-promise-native/errors';
 import auth, { Auth } from './Auth';
+import { CommandInstance } from './cli';
 const packageJSON = require('../package.json');
 
 class Request {

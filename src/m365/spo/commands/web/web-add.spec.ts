@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
 describe(commands.WEB_ADD, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -22,7 +21,6 @@ describe(commands.WEB_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.WEB_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.post
     ]);
@@ -54,11 +51,11 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.WEB_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.WEB_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('creates web without inheriting the navigation', (done) => {
@@ -112,7 +109,7 @@ describe(commands.WEB_ADD, () => {
           WebTemplate: "STS",
           WebTemplateId: 0
         }), 'Invalid web info');
-        assert.equal(configuredNavigation, false, 'Configured inheriting navigation while not expected');
+        assert.strictEqual(configuredNavigation, false, 'Configured inheriting navigation while not expected');
         done();
       }
       catch (e) {
@@ -183,7 +180,7 @@ describe(commands.WEB_ADD, () => {
           WebTemplate: "STS",
           WebTemplateId: 0
         }), 'Incorrect web info');
-        assert.equal(configuredNavigation, false, 'Configured inheriting navigation while not expected');
+        assert.strictEqual(configuredNavigation, false, 'Configured inheriting navigation while not expected');
         done();
       }
       catch (e) {
@@ -255,7 +252,7 @@ describe(commands.WEB_ADD, () => {
           WebTemplate: "STS",
           WebTemplateId: 0
         }), 'Incorrect web info');
-        assert.equal(configuredNavigation, false, 'Configured inheriting navigation while not expected');
+        assert.strictEqual(configuredNavigation, false, 'Configured inheriting navigation while not expected');
         done();
       }
       catch (e) {
@@ -331,7 +328,7 @@ describe(commands.WEB_ADD, () => {
       }
     }, () => {
       try {
-        assert.equal(configuredNavigation, true);
+        assert.strictEqual(configuredNavigation, true);
         done();
       }
       catch (e) {
@@ -406,7 +403,7 @@ describe(commands.WEB_ADD, () => {
       }
     }, () => {
       try {
-        assert.equal(configuredNavigation, true);
+        assert.strictEqual(configuredNavigation, true);
         done();
       }
       catch (e) {
@@ -472,7 +469,7 @@ describe(commands.WEB_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
       }
       catch (e) {
@@ -511,7 +508,7 @@ describe(commands.WEB_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("The Web site address \"/sites/test/subsite\" is already in use.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("The Web site address \"/sites/test/subsite\" is already in use.")));
         done();
       }
       catch (e) {
@@ -568,7 +565,7 @@ describe(commands.WEB_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
       }
       catch (e) {
@@ -592,7 +589,7 @@ describe(commands.WEB_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -618,7 +615,7 @@ describe(commands.WEB_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -638,16 +635,6 @@ describe(commands.WEB_ADD, () => {
     assert(containsDebugOption);
   });
 
-  it('fails validation if the title option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        webUrl: "subsite",
-        parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0", locale: 1033
-      }
-    });
-    assert.notEqual(actual, true);
-  });
-
   it('passes validation if all required options are specified', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
@@ -655,7 +642,7 @@ describe(commands.WEB_ADD, () => {
         parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0"
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if all required options and valid locale are specified', () => {
@@ -665,17 +652,7 @@ describe(commands.WEB_ADD, () => {
         parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0", locale: 1033
       }
     });
-    assert.equal(actual, true);
-  });
-
-  it('fails validation if the webUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        title: "subsite",
-        parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0", locale: 1033
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if the parentWebUrl option not specified', () => {
@@ -685,7 +662,7 @@ describe(commands.WEB_ADD, () => {
         webUrl: "subsite", webTemplate: "STS#0", locale: 1033
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the parentWebUrl option is not a valid SharePoint URL', () => {
@@ -696,17 +673,7 @@ describe(commands.WEB_ADD, () => {
         parentWebUrl: 'foo'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the webTemplate option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        title: "subsite",
-        webUrl: "subsite", parentWebUrl: "https://contoso.sharepoint.com", locale: 1033
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the specified locale is not a number', () => {
@@ -715,40 +682,6 @@ describe(commands.WEB_ADD, () => {
         title: "subsite", webUrl: "subsite", parentWebUrl: "https://contoso.sharepoint.com", webTemplate: 'STS#0', locale: 'abc'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.WEB_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.notStrictEqual(actual, true);
   });
 });

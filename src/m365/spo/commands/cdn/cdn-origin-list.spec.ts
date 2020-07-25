@@ -10,7 +10,6 @@ import Utils from '../../../../Utils';
 import config from '../../../../config';
 
 describe(commands.CDN_ORIGIN_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -24,7 +23,6 @@ describe(commands.CDN_ORIGIN_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -40,7 +38,6 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -56,11 +53,11 @@ describe(commands.CDN_ORIGIN_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CDN_ORIGIN_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.CDN_ORIGIN_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('retrieves the settings of the public CDN when type set to Public', (done) => {
@@ -236,7 +233,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert.equal(err.message, 'An error has occurred');
+        assert.strictEqual(err.message, 'An error has occurred');
         done();
       }
       catch (e) {
@@ -256,7 +253,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
     cmdInstance.action({ options: { debug: false } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -299,56 +296,22 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
   it('accepts Public SharePoint Online CDN type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'Public' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', () => {
     const actual = (command.validate() as CommandValidate)({ options: { type: 'Private' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', () => {
     const type = 'foo';
     const actual = (command.validate() as CommandValidate)({ options: { type: type } });
-    assert.equal(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
+    assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => {},
-      prompt: () => {},
-      helpInformation: () => {}
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => {});
-    assert(find.calledWith(commands.CDN_ORIGIN_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => {},
-      helpInformation: () => {}
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => {});
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

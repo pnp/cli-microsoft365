@@ -20,7 +20,7 @@ describe('FN014001_CODE_settings_jsonSchemas', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if json.schemas should be added and is already present', () => {
@@ -34,7 +34,7 @@ describe('FN014001_CODE_settings_jsonSchemas', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if json.schemas should be added but is not present', () => {
@@ -46,7 +46,7 @@ describe('FN014001_CODE_settings_jsonSchemas', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('doesn\'t return notification if .vscode/settings.json is not available', () => {
@@ -54,6 +54,6 @@ describe('FN014001_CODE_settings_jsonSchemas', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

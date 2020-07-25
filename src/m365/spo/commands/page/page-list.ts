@@ -6,8 +6,8 @@ import {
   CommandOption,
   CommandValidate
 } from '../../../../Command';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -58,7 +58,7 @@ class SpoPageListCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -79,22 +79,8 @@ class SpoPageListCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Missing required option webUrl';
-      }
-
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    List all modern pages in the specific site
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a
-`);
   }
 }
 

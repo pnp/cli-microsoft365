@@ -5,8 +5,7 @@ import Command, {
 } from '../../Command';
 import Utils from '../../Utils';
 import { AuthType } from '../../Auth';
-
-const vorpal: Vorpal = require('../../vorpal-init');
+import { CommandInstance } from '../../cli';
 
 class StatusCommand extends Command {
   public get name(): string {
@@ -50,32 +49,12 @@ class StatusCommand extends Command {
       auth
         .restoreAuth()
         .then((): void => {
-          args = (cmd as any).processArgs(args);
           (cmd as any).initAction(args, this);
-
           cmd.commandAction(this, args, cb);
         }, (error: any): void => {
           cb(new CommandError(error));
         });
     }
-  }
-
-  public commandHelp(args: any, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.STATUS).helpInformation());
-    log(
-      `  Remarks:
-
-    If you are logged in to Microsoft 365, the ${chalk.blue(commands.STATUS)} command
-    will show you information about the user or application name used to sign in
-    and the details about the stored refresh and access tokens and their
-    expiration date and time when run in debug mode.
-
-  Examples:
-  
-    Show the information about the current login to Microsoft 365
-      m365 ${this.name}
-`);
   }
 }
 

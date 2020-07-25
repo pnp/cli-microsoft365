@@ -10,15 +10,26 @@ m365 yammer group user add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`--id <id>`|The ID of the group to add the user to
-`--userId [userId]`|ID of the user to add to the group. If not specified, adds the current user
-`--email [email]`|E-mail of the user to add to the group
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`--id <id>`
+: The ID of the group to add the user to
+
+`--userId [userId]`
+: ID of the user to add to the group. If not specified, adds the current user
+
+`--email [email]`
+: E-mail of the user to add to the group
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

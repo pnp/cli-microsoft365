@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import AzmgmtCommand from './AzmgmtCommand';
+import { CommandInstance } from '../../cli';
 
 class MockCommand extends AzmgmtCommand {
   public get name(): string {

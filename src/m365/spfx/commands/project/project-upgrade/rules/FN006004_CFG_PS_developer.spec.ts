@@ -17,6 +17,6 @@ describe('FN006004_CFG_PS_developer', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

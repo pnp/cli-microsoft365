@@ -6,8 +6,8 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import { PageHeader, CustomPageHeader, CustomPageHeaderServerProcessedContent, CustomPageHeaderProperties } from './PageHeader';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -275,7 +275,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -395,14 +395,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.pageName) {
-        return 'Required parameter pageName missing';
-      }
-
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       if (args.options.type &&
         args.options.type !== 'None' &&
         args.options.type !== 'Default' &&
@@ -432,34 +424,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    If the specified ${chalk.grey('name')} doesn't refer to an existing modern page, you will get
-    a ${chalk.grey('File doesn\'t exists')} error.
-
-    The ${chalk.blue('showKicker')}, ${chalk.blue('kicker')} and ${chalk.blue('authors')} options are based on preview
-    functionality that isn't available on all tenants yet.
-
-  Examples:
-
-    Reset the page header to default
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx
-
-    Reset the page header to default and set authors
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --authors "steve@contoso.com, bob@contoso.com"
-
-    Use the specified image focused on the given coordinates in the page header
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --type Custom --imageUrl /sites/team-a/SiteAssets/hero.jpg --altText 'Sunset over the ocean' --translateX 42.3837520042758 --translateY 56.4285714285714
-
-    Center the page title in the header and show the publishing date
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --textAlignment Center --showPublishDate
-`);
   }
 }
 

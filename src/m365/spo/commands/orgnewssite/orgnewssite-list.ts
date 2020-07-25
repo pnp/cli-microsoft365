@@ -8,8 +8,8 @@ import {
   CommandError
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -60,7 +60,7 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
           cmd.log(results);
 
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
           cb();
         }
@@ -70,21 +70,6 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const parentOptions: CommandOption[] = super.options();
     return parentOptions;
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.ORGNEWSSITE_LIST).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-    
-  Examples:
-  
-    List all organizational news sites
-      m365 ${this.name}
-  `);
-
   }
 }
 

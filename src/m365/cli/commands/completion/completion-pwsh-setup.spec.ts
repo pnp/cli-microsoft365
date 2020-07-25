@@ -1,5 +1,5 @@
 import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 const command: Command = require('./completion-pwsh-setup');
@@ -9,10 +9,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { autocomplete } from '../../../../autocomplete';
+import * as chalk from 'chalk';
 
 describe(commands.COMPLETION_PWSH_SETUP, () => {
   const completionScriptPath: string = path.resolve(__dirname, '..', '..', '..', '..', '..', 'scripts', 'Register-CLIM365Completion.ps1');
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -23,7 +23,6 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -39,7 +38,6 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       fs.existsSync,
       fs.mkdirSync,
       fs.writeFileSync,
@@ -55,11 +53,11 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.COMPLETION_PWSH_SETUP), true);
+    assert.strictEqual(command.name.startsWith(commands.COMPLETION_PWSH_SETUP), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('appends completion scripts to profile when profile file already exists', (done) => {
@@ -87,7 +85,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
 
     cmdInstance.action({ options: { debug: true, profile: profilePath } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWithExactly(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWithExactly(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -183,7 +181,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     cmdInstance.action({ options: { debug: false, profile: profilePath } }, (err?: any) => {
       try {
         assert(mkdirSyncStub.calledWith(path.dirname(profilePath), { recursive: true }), 'Profile path not created');
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(error)), 'Invalid error returned');
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)), 'Invalid error returned');
         assert(writeFileSyncStub.notCalled, 'Profile file created');
         assert(appendFileSyncStub.notCalled, 'Completion script appended');
         done();
@@ -204,7 +202,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     cmdInstance.action({ options: { debug: false, profile: profilePath } }, (err?: any) => {
       try {
         assert(writeFileSyncStub.calledWithExactly(profilePath, '', 'utf8'), 'Profile file not created');
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(error)), 'Invalid error returned');
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)), 'Invalid error returned');
         assert(appendFileSyncStub.notCalled, 'Completion script appended');
         done();
       }
@@ -224,23 +222,13 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     cmdInstance.action({ options: { debug: false, profile: profilePath } }, (err?: any) => {
       try {
         assert(appendFileSyncStub.calledWithExactly(profilePath, os.EOL + completionScriptPath, 'utf8'), 'Completion script not appended');
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(error)), 'Invalid error returned');
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)), 'Invalid error returned');
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('fails validation if the profile path is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation when the profile path specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { profile: 'profile.ps1' } });
-    assert.equal(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -252,39 +240,5 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.COMPLETION_PWSH_SETUP));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

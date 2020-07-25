@@ -11,7 +11,6 @@ import config from '../../../../config';
 const command: Command = require('./folder-rename');
 
 describe(commands.FOLDER_RENAME, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -87,7 +86,6 @@ describe(commands.FOLDER_RENAME, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -103,7 +101,6 @@ describe(commands.FOLDER_RENAME, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -118,11 +115,11 @@ describe(commands.FOLDER_RENAME, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.FOLDER_RENAME), true);
+    assert.strictEqual(command.name.startsWith(commands.FOLDER_RENAME), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('should send correct folder remove request body', (done) => {
@@ -139,7 +136,7 @@ describe(commands.FOLDER_RENAME, () => {
     cmdInstance.action({ options: options }, () => {
       try {
         const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="MoveTo" Id="32" ObjectPathId="26"><Parameters><Parameter Type="String">/sites/abc/Shared Documents/test1</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="26" Name="${folderObjectIdentity}" /></ObjectPaths></Request>`;
-        assert.equal(requestStub.lastCall.args[0].body, bodyPayload);
+        assert.strictEqual(requestStub.lastCall.args[0].body, bodyPayload);
         done();
       }
       catch (e) {
@@ -159,7 +156,7 @@ describe(commands.FOLDER_RENAME, () => {
 
     cmdInstance.action({ options: options }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {
@@ -178,7 +175,7 @@ describe(commands.FOLDER_RENAME, () => {
 
     cmdInstance.action({ options: options }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.called, false);
+        assert.strictEqual(cmdInstanceLogSpy.called, false);
         done();
       }
       catch (e) {
@@ -197,7 +194,7 @@ describe(commands.FOLDER_RENAME, () => {
     }
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -217,7 +214,7 @@ describe(commands.FOLDER_RENAME, () => {
     }
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
         done();
       }
       catch (e) {
@@ -236,7 +233,7 @@ describe(commands.FOLDER_RENAME, () => {
     }
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc 1')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc 1')));
         done();
       }
       catch (e) {
@@ -256,7 +253,7 @@ describe(commands.FOLDER_RENAME, () => {
     }
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -277,7 +274,7 @@ describe(commands.FOLDER_RENAME, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -296,7 +293,7 @@ describe(commands.FOLDER_RENAME, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
         done();
       }
       catch (e) {
@@ -315,7 +312,7 @@ describe(commands.FOLDER_RENAME, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('folder remove promise error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('folder remove promise error')));
         done();
       }
       catch (e) {
@@ -335,7 +332,7 @@ describe(commands.FOLDER_RENAME, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found')));
         done();
       }
       catch (e) {
@@ -356,7 +353,7 @@ describe(commands.FOLDER_RENAME, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -383,24 +380,9 @@ describe(commands.FOLDER_RENAME, () => {
     assert(options.length > 0);
   });
 
-  it('fails validation if the webUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, "Required parameter webUrl missing");
-  });
-
   it('fails validation if the webUrl option is not valid', () => {
     const actual = (command.validate() as CommandValidate)({ options: {webUrl:'abc'} });
-    assert.equal(actual, "abc is not a valid SharePoint Online site URL");
-  });
-
-  it('fails validation if the folderUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {webUrl:'https://contoso.sharepoint.com'} });
-    assert.equal(actual, "Required parameter folderUrl missing");
-  });
-
-  it('fails validation if the name option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {webUrl:'https://contoso.sharepoint.com', folderUrl: '/Shared Documents/test'} });
-    assert.equal(actual, "Required parameter name missing");
+    assert.strictEqual(actual, "abc is not a valid SharePoint Online site URL");
   });
 
   it('passes validation when the url option specified', () => {
@@ -412,40 +394,6 @@ describe(commands.FOLDER_RENAME, () => {
           name: 'abc'
         }
     });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.FOLDER_RENAME));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

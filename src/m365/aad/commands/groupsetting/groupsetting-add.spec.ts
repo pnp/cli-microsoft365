@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.GROUPSETTING_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.GROUPSETTING_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.GROUPSETTING_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.post
     ]);
@@ -53,11 +50,11 @@ describe(commands.GROUPSETTING_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.GROUPSETTING_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.GROUPSETTING_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('adds group setting using default template setting values', (done) => {
@@ -482,7 +479,7 @@ describe(commands.GROUPSETTING_ADD, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`)));
         done();
       }
       catch (e) {
@@ -519,7 +516,7 @@ describe(commands.GROUPSETTING_ADD, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`)));
         done();
       }
       catch (e) {
@@ -528,24 +525,19 @@ describe(commands.GROUPSETTING_ADD, () => {
     });
   });
 
-  it('fails validation if the templateId not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if the templateId is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { templateId: 'invalid' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the templateId is a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { templateId: '68be84bf-a585-4776-80b3-30aa5207aa22' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('allows unknown properties', () => {
     const allowUnknownOptions = command.allowUnknownOptions();
-    assert.equal(allowUnknownOptions, true);
+    assert.strictEqual(allowUnknownOptions, true);
   });
 
   it('supports debug mode', () => {
@@ -557,39 +549,5 @@ describe(commands.GROUPSETTING_ADD, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.GROUPSETTING_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

@@ -9,8 +9,8 @@ import SpoCommand from '../../../base/SpoCommand';
 import { SpoPropertyBagBaseCommand } from '../propertybag/propertybag-base';
 import { ContextInfo } from '../../spo';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -95,14 +95,14 @@ class SpoWebReindexCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
       }, (err: any): void => {
         if (this.reindexedLists) {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
 
           cb();
@@ -179,34 +179,8 @@ class SpoWebReindexCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    If the subsite to be reindexed is a no-script site, the command will request
-    reindexing all lists from the subsite that haven't been excluded from the
-    search index.
-        
-  Examples:
-  
-    Request reindexing the subsite ${chalk.grey('https://contoso.sharepoint.com/subsite')}
-      ${this.name} --webUrl https://contoso.sharepoint.com/subsite
-      `);
   }
 }
 

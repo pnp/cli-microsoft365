@@ -22,7 +22,7 @@ describe('FN012011_TSC_outDir', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if object is missing', () => {
@@ -31,6 +31,6 @@ describe('FN012011_TSC_outDir', () => {
       tsConfigJson: undefined
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

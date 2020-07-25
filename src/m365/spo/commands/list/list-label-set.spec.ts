@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.LIST_LABEL_SET, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.LIST_LABEL_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -37,7 +35,6 @@ describe(commands.LIST_LABEL_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       request.post
     ]);
@@ -52,11 +49,11 @@ describe(commands.LIST_LABEL_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.LIST_LABEL_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.LIST_LABEL_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('should handle error when trying to set label', (done) => {
@@ -93,7 +90,7 @@ describe(commands.LIST_LABEL_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("Can not find compliance tag with value: abc. SiteSubscriptionId: ea1787c6-7ce2-4e71-be47-5e0deb30f9e4")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Can not find compliance tag with value: abc. SiteSubscriptionId: ea1787c6-7ce2-4e71-be47-5e0deb30f9e4")));
         done();
       }
       catch (e) {
@@ -120,7 +117,7 @@ describe(commands.LIST_LABEL_SET, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('404 - "404 FILE NOT FOUND"')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('404 - "404 FILE NOT FOUND"')));
         done();
       }
       catch (e) {
@@ -157,11 +154,11 @@ describe(commands.LIST_LABEL_SET, () => {
     }, () => {
       try {
         const lastCall = postStub.lastCall.args[0];
-        assert.equal(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.equal(lastCall.body.complianceTagValue, 'abc');
-        assert.equal(lastCall.body.blockDelete, false);
-        assert.equal(lastCall.body.blockEdit, false);
-        assert.equal(lastCall.body.syncToItems, false);
+        assert.strictEqual(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+        assert.strictEqual(lastCall.body.complianceTagValue, 'abc');
+        assert.strictEqual(lastCall.body.blockDelete, false);
+        assert.strictEqual(lastCall.body.blockEdit, false);
+        assert.strictEqual(lastCall.body.syncToItems, false);
         done();
       }
       catch (e) {
@@ -197,11 +194,11 @@ describe(commands.LIST_LABEL_SET, () => {
     }, () => {
       try {
         const lastCall = postStub.lastCall.args[0];
-        assert.equal(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.equal(lastCall.body.complianceTagValue, 'abc');
-        assert.equal(lastCall.body.blockDelete, false);
-        assert.equal(lastCall.body.blockEdit, false);
-        assert.equal(lastCall.body.syncToItems, false);
+        assert.strictEqual(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+        assert.strictEqual(lastCall.body.complianceTagValue, 'abc');
+        assert.strictEqual(lastCall.body.blockDelete, false);
+        assert.strictEqual(lastCall.body.blockEdit, false);
+        assert.strictEqual(lastCall.body.syncToItems, false);
         done();
       }
       catch (e) {
@@ -229,12 +226,12 @@ describe(commands.LIST_LABEL_SET, () => {
     }, () => {
       try {
         const lastCall = postStub.lastCall.args[0];
-        assert.equal(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.equal(lastCall.body.complianceTagValue, 'abc');
-        assert.equal(lastCall.body.blockDelete, false);
-        assert.equal(lastCall.body.blockEdit, false);
-        assert.equal(lastCall.body.syncToItems, false);
-        assert.notEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE'), -1);
+        assert.strictEqual(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+        assert.strictEqual(lastCall.body.complianceTagValue, 'abc');
+        assert.strictEqual(lastCall.body.blockDelete, false);
+        assert.strictEqual(lastCall.body.blockEdit, false);
+        assert.strictEqual(lastCall.body.syncToItems, false);
+        assert.notStrictEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
       catch (e) {
@@ -264,11 +261,11 @@ describe(commands.LIST_LABEL_SET, () => {
     }, () => {
       try {
         const lastCall = postStub.lastCall.args[0];
-        assert.equal(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.equal(lastCall.body.complianceTagValue, 'abc');
-        assert.equal(lastCall.body.blockDelete, true);
-        assert.equal(lastCall.body.blockEdit, true);
-        assert.equal(lastCall.body.syncToItems, true);
+        assert.strictEqual(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+        assert.strictEqual(lastCall.body.complianceTagValue, 'abc');
+        assert.strictEqual(lastCall.body.blockDelete, true);
+        assert.strictEqual(lastCall.body.blockEdit, true);
+        assert.strictEqual(lastCall.body.syncToItems, true);
         done();
       }
       catch (e) {
@@ -277,19 +274,9 @@ describe(commands.LIST_LABEL_SET, () => {
     });
   });
 
-  it('fails validation if the url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { label: 'abc' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the label option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
@@ -299,7 +286,7 @@ describe(commands.LIST_LABEL_SET, () => {
 
   it('fails validation if the listid option is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc', listId: 'XXXXX' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listid option is a valid GUID', () => {
@@ -309,7 +296,7 @@ describe(commands.LIST_LABEL_SET, () => {
 
   it('fails validation if listId, listUrl and listTitle options are not passed', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
@@ -321,39 +308,5 @@ describe(commands.LIST_LABEL_SET, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.LIST_LABEL_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

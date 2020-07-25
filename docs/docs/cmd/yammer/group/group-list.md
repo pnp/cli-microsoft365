@@ -10,14 +10,23 @@ m365 yammer group list [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`--userId [userId]`|Returns the groups for a specific user
-`--limit [limit]`|Limits the groups returned
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`--userId [userId]`
+: Returns the groups for a specific user
+
+`--limit [limit]`
+: Limits the groups returned
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

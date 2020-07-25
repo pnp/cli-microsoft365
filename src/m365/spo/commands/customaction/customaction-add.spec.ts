@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.CUSTOMACTION_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -35,7 +34,6 @@ describe(commands.CUSTOMACTION_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -58,7 +56,6 @@ describe(commands.CUSTOMACTION_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -72,15 +69,15 @@ describe(commands.CUSTOMACTION_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CUSTOMACTION_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.CUSTOMACTION_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('has a permissionsKindMap', () => {
-    assert.equal((command as any)['permissionsKindMap'].length, 37);
+    assert.strictEqual((command as any)['permissionsKindMap'].length, 37);
   });
 
   it('correct https body send when custom action with location StandardMenu', (done) => {
@@ -438,7 +435,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
 
     cmdInstance.action({ options: defaultCommandOptions }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -505,16 +502,10 @@ describe(commands.CUSTOMACTION_ADD, () => {
     assert(registrationType === 4);
   });
 
-  it('fails validation if the url option not specified', () => {
-    defaultCommandOptions.url = undefined;
-    const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, 'Missing required option url');
-  });
-
   it('fails if non existing PermissionKind rights specified', () => {
     defaultCommandOptions.rights = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Rights option '${defaultCommandOptions.rights}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`);
+    assert.strictEqual(actual, `Rights option '${defaultCommandOptions.rights}' is not recognized as valid PermissionKind choice. Please note it is case sensitive`);
   });
 
   it('has correct PermissionKind rights specified', () => {
@@ -526,25 +517,25 @@ describe(commands.CUSTOMACTION_ADD, () => {
   it('fails if clientSideComponentId not specified', () => {
     defaultCommandOptions.clientSideComponentProperties = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Option clientSideComponentProperties is specified, but the clientSideComponentId option is missing`);
+    assert.strictEqual(actual, `Option clientSideComponentProperties is specified, but the clientSideComponentId option is missing`);
   });
 
   it('fails if clientSideComponentId is not a valid GUID', () => {
     defaultCommandOptions.clientSideComponentId = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `ClientSideComponentId ${defaultCommandOptions.clientSideComponentId} is not a valid GUID`);
+    assert.strictEqual(actual, `ClientSideComponentId ${defaultCommandOptions.clientSideComponentId} is not a valid GUID`);
   });
 
   it('fails if the sequence value less than 0', () => {
     defaultCommandOptions.sequence = -1;
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
+    assert.strictEqual(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
   });
 
   it('fails if the sequence value is higher than 65536', () => {
     defaultCommandOptions.sequence = 65537;
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
+    assert.strictEqual(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
   });
 
   it('fails if both option scriptSrc and scriptBlock specified', () => {
@@ -552,7 +543,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
     defaultCommandOptions.scriptSrc = 'abc';
     defaultCommandOptions.scriptBlock = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Either option scriptSrc or scriptBlock can be specified, but not both`);
+    assert.strictEqual(actual, `Either option scriptSrc or scriptBlock can be specified, but not both`);
   });
 
   it('fails if scriptSrc or scriptBlock, but the location is not ScriptLink', () => {
@@ -560,50 +551,40 @@ describe(commands.CUSTOMACTION_ADD, () => {
     defaultCommandOptions.scriptSrc = 'abc';
     defaultCommandOptions.scriptBlock = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Option scriptSrc or scriptBlock is specified, but the location option is different than ScriptLink. Please use --actionUrl, if the location should be different than ScriptLink`);
+    assert.strictEqual(actual, `Option scriptSrc or scriptBlock is specified, but the location option is different than ScriptLink. Please use --actionUrl, if the location should be different than ScriptLink`);
   });
 
   it('fails if scriptSrc and scriptBlock not specified when location ScriptLink', () => {
     defaultCommandOptions.location = 'ScriptLink';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Option scriptSrc or scriptBlock is required when the location is set to ScriptLink`);
+    assert.strictEqual(actual, `Option scriptSrc or scriptBlock is required when the location is set to ScriptLink`);
   });
 
   it('fails if registrationType, but not registrationId', () => {
     defaultCommandOptions.registrationType = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Option registrationType is specified, but registrationId is missing`);
+    assert.strictEqual(actual, `Option registrationType is specified, but registrationId is missing`);
   });
 
   it('fails if registrationId, but not registrationType', () => {
     defaultCommandOptions.registrationId = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Option registrationId is specified, but registrationType is missing`);
+    assert.strictEqual(actual, `Option registrationId is specified, but registrationType is missing`);
   });
 
-  it('fails if location missing', () => {
-    defaultCommandOptions.location = undefined;
+  it('fails if the specified URL is invalid', () => {
+    defaultCommandOptions.location = 'Microsoft.SharePoint.StandardMenu';
+    defaultCommandOptions.group = 'SiteActions';
+    defaultCommandOptions.url = 'foo';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Missing required option location`);
-  });
-
-  it('fails if name missing', () => {
-    defaultCommandOptions.name = undefined;
-    const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Missing required option name`);
-  });
-
-  it('fails if title missing', () => {
-    defaultCommandOptions.title = undefined;
-    const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Missing required option title`);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails if location that requires group option is set, but group is not set', () => {
     defaultCommandOptions.location = 'Microsoft.SharePoint.StandardMenu';
     defaultCommandOptions.group = undefined;
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `The location specified requires the group option to be specified as well`);
+    assert.strictEqual(actual, `The location specified requires the group option to be specified as well`);
   });
 
   it('success if location that requires group option is set, but group is also set', () => {
@@ -651,7 +632,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
     const actual = (command.validate() as CommandValidate)({
       options: defaultCommandOptions
     });
-    assert.equal(actual, `${defaultCommandOptions.scope} is not a valid custom action scope. Allowed values are Site|Web`);
+    assert.strictEqual(actual, `${defaultCommandOptions.scope} is not a valid custom action scope. Allowed values are Site|Web`);
   });
 
   it('doesn\'t fail validation if the optional scope option not specified', () => {
@@ -689,39 +670,5 @@ describe(commands.CUSTOMACTION_ADD, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.CUSTOMACTION_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

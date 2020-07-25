@@ -3,8 +3,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -72,35 +71,12 @@ class YammerMessageGetCommand extends YammerCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.id) {
-        return 'Required id value is missing';
-      }
       if (typeof args.options.id !== 'number') {
         return `${args.options.id} is not a number`;
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-  
-    ${chalk.yellow('Attention:')} In order to use this command, you need to grant the Azure AD
-    application used by the CLI for Microsoft 365 the permission to the Yammer API.
-    To do this, execute the ${chalk.blue('cli consent --service yammer')} command.
-    
-  Examples:
-  
-    Returns the Yammer message with the id 1239871123
-      ${this.name} --id 1239871123
-
-    Returns the Yammer message with the id 1239871123 in JSON format
-      ${this.name} --id 1239871123 --output json
-    `);
   }
 }
 

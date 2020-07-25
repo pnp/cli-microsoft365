@@ -12,8 +12,8 @@ import {
 import { StandardWebPart, StandardWebPartUtils } from '../../StandardWebPartTypes';
 import { isNumber } from 'util';
 import { Control } from './canvasContent';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -238,7 +238,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
         cb();
       })
@@ -398,14 +398,6 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
-      if (!args.options.pageName) {
-        return 'Required option pageName is missing';
-      }
-
       if (!args.options.standardWebPart && !args.options.webPartId) {
         return 'Specify either the standardWebPart or the webPartId option';
       }
@@ -456,51 +448,6 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    If the specified ${chalk.grey('pageName')} doesn't refer to an existing modern page,
-    you will get a ${chalk.grey("File doesn't exists")} error.
-
-    To add a standard web part to the page, specify one of the following values:
-    ${chalk.grey("ContentRollup, BingMap, ContentEmbed, DocumentEmbed, Image,")}
-    ${chalk.grey("ImageGallery, LinkPreview, NewsFeed, NewsReel, PowerBIReportEmbed,")}
-    ${chalk.grey("QuickChart, SiteActivity, VideoEmbed, YammerEmbed, Events,")}
-    ${chalk.grey("GroupCalendar, Hero, List, PageTitle, People, QuickLinks,")}
-    ${chalk.grey("CustomMessageRegion, Divider, MicrosoftForms, Spacer")}.
-
-    When specifying the JSON string with web part properties on Windows, you
-    have to escape double quotes in a specific way. Considering the following
-    value for the _webPartProperties_ option: {"Foo":"Bar"},
-    you should specify the value as \`"{""Foo"":""Bar""}"\`. In addition,
-    when using PowerShell, you should use the --% argument.
-
-  Examples:
-
-    Add the standard Bing Map web part to a modern page in the first available location on the page
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap
-
-    Add the standard Bing Map web part to a modern page in the third column of the second section
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --section 2 --column 3
-
-    Add a custom web part to the modern page
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --webPartId 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1
-
-    Using PowerShell, add the standard Bing Map web part with the specific properties to a modern page
-      --% ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --webPartProperties \`"{""Title"":""Foo location""}"\`
-
-    Using Windows command line, add the standard Bing Map web part with the specific properties to a modern page
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --webPartProperties \`"{""Title"":""Foo location""}"\`
-
-    Add the standard Image web part with the preconfigured image
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart Image --webPartData '\`{ "dataVersion": "1.8", "serverProcessedContent": {"htmlStrings":{},"searchablePlainTexts":{"captionText":""},"imageSources":{"imageSource":"/sites/team-a/SiteAssets/work-life-balance.png"},"links":{}}, "properties": {"imageSourceType":2,"altText":"a group of people on a beach","overlayText":"Work life balance","fileName":"48146-OFF12_Justice_01.png","siteId":"27664b85-067d-4be9-a7d7-89b2e804d09f","webId":"a7664b85-067d-4be9-a7d7-89b2e804d09f","listId":"37664b85-067d-4be9-a7d7-89b2e804d09f","uniqueId":"67664b85-067d-4be9-a7d7-89b2e804d09f","imgWidth":650,"imgHeight":433,"fixAspectRatio":false,"isOverlayTextEnabled":true}}\`'
-      `
-    );
   }
 }
 

@@ -6,8 +6,8 @@ import {
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import Utils from '../../../../Utils';
 import { Channel } from '../../Channel';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -45,7 +45,7 @@ class TeamsChannelListCommand extends GraphItemsListCommand<Channel>{
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
@@ -64,26 +64,12 @@ class TeamsChannelListCommand extends GraphItemsListCommand<Channel>{
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.teamId as string)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
       
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    List the channels in a specified Microsoft Teams team
-      ${this.name} --teamId 00000000-0000-0000-0000-000000000000
-`   );
   }
 }
 

@@ -11,7 +11,6 @@ import config from '../../../../config';
 const command: Command = require('./contenttypehub-get');
 
 describe(commands.CONTENTTYPEHUB_GET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -54,7 +53,6 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     auth.service.connected = true;
     log = [];
     cmdInstance = {
@@ -71,7 +69,6 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -87,11 +84,11 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CONTENTTYPEHUB_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.CONTENTTYPEHUB_GET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('should send correct request body', (done) => {
@@ -121,7 +118,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     <Method Id="4" ParentId="1" Name="GetDefaultSiteCollectionTermStore" />
   </ObjectPaths>
 </Request>`;
-        assert.equal(requestStub.lastCall.args[0].body, bodyPayload);
+        assert.strictEqual(requestStub.lastCall.args[0].body, bodyPayload);
         assert(cmdInstanceLogSpy.calledWith({ "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub" }));
         done();
       }
@@ -138,7 +135,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     }
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('request error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('request error')));
         done();
       }
       catch (e) {
@@ -155,7 +152,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     }
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc error')));
         done();
       }
       catch (e) {
@@ -188,39 +185,5 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     assert(containsVerboseOption, "Verbose option not available");
     assert(containsDebugOption, "Debug option not available");
     assert(containsQueryOption, "Query option not available");
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.CONTENTTYPEHUB_GET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

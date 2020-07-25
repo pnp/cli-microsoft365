@@ -8,8 +8,8 @@ import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import GlobalOptions from '../../../../GlobalOptions';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -66,7 +66,7 @@ class SpoServicePrincipalPermissionRequestDenyCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
         }
         cb();
@@ -85,35 +85,12 @@ class SpoServicePrincipalPermissionRequestDenyCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.requestId) {
-        return 'Required parameter requestId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.requestId)) {
         return `${args.options.requestId} is not a valid GUID`;
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-        
-  Remarks:
-
-    The permission request you want to deny is denoted using its ${chalk.grey('ID')}. You can
-    retrieve it using the ${chalk.grey(`${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST}`)} command.
-
-  Examples:
-  
-    Deny permission request with id ${chalk.grey('4dc4c043-25ee-40f2-81d3-b3bf63da7538')}
-      m365 ${this.name} --requestId 4dc4c043-25ee-40f2-81d3-b3bf63da7538
-`);
   }
 }
 

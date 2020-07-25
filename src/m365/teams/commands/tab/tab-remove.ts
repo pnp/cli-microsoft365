@@ -6,7 +6,8 @@ import {
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -46,7 +47,7 @@ class TeamsTabRemoveCommand extends GraphCommand {
       request.delete(requestOptions).then(
         (): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green("DONE"));
+            cmd.log(chalk.green("DONE"));
           }
           cb();
         },
@@ -102,18 +103,6 @@ class TeamsTabRemoveCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return "Required parameter teamId missing";
-      }
-
-      if (!args.options.channelId) {
-        return "Required parameter channelId missing";
-      }
-
-      if (!args.options.tabId) {
-        return "Required parameter tabId missing";
-      }
-
       if (!Utils.isValidGuid(args.options.teamId as string)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
@@ -128,25 +117,6 @@ class TeamsTabRemoveCommand extends GraphCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Removes a tab from the specified channel. Will prompt for confirmation
-      ${this.name} --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --tabId 06805b9e-77e3-4b93-ac81-525eb87513b8
-
-    Removes a tab from the specified channel without prompting for confirmation
-      ${this.name} --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --tabId 06805b9e-77e3-4b93-ac81-525eb87513b8 --confirm
-
-  Additional information:
-
-    Delete tab from channel:
-      https://docs.microsoft.com/en-us/graph/api/teamstab-delete?view=graph-rest-1.0
-     `
-    );
   }
 }
 

@@ -41,7 +41,6 @@ enum TestID {
 }
 
 describe(commands.SEARCH, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let returnArrayLength = 0;
@@ -301,7 +300,6 @@ describe(commands.SEARCH, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -316,7 +314,6 @@ describe(commands.SEARCH, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -331,11 +328,11 @@ describe(commands.SEARCH, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SEARCH), true);
+    assert.strictEqual(command.name.startsWith(commands.SEARCH), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('executes search request', (done) => {
@@ -349,8 +346,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_NoParameterTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
         done();
       }
       catch (e) {
@@ -370,8 +367,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 2);
-        assert.equal(executedTest, TestID.QueryDocuments_NoParameterTest);
+        assert.strictEqual(returnArrayLength, 2);
+        assert.strictEqual(executedTest, TestID.QueryDocuments_NoParameterTest);
         done();
       }
       catch (e) {
@@ -393,8 +390,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 2);
-        assert.equal(executedTest, TestID.QueryDocuments_WithStartRow1Test);
+        assert.strictEqual(returnArrayLength, 2);
+        assert.strictEqual(executedTest, TestID.QueryDocuments_WithStartRow1Test);
         done();
       }
       catch (e) {
@@ -415,8 +412,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 2);
-        assert.equal(executedTest, TestID.QueryAll_WithTrimDuplicatesTest);
+        assert.strictEqual(returnArrayLength, 2);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithTrimDuplicatesTest);
         done();
       }
       catch (e) {
@@ -437,8 +434,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_SortListTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_SortListTest);
         done();
       }
       catch (e) {
@@ -459,8 +456,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 2);
-        assert.equal(executedTest, TestID.QueryAll_WithEnableStemmingTest);
+        assert.strictEqual(returnArrayLength, 2);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithEnableStemmingTest);
         done();
       }
       catch (e) {
@@ -481,8 +478,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_NoParameterTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
         done();
       }
       catch (e) {
@@ -503,8 +500,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 1);
-        assert.equal(executedTest, TestID.QueryAll_WithCultureTest);
+        assert.strictEqual(returnArrayLength, 1);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithCultureTest);
         done();
       }
       catch (e) {
@@ -526,8 +523,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 2);
-        assert.equal(executedTest, TestID.QueryDocuments_WithStartRow1Test);
+        assert.strictEqual(returnArrayLength, 2);
+        assert.strictEqual(executedTest, TestID.QueryDocuments_WithStartRow1Test);
         done();
       }
       catch (e) {
@@ -548,8 +545,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 2);
-        assert.equal(executedTest, TestID.QueryDocuments_NoParameterTest);
+        assert.strictEqual(returnArrayLength, 2);
+        assert.strictEqual(executedTest, TestID.QueryDocuments_NoParameterTest);
         done();
       }
       catch (e) {
@@ -570,8 +567,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 2);
-        assert.equal(executedTest, TestID.QueryAll_WithRefinementFiltersTest);
+        assert.strictEqual(returnArrayLength, 2);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithRefinementFiltersTest);
         done();
       }
       catch (e) {
@@ -592,8 +589,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 2);
-        assert.equal(executedTest, TestID.QueryAll_WithQueryTemplateTest);
+        assert.strictEqual(returnArrayLength, 2);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithQueryTemplateTest);
         done();
       }
       catch (e) {
@@ -614,8 +611,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 1);
-        assert.equal(executedTest, TestID.QueryAll_WithSourceIdTest);
+        assert.strictEqual(returnArrayLength, 1);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithSourceIdTest);
         done();
       }
       catch (e) {
@@ -636,8 +633,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithRankingModelIdTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithRankingModelIdTest);
         done();
       }
       catch (e) {
@@ -658,8 +655,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 1);
-        assert.equal(executedTest, TestID.QueryAll_WithRowLimitTest);
+        assert.strictEqual(returnArrayLength, 1);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithRowLimitTest);
         done();
       }
       catch (e) {
@@ -680,8 +677,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 3);
-        assert.equal(executedTest, TestID.QueryAll_WithStartRowTest);
+        assert.strictEqual(returnArrayLength, 3);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithStartRowTest);
         done();
       }
       catch (e) {
@@ -702,8 +699,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithPropertiesTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithPropertiesTest);
         done();
       }
       catch (e) {
@@ -724,8 +721,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithSourceNameAndNoPreviousPropertiesTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndNoPreviousPropertiesTest);
         done();
       }
       catch (e) {
@@ -747,8 +744,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
         done();
       }
       catch (e) {
@@ -770,8 +767,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithSourceNameAndPreviousPropertiesTest);
         done();
       }
       catch (e) {
@@ -792,8 +789,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithRefinersTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithRefinersTest);
         done();
       }
       catch (e) {
@@ -814,8 +811,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithWebTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithWebTest);
         done();
       }
       catch (e) {
@@ -836,8 +833,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithHiddenConstraintsTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithHiddenConstraintsTest);
         done();
       }
       catch (e) {
@@ -858,8 +855,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithClientTypeTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithClientTypeTest);
         done();
       }
       catch (e) {
@@ -880,8 +877,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithEnablePhoneticTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithEnablePhoneticTest);
         done();
       }
       catch (e) {
@@ -902,8 +899,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithProcessBestBetsTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithProcessBestBetsTest);
         done();
       }
       catch (e) {
@@ -924,8 +921,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithEnableQueryRulesTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithEnableQueryRulesTest);
         done();
       }
       catch (e) {
@@ -946,8 +943,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_WithProcessPersonalFavoritesTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_WithProcessPersonalFavoritesTest);
         done();
       }
       catch (e) {
@@ -968,8 +965,8 @@ describe(commands.SEARCH, () => {
       }
     }, () => {
       try {
-        assert.equal(returnArrayLength, 4);
-        assert.equal(executedTest, TestID.QueryAll_NoParameterTest);
+        assert.strictEqual(returnArrayLength, 4);
+        assert.strictEqual(executedTest, TestID.QueryAll_NoParameterTest);
         done();
       }
       catch (e) {
@@ -985,7 +982,7 @@ describe(commands.SEARCH, () => {
         queryText: '*'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the sourceId is a valid GUID', () => {
@@ -995,7 +992,7 @@ describe(commands.SEARCH, () => {
         queryText: '*'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if the rankingModelId is not a valid GUID', () => {
@@ -1005,7 +1002,7 @@ describe(commands.SEARCH, () => {
         queryText: '*'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the rankingModelId is a valid GUID', () => {
@@ -1015,7 +1012,7 @@ describe(commands.SEARCH, () => {
         queryText: '*'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if the rowLimit is not a valid number', () => {
@@ -1025,7 +1022,7 @@ describe(commands.SEARCH, () => {
         queryText: '*'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the startRow is not a valid number', () => {
@@ -1035,7 +1032,7 @@ describe(commands.SEARCH, () => {
         queryText: '*'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the culture is not a valid number', () => {
@@ -1045,7 +1042,7 @@ describe(commands.SEARCH, () => {
         queryText: '*'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('command correctly handles reject request', (done) => {
@@ -1075,7 +1072,7 @@ describe(commands.SEARCH, () => {
       }
     }, (error?: any) => {
       try {
-        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
+        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -1106,57 +1103,18 @@ describe(commands.SEARCH, () => {
     assert(containsTypeOption);
   });
 
-  it('fails validation if the queryText option is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
   it('passes validation if all options are provided', () => {
     const actual = (command.validate() as CommandValidate)({ options: { queryText: '*' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if sortList is in an invalid format', () => {
     const actual = (command.validate() as CommandValidate)({ options: { queryText: '*', sortList: 'property1:wrongvalue' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if sortList is in a valid format', () => {
     const actual = (command.validate() as CommandValidate)({ options: { queryText: '*', sortList: 'property1:ascending,property2:descending' } });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SEARCH));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 }); 

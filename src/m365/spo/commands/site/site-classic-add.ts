@@ -3,14 +3,14 @@ import commands from '../../commands';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import { CommandOption, CommandValidate, CommandCancel } from '../../../../Command';
+import { CommandOption, CommandValidate } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import { SiteProperties } from './SiteProperties';
 import { DeletedSiteProperties } from './DeletedSiteProperties';
 import { SpoOperation } from './SpoOperation';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -146,19 +146,11 @@ class SpoSiteClassicAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
-  }
-
-  public cancel(): CommandCancel {
-    return (): void => {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-      }
-    }
   }
 
   private siteExistsInTheRecycleBin(url: string, cmd: CommandInstance): Promise<boolean> {
@@ -350,25 +342,9 @@ class SpoSiteClassicAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required option url missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
-      }
-
-      if (!args.options.title) {
-        return 'Required option title missing';
-      }
-
-      if (!args.options.owner) {
-        return 'Required option owner missing';
-      }
-
-      if (!args.options.timeZone) {
-        return 'Required option timeZone missing';
       }
 
       if (typeof args.options.timeZone !== 'number') {
@@ -420,74 +396,6 @@ class SpoSiteClassicAddCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-
-    This command is deprecated. Please use ${chalk.yellow('spo site add')} instead.
-   
-  Remarks:
-
-    Using the ${chalk.blue('-z, --timeZone')} option you have to specify the
-    time zone of the site. For more information about the valid values see
-    https://msdn.microsoft.com/library/microsoft.sharepoint.spregionalsettings.timezones.aspx.
-
-    The ${chalk.blue('-l, --lcid')} option denotes the language of the site.
-    For more information see Locale IDs Assigned by Microsoft:
-    https://msdn.microsoft.com/library/microsoft.sharepoint.spregionalsettings.timezones.aspx.
-
-    The value of the ${chalk.blue('--resourceQuota')} option must not exceed
-    the company's aggregate available Sandboxed Solutions quota.
-    For more information, see Resource Usage Limits on Sandboxed Solutions
-    in SharePoint 2010: http://msdn.microsoft.com/en-us/library/gg615462.aspx.
-
-    The value of the ${chalk.blue('--resourceQuotaWarningLevel')} option
-    must not exceed the value of the ${chalk.blue('--resourceQuota')} option.
-
-    The value of the ${chalk.blue('--storageQuota')} option must not exceed
-    the company's available quota.
-
-    The value of the ${chalk.blue('--storageQuotaWarningLevel')} option must not
-    exceed the the value of the ${chalk.blue('--storageQuota')} option.
-
-    If you try to create a site with the same URL as a site that has been
-    previously moved to the recycle bin, you will get an error. To avoid this
-    error, you can use the ${chalk.blue('--removeDeletedSite')} option. Prior
-    to creating the site, the ${chalk.blue(this.getCommandName())} command will
-    check if the site with the specified URL has been previously moved to the
-    recycle bin and if so, will remove it. Because removing sites from the
-    recycle bin might take a moment, it should be used in conjunction with the
-    ${chalk.blue('--wait')} option so that the new site is not created before
-    the old site is fully removed.
-
-    Deleting and creating classic site collections is by default asynchronous
-    and depending on the current state of Microsoft 365, might take up to few
-    minutes. If you're building a script with steps that require the site to be
-    fully provisioned, you should use the ${chalk.blue('--wait')} flag. When
-    using this flag, the ${chalk.blue(this.getCommandName())} command will keep
-    running until it received confirmation from Microsoft 365 that the site
-    has been fully provisioned.
-  
-  Examples:
-
-    Create new classic site collection using the Team site template. Set time
-    zone to UTC+01:00. Don't wait for the site provisioning to complete
-      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4
-
-    Create new classic site collection using the Team site template. Set time
-    zone to UTC+01:00. Wait for the site provisioning to complete
-      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --wait
-
-    Create new classic site collection using the Team site template. Set time
-    zone to UTC+01:00. If a site with the same URL is in the recycle bin, delete
-    it. Wait for the site provisioning to complete
-      ${this.getCommandName()} --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --removeDeletedSite --wait
-`);
   }
 }
 

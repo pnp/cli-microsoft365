@@ -1,19 +1,18 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import Command, {
-  CommandCancel, CommandError, CommandOption, CommandValidate
+  CommandError, CommandOption, CommandValidate
 } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
+import * as chalk from 'chalk';
 
 const command: Command = require('./site-add');
 describe(commands.SITE_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -30,7 +29,6 @@ describe(commands.SITE_ADD, () => {
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
 
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -47,7 +45,6 @@ describe(commands.SITE_ADD, () => {
   afterEach(() => {
     (command as any).currentContext = undefined;
     Utils.restore([
-      vorpal.find,
       request.post,
       global.setTimeout,
       (command as any).ensureFormDigest
@@ -64,11 +61,11 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITE_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.SITE_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('creates modern team site using the correct endpoint', (done) => {
@@ -119,7 +116,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', title: expected } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -142,7 +139,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', alias: expected } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -165,7 +162,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', isPublic: true } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -188,7 +185,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -211,7 +208,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', description: expected } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -234,7 +231,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -257,7 +254,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', classification: expected } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -280,7 +277,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -303,7 +300,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'TeamSite', lcid: 1033 } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -392,7 +389,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('The group alias already exists.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The group alias already exists.')));
         done();
       }
       catch (e) {
@@ -408,7 +405,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -448,7 +445,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', title: expected } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -488,7 +485,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', title: expected, owners: 'abc@email.com' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -511,7 +508,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', url: expected } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -534,7 +531,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', allowFileSharingForGuestUsers: true } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -557,7 +554,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', shareByEmailEnabled: true } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -596,7 +593,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -619,7 +616,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', description: expected } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -642,7 +639,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -665,7 +662,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', classification: expected } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -688,7 +685,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -711,7 +708,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesign: 'Topic' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -734,7 +731,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesign: 'Showcase' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -757,7 +754,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesign: 'Blank' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -780,7 +777,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -803,7 +800,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesignId: expected } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -826,7 +823,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', lcid: expected } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -996,7 +993,7 @@ describe(commands.SITE_ADD, () => {
         alias: 'team1'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the TeamSite type option specified', () => {
@@ -1007,7 +1004,7 @@ describe(commands.SITE_ADD, () => {
         alias: 'team1'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when single owner is specified for a TeamSite', () => {
@@ -1019,7 +1016,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when \'owners\' is specified for a CommunicationSite', () => {
@@ -1031,7 +1028,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when multiple owners are specified for a TeamSite', () => {
@@ -1043,7 +1040,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com,steve@contoso.com'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when multiple owners with a space in between are specified for a TeamSite', () => {
@@ -1055,7 +1052,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com, steve@contoso.com'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the CommunicationSite type option specified', () => {
@@ -1066,7 +1063,7 @@ describe(commands.SITE_ADD, () => {
         url: 'https://contoso.sharepoint.com/sites/marketing'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when lcid is valid', () => {
@@ -1078,7 +1075,7 @@ describe(commands.SITE_ADD, () => {
         url: 'https://contoso.sharepoint.com/sites/marketing'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if an invalid type option specified', () => {
@@ -1089,7 +1086,7 @@ describe(commands.SITE_ADD, () => {
         alias: 'team1'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if an parameter option specified for TeamSites', () => {
@@ -1101,16 +1098,7 @@ describe(commands.SITE_ADD, () => {
         webTemplate: 'STS#3'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation when the title option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        alias: 'team1'
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the type is TeamSite and alias option not specified', () => {
@@ -1119,7 +1107,7 @@ describe(commands.SITE_ADD, () => {
         title: 'Team 1'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the type is CommunicationSite and url option not specified', () => {
@@ -1129,7 +1117,7 @@ describe(commands.SITE_ADD, () => {
         title: 'Team 1'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the type is CommunicationSite and uses a wrong parameter', () => {
@@ -1141,7 +1129,7 @@ describe(commands.SITE_ADD, () => {
         alias: 'alias'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the type is CommunicationSite and the url option is not a valid SharePoint site URL', () => {
@@ -1152,7 +1140,7 @@ describe(commands.SITE_ADD, () => {
         url: 'foo'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the type is CommunicationSite and multiple owners specified', () => {
@@ -1164,7 +1152,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com,admin1@contoso.com'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the type is CommunicationSite and the url option is a valid SharePoint site URL', () => {
@@ -1175,7 +1163,7 @@ describe(commands.SITE_ADD, () => {
         url: 'https://contoso.sharepoint.com/sites/marketing'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the type is CommunicationSite and siteDesign is Topic', () => {
@@ -1187,7 +1175,7 @@ describe(commands.SITE_ADD, () => {
         siteDesign: 'Topic'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the type is CommunicationSite and siteDesign is Showcase', () => {
@@ -1199,7 +1187,7 @@ describe(commands.SITE_ADD, () => {
         siteDesign: 'Showcase'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the type is CommunicationSite and siteDesign is Blank', () => {
@@ -1211,7 +1199,7 @@ describe(commands.SITE_ADD, () => {
         siteDesign: 'Blank'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when the type is CommunicationSite and siteDesign is invalid', () => {
@@ -1223,7 +1211,7 @@ describe(commands.SITE_ADD, () => {
         siteDesign: 'Invalid'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the type is CommunicationSite and uses alias', () => {
@@ -1236,7 +1224,7 @@ describe(commands.SITE_ADD, () => {
         alias: 'test'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the type is CommunicationSite and siteDesignId is a valid GUID', () => {
@@ -1248,7 +1236,7 @@ describe(commands.SITE_ADD, () => {
         siteDesignId: '92398ab7-45c7-486b-81fa-54da2ee0738a'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when the type is CommunicationSite and siteDesignId is not a valid GUID', () => {
@@ -1260,7 +1248,7 @@ describe(commands.SITE_ADD, () => {
         siteDesignId: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the type is CommunicationSite and both siteDesign and siteDesignId are specified', () => {
@@ -1273,7 +1261,7 @@ describe(commands.SITE_ADD, () => {
         siteDesignId: '92398ab7-45c7-486b-81fa-54da2ee0738a'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when lcid is not a number', () => {
@@ -1285,7 +1273,7 @@ describe(commands.SITE_ADD, () => {
         lcid: 'a'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when lcid is less than 0', () => {
@@ -1297,7 +1285,7 @@ describe(commands.SITE_ADD, () => {
         lcid: -1
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when lcid is not valid', () => {
@@ -1309,7 +1297,7 @@ describe(commands.SITE_ADD, () => {
         lcid: 3081
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('creates classic site with minimal options. doesn\'t wait for completion', (done) => {
@@ -1389,7 +1377,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -1432,7 +1420,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', lcid: 1033, webTemplate: 'PUBLISHING#0', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -1659,7 +1647,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
       }
       catch (e) {
@@ -1697,7 +1685,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
       }
       catch (e) {
@@ -1928,7 +1916,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -1978,7 +1966,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
       }
       catch (e) {
@@ -2116,7 +2104,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -2500,7 +2488,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -2603,7 +2591,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, verbose: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -2670,7 +2658,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
       }
       catch (e) {
@@ -2827,7 +2815,7 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team>', title: 'Team>', timeZone: 4, owners: 'admin@contoso.com>', lcid: 1033, webTemplate: 'PUBLISHING#0>', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -2858,31 +2846,13 @@ describe(commands.SITE_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("A site already exists at url https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("A site already exists at url https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam.")));
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('can be cancelled', () => {
-    assert(command.cancel());
-  });
-
-  it('clears pending connection on cancel', () => {
-    (command as any).timeout = {};
-    const clearTimeoutSpy = sinon.spy(global, 'clearTimeout');
-    (command.cancel() as CommandCancel)();
-    Utils.restore(global.clearTimeout);
-    assert(clearTimeoutSpy.called);
-  });
-
-  it('doesn\'t fail on cancel if no connection pending', () => {
-    (command as any).timeout = undefined;
-    (command.cancel() as CommandCancel)();
-    assert(true);
   });
 
   it('supports debug mode', () => {
@@ -2902,7 +2872,7 @@ describe(commands.SITE_ADD, () => {
         type: "ClassicSite", title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the url is not a valid url', () => {
@@ -2911,7 +2881,7 @@ describe(commands.SITE_ADD, () => {
         type: "ClassicSite", url: 'abc', title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the url is not a valid SharePoint url', () => {
@@ -2920,16 +2890,7 @@ describe(commands.SITE_ADD, () => {
         type: "ClassicSite", url: 'http://contoso', title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
     });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if the title is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', timeZone: 4, owners: 'admin@contoso.com'
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the owner is not specified', () => {
@@ -2938,7 +2899,7 @@ describe(commands.SITE_ADD, () => {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the timeZone is not specified', () => {
@@ -2947,7 +2908,7 @@ describe(commands.SITE_ADD, () => {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', owners: 'admin@contoso.com'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the timeZone is not a number', () => {
@@ -2957,7 +2918,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 'a'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the lcid is not a number', () => {
@@ -2967,7 +2928,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4, lcid: 'a'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the resourceQuota is not a number', () => {
@@ -2977,7 +2938,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4, resourceQuota: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the resourceQuotaWarningLevel is not a number', () => {
@@ -2987,7 +2948,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the resourceQuotaWarningLevel is specified without resourceQuota', () => {
@@ -2997,7 +2958,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', () => {
@@ -3007,7 +2968,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10, resourceQuota: 5
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the storageQuota is not a number', () => {
@@ -3017,7 +2978,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4, storageQuota: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the storageQuotaWarningLevel is not a number', () => {
@@ -3027,7 +2988,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 'abc'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the storageQuotaWarningLevel is specified without storageQuota', () => {
@@ -3037,7 +2998,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if is using a wrong parameter (alias)', () => {
@@ -3047,7 +3008,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', () => {
@@ -3057,7 +3018,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10, storageQuota: 5
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the required options are correct but a wrong parameter passed', () => {
@@ -3067,7 +3028,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4, alias: 'team'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the required options are correct', () => {
@@ -3077,7 +3038,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com', timeZone: 4
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if the owner property passes two owners', () => {
@@ -3087,7 +3048,7 @@ describe(commands.SITE_ADD, () => {
         owners: 'admin@contoso.com, admin2@contoso.com', timeZone: 4
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if all options are correct', () => {
@@ -3099,40 +3060,6 @@ describe(commands.SITE_ADD, () => {
         storageQuota: 100, storageQuotaWarningLevel: 90
       }
     });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITE_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

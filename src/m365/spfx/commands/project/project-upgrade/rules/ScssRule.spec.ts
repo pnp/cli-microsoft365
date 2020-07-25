@@ -36,10 +36,10 @@ describe('ScssRule', () => {
   })
 
   it('rule has empty file', () => {
-    assert.equal('', rule.file);
+    assert.strictEqual('', rule.file);
   });
 
   it('returns resolution type of scss', () => {
-    assert.equal('scss', rule.resolutionType);
+    assert.strictEqual('scss', rule.resolutionType);
   });
 });

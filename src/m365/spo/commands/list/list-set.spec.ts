@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.LIST_SET, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   
@@ -20,7 +19,6 @@ describe(commands.LIST_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -35,7 +33,6 @@ describe(commands.LIST_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -49,11 +46,11 @@ describe(commands.LIST_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.LIST_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.LIST_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('sets specified title for list', (done) => {
@@ -70,7 +67,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: true, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', title: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -93,7 +90,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', description: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -116,7 +113,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', templateFeatureId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -139,7 +136,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', schemaXml: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -162,7 +159,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowDeletion: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -185,7 +182,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowEveryoneViewItems: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -208,7 +205,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowMultiResponses: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -231,7 +228,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -254,7 +251,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', crawlNonDefaultViews: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -277,7 +274,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultContentApprovalWorkflowId: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -300,7 +297,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultDisplayFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -323,7 +320,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultEditFormUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -347,7 +344,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -370,7 +367,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableGridEditing: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -393,7 +390,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -416,7 +413,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', emailAlias: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -439,7 +436,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAssignToEmail: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -462,7 +459,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAttachments: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -485,7 +482,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableDeployWithDependentList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -508,7 +505,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableFolderCreation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -531,7 +528,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableMinorVersions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -554,7 +551,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableModeration: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -577,7 +574,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enablePeopleSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -600,7 +597,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableResourceSelector: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -623,7 +620,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSchemaCaching: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -646,7 +643,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSyndication: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -669,7 +666,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableThrottling: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -692,7 +689,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableVersioning: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -715,7 +712,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enforceDataValidation: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -738,7 +735,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', excludeFromOfflineClient: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -761,7 +758,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', fetchPropertyBagForListView: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -784,7 +781,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', followable: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -807,7 +804,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceCheckout: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -830,7 +827,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceDefaultContentType: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -853,7 +850,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', hidden: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -876,7 +873,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -899,7 +896,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -922,7 +919,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmExpire: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -945,7 +942,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmReject: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -968,7 +965,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', isApplicationList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -991,7 +988,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1014,7 +1011,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: expected, enableVersioning: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1037,7 +1034,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorWithMinorVersionsLimit: expected, enableMinorVersions: true, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1060,7 +1057,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', multipleDataList: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1083,7 +1080,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', navigateForFormsPages: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1106,7 +1103,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', needUpdateSiteClientTag: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1129,7 +1126,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', noCrawl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1152,7 +1149,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', onQuickLaunch: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1175,7 +1172,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', ordered: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1198,7 +1195,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', parserDisabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1221,7 +1218,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readOnlyUI: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1244,7 +1241,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1267,7 +1264,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', requestAccessEnabled: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1290,7 +1287,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', restrictUserUpdates: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1313,7 +1310,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationName: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1336,7 +1333,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', sendToLocationUrl: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1359,7 +1356,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', showUser: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1382,7 +1379,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', useFormsForDisplay: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1405,7 +1402,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationFormula: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1428,7 +1425,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', validationMessage: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1451,7 +1448,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: expected, webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert.equal(actual, expected);
+        assert.strictEqual(actual, expected);
         done();
       }
       catch (e) {
@@ -1467,7 +1464,7 @@ describe(commands.LIST_SET, () => {
 
     cmdInstance.action({ options: { debug: false, id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', webUrl: 'https://contoso.sharepoint.com/sites/project-x' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -1510,18 +1507,13 @@ describe(commands.LIST_SET, () => {
   });
 
   it('configures command types', () => {
-    assert.notEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
-  });
-
-  it('fails validation if id option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
+    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
   });
 
   it('fails validation if the id option is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the id option is a valid GUID', () => {
@@ -1529,14 +1521,9 @@ describe(commands.LIST_SET, () => {
     assert(actual);
   });
 
-  it('fails validation if the url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F' } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: 'true' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
@@ -1552,7 +1539,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the templateFeatureId option is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', templateFeatureId: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the templateFeatureId option is a valid GUID', () => {
@@ -1562,7 +1549,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the allowDeletion option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowDeletion: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the allowDeletion option is a valid Boolean', () => {
@@ -1572,7 +1559,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the allowEveryoneViewItems option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowEveryoneViewItems: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the allowEveryoneViewItems option is a valid Boolean', () => {
@@ -1582,7 +1569,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the allowMultiResponses option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', allowMultiResponses: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the allowMultiResponses option is a valid Boolean', () => {
@@ -1592,7 +1579,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the contentTypesEnabled option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', contentTypesEnabled: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the contentTypesEnabled option is a valid Boolean', () => {
@@ -1602,7 +1589,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the crawlNonDefaultViews option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', crawlNonDefaultViews: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the crawlNonDefaultViews option is a valid Boolean', () => {
@@ -1612,7 +1599,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the disableGridEditing option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', disableGridEditing: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the disableGridEditing option is a valid Boolean', () => {
@@ -1622,7 +1609,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enableAssignToEmail option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAssignToEmail: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enableAssignToEmail option is a valid Boolean', () => {
@@ -1632,7 +1619,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enableAttachments option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableAttachments: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enableAttachments option is a valid Boolean', () => {
@@ -1642,7 +1629,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enableDeployWithDependentList option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableDeployWithDependentList: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enableDeployWithDependentList option is a valid Boolean', () => {
@@ -1652,7 +1639,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enableFolderCreation option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableFolderCreation: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enableFolderCreation option is a valid Boolean', () => {
@@ -1662,7 +1649,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enableMinorVersions option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableMinorVersions: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enableMinorVersions option is a valid Boolean', () => {
@@ -1672,7 +1659,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enableModeration option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableModeration: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enableModeration option is a valid Boolean', () => {
@@ -1682,7 +1669,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enablePeopleSelector option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enablePeopleSelector: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enablePeopleSelector option is a valid Boolean', () => {
@@ -1692,7 +1679,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enableResourceSelector option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableResourceSelector: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enableResourceSelector option is a valid Boolean', () => {
@@ -1702,7 +1689,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enableSchemaCaching option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSchemaCaching: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enableSchemaCaching option is a valid Boolean', () => {
@@ -1712,7 +1699,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enableSyndication option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableSyndication: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enableSyndication option is a valid Boolean', () => {
@@ -1722,7 +1709,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enableThrottling option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableThrottling: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enableThrottling option is a valid Boolean', () => {
@@ -1732,7 +1719,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enableVersioning option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enableVersioning: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enableVersioning option is a valid Boolean', () => {
@@ -1742,7 +1729,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the enforceDataValidation option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', enforceDataValidation: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the enforceDataValidation option is a valid Boolean', () => {
@@ -1752,7 +1739,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the excludeFromOfflineClient option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', excludeFromOfflineClient: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the excludeFromOfflineClient option is a valid Boolean', () => {
@@ -1762,7 +1749,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the fetchPropertyBagForListView option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', fetchPropertyBagForListView: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the fetchPropertyBagForListView option is a valid Boolean', () => {
@@ -1772,7 +1759,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the followable option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', followable: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the followable option is a valid Boolean', () => {
@@ -1782,7 +1769,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the forceCheckout option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceCheckout: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the forceCheckout option is a valid Boolean', () => {
@@ -1792,7 +1779,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the forceDefaultContentType option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', forceDefaultContentType: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the forceDefaultContentType option is a valid Boolean', () => {
@@ -1802,7 +1789,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the hidden option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', hidden: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the hidden option is a valid Boolean', () => {
@@ -1812,7 +1799,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the includedInMyFilesScope option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', includedInMyFilesScope: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the includedInMyFilesScope option is a valid Boolean', () => {
@@ -1822,7 +1809,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the irmEnabled option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmEnabled: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the irmEnabled option is a valid Boolean', () => {
@@ -1832,7 +1819,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the irmExpire option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmExpire: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the irmExpire option is a valid Boolean', () => {
@@ -1842,7 +1829,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the irmReject option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', irmReject: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the irmReject option is a valid Boolean', () => {
@@ -1852,7 +1839,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the isApplicationList option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', isApplicationList: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the isApplicationList option is a valid Boolean', () => {
@@ -1862,7 +1849,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the multipleDataList option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', multipleDataList: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the multipleDataList option is a valid Boolean', () => {
@@ -1872,7 +1859,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the navigateForFormsPages option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', navigateForFormsPages: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the navigateForFormsPages option is a valid Boolean', () => {
@@ -1882,7 +1869,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the needUpdateSiteClientTag option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', needUpdateSiteClientTag: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the needUpdateSiteClientTag option is a valid Boolean', () => {
@@ -1892,7 +1879,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the noCrawl option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', noCrawl: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the noCrawl option is a valid Boolean', () => {
@@ -1902,7 +1889,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the onQuickLaunch option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', onQuickLaunch: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the onQuickLaunch option is a valid Boolean', () => {
@@ -1912,7 +1899,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the ordered option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', ordered: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the ordered option is a valid Boolean', () => {
@@ -1922,7 +1909,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the parserDisabled option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', parserDisabled: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the parserDisabled option is a valid Boolean', () => {
@@ -1932,7 +1919,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the readOnlyUI option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readOnlyUI: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the readOnlyUI option is a valid Boolean', () => {
@@ -1942,7 +1929,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the requestAccessEnabled option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', requestAccessEnabled: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the requestAccessEnabled option is a valid Boolean', () => {
@@ -1952,7 +1939,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the restrictUserUpdates option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', restrictUserUpdates: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the restrictUserUpdates option is a valid Boolean', () => {
@@ -1962,7 +1949,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the showUser option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', showUser: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the showUser option is a valid Boolean', () => {
@@ -1972,7 +1959,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the useFormsForDisplay option is not a valid Boolean', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', useFormsForDisplay: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the useFormsForDisplay option is a valid Boolean', () => {
@@ -1982,7 +1969,7 @@ describe(commands.LIST_SET, () => {
 
   it('fails validation if the defaultContentApprovalWorkflowId option is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', defaultContentApprovalWorkflowId: 'foo' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the defaultContentApprovalWorkflowId option is a valid GUID', () => {
@@ -1993,7 +1980,7 @@ describe(commands.LIST_SET, () => {
   it('fails if non existing draftVersionVisibility specified', () => {
     const draftVersionValue = 'NonExistingDraftVersionVisibility';
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', draftVersionVisibility: draftVersionValue } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('has correct draftVersionVisibility specified', () => {
@@ -2005,7 +1992,7 @@ describe(commands.LIST_SET, () => {
   it('fails if emailAlias specified, but enableAssignToEmail is not true', () => {
     const emailAliasValue = 'yourname@contoso.onmicrosoft.com';
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', emailAlias: emailAliasValue } });
-    assert.equal(actual, `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`);
+    assert.strictEqual(actual, `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`);
   });
 
   it('has correct emailAlias and enableAssignToEmail values specified', () => {
@@ -2017,7 +2004,7 @@ describe(commands.LIST_SET, () => {
   it('fails if non existing direction specified', () => {
     const directionValue = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', direction: directionValue } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('has correct direction specified', () => {
@@ -2029,7 +2016,7 @@ describe(commands.LIST_SET, () => {
   it('fails if majorVersionLimit specified, but enableVersioning is not true', () => {
     const majorVersionLimitValue = 20;
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorVersionLimit: majorVersionLimitValue } });
-    assert.equal(actual, `majorVersionLimit option is only valid in combination with enableVersioning.`);
+    assert.strictEqual(actual, `majorVersionLimit option is only valid in combination with enableVersioning.`);
   });
 
   it('has correct majorVersionLimit and enableVersioning values specified', () => {
@@ -2041,7 +2028,7 @@ describe(commands.LIST_SET, () => {
   it('fails if majorWithMinorVersionsLimit specified, but enableModeration is not true', () => {
     const majorWithMinorVersionLimitValue = 20;
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', majorWithMinorVersionsLimit: majorWithMinorVersionLimitValue } });
-    assert.equal(actual, `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`);
+    assert.strictEqual(actual, `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`);
   });
 
   it('has correct majorVersionLimit and enableVersioning values specified', () => {
@@ -2053,7 +2040,7 @@ describe(commands.LIST_SET, () => {
   it('fails if non existing readSecurity specified', () => {
     const readSecurityValue = 5;
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', readSecurity: readSecurityValue } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('has correct readSecurity specified', () => {
@@ -2065,7 +2052,7 @@ describe(commands.LIST_SET, () => {
   it('fails if non existing listExperienceOptions specified', () => {
     const listExperienceValue = 'NonExistingExperience';
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', listExperienceOptions: listExperienceValue } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('has correct listExperienceOptions specified', () => {
@@ -2077,46 +2064,12 @@ describe(commands.LIST_SET, () => {
   it('fails if non existing readSecurity specified', () => {
     const writeSecurityValue = 5;
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: writeSecurityValue } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('has correct direction specified', () => {
     const writeSecurityValue = 4;
     const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '3EA5A977-315E-4E25-8B0F-E4F949BF6B8F', writeSecurity: writeSecurityValue } });
     assert(actual === true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.LIST_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

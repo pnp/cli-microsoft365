@@ -15,8 +15,7 @@ import { ReportData, ReportDataModification } from './ReportData';
 import { BaseProjectCommand } from './base-project-command';
 import { FindingTour } from './project-upgrade/FindingTour';
 import { FindingTourStep } from './project-upgrade/FindingTourStep';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -172,7 +171,6 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
   public action(): CommandAction {
     const cmd: Command = this;
     return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
-      args = (cmd as any).processArgs(args);
       (cmd as any).initAction(args, this);
       cmd.commandAction(this, args, cb);
     }
@@ -382,8 +380,9 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     if (!fs.existsSync(toursFolder)) {
       fs.mkdirSync(toursFolder, { recursive: false });
     }
-    const tourFilePath = path.join(this.projectRootPath as string, '.tours', 'upgrade.tour');
-    fs.writeFileSync(path.resolve(tourFilePath),findingsToReport, 'utf-8');
+
+    const tourFilePath: string = path.join(this.projectRootPath as string, '.tours', 'upgrade.tour');
+    fs.writeFileSync(path.resolve(tourFilePath), findingsToReport, 'utf-8');
   }
 
   private getTextReport(findings: FindingToReport[]): string {
@@ -735,70 +734,10 @@ ${f.resolution}
         if (['bash', 'powershell', 'cmd'].indexOf(args.options.shell) < 0) {
           return `${args.options.shell} is not a supported shell. Supported shells are bash, powershell and cmd`;
         }
-      }     
+      }
 
       return true;
     };
-  }
-
-  public commandHelp(args: any, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.PROJECT_UPGRADE).helpInformation());
-    log(
-      `   ${chalk.yellow('Important:')} Run this command in the folder where the project
-    that you want to upgrade is located. This command doesn't change your
-    project files.
-      
-  Remarks:
-
-    The ${this.name} command helps you upgrade your SharePoint Framework
-    project to the specified version. If no version is specified, the command
-    will upgrade to the latest version of the SharePoint Framework it supports
-    (v1.11.0).
-
-    This command doesn't change your project files. Instead, it gives you
-    a report with all steps necessary to upgrade your project to the specified
-    version of the SharePoint Framework. Changing project files is error-prone,
-    especially when it comes to updating your solution's code. This is why at
-    this moment, this command produces a report that you can use yourself to
-    perform the necessary updates and verify that everything is working as
-    expected.
-
-    Using this command you can upgrade SharePoint Framework projects built using
-    versions: 1.0.0, 1.0.1, 1.0.2, 1.1.0, 1.1.1, 1.1.3, 1.2.0, 1.3.0, 1.3.1,
-    1.3.2, 1.3.4, 1.4.0, 1.4.1, 1.5.0, 1.5.1, 1.6.0, 1.7.0, 1.7.1, 1.8.0,
-    1.8.1, 1.8.2, 1.9.1 and 1.10.0.
-
-  Examples:
-  
-    Get instructions to upgrade the current SharePoint Framework project to
-    SharePoint Framework version 1.5.0 and save the findings in a Markdown file
-      ${this.name} --toVersion 1.5.0 --output md > "upgrade-report.md"
-
-    Get instructions to Upgrade the current SharePoint Framework project to
-    SharePoint Framework version 1.5.0 and show the summary of the findings
-    in the shell
-      ${this.name} --toVersion 1.5.0
-
-    Get instructions to upgrade the current SharePoint Framework project to the
-    latest SharePoint Framework version supported by the CLI for Microsoft 365 using
-    pnpm
-      ${this.name} --packageManager pnpm
-
-    Get instructions to upgrade the current SharePoint Framework project to the
-    latest SharePoint Framework version supported by the CLI for Microsoft 365
-      ${this.name}
-
-    Get instructions to upgrade the current SharePoint Framework project to the
-    latest SharePoint Framework version supported by the CLI for Microsoft 365 using
-    PowerShell
-      ${this.name} --shell powershell
-
-    Get instructions to upgrade the current SharePoint Framework project to
-    the latest version of SharePoint Framework and save the findings in a 
-    CodeTour file
-        ${this.name} --output tour
-`);
   }
 }
 

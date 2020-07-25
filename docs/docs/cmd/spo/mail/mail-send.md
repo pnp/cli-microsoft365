@@ -10,21 +10,44 @@ m365 spo mail send [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|Absolute URL of the site from which the email will be sent
-`--to <to>`|Comma-separated list of recipients' e-mail addresses
-`--subject <subject>`|Subject of the e-mail
-`--body <body>`|Content of the e-mail
-`--from [from]`|Sender's e-mail address
-`--cc [cc]`|Comma-separated list of CC recipients
-`--bcc [bcc]`|Comma-separated list of BCC recipients
-`--additionalHeaders [additionalHeaders]`|JSON string with additional headers
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: Absolute URL of the site from which the email will be sent
+
+`--to <to>`
+: Comma-separated list of recipients' e-mail addresses
+
+`--subject <subject>`
+: Subject of the e-mail
+
+`--body <body>`
+: Content of the e-mail
+
+`--from [from]`
+: Sender's e-mail address
+
+`--cc [cc]`
+: Comma-separated list of CC recipients
+
+`--bcc [bcc]`
+: Comma-separated list of BCC recipients
+
+`--additionalHeaders [additionalHeaders]`
+: JSON string with additional headers
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

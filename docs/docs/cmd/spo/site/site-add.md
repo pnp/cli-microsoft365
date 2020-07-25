@@ -10,34 +10,83 @@ m365 spo site add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`--type [type]`|Type of sites to add. Allowed values `TeamSite,CommunicationSite,ClassicSite`, default `TeamSite`
-`-t, --title <title>`|Site title
-`-a, --alias [alias]`|Site alias, used in the URL and in the team site group e-mail (applies to type TeamSite)
-`-u, --url [url]`|Site URL  (applies to type CommunicationSite, ClassicSite)
-`-z, --timeZone [timeZone]`|Integer representing time zone to use for the site (applies to type ClassicSite)
-`-d, --description [description]`|Site description
-`-l, --lcid [lcid]`|Site language in the LCID format, eg. _1033_ for _en-US_. See [SharePoint documentation](https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff) for the list of supported languages
-`--owners [owners]`|Comma-separated list of users to set as site owners
-`--isPublic`|Determines if the associated group is public or not (applies to type TeamSite)
-`-c, --classification [classification]`|Site classification (applies to type TeamSite, CommunicationSite)
-`--siteDesign [siteDesign]`|Type of communication site to create. Allowed values `Topic,Showcase,Blank`, default `Topic`. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies to type CommunicationSite)
-`--siteDesignId [siteDesignId]`|Id of the custom site design to use to create the site. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies to type CommunicationSite)
-`--allowFileSharingForGuestUsers`|(deprecated. Use `shareByEmailEnabled` instead) Determines whether it's allowed to share file with guests (applies to type CommunicationSite)
-`--shareByEmailEnabled`|Determines whether it's allowed to share file with guests (applies to type CommunicationSite)
-`-w, --webTemplate [webTemplate]`|Template to use for creating the site. Default `STS#0`  (applies to type ClassicSite)
-`--resourceQuota [resourceQuota]`|The quota for this site collection in Sandboxed Solutions units. Default `0`  (applies to type ClassicSite)
-`--resourceQuotaWarningLevel [resourceQuotaWarningLevel]`|The warning level for the resource quota. Default `0`  (applies to type ClassicSite)
-`--storageQuota [storageQuota]`|The storage quota for this site collection in megabytes. Default `100`  (applies to type ClassicSite)
-`--storageQuotaWarningLevel [storageQuotaWarningLevel]`|The warning level for the storage quota in megabytes. Default `100`  (applies to type ClassicSite)
-`--removeDeletedSite`|Set, to remove existing deleted site with the same URL from the Recycle Bin  (applies to type ClassicSite)
-`--wait`|Wait for the site to be provisioned before completing the command  (applies to type ClassicSite)
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`--type [type]`
+: Type of sites to add. Allowed values `TeamSite,CommunicationSite,ClassicSite`, default `TeamSite`
+
+`-t, --title <title>`
+: Site title
+
+`-a, --alias [alias]`
+: Site alias, used in the URL and in the team site group e-mail (applies to type TeamSite)
+
+`-u, --url [url]`
+: Site URL  (applies to type CommunicationSite, ClassicSite)
+
+`-z, --timeZone [timeZone]`
+: Integer representing time zone to use for the site (applies to type ClassicSite)
+
+`-d, --description [description]`
+: Site description
+
+`-l, --lcid [lcid]`
+: Site language in the LCID format, eg. _1033_ for _en-US_. See [SharePoint documentation](https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff) for the list of supported languages
+
+`--owners [owners]`
+: Comma-separated list of users to set as site owners (applies to type TeamSite, ClassicSite)
+
+`--isPublic`
+: Determines if the associated group is public or not (applies to type TeamSite)
+
+`-c, --classification [classification]`
+: Site classification (applies to type TeamSite, CommunicationSite)
+
+`--siteDesign [siteDesign]`
+: Type of communication site to create. Allowed values `Topic,Showcase,Blank`, default `Topic`. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies to type CommunicationSite)
+
+`--siteDesignId [siteDesignId]`
+: Id of the custom site design to use to create the site. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies to type CommunicationSite)
+
+`--allowFileSharingForGuestUsers`
+: (deprecated. Use `shareByEmailEnabled` instead) Determines whether it's allowed to share file with guests (applies to type CommunicationSite)
+
+`--shareByEmailEnabled`
+: Determines whether it's allowed to share file with guests (applies to type CommunicationSite)
+
+`-w, --webTemplate [webTemplate]`
+: Template to use for creating the site. Default `STS#0`  (applies to type ClassicSite)
+
+`--resourceQuota [resourceQuota]`
+: The quota for this site collection in Sandboxed Solutions units. Default `0`  (applies to type ClassicSite)
+
+`--resourceQuotaWarningLevel [resourceQuotaWarningLevel]`
+: The warning level for the resource quota. Default `0`  (applies to type ClassicSite)
+
+`--storageQuota [storageQuota]`
+: The storage quota for this site collection in megabytes. Default `100`  (applies to type ClassicSite)
+
+`--storageQuotaWarningLevel [storageQuotaWarningLevel]`
+: The warning level for the storage quota in megabytes. Default `100`  (applies to type ClassicSite)
+
+`--removeDeletedSite`
+: Set, to remove existing deleted site with the same URL from the Recycle Bin  (applies to type ClassicSite)
+
+`--wait`
+: Wait for the site to be provisioned before completing the command  (applies to type ClassicSite)
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks for classic sites
 

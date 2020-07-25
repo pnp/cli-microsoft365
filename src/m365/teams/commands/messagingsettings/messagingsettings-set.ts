@@ -6,8 +6,8 @@ import {
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -70,7 +70,7 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
       .patch(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -111,10 +111,6 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.teamId) {
-        return 'Required parameter teamId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.teamId)) {
         return `${args.options.teamId} is not a valid GUID`;
       }
@@ -145,19 +141,6 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Allow users to edit messages in channels
-      ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --allowUserEditMessages true
-
-    Disallow users to delete messages in channels
-      ${this.name} --teamId '00000000-0000-0000-0000-000000000000' --allowUserDeleteMessages false
-`);
   }
 }
 

@@ -3,8 +3,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -45,7 +45,7 @@ class YammerMessageRemoveCommand extends YammerCommand {
         .delete(requestOptions)
         .then((res: any): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
 
           cb();
@@ -90,42 +90,12 @@ class YammerMessageRemoveCommand extends YammerCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.id) {
-        return 'Required id value is missing';
-      }
-
       if (typeof args.options.id !== 'number') {
         return `${args.options.id} is not a number`;
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-  
-    ${chalk.yellow('Attention:')} In order to use this command, you need to grant the Azure AD
-    application used by the CLI for Microsoft 365 the permission to the Yammer API.
-    To do this, execute the ${chalk.blue('cli consent --service yammer')} command.
-
-    To remove a message, you must either:
-      - have posted the message yourself 
-      - be an administrator of the group the message was posted to or 
-      - be an admin of the network the message is in.
-    
-  Examples:
-  
-    Removes the Yammer message with the id 1239871123
-      ${this.name} --id 1239871123
-
-    Removes the Yammer message with the id 1239871123 without prompting for
-    confirmation.
-      ${this.name} --id 1239871123 --confirm
-`);
   }
 }
 

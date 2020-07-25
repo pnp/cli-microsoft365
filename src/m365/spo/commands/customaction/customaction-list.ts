@@ -7,8 +7,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import { CustomAction } from './customaction';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -166,42 +165,6 @@ class SpoCustomActionListCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CUSTOMACTION_LIST).helpInformation());
-    log(
-      `  Remarks:
-
-    When using the text output type (default), the command lists only the values
-    of the ${chalk.grey('Name')}, ${chalk.grey('Location')}, ${chalk.grey('Scope')} and ${chalk.grey('Id')} properties of the custom action.
-    When setting the output type to JSON, all available properties are included
-    in the command output.
-
-  Examples:
-  
-    Return details about all user custom actions located
-    in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test
-
-    Return details about all user custom actions located
-    in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test
-
-    Return details about all user custom actions located 
-    in site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test --scope Site
-
-    Return details about all user custom actions located 
-    in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test --scope Web
-
-  More information:
-
-    UserCustomAction REST API resources:
-      https://msdn.microsoft.com/en-us/library/office/dn531432.aspx#bk_UserCustomAction
-      `);
   }
 }
 

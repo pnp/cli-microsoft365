@@ -27,7 +27,6 @@ class MockCommand extends DateAndPeriodBasedReport {
 
 describe('PeriodBasedReport', () => {
   const mockCommand = new MockCommand();
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   before(() => {
@@ -37,7 +36,6 @@ describe('PeriodBasedReport', () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -53,7 +51,6 @@ describe('PeriodBasedReport', () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get,
       fs.writeFileSync
     ]);
@@ -68,26 +65,26 @@ describe('PeriodBasedReport', () => {
   });
 
   it('has correct name', () => {
-    assert.equal(mockCommand.name.startsWith('mock'), true);
+    assert.strictEqual(mockCommand.name.startsWith('mock'), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(mockCommand.description, null);
+    assert.notStrictEqual(mockCommand.description, null);
   });
 
   it('fails validation if period option is not passed', () => {
     const actual = (mockCommand.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation on invalid period', () => {
     const actual = (mockCommand.validate() as CommandValidate)({ options: { period: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation on invalid date', () => {
     const actual = (mockCommand.validate() as CommandValidate)({ options: { date: '10.10.2019' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation on valid \'D7\' period', () => {
@@ -96,7 +93,7 @@ describe('PeriodBasedReport', () => {
         period: 'D7'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation on valid \'D30\' period', () => {
@@ -105,7 +102,7 @@ describe('PeriodBasedReport', () => {
         period: 'D30'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation on valid \'D90\' period', () => {
@@ -114,7 +111,7 @@ describe('PeriodBasedReport', () => {
         period: 'D90'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation on valid \'180\' period', () => {
@@ -123,12 +120,12 @@ describe('PeriodBasedReport', () => {
         period: 'D90'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation if both period and date options set', () => {
     const actual = (mockCommand.validate() as CommandValidate)({ options: { period: 'D7', date: '2019-07-13' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('get unique device type in teams and export it in a period', (done) => {
@@ -145,9 +142,9 @@ describe('PeriodBasedReport', () => {
 
     cmdInstance.action({ options: { debug: false, period: 'D7' } }, () => {
       try {
-        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
-        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
+        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.strictEqual(requestStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {
@@ -163,7 +160,7 @@ describe('PeriodBasedReport', () => {
         date: '2018-X-09'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('gets details about Microsoft Teams user activity by user for the given date', (done) => {
@@ -181,9 +178,9 @@ describe('PeriodBasedReport', () => {
 
     cmdInstance.action({ options: { debug: false, date: '2019-07-13' } }, () => {
       try {
-        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(date=2019-07-13)");
-        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(date=2019-07-13)");
+        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.strictEqual(requestStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {
@@ -197,7 +194,7 @@ describe('PeriodBasedReport', () => {
 
     cmdInstance.action({ options: { debug: false, period: 'D7' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

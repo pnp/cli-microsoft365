@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.TEAMS_MEMBERSETTINGS_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.TEAMS_MEMBERSETTINGS_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -38,7 +36,6 @@ describe(commands.TEAMS_MEMBERSETTINGS_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -52,11 +49,11 @@ describe(commands.TEAMS_MEMBERSETTINGS_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_MEMBERSETTINGS_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_MEMBERSETTINGS_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('lists member settings for a Microsoft Team', (done) => {
@@ -129,15 +126,6 @@ describe(commands.TEAMS_MEMBERSETTINGS_LIST, () => {
     });
   });
 
-  it('fails validation if teamId is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        debug: false,
-      }
-    });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if teamId is not a valid GUID', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
@@ -145,7 +133,7 @@ describe(commands.TEAMS_MEMBERSETTINGS_LIST, () => {
         teamId: 'invalid'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when teamId is valid', () => {
@@ -155,7 +143,7 @@ describe(commands.TEAMS_MEMBERSETTINGS_LIST, () => {
         teamId: '2609af39-7775-4f94-a3dc-0dd67657e900'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('lists all properties for output json', (done) => {
@@ -201,7 +189,7 @@ describe(commands.TEAMS_MEMBERSETTINGS_LIST, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -219,39 +207,5 @@ describe(commands.TEAMS_MEMBERSETTINGS_LIST, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_MEMBERSETTINGS_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

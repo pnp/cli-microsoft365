@@ -1,5 +1,6 @@
 import commands from '../../commands';
 import * as os from 'os';
+import * as chalk from 'chalk';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
@@ -7,8 +8,7 @@ import {
 } from '../../../../Command';
 import { Outlook } from '../../Outlook';
 import GraphCommand from '../../../base/GraphCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -71,7 +71,7 @@ class OutlookMessageMoveCommand extends GraphCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -148,10 +148,6 @@ class OutlookMessageMoveCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.messageId) {
-        return `Required option messageId missing`;
-      }
-
       if (!args.options.sourceFolderId &&
         !args.options.sourceFolderName) {
         return 'Specify sourceFolderId or sourceFolderName';
@@ -174,28 +170,6 @@ class OutlookMessageMoveCommand extends GraphCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Move the specified message to another folder specified by ID
-      m365 ${this.name} --messageId AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALdyzhHAAA= --sourceFolderId AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEKAAA= --targetFolderId AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAeUO-fAAA=
-
-    Move the specified message to another folder specified by name
-      m365 ${this.name} --messageId AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALdyzhHAAA= --sourceFolderName Inbox --targetFolderName "Project X"
-
-    Move the specified message to another folder specified by its well-known
-    name
-      m365 ${this.name} --messageId AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OABGAAAAAAAiQ8W967B7TKBjgx9rVEURBwAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAAiIsqMbYjsT5e-T7KzowPTAALdyzhHAAA= --sourceFolderName inbox --targetFolderName archive
-
-  More information:
-
-    Well-known folder names
-      https://docs.microsoft.com/en-us/graph/api/resources/mailfolder?view=graph-rest-1.0
-`);
   }
 }
 

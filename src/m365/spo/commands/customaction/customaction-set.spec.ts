@@ -9,7 +9,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.CUSTOMACTION_SET, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -35,7 +34,6 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -56,7 +54,6 @@ describe(commands.CUSTOMACTION_SET, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       (command as any).updateCustomAction,
       (command as any).searchAllScopes
@@ -72,15 +69,15 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.CUSTOMACTION_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.CUSTOMACTION_SET), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('has a permissionsKindMap', () => {
-    assert.equal((command as any)['permissionsKindMap'].length, 37);
+    assert.strictEqual((command as any)['permissionsKindMap'].length, 37);
   });
 
   it('correct https body send when custom action with location StandardMenu', (done) => {
@@ -663,7 +660,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       }
     }, (error?: any) => {
       try {
-        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
+        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -701,7 +698,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       }
     }, (error?: any) => {
       try {
-        assert.equal(JSON.stringify(error), JSON.stringify(new CommandError(err)));
+        assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
       }
       catch (e) {
@@ -769,9 +766,14 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('fails validation if no other fields specified than url, id, scope', () => {
-    defaultCommandOptions.url = undefined;
     const actual = (command.validate() as CommandValidate)({ options: { id: '058140e3-0e37-44fc-a1d3-79c487d371a3', url:'https://contoso.sharepoint.com'} });
-    assert.equal(actual, 'Please specify option to be updated');
+    assert.strictEqual(actual, 'Please specify option to be updated');
+  });
+
+  it('fails if the specified URL is invalid', () => {
+    defaultCommandOptions.url = 'foo';
+    const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
+    assert.notStrictEqual(actual, true);
   });
 
   it('getRegistrationType returns 1 if registrationType value is List', () => {
@@ -801,24 +803,18 @@ describe(commands.CUSTOMACTION_SET, () => {
 
   it('fails validation if invalid id', () => {
     const actual = (command.validate() as CommandValidate)({ options: { id: '1', url:'https://contoso.sharepoint.com'} });
-    assert.equal(actual, '1 is not valid. Custom action id (Guid) expected');
+    assert.strictEqual(actual, '1 is not valid. Custom action id (Guid) expected');
   });
 
   it('fails validation if undefined id', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url:'https://contoso.sharepoint.com'} });
-    assert.equal(actual, 'undefined is not valid. Custom action id (Guid) expected');
-  });
-
-  it('fails validation if the url option not specified', () => {
-    defaultCommandOptions.url = undefined;
-    const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, 'Missing required option url');
+    assert.strictEqual(actual, 'undefined is not valid. Custom action id (Guid) expected');
   });
 
   it('fails if non existing PermissionKind rights specified', () => {
     defaultCommandOptions.rights = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Rights option '${defaultCommandOptions.rights}' is not recognized as valid PermissionKind choice. Please note it is case-sensitive`);
+    assert.strictEqual(actual, `Rights option '${defaultCommandOptions.rights}' is not recognized as valid PermissionKind choice. Please note it is case-sensitive`);
   });
 
   it('has correct PermissionKind rights specified', () => {
@@ -830,19 +826,19 @@ describe(commands.CUSTOMACTION_SET, () => {
   it('fails if clientSideComponentId is not a valid GUID', () => {
     defaultCommandOptions.clientSideComponentId = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `ClientSideComponentId ${defaultCommandOptions.clientSideComponentId} is not a valid GUID`);
+    assert.strictEqual(actual, `ClientSideComponentId ${defaultCommandOptions.clientSideComponentId} is not a valid GUID`);
   });
 
   it('fails if the sequence value less than 0', () => {
     defaultCommandOptions.sequence = -1;
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
+    assert.strictEqual(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
   });
 
   it('fails if the sequence value is higher than 65536', () => {
     defaultCommandOptions.sequence = 65537;
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
+    assert.strictEqual(actual, `Invalid option sequence. Expected value in range from 0 to 65536`);
   });
 
   it('fails if both option scriptSrc and scriptBlock specified', () => {
@@ -850,7 +846,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     defaultCommandOptions.scriptSrc = 'abc';
     defaultCommandOptions.scriptBlock = 'abc';
     const actual = (command.validate() as CommandValidate)({ options: defaultCommandOptions });
-    assert.equal(actual, `Either option scriptSrc or scriptBlock can be specified, but not both`);
+    assert.strictEqual(actual, `Either option scriptSrc or scriptBlock can be specified, but not both`);
   });
 
   it('success if location that requires group option is set, but group is also set', () => {
@@ -937,7 +933,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     const actual = (command.validate() as CommandValidate)({
       options: defaultCommandOptions
     });
-    assert.equal(actual, `${defaultCommandOptions.scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
+    assert.strictEqual(actual, `${defaultCommandOptions.scope} is not a valid custom action scope. Allowed values are Site|Web|All`);
   });
 
   it('doesn\'t fail validation if the optional scope option not specified', () => {
@@ -975,39 +971,5 @@ describe(commands.CUSTOMACTION_SET, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.CUSTOMACTION_SET));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

@@ -9,7 +9,6 @@ import Utils from '../../../Utils';
 import * as child_process from 'child_process';
 
 describe(commands.DOCTOR, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let sandbox: SinonSandbox;
   let cmdInstance: any;
@@ -32,7 +31,6 @@ describe(commands.DOCTOR, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -50,7 +48,6 @@ describe(commands.DOCTOR, () => {
   afterEach(() => {
     Utils.restore([
       sandbox,
-      vorpal.find,
       child_process.execFile,
       process.platform
     ]);
@@ -63,11 +60,11 @@ describe(commands.DOCTOR, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.DOCTOR), true);
+    assert.strictEqual(command.name.startsWith(commands.DOCTOR), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('passes all checks for SPFx v1.11 project when all requirements met', (done) => {
@@ -597,7 +594,7 @@ describe(commands.DOCTOR, () => {
     cmdInstance.action({ options: { debug: false } }, (err: any) => {
       try {
         assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint Framework not found')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint Framework not found')));
         assert(!cmdInstanceLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
         done();
       }
@@ -626,7 +623,7 @@ describe(commands.DOCTOR, () => {
     cmdInstance.action({ options: { debug: true } }, (err: any) => {
       try {
         assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint Framework not found')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint Framework not found')));
         assert(!cmdInstanceLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
         done();
       }
@@ -1058,7 +1055,7 @@ describe(commands.DOCTOR, () => {
 
     cmdInstance.action({ options: { debug: false } }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('npm not found')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('npm not found')));
         assert(!cmdInstanceLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
         done();
       }
@@ -1462,7 +1459,7 @@ describe(commands.DOCTOR, () => {
 
     cmdInstance.action({ options: { debug: false } }, (err: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`spfx doctor doesn't support SPFx v0.9.0 at this moment`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`spfx doctor doesn't support SPFx v0.9.0 at this moment`)));
         done();
       }
       catch (e) {
@@ -1521,73 +1518,39 @@ describe(commands.DOCTOR, () => {
   });
 
   it('configures command types', () => {
-    assert.notEqual(typeof command.types(), 'undefined', 'command types undefined');
-    assert.notEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
+    assert.notStrictEqual(typeof command.types(), 'undefined', 'command types undefined');
+    assert.notStrictEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
   });
 
   it('configures env as string option', () => {
     const types = (command.types() as CommandTypes);
     ['e', 'env'].forEach(o => {
-      assert.notEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
+      assert.notStrictEqual((types.string as string[]).indexOf(o), -1, `option ${o} not specified as string`);
     });
   });
 
   it('passes validation when no options specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when sp2016 env specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { env: 'sp2016' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when sp2019 env specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { env: 'sp2019' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when spo env specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { env: 'spo' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when 2016 env specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { env: '2016' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.DOCTOR));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.notStrictEqual(actual, true);
   });
 });

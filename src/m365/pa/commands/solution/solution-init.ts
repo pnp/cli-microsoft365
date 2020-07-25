@@ -12,8 +12,8 @@ import Command, {
 import Utils from '../../../../Utils';
 import { SolutionInitVariables } from "./solution-init/solution-init-variables";
 import TemplateInstantiator from "../../template-instantiator";
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -41,7 +41,6 @@ class PaSolutionInitCommand extends Command {
   public action(): CommandAction {
     const cmd: Command = this;
     return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
-      args = (cmd as any).processArgs(args);
       (cmd as any).initAction(args, this);
       cmd.commandAction(this, args, cb);
     }
@@ -85,16 +84,16 @@ class PaSolutionInitCommand extends Command {
         cmd.log(` `);
       }
 
-      cmd.log(vorpal.chalk.green(`CDS solution project with name '${workingDirectoryName}' created successfully in current directory.`));
+      cmd.log(chalk.green(`CDS solution project with name '${workingDirectoryName}' created successfully in current directory.`));
 
       const cdsAssetsExist: boolean = fs.existsSync(cdsAssetsDirectory) && fs.existsSync(cdsAssetsDirectorySolutionsFile);
       if (cdsAssetsExist) {
-        cmd.log(vorpal.chalk.yellow(`CDS solution files already exist in the current directory. Skipping CDS solution files creation.`));
+        cmd.log(chalk.yellow(`CDS solution files already exist in the current directory. Skipping CDS solution files creation.`));
       }
       else {
         TemplateInstantiator.instantiate(cmd, cdsAssetsTemplatePath, cdsAssetsDirectory, false, variables, this.verbose);
-        cmd.log(vorpal.chalk.green(`CDS solution files were successfully created for this project in the sub-directory 'Other', using solution name '${workingDirectory}', publisher name '${publisherName}', and customization prefix '${publisherPrefix}'.`));
-        cmd.log(`Please verify the publisher information and solution name found in the '${vorpal.chalk.grey('Solution.xml')}' file.`);
+        cmd.log(chalk.green(`CDS solution files were successfully created for this project in the sub-directory 'Other', using solution name '${workingDirectory}', publisher name '${publisherName}', and customization prefix '${publisherPrefix}'.`));
+        cmd.log(`Please verify the publisher information and solution name found in the '${chalk.grey('Solution.xml')}' file.`);
       }
 
       cb();
@@ -151,31 +150,6 @@ class PaSolutionInitCommand extends Command {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.SOLUTION_INIT).helpInformation());
-    log(
-      `  Remarks:
-
-    PublisherName only allows characters within the ranges [A-Z], [a-z], [0-9],
-    or _. The first character may only be in the ranges [A-Z], [a-z], or _.
-    
-    PublisherPrefix must be 2 to 8 characters long, can only consist of
-    alpha-numerics, must start with a letter, and cannot start with 'mscrm'.
-
-  Examples:
-
-    Initializes a CDS solution project using ${chalk.grey('yourPublisherName')} as publisher
-    name and ${chalk.grey('ypn')} as publisher prefix
-      m365 ${this.name} --publisherName yourPublisherName --publisherPrefix ypn
-
-  More information:
-
-    Create and build a custom component
-      https://docs.microsoft.com/en-us/powerapps/developer/component-framework/create-custom-controls-using-pcf
-`);
   }
 
   private generateOptionValuePrefixForPublisher(customizationPrefix: string): string {

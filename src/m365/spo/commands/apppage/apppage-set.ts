@@ -6,7 +6,8 @@ import {
 import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -43,7 +44,7 @@ class SpoAppPageSetCommand extends SpoCommand {
 
     request.post(requestOptions).then((res: any): void => {
       if (this.verbose) {
-        cmd.log(vorpal.chalk.green('DONE'));
+        cmd.log(chalk.green('DONE'));
       }
       cb();
     }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
@@ -87,19 +88,6 @@ class SpoAppPageSetCommand extends SpoCommand {
       }
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(`    
-  Examples:   
-     
-    Updates the single-part app page located in a site with url
-    https://contoso.sharepoint.com. Web part data is stored in the ${chalk.grey('$webPartData')}
-    variable
-      ${this.name} --webUrl "https://contoso.sharepoint.com" --pageName "Contoso.aspx" --webPartData $webPartData 
-`);
   }
 }
 module.exports = new SpoAppPageSetCommand();

@@ -10,20 +10,41 @@ m365 spo page set [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-n, --name <name>`|Name of the page to update
-`-u, --webUrl <webUrl>`|URL of the site where the page to update is located
-`-l, --layoutType [layoutType]`|Layout of the page. Allowed values `Article,Home`
-`-p, --promoteAs [promoteAs]`|Update the page purpose. Allowed values `HomePage,NewsPage`
-`--commentsEnabled [commentsEnabled]`|Set to `true`, to enable comments on the page. Allowed values `true,false`
-`--publish`|Set to publish the page
-`--publishMessage [publishMessage]`|Message to set when publishing the page
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-n, --name <name>`
+: Name of the page to update
+
+`-u, --webUrl <webUrl>`
+: URL of the site where the page to update is located
+
+`-l, --layoutType [layoutType]`
+: Layout of the page. Allowed values `Article,Home`
+
+`-p, --promoteAs [promoteAs]`
+: Update the page purpose. Allowed values `HomePage,NewsPage`
+
+`--commentsEnabled [commentsEnabled]`
+: Set to `true`, to enable comments on the page. Allowed values `true,false`
+
+`--publish`
+: Set to publish the page
+
+`--publishMessage [publishMessage]`
+: Message to set when publishing the page
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

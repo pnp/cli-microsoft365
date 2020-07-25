@@ -11,8 +11,7 @@ import Utils from '../../../../Utils';
 import * as fs from 'fs';
 import * as path from 'path';
 import { FolderExtensions } from '../../FolderExtensions';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -397,21 +396,9 @@ class SpoFileAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
-      }
-
-      if (!args.options.folder) {
-        return 'Required parameter folder missing';
-      }
-
-      if (!args.options.path) {
-        return 'Required parameter path missing';
       }
 
       if (args.options.path && !fs.existsSync(args.options.path)) {
@@ -428,98 +415,6 @@ class SpoFileAddCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-  
-    This command allows using unknown properties. Each property corresponds to
-    the list item field that should be set when uploading the file.
-        
-  Examples:
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg'
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in sub folder ${chalk.grey('Shared Documents/Sub Folder 1')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents/Sub Folder 1' --path 'C:\\MS365.jpg'
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} specifying server-relative folder url
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder '/sites/project-x/Shared Documents' --path 'C:\\MS365.jpg'
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} with specified content type
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --contentType 'Picture'
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')}, but checks out existing file before the upload
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --checkOut --checkInComment 'check in comment x'
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and approves it (when list moderation is enabled)
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --approve --approveComment 'approve comment x'
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and publishes it
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --publish --publishComment 'publish comment x'
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and changes single text field value of
-    the list item
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Title "New Title"
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and changes person/group field and
-    DateTime field values
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Editor "[{'Key':'i:0#.f|membership|john.smith@contoso.com'}]" --Modified '6/23/2018 10:15 PM'
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and changes hyperlink or picture field
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --URL 'https://contoso.com, Contoso'
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and changes taxonomy field
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Topic "HR services|c17baaeb-67cd-4378-9389-9d97a945c701"
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and changes taxonomy multi-value field
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Topic "HR services|c17baaeb-67cd-4378-9389-9d97a945c701;Inclusion ＆ Diversity|66a67671-ed89-44a7-9be4-e80c06b41f35"
-  
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and changes choice field and multi-choice field
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --ChoiceField1 'Option3' --MultiChoiceField1 'Option2;#Option3'
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and changes person/group field that allows
-    multi-user selection
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --AllowedUsers "[{'Key':'i:0#.f|membership|john.smith@contoso.com'},{'Key':'i:0#.f|membership|velin.georgiev@contoso.com'}]"
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and changes yes/no field
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --HasCar true
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and changes number field and currency field
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --NumberField 100 --CurrencyField 20
-
-    Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-    in folder ${chalk.grey('Shared Documents')} and changes lookup field and multi-lookup field
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --LookupField 1 --MultiLookupField "2;#;#3;#;#4;#"
-      
-  More information:
-
-    Update file metadata with REST API using ValidateUpdateListItem method:
-      https://robertschouten.com/2018/04/30/update-file-metadata-with-rest-api-using-validateupdatelistitem-method/
-
-    List Items System Update options in SharePoint Online:
-      https://www.linkedin.com/pulse/list-items-system-update-options-sharepoint-online-andrew-koltyakov/
-      `);
   }
 
   private listHasContentType(contentType: string, webUrl: string, listSettings: ListSettings, cmd: any): Promise<void> {

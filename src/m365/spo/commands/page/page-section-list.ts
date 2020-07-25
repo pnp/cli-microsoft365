@@ -6,8 +6,8 @@ import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ClientSidePage, CanvasSection } from './clientsidepages';
 import { Page } from './Page';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -51,7 +51,7 @@ class SpoPageSectionListCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -76,32 +76,8 @@ class SpoPageSectionListCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.name) {
-        return 'Required parameter name missing';
-      }
-
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    If the specified ${chalk.grey('name')} doesn't refer to an existing modern 
-    page, you will get a ${chalk.grey('File doesn\'t exists')} error.
-
-  Examples:
-  
-    List sections of a modern page named ${chalk.grey('home.aspx')}
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
-`);
   }
 }
 

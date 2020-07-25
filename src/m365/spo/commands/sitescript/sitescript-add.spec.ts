@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
 describe(commands.SITESCRIPT_ADD, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -23,7 +22,6 @@ describe(commands.SITESCRIPT_ADD, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -39,7 +37,6 @@ describe(commands.SITESCRIPT_ADD, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -56,11 +53,11 @@ describe(commands.SITESCRIPT_ADD, () => {
 
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.SITESCRIPT_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.SITESCRIPT_ADD), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('adds new site script', (done) => {
@@ -210,7 +207,7 @@ describe(commands.SITESCRIPT_ADD, () => {
 
     cmdInstance.action({ options: { debug: false, title: 'Contoso', content: JSON.stringify({}) } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -263,57 +260,13 @@ describe(commands.SITESCRIPT_ADD, () => {
     assert(containsOption);
   });
 
-  it('fails validation if title not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.notEqual(actual, true);
-  });
-
-  it('fails validation if script content not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { title: 'Contoso' } });
-    assert.notEqual(actual, true);
-  });
-
   it('fails validation if script content is not a valid JSON string', () => {
     const actual = (command.validate() as CommandValidate)({ options: { title: 'Contoso', content: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when title specified and  script content is valid JSON', () => {
     const actual = (command.validate() as CommandValidate)({ options: { title: 'Contoso', content: JSON.stringify({}) } });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.SITESCRIPT_ADD));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

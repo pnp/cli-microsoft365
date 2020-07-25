@@ -10,7 +10,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 
 describe(commands.O365GROUP_USER_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -22,7 +21,6 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -39,7 +37,6 @@ describe(commands.O365GROUP_USER_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -53,21 +50,21 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.O365GROUP_USER_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.O365GROUP_USER_LIST), true);
   });
 
   it('defines alias', () => {
     const alias = command.alias();
-    assert.notEqual(typeof alias, 'undefined');
+    assert.notStrictEqual(typeof alias, 'undefined');
   });
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.equal((alias && alias.indexOf(teamsCommands.TEAMS_USER_LIST) > -1), true);
+    assert.strictEqual((alias && alias.indexOf(teamsCommands.TEAMS_USER_LIST) > -1), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
@@ -76,17 +73,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
         teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
-    assert.notEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the groupId is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
-      options: {
-        role: 'Member'
-      }
-    });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -96,7 +83,15 @@ describe(commands.O365GROUP_USER_LIST, () => {
         groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
+  it('fails validation if the groupId is not provided.', (done) => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {}
+    });
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -107,7 +102,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -118,7 +113,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
         role: 'Invalid',
       }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
     done();
   });
 
@@ -128,7 +123,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
     done();
   });
 
@@ -139,7 +134,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
         role: 'Owner'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
     done();
   });
 
@@ -150,7 +145,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
         role: 'Member'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
     done();
   });
 
@@ -161,7 +156,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
         role: 'Guest'
       }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
     done();
   });
 
@@ -314,7 +309,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
 
     cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -332,39 +327,5 @@ describe(commands.O365GROUP_USER_LIST, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.O365GROUP_USER_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 });

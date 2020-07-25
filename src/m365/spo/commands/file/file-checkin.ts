@@ -7,8 +7,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -122,10 +121,6 @@ class SpoFileCheckinCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -159,32 +154,6 @@ class SpoFileCheckinCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Checks in file with UniqueId ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
-    located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' 
-
-    Checks in file with server-relative url
-    ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx'
-
-    Checks in minor version of file with server-relative url
-      ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site
-      ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-        m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --type minor
-
-    Checks in file ${chalk.grey('/sites/project-x/documents/Test1.docx')} with comment located in site
-      ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-        m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --comment 'approved'
-      `);
   }
 }
 

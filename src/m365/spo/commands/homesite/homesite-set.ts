@@ -10,8 +10,8 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -62,7 +62,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
           cmd.log(json[json.length - 1]);
 
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
         }
         cb();
@@ -71,10 +71,6 @@ class SpoHomeSiteSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.siteUrl) {
-        return `Required parameter siteUrl missing`;
-      }
-
       return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
     };
   }
@@ -89,26 +85,6 @@ class SpoHomeSiteSetCommand extends SpoCommand {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.HOMESITE_SET).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-      
-  Examples:
-  
-    Set the specified site as the Home Site
-      m365 ${this.name} --siteUrl https://contoso.sharepoint.com/sites/comms
-
-  More information:
-
-    SharePoint home sites: a landing for your organization on the intelligent
-    intranet
-      https://techcommunity.microsoft.com/t5/Microsoft-SharePoint-Blog/SharePoint-home-sites-a-landing-for-your-organization-on-the/ba-p/621933
-`);
   }
 }
 

@@ -10,14 +10,26 @@ m365 spo report siteusagedetail [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-d, --date [date]`|The date for which you would like to view the users who performed any activity. Supported date format is `YYYY-MM-DD`. Specify the date or period, but not both.
-`-p, --period [period]`|The length of time over which the report is aggregated. Supported values `D7,D30,D90,D180`
-`-o, --output [output]`|Output type. `text,json`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-d, --date [date]`
+: The date for which you would like to view the users who performed any activity. Supported date format is `YYYY-MM-DD`. Specify the date or period, but not both.
+
+`-p, --period [period]`
+: The length of time over which the report is aggregated. Supported values `D7,D30,D90,D180`
+
+`-f, --outputFile [outputFile]`
+: Path to the file where the report should be stored in
+
+`-o, --output [output]`
+: Output type. `text,json`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

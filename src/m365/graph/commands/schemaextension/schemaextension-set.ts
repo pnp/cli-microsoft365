@@ -6,8 +6,8 @@ import {
 } from '../../../../Command';
 import GraphCommand from '../../../base/GraphCommand';
 import Utils from '../../../../Utils';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -112,7 +112,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -153,14 +153,6 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.id) {
-        return 'Required option id is missing';
-      }
-
-      if (!args.options.owner) {
-        return 'Required option owner is missing';
-      }
-
       if (!Utils.isValidGuid(args.options.owner)) {
         return `The specified owner '${args.options.owner}' is not a valid App Id`;
       }
@@ -215,42 +207,6 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     }
 
     return ['Binary', 'Boolean', 'DateTime', 'Integer', 'String'].indexOf(propertyType) > -1;
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    The lifecycle state of the schema extension. 
-    The initial state upon creation is ${chalk.grey("InDevelopment")}.
-    Possible states transitions are from ${chalk.grey("InDevelopment")} to ${chalk.grey("Available")} and ${chalk.grey("Available")} to ${chalk.grey("Deprecated")}.
-
-    The target types are the set of Microsoft Graph resource types (that support
-    schema extensions) that this schema extension definition can be applied to
-    This option is specified as a comma-separated list.
-
-    When specifying the JSON string of properties on Windows, you
-    have to escape double quotes in a specific way. Considering the following
-    value for the properties option: {"Foo":"Bar"},
-    you should specify the value as ${chalk.grey('\`"{""Foo"":""Bar""}"\`')}.
-    In addition, when using PowerShell, you should use the --% argument.
-
-  Examples:
-  
-    Update the description of a schema extension
-      ${this.name} --id MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b  --description "My schema extension" 
-
-    Update the target types and properties of a schema extension
-      ${this.name} --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --description "My schema extension" --targetTypes "Group,User" --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
-
-    Update the properties of a schema extension in PowerShell
-      ${this.name} --id MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --properties --% \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
-
-    Change the status of a schema extension to 'Available'
-      ${this.name} --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b  --status Available
-`);
   }
 }
 

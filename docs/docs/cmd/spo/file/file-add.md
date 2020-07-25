@@ -10,23 +10,50 @@ m365 spo file add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|The URL of the site where the file should be uploaded to
-`-f, --folder <folder>`|Site-relative or server-relative URL to the folder where the file should be uploaded
-`-p, --path <path>`|Local path to the file to upload
-`-c, --contentType [contentType]`|Content type name or ID to assign to the file
-`--checkOut [checkOut]`|If versioning is enabled, this will check out the file first if it exists, upload the file, then check it in again
-`--checkInComment [checkInComment]`|Comment to set when checking the file in
-`--approve [approve]`|Will automatically approve the uploaded file
-`--approveComment [approveComment]`|Comment to set when approving the file
-`--publish [publish]`|Will automatically publish the uploaded file
-`--publishComment [publishComment]`|Comment to set when publishing the file
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: The URL of the site where the file should be uploaded to
+
+`-f, --folder <folder>`
+: Site-relative or server-relative URL to the folder where the file should be uploaded
+
+`-p, --path <path>`
+: Local path to the file to upload
+
+`-c, --contentType [contentType]`
+: Content type name or ID to assign to the file
+
+`--checkOut [checkOut]`
+: If versioning is enabled, this will check out the file first if it exists, upload the file, then check it in again
+
+`--checkInComment [checkInComment]`
+: Comment to set when checking the file in
+
+`--approve [approve]`
+: Will automatically approve the uploaded file
+
+`--approveComment [approveComment]`
+: Comment to set when approving the file
+
+`--publish [publish]`
+: Will automatically publish the uploaded file
+
+`--publishComment [publishComment]`
+: Comment to set when publishing the file
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

@@ -13,7 +13,7 @@ describe('FN003003_CFG_bundles', () => {
   });
 
   it('has empty resolution', () => {
-    assert.equal(rule.resolution, '');
+    assert.strictEqual(rule.resolution, '');
   });
 
   it('doesn\'t return notification if bundles is already up-to-date', () => {
@@ -26,7 +26,7 @@ describe('FN003003_CFG_bundles', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notification if entries has to be converted to bundles', () => {
@@ -43,7 +43,7 @@ describe('FN003003_CFG_bundles', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 
   it('should correctly convert entries schema to bundle schema', () => {
@@ -64,10 +64,10 @@ describe('FN003003_CFG_bundles', () => {
     const resolution: any = JSON.parse(findings[0].occurrences[0].resolution);
     const bundle1: any = resolution.bundles["hello-world-application-customizer"];
 
-    assert.notEqual(bundle1, undefined, 'Bundle undefined');
-    assert.equal(bundle1.components[0].entrypoint, './lib/extensions/helloWorld/HelloWorldApplicationCustomizer.js', 'Invalid entrypoint');
-    assert.equal(bundle1.components[0].manifest, './src/extensions/helloWorld/HelloWorldApplicationCustomizer.manifest.json', 'Invalid manifest');
-    assert.equal(bundle1.components[0].outputPath, undefined, 'outputPath defined');
+    assert.notStrictEqual(bundle1, undefined, 'Bundle undefined');
+    assert.strictEqual(bundle1.components[0].entrypoint, './lib/extensions/helloWorld/HelloWorldApplicationCustomizer.js', 'Invalid entrypoint');
+    assert.strictEqual(bundle1.components[0].manifest, './src/extensions/helloWorld/HelloWorldApplicationCustomizer.manifest.json', 'Invalid manifest');
+    assert.strictEqual(bundle1.components[0].outputPath, undefined, 'outputPath defined');
   });
 
   it('doesn\'t return notification if no config.json', () => {
@@ -75,7 +75,7 @@ describe('FN003003_CFG_bundles', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if no entries', () => {
@@ -85,6 +85,6 @@ describe('FN003003_CFG_bundles', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

@@ -10,8 +10,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { ListItemInstanceCollection } from './ListItemInstanceCollection';
 import { ContextInfo } from '../../spo';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -196,10 +195,6 @@ class SpoListItemListCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -244,40 +239,6 @@ class SpoListItemListCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-  
-    ${chalk.grey('pageNumber')} is specified as a 0-based index. A value of ${chalk.grey('2')} returns the third
-    page of items.
-        
-  Examples:
-  
-    Get all items from a list named ${chalk.grey('Demo List')}
-      m365 ${this.name} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x
-
-    From a list named ${chalk.grey('Demo List')} get all items with title ${chalk.grey('Demo list item')}
-    using a CAML query
-      m365 ${this.name} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<View><Query><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></Query></View>"
-    
-    Get all items from a list with ID ${chalk.grey('935c13a0-cc53-4103-8b48-c1d0828eaa7f')} 
-      m365 ${this.name} --id 935c13a0-cc53-4103-8b48-c1d0828eaa7f --webUrl https://contoso.sharepoint.com/sites/project-x
-
-    Get all items from list named ${chalk.grey('Demo List')}. For each item, retrieve the value
-    of the ${chalk.grey('ID')}, ${chalk.grey('Title')} and ${chalk.grey('Modified')} fields
-      m365 ${this.name} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --fields "ID,Title,Modified"
-
-    From a list named ${chalk.grey('Demo List')} get all items with title ${chalk.grey('Demo list item')}
-    using an OData filter 
-      m365 ${this.name} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --filter "Title eq 'Demo list item'"
-
-    From a list named ${chalk.grey('Demo List')} get the third batch of 10 items
-      m365 ${this.name} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --pageSize 10 --pageNumber 2
-   `);
   }
 }
 

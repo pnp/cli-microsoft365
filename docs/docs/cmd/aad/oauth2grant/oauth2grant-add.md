@@ -10,16 +10,29 @@ m365 aad oauth2grant add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-i, --clientId <clientId>`|`objectId` of the service principal for which permissions should be granted
-`-r, --resourceId <resourceId>`|`objectId` of the AAD application to which permissions should be granted
-`-s, --scope <scope>`|Permissions to grant
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-i, --clientId <clientId>`
+: `objectId` of the service principal for which permissions should be granted
+
+`-r, --resourceId <resourceId>`
+: `objectId` of the AAD application to which permissions should be granted
+
+`-s, --scope <scope>`
+: Permissions to grant
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

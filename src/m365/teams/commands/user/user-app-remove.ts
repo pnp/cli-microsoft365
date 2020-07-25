@@ -4,8 +4,8 @@ import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandValidate } from '../../../../Command';
 import GraphCommand from '../../../base/GraphCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -48,7 +48,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
         .delete(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
 
           cb();
@@ -100,40 +100,12 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.appId) {
-        return 'Required parameter appId missing';
-      }
-
-      if (!args.options.userId) {
-        return 'Required parameter userId missing';
-      }
-
       if (!Utils.isValidGuid(args.options.userId)) {
         return `${args.options.userId} is not a valid GUID`;
       }
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently in preview
-    and is subject to change once the API reached general availability.
-
-    The ${chalk.grey(`appId`)} has to be the id of the app instance installed for the user.
-    Do not use the ID from the manifest of the zip app package or the id
-    from the Microsoft Teams App Catalog.
-
-  Examples:
-
-    Uninstall an app for the specified user
-      ${this.name} --appId YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY= --userId 2609af39-7775-4f94-a3dc-0dd67657e900
-`);
   }
 }
 

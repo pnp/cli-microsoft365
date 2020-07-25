@@ -7,11 +7,9 @@ import {
 } from '../../../Command';
 import AzmgmtCommand from '../../base/AzmgmtCommand';
 import Utils from '../../../Utils';
-import * as os from 'os';
 import * as path from 'path';
 import * as fs from 'fs';
-
-const vorpal: Vorpal = require('../../../vorpal-init');
+import { CommandInstance } from '../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -206,16 +204,7 @@ class FlowExportCommand extends AzmgmtCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-
       const lowerCaseFormat = args.options.format ? args.options.format.toLowerCase() : '';
-
-      if (!args.options.id) {
-        return 'Required option id missing';
-      }
-
-      if (!args.options.environment) {
-        return 'Required option environment missing';
-      }
 
       if (!Utils.isValidGuid(args.options.id)) {
         return `${args.options.id} is not a valid GUID`;
@@ -249,39 +238,6 @@ class FlowExportCommand extends AzmgmtCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.FLOW_EXPORT).helpInformation());
-    log(
-      `  Remarks:
-
-    ${chalk.yellow('Attention:')} This command is based on an API that is currently
-    in preview and is subject to change once the API reached general
-    availability.
-  
-    If the environment with the name you specified doesn't exist, you will get
-    the ${chalk.grey('Access to the environment \'xyz\' is denied.')} error.
-
-    If the Microsoft Flow with the id you specified doesn't exist, you will
-    get the ${chalk.grey(`The caller with object id \'abc\' does not have permission${os.EOL}` +
-        '    for connection \'xyz\' under Api \'shared_logicflows\'.')} error.
-   
-  Examples:
-  
-    Export the specified Microsoft Flow as a ZIP file
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d
-
-    Export the specified Microsoft Flow as a JSON file
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --format json
-
-    Export the specified Microsoft Flow as a ZIP file with a package display name of 'My flow name'
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --packageDisplayName 'My flow name'
-
-    Export the specified Microsoft Flow as a ZIP file named 'MyFlow.zip' saved to the current directory
-      ${this.getCommandName()} --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --path './MyFlow.zip'
-`);
   }
 }
 

@@ -7,8 +7,7 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import { Feature } from './Feature';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -78,10 +77,6 @@ class SpoFeatureListCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required parameter url missing';
-      }
-
       if (args.options.scope) {
         if (args.options.scope !== 'Site' &&
           args.options.scope !== 'Web') {
@@ -91,19 +86,6 @@ class SpoFeatureListCommand extends SpoCommand {
 
       return SpoCommand.isValidSharePointUrl(args.options.url);
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    log(vorpal.find(commands.FEATURE_LIST).helpInformation());
-    log(
-      `  Examples:
-  
-    Return details about Features activated in the specified site collection
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test --scope Site
-
-    Return details about Features activated in the specified site
-      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test --scope Web
-      `);
   }
 }
 

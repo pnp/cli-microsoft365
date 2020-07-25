@@ -9,7 +9,6 @@ import request from '../../../../request';
 import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport';
 
 describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
 
@@ -20,7 +19,6 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -36,7 +34,6 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -50,45 +47,11 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('gets details about Microsoft Teams user activity by user for the given date', (done) => {
@@ -106,9 +69,9 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
 
     cmdInstance.action({ options: { debug: false, date: '2019-07-13' } }, () => {
       try {
-        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(date=2019-07-13)");
-        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(date=2019-07-13)");
+        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.strictEqual(requestStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {

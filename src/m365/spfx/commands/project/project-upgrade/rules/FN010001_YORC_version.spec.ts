@@ -17,7 +17,7 @@ describe('FN010001_YORC_version', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notification if version is already up-to-date', () => {
@@ -30,6 +30,6 @@ describe('FN010001_YORC_version', () => {
       }
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });

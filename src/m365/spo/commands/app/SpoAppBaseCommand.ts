@@ -1,6 +1,7 @@
 import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;

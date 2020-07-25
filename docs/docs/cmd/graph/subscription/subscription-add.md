@@ -10,18 +10,35 @@ m365 graph subscription add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-r, --resource <resource>`|The resource that will be monitored for changes
-`-c, --changeType <changeType>`|The type of change in the subscribed resource that will raise a notification. The supported values are: `created`, `updated`, `deleted`. Multiple values can be combined using a comma-separated list
-`-u, --notificationUrl <notificationUrl>`|The URL of the endpoint that will receive the notifications. This URL must use the HTTPS protocol
-`-e, --expirationDateTime [expirationDateTime]`|The date and time when the webhook subscription expires. The time is in UTC, and can be an amount of time from subscription creation that varies for the resource subscribed to. If not specified, the maximum allowed expiration for the specified resource will be used
-`-s, --clientState [clientState]`|The value of the clientState property sent by the service in each notification. The maximum length is 128 characters
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-r, --resource <resource>`
+: The resource that will be monitored for changes
+
+`-c, --changeType <changeType>`
+: The type of change in the subscribed resource that will raise a notification. The supported values are: `created`, `updated`, `deleted`. Multiple values can be combined using a comma-separated list
+
+`-u, --notificationUrl <notificationUrl>`
+: The URL of the endpoint that will receive the notifications. This URL must use the HTTPS protocol
+
+`-e, --expirationDateTime [expirationDateTime]`
+: The date and time when the webhook subscription expires. The time is in UTC, and can be an amount of time from subscription creation that varies for the resource subscribed to. If not specified, the maximum allowed expiration for the specified resource will be used
+
+`-s, --clientState [clientState]`
+: The value of the clientState property sent by the service in each notification. The maximum length is 128 characters
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

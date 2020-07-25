@@ -10,17 +10,32 @@ m365 teams channel remove [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-c, --channelId [channelId]`|The ID of the channel to remove
-`-n, --channelName [channelName]`|The name of the channel to remove. Specify channelId or channelName but not both
-`-i, --teamId <teamId>`|The ID of the team to which the channel to remove belongs
-`--confirm`|Don't prompt for confirmation
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-c, --channelId [channelId]`
+: The ID of the channel to remove
+
+`-n, --channelName [channelName]`
+: The name of the channel to remove. Specify channelId or channelName but not both
+
+`-i, --teamId <teamId>`
+: The ID of the team to which the channel to remove belongs
+
+`--confirm`
+: Don't prompt for confirmation
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

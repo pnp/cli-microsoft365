@@ -24,7 +24,7 @@ describe('FN014005_CODE_settingsfile', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns notifications if vscode settings file is absent', () => {
@@ -33,6 +33,6 @@ describe('FN014005_CODE_settingsfile', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 1);
+    assert.strictEqual(findings.length, 1);
   });
 });

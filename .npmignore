@@ -1,8 +1,11 @@
 .circleci
 .nyc_output
 .vscode
+.github
+.c8rc.json
 coverage
-docs
+docs/**
+!docs/docs/cmd/**
 node_modules
 scripts/*
 !scripts/Register-CLIM365Completion.ps1

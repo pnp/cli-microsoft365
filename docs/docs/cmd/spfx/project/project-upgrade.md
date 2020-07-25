@@ -10,16 +10,32 @@ m365 spfx project upgrade [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-v, --toVersion [toVersion]`|The version of SharePoint Framework to which upgrade the project
-`--packageManager [packageManager]`|The package manager you use. Supported managers `npm,pnpm,yarn`. Default `npm`
-`--shell [shell]`|The shell you use. Supported shells `bash,powershell,cmd`. Default `bash`
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text,md,tour`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-v, --toVersion [toVersion]`
+: The version of SharePoint Framework to which upgrade the project
+
+`--packageManager [packageManager]`
+: The package manager you use. Supported managers `npm,pnpm,yarn`. Default `npm`
+
+`--shell [shell]`
+: The shell you use. Supported shells `bash,powershell,cmd`. Default `bash`
+
+`-f, --outputFile [outputFile]`
+: Path to the file where the upgrade report should be stored in. Ignored when `output` is `tour`
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text,md,tour`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 !!! important
     Run this command in the folder where the project that you want to upgrade is located. This command doesn't change your project files.

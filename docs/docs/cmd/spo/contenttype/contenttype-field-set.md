@@ -10,18 +10,35 @@ m365 spo contenttype field set [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|Absolute URL of the site where the content type is located
-`-c, --contentTypeId <contentTypeId>`|ID of the content type on which the field reference should be set
-`-f, --fieldId <fieldId>`|ID of the field to which the reference should be set
-`-r, --required [required]`|Set to `true`, if the field should be required or to `false` if it should be optional
-`--hidden [hidden]`|Set to `true`, if the field should be hidden or to `false` if it should be visible
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: Absolute URL of the site where the content type is located
+
+`-c, --contentTypeId <contentTypeId>`
+: ID of the content type on which the field reference should be set
+
+`-f, --fieldId <fieldId>`
+: ID of the field to which the reference should be set
+
+`-r, --required [required]`
+: Set to `true`, if the field should be required or to `false` if it should be optional
+
+`--hidden [hidden]`
+: Set to `true`, if the field should be hidden or to `false` if it should be visible
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

@@ -10,19 +10,38 @@ m365 spo listitem set [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|URL of the site where the item should be updated
-`-i, --id <id>`|ID of the list item to update.
-`-l, --listId [listId]`|ID of the list where the item should be updated. Specify `listId` or `listTitle` but not both
-`-t, --listTitle [listTitle]`|Title of the list where the item should be updated. Specify `listId` or `listTitle` but not both
-`-c, --contentType [contentType]`|The name or the ID of the content type to associate with the updated item
-`-s, --systemUpdate`|Update the item without updating the modified date and modified by fields
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: URL of the site where the item should be updated
+
+`-i, --id <id>`
+: ID of the list item to update.
+
+`-l, --listId [listId]`
+: ID of the list where the item should be updated. Specify `listId` or `listTitle` but not both
+
+`-t, --listTitle [listTitle]`
+: Title of the list where the item should be updated. Specify `listId` or `listTitle` but not both
+
+`-c, --contentType [contentType]`
+: The name or the ID of the content type to associate with the updated item
+
+`-s, --systemUpdate`
+: Update the item without updating the modified date and modified by fields
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

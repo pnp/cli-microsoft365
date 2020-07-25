@@ -11,7 +11,6 @@ import config from '../../../../config';
 import { IdentityResponse } from '../../ClientSvc';
 
 describe(commands.PROPERTYBAG_REMOVE, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -91,7 +90,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -112,7 +110,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post,
       (command as any).removeProperty
     ]);
@@ -127,11 +124,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.PROPERTYBAG_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.PROPERTYBAG_REMOVE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('should remove property without prompting with confirmation argument', (done) => {
@@ -396,7 +393,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -417,7 +414,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
         done();
       }
       catch (e) {
@@ -438,7 +435,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
         done();
       }
       catch (e) {
@@ -459,7 +456,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
         done();
       }
       catch (e) {
@@ -480,7 +477,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -500,7 +497,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
         done();
       }
       catch (e) {
@@ -522,7 +519,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
         assert(removePropertySpy.calledOnce === true);
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('removeProperty promise error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('removeProperty promise error')));
         done();
       }
       catch (e) {
@@ -543,7 +540,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('removeProperty error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('removeProperty error')));
         done();
       }
       catch (e) {
@@ -564,7 +561,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
     cmdInstance.action({ options: options }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
       }
       catch (e) {
@@ -602,11 +599,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     assert(options.length > 0);
   });
 
-  it('fails validation if the url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, "Missing required option url");
-  });
-
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = (command.validate() as CommandValidate)({
       options:
@@ -615,7 +607,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
           key: 'key1'
         }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the key option is not a valid SharePoint site URL', () => {
@@ -625,7 +617,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
           webUrl: 'https://contoso.sharepoint.com'
         }
     });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the url option specified', () => {
@@ -636,7 +628,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
           key: 'key1'
         }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when the url and folder options specified', () => {
@@ -648,7 +640,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
           folder: '/'
         }
     });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('doesn\'t fail validation if the optional folder option not specified', () => {
@@ -660,40 +652,6 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
             key: 'key1'
           }
       });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.PROPERTYBAG_REMOVE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

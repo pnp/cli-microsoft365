@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import request from '../../../../request';
 
 describe(commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
 
@@ -20,7 +19,6 @@ describe(commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -36,7 +34,6 @@ describe(commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -50,11 +47,11 @@ describe(commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL), true);
+    assert.strictEqual(command.name.startsWith(commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('gets the report for the last week', (done) => {
@@ -70,26 +67,14 @@ describe(commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL, () => {
 
     cmdInstance.action({ options: { debug: false, period: 'D7' } }, () => {
       try {
-        assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getEmailAppUsageUserDetail(period='D7')");
-        assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert.equal(requestStub.lastCall.args[0].json, true);
+        assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getEmailAppUsageUserDetail(period='D7')");
+        assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
+        assert.strictEqual(requestStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL));
   });
 });

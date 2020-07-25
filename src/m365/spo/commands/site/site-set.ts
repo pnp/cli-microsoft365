@@ -18,8 +18,8 @@ import { Options as AadO365GroupSetCommandOptions } from '../../../aad/commands/
 import * as spoSiteDesignApplyCommand from '../sitedesign/sitedesign-apply';
 import { Options as SpoSiteDesignApplyCommandOptions } from '../sitedesign/sitedesign-apply';
 import { SharingCapabilities } from '../site/SharingCapabilities';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance, Cli } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -87,7 +87,7 @@ class SpoSiteSetCommand extends SpoCommand {
       .then((): Promise<void> => this.setSharingCapabilities(cmd, args))
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -118,7 +118,7 @@ class SpoSiteSetCommand extends SpoCommand {
       debug: this.debug,
       verbose: this.verbose
     };
-    return Utils.executeCommand(spoSiteClassicSetCommand as Command, options, cmd);
+    return Cli.executeCommand((spoSiteClassicSetCommand as Command).name, spoSiteClassicSetCommand as Command, { options: { ...options, _: [] } });
   }
 
   private updateGroupifiedSite(cmd: CommandInstance, args: CommandArgs): Promise<void> {
@@ -167,7 +167,7 @@ class SpoSiteSetCommand extends SpoCommand {
           debug: this.debug,
           verbose: this.verbose
         };
-        promises.push(Utils.executeCommand(aadO365GroupSetCommand as Command, commandOptions, cmd));
+        promises.push(Cli.executeCommand((aadO365GroupSetCommand as Command).name, aadO365GroupSetCommand as Command, { options: { ...commandOptions, _: [] } }));
       }
 
       promises.push(this.setGroupifiedSiteOwners(cmd, args));
@@ -297,7 +297,7 @@ class SpoSiteSetCommand extends SpoCommand {
       debug: this.debug,
       verbose: this.verbose
     };
-    return Utils.executeCommand(spoSiteDesignApplyCommand as Command, options, cmd);
+    return Cli.executeCommand((spoSiteDesignApplyCommand as Command).name, spoSiteDesignApplyCommand as Command, { options: { ...options, _: [] } });
   }
 
   private setSharingCapabilities(cmd: CommandInstance, args: CommandArgs): Promise<void> {
@@ -443,10 +443,6 @@ class SpoSiteSetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Required parameter url missing';
-      }
-
       const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
       if (isValidSharePointUrl !== true) {
         return isValidSharePointUrl;
@@ -501,57 +497,6 @@ class SpoSiteSetCommand extends SpoCommand {
     return {
       string: ['classification']
     }
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.SITE_SET).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-      
-  Remarks:
-
-    If the specified ${chalk.grey('url')} doesn't refer to an existing site collection,
-    you will get a ${chalk.grey('404 - "404 FILE NOT FOUND"')} error.
-
-    The ${chalk.grey('isPublic')} property can be set only on groupified site
-    collections. If you try to set it on a site collection without a group, you
-    will get an error.
-
-    When setting owners, the specified owners will be added to the already
-    configured owners. Existing owners will not be removed.
-
-  Examples:
-  
-    Update site collection's classification
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --classification MBI
-
-    Reset site collection's classification.
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --classification
-
-    Disable using Microsoft Flow on the site collection
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --disableFlows true
-
-    Update the visibility of the Microsoft 365 group behind the specified
-    groupified site collection to public
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --isPublic true
-
-    Update site collection's owners
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --owners "john@contoso.onmicrosoft.com,steve@contoso.onmicrosoft.com"
-
-    Allow sharing files in the site collection with guests
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --shareByEmailEnabled true
-
-    Apply the specified site ID to the site collection
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --siteDesignId "eb2f31da-9461-4fbf-9ea1-9959b134b89e"
-
-    Update site collection's title
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --title "My new site"
-
-    Restrict external sharing to already available external users only
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --sharingCapability ExternalUserSharingOnly
-`);
   }
 }
 

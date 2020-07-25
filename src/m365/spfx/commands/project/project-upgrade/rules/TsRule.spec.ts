@@ -31,14 +31,14 @@ describe('TsRule', () => {
   })
 
   it('returns no resolution by default', () => {
-    assert.equal(rule.resolution, '');
+    assert.strictEqual(rule.resolution, '');
   });
 
   it('returns ts resolutionType', () => {
-    assert.equal(rule.resolutionType, 'ts');
+    assert.strictEqual(rule.resolutionType, 'ts');
   });
 
   it('returns no file name by default', () => {
-    assert.equal(rule.file, '');
+    assert.strictEqual(rule.file, '');
   });
 });

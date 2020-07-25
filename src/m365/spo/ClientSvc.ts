@@ -3,6 +3,7 @@ import Utils from '../../Utils';
 import config from '../../config';
 import { ClientSvcResponse, ClientSvcResponseContents } from './spo';
 import { BasePermissions } from './base-permissions';
+import { CommandInstance } from '../../cli';
 
 export interface IdentityResponse {
   objectIdentity: string;

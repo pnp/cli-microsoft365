@@ -10,17 +10,32 @@ m365 spo list remove [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|URL of the site where the list to remove is located
-`-i, --id [id]`|The ID of the list to remove. Specify either `id` or `title` but not both
-`-t, --title [title]`|Title of the list to remove. Specify either `id` or `title` but not both
-`--confirm`|Don't prompt for confirming removing the list
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: URL of the site where the list to remove is located
+
+`-i, --id [id]`
+: The ID of the list to remove. Specify either `id` or `title` but not both
+
+`-t, --title [title]`
+: Title of the list to remove. Specify either `id` or `title` but not both
+
+`--confirm`
+: Don't prompt for confirming removing the list
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

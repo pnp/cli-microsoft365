@@ -10,15 +10,26 @@ m365 yammer group user remove [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`--id <id>`|The ID of the Yammer group
-`--userId [userId]`|ID of the user to remove from the group. If not specified, removes the current user
-`--confirm`|Don't prompt for confirmation before removing the user from the group
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`--id <id>`
+: The ID of the Yammer group
+
+`--userId [userId]`
+: ID of the user to remove from the group. If not specified, removes the current user
+
+`--confirm`
+: Don't prompt for confirmation before removing the user from the group
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

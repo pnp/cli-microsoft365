@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
 describe(commands.STORAGEENTITY_LIST, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -21,7 +20,6 @@ describe(commands.STORAGEENTITY_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -37,7 +35,6 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.get
     ]);
   });
@@ -51,11 +48,11 @@ describe(commands.STORAGEENTITY_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.STORAGEENTITY_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.STORAGEENTITY_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('retrieves the list of configured tenant properties', (done) => {
@@ -119,7 +116,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     });
     cmdInstance.action({ options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
-        assert.equal(log.length, 0);
+        assert.strictEqual(log.length, 0);
         done();
       }
       catch (e) {
@@ -175,7 +172,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     });
     cmdInstance.action({ options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
-        assert.equal(log.length, 0);
+        assert.strictEqual(log.length, 0);
         done();
       }
       catch (e) {
@@ -231,7 +228,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
     });
     cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Unexpected token a in JSON at position 0')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unexpected token a in JSON at position 0')));
         done();
       }
       catch (e) {
@@ -271,57 +268,23 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('accepts valid SharePoint Online app catalog URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('accepts valid SharePoint Online site URL', () => {
     const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online URL', () => {
     const url = 'http://contoso';
     const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: url } });
-    assert.equal(actual, `${url} is not a valid SharePoint Online site URL`);
+    assert.strictEqual(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
   it('fails validation when no SharePoint Online app catalog URL specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, 'Missing required option appCatalogUrl');
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.STORAGEENTITY_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, 'Missing required option appCatalogUrl');
   });
 
   it('handles promise rejection', (done) => {
@@ -331,7 +294,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
       options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('error')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error')));
         done();
       }
       catch (e) {

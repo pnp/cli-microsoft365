@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import AadCommand from './AadCommand';
+import { CommandInstance } from '../../cli';
 
 class MockCommand extends AadCommand {
   public get name(): string {

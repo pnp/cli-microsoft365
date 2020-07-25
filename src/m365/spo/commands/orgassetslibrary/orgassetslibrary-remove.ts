@@ -6,13 +6,12 @@ import request from '../../../../request';
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandValidate,
   CommandOption,
   CommandError
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -67,7 +66,7 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
             }
 
             if (this.verbose) {
-              cmd.log(vorpal.chalk.green('DONE'));
+              cmd.log(chalk.green('DONE'));
             }
           }
           cb();
@@ -94,16 +93,6 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
     }
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.libraryUrl) {
-        return 'Required parameter libraryUrl missing';
-      }
-
-      return true
-    };
-  }
-
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -118,20 +107,6 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.ORGASSETSLIBRARY_REMOVE).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-
-  Examples:
-
-    Removes organization assets library without confirmation
-      m365 ${this.name} --libraryUrl "/sites/branding/assets" --confirm
-  `);
   }
 }
 

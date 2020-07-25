@@ -10,18 +10,35 @@ m365 spo file copy [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|The URL of the site where the file is located
-`-s, --sourceUrl <sourceUrl>`|Site-relative URL of the file to copy
-`-t, --targetUrl <targetUrl>`|Server-relative URL where to copy the file
-`--deleteIfAlreadyExists`|If a file already exists at the targetUrl, it will be moved to the recycle bin. If omitted, the copy operation will be canceled if the file already exists at the targetUrl location
-`--allowSchemaMismatch`|Ignores any missing fields in the target document library and copies the file anyway
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: The URL of the site where the file is located
+
+`-s, --sourceUrl <sourceUrl>`
+: Site-relative URL of the file to copy
+
+`-t, --targetUrl <targetUrl>`
+: Server-relative URL where to copy the file
+
+`--deleteIfAlreadyExists`
+: If a file already exists at the targetUrl, it will be moved to the recycle bin. If omitted, the copy operation will be canceled if the file already exists at the targetUrl location
+
+`--allowSchemaMismatch`
+: Ignores any missing fields in the target document library and copies the file anyway
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

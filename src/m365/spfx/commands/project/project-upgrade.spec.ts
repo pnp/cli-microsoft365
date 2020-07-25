@@ -12,7 +12,6 @@ import { Project, Manifest, VsCode } from './model';
 import { Finding } from './project-upgrade/Finding';
 
 describe(commands.PROJECT_UPGRADE, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
   let trackEvent: any;
@@ -32,7 +31,6 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -54,7 +52,6 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       (command as any).getProjectRoot,
       (command as any).getProjectVersion,
       fs.existsSync,
@@ -73,11 +70,11 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.PROJECT_UPGRADE), true);
+    assert.strictEqual(command.name.startsWith(commands.PROJECT_UPGRADE), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('calls telemetry', () => {
@@ -90,7 +87,7 @@ describe(commands.PROJECT_UPGRADE, () => {
   it('logs correct telemetry event', () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, () => {
-      assert.equal(telemetry.name, commands.PROJECT_UPGRADE);
+      assert.strictEqual(telemetry.name, commands.PROJECT_UPGRADE);
     });
   });
 
@@ -99,7 +96,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
     });
   });
 
@@ -115,14 +112,14 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
     });
   });
 
   it('shows error if the specified spfx version is not supported by the CLI', () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '0.0.1' } }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`CLI for Microsoft 365 doesn't support upgrading SharePoint Framework projects to version 0.0.1. Supported versions are ${(command as any).supportedVersions.join(', ')}`, 2)));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`CLI for Microsoft 365 doesn't support upgrading SharePoint Framework projects to version 0.0.1. Supported versions are ${(command as any).supportedVersions.join(', ')}`, 2)));
     });
   });
 
@@ -332,7 +329,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, 3)));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, 3)));
     });
   });
 
@@ -418,7 +415,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: {} }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`CLI for Microsoft 365 doesn't support upgrading projects build on SharePoint Framework v0.0.1`, 4)));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`CLI for Microsoft 365 doesn't support upgrading projects build on SharePoint Framework v0.0.1`, 4)));
     });
   });
 
@@ -427,7 +424,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0' } }, (err?: any) => {
-      assert.equal(typeof(err), 'undefined', 'Returns error');
+      assert.strictEqual(typeof(err), 'undefined', 'Returns error');
       assert(log.indexOf(`Project doesn't need to be upgraded`) > -1, `Doesn't return info message`);
     });
   });
@@ -437,36 +434,36 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
-      assert.equal(JSON.stringify(err), JSON.stringify(new CommandError(`You cannot downgrade a project`, 5)));
+      assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`You cannot downgrade a project`, 5)));
     });
   });
 
   it('loads config.json when available', () => {
-    assert.notEqual(typeof (project141webPartNoLib.configJson), 'undefined');
+    assert.notStrictEqual(typeof (project141webPartNoLib.configJson), 'undefined');
   });
 
   it('loads copy-assets.json when available', () => {
-    assert.notEqual(typeof (project141webPartNoLib.copyAssetsJson), 'undefined');
+    assert.notStrictEqual(typeof (project141webPartNoLib.copyAssetsJson), 'undefined');
   });
 
   it('loads deploy-azure-storage.json when available', () => {
-    assert.notEqual(typeof (project141webPartNoLib.deployAzureStorageJson), 'undefined');
+    assert.notStrictEqual(typeof (project141webPartNoLib.deployAzureStorageJson), 'undefined');
   });
 
   it('loads package-solution.json when available', () => {
-    assert.notEqual(typeof (project141webPartNoLib.packageSolutionJson), 'undefined');
+    assert.notStrictEqual(typeof (project141webPartNoLib.packageSolutionJson), 'undefined');
   });
 
   it('loads serve.json when available', () => {
-    assert.notEqual(typeof (project141webPartNoLib.serveJson), 'undefined');
+    assert.notStrictEqual(typeof (project141webPartNoLib.serveJson), 'undefined');
   });
 
   it('loads tslint.json when available', () => {
-    assert.notEqual(typeof (project141webPartNoLib.tsLintJson), 'undefined');
+    assert.notStrictEqual(typeof (project141webPartNoLib.tsLintJson), 'undefined');
   });
 
   it('loads write-manifests.json when available', () => {
-    assert.notEqual(typeof (project141webPartNoLib.writeManifestsJson), 'undefined');
+    assert.notStrictEqual(typeof (project141webPartNoLib.writeManifestsJson), 'undefined');
   });
 
   it('doesn\'t fail if package.json not available', () => {
@@ -482,7 +479,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.packageJson), 'undefined');
+    assert.strictEqual(typeof (project.packageJson), 'undefined');
   });
 
   it('doesn\'t fail if tsconfig.json not available', () => {
@@ -498,7 +495,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.tsConfigJson), 'undefined');
+    assert.strictEqual(typeof (project.tsConfigJson), 'undefined');
   });
 
   it('doesn\'t fail if config.json is empty', () => {
@@ -514,7 +511,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.configJson), 'undefined');
+    assert.strictEqual(typeof (project.configJson), 'undefined');
   });
 
   it('doesn\'t fail if copy-assets.json is empty', () => {
@@ -530,7 +527,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.copyAssetsJson), 'undefined');
+    assert.strictEqual(typeof (project.copyAssetsJson), 'undefined');
   });
 
   it('doesn\'t fail if deploy-azure-storage.json is empty', () => {
@@ -546,7 +543,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.deployAzureStorageJson), 'undefined');
+    assert.strictEqual(typeof (project.deployAzureStorageJson), 'undefined');
   });
 
   it('doesn\'t fail if package.json is empty', () => {
@@ -562,7 +559,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.packageJson), 'undefined');
+    assert.strictEqual(typeof (project.packageJson), 'undefined');
   });
 
   it('doesn\'t fail if package-solution.json is empty', () => {
@@ -578,7 +575,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.packageSolutionJson), 'undefined');
+    assert.strictEqual(typeof (project.packageSolutionJson), 'undefined');
   });
 
   it('doesn\'t fail if serve.json is empty', () => {
@@ -594,7 +591,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.serveJson), 'undefined');
+    assert.strictEqual(typeof (project.serveJson), 'undefined');
   });
 
   it('doesn\'t fail if tslint.json is empty', () => {
@@ -619,7 +616,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.tsLintJson), 'undefined');
+    assert.strictEqual(typeof (project.tsLintJson), 'undefined');
   });
 
   it('doesn\'t fail if write-manifests.json is empty', () => {
@@ -635,7 +632,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.writeManifestsJson), 'undefined');
+    assert.strictEqual(typeof (project.writeManifestsJson), 'undefined');
   });
 
   it('doesn\'t fail if .yo-rc.json is empty', () => {
@@ -651,7 +648,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof (project.yoRcJson), 'undefined');
+    assert.strictEqual(typeof (project.yoRcJson), 'undefined');
   });
 
   it('doesn\'t fail if extensions.json is empty', () => {
@@ -667,11 +664,11 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof ((project.vsCode as VsCode).extensionsJson), 'undefined');
+    assert.strictEqual(typeof ((project.vsCode as VsCode).extensionsJson), 'undefined');
   });
 
   it('loads manifests when available', () => {
-    assert.equal((project141webPartNoLib.manifests as Manifest[]).length, 1);
+    assert.strictEqual((project141webPartNoLib.manifests as Manifest[]).length, 1);
   });
 
   it('doesn\'t fail if vscode settings are not available', () => {
@@ -687,7 +684,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
+    assert.strictEqual(typeof ((project.vsCode) as VsCode).settingsJson, 'undefined');
   });
 
   it('doesn\'t fail if vscode settings are empty', () => {
@@ -703,7 +700,7 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof ((project.vsCode as any).settingsJson), 'undefined');
+    assert.strictEqual(typeof ((project.vsCode as any).settingsJson), 'undefined');
   });
 
   it('doesn\'t fail if vscode launch info is empty', () => {
@@ -719,68 +716,68 @@ describe(commands.PROJECT_UPGRADE, () => {
 
     const getProject = (command as any).getProject;
     const project: Project = getProject(projectPath);
-    assert.equal(typeof ((project.vsCode as any).launch), 'undefined');
+    assert.strictEqual(typeof ((project.vsCode as any).launch), 'undefined');
   });
 
   //#region npm
   it(`doesn't return any dependencies from command npm for npm package manager`, () => {
     (command as any).mapPackageManagerCommand('npm', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns 1 exact dependency to be installed for npm i -SE for npm package manager`, () => {
     (command as any).mapPackageManagerCommand('npm i -SE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns 1 exact dev dependency to be installed for npm i -DE for npm package manager`, () => {
     (command as any).mapPackageManagerCommand('npm i -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 1, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 1, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns 1 dependency to uninstall for npm un -S for npm package manager`, () => {
     (command as any).mapPackageManagerCommand('npm un -S package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 1, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 1, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns 1 dev dependency to uninstall for npm un -D for npm package manager`, () => {
     (command as any).mapPackageManagerCommand('npm un -D package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 1, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 1, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns command to install dependency for 1 dep for npm package manager`, () => {
     const commands: string[] = (command as any).reducePackageManagerCommand(['package'], [], [], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['npm i -SE package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['npm i -SE package']));
   });
 
   it(`returns command to install dev dependency for 1 dev dep for npm package manager`, () => {
     const commands: string[] = (command as any).reducePackageManagerCommand([], ['package'], [], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['npm i -DE package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['npm i -DE package']));
   });
 
   it(`returns command to uninstall dependency for 1 dep for npm package manager`, () => {
     const commands: string[] = (command as any).reducePackageManagerCommand([], [], ['package'], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['npm un -S package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['npm un -S package']));
   });
 
   it(`returns command to uninstall dev dependency for 1 dev dep for npm package manager`, () => {
     const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], ['package']);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['npm un -D package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['npm un -D package']));
   });
   //#endregion
 
@@ -788,61 +785,61 @@ describe(commands.PROJECT_UPGRADE, () => {
   it(`doesn't return any dependencies from command pnpm for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
     (command as any).mapPackageManagerCommand('pnpm', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns 1 exact dependency to be installed for pnpm i -E for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
     (command as any).mapPackageManagerCommand('pnpm i -E package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns 1 exact dev dependency to be installed for pnpm i -DE for npm package manager`, () => {
     (command as any).packageManager = 'pnpm';
     (command as any).mapPackageManagerCommand('pnpm i -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 1, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 1, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns 1 dev dependency to uninstall for pnpm un for npm package manager`, () => {
     (command as any).packageManager = 'pnpm';
     (command as any).mapPackageManagerCommand('pnpm un package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 1, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 1, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns command to install dependency for 1 dep for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
     const commands: string[] = (command as any).reducePackageManagerCommand(['package'], [], [], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['pnpm i -E package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm i -E package']));
   });
 
   it(`returns command to install dev dependency for 1 dev dep for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
     const commands: string[] = (command as any).reducePackageManagerCommand([], ['package'], [], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['pnpm i -DE package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm i -DE package']));
   });
 
   it(`returns command to uninstall dependency for 1 dep for pnpm package manager`, () => {
     (command as any).packageManager = 'pnpm';
     const commands: string[] = (command as any).reducePackageManagerCommand([], [], ['package'], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['pnpm un package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm un package']));
   });
 
   it(`returns command to uninstall dev dependency for 1 dev dep for npm package manager`, () => {
     (command as any).packageManager = 'pnpm';
     const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], ['package']);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['pnpm un package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['pnpm un package']));
   });
   //#endregion
 
@@ -850,67 +847,67 @@ describe(commands.PROJECT_UPGRADE, () => {
   it(`doesn't return any dependencies from command yarn for yarn package manager`, () => {
     (command as any).packageManager = 'yarn';
     (command as any).mapPackageManagerCommand('yarn', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns 1 exact dependency to be installed for yarn add -E for pnpm package manager`, () => {
     (command as any).packageManager = 'yarn';
     (command as any).mapPackageManagerCommand('yarn add -E package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 1, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns 1 exact dev dependency to be installed for yarn add -DE for npm package manager`, () => {
     (command as any).packageManager = 'yarn';
     (command as any).mapPackageManagerCommand('yarn add -DE package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 1, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 1, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 0, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns 1 dev dependency to uninstall for yarn un for npm package manager`, () => {
     (command as any).packageManager = 'yarn';
     (command as any).mapPackageManagerCommand('yarn remove package', packagesDevExact, packagesDepExact, packagesDepUn, packagesDevUn);
-    assert.equal(packagesDevExact.length, 0, 'Incorrect number of deps to install');
-    assert.equal(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
-    assert.equal(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
-    assert.equal(packagesDevUn.length, 1, 'Incorrect number of dev deps to uninstall');
+    assert.strictEqual(packagesDevExact.length, 0, 'Incorrect number of deps to install');
+    assert.strictEqual(packagesDepExact.length, 0, 'Incorrect number of dev deps to install');
+    assert.strictEqual(packagesDepUn.length, 0, 'Incorrect number of deps to uninstall');
+    assert.strictEqual(packagesDevUn.length, 1, 'Incorrect number of dev deps to uninstall');
   });
 
   it(`returns command to install dependency for 1 dep for yarn package manager`, () => {
     (command as any).packageManager = 'yarn';
     const commands: string[] = (command as any).reducePackageManagerCommand(['package'], [], [], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['yarn add -E package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['yarn add -E package']));
   });
 
   it(`returns command to install dev dependency for 1 dev dep for yarn package manager`, () => {
     (command as any).packageManager = 'yarn';
     const commands: string[] = (command as any).reducePackageManagerCommand([], ['package'], [], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['yarn add -DE package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['yarn add -DE package']));
   });
 
   it(`returns command to uninstall dependency for 1 dep for yarn package manager`, () => {
     (command as any).packageManager = 'yarn';
     const commands: string[] = (command as any).reducePackageManagerCommand([], [], ['package'], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['yarn remove package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['yarn remove package']));
   });
 
   it(`returns command to uninstall dev dependency for 1 dev dep for yarn package manager`, () => {
     (command as any).packageManager = 'yarn';
     const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], ['package']);
-    assert.equal(JSON.stringify(commands), JSON.stringify(['yarn remove package']));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify(['yarn remove package']));
   });
   //#endregion
 
   it(`returns no commands to run when no dependencies found`, () => {
     const commands: string[] = (command as any).reducePackageManagerCommand([], [], [], []);
-    assert.equal(JSON.stringify(commands), JSON.stringify([]));
+    assert.strictEqual(JSON.stringify(commands), JSON.stringify([]));
   });
 
   it('shows error when a upgrade rule failed', () => {
@@ -931,7 +928,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 3);
+      assert.strictEqual(findings.length, 3);
     });
   });
 
@@ -941,7 +938,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 3);
+      assert.strictEqual(findings.length, 3);
     });
   });
 
@@ -951,7 +948,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 3);
+      assert.strictEqual(findings.length, 3);
     });
   });
 
@@ -961,7 +958,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 3);
+      assert.strictEqual(findings.length, 3);
     });
   });
   //#endregion
@@ -972,7 +969,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 2);
+      assert.strictEqual(findings.length, 2);
     });
   });
 
@@ -981,7 +978,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 2);
+      assert.strictEqual(findings.length, 2);
     });
   });
 
@@ -990,7 +987,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 5);
+      assert.strictEqual(findings.length, 5);
     });
   });
 
@@ -999,7 +996,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.0.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 2);
+      assert.strictEqual(findings.length, 2);
     });
   });
   //#endregion
@@ -1011,7 +1008,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 16);
+      assert.strictEqual(findings.length, 16);
     });
   });
 
@@ -1021,7 +1018,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 23);
+      assert.strictEqual(findings.length, 23);
     });
   });
 
@@ -1031,7 +1028,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 16);
+      assert.strictEqual(findings.length, 16);
     });
   });
 
@@ -1041,7 +1038,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 22);
+      assert.strictEqual(findings.length, 22);
     });
   });
   //#endregion
@@ -1053,7 +1050,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 3);
+      assert.strictEqual(findings.length, 3);
     });
   });
 
@@ -1063,7 +1060,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 3);
+      assert.strictEqual(findings.length, 3);
     });
   });
 
@@ -1073,7 +1070,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 6);
+      assert.strictEqual(findings.length, 6);
     });
   });
 
@@ -1083,7 +1080,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 5);
+      assert.strictEqual(findings.length, 5);
     });
   });
 
@@ -1093,7 +1090,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 5);
+      assert.strictEqual(findings.length, 5);
     });
   });
 
@@ -1103,7 +1100,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 5);
+      assert.strictEqual(findings.length, 5);
     });
   });
   //#endregion
@@ -1115,7 +1112,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 4);
+      assert.strictEqual(findings.length, 4);
     });
   });
 
@@ -1125,7 +1122,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 4);
+      assert.strictEqual(findings.length, 4);
     });
   });
 
@@ -1135,7 +1132,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 4);
+      assert.strictEqual(findings.length, 4);
     });
   });
 
@@ -1145,7 +1142,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 4);
+      assert.strictEqual(findings.length, 4);
     });
   });
 
@@ -1155,7 +1152,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 4);
+      assert.strictEqual(findings.length, 4);
     });
   });
 
@@ -1165,7 +1162,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.1.3', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 4);
+      assert.strictEqual(findings.length, 4);
     });
   });
   //#endregion
@@ -1177,7 +1174,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 21);
+      assert.strictEqual(findings.length, 21);
     });
   });
 
@@ -1187,7 +1184,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 27);
+      assert.strictEqual(findings.length, 27);
     });
   });
 
@@ -1197,7 +1194,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 21);
+      assert.strictEqual(findings.length, 21);
     });
   });
 
@@ -1207,7 +1204,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 22);
+      assert.strictEqual(findings.length, 22);
     });
   });
 
@@ -1217,7 +1214,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 23);
+      assert.strictEqual(findings.length, 23);
     });
   });
 
@@ -1227,7 +1224,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 25);
+      assert.strictEqual(findings.length, 25);
     });
   });
 
@@ -1237,7 +1234,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 24);
+      assert.strictEqual(findings.length, 24);
     });
   });
   //#endregion
@@ -1249,7 +1246,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 8);
+      assert.strictEqual(findings.length, 8);
     });
   });
 
@@ -1259,7 +1256,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 8);
+      assert.strictEqual(findings.length, 8);
     });
   });
 
@@ -1269,7 +1266,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 15);
+      assert.strictEqual(findings.length, 15);
     });
   });
 
@@ -1279,7 +1276,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
 
@@ -1289,7 +1286,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
 
@@ -1299,7 +1296,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
   //#endregion
@@ -1311,7 +1308,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
 
@@ -1321,7 +1318,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
 
@@ -1331,7 +1328,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
 
@@ -1341,7 +1338,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
 
@@ -1351,7 +1348,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
 
@@ -1361,7 +1358,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
   //#endregion
@@ -1373,7 +1370,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
 
@@ -1383,7 +1380,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
 
@@ -1393,7 +1390,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
 
@@ -1403,7 +1400,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
 
@@ -1413,7 +1410,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
 
@@ -1423,7 +1420,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 1);
+      assert.strictEqual(findings.length, 1);
     });
   });
   //#endregion
@@ -1435,7 +1432,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 11);
+      assert.strictEqual(findings.length, 11);
     });
   });
 
@@ -1445,7 +1442,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 11);
+      assert.strictEqual(findings.length, 11);
     });
   });
 
@@ -1455,7 +1452,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 18);
+      assert.strictEqual(findings.length, 18);
     });
   });
 
@@ -1465,7 +1462,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -1475,7 +1472,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -1485,7 +1482,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.3.4', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 11);
+      assert.strictEqual(findings.length, 11);
     });
   });
   //#endregion
@@ -1497,7 +1494,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 19);
+      assert.strictEqual(findings.length, 19);
     });
   });
 
@@ -1507,7 +1504,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 26);
+      assert.strictEqual(findings.length, 26);
     });
   });
 
@@ -1517,7 +1514,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 26);
+      assert.strictEqual(findings.length, 26);
     });
   });
 
@@ -1527,7 +1524,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 19);
+      assert.strictEqual(findings.length, 19);
     });
   });
 
@@ -1537,7 +1534,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 19);
+      assert.strictEqual(findings.length, 19);
     });
   });
 
@@ -1547,7 +1544,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 25);
+      assert.strictEqual(findings.length, 25);
     });
   });
   //#endregion
@@ -1559,7 +1556,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
 
@@ -1569,7 +1566,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
 
@@ -1579,7 +1576,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 16);
+      assert.strictEqual(findings.length, 16);
     });
   });
 
@@ -1589,7 +1586,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
 
@@ -1599,7 +1596,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
 
@@ -1609,7 +1606,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.4.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 8);
+      assert.strictEqual(findings.length, 8);
     });
   });
   //#endregion
@@ -1621,7 +1618,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 26);
+      assert.strictEqual(findings.length, 26);
     });
   });
 
@@ -1631,7 +1628,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 26);
+      assert.strictEqual(findings.length, 26);
     });
   });
 
@@ -1641,7 +1638,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 33);
+      assert.strictEqual(findings.length, 33);
     });
   });
 
@@ -1651,7 +1648,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 26);
+      assert.strictEqual(findings.length, 26);
     });
   });
 
@@ -1661,7 +1658,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 26);
+      assert.strictEqual(findings.length, 26);
     });
   });
 
@@ -1671,7 +1668,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 25);
+      assert.strictEqual(findings.length, 25);
     });
   });
   //#endregion
@@ -1683,7 +1680,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
 
@@ -1693,7 +1690,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', debug: true, output: 'json' } }, (err?: any) => {
       const findings: Finding[] = log[3];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
 
@@ -1703,7 +1700,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 18);
+      assert.strictEqual(findings.length, 18);
     });
   });
 
@@ -1713,7 +1710,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
 
@@ -1723,7 +1720,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
 
@@ -1733,7 +1730,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.5.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 8);
+      assert.strictEqual(findings.length, 8);
     });
   });
   //#endregion
@@ -1745,7 +1742,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 16);
+      assert.strictEqual(findings.length, 16);
     });
   });
 
@@ -1755,7 +1752,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 18);
+      assert.strictEqual(findings.length, 18);
     });
   });
 
@@ -1765,7 +1762,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 17);
+      assert.strictEqual(findings.length, 17);
     });
   });
 
@@ -1775,7 +1772,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 16);
+      assert.strictEqual(findings.length, 16);
     });
   });
 
@@ -1785,7 +1782,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 21);
+      assert.strictEqual(findings.length, 21);
     });
   });
 
@@ -1795,7 +1792,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 25);
+      assert.strictEqual(findings.length, 25);
     });
   });
 
@@ -1805,7 +1802,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 16);
+      assert.strictEqual(findings.length, 16);
     });
   });
 
@@ -1815,7 +1812,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 16);
+      assert.strictEqual(findings.length, 16);
     });
   });
 
@@ -1825,7 +1822,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 15);
+      assert.strictEqual(findings.length, 15);
     });
   });
   //#endregion
@@ -1837,7 +1834,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 15);
+      assert.strictEqual(findings.length, 15);
     });
   });
 
@@ -1847,7 +1844,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 18);
+      assert.strictEqual(findings.length, 18);
     });
   });
 
@@ -1857,7 +1854,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 15);
+      assert.strictEqual(findings.length, 15);
     });
   });
 
@@ -1867,7 +1864,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 19);
+      assert.strictEqual(findings.length, 19);
     });
   });
 
@@ -1877,7 +1874,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 19);
+      assert.strictEqual(findings.length, 19);
     });
   });
 
@@ -1887,7 +1884,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 23);
+      assert.strictEqual(findings.length, 23);
     });
   });
 
@@ -1897,7 +1894,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 28);
+      assert.strictEqual(findings.length, 28);
     });
   });
 
@@ -1907,7 +1904,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings[18].file, path.join('teams', 'tab20x20.png'));
+      assert.strictEqual(findings[18].file, path.join('teams', 'tab20x20.png'));
     });
   });
 
@@ -1917,7 +1914,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings[19].file, path.join('teams', 'tab96x96.png'));
+      assert.strictEqual(findings[19].file, path.join('teams', 'tab96x96.png'));
     });
   });
   //#endregion
@@ -1929,7 +1926,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -1939,7 +1936,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -1949,7 +1946,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -1959,7 +1956,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -1969,7 +1966,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -1979,7 +1976,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 13);
+      assert.strictEqual(findings.length, 13);
     });
   });
 
@@ -1989,7 +1986,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.7.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 22);
+      assert.strictEqual(findings.length, 22);
     });
   });
   //#endregion
@@ -2001,7 +1998,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 15);
+      assert.strictEqual(findings.length, 15);
     });
   });
 
@@ -2011,7 +2008,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 16);
+      assert.strictEqual(findings.length, 16);
     });
   });
 
@@ -2021,7 +2018,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 15);
+      assert.strictEqual(findings.length, 15);
     });
   });
 
@@ -2031,7 +2028,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 21);
+      assert.strictEqual(findings.length, 21);
     });
   });
 
@@ -2041,7 +2038,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 21);
+      assert.strictEqual(findings.length, 21);
     });
   });
 
@@ -2051,7 +2048,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 23);
+      assert.strictEqual(findings.length, 23);
     });
   });
 
@@ -2061,7 +2058,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 31);
+      assert.strictEqual(findings.length, 31);
     });
   });
 
@@ -2071,7 +2068,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings[20].file, path.join('teams', '7c4a6c24-2154-4dcc-9eb4-d64b8a2c5daa_outline.png'));
+      assert.strictEqual(findings[20].file, path.join('teams', '7c4a6c24-2154-4dcc-9eb4-d64b8a2c5daa_outline.png'));
     });
   });
 
@@ -2081,7 +2078,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings[21].file, path.join('teams', '7c4a6c24-2154-4dcc-9eb4-d64b8a2c5daa_color.png'));
+      assert.strictEqual(findings[21].file, path.join('teams', '7c4a6c24-2154-4dcc-9eb4-d64b8a2c5daa_color.png'));
     });
   });
   //#endregion
@@ -2093,7 +2090,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 10);
+      assert.strictEqual(findings.length, 10);
     });
   });
 
@@ -2103,7 +2100,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 9);
+      assert.strictEqual(findings.length, 9);
     });
   });
 
@@ -2113,7 +2110,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 10);
+      assert.strictEqual(findings.length, 10);
     });
   });
 
@@ -2123,7 +2120,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 11);
+      assert.strictEqual(findings.length, 11);
     });
   });
 
@@ -2133,7 +2130,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 11);
+      assert.strictEqual(findings.length, 11);
     });
   });
 
@@ -2143,7 +2140,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 11);
+      assert.strictEqual(findings.length, 11);
     });
   });
 
@@ -2153,7 +2150,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 21);
+      assert.strictEqual(findings.length, 21);
     });
   });
   //#endregion
@@ -2165,7 +2162,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -2175,7 +2172,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 15);
+      assert.strictEqual(findings.length, 15);
     });
   });
 
@@ -2185,7 +2182,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -2195,7 +2192,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 13);
+      assert.strictEqual(findings.length, 13);
     });
   });
 
@@ -2205,7 +2202,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 13);
+      assert.strictEqual(findings.length, 13);
     });
   });
 
@@ -2215,7 +2212,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 17);
+      assert.strictEqual(findings.length, 17);
     });
   });
 
@@ -2225,7 +2222,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 23);
+      assert.strictEqual(findings.length, 23);
     });
   });
   //#endregion
@@ -2237,7 +2234,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -2247,7 +2244,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 17);
+      assert.strictEqual(findings.length, 17);
     });
   });
 
@@ -2257,7 +2254,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -2267,7 +2264,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 13);
+      assert.strictEqual(findings.length, 13);
     });
   });
 
@@ -2277,7 +2274,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 13);
+      assert.strictEqual(findings.length, 13);
     });
   });
 
@@ -2287,7 +2284,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 21);
+      assert.strictEqual(findings.length, 21);
     });
   });
 
@@ -2297,7 +2294,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.9.1', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 23);
+      assert.strictEqual(findings.length, 23);
     });
   });
   //#endregion
@@ -2309,7 +2306,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -2319,7 +2316,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 11);
+      assert.strictEqual(findings.length, 11);
     });
   });
 
@@ -2329,7 +2326,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 12);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
@@ -2339,7 +2336,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 14);
+      assert.strictEqual(findings.length, 14);
     });
   });
 
@@ -2349,7 +2346,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 14);
+      assert.strictEqual(findings.length, 14);
     });
   });
 
@@ -2359,7 +2356,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 14);
+      assert.strictEqual(findings.length, 14);
     });
   });
 
@@ -2369,7 +2366,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.10.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 24);
+      assert.strictEqual(findings.length, 24);
     });
   });
   //#endregion
@@ -2381,7 +2378,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 16);
+      assert.strictEqual(findings.length, 16);
     });
   });
 
@@ -2391,7 +2388,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 20);
+      assert.strictEqual(findings.length, 20);
     });
   });
 
@@ -2401,7 +2398,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 16);
+      assert.strictEqual(findings.length, 16);
     });
   });
 
@@ -2411,7 +2408,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 17);
+      assert.strictEqual(findings.length, 17);
     });
   });
 
@@ -2421,7 +2418,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 17);
+      assert.strictEqual(findings.length, 17);
     });
   });
 
@@ -2431,7 +2428,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 22);
+      assert.strictEqual(findings.length, 22);
     });
   });
 
@@ -2441,7 +2438,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.11.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 27);
+      assert.strictEqual(findings.length, 27);
     });
   });
   //#endregion
@@ -2453,7 +2450,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.2.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 23);
+      assert.strictEqual(findings.length, 23);
     });
   });
 
@@ -2463,7 +2460,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 33);
+      assert.strictEqual(findings.length, 33);
     });
   });
 
@@ -2473,7 +2470,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.8.2', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 27);
+      assert.strictEqual(findings.length, 27);
     });
   });
 
@@ -2483,7 +2480,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { toVersion: '1.6.0', output: 'json' } }, (err?: any) => {
       const findings: FindingToReport[] = log[0];
-      assert.equal(findings.length, 32);
+      assert.strictEqual(findings.length, 32);
     });
   });
   //#endregion
@@ -2570,86 +2567,51 @@ describe(commands.PROJECT_UPGRADE, () => {
 
   it('passes validation when package manager not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when unsupported package manager specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when npm package manager specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'npm' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when pnpm package manager specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'pnpm' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when yarn package manager specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { packageManager: 'yarn' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when shell not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('fails validation when unsupported shell specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { shell: 'abc' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when bash shell specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { shell: 'bash' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when powershell shell specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { shell: 'powershell' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation when cmd shell specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { shell: 'cmd' } });
-    assert.equal(actual, true);
-  });
-
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.PROJECT_UPGRADE));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 });

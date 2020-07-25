@@ -9,8 +9,8 @@ import {
   CommandError
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -127,7 +127,7 @@ class SpoCdnSetCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
         }
         cb();
@@ -143,9 +143,8 @@ class SpoCdnSetCommand extends SpoCommand {
         }
       }
 
-      const enabled: string | undefined = args.options.enabled ? args.options.enabled.toLowerCase() : undefined;
-      if (enabled !== 'true' &&
-        enabled !== 'false') {
+      if (args.options.enabled !== 'true' &&
+        args.options.enabled !== 'false') {
         return `${args.options.enabled} is not a valid boolean value. Allowed values are true|false`;
       }
 
@@ -173,52 +172,6 @@ class SpoCdnSetCommand extends SpoCommand {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CDN_SET).helpInformation());
-    log(
-      `  ${chalk.yellow('Important:')} to use this command you have to have permissions to access
-    the tenant admin site.
-        
-  Remarks:
-
-    Using the ${chalk.blue('-t, --type')} option you can choose whether you want
-    to manage the settings of the Public (default), Private CDN or both. If you
-    don't use the option, the command will use the Public CDN.
-
-    Using the ${chalk.blue('-e, --enabled')} option you can specify whether the given
-    CDN type should be enabled or disabled. Use ${chalk.grey('true')} to enable the specified
-    CDN and ${chalk.grey('false')} to disable it.
-
-    Using the ${chalk.blue('-noDefaultOrigins')} option you can specify to skip
-    the creation of the default origins.  
-
-  Examples:
-  
-    Enable the Microsoft 365 Public CDN on the current tenant
-      m365 ${this.name} --type Public --enabled true
-
-    Disable the Microsoft 365 Public CDN on the current tenant
-      m365 ${this.name} --type Public --enabled false
-
-    Enable the Microsoft 365 Private CDN on the current tenant
-      m365 ${this.name} --type Private --enabled true
-  
-    Enable the Microsoft 365 Private and Public CDN on the current tenant with
-    default origins 
-      m365 ${this.name} --type Both --enabled true 
-
-    Enable the Microsoft 365 Private and Public CDN on the current tenant without
-    the default origins 
-      m365 ${this.name} --type Both --enabled true --noDefaultOrigins
-
-  More information:
-
-    General availability of Microsoft 365 CDN
-      https://dev.office.com/blogs/general-availability-of-office-365-cdn
-`);
   }
 }
 

@@ -9,8 +9,8 @@ import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
 import { CustomAction } from './customaction';
 import { BasePermissions, PermissionKind } from '../../base-permissions';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -99,7 +99,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
           if (customAction && customAction["odata.null"] === true) {
             cmd.log(`Custom action with id ${args.options.id} not found`);
           } else {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
         }
         cb();
@@ -198,8 +198,9 @@ class SpoCustomActionSetCommand extends SpoCommand {
         return `${args.options.id} is not valid. Custom action id (Guid) expected`;
       }
 
-      if (!args.options.url || SpoCommand.isValidSharePointUrl(args.options.url) !== true) {
-        return 'Missing required option url';
+      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+      if (isValidSharePointUrl !== true) {
+        return isValidSharePointUrl;
       }
 
       if (!args.options.title && !args.options.name && !args.options.location &&
@@ -245,71 +246,6 @@ class SpoCustomActionSetCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: CommandArgs, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(commands.CUSTOMACTION_SET).helpInformation());
-    log(
-      `  Remarks:
-          
-    Running this command from the Windows Command Shell (cmd.exe) or PowerShell
-    for Windows OS XP, 7, 8, 8.1 without bash installed might require additional
-    formatting for command options that have JSON, XML or JavaScript values,
-    because the command shell treat quotes differently. For example, this is how
-    ApplicationCustomizer user custom action can be created from the Windows
-    cmd.exe:
-
-      m365 spo m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{\"testMessage\":\"Test message\"}'
-    
-    Note, how the clientSideComponentProperties option (-p) has escaped double
-    quotes ${chalk.grey(`'{\"testMessage\":\"Test message\"}'`)} compared to execution from bash:
-    ${chalk.grey(`'{"testMessage":"Test message"}'`)}.
-
-    The ${chalk.grey(`--rights`)} option accepts case-sensitive values.
-
-    Note, specifying the scope option might speed up the execution of the
-    command, but would not update the scope. If the scope has to be changed,
-    then the existing custom action should be removed and new should be added
-    with different scope.
-
-  Examples:
-    
-    Updates tenant-wide SharePoint Framework Application Customizer extension
-    properties in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{"testMessage":"Test message"}'
-    
-    Updates tenant-wide SharePoint Framework ${chalk.blue('modern list view')} Command Set
-    extension properties and sequence in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}' --sequence 100
-    
-    Updates url custom action in the SiteActions menu in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --actionUrl "~site/SitePages/Home.aspx"
-    
-    Updates ScriptLink custom action with script source in ${chalk.blue('classic pages')} in
-    site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --scriptSrc "~sitecollection/SiteAssets/YourScript.js"
-    
-    Updates custom action with delegated rights in the SiteActions menu in site
-    ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --rights "AddListItems,DeleteListItems,ManageLists"
-  
-  More information:
-
-    UserCustomAction REST API resources:
-      https://msdn.microsoft.com/en-us/library/office/dn531432.aspx#bk_UserCustomAction
-      
-    UserCustomAction Locations and Group IDs:
-      https://msdn.microsoft.com/en-us/library/office/bb802730.aspx
-
-    UserCustomAction Element:
-      https://msdn.microsoft.com/en-us/library/office/ms460194.aspx
-
-    UserCustomAction Rights:
-      https://msdn.microsoft.com/en-us/library/office/microsoft.sharepoint.spbasepermissions.aspx
-
-      `);
   }
 
   private updateCustomAction(options: Options): Promise<undefined> {

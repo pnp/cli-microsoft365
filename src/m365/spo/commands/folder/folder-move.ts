@@ -3,13 +3,11 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import {
   CommandOption,
-  CommandValidate,
-  CommandCancel
+  CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import * as url from 'url';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -88,14 +86,6 @@ class SpoFolderMoveCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  public cancel(): CommandCancel {
-    return (): void => {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-      }
-    }
-  }
-
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -122,53 +112,8 @@ class SpoFolderMoveCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
-      }
-
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      if (!args.options.sourceUrl) {
-        return 'Required parameter sourceUrl missing';
-      }
-
-      if (!args.options.targetUrl) {
-        return 'Required parameter targetUrl missing';
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    When you move a folder with documents that have version history,
-    all of the versions are being moved.
-
-  Examples:
-
-    Moves folder from a document library located in one site collection to
-    another site collection
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/
-
-    Moves folder from a document library to another site in the same site
-    collection
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
-    
-    Moves folder to a document library in another site collection. Will ignore any missing fields in the target destination and move anyway
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
-
-  More information:
-
-    Move items from a SharePoint document library
-      https://support.office.com/en-us/article/move-or-copy-items-from-a-sharepoint-document-library-00e2f483-4df3-46be-a861-1f5f0c1a87bc
-    `);
   }
 }
 

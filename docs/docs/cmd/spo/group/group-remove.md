@@ -12,7 +12,7 @@ m365 spo group remove [options]
 
 Option|Description
 ------|-----------
-`--help`|output usage information
+`-h, --help`|output usage information
 `-u, --webUrl <webUrl>`|Url of the web to remove the group from
 `--id [id]`|ID of the group to remove. Use ID or name but not both
 `--name [name]`|Name of the group to remove. Use ID or name but not both

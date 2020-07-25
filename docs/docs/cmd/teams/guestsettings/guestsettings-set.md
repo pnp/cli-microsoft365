@@ -10,16 +10,29 @@ m365 teams guestsettings set [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-i, --teamId <teamId>`|The ID of the Teams team for which to update settings
-`--allowCreateUpdateChannels [allowCreateUpdateChannels]`|Set to `true` to allow guests to create and update channels and to `false` to disallow it
-`--allowDeleteChannels [allowDeleteChannels]`|Set to `true` to allow guests to create and update channels and to `false` to disallow it
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-i, --teamId <teamId>`
+: The ID of the Teams team for which to update settings
+
+`--allowCreateUpdateChannels [allowCreateUpdateChannels]`
+: Set to `true` to allow guests to create and update channels and to `false` to disallow it
+
+`--allowDeleteChannels [allowDeleteChannels]`
+: Set to `true` to allow guests to create and update channels and to `false` to disallow it
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 

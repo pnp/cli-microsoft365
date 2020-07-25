@@ -10,22 +10,47 @@ m365 spo page clientsidewebpart add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --webUrl <webUrl>`|URL of the site where the page to add the web part to is located
-`-n, --pageName <pageName>`|Name of the page to which add the web part
-`--standardWebPart [standardWebPart]`|Name of the standard web part to add (see the possible values below)
-`--webPartId [webPartId]`|ID of the custom web part to add
-`--webPartProperties [webPartProperties]`|JSON string with web part properties to set on the web part. Specify `webPartProperties` or `webPartData` but not both
-`--webPartData [webPartData]`|JSON string with web part data as retrieved from the web part maintenance mode. Specify `webPartProperties` or `webPartData` but not both
-`--section [section]`|Number of the section to which the web part should be added (1 or higher)
-`--column [column]`|Number of the column in which the web part should be added (1 or higher)
-`--order [order]`|Order of the web part in the column
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: URL of the site where the page to add the web part to is located
+
+`-n, --pageName <pageName>`
+: Name of the page to which add the web part
+
+`--standardWebPart [standardWebPart]`
+: Name of the standard web part to add (see the possible values below)
+
+`--webPartId [webPartId]`
+: ID of the custom web part to add
+
+`--webPartProperties [webPartProperties]`
+: JSON string with web part properties to set on the web part. Specify `webPartProperties` or `webPartData` but not both
+
+`--webPartData [webPartData]`
+: JSON string with web part data as retrieved from the web part maintenance mode. Specify `webPartProperties` or `webPartData` but not both
+
+`--section [section]`
+: Number of the section to which the web part should be added (1 or higher)
+
+`--column [column]`
+: Number of the column in which the web part should be added (1 or higher)
+
+`--order [order]`
+: Order of the web part in the column
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

@@ -12,7 +12,7 @@ m365 tenant service report historicalservicestatus [options]
 
 Option|Description
 ------|-----------
-`--help`|output usage information
+`-h, --help`|output usage information
 `-w, --workload [workload]`|Retrieve the historical service status for the particular service. If not provided, the historical service status of all services will be returned.
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`

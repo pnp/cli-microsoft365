@@ -6,7 +6,8 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -51,7 +52,7 @@ class SpoWebAddCommand extends SpoCommand {
         .post(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green('DONE'));
+            cmd.log(chalk.green('DONE'));
           }
 
           cb();
@@ -96,27 +97,8 @@ class SpoWebAddCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.webUrl) {
-        return 'Required option webUrl missing';
-      }
-
-      const isValidUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (typeof isValidUrl === 'string') {
-        return isValidUrl;
-      }
-
-      return true;
+      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Examples:
-  
-    Delete subsite without prompting for confirmation
-      m365 ${this.name} --webUrl https://contoso.sharepoint.com/subsite --confirm
-  ` );
   }
 }
 

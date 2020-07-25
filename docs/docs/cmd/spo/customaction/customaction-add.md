@@ -10,31 +10,74 @@ m365 spo customaction add [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --url <url>`|Url of the site or site collection to add the custom action
-`-n, --name <name>`|The name of the custom action
-`-t, --title <title>`|The title of the custom action
-`-l, --location <location>`|The actual location where this custom action need to be added like `CommandUI.Ribbon`
-`-g, --group [group]`|The group where this custom action needs to be added like `SiteActions`
-`-d, --description [description]`|The description of the custom action
-`--sequence [sequence]`|Sequence of this CustomAction being injected. Use when you have a specific sequence with which to have multiple CustomActions being added to the page
-`--actionUrl [actionUrl]`|The URL, URI or JavaScript function associated with the action. URL example `~site/_layouts/sampleurl.aspx` or `~sitecollection/_layouts/sampleurl.aspx`
-`--imageUrl [imageUrl]`|The URL of the image associated with the custom action
-`-e, --commandUIExtension [commandUIExtension]`|XML fragment that determines user interface properties of the custom action
-`--registrationId [registrationId]`|Specifies the identifier of the list or item content type that this action is associated with, or the file type or programmatic identifier
-`--registrationType [registrationType]`|Specifies the type of object associated with the custom action. Allowed values `None,List,ContentType,ProgId,FileType`. Default `None`
-`--rights [rights]`|A case sensitive string array that contain the permissions needed for the custom action. Allowed values `EmptyMask,ViewListItems,AddListItems,EditListItems,DeleteListItems,ApproveItems,OpenItems,ViewVersions,DeleteVersions,CancelCheckout,ManagePersonalViews,ManageLists,ViewFormPages,AnonymousSearchAccessList,Open,ViewPages,AddAndCustomizePages,ApplyThemeAndBorder,ApplyStyleSheets,ViewUsageData,CreateSSCSite,ManageSubwebs,CreateGroups,ManagePermissions,BrowseDirectories,BrowseUserInfo,AddDelPrivateWebParts,UpdatePersonalWebParts,ManageWeb,AnonymousSearchAccessWebLists,UseClientIntegration,UseRemoteAPIs,ManageAlerts,CreateAlerts,EditMyUserInfo,EnumeratePermissions,FullMask`. Default `EmptyMask`
-`-s, --scope [scope]`|Scope of the custom action. Allowed values `Site,Web`. Default `Web`
-`--scriptBlock [scriptBlock]`|Specifies a block of script to be executed. This attribute is only applicable when the Location attribute is set to ScriptLink
-`--scriptSrc [scriptSrc]`|Specifies a file that contains script to be executed. This attribute is only applicable when the Location attribute is set to ScriptLink
-`-c, --clientSideComponentId [clientSideComponentId]`|The Client Side Component Id (GUID) of the custom action
-`-p, --clientSideComponentProperties [clientSideComponentProperties]`|The Client Side Component Properties of the custom action. Specify values as a JSON string : `'{"testMessage":"Test message"}'`
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --url <url>`
+: Url of the site or site collection to add the custom action
+
+`-n, --name <name>`
+: The name of the custom action
+
+`-t, --title <title>`
+: The title of the custom action
+
+`-l, --location <location>`
+: The actual location where this custom action need to be added like `CommandUI.Ribbon`
+
+`-g, --group [group]`
+: The group where this custom action needs to be added like `SiteActions`
+
+`-d, --description [description]`
+: The description of the custom action
+
+`--sequence [sequence]`
+: Sequence of this CustomAction being injected. Use when you have a specific sequence with which to have multiple CustomActions being added to the page
+
+`--actionUrl [actionUrl]`
+: The URL, URI or JavaScript function associated with the action. URL example `~site/_layouts/sampleurl.aspx` or `~sitecollection/_layouts/sampleurl.aspx`
+
+`--imageUrl [imageUrl]`
+: The URL of the image associated with the custom action
+
+`-e, --commandUIExtension [commandUIExtension]`
+: XML fragment that determines user interface properties of the custom action
+
+`--registrationId [registrationId]`
+: Specifies the identifier of the list or item content type that this action is associated with, or the file type or programmatic identifier
+
+`--registrationType [registrationType]`
+: Specifies the type of object associated with the custom action. Allowed values `None,List,ContentType,ProgId,FileType`. Default `None`
+
+`--rights [rights]`
+: A case sensitive string array that contain the permissions needed for the custom action. Allowed values `EmptyMask,ViewListItems,AddListItems,EditListItems,DeleteListItems,ApproveItems,OpenItems,ViewVersions,DeleteVersions,CancelCheckout,ManagePersonalViews,ManageLists,ViewFormPages,AnonymousSearchAccessList,Open,ViewPages,AddAndCustomizePages,ApplyThemeAndBorder,ApplyStyleSheets,ViewUsageData,CreateSSCSite,ManageSubwebs,CreateGroups,ManagePermissions,BrowseDirectories,BrowseUserInfo,AddDelPrivateWebParts,UpdatePersonalWebParts,ManageWeb,AnonymousSearchAccessWebLists,UseClientIntegration,UseRemoteAPIs,ManageAlerts,CreateAlerts,EditMyUserInfo,EnumeratePermissions,FullMask`. Default `EmptyMask`
+
+`-s, --scope [scope]`
+: Scope of the custom action. Allowed values `Site,Web`. Default `Web`
+
+`--scriptBlock [scriptBlock]`
+: Specifies a block of script to be executed. This attribute is only applicable when the Location attribute is set to ScriptLink
+
+`--scriptSrc [scriptSrc]`
+: Specifies a file that contains script to be executed. This attribute is only applicable when the Location attribute is set to ScriptLink
+
+`-c, --clientSideComponentId [clientSideComponentId]`
+: The Client Side Component Id (GUID) of the custom action
+
+`-p, --clientSideComponentProperties [clientSideComponentProperties]`
+: The Client Side Component Properties of the custom action. Specify values as a JSON string : `'{"testMessage":"Test message"}'`
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

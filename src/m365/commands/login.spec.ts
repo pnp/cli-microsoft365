@@ -1,5 +1,5 @@
 import commands from './commands';
-import Command, { CommandCancel, CommandOption, CommandValidate, CommandError } from '../../Command';
+import Command, { CommandOption, CommandValidate, CommandError } from '../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../appInsights';
 import auth from '../../Auth';
@@ -11,7 +11,6 @@ import { AuthType } from '../../Auth';
 import * as fs from 'fs';
 
 describe(commands.LOGIN, () => {
-  let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -24,7 +23,6 @@ describe(commands.LOGIN, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../vorpal-init');
     log = [];
     cmdInstance = {
       action: command.action(),
@@ -41,7 +39,6 @@ describe(commands.LOGIN, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       auth.cancel,
       fs.existsSync,
       fs.readFileSync,
@@ -61,11 +58,11 @@ describe(commands.LOGIN, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.LOGIN), true);
+    assert.strictEqual(command.name.startsWith(commands.LOGIN), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('logs in to Microsoft 365', (done) => {
@@ -98,9 +95,9 @@ describe(commands.LOGIN, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
     cmdInstance.action({ options: { debug: false, authType: 'password', userName: 'user', password: 'password' } }, () => {
       try {
-        assert.equal(auth.service.authType, AuthType.Password, 'Incorrect authType set');
-        assert.equal(auth.service.userName, 'user', 'Incorrect user name set');
-        assert.equal(auth.service.password, 'password', 'Incorrect password set');
+        assert.strictEqual(auth.service.authType, AuthType.Password, 'Incorrect authType set');
+        assert.strictEqual(auth.service.userName, 'user', 'Incorrect user name set');
+        assert.strictEqual(auth.service.password, 'password', 'Incorrect password set');
         done();
       }
       catch (e) {
@@ -114,9 +111,9 @@ describe(commands.LOGIN, () => {
 
     cmdInstance.action({ options: { debug: false, authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } }, () => {
       try {
-        assert.equal(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
-        assert.equal(auth.service.certificate, 'certificate', 'Incorrect certificate set');
-        assert.equal(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
+        assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
+        assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
+        assert.strictEqual(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
         done();
       }
       catch (e) {
@@ -130,8 +127,8 @@ describe(commands.LOGIN, () => {
 
     cmdInstance.action({ options: { debug: false, authType: 'identity', userName:  'ac9fbed5-804c-4362-a369-21a4ec51109e' } }, () => {
       try {
-        assert.equal(auth.service.authType, AuthType.Identity, 'Incorrect authType set');
-        assert.equal(auth.service.userName, 'ac9fbed5-804c-4362-a369-21a4ec51109e', 'Incorrect userName set');
+        assert.strictEqual(auth.service.authType, AuthType.Identity, 'Incorrect authType set');
+        assert.strictEqual(auth.service.userName, 'ac9fbed5-804c-4362-a369-21a4ec51109e', 'Incorrect userName set');
         done();
       }
       catch (e) {
@@ -145,24 +142,14 @@ describe(commands.LOGIN, () => {
 
     cmdInstance.action({ options: { debug: false, authType: 'identity' } }, () => {
       try {
-        assert.equal(auth.service.authType, AuthType.Identity, 'Incorrect authType set');
-        assert.equal(auth.service.userName, undefined, 'Incorrect userName set');
+        assert.strictEqual(auth.service.authType, AuthType.Identity, 'Incorrect authType set');
+        assert.strictEqual(auth.service.userName, undefined, 'Incorrect userName set');
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });
-
-  it('can be cancelled', () => {
-    assert(command.cancel());
-  });
-
-  it('clears pending connection on cancel', () => {
-    const authCancelStub = sinon.stub(auth, 'cancel').callsFake(() => { });
-    (command.cancel() as CommandCancel)();
-    assert(authCancelStub.called);
   });
 
   it('supports specifying authType', () => {
@@ -200,89 +187,55 @@ describe(commands.LOGIN, () => {
 
   it('fails validation if authType is set to password and userName and password not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'password' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if authType is set to password and userName not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'password', password: 'password' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if authType is set to password and password not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'password', userName: 'user' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if authType is set to certificate and certificateFile not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', thumbprint: 'thumbprint' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if authType is set to certificate and certificateFile does not exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if authType is set to certificate and thumbprint not specified', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificate' } });
-    assert.notEqual(actual, true);
+    assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if authType is set to password and userName and password specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'password', userName: 'user', password: 'password' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if authType is set to deviceCode and userName and password not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: { authType: 'deviceCode' } });
-    assert.equal(actual, true);
+    assert.strictEqual(actual, true);
   });
 
   it('passes validation if authType is not set and userName and password not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.LOGIN));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
+    assert.strictEqual(actual, true);
   });
 
   it('ignores the error raised by cancelling device code auth flow', (done) => {
@@ -303,6 +256,19 @@ describe(commands.LOGIN, () => {
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith('Polling_Request_Cancelled'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles error in device code auth flow', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error'); });
+    cmdInstance.action({ options: {} }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Error')));
         done();
       }
       catch (e) {
@@ -357,7 +323,7 @@ describe(commands.LOGIN, () => {
     cmdInstance.action = command.action();
     cmdInstance.action({ options: { debug: true } }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {

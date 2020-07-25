@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
 describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
-  let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
 
@@ -24,7 +23,6 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
   });
 
   beforeEach(() => {
-    vorpal = require('../../../../vorpal-init');
     log = [];
     cmdInstance = {
       commandWrapper: {
@@ -40,7 +38,6 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
 
   afterEach(() => {
     Utils.restore([
-      vorpal.find,
       request.post
     ]);
   });
@@ -56,11 +53,11 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TENANT_RECYCLEBINITEM_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.TENANT_RECYCLEBINITEM_LIST), true);
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
   });
 
   it('supports debug mode', () => {
@@ -72,40 +69,6 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       }
     });
     assert(containsDebugOption);
-  });
-
-  it('has help referring to the right command', () => {
-    const cmd: any = {
-      log: (msg: string) => { },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    assert(find.calledWith(commands.TENANT_RECYCLEBINITEM_LIST));
-  });
-
-  it('has help with examples', () => {
-    const _log: string[] = [];
-    const cmd: any = {
-      log: (msg: string) => {
-        _log.push(msg);
-      },
-      prompt: () => { },
-      helpInformation: () => { }
-    };
-    sinon.stub(vorpal, 'find').callsFake(() => cmd);
-    cmd.help = command.help();
-    cmd.help({}, () => { });
-    let containsExamples: boolean = false;
-    _log.forEach(l => {
-      if (l && l.indexOf('Examples:') > -1) {
-        containsExamples = true;
-      }
-    });
-    Utils.restore(vorpal.find);
-    assert(containsExamples);
   });
 
   it('handles client.svc promise error', (done) => {
@@ -122,7 +85,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -151,7 +114,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -228,12 +191,12 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
 
     cmdInstance.action({ options: { debug: true } }, () => {
       try {
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0]["DaysRemaining"], 92);
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0]["DaysRemaining"], 92);
         assert.deepEqual(cmdInstanceLogSpy.lastCall.args[0][0]["DeletionTime"], new Date(2020, 0, 15, 11, 4, 3, 893));
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][0]["Url"], 'https://contoso.sharepoint.com/sites/ClassicThrowaway');
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][1].DaysRemaining, 92);
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0]["Url"], 'https://contoso.sharepoint.com/sites/ClassicThrowaway');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][1].DaysRemaining, 92);
         assert.deepEqual(cmdInstanceLogSpy.lastCall.args[0][1].DeletionTime, new Date(2020, 0, 15, 11, 40, 58, 90));
-        assert.equal(cmdInstanceLogSpy.lastCall.args[0][1].Url, 'https://contoso.sharepoint.com/sites/ModernThrowaway');
+        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][1].Url, 'https://contoso.sharepoint.com/sites/ModernThrowaway');
 
         done();
       }
@@ -319,7 +282,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('Timed out')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Timed out')));
         done();
       }
       catch (e) {

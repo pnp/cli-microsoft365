@@ -10,18 +10,35 @@ m365 spo site remove [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`--help`|output usage information
-`-u, --url <url>`|URL of the site to remove
-`--skipRecycleBin`|Set to directly remove the site without moving it to the Recycle Bin
-`--fromRecycleBin`|Set to remove the site from the Recycle Bin
-`--wait`|Wait for the site to be removed before completing the command
-`--confirm`|Don't prompt for confirming removing the site
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --url <url>`
+: URL of the site to remove
+
+`--skipRecycleBin`
+: Set to directly remove the site without moving it to the Recycle Bin
+
+`--fromRecycleBin`
+: Set to remove the site from the Recycle Bin
+
+`--wait`
+: Wait for the site to be removed before completing the command
+
+`--confirm`
+: Don't prompt for confirming removing the site
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 !!! important
     To use this command you have to have permissions to access the tenant admin site.

@@ -4,8 +4,7 @@ import request from '../../../../request';
 import {
   CommandOption,
   CommandValidate,
-  CommandError,
-  CommandCancel
+  CommandError
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
@@ -14,8 +13,8 @@ import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '..
 import { DeletedSiteProperties } from './DeletedSiteProperties';
 import { SiteProperties } from './SiteProperties';
 import { SpoOperation } from './SpoOperation';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -31,7 +30,7 @@ interface Options extends GlobalOptions {
   lcid?: number;
   url?: string;
   allowFileSharingForGuestUsers?: boolean;
-  owners?: string;
+  owners: string;
   shareByEmailEnabled?: boolean;
   siteDesign?: string;
   siteDesignId?: string;
@@ -124,7 +123,7 @@ class SpoSiteAddCommand extends SpoCommand {
         spoUrl = _spoUrl;
 
         if (args.options.allowFileSharingForGuestUsers && this.verbose) {
-          cmd.log(vorpal.chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
+          cmd.log(chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
         }
 
         if (this.verbose) {
@@ -330,19 +329,11 @@ class SpoSiteAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
-  }
-
-  public cancel(): CommandCancel {
-    return (): void => {
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-      }
-    }
   }
 
   private siteExistsInTheRecycleBin(url: string, cmd: CommandInstance): Promise<boolean> {
@@ -584,10 +575,6 @@ class SpoSiteAddCommand extends SpoCommand {
         }
       }
 
-      if (!args.options.title) {
-        return 'Required option title missing';
-      }
-
       if (isTeamSite) {
         if (!args.options.alias) {
           return 'Required option alias missing';
@@ -654,7 +641,7 @@ class SpoSiteAddCommand extends SpoCommand {
         if (!args.options.timeZone) {
           return 'Required option timeZone missing';
         }
-
+        
         if (typeof args.options.timeZone !== 'number') {
           return `${args.options.timeZone} is not a number`;
         }
@@ -718,110 +705,6 @@ class SpoSiteAddCommand extends SpoCommand {
 
       return true;
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks for classic sites:
-
-    Using the ${chalk.blue('-z, --timeZone')} option you have to specify the
-    time zone of the site. For more information about the valid values see
-    https://msdn.microsoft.com/library/microsoft.sharepoint.spregionalsettings.timezones.aspx.
-
-    The value of the ${chalk.blue('--resourceQuota')} option must not exceed
-    the company's aggregate available Sandboxed Solutions quota.
-    For more information, see Resource Usage Limits on Sandboxed Solutions
-    in SharePoint 2010: http://msdn.microsoft.com/en-us/library/gg615462.aspx.
-
-    The value of the ${chalk.blue('--resourceQuotaWarningLevel')} option
-    must not exceed the value of the ${chalk.blue('--resourceQuota')} option.
-
-    The value of the ${chalk.blue('--storageQuota')} option must not exceed
-    the company's available quota.
-
-    The value of the ${chalk.blue('--storageQuotaWarningLevel')} option must not
-    exceed the the value of the ${chalk.blue('--storageQuota')} option.
-
-    If you try to create a site with the same URL as a site that has been
-    previously moved to the recycle bin, you will get an error. To avoid this
-    error, you can use the ${chalk.blue('--removeDeletedSite')} option. Prior
-    to creating the site, the ${chalk.blue(this.getCommandName())} command will
-    check if the site with the specified URL has been previously moved to the
-    recycle bin and if so, will remove it. Because removing sites from the
-    recycle bin might take a moment, it should be used in conjunction with the
-    ${chalk.blue('--wait')} option so that the new site is not created before
-    the old site is fully removed.
-
-    Deleting and creating classic site collections is by default asynchronous
-    and depending on the current state of Office 365, might take up to few
-    minutes. If you're building a script with steps that require the site to be
-    fully provisioned, you should use the ${chalk.blue('--wait')} flag. When
-    using this flag, the ${chalk.blue(this.getCommandName())} command will keep
-    running until it received confirmation from Office 365 that the site
-    has been fully provisioned.
-      
-  Remarks for modern sites:
-    
-    The ${chalk.blue('--owners')} option is mandatory for creating CommunicationSite sites
-    with app-only permissions.
-
-    When trying to create a team site using app-only permissions, you will get
-    an 'Insufficient privileges to complete the operation.' error.
-    As a workaround, you can use the ${chalk.blue('aad o365group add')} command,
-    followed by ${chalk.blue('spo site set')} to further configure the Team site.
-      
-  Examples:
-
-    Create modern team site with private group
-      m365 ${this.name} --alias team1 --title "Team 1"
-
-    Create modern team site with description and classification
-      m365 ${this.name} --type TeamSite --alias team1 --title "Team 1" --description "Site of Team 1" --classification LBI
-
-    Create modern team site with public group
-      m365 ${this.name} --type TeamSite --alias team1 --title "Team 1" --isPublic
-
-    Create modern team site using the Dutch language
-      m365 ${this.name} --alias team1 --title "Team 1" --lcid 1043
-
-    Create modern team site with the specified users as owners
-      m365 ${this.name} --alias team1 --title "Team 1" --owners "steve@contoso.com, bob@contoso.com"
-
-    Create communication site using the Topic design
-      m365 ${this.name} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing
-
-    Create communication site using app-only permissions
-      m365 ${this.name} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --owners "john.smith@contoso.com"
-
-    Create communication site using the Showcase design
-      m365 ${this.name} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesign Showcase
-
-    Create communication site using a custom site design
-      m365 ${this.name} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesignId 99f410fe-dd79-4b9d-8531-f2270c9c621c
-
-    Create communication site using the Blank design with description and classification
-      m365 ${this.name} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --description Site of the marketing department --classification MBI --siteDesign Blank
-
-    Create new classic site collection using the Team site template. Set time
-    zone to UTC+01:00. Don't wait for the site provisioning to complete
-      m365 ${this.name} --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owners admin@contoso.onmicrosoft.com --timeZone 4
-
-    Create new classic site collection using the Team site template. Set time
-    zone to UTC+01:00. Wait for the site provisioning to complete
-      m365 ${this.name} --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owners admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --wait
-
-    Create new classic site collection using the Team site template. Set time
-    zone to UTC+01:00. If a site with the same URL is in the recycle bin, delete
-    it. Wait for the site provisioning to complete
-      m365 ${this.name} --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owners admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --removeDeletedSite --wait 
-
-  More information
-
-    Creating SharePoint Communication Site using REST
-      https://docs.microsoft.com/en-us/sharepoint/dev/apis/communication-site-creation-rest
-`);
   }
 }
 

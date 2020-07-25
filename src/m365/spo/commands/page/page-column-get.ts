@@ -6,8 +6,8 @@ import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import { ClientSidePage, CanvasSection } from './clientsidepages';
 import { Page } from './Page';
-
-const vorpal: Vorpal = require('../../../../vorpal-init');
+import * as chalk from 'chalk';
+import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -53,7 +53,7 @@ class SpoPageColumnGetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+          cmd.log(chalk.green('DONE'));
         }
 
         cb();
@@ -86,51 +86,15 @@ class SpoPageColumnGetCommand extends SpoCommand {
 
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
-      if (!args.options.name) {
-        return 'Required parameter name missing';
+      if (isNaN(args.options.section)) {
+        return `${args.options.section} is not a number`;
       }
 
-      if (!args.options.webUrl) {
-        return 'Required parameter webUrl missing';
+      if (isNaN(args.options.column)) {
+        return `${args.options.column} is not a number`;
       }
-
-      if (!args.options.section) {
-        return 'Required parameter section missing';
-      }
-      else {
-        if (isNaN(args.options.section)) {
-          return `${args.options.section} is not a number`;
-        }
-      }
-
-      if (!args.options.column) {
-        return 'Required parameter column missing';
-      }
-      else {
-        if (isNaN(args.options.column)) {
-          return `${args.options.column} is not a number`;
-        }
-      }
-
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
-  }
-
-  public commandHelp(args: {}, log: (help: string) => void): void {
-    const chalk = vorpal.chalk;
-    log(vorpal.find(this.name).helpInformation());
-    log(
-      `  Remarks:
-
-    If the specified ${chalk.grey('name')} doesn't refer to an existing modern page,
-    you will get a ${chalk.grey('File doesn\'t exists')} error.
-
-  Examples:
-  
-    Get information about the first column in the first section of a modern page
-    with name ${chalk.grey('home.aspx')}
-      ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1 --column 1
-`);
   }
 }
 

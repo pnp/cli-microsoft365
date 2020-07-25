@@ -20,11 +20,11 @@ describe('FN018003_TEAMS_tab20x20_png', () => {
   });
 
   it('returns empty resolution by default', () => {
-    assert.equal(rule.resolution, '');
+    assert.strictEqual(rule.resolution, '');
   });
 
   it('returns empty file name by default', () => {
-    assert.equal(rule.file, '');
+    assert.strictEqual(rule.file, '');
   });
 
   it('doesn\'t return notifications if no manifests are present', () => {
@@ -32,7 +32,7 @@ describe('FN018003_TEAMS_tab20x20_png', () => {
       path: '/usr/tmp'
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('doesn\'t return notifications if the icon exists', () => {
@@ -47,7 +47,7 @@ describe('FN018003_TEAMS_tab20x20_png', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 
   it('returns path to icon with the specified name when fixed name used', () => {
@@ -63,7 +63,7 @@ describe('FN018003_TEAMS_tab20x20_png', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings[0].occurrences[0].file, path.join('teams', 'tab20x20.png'));
+    assert.strictEqual(findings[0].occurrences[0].file, path.join('teams', 'tab20x20.png'));
   });
 
   it('returns path to icon with name following web part ID when no fixed name specified', () => {
@@ -78,7 +78,7 @@ describe('FN018003_TEAMS_tab20x20_png', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings[0].occurrences[0].file, path.join('teams', 'c93e90e5-6222-45c6-b241-995df0029e3c_outline.png'));
+    assert.strictEqual(findings[0].occurrences[0].file, path.join('teams', 'c93e90e5-6222-45c6-b241-995df0029e3c_outline.png'));
   });
 
   it(`doesn't return notification when web part ID not specified`, () => {
@@ -92,6 +92,6 @@ describe('FN018003_TEAMS_tab20x20_png', () => {
       }]
     };
     rule.visit(project, findings);
-    assert.equal(findings.length, 0);
+    assert.strictEqual(findings.length, 0);
   });
 });
