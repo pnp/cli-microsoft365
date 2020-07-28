@@ -558,6 +558,107 @@ describe(commands.SITE_SET, () => {
     });
   });
 
+  it('sets sharingCapabilities for Site - Disabled', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
+        return Promise.resolve({
+          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          GroupId: '00000000-0000-0000-0000-000000000000'
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery`) {
+        return Promise.resolve(JSON.stringify(
+          [
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8929.1227", "ErrorInfo": null, "TraceCorrelationId": "e4f2e59e-c0a9-0000-3dd0-1d8ef12cc742"
+            },
+            2,
+            {
+              "IsNull": false
+            },
+            4,
+            {
+              "IsNull": false
+            },
+            7,
+            {
+              "IsNull": false
+            },
+            8,
+            {
+              "_ObjectIdentity_": "b61d6a9f-d0ca-0000-4814-29cf3242c81a|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%contoso.sharepoint.com%2fsites%2fSales"
+            }
+          ]
+        ));
+      }
+      return Promise.reject('Invalid request');
+    });
+    cmdInstance.action({ options: { debug: false, sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('sets sharingCapabilities for Site - (Debug) -  Disabled', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
+        return Promise.resolve({
+          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          GroupId: '00000000-0000-0000-0000-000000000000'
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.body === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1"/><ObjectPath Id="4" ObjectPathId="3"/><SetProperty Id="5" ObjectPathId="3" Name="SharingCapability"><Parameter Type="Enum">0</Parameter></SetProperty><ObjectPath Id="7" ObjectPathId="6"/><ObjectIdentityQuery Id="8" ObjectPathId="3"/></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/Sales</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="6" ParentId="3" Name="Update"/></ObjectPaths></Request>`) {
+        return Promise.resolve(JSON.stringify(
+          [
+            {
+              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8929.1227", "ErrorInfo": null, "TraceCorrelationId": "e4f2e59e-c0a9-0000-3dd0-1d8ef12cc742"
+            },
+            2,
+            {
+              "IsNull": false
+            },
+            4,
+            {
+              "IsNull": false
+            },
+            7,
+            {
+              "IsNull": false
+            },
+            8,
+            {
+              "_ObjectIdentity_": "b61d6a9f-d0ca-0000-4814-29cf3242c81a|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%contoso.sharepoint.com%2fsites%2fSales"
+            }
+          ]
+        ));
+      }
+      return Promise.reject('Invalid request');
+    });
+    cmdInstance.action({ options: { debug: true, sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('throws error when trying to update isPublic property on a non-groupified site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
@@ -1135,6 +1236,43 @@ describe(commands.SITE_SET, () => {
     });
   });
 
+  it('correctly handles API error while updating sharingCapability properties', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
+        return Promise.resolve({
+          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          GroupId: '00000000-0000-0000-0000-000000000000'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        return Promise.resolve(JSON.stringify([
+          {
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7303.1206", "ErrorInfo": {
+              "ErrorMessage": "An error has occurred.", "ErrorValue": null, "TraceCorrelationId": "7420429e-a097-5000-fcf8-bab3f3683799", "ErrorCode": -2146232832, "ErrorTypeName": "Microsoft.SharePoint.SPException"
+            }, "TraceCorrelationId": "7420429e-a097-5000-fcf8-bab3f3683799"
+          }
+        ]));
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', sharingCapability: 'Invalid' } }, (err?: any) => {
+      try {
+        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('configures command types', () => {
     assert.notEqual(typeof command.types(), 'undefined', 'command types undefined');
     assert.notEqual((command.types() as CommandTypes).string, 'undefined', 'command string types undefined');
@@ -1283,6 +1421,18 @@ describe(commands.SITE_SET, () => {
 
   it('passes validation if a valid GUID specified for siteDesignId', () => {
     const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', siteDesignId: 'eb2f31da-9461-4fbf-9ea1-9959b134b89e' } });
+    assert.equal(actual, true);
+  });
+
+  it('passes validation if non existing sharingCapability specified', () => {
+    const sharingCapabilityvalue = 'nonExistentSharingCapabilityValue';
+    const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } });
+    assert.notEqual(actual, true);
+  });
+
+  it('passes validation if correct sharingCapability specified', () => {
+    const sharingCapabilityvalue = 'ExternalUserSharingOnly';
+    const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com', sharingCapability: sharingCapabilityvalue } });
     assert.equal(actual, true);
   });
 
