@@ -22,6 +22,7 @@ Option|Description
 `--shareByEmailEnabled [shareByEmailEnabled]`|Set to true to allow to share files with guests and to false to disallow it
 `--siteDesignId [siteDesignId]`|Id of the custom site design to apply to the site
 `--title [title]`|The new title for the site collection
+`--sharingCapabilities [sharingCapabilities]`|Set the sharing capabilities for the site. Allowed sharing values are :  `Disabled`, `ExternalUserSharingOnly`,  `ExternalUserAndGuestSharing`,  `ExistingExternalUserSharingOnly`. 
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
@@ -87,4 +88,10 @@ Update site collection's title
 
 ```sh
 spo site set --url https://contoso.sharepoint.com/sites/sales --title "My new site"
+```
+
+Change Sharing capabilities of the site. Following command restricts external sharing to already available external users only
+
+```sh
+spo site set --url https://contoso.sharepoint.com/sites/sales  --sharingCapabilities ExistingExternalUserSharingOnly
 ```

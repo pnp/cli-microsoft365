@@ -17,6 +17,7 @@ import * as aadO365GroupSetCommand from '../../../aad/commands/o365group/o365gro
 import { Options as AadO365GroupSetCommandOptions } from '../../../aad/commands/o365group/o365group-set';
 import * as spoSiteDesignApplyCommand from '../sitedesign/sitedesign-apply';
 import { Options as SpoSiteDesignApplyCommandOptions } from '../sitedesign/sitedesign-apply';
+import { SharingCapabilities } from '../site/SharingCapabilities';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -34,11 +35,14 @@ interface Options extends GlobalOptions {
   siteDesignId?: string;
   title?: string;
   url: string;
+  sharingCapabilities? : string;
 }
 
 class SpoSiteSetCommand extends SpoCommand {
   private groupId: string | undefined;
   private siteId: string | undefined;
+  private spoAdminUrl?: string;
+  
 
   public get name(): string {
     return commands.SITE_SET;
@@ -58,6 +62,7 @@ class SpoSiteSetCommand extends SpoCommand {
     telemetryProps.shareByEmailEnabled = args.options.shareByEmailEnabled;
     telemetryProps.title = typeof args.options.title === 'string';
     telemetryProps.siteDesignId = typeof args.options.siteDesignId !== undefined;
+    telemetryProps.sharingCapabilities = args.options.sharingCapabilities;
     return telemetryProps;
   }
 
@@ -86,6 +91,7 @@ class SpoSiteSetCommand extends SpoCommand {
       })
       .then((): Promise<void> => this.updateSharedProperties(cmd, args))
       .then((): Promise<void> => this.applySiteDesign(cmd, args))
+      .then((): Promise<void> => this.setsharingCapabilities(cmd, args))
       .then((): void => {
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -301,6 +307,52 @@ class SpoSiteSetCommand extends SpoCommand {
     return Utils.executeCommand(spoSiteDesignApplyCommand as Command, options, cmd);
   }
 
+  private setsharingCapabilities(cmd: CommandInstance, args: CommandArgs): Promise<void> {
+    if (typeof args.options.sharingCapabilities === 'undefined') {
+      return Promise.resolve();
+    }
+
+    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+      if (this.verbose) {
+        cmd.log(`Retrieving request digest...`);
+      }
+
+      let sharingCapability: SharingCapabilities = SharingCapabilities[(args.options.sharingCapabilities as keyof typeof SharingCapabilities)];
+     
+      this.getSpoAdminUrl(cmd,this.debug)
+      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+        this.spoAdminUrl = _spoAdminUrl;
+        return this.getRequestDigest(this.spoAdminUrl);
+      }).then((res: ContextInfo): Promise<string> => {
+        if (this.verbose) {
+          cmd.log(`Setting sharing for site  ${args.options.url} as ${args.options.sharingCapabilities}`);
+        }
+
+        const requestOptions: any = {
+          url: `${this.spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': res.FormDigestValue
+          },
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1"/><ObjectPath Id="4" ObjectPathId="3"/><SetProperty Id="5" ObjectPathId="3" Name="SharingCapability"><Parameter Type="Enum">${sharingCapability}</Parameter></SetProperty><ObjectPath Id="7" ObjectPathId="6"/><ObjectIdentityQuery Id="8" ObjectPathId="3"/></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${args.options.url}</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="6" ParentId="3" Name="Update"/></ObjectPaths></Request>`
+        };
+
+        return request.post(requestOptions);
+      })
+        .then((res: string): void => {
+          const json: ClientSvcResponse = JSON.parse(res);
+          const response: ClientSvcResponseContents = json[0];
+          if (response.ErrorInfo) {
+            reject(response.ErrorInfo.ErrorMessage);
+          }
+          else {
+            resolve();
+          }
+        }, (err: any): void => {
+          reject(err);
+        });
+    });
+  }
+
   private loadSiteIds(siteUrl: string, cmd: CommandInstance): Promise<void> {
     if (this.debug) {
       cmd.log('Loading site IDs...');
@@ -326,6 +378,21 @@ class SpoSiteSetCommand extends SpoCommand {
 
         return Promise.resolve();
       });
+  }
+
+  /**
+   * Maps the base sharingCapability enum to string array so it can 
+   * more easily be used in validation or descriptions.
+   */
+  protected get sharingCapabilitiesmap(): string[] {
+    const result: string[] = [];
+
+    for (let sharingCapability in SharingCapabilities) {
+      if (typeof SharingCapabilities[sharingCapability] === 'number') {
+        result.push(sharingCapability);
+      }
+    }
+    return result;
   }
 
   public options(): CommandOption[] {
@@ -365,6 +432,11 @@ class SpoSiteSetCommand extends SpoCommand {
       {
         option: '--title [title]',
         description: 'The new title for the site collection'
+      },
+      {
+        option: '--sharingCapabilities [sharingCapabilities]',
+        description: `Sets the sharing capability for the Site. Allowed values ${this.sharingCapabilitiesmap.join(' | ')}.`,
+        autocomplete: this.sharingCapabilitiesmap
       }
     ];
 
@@ -394,7 +466,8 @@ class SpoSiteSetCommand extends SpoCommand {
         typeof args.options.isPublic === 'undefined' &&
         typeof args.options.owners === 'undefined' &&
         typeof args.options.shareByEmailEnabled === 'undefined' &&
-        typeof args.options.siteDesignId === 'undefined') {
+        typeof args.options.siteDesignId === 'undefined' &&
+        typeof args.options.sharingCapabilities === 'undefined') {
         return 'Specify at least one property to update';
       }
 
@@ -419,6 +492,13 @@ class SpoSiteSetCommand extends SpoCommand {
       if (args.options.siteDesignId) {
         if (!Utils.isValidGuid(args.options.siteDesignId)) {
           return `${args.options.siteDesignId} is not a valid GUID`;
+        }
+      }
+
+      if (args.options.sharingCapabilities) {
+        let sharingCapability: SharingCapabilities = SharingCapabilities[(args.options.sharingCapabilities.trim() as keyof typeof SharingCapabilities)];        
+        if (sharingCapability === undefined) {
+          return `${args.options.sharingCapabilities} is not a valid sharingCapabilities value. Allowed values are  ${this.sharingCapabilitiesmap.join(' | ')}`;
         }
       }
 
@@ -478,6 +558,9 @@ class SpoSiteSetCommand extends SpoCommand {
 
     Update site collection's title
       ${this.name} --url https://contoso.sharepoint.com/sites/sales --title "My new site"
+
+    Update Sharing Capability of the site
+      ${this.name} --url https://contoso.sharepoint.com/sites/sales --sharingCapabilities ExternalUserSharingOnly
 `);
   }
 }
