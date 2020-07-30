@@ -2,6 +2,7 @@ const prefix: string = 'outlook';
 
 export default {
   OUTLOOK_MAIL_SEND: `${prefix} mail send`,
+  OUTLOOK_MESSAGE_LIST: `${prefix} message list`,
   OUTLOOK_REPORT_MAILACTIVITYCOUNTS: `${prefix} report mailactivitycounts`,
   OUTLOOK_REPORT_MAILACTIVITYUSERCOUNTS: `${prefix} report mailactivityusercounts`,
   OUTLOOK_REPORT_MAILACTIVITYUSERDETAIL: `${prefix} report mailactivityuserdetail`,
