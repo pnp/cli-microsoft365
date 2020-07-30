@@ -342,7 +342,7 @@ Get-PnPFolderItem|SharePointPnPPowerShellOnline|
 Get-PnPFooter|SharePointPnPPowerShellOnline|
 Get-PnPGraphAccessToken|SharePointPnPPowerShellOnline|[util accesstoken get](../cmd/util/accesstoken/accesstoken-get.md)
 Get-PnPGraphSubscription|SharePointPnPPowerShellOnline|
-Get-PnPGroup|SharePointPnPPowerShellOnline|[spo group get](../cmd/spo/group/group-get.md)
+Get-PnPGroup|SharePointPnPPowerShellOnline|[spo group get](../cmd/spo/group/group-get.md), [spo group list](../cmd/spo/group/group-list.md)
 Get-PnPGroupMembers|SharePointPnPPowerShellOnline|
 Get-PnPGroupPermissions|SharePointPnPPowerShellOnline|
 Get-PnPHealthScore|SharePointPnPPowerShellOnline|
