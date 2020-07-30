@@ -138,6 +138,35 @@ describe(commands.USERPROFILE_GET, () => {
     });
   });
 
+  it('retrieves user profile properties by user email with output option json (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor') > -1) {
+        return Promise.resolve(
+          {
+            "odata.null": true
+          }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        output: 'json',
+        debug: true,
+        userName: 'john.doe@contoso.onmicrosoft.com'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('fails validation if the user name option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.notEqual(actual, true);
@@ -159,6 +188,16 @@ describe(commands.USERPROFILE_GET, () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.notEqual(actual, true);
   });
+
+  it('passes validation when the input is correct', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        userName: 'john.doe@mytenant.onmicrosoft.com',
+      }
+    });
+    assert.equal(actual, true);
+  });
+
 
   it('has help with examples', () => {
     const _log: string[] = [];
