@@ -108,6 +108,7 @@ nav:
         - mail send: 'cmd/outlook/mail/mail-send.md'
       - message:
         - message list: 'cmd/outlook/message/message-list.md'
+        - message move: 'cmd/outlook/message/message-move.md'
       - report:
         - report mailactivitycounts: 'cmd/outlook/report/report-mailactivitycounts.md'
         - report mailactivityusercounts: 'cmd/outlook/report/report-mailactivityusercounts.md'
