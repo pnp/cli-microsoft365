@@ -205,6 +205,10 @@ class SpoSiteAddCommand extends SpoCommand {
           if (args.options.lcid) {
             requestOptions.body.request.Lcid = args.options.lcid;
           }
+
+          if (args.options.owners) {
+            requestOptions.body.request.Owner = args.options.owners;
+          }
         }
 
         return request.post(requestOptions);
@@ -498,7 +502,7 @@ class SpoSiteAddCommand extends SpoCommand {
       },
       {
         option: '--owners [owners]',
-        description: 'Comma-separated list of users to set as site owners (applies to type TeamSite, ClassicSite)'
+        description: 'Comma-separated list of users to set as site owners'
       },
       {
         option: '--isPublic',
@@ -604,6 +608,10 @@ class SpoSiteAddCommand extends SpoCommand {
           }
         }
 
+        if (args.options.owners && args.options.owners.indexOf(",") > -1) {
+          return 'The CommunicationSite supports only one owner in the owners option';
+        }
+
         if (args.options.siteDesignId) {
           if (!Utils.isValidGuid(args.options.siteDesignId)) {
             return `${args.options.siteDesignId} is not a valid GUID`;
@@ -614,8 +622,8 @@ class SpoSiteAddCommand extends SpoCommand {
           return 'Specify siteDesign or siteDesignId but not both';
         }
 
-        if (args.options.timeZone || args.options.isPublic || args.options.removeDeletedSite || args.options.owners || args.options.wait || args.options.alias || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
-          return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, allowFileSharingForGuestUsers, siteDesignId, and description";
+        if (args.options.timeZone || args.options.isPublic || args.options.removeDeletedSite || args.options.wait || args.options.alias || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
+          return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, allowFileSharingForGuestUsers, siteDesignId, owners, and description";
         }
       }
       else {
@@ -707,41 +715,51 @@ class SpoSiteAddCommand extends SpoCommand {
     log(
       `  Remarks for classic sites:
 
-      Using the ${chalk.blue('-z, --timeZone')} option you have to specify the
-      time zone of the site. For more information about the valid values see
-      https://msdn.microsoft.com/library/microsoft.sharepoint.spregionalsettings.timezones.aspx.
-  
-      The value of the ${chalk.blue('--resourceQuota')} option must not exceed
-      the company's aggregate available Sandboxed Solutions quota.
-      For more information, see Resource Usage Limits on Sandboxed Solutions
-      in SharePoint 2010: http://msdn.microsoft.com/en-us/library/gg615462.aspx.
-  
-      The value of the ${chalk.blue('--resourceQuotaWarningLevel')} option
-      must not exceed the value of the ${chalk.blue('--resourceQuota')} option.
-  
-      The value of the ${chalk.blue('--storageQuota')} option must not exceed
-      the company's available quota.
-  
-      The value of the ${chalk.blue('--storageQuotaWarningLevel')} option must not
-      exceed the the value of the ${chalk.blue('--storageQuota')} option.
-  
-      If you try to create a site with the same URL as a site that has been
-      previously moved to the recycle bin, you will get an error. To avoid this
-      error, you can use the ${chalk.blue('--removeDeletedSite')} option. Prior
-      to creating the site, the ${chalk.blue(this.getCommandName())} command will
-      check if the site with the specified URL has been previously moved to the
-      recycle bin and if so, will remove it. Because removing sites from the
-      recycle bin might take a moment, it should be used in conjunction with the
-      ${chalk.blue('--wait')} option so that the new site is not created before
-      the old site is fully removed.
-  
-      Deleting and creating classic site collections is by default asynchronous
-      and depending on the current state of Office 365, might take up to few
-      minutes. If you're building a script with steps that require the site to be
-      fully provisioned, you should use the ${chalk.blue('--wait')} flag. When
-      using this flag, the ${chalk.blue(this.getCommandName())} command will keep
-      running until it received confirmation from Office 365 that the site
-      has been fully provisioned.
+    Using the ${chalk.blue('-z, --timeZone')} option you have to specify the
+    time zone of the site. For more information about the valid values see
+    https://msdn.microsoft.com/library/microsoft.sharepoint.spregionalsettings.timezones.aspx.
+
+    The value of the ${chalk.blue('--resourceQuota')} option must not exceed
+    the company's aggregate available Sandboxed Solutions quota.
+    For more information, see Resource Usage Limits on Sandboxed Solutions
+    in SharePoint 2010: http://msdn.microsoft.com/en-us/library/gg615462.aspx.
+
+    The value of the ${chalk.blue('--resourceQuotaWarningLevel')} option
+    must not exceed the value of the ${chalk.blue('--resourceQuota')} option.
+
+    The value of the ${chalk.blue('--storageQuota')} option must not exceed
+    the company's available quota.
+
+    The value of the ${chalk.blue('--storageQuotaWarningLevel')} option must not
+    exceed the the value of the ${chalk.blue('--storageQuota')} option.
+
+    If you try to create a site with the same URL as a site that has been
+    previously moved to the recycle bin, you will get an error. To avoid this
+    error, you can use the ${chalk.blue('--removeDeletedSite')} option. Prior
+    to creating the site, the ${chalk.blue(this.getCommandName())} command will
+    check if the site with the specified URL has been previously moved to the
+    recycle bin and if so, will remove it. Because removing sites from the
+    recycle bin might take a moment, it should be used in conjunction with the
+    ${chalk.blue('--wait')} option so that the new site is not created before
+    the old site is fully removed.
+
+    Deleting and creating classic site collections is by default asynchronous
+    and depending on the current state of Office 365, might take up to few
+    minutes. If you're building a script with steps that require the site to be
+    fully provisioned, you should use the ${chalk.blue('--wait')} flag. When
+    using this flag, the ${chalk.blue(this.getCommandName())} command will keep
+    running until it received confirmation from Office 365 that the site
+    has been fully provisioned.
+      
+  Remarks for modern sites:
+    
+    The ${chalk.blue('--owners')} option is mandatory for creating CommunicationSite sites
+    with app-only permissions.
+
+    When trying to create a team site using app-only permissions, you will get
+    an 'Insufficient privileges to complete the operation.' error.
+    As a workaround, you can use the ${chalk.blue('aad o365group add')} command,
+    followed by ${chalk.blue('spo site set')} to further configure the Team site.
       
   Examples:
 
@@ -762,6 +780,9 @@ class SpoSiteAddCommand extends SpoCommand {
 
     Create communication site using the Topic design
       ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing
+
+    Create communication site using app-only permissions
+      ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --owners "john.smith@contoso.com"
 
     Create communication site using the Showcase design
       ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesign Showcase
