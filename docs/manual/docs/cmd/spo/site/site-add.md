@@ -20,7 +20,7 @@ Option|Description
 `-z, --timeZone [timeZone]`|Integer representing time zone to use for the site (applies to type ClassicSite)
 `-d, --description [description]`|Site description
 `-l, --lcid [lcid]`|Site language in the LCID format, eg. _1033_ for _en-US_
-`--owners [owners]`|Comma-separated list of users to set as site owners (applies to type TeamSite, ClassicSite)
+`--owners [owners]`|Comma-separated list of users to set as site owners
 `--isPublic`|Determines if the associated group is public or not (applies to type TeamSite)
 `-c, --classification [classification]`|Site classification (applies to type TeamSite, CommunicationSite)
 `--siteDesign [siteDesign]`|Type of communication site to create. Allowed values `Topic,Showcase,Blank`, default `Topic`. When creating a communication site, specify either `siteDesign` or `siteDesignId` (applies to type CommunicationSite)
@@ -55,6 +55,13 @@ The value of the `--storageQuotaWarningLevel` option must not exceed the the val
 If you try to create a site with the same URL as a site that has been previously moved to the recycle bin, you will get an error. To avoid this error, you can use the `--removeDeletedSite` option. Prior to creating the site, the spo site classic add command will check if the site with the specified URL has been previously moved to the recycle bin and if so, will remove it. Because removing sites from the recycle bin might take a moment, it should be used in conjunction with the `--wait` option so that the new site is not created before the old site is fully removed.
 
 Deleting and creating classic site collections is by default asynchronous and depending on the current state of Office 365, might take up to few minutes. If you're building a script with steps that require the site to be fully provisioned, you should use the `--wait` flag. When using this flag, the spo site classic add command will keep running until it received confirmation from Office 365 that the site has been fully provisioned.
+
+## Remarks for modern sites:
+
+The `--owners` option is mandatory for site creation of type CommunicationSite 
+when using Azure AD application permissions.
+    
+The creation of the team site under Azure AD application permissions currently throws error 'Insufficient privileges to complete the operation.'. As a workaround, the `aad o365group add` command can be used instead, followed by `spo site set` to further set the properties on the Team site.
 
 ## Examples
 
@@ -92,6 +99,12 @@ Create communication site using the Topic design
 
 ```sh
 spo site add --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing
+```
+
+Create communication site when using Azure AD application permissions instead of delegated permissions
+
+```sh
+spo site add --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --owners "john.smith@contoso.com"
 ```
 
 Create communication site using the Showcase design

@@ -457,6 +457,46 @@ describe(commands.SITE_ADD, () => {
     });
   });
 
+  it('creates communication site using the owner option', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
+        return Promise.resolve({ SiteStatus: 2, SiteUrl: "https://contoso.sharepoint.com/sites/marketing" });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
+      assert(true);
+      done();
+    }, () => {
+      assert(false);
+    });
+  });
+
+  it('sets specified title for communication site', (done) => {
+    const expected = 'Marketing';
+    let actual = '';
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/SPSiteManager/Create`) > -1) {
+        actual = opts.body.request.Title;
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', title: expected, owners: 'abc@email.com' } }, () => {
+      try {
+        assert.equal(actual, expected);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('sets specified url for communication site', (done) => {
     const expected = 'https://contoso.sharepoint.com/sites/marketing';
     let actual = '';
@@ -982,6 +1022,18 @@ describe(commands.SITE_ADD, () => {
     assert.equal(actual, true);
   });
 
+  it('passes validation when \'owners\' is specified for a CommunicationSite', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        url: 'https://contoso.sharepoint.com',
+        type: 'CommunicationSite',
+        title: 'Team 1',
+        owners: 'admin@contoso.com'
+      }
+    });
+    assert.equal(actual, true);
+  });
+
   it('passes validation when multiple owners are specified for a TeamSite', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
@@ -1103,13 +1155,13 @@ describe(commands.SITE_ADD, () => {
     assert.notEqual(actual, true);
   });
 
-  it('fails validation when the type is CommunicationSite and owners option is specified', () => {
+  it('fails validation when the type is CommunicationSite and multiple owners specified', () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
         url: 'https://contoso.sharepoint.com/sites/marketing',
-        owners: 'admin@contoso.com'
+        owners: 'admin@contoso.com,admin1@contoso.com'
       }
     });
     assert.notEqual(actual, true);
