@@ -1,6 +1,6 @@
 # List app usage in Microsoft Teams
 
-Author: [Arjun Menon](https://twitter.com/arjunumenon)
+Inspired by: [Thomy Goelles](https://thomy.tech/list-teams-app-usage/)
 
 A sample script which iterates through all the teams in your tenant and lists all apps in each team. This script will be handy if you want to generate a report of available apps in Teams across your tenant.
 
