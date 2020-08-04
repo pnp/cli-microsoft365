@@ -23,6 +23,7 @@ Option|Description
 `--megaMenuEnabled [megaMenuEnabled]`|Set to `true` to change the menu style to megamenu. Set to `false` to use the cascading menu style
 `--footerEnabled [footerEnabled]`|Set to `true` to enable footer and to `false` to disable it
 `--searchScope [searchScope]`|Search scope to set in the site. Allowed values `DefaultScope,Tenant,Hub,Site`
+`--welcomePage [welcomePage]`|Set welcome page for the web
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
@@ -75,6 +76,10 @@ Set search scope to tenant scope
 
 ```sh
 spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
+```
+Set welcome page for the web
+```sh
+spo web set  --webUrl https://contoso.sharepoint.com/sites/team-a --welcomePage "SitePages/new-Home.aspx"
 ```
 
 ## More information
