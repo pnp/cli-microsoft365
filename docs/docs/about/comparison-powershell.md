@@ -632,7 +632,7 @@ Set-PnPGroup|SharePointPnPPowerShellOnline|
 Set-PnPGroupPermissions|SharePointPnPPowerShellOnline|
 Set-PnPHomeSite|SharePointPnPPowerShellOnline|[spo homesite set](../cmd/spo/homesite/homesite-set.md)
 Set-PnPHideDefaultThemes|SharePointPnPPowerShellOnline|[spo hidedefaultthemes set](../cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md)
-Set-PnPHomePage|SharePointPnPPowerShellOnline|
+Set-PnPHomePage|SharePointPnPPowerShellOnline|[spo web set](../cmd/spo/web/web-set.md)
 Set-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite set](../cmd/spo/hubsite/hubsite-set.md)
 Set-PnPIndexedProperties|SharePointPnPPowerShellOnline|
 Set-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|[spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md)

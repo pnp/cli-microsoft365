@@ -24,6 +24,7 @@ Option|Description
 `--footerEnabled [footerEnabled]`|Set to `true` to enable footer and to `false` to disable it
 `--searchScope [searchScope]`|Search scope to set in the site. Allowed values `DefaultScope,Tenant,Hub,Site`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+`--welcomePage [welcomePage]`|Site-relative URL of the welcome page for the site
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -74,6 +75,12 @@ Set search scope to tenant scope
 
 ```sh
 spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
+```
+
+Set welcome page for the web
+
+```sh
+spo web set  --webUrl https://contoso.sharepoint.com/sites/team-a --welcomePage "SitePages/new-home.aspx"
 ```
 
 ## More information

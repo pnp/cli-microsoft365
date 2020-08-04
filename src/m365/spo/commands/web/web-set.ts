@@ -23,6 +23,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   footerEnabled?: string;
   searchScope?: string;
+  welcomePage?: string;
 }
 
 class SpoWebSetCommand extends SpoCommand {
@@ -48,6 +49,7 @@ class SpoWebSetCommand extends SpoCommand {
     telemetryProps.quickLaunchEnabled = typeof args.options.quickLaunchEnabled !== 'undefined';
     telemetryProps.footerEnabled = typeof args.options.footerEnabled !== 'undefined';
     telemetryProps.searchScope = args.options.searchScope !== 'undefined';
+    telemetryProps.welcomePage = args.options.welcomePage !== 'undefined';
     this.trackUnknownOptions(telemetryProps, args.options);
     return telemetryProps;
   }
@@ -102,6 +104,29 @@ class SpoWebSetCommand extends SpoCommand {
 
     request
       .patch(requestOptions)
+      .then((): Promise<void> => {
+        if (typeof args.options.welcomePage === 'undefined') {
+          return Promise.resolve();
+        }
+
+        if (this.verbose) {
+          cmd.log(`Updating Welcome page for the site ${args.options.webUrl}`);
+        }
+
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/rootfolder`,
+          headers: {
+            'Content-Type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata',
+            'IF-MATCH': '*',
+            'X-HTTP-Method': 'PATCH'
+          },
+          body: { WelcomePage: args.options.welcomePage },
+          json: true
+        };
+
+        return request.patch(requestOptions)
+      })
       .then((): void => {
         if (this.debug) {
           cmd.log(vorpal.chalk.green('DONE'));
@@ -161,6 +186,10 @@ class SpoWebSetCommand extends SpoCommand {
         option: '--searchScope [searchScope]',
         description: 'Search scope to set in the site. Allowed values DefaultScope|Tenant|Hub|Site',
         autocomplete: SpoWebSetCommand.searchScopeOptions
+      },
+      {
+        option: '--welcomePage [welcomePage]',
+        description: 'Site-relative URL of the welcome page for the site'
       }
     ];
 
@@ -237,9 +266,9 @@ class SpoWebSetCommand extends SpoCommand {
     command, you can update the value of any other web property using its
     CSOM name, eg. ${chalk.grey('--AllowAutomaticASPXPageIndexing')}. At this
     moment, the CLI supports properties of types Boolean, String and Int32.
-      
+
   Examples:
-  
+
     Update subsite title
       ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --title Team-a
 
@@ -261,6 +290,9 @@ class SpoWebSetCommand extends SpoCommand {
     Set search scope to tenant scope
       ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
   
+    Set welcome page for the web
+      ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --welcomePage "SitePages/new-home.aspx"
+
   More information:
     
     Web properties
