@@ -19,7 +19,7 @@ Option|Description
 `-u, --url [url]`|Site URL  (applies to type CommunicationSite, ClassicSite)
 `-z, --timeZone [timeZone]`|Integer representing time zone to use for the site (applies to type ClassicSite)
 `-d, --description [description]`|Site description
-`-l, --lcid [lcid]`|Site language in the LCID format, eg. _1033_ for _en-US_
+`-l, --lcid [lcid]`|Site language in the LCID format, eg. _1033_ for _en-US_. See [SharePoint documentation](https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff) for the list of supported languages
 `--owners [owners]`|Comma-separated list of users to set as site owners
 `--isPublic`|Determines if the associated group is public or not (applies to type TeamSite)
 `-c, --classification [classification]`|Site classification (applies to type TeamSite, CommunicationSite)

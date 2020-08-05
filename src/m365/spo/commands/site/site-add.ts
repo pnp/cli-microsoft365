@@ -59,6 +59,13 @@ class SpoSiteAddCommand extends SpoCommand {
   private dots?: string;
   private timeout?: NodeJS.Timer;
 
+  private get supportedLcids(): number[] {
+    // Languages supported by SharePoint
+    // https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff
+    // https://github.com/pnp/PnP-PowerShell/wiki/Supported-LCIDs-by-SharePoint
+    return [1025, 1068, 1069, 5146, 1026, 1027, 2052, 1028, 1050, 1029, 1030, 1043, 1033, 1061, 1035, 1036, 1110, 1031, 1032, 1037, 1081, 1038, 1057, 2108, 1040, 1041, 1087, 1042, 1062, 1063, 1071, 1086, 1044, 1045, 1046, 2070, 1048, 1049, 10266, 2074, 1051, 1060, 3082, 1053, 1054, 1055, 1058, 1066, 1106];
+  }
+
   public get name(): string {
     return commands.SITE_ADD;
   }
@@ -498,7 +505,7 @@ class SpoSiteAddCommand extends SpoCommand {
       },
       {
         option: '-l, --lcid [lcid]',
-        description: 'Site language in the LCID format, eg. 1033 for en-US'
+        description: 'Site language in the LCID format, eg. 1033 for en-US. See https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff for the list of supported languages'
       },
       {
         option: '--owners [owners]',
@@ -703,6 +710,10 @@ class SpoSiteAddCommand extends SpoCommand {
         if (args.options.lcid < 0) {
           return `LCID must be greater than 0 (${args.options.lcid})`;
         }
+
+        if (this.supportedLcids.indexOf(args.options.lcid) < 0) {
+          return `LCID ${args.options.lcid} is not valid. See https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff for the languages supported by SharePoint.`;
+        }   
       }
 
       return true;

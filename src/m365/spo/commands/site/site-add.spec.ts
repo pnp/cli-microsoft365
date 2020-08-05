@@ -1300,6 +1300,18 @@ describe(commands.SITE_ADD, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validation when lcid is not valid', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options: {
+        type: 'CommunicationSite',
+        title: 'Marketing',
+        url: 'https://contoso.sharepoint.com/sites/marketing',
+        lcid: 3081
+      }
+    });
+    assert.notEqual(actual, true);
+  });
+
   it('creates classic site with minimal options. doesn\'t wait for completion', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
