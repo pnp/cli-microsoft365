@@ -1,5 +1,13 @@
 # Release notes
 
+## v2.14.0
+
+### New commands
+
+**Microsoft Teams:**
+
+- [teams app user remove](../cmd/teams/user/user-app-remove.md) - uninstall an app from the personal scope of the specified user [#1711](https://github.com/pnp/office365-cli/issues/1711)
+
 ## [v2.13.0](https://github.com/pnp/office365-cli/releases/tag/v2.13.0)
 
 ### New commands
