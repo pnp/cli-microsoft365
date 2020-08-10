@@ -155,7 +155,7 @@ Set-SPOGeoStorageQuota|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOHideDefaultThemes|Microsoft.Online.SharePoint.PowerShell|[spo hidedefaultthemes set](../cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md)
 Set-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite set](../cmd/spo/homesite/homesite-set.md)
 Set-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite set](../cmd/spo/hubsite/hubsite-set.md)
-Set-SPOKnowledgeHubSite|Microsoft.Online.SharePoint.PowerShell|
+Set-SPOKnowledgeHubSite|Microsoft.Online.SharePoint.PowerShell|[spo knowledgehub set](../cmd/spo/knowledgehub/knowledgehub-set.md)
 Set-SPOMigrationPackageAzureSource|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
 Set-SPOMultiGeoExperience|Microsoft.Online.SharePoint.PowerShell|
@@ -636,7 +636,7 @@ Set-PnPHomePage|SharePointPnPPowerShellOnline|
 Set-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite set](../cmd/spo/hubsite/hubsite-set.md)
 Set-PnPIndexedProperties|SharePointPnPPowerShellOnline|
 Set-PnPInPlaceRecordsManagement|SharePointPnPPowerShellOnline|[spo site inplacerecordsmanagement set](../cmd/spo/site/site-inplacerecordsmanagement-set.md)
-Set-PnPKnowledgeHubSite|SharePointPnPPowerShellOnline|
+Set-PnPKnowledgeHubSite|SharePointPnPPowerShellOnline|[spo knowledgehub set](../cmd/spo/knowledgehub/knowledgehub-set.md)
 Set-PnPLabel|SharePointPnPPowerShellOnline|[spo list label set](../cmd/spo/list/list-label-set.md)
 Set-PnPList|SharePointPnPPowerShellOnline|[spo list set](../cmd/spo/list/list-set.md)
 Set-PnPListInformationRightsManagement|SharePointPnPPowerShellOnline|

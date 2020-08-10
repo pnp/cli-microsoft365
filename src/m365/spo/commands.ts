@@ -74,6 +74,7 @@ export default {
   HUBSITE_SET: `${prefix} hubsite set`,
   HUBSITE_THEME_SYNC: `${prefix} hubsite theme sync`,
   HUBSITE_UNREGISTER: `${prefix} hubsite unregister`,
+  KNOWLEDGEHUB_SET: `${prefix} knowledgehub set`,
   LIST_ADD: `${prefix} list add`,
   LIST_CONTENTTYPE_ADD: `${prefix} list contenttype add`,
   LIST_CONTENTTYPE_LIST: `${prefix} list contenttype list`,
