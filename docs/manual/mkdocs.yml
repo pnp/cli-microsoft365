@@ -229,6 +229,8 @@ nav:
         - hubsite set: 'cmd/spo/hubsite/hubsite-set.md'
         - hubsite theme sync: 'cmd/spo/hubsite/hubsite-theme-sync.md'
         - hubsite unregister: 'cmd/spo/hubsite/hubsite-unregister.md'
+      - knowledegehub:
+        - knowledegehub set: 'cmd/spo/knowledegehub/knowledegehub-set.md'
       - list:
         - list add: 'cmd/spo/list/list-add.md'
         - list get: 'cmd/spo/list/list-get.md'
