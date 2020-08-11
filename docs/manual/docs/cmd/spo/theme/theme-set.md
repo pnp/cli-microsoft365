@@ -39,6 +39,42 @@ Add or update an inverted theme from a theme JSON file
 spo theme set -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json --isInverted
 ```
 
+A valid theme object is as follows:
+
+```json
+{
+    "themePrimary": "#d81e05",
+    "themeLighterAlt": "#fdf5f4",
+    "themeLighter": "#f9d6d2",
+    "themeLight": "#f4b4ac",
+    "themeTertiary": "#e87060",
+    "themeSecondary": "#dd351e",
+    "themeDarkAlt": "#c31a04",
+    "themeDark": "#a51603",
+    "themeDarker": "#791002",
+    "neutralLighterAlt": "#eeeeee",
+    "neutralLighter": "#f5f5f5",
+    "neutralLight": "#e1e1e1",
+    "neutralQuaternaryAlt": "#d1d1d1",
+    "neutralQuaternary": "#c8c8c8",
+    "neutralTertiaryAlt": "#c0c0c0",
+    "neutralTertiary": "#c2c2c2",
+    "neutralSecondary": "#858585",
+    "neutralPrimaryAlt": "#4b4b4b",
+    "neutralPrimary": "#333333",
+    "neutralDark": "#272727",
+    "black": "#1d1d1d",
+    "white": "#f5f5f5"
+}
+```
+
+Validation checks the following:
+
+- The specified string is a valid JSON string
+- The deserialized object contains all properties defined in the above example
+- The deserialized object doesn't contain any other properties
+- Each property of the deserialized object contains a valid hex color value prefixed with a #
+
 ## More information
 
 - SharePoint site theming: [https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-theming/sharepoint-site-theming-overview](https://docs.microsoft.com/en-us/sharepoint/dev/declarative-customization/site-theming/sharepoint-site-theming-overview)
