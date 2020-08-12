@@ -1,11 +1,11 @@
-# spo knowledegehub set
+# spo knowledgehub set
 
 Sets the Knowledge Hub Site for your tenant
 
 ## Usage
 
 ```sh
-spo knowledegehub set [options]
+spo knowledgehub set [options]
 ```
 
 ## Options
@@ -32,5 +32,5 @@ If the specified url doesn't refer to an existing site collection, you will get 
 Sets the Knowledge Hub Site for your tenant
 
 ```sh
-spo knowledegehub set --url https://contoso.sharepoint.com/sites/knowledgesite
+spo knowledgehub set --url https://contoso.sharepoint.com/sites/knowledgesite
 ```

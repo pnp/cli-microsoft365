@@ -3,7 +3,7 @@ import Command, { CommandValidate, CommandOption, CommandError } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./knowledegehub-set');
+const command: Command = require('./knowledgehub-set');
 import * as assert from 'assert';
 import request from '../../../../request';
 import config from '../../../../config';
