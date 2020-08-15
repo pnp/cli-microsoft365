@@ -25,6 +25,11 @@
 
 - [spo group list](../cmd/spo/group/group-list.md) - lists groups from specific web [#1691](https://github.com/pnp/office365-cli/issues/1691)
 
+### Changes
+
+- fixed 'spo search' command [#1696](https://github.com/pnp/office365-cli/issues/1696)
+- added the 'Export Configurations of Tenant Wide Extensions' sample script [#1440](https://github.com/pnp/office365-cli/issues/1440)
+
 ## [v2.13.0](https://github.com/pnp/office365-cli/releases/tag/v2.13.0)
 
 ### New commands
