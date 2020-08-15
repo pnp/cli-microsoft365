@@ -7,7 +7,7 @@ The SharePoint Admin Center provides various governance features, but there is n
 ```powershell tab="PowerShell Core"
 $resultDir = "Output"
 $listName = "Tenant Wide Extensions"
-$fields = $fields = "Title, Modified, Created, AuthorId, EditorId, TenantWideExtensionComponentId, TenantWideExtensionComponentProperties, TenantWideExtensionListTemplate, TenantWideExtensionWebTemplate, TenantWideExtensionSequence, TenantWideExtensionHostProperties, TenantWideExtensionLocation, TenantWideExtensionDisabled"
+$fields = $fields = "Id,Title, Modified, Created, AuthorId, EditorId, TenantWideExtensionComponentId, TenantWideExtensionComponentProperties, TenantWideExtensionListTemplate, TenantWideExtensionWebTemplate, TenantWideExtensionSequence, TenantWideExtensionHostProperties, TenantWideExtensionLocation, TenantWideExtensionDisabled"
 
 $executionDir = $PSScriptRoot
 $outputDir = "$executionDir/$resultDir"
