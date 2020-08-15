@@ -87,19 +87,6 @@ class TeamsDeeplinkTabGenerateCommand extends GraphCommand {
       }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
-  /**
-   * Maps the base TabTypeOptions enum to string array so it can 
-   * more easily be used in validation or descriptions.
-   */
-  protected get tabTypeMap(): string[] {
-    const result: string[] = [];
-
-    for (let tabType in TabTypeOptions) {
-      result.push(tabType);
-    }
-    return result;
-  }
-
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
