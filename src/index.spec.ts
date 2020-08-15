@@ -54,8 +54,7 @@ describe('Lazy loading commands', () => {
       'teams user add',
       'teams user list',
       'teams user remove',
-      'teams user set',
-      'teams deeplink tab generate'
+      'teams user set'
     ];
     const allCommandNames: string[] = [];
 

@@ -40,6 +40,16 @@ class TeamsDeeplinkTabGenerateCommand extends GraphCommand {
     return 'Generates a Microsoft Teams deep link from an existing Tab in a Channel';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.teamId = args.options.teamId;
+    telemetryProps.channelId = args.options.channelId;
+    telemetryProps.tabId = args.options.tabId;
+    telemetryProps.label = args.options.label;
+    telemetryProps.tabType = args.options.tabType || 'Static';;
+    return telemetryProps;
+  }
+
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}/tabs/${encodeURIComponent(args.options.tabId)}?$expand=teamsApp`,
@@ -60,12 +70,12 @@ class TeamsDeeplinkTabGenerateCommand extends GraphCommand {
         let tabTypeInput: string = args.options.tabType ? args.options.tabType.trim() : TabTypeOptions.Static;
 
         if (TabTypeOptions[(tabTypeInput as keyof typeof TabTypeOptions)].valueOf() == TabTypeOptions.Configurable) {         
-            let context: string = `{"channelId": "${args.options.channelId}"}`;
-            deeplink = { deeplink: `https://teams.microsoft.com/l/entity/${appId}/${entityId}?webUrl=${contentUrl}&label=${args.options.label}&context=${context}` };
+            let context: string = `{"channelId": "${encodeURIComponent(args.options.channelId)}"}`;
+            deeplink = { deeplink: `https://teams.microsoft.com/l/entity/${appId}/${entityId}?webUrl=${contentUrl}&label=${encodeURIComponent(args.options.label)}&context=${context}` };
             cmd.log(deeplink);
         }
         else if (TabTypeOptions[(tabTypeInput as keyof typeof TabTypeOptions)].valueOf() == TabTypeOptions.Static) {
-            deeplink = { deeplink: `https://teams.microsoft.com/l/entity/${appId}/${entityId}?webUrl=${contentUrl}&label=${args.options.label}` };
+            deeplink = { deeplink: `https://teams.microsoft.com/l/entity/${appId}/${entityId}?webUrl=${contentUrl}&label=${encodeURIComponent(args.options.label)}` };
             cmd.log(deeplink);
         }
 
@@ -110,8 +120,8 @@ class TeamsDeeplinkTabGenerateCommand extends GraphCommand {
       },
       {
         option: '-m, --tabType <TabTypeOptions>',
-        description: `The tab type. Allowed values ${this.tabTypeMap.join('|')}. Default ${this.tabTypeMap[0]}`,
-        autocomplete: this.tabTypeMap
+        description: `The tab type. Allowed values Static|Configurable. Default Static}`,
+        autocomplete: ['Static', 'Configurable']
       }
     ];
 
@@ -168,9 +178,6 @@ class TeamsDeeplinkTabGenerateCommand extends GraphCommand {
       `  Remarks:
 
     You can only retrieve deeplink to tabs for teams of which you are a member.
-
-    Tabs 'Conversations' and 'Files' are present in every team and therefore not
-    included in the list of available tabs to retrieve deeplink.
 
     Examples:
     Generates a Microsoft Teams deep link from an existing Tab in a Channel
