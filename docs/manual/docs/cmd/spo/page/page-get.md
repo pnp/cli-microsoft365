@@ -18,7 +18,7 @@ Option|Description
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text`. Default `text`
 `--pretty`|Prettifies `json` output
-`--verbose`|Runs command with verbose logging by including all returned properties
+`--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
 
 ## Remarks
@@ -31,10 +31,4 @@ Get information about the modern page with name _home.aspx_
 
 ```sh
 spo page get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
-```
-
-Get information about the modern page with name _home.aspx_ by including all returned properties
-
-```sh
-spo page get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --verbose
 ```

@@ -59,5 +59,10 @@ export interface PageItem {
   Title: string,
   UIVersion: number,
   UIVersionLabel: string,
-  UniqueId: string
+  UniqueId: string,
+  layoutType: string,
+  commentsDisabled?: boolean,
+  numSections?: number,
+  numControls?: number,
+  title?: string
 }

@@ -58,31 +58,24 @@ class SpoPageGetCommand extends SpoCommand {
           return;
         }
 
-        if (this.verbose) {
-          cmd.log(res);
-        }
-        else {
-          const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
-          let numControls: number = 0;
-          clientSidePage.sections.forEach(s => {
-            s.columns.forEach(c => {
-              numControls += c.controls.length;
-            });
+        const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
+        let numControls: number = 0;
+        clientSidePage.sections.forEach(s => {
+          s.columns.forEach(c => {
+            numControls += c.controls.length;
           });
+        });
 
-          const page: any = {
-            commentsDisabled: res.ListItemAllFields.CommentsDisabled,
-            numSections: clientSidePage.sections.length,
-            numControls: numControls,
-            title: res.ListItemAllFields.Title
-          };
-
-          if (res.ListItemAllFields.PageLayoutType) {
-            page.layoutType = res.ListItemAllFields.PageLayoutType;
-          }
-
-          cmd.log(page);
+        if (res.ListItemAllFields.PageLayoutType) {
+          res.layoutType = res.ListItemAllFields.PageLayoutType;
         }
+
+        res.commentsDisabled = res.ListItemAllFields.CommentsDisabled;
+        res.numSections = clientSidePage.sections.length;
+        res.numControls = numControls;
+        res.title = res.ListItemAllFields.Title;
+
+        cmd.log(res);
 
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
