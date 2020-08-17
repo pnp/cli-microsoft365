@@ -62,11 +62,18 @@ class TeamsDeeplinkTabGenerateCommand extends GraphCommand {
     request
       .get<Tab>(requestOptions)
       .then((res: Tab): void => {
-        let appId: string = res.teamsApp.id;
-        let entityId: string = res.configuration.entityId;
+        let appId: string = res.teamsApp.id;        
         let contentUrl: string = encodeURIComponent(res.webUrl);
         let deeplink: Deeplink = { deeplink: "" };
 
+        // Since entityId is mostly returned as null from Graph API, we will retrieve it from webUrl
+        let entityId: string = "";
+        var myRegexp = /https:\/\/teams.microsoft.com\/l\/(.*)\/(.*)\/(.*)\?(.*)/;
+        var match = myRegexp.exec(res.webUrl);
+        if (match != null) {
+          entityId = match[3];
+        }
+        
         let tabTypeInput: string = args.options.tabType ? args.options.tabType.trim() : TabTypeOptions.Static;
 
         if (TabTypeOptions[(tabTypeInput as keyof typeof TabTypeOptions)].valueOf() == TabTypeOptions.Configurable) {         
