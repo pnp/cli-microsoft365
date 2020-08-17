@@ -47,7 +47,8 @@ if ($appCatalogUrl) {
             $configurationObject | Add-Member -MemberType NoteProperty -Name "TenantWideExtensionLocation" -Value $spolItem.TenantWideExtensionLocation
             $configurationObject | Add-Member -MemberType NoteProperty -Name "TenantWideExtensionDisabled" -Value $spolItem.TenantWideExtensionDisabled
 
-            o365 spo listitem remove --webUrl $appCatalogUrl --listTitle $listName --id $spolItem.Id
+            # you can add --recyle parameter to Recycle the list item
+            o365 spo listitem remove --webUrl $appCatalogUrl --listTitle $listName --id $spolItem.Id --confirm
             $deletedSpfxExtensionConfigs += $configurationObject
         }
 
