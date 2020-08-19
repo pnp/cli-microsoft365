@@ -3,7 +3,7 @@ import Command, { CommandOption, CommandError, CommandValidate } from '../../../
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./tab-generate');
+const command: Command = require('./deeplink-tab-generate');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
