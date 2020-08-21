@@ -5,7 +5,7 @@ coverage
 docs
 node_modules
 scripts/*
-!scripts/Register-O365CLICompletion.ps1
+!scripts/Register-CLIM365Completion.ps1
 src
 types
 .gitignore
