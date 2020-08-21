@@ -2,19 +2,6 @@
 
 ## [v3.0.0](https://github.com/pnp/office365-cli/releases/tag/v3.0.0)
 
-### Changes
-
-- removed deprecated 'id' option in 'spo site set' [#1536](https://github.com/pnp/office365-cli/issues/1536)
-- removed deprecated exit code in 'spfx project upgrade' [#1418](https://github.com/pnp/office365-cli/issues/1418)
-- removed immersive mode [#1600](https://github.com/pnp/office365-cli/issues/1600)
-- removed '-h' as option [#1680](https://github.com/pnp/office365-cli/issues/1680)
-- removed deprecated 'accesstoken get' alias [#1368](https://github.com/pnp/office365-cli/issues/1368)
-- removed '--pretty' global option [#1338](https://github.com/pnp/office365-cli/issues/1338)
-- removed deprecated aliases [#1339](https://github.com/pnp/office365-cli/issues/1339)
-- renamed 'Office 365 CLI' to 'CLI for Microsoft 365' [#1635](https://github.com/pnp/office365-cli/issues/1635)
-
-## [v2.14.0](https://github.com/pnp/office365-cli/releases/tag/v2.14.0)
-
 ### New commands
 
 **Microsoft Teams:**
@@ -30,6 +17,14 @@
 - fixed 'spo search' command [#1696](https://github.com/pnp/office365-cli/issues/1696)
 - added the 'Export Configurations of Tenant Wide Extensions' sample script [#1440](https://github.com/pnp/office365-cli/issues/1440)
 - extended 'spo site set' with sharing capabilities [#1713](https://github.com/pnp/office365-cli/issues/1713)
+- removed deprecated 'id' option in 'spo site set' [#1536](https://github.com/pnp/office365-cli/issues/1536)
+- removed deprecated exit code in 'spfx project upgrade' [#1418](https://github.com/pnp/office365-cli/issues/1418)
+- removed immersive mode [#1600](https://github.com/pnp/office365-cli/issues/1600)
+- removed '-h' as option [#1680](https://github.com/pnp/office365-cli/issues/1680)
+- removed deprecated 'accesstoken get' alias [#1368](https://github.com/pnp/office365-cli/issues/1368)
+- removed '--pretty' global option [#1338](https://github.com/pnp/office365-cli/issues/1338)
+- removed deprecated aliases [#1339](https://github.com/pnp/office365-cli/issues/1339)
+- renamed 'Office 365 CLI' to 'CLI for Microsoft 365' [#1635](https://github.com/pnp/office365-cli/issues/1635)
 
 ## [v2.13.0](https://github.com/pnp/office365-cli/releases/tag/v2.13.0)
 
