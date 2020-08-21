@@ -2,8 +2,8 @@
 
 @latest/@next (master) |
 :--------------: |
-[![CircleCI](https://circleci.com/gh/pnp/office365-cli/tree/master.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/pnp/office365-cli/tree/master)|
-[![Coverage Status](https://coveralls.io/repos/github/pnp/office365-cli/badge.svg?branch=master)](https://coveralls.io/github/pnp/office365-cli?branch=master)|
+[![CircleCI](https://circleci.com/gh/pnp/cli-microsoft365/tree/master.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/pnp/cli-microsoft365/tree/master)|
+[![Coverage Status](https://coveralls.io/repos/github/pnp/cli-microsoft365/badge.svg?branch=master)](https://coveralls.io/github/pnp/cli-microsoft365?branch=master)|
 
 # CLI for Microsoft 365
 
@@ -51,7 +51,7 @@ See the [User Guide](docs/manual/docs/user-guide/installing-cli.md) to learn mor
 
 ## Sharing is Caring
 
-We'd love your help! If you have ideas for new features or feedback, let us know by creating an issue in the [issues list](https://github.com/pnp/office365-cli/issues). Before you submit a PR with your improvements, please review our [project guides](./docs/guides/index.md).
+We'd love your help! If you have ideas for new features or feedback, let us know by creating an issue in the [issues list](https://github.com/pnp/cli-microsoft365/issues). Before you submit a PR with your improvements, please review our [project guides](./docs/guides/index.md).
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
@@ -63,4 +63,4 @@ contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additio
 
 **THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.**
 
-![telemetry](https://telemetry.sharepointpnp.com/office365-cli/readme)
+![telemetry](https://telemetry.sharepointpnp.com/cli-microsoft365/readme)

@@ -558,5 +558,5 @@ extra:
       link: 'http://aka.ms/sppnp-videos'
     - type: 'link'
       link: 'https://aka.ms/sppnp'
-repo_url: http://github.com/pnp/office365-cli
+repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/master/docs/manual/docs

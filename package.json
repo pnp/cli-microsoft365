@@ -11,11 +11,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pnp/office365-cli.git"
+    "url": "git+https://github.com/pnp/cli-microsoft365.git"
   },
-  "homepage": "https://pnp.github.io/office365-cli/",
+  "homepage": "https://pnp.github.io/cli-microsoft365/",
   "bugs": {
-    "url": "https://github.com/pnp/office365-cli/issues"
+    "url": "https://github.com/pnp/cli-microsoft365/issues"
   },
   "scripts": {
     "build": "tsc -p . && node scripts/copy-files.js",
@@ -40,7 +40,7 @@
     "azure",
     "microsoft"
   ],
-  "author": "https://github.com/pnp/office365-cli/graphs/contributors",
+  "author": "https://github.com/pnp/cli-microsoft365/graphs/contributors",
   "maintainers": [
     {
       "name": "Waldek Mastykarz",
