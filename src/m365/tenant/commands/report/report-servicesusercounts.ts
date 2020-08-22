@@ -26,11 +26,11 @@ class TenantReportServicesUserCountsCommand extends PeriodBasedReport {
 
     Gets the count of users by activity type and service for the last week
     and exports the report data in the specified path in text format
-      ${commands.TENANT_REPORT_SERVICESUSERCOUNTS} --period D7 --output text --outputFile "servicesusercount.txt"
+      ${commands.TENANT_REPORT_SERVICESUSERCOUNTS} --period D7 --output text > "servicesusercount.txt"
 
     Gets the count of users by activity type and service for the last week
     and exports the report data in the specified path in json format
-      ${commands.TENANT_REPORT_SERVICESUSERCOUNTS} --period D7 --output json --outputFile "servicesusercount.json"
+      ${commands.TENANT_REPORT_SERVICESUSERCOUNTS} --period D7 --output json > "servicesusercount.json"
 `);
   }
 }

@@ -26,11 +26,11 @@ class SpoReportActivityPagesCommand extends PeriodBasedReport {
 
     Gets the number of unique pages visited by users for the last week
     and exports the report data in the specified path in text format
-      ${commands.REPORT_ACTIVITYPAGES} --period D7 --output text --outputFile "activitypages.txt"
+      ${commands.REPORT_ACTIVITYPAGES} --period D7 --output text > "activitypages.txt"
 
     Gets the number of unique pages visited by users for the last week
     and exports the report data in the specified path in json format
-      ${commands.REPORT_ACTIVITYPAGES} --period D7 --output json --outputFile "activitypages.json"
+      ${commands.REPORT_ACTIVITYPAGES} --period D7 --output json > "activitypages.json"
 `);
   }
 }

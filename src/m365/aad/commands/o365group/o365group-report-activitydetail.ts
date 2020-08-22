@@ -29,11 +29,11 @@ class O365GroupReportActivityDetailCommand extends DateAndPeriodBasedReport {
 
     Get details about Microsoft 365 Groups activity by group for the last week
     and exports the report data in the specified path in text format
-      ${commands.O365GROUP_REPORT_ACTIVITYDETAIL} --period D7 --output text --outputFile "o365groupactivitydetail.txt"
+      ${commands.O365GROUP_REPORT_ACTIVITYDETAIL} --period D7 --output text > "o365groupactivitydetail.txt"
 
     Get details about Microsoft 365 Groups activity by group for the last week
     and exports the report data in the specified path in json format
-      ${commands.O365GROUP_REPORT_ACTIVITYDETAIL} --period D7 --output json --outputFile "o365groupactivitydetail.json"
+      ${commands.O365GROUP_REPORT_ACTIVITYDETAIL} --period D7 --output json > "o365groupactivitydetail.json"
 `);
   }
 }

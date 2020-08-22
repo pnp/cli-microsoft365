@@ -1,10 +1,9 @@
 import commands from '../../commands';
 import Command, {
-  CommandOption, CommandError, CommandAction, CommandValidate
+  CommandOption, CommandError, CommandAction
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import * as path from 'path';
-import * as fs from 'fs';
 import * as os from 'os';
 import { Project, ExternalConfiguration, External } from './model';
 
@@ -15,11 +14,7 @@ import { ExternalizeEntry, FileEdit } from './project-externalize/';
 import { BaseProjectCommand } from './base-project-command';
 
 interface CommandArgs {
-  options: Options;
-}
-
-interface Options extends GlobalOptions {
-  outputFile?: string;
+  options: GlobalOptions;
 }
 
 class SpfxProjectExternalizeCommand extends BaseProjectCommand {
@@ -64,12 +59,6 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
 
   public get description(): string {
     return 'Externalizes SharePoint Framework project dependencies';
-  }
-
-  public getTelemetryProperties(args: CommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
-    return telemetryProps;
   }
 
   public action(): CommandAction {
@@ -128,7 +117,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
       });
   }
 
-  private writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], cmd: CommandInstance, options: Options): void {
+  private writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], cmd: CommandInstance, options: GlobalOptions): void {
     let report;
 
     switch (options.output) {
@@ -143,12 +132,8 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
         break;
     }
 
-    if (options.outputFile) {
-      fs.writeFileSync(path.resolve(options.outputFile), options.output === 'json' ? JSON.stringify(report, null, 2) : report, 'utf-8');
-    }
-    else {
       cmd.log(report);
-    }
+    
   }
 
   private serializeMdReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[]): string {
@@ -227,13 +212,6 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
   }
 
   public options(): CommandOption[] {
-    const options: CommandOption[] = [
-      {
-        option: '-f, --outputFile [outputFile]',
-        description: 'Path to the file where the report should be stored in'
-      } as CommandOption
-    ];
-
     const parentOptions: CommandOption[] = super.options();
     parentOptions.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
@@ -241,20 +219,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
         o.autocomplete = ['json', 'text', 'md'];
       }
     });
-    return options.concat(parentOptions);
-  }
-
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.outputFile) {
-        const dirPath: string = path.dirname(path.resolve(args.options.outputFile));
-        if (!fs.existsSync(dirPath)) {
-          return `Directory ${dirPath} doesn't exist. Please check the path and try again.`;
-        }
-      }
-
-      return true;
-    };
+    return parentOptions;
   }
 
   public commandHelp(args: any, log: (help: string) => void): void {
@@ -285,7 +250,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
 
     Get instructions to externalize dependencies for the current SharePoint
     Framework project and save the findings in a Markdown file
-      ${this.name} --output md --outputFile "deps-report.md"
+      ${this.name} --output md > "deps-report.md"
 
     Get instructions to externalize the current SharePoint Framework project
     dependencies and show the summary of the findings in the terminal

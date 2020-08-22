@@ -27,11 +27,11 @@ class YammerReportDeviceUsageUserCountsCommand extends PeriodBasedReport {
 
     Gets the number of daily users by device type for the last week and exports
     the report data in the specified path in text format
-      ${commands.YAMMER_REPORT_DEVICEUSAGEUSERCOUNTS} --period D7 --output text --outputFile "deviceusageusercounts.txt"
+      ${commands.YAMMER_REPORT_DEVICEUSAGEUSERCOUNTS} --period D7 --output text > "deviceusageusercounts.txt"
 
     Gets the number of daily users by device type for the last week and exports
     the report data in the specified path in json format
-      ${commands.YAMMER_REPORT_DEVICEUSAGEUSERCOUNTS} --period D7 --output json --outputFile "deviceusageusercounts.json"
+      ${commands.YAMMER_REPORT_DEVICEUSAGEUSERCOUNTS} --period D7 --output json > "deviceusageusercounts.json"
 `);
   }
 }

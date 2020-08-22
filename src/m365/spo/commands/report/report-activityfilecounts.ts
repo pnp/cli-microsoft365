@@ -28,12 +28,12 @@ class SpoReportActivityFileCountsCommand extends PeriodBasedReport {
     Gets the number of unique, licensed users who interacted with files stored
     on SharePoint sites for the last week and exports the report data
     in the specified path in text format
-      ${commands.REPORT_ACTIVITYFILECOUNTS} --period D7 --output text --outputFile "activityfilecounts.txt"
+      ${commands.REPORT_ACTIVITYFILECOUNTS} --period D7 --output text > "activityfilecounts.txt"
 
     Gets the number of unique, licensed users who interacted with files stored
     on SharePoint sites for the last week and exports the report data
     in the specified path in json format
-      ${commands.REPORT_ACTIVITYFILECOUNTS} --period D7 --output json --outputFile "activityfilecounts.json"
+      ${commands.REPORT_ACTIVITYFILECOUNTS} --period D7 --output json > "activityfilecounts.json"
 `);
   }
 }

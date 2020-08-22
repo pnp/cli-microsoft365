@@ -26,11 +26,11 @@ class SpoReportSiteUsagePagesCommand extends PeriodBasedReport {
 
     Gets the number of pages viewed across all sites for the last week
     and exports the report data in the specified path in text format
-      ${commands.REPORT_SITEUSAGEPAGES} --period D7 --output text --outputFile "siteusagepages.txt"
+      ${commands.REPORT_SITEUSAGEPAGES} --period D7 --output text > "siteusagepages.txt"
 
     Gets the number of pages viewed across all sites for the last week
     and exports the report data in the specified path in json format
-      ${commands.REPORT_SITEUSAGEPAGES} --period D7 --output json --outputFile "siteusagepages.json"
+      ${commands.REPORT_SITEUSAGEPAGES} --period D7 --output json > "siteusagepages.json"
 `);
   }
 }

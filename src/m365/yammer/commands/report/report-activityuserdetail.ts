@@ -34,11 +34,11 @@ class YammerReportActivityUserDetailCommand extends DateAndPeriodBasedReport {
 
     Gets details about Yammer activity by user for the last week
     and exports the report data in the specified path in text format
-      ${commands.YAMMER_REPORT_ACTIVITYUSERDETAIL} --period D7 --output text --outputFile "activityuserdetail.txt"
+      ${commands.YAMMER_REPORT_ACTIVITYUSERDETAIL} --period D7 --output text > "activityuserdetail.txt"
 
     Gets details about Yammer activity by user for the last week
     and exports the report data in the specified path in json format
-      ${commands.YAMMER_REPORT_ACTIVITYUSERDETAIL} --period D7 --output json --outputFile "activityuserdetail.json"
+      ${commands.YAMMER_REPORT_ACTIVITYUSERDETAIL} --period D7 --output json > "activityuserdetail.json"
 `);
   }
 }

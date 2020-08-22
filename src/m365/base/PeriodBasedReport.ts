@@ -4,40 +4,26 @@ import {
 } from '../../Command';
 import GraphCommand from "./GraphCommand";
 import request from '../../request';
-import * as path from 'path';
-import * as fs from 'fs';
 
 interface CommandArgs {
   options: UsagePeriodOptions;
 }
 
-interface OutputFileCommandArgs {
-  options: OutputFileOptions;
-}
-
-interface UsagePeriodOptions extends OutputFileOptions {
+interface UsagePeriodOptions extends GlobalOptions {
   period: string;
-}
-
-export interface OutputFileOptions extends GlobalOptions {
-  outputFile?: string;
 }
 
 export default abstract class PeriodBasedReport extends GraphCommand {
   public abstract get usageEndpoint(): string;
 
-  public getTelemetryProperties(args: OutputFileCommandArgs): any {
-    const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.outputFile = typeof args.options.outputFile !== 'undefined';
-    return telemetryProps;
-  }
+
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     const endpoint: string = `${this.resource}/v1.0/reports/${this.usageEndpoint}(period='${encodeURIComponent(args.options.period)}')`;
-    this.executeReport(endpoint, cmd, args.options.output, args.options.outputFile, cb);
+    this.executeReport(endpoint, cmd, args.options.output, cb);
   }
 
-  protected executeReport(endPoint: string, cmd: CommandInstance, output: string | undefined, outputFile: string | undefined, cb: () => void): void {
+  protected executeReport(endPoint: string, cmd: CommandInstance, output: string | undefined, cb: () => void): void {
     const requestOptions: any = {
       url: endPoint,
       headers: {
@@ -60,16 +46,8 @@ export default abstract class PeriodBasedReport extends GraphCommand {
           content = cleanResponse;
         }
 
-        if (!outputFile) {
           cmd.log(content);
-        }
-        else {
-          fs.writeFileSync(outputFile, content, 'utf8');
-          if (this.verbose) {
-            cmd.log(`File saved to path '${outputFile}'`);
-          }
-        }
-
+        
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
@@ -103,10 +81,6 @@ export default abstract class PeriodBasedReport extends GraphCommand {
         option: '-p, --period <period>',
         description: 'The length of time over which the report is aggregated. Supported values D7|D30|D90|D180',
         autocomplete: ['D7', 'D30', 'D90', 'D180']
-      },
-      {
-        option: '-f, --outputFile [outputFile]',
-        description: 'Path to the file where the report should be stored in'
       }
     ];
 
@@ -119,11 +93,6 @@ export default abstract class PeriodBasedReport extends GraphCommand {
       if (!args.options.period) {
         return 'Required parameter period missing';
       }
-
-      if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
-        return `The specified path ${path.dirname(args.options.outputFile)} doesn't exist`;
-      }
-
       return this.validatePeriod(args.options.period);
     };
   }
