@@ -26,11 +26,11 @@ class SpoReportSiteUsageStorageCommand extends PeriodBasedReport {
 
     Gets the trend of storage allocated and consumed during the last week
     and exports the report data in the specified path in text format
-      ${commands.REPORT_SITEUSAGESTORAGE} --period D7 --output text --outputFile "siteusagestorage.txt"
+      ${commands.REPORT_SITEUSAGESTORAGE} --period D7 --output text > "siteusagestorage.txt"
 
     Gets the trend of storage allocated and consumed during the last week
     and exports the report data in the specified path in json format
-      ${commands.REPORT_SITEUSAGESTORAGE} --period D7 --output json --outputFile "siteusagestorage.json"
+      ${commands.REPORT_SITEUSAGESTORAGE} --period D7 --output json > "siteusagestorage.json"
 `);
   }
 }

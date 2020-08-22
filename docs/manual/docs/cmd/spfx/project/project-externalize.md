@@ -13,7 +13,6 @@ spfx project externalize [options]
 Option|Description
 ------|-----------
 `--help`|output usage information
-`-f, --outputFile [outputFile]`|Path to the file where the report should be stored in
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text,md`. Default `text`
 `--verbose`|Runs command with verbose logging
@@ -36,7 +35,7 @@ This command doesn't change your project files. Instead, it gives you a report w
 Get instructions to externalize the current SharePoint Framework project dependencies and save the findings in a Markdown file
 
 ```sh
-spfx project externalize --output md --outputFile "deps-report.md"
+spfx project externalize --output md > "deps-report.md"
 ```
 
 Get instructions to externalize the current SharePoint Framework project dependencies and show the summary of the findings in the terminal

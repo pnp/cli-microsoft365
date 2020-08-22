@@ -27,12 +27,12 @@ class O365GroupReportActivityStorageCommand extends PeriodBasedReport {
 
     Get the total storage used across all group mailboxes and group sites and
     exports the report data in the specified path in text format
-      ${commands.O365GROUP_REPORT_ACTIVITYSTORAGE} --period D7 --output text --outputFile "o365groupactivitystorage.txt"
+      ${commands.O365GROUP_REPORT_ACTIVITYSTORAGE} --period D7 --output text > "o365groupactivitystorage.txt"
 
     Get the total storage used across all group mailboxes and group sites for
     the last week and exports the report data in the specified path in json
     format
-      ${commands.O365GROUP_REPORT_ACTIVITYSTORAGE} --period D7 --output json --outputFile "o365groupactivitystorage.json"
+      ${commands.O365GROUP_REPORT_ACTIVITYSTORAGE} --period D7 --output json > "o365groupactivitystorage.json"
 `);
   }
 }

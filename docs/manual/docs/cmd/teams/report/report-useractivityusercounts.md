@@ -14,7 +14,6 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-p, --period <period>`|The length of time over which the report is aggregated. Supported values `D7,D30,D90,D180`
-`-f, --outputFile [outputFile]`|Path to the file where the Microsoft Teams users by activity type report should be stored in
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `text,json`. Default `text`
 `--verbose`|Runs command with verbose logging
@@ -31,11 +30,11 @@ teams report useractivityusercounts --period D7
 Gets the number of Microsoft Teams users by activity type for the last week and exports the report data in the specified path in text format
 
 ```sh
-teams report useractivityusercounts --period D7 --output text --outputFile "useractivityusercounts.txt"
+teams report useractivityusercounts --period D7 --output text > "useractivityusercounts.txt"
 ```
 
 Gets the number of Microsoft Teams users by activity type for the last week and exports the report data in the specified path in json format
 
 ```sh
-teams report useractivityusercounts --period D7 --output json --outputFile "useractivityusercounts.json"
+teams report useractivityusercounts --period D7 --output json > "useractivityusercounts.json"
 ```

@@ -1,6 +1,6 @@
 import request from '../../../../request';
 import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import Command, { CommandOption, CommandError } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 const command: Command = require('./project-externalize');
@@ -619,7 +619,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
 
     cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'json', debug: true, outputFile: 'report.json' } }, (err?: any) => {
+    cmdInstance.action({ options: { output: 'json', debug: true } }, (err?: any) => {
       try {
         assert.notEqual(typeof err, 'undefined');
         done();
@@ -715,41 +715,6 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     assert(emptyReport.length === 122 || emptyReport.length === 124);
   });
 
-  it('writes externalize report to file when outputFile specified', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
-    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'md', outputFile: '/foo/report.md' } }, (err?: any) => {
-      try {
-        assert(writeFileSyncSpy.called);
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
-  });
-
-  it('writes JSON externalize report to file when outputFile specified in json output mode', (done) => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
-    let typeofReport: string = '';
-    sinon.stub(fs, 'writeFileSync').callsFake((path, contents: any) => {
-      typeofReport = typeof contents;
-    });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'json', outputFile: '/foo/report.json' } }, (err?: any) => {
-      try {
-        assert.equal(typeofReport, 'string');
-        done();
-      }
-      catch (ex) {
-        done(ex);
-      }
-    });
-  });
-
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
     let containsOption = false;
@@ -759,23 +724,6 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     assert(containsOption);
-  });
-
-  it('passes validation when package manager not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
-    assert.equal(actual, true);
-  });
-
-  it('fails validation when non-existent path specified', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = (command.validate() as CommandValidate)({ options: { outputFile: '/foo/file.md' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation when valid file path specified', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = (command.validate() as CommandValidate)({ options: { outputFile: '/foo/file.md' } });
-    assert.equal(actual, true);
   });
 
   it('has help referring to the right command', () => {

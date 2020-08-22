@@ -14,7 +14,6 @@ Option|Description
 ------|-----------
 `--help`|output usage information
 `-p, --period <period>`|The length of time over which the report is aggregated. Supported values `D7,D30,D90,D180`
-`-f, --outputFile [outputFile]`|Path to the file where the report should be stored in
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `text,json`. Default `text`
 `--verbose`|Runs command with verbose logging
@@ -35,11 +34,11 @@ spo report siteusagefilecounts --period D7
 Get the total number of files across all sites and the number of active files for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report siteusagefilecounts --period D7 --output text --outputFile "siteusagefilecounts.txt"
+spo report siteusagefilecounts --period D7 --output text > "siteusagefilecounts.txt"
 ```
 
 Get the total number of files across all sites and the number of active files for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report siteusagefilecounts --period D7 --output json --outputFile "siteusagefilecounts.json"
+spo report siteusagefilecounts --period D7 --output json > "siteusagefilecounts.json"
 ```

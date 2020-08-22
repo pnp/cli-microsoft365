@@ -28,12 +28,12 @@ class YammerReportGroupsActivityCountsCommand extends PeriodBasedReport {
     Gets the number of Yammer messages posted, read, and liked in groups for
     the last week and exports the report data in the specified path in text
     format
-      ${commands.YAMMER_REPORT_GROUPSACTIVITYCOUNTS} --period D7 --output text --outputFile "groupsactivitycounts.txt"
+      ${commands.YAMMER_REPORT_GROUPSACTIVITYCOUNTS} --period D7 --output text > "groupsactivitycounts.txt"
 
     Gets the number of Yammer messages posted, read, and liked in groups for
     the last week and exports the report data in the specified path in json
     format
-      ${commands.YAMMER_REPORT_GROUPSACTIVITYCOUNTS} --period D7 --output json --outputFile "groupsactivitycounts.json"
+      ${commands.YAMMER_REPORT_GROUPSACTIVITYCOUNTS} --period D7 --output json > "groupsactivitycounts.json"
 `);
   }
 }

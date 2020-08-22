@@ -1,15 +1,14 @@
 import {
   CommandOption, CommandValidate
 } from '../../Command';
-import PeriodBasedReport, { OutputFileOptions } from './PeriodBasedReport';
-import * as path from 'path';
-import * as fs from 'fs';
+import PeriodBasedReport from './PeriodBasedReport';
+import GlobalOptions from '../../GlobalOptions';
 
 interface CommandArgs {
   options: DateAndPeriodBasedOptions;
 }
 
-interface DateAndPeriodBasedOptions extends OutputFileOptions {
+interface DateAndPeriodBasedOptions extends GlobalOptions {
   period?: string;
   date?: string;
 }
@@ -19,7 +18,7 @@ export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport
     const periodParameter: string = args.options.period ? `${this.usageEndpoint}(period='${encodeURIComponent(args.options.period)}')` : '';
     const dateParameter: string = args.options.date ? `${this.usageEndpoint}(date=${encodeURIComponent(args.options.date)})` : '';
     const endpoint: string = `${this.resource}/v1.0/reports/${(args.options.period ? periodParameter : dateParameter)}`;
-    this.executeReport(endpoint, cmd, args.options.output, args.options.outputFile, cb);
+    this.executeReport(endpoint, cmd, args.options.output, cb);
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -49,10 +48,6 @@ export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport
     return (args: CommandArgs): boolean | string => {
       if (!args.options.period && !args.options.date) {
         return 'Specify period or date, one is required.';
-      }
-
-      if (args.options.outputFile && !fs.existsSync(path.dirname(args.options.outputFile))) {
-        return `The specified path ${path.dirname(args.options.outputFile)} doesn't exist`;
       }
 
       if (args.options.period && args.options.date) {

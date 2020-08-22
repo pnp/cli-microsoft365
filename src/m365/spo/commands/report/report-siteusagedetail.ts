@@ -34,11 +34,11 @@ class SpoReportSiteUsageDetailCommand extends DateAndPeriodBasedReport {
 
     Gets details about SharePoint site usage for the last week 
     and exports the report data in the specified path in text format
-      ${commands.REPORT_SITEUSAGEDETAIL} --period D7 --output text --outputFile "siteusagedetail.txt"
+      ${commands.REPORT_SITEUSAGEDETAIL} --period D7 --output text > "siteusagedetail.txt"
 
     Gets details about SharePoint site usage for the last week
     and exports the report data in the specified path in json format
-      ${commands.REPORT_SITEUSAGEDETAIL} --period D7 --output json --outputFile "siteusagedetail.json"
+      ${commands.REPORT_SITEUSAGEDETAIL} --period D7 --output json > "siteusagedetail.json"
 `);
   }
 }

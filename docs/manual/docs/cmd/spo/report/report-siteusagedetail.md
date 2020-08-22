@@ -15,7 +15,6 @@ Option|Description
 `--help`|output usage information
 `-d, --date [date]`|The date for which you would like to view the users who performed any activity. Supported date format is `YYYY-MM-DD`. Specify the date or period, but not both.
 `-p, --period [period]`|The length of time over which the report is aggregated. Supported values `D7,D30,D90,D180`
-`-f, --outputFile [outputFile]`|Path to the file where the report should be stored in
 `-o, --output [output]`|Output type. `text,json`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -41,11 +40,11 @@ spo report siteusagedetail --date 2019-05-01
 Gets details about SharePoint site usage for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report siteusagedetail --period D7 --output text --outputFile "siteusagedetail.txt"
+spo report siteusagedetail --period D7 --output text > "siteusagedetail.txt"
 ```
 
 Gets details about SharePoint site usage for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report siteusagedetail --period D7 --output json --outputFile "siteusagedetail.json"
+spo report siteusagedetail --period D7 --output json > "siteusagedetail.json"
 ```

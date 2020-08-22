@@ -28,12 +28,12 @@ class O365GroupReportActivityFileCountsCommand extends PeriodBasedReport {
     Get the total number of files and how many of them were active across all
     group sites associated with an Microsoft 365 Group for the last week
     and exports the report data in the specified path in text format
-      ${commands.O365GROUP_REPORT_ACTIVITYFILECOUNTS} --period D7 --output text --outputFile "o365groupactivityfilecounts.txt"
+      ${commands.O365GROUP_REPORT_ACTIVITYFILECOUNTS} --period D7 --output text > "o365groupactivityfilecounts.txt"
 
     Get the total number of files and how many of them were active across all
     group sites associated with an Microsoft 365 Group for the last week
     and exports the report data in the specified path in json format
-      ${commands.O365GROUP_REPORT_ACTIVITYFILECOUNTS} --period D7 --output json --outputFile "o365groupactivityfilecounts.json"
+      ${commands.O365GROUP_REPORT_ACTIVITYFILECOUNTS} --period D7 --output json > "o365groupactivityfilecounts.json"
 `);
   }
 }

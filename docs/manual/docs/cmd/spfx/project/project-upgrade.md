@@ -16,7 +16,6 @@ Option|Description
 `-v, --toVersion [toVersion]`|The version of SharePoint Framework to which upgrade the project
 `--packageManager [packageManager]`|The package manager you use. Supported managers `npm,pnpm,yarn`. Default `npm`
 `--shell [shell]`|The shell you use. Supported shells `bash,powershell,cmd`. Default `bash`
-`-f, --outputFile [outputFile]`|Path to the file where the upgrade report should be stored in. Ignored when `output` is `tour`
 `--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json,text,md,tour`. Default `text`
 `--verbose`|Runs command with verbose logging
@@ -38,7 +37,7 @@ Using this command you can upgrade SharePoint Framework projects built using ver
 Get instructions to upgrade the current SharePoint Framework project to SharePoint Framework version 1.5.0 and save the findings in a Markdown file
 
 ```sh
-spfx project upgrade --toVersion 1.5.0 --output md --outputFile "upgrade-report.md"
+spfx project upgrade --toVersion 1.5.0 --output md > "upgrade-report.md"
 ```
 
 Get instructions to Upgrade the current SharePoint Framework project to SharePoint Framework version 1.5.0 and show the summary of the findings in the shell

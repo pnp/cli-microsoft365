@@ -26,11 +26,11 @@ class OneDriveReportActivityUserCountCommand extends PeriodBasedReport {
 
     Gets the trend in the number of active OneDrive users for the last week
     and exports the report data in the specified path in text format
-      ${commands.REPORT_ACTIVITYUSERCOUNTS} --period D7 --output text --outputFile "activityusercounts.txt"
+      ${commands.REPORT_ACTIVITYUSERCOUNTS} --period D7 --output text > "activityusercounts.txt"
 
     Gets the trend in the number of active OneDrive users for the last week
     and exports the report data in the specified path in json format
-      ${commands.REPORT_ACTIVITYUSERCOUNTS} --period D7 --output json --outputFile "activityusercounts.json"
+      ${commands.REPORT_ACTIVITYUSERCOUNTS} --period D7 --output json > "activityusercounts.json"
 `);
   }
 }

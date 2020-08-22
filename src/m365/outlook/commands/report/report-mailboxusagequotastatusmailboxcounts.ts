@@ -26,11 +26,11 @@ class OutlookReportMailboxUsageQuotaStatusMailboxCountsCommand extends PeriodBas
 
     Gets the count of user mailboxes in each quota category for the last week
     and exports the report data in the specified path in text format
-      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS} --period D7 --output text --outputFile "mailboxusagequotastatusmailboxcounts.txt"
+      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS} --period D7 --output text > "mailboxusagequotastatusmailboxcounts.txt"
 
     Gets the count of user mailboxes in each quota category for the last week
     and exports the report data in the specified path in json format
-      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS} --period D7 --output json --outputFile "mailboxusagequotastatusmailboxcounts.json"
+      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEQUOTASTATUSMAILBOXCOUNTS} --period D7 --output json > "mailboxusagequotastatusmailboxcounts.json"
 `);
   }
 }

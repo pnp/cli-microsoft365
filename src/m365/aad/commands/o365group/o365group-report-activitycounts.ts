@@ -26,11 +26,11 @@ class O365GroupReportActivityCountsCommand extends PeriodBasedReport {
 
     Get the number of group activities across group workloads for the last week
     and exports the report data in the specified path in text format
-      ${commands.O365GROUP_REPORT_ACTIVITYCOUNTS} --period D7 --output text --outputFile "o365groupactivitycounts.txt"
+      ${commands.O365GROUP_REPORT_ACTIVITYCOUNTS} --period D7 --output text > "o365groupactivitycounts.txt"
 
     Get the number of group activities across group workloads for the last week
     and exports the report data in the specified path in json format
-      ${commands.O365GROUP_REPORT_ACTIVITYCOUNTS} --period D7 --output json --outputFile "o365groupactivitycounts.json"
+      ${commands.O365GROUP_REPORT_ACTIVITYCOUNTS} --period D7 --output json > "o365groupactivitycounts.json"
 `);
   }
 }

@@ -2515,29 +2515,6 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
-  it('writes upgrade report to file when outputFile specified', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
-    const writeFileSyncSpy: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'md', toVersion: '1.6.0', outputFile: '/foo/report.md' } }, (err?: any) => {
-      assert(writeFileSyncSpy.called);
-    });
-  });
-
-  it('writes JSON upgrade report to file when outputFile specified in json output mode', () => {
-    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
-    let typeofReport: string = '';
-    sinon.stub(fs, 'writeFileSync').callsFake((path, contents: any) => {
-      typeofReport = typeof contents;
-    });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'json', toVersion: '1.6.0', outputFile: '/foo/report.md' } }, (err?: any) => {
-      assert.equal(typeofReport, 'string');
-    });
-  });
-
   it('writes CodeTour upgrade report to .tours folder when in tour output mode. Creates the folder when it does not exist', () => {
     const projectPath: string = 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph';
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
@@ -2641,17 +2618,6 @@ describe(commands.PROJECT_UPGRADE, () => {
     assert.equal(actual, true);
   });
 
-  it('fails validation when non-existent path specified', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = (command.validate() as CommandValidate)({ options: { outputFile: '/foo/file.md' } });
-    assert.notEqual(actual, true);
-  });
-
-  it('passes validation when valid file path specified', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
-    const actual = (command.validate() as CommandValidate)({ options: { outputFile: '/foo/file.md' } });
-    assert.equal(actual, true);
-  });
 
   it('has help referring to the right command', () => {
     const cmd: any = {

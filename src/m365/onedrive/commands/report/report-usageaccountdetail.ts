@@ -29,11 +29,11 @@ class OneDriveReportUsageAccountDetailCommand extends DateAndPeriodBasedReport {
 
     Gets details about OneDrive usage by account for the last week
     and exports the report data in the specified path in text format
-      ${commands.REPORT_USAGEACCOUNTDETAIL} --period D7 --output text --outputFile "onedriveusageaccountdetail.txt"
+      ${commands.REPORT_USAGEACCOUNTDETAIL} --period D7 --output text > "onedriveusageaccountdetail.txt"
 
     Gets details about OneDrive usage by account for the last week
     and exports the report data in the specified path in json format
-      ${commands.REPORT_USAGEACCOUNTDETAIL} --period D7 --output json --outputFile "onedriveusageaccountdetail.json"
+      ${commands.REPORT_USAGEACCOUNTDETAIL} --period D7 --output json > "onedriveusageaccountdetail.json"
 `);
   }
 }

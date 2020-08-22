@@ -31,11 +31,11 @@ class TeamsReportUserActivityUserDetailCommand extends DateAndPeriodBasedReport 
 
     Gets details about Microsoft Teams user activity by user for the last week
     and exports the report data in the specified path in text format
-      ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period D7 --output text --outputFile "useractivityuserdetails.txt"
+      ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period D7 --output text > "useractivityuserdetails.txt"
 
     Gets details about Microsoft Teams user activity by user for the last week
     and exports the report data in the specified path in json format
-      ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period D7 --output json --outputFile "useractivityuserdetails.json"
+      ${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL} --period D7 --output json > "useractivityuserdetails.json"
 `);
   }
 }

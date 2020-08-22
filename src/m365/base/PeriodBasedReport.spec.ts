@@ -30,8 +30,8 @@ describe('PeriodBasedReport', () => {
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
-  let writeFileSyncFake = () => { };
+  //let cmdInstanceLogSpy: sinon.SinonSpy;
+  //let writeFileSyncFake = () => { };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -51,7 +51,7 @@ describe('PeriodBasedReport', () => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    //cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
     (mockCommand as any).items = [];
   });
 
@@ -125,17 +125,6 @@ describe('PeriodBasedReport', () => {
     assert.equal(actual, true);
   });
 
-  it('fails validation if specified outputFile directory path doesn\'t exist', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = (mockCommand.validate() as CommandValidate)({
-      options: {
-        period: 'D7',
-        outputFile: '/path/not/found.zip'
-      }
-    });
-    Utils.restore(fs.existsSync);
-    assert.notEqual(actual, true);
-  });
 
   it('get unique device type in teams and export it in a period', (done) => {
     const requestStub: sinon.SinonStub = sinon.stub(request, 'get').callsFake((opts) => {
@@ -174,14 +163,14 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+    //const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/deviceusagedistributionusercounts.txt' } }, () => {
+    cmdInstance.action({ options: { debug: false, period: 'D7' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
         assert.equal(requestStub.lastCall.args[0].json, true);
-        assert.equal(fileStub.called, true);
+        //assert.equal(fileStub.called, true);
         done();
       }
       catch (e) {
@@ -201,14 +190,14 @@ describe('PeriodBasedReport', () => {
       return Promise.reject('Invalid request');
     });
 
-    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+    //const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
     cmdInstance.action({ options: { debug: false, period: 'D7', output: 'json' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
         assert.equal(requestStub.lastCall.args[0].json, true);
-        assert.equal(fileStub.notCalled, true);
+        //assert.equal(fileStub.notCalled, true);
         done();
       }
       catch (e) {
@@ -228,14 +217,14 @@ describe('PeriodBasedReport', () => {
 
       return Promise.reject('Invalid request');
     });
-    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+    //const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/deviceusagedistributionusercounts.txt', output: 'text' } }, () => {
+    cmdInstance.action({ options: { debug: false, period: 'D7',  output: 'text' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
         assert.equal(requestStub.lastCall.args[0].json, true);
-        assert.equal(fileStub.called, true);
+        //assert.equal(fileStub.called, true);
         done();
       }
       catch (e) {
@@ -255,14 +244,14 @@ describe('PeriodBasedReport', () => {
 
       return Promise.reject('Invalid request');
     });
-    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+    //const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: false, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/deviceusagedistributionusercounts.json' } }, () => {
+    cmdInstance.action({ options: { debug: false, period: 'D7' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
         assert.equal(requestStub.lastCall.args[0].json, true);
-        assert.equal(fileStub.called, true);
+        //assert.equal(fileStub.called, true);
         done();
       }
       catch (e) {
@@ -279,15 +268,15 @@ describe('PeriodBasedReport', () => {
 
       return Promise.reject('Invalid request');
     });
-    const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+    //const fileStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
 
-    cmdInstance.action({ options: { debug: true, period: 'D7', outputFile: '/Users/josephvelliah/Desktop/deviceusagedistributionusercounts.json', output: 'json' } }, () => {
+    cmdInstance.action({ options: { debug: true, period: 'D7',  output: 'json' } }, () => {
       try {
         assert.equal(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/MockEndPoint(period='D7')");
         assert.equal(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
         assert.equal(requestStub.lastCall.args[0].json, true);
-        assert.equal(fileStub.called, true);
-        assert(cmdInstanceLogSpy.calledWith(`File saved to path '/Users/josephvelliah/Desktop/deviceusagedistributionusercounts.json'`));
+        //assert.equal(fileStub.called, true);
+        //assert(cmdInstanceLogSpy.calledWith(`File saved to path '/Users/josephvelliah/Desktop/deviceusagedistributionusercounts.json'`));
         done();
       }
       catch (e) {
@@ -310,16 +299,7 @@ describe('PeriodBasedReport', () => {
     });
   });
 
-  it('supports specifying outputFile', () => {
-    const options = mockCommand.options();
-    let containsOption = false;
-    options.forEach((o: any) => {
-      if (o.option.indexOf('--outputFile') > -1) {
-        containsOption = true;
-      }
-    });
-    assert(containsOption);
-  });
+
 
   it('supports debug mode', () => {
     const options = mockCommand.options();

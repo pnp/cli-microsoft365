@@ -26,11 +26,11 @@ class TeamsReportDeviceUsageDistributionUserCountsCommand extends PeriodBasedRep
 
     Gets the number of Microsoft Teams unique users by device type for the last week
     and exports the report data in the specified path in text format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS} --period D7 --output text --outputFile "deviceusagedistributionusercounts.txt"
+      ${commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS} --period D7 --output text > "deviceusagedistributionusercounts.txt"
 
     Gets the number of Microsoft Teams unique users by device type for the last week
     and exports the report data in the specified path in json format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS} --period D7 --output json --outputFile "deviceusagedistributionusercounts.json"
+      ${commands.TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS} --period D7 --output json > "deviceusagedistributionusercounts.json"
 `);
   }
 }

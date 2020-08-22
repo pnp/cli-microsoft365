@@ -34,11 +34,11 @@ class YammerReportGroupsActivityDetailCommand extends DateAndPeriodBasedReport {
 
     Gets details about Yammer groups activity by group for the last week
     and exports the report data in the specified path in text format
-      ${commands.YAMMER_REPORT_GROUPSACTIVITYDETAIL} --period D7 --output text --outputFile "groupsactivitydetail.txt"
+      ${commands.YAMMER_REPORT_GROUPSACTIVITYDETAIL} --period D7 --output text > "groupsactivitydetail.txt"
 
     Gets details about Yammer groups activity by group for the last week
     and exports the report data in the specified path in json format
-      ${commands.YAMMER_REPORT_GROUPSACTIVITYDETAIL} --period D7 --output json --outputFile "groupsactivitydetail.json"
+      ${commands.YAMMER_REPORT_GROUPSACTIVITYDETAIL} --period D7 --output json > "groupsactivitydetail.json"
 `);
   }
 }

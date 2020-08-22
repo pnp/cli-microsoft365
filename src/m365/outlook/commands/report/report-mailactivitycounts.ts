@@ -26,11 +26,11 @@ class OutlookReportMailActivityCountsCommand extends PeriodBasedReport {
 
     Gets the trends of email activity (like how many were sent, read, and received) in your organization for the last week
     and exports the report data in the specified path in text format
-      ${commands.OUTLOOK_REPORT_MAILACTIVITYCOUNTS} --period D7 --output text --outputFile "mailactivitycounts.txt"
+      ${commands.OUTLOOK_REPORT_MAILACTIVITYCOUNTS} --period D7 --output text > "mailactivitycounts.txt"
 
     Gets the trends of email activity (like how many were sent, read, and received) in your organization for the last week
     and exports the report data in the specified path in json format
-      ${commands.OUTLOOK_REPORT_MAILACTIVITYCOUNTS} --period D7 --output json --outputFile "mailactivitycounts.json"
+      ${commands.OUTLOOK_REPORT_MAILACTIVITYCOUNTS} --period D7 --output json > "mailactivitycounts.json"
 `);
   }
 }

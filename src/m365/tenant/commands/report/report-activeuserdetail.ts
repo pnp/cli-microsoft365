@@ -34,11 +34,11 @@ class TenantReportActiveUserDetailCommand extends DateAndPeriodBasedReport {
 
     Gets details about Microsoft 365 active users for the last week 
     and exports the report data in the specified path in text format
-      ${commands.TENANT_REPORT_ACTIVEUSERDETAIL} --period D7 --output text --outputFile "activeuserdetail.txt"
+      ${commands.TENANT_REPORT_ACTIVEUSERDETAIL} --period D7 --output text > "activeuserdetail.txt"
 
     Gets details about Microsoft 365 active users for the last week
     and exports the report data in the specified path in json format
-      ${commands.TENANT_REPORT_ACTIVEUSERDETAIL} --period D7 --output json --outputFile "activeuserdetail.json"
+      ${commands.TENANT_REPORT_ACTIVEUSERDETAIL} --period D7 --output json > "activeuserdetail.json"
   `);
   }
 }
