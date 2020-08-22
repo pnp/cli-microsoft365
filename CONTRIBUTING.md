@@ -6,15 +6,15 @@ Sharing is caring!
 
 ## You have an idea for a new command
 
-Awesome! Good ideas are invaluable for every product. Before you start hacking away, please check if there is no similar idea already listed in the [issue list](https://github.com/pnp/office365-cli/issues). If not, please create a new issue describing your idea. Once we agree on the feature scope and architecture, the feature will be ready for building. Don't hesitate to mention in the issue if you'd like to build the feature yourself. If it's the first time you're building a command see the [guidance article](./docs/guides/adding-command.md) explaining in detail what you will need at minimum.
+Awesome! Good ideas are invaluable for every product. Before you start hacking away, please check if there is no similar idea already listed in the [issue list](https://github.com/pnp/cli-microsoft365/issues). If not, please create a new issue describing your idea. Once we agree on the feature scope and architecture, the feature will be ready for building. Don't hesitate to mention in the issue if you'd like to build the feature yourself. If it's the first time you're building a command see the [guidance article](./docs/guides/adding-command.md) explaining in detail what you will need at minimum.
 
 ## You have a suggestion for improving an existing command
 
-Nothing is perfect. If you have an idea how to improve an existing command or the CLI, let us know by submitting an issue in the [issue list](https://github.com/pnp/office365-cli/issues). Some things are done for a reason, but some are not. Let's discuss what you think and see how the project could be improved for everyone.
+Nothing is perfect. If you have an idea how to improve an existing command or the CLI, let us know by submitting an issue in the [issue list](https://github.com/pnp/cli-microsoft365/issues). Some things are done for a reason, but some are not. Let's discuss what you think and see how the project could be improved for everyone.
 
 ## You've found a bug
 
-Bugs happen. When you find a bug, please have a look at the [issue list](https://github.com/pnp/office365-cli/issues) if a similar bug has already been logged. If not, let us know what doesn't work and how we can reproduce it. If we can't reproduce your bug, we will ask you for clarification, which will only make it longer to fix it.
+Bugs happen. When you find a bug, please have a look at the [issue list](https://github.com/pnp/cli-microsoft365/issues) if a similar bug has already been logged. If not, let us know what doesn't work and how we can reproduce it. If we can't reproduce your bug, we will ask you for clarification, which will only make it longer to fix it.
 
 ## Fixing typos
 
@@ -24,13 +24,13 @@ Typos are embarrassing! Most PR's that fix typos will be accepted immediately. I
 
 Before contributing:
 
-- ensure that the **master** branch on your fork is in sync with the original **office365-cli** repository
+- ensure that the **master** branch on your fork is in sync with the original **cli-microsoft365** repository
 
     ```sh
     # assuming you are in the folder of your locally cloned fork....
     git checkout master
 
-    # assuming you have a remote named `upstream` pointing to the official **office365-cli** repo
+    # assuming you have a remote named `upstream` pointing to the official **cli-microsoft365** repo
     git fetch upstream
 
     # update your local master to be a mirror of what's in the main repo
