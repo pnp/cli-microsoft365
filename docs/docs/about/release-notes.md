@@ -27,6 +27,7 @@
 - renamed 'Office 365 CLI' to 'CLI for Microsoft 365' [#1635](https://github.com/pnp/cli-microsoft365/issues/1635)
 - added 'owners' option for CommunicationSite creation using 'spo site add' [#1734](https://github.com/pnp/cli-microsoft365/issues/1734)
 - added LCID validation to 'spo site add' [#1749](https://github.com/pnp/cli-microsoft365/issues/1749)
+- added "Caveats when certificate login" doc [#1734](https://github.com/pnp/cli-microsoft365/issues/1734), [#1738](https://github.com/pnp/cli-microsoft365/issues/1738)
 
 ## [v2.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v2.13.0)
 
