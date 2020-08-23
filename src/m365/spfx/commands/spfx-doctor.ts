@@ -320,6 +320,21 @@ class SpfxDoctorCommand extends AnonymousCommand {
           fix: 'npm i react@16.8.5'
         },
         sp: SharePointVersion.SPO
+      },
+      '1.11.0': {
+        node: {
+          range: '^10.0.0',
+          fix: 'Install Node.js v10'
+        },
+        npm: {
+          range: '^5.0.0 || ^6.0.0',
+          fix: 'npm i -g npm@6'
+        },
+        react: {
+          range: '16.8.5',
+          fix: 'npm i react@16.8.5'
+        },
+        sp: SharePointVersion.SPO
       }
     };
 

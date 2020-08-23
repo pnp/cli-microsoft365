@@ -70,6 +70,260 @@ describe(commands.DOCTOR, () => {
     assert.notEqual(command.description, null);
   });
 
+  it('passes all checks for SPFx v1.11 project when all requirements met', (done) => {
+    const sandbox = sinon.createSandbox();
+    sandbox.stub(process, 'version').value('v10.22.0');
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
+        callback(undefined, '6.14.6');
+        return {} as child_process.ChildProcess;
+      }
+
+      const packageName: string = (args as string[])[1];
+      switch (packageName) {
+        case '@microsoft/sp-core-library':
+          callback(undefined, packageVersionResponse(packageName, '1.11.0'));
+          break;
+        case 'yo':
+          callback(undefined, packageVersionResponse(packageName, '3.1.1'));
+          break;
+        case 'gulp':
+          callback(undefined, packageVersionResponse(packageName, '4.0.2'));
+          break;
+        case 'react':
+          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
+          break;
+        case 'typescript':
+          callback(undefined, '{}');
+          break;
+        default:
+          callback(new Error(`${file} ENOENT`));
+      }
+      return {} as child_process.ChildProcess;
+    });
+
+    cmdInstance.action({ options: { debug: false } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.22.0')), 'Invalid Node version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('passes all checks for SPFx v1.11 project when all requirements met (debug)', (done) => {
+    const sandbox = sinon.createSandbox();
+    sandbox.stub(process, 'version').value('v10.18.0');
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
+        callback(undefined, '6.14.6');
+        return {} as child_process.ChildProcess;
+      }
+
+      const packageName: string = (args as string[])[1];
+      switch (packageName) {
+        case '@microsoft/sp-core-library':
+          callback(undefined, packageVersionResponse(packageName, '1.11.0'));
+          break;
+        case 'yo':
+          callback(undefined, packageVersionResponse(packageName, '3.1.1'));
+          break;
+        case 'gulp':
+          callback(undefined, packageVersionResponse(packageName, '4.0.2'));
+          break;
+        case 'react':
+          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
+          break;
+        case 'typescript':
+          callback(undefined, '{}');
+          break;
+        default:
+          callback(new Error(`${file} ENOENT`));
+      }
+      return {} as child_process.ChildProcess;
+    });
+
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('passes all checks for SPFx v1.11 generator installed locally when all requirements met (debug)', (done) => {
+    const sandbox = sinon.createSandbox();
+    sandbox.stub(process, 'version').value('v10.18.0');
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
+        callback(undefined, '6.13.4');
+        return {} as child_process.ChildProcess;
+      }
+
+      const packageName: string = (args as string[])[1];
+      switch (packageName) {
+        case '@microsoft/sp-core-library':
+          callback(undefined, '{}');
+          break;
+        case '@microsoft/generator-sharepoint':
+          callback(undefined, (args as string[])[(args as string[]).length - 1] === '-g' ? '{}' : packageVersionResponse(packageName, '1.11.0'));
+          break;
+        case 'yo':
+          callback(undefined, packageVersionResponse(packageName, '3.1.1'));
+          break;
+        case 'gulp':
+          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+          break;
+        case 'react':
+          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
+          break;
+        case 'typescript':
+          callback(undefined, '{}');
+          break;
+        default:
+          callback(new Error(`${file} ENOENT`));
+      }
+      return {} as child_process.ChildProcess;
+    });
+
+    cmdInstance.action({ options: { debug: true } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('passes all checks for SPFx v1.11 generator installed globally when all requirements met', (done) => {
+    const sandbox = sinon.createSandbox();
+    sandbox.stub(process, 'version').value('v10.18.0');
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
+        callback(undefined, '6.13.4');
+        return {} as child_process.ChildProcess;
+      }
+
+      const packageName: string = (args as string[])[1];
+      switch (packageName) {
+        case '@microsoft/sp-core-library':
+          callback(undefined, '{}');
+          break;
+        case '@microsoft/generator-sharepoint':
+          callback(undefined, (args as string[])[(args as string[]).length - 1] === '-g' ? packageVersionResponse(packageName, '1.11.0') : '{}');
+          break;
+        case 'yo':
+          callback(undefined, packageVersionResponse(packageName, '3.1.1'));
+          break;
+        case 'gulp':
+          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+          break;
+        case 'react':
+          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
+          break;
+        case 'typescript':
+          callback(undefined, '{}');
+          break;
+        default:
+          callback(new Error(`${file} ENOENT`));
+      }
+      return {} as child_process.ChildProcess;
+    });
+
+    cmdInstance.action({ options: { debug: false } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('passes all checks for SPFx v1.11 generator installed locally when all requirements met', (done) => {
+    const sandbox = sinon.createSandbox();
+    sandbox.stub(process, 'version').value('v10.18.0');
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
+        callback(undefined, '6.14.6');
+        return {} as child_process.ChildProcess;
+      }
+
+      const packageName: string = (args as string[])[1];
+      switch (packageName) {
+        case '@microsoft/sp-core-library':
+          callback(undefined, '{}');
+          break;
+        case '@microsoft/generator-sharepoint':
+          callback(undefined, (args as string[])[(args as string[]).length - 1] === '-g' ? '{}' : packageVersionResponse(packageName, '1.11.0'));
+          break;
+        case 'yo':
+          callback(undefined, packageVersionResponse(packageName, '3.1.1'));
+          break;
+        case 'gulp':
+          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
+          break;
+        case 'react':
+          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
+          break;
+        case 'typescript':
+          callback(undefined, '{}');
+          break;
+        default:
+          callback(new Error(`${file} ENOENT`));
+      }
+      return {} as child_process.ChildProcess;
+    });
+
+    cmdInstance.action({ options: { debug: false } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('passes all checks for SPFx v1.10 project when all requirements met', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
@@ -366,7 +620,7 @@ describe(commands.DOCTOR, () => {
         default:
           callback(new Error(`${file} ENOENT`));
           return {} as child_process.ChildProcess;
-        }
+      }
     });
 
     cmdInstance.action({ options: { debug: true } }, (err: any) => {
@@ -374,6 +628,30 @@ describe(commands.DOCTOR, () => {
         assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint Framework not found')));
         assert(!cmdInstanceLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('passes SPO compatibility check for SPFx v1.11.0', (done) => {
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      const packageName: string = (args as string[])[1];
+      switch (packageName) {
+        case '@microsoft/sp-core-library':
+          callback(undefined, packageVersionResponse(packageName, '1.11.0'));
+          return {} as child_process.ChildProcess;
+      }
+
+      callback(new Error(`${file} ENOENT`));
+      return {} as child_process.ChildProcess;
+    });
+
+    cmdInstance.action({ options: { debug: false, env: 'spo' } }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Supported in SPO')));
         done();
       }
       catch (e) {
