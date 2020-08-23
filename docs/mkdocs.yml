@@ -559,4 +559,4 @@ extra:
     - type: 'link'
       link: 'https://aka.ms/sppnp'
 repo_url: http://github.com/pnp/cli-microsoft365
-edit_uri: blob/master/docs/manual/docs
+edit_uri: blob/master/docs/docs

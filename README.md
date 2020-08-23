@@ -1,4 +1,4 @@
-<img src="./docs/manual/docs/images/pnp-cli-microsoft365-blue.svg" alt="CLI for Microsoft 365" height=78 />
+<img src="./docs/docs/images/pnp-cli-microsoft365-blue.svg" alt="CLI for Microsoft 365" height=78 />
 
 @latest/@next (master) |
 :--------------: |
@@ -47,11 +47,11 @@ To list all available commands, type in the CLI for Microsoft 365 prompt `help`:
 m365 help
 ```
 
-See the [User Guide](docs/manual/docs/user-guide/installing-cli.md) to learn more about the CLI for Microsoft 365 and its capabilities.
+See the [User Guide](docs/docs/user-guide/installing-cli.md) to learn more about the CLI for Microsoft 365 and its capabilities.
 
 ## Sharing is Caring
 
-We'd love your help! If you have ideas for new features or feedback, let us know by creating an issue in the [issues list](https://github.com/pnp/cli-microsoft365/issues). Before you submit a PR with your improvements, please review our [project guides](./docs/guides/index.md).
+We'd love your help! If you have ideas for new features or feedback, let us know by creating an issue in the [issues list](https://github.com/pnp/cli-microsoft365/issues). Before you submit a PR with your improvements, please review our [project guides](https://github.com/pnp/cli-microsoft365/wiki).
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or

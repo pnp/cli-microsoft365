@@ -49,8 +49,8 @@ Closes #
 > - src/m365/teams/commands.ts
 > - src/m365/teams/commands/tab/teams-tab-add.ts
 > - src/m365/teams/commands/tab/teams-tab-add.spec.ts
-> - docs/manual/mkdocs.yml
-> - docs/manual/docs/cmd/teams/tab/tab-add.md
+> - docs/mkdocs.yml
+> - docs/docs/cmd/teams/tab/tab-add.md
 >
 > _(DELETE THIS SECTION AFTER READING)_
 >

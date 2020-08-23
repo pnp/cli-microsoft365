@@ -69,7 +69,7 @@ jobs:
           name: Publish
           command: npm publish --access public
   deploy_docs:
-    working_directory: ~/cli-microsoft365/docs/manual
+    working_directory: ~/cli-microsoft365/docs
     docker:
       - image: circleci/python:3.6.6-jessie-node
     steps:

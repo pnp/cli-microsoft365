@@ -58,7 +58,7 @@ dist
 .DS_Store
 coverage
 # generated docs
-docs/manual/site
+docs/site
 # generated commands info
 commands.json
 
