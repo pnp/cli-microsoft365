@@ -462,6 +462,8 @@ nav:
         - report activeusercounts: 'cmd/tenant/report/report-activeusercounts.md'
         - report activeuserdetail: 'cmd/tenant/report/report-activeuserdetail.md'
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
+      - service:
+        - service message list: 'cmd/tenant/service/message/message-list.md'
       - status:
         - status list: 'cmd/tenant/status/status-list.md'
     - To Do (todo):

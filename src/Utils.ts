@@ -217,6 +217,29 @@ export default class Utils {
     }
   }
 
+  public static getTenantIdFromAccessToken(accessToken: string): string {
+    let tenantId: string = '';
+
+    if (!accessToken || accessToken.length === 0) {
+      return tenantId;
+    }
+
+    const chunks = accessToken.split('.');
+    if (chunks.length !== 3) {
+      return tenantId;
+    }
+
+    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
+    try {
+      const token: any = JSON.parse(tokenString);
+      tenantId = token.tid;
+    }
+    catch {
+    }
+
+    return tenantId;
+  }
+
   public static getUserNameFromAccessToken(accessToken: string): string {
     let userName: string = '';
 
