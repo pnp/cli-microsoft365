@@ -1,7 +1,7 @@
 import commands from '../../commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
-import { CommandOption, CommandError } from '../../../../Command';
+import { CommandOption } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -47,12 +47,7 @@ class TenantServiceMessageListCommand extends SpoCommand {
 
         return request.get(requestOptions);
       })
-      .then((res: any): void => {
-        if (res.error) {
-          cb(new CommandError(res.error_description));
-          return;
-        }
-        
+      .then((res: any): void => {        
         if (args.options.output === 'json') {
           cmd.log(res);
         }
