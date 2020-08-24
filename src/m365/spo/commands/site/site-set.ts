@@ -550,7 +550,7 @@ class SpoSiteSetCommand extends SpoCommand {
       ${this.name} --url https://contoso.sharepoint.com/sites/sales --title "My new site"
 
     Restrict external sharing to already available external users only
-      ${this.name} --url https://contoso.sharepoint.com/sites/sales --sharingCapabilities ExternalUserSharingOnly
+      ${this.name} --url https://contoso.sharepoint.com/sites/sales --sharingCapability ExternalUserSharingOnly
 `);
   }
 }
