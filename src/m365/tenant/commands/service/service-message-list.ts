@@ -1,0 +1,101 @@
+import commands from '../../commands';
+import request from '../../../../request';
+import GlobalOptions from '../../../../GlobalOptions';
+import { CommandOption, CommandError } from '../../../../Command';
+import SpoCommand from '../../../base/SpoCommand';
+
+const vorpal: Vorpal = require('../../../../vorpal-init');
+
+interface CommandArgs {
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  workload: string;
+}
+
+class TenantServiceMessageListCommand extends SpoCommand {
+  public get name(): string {
+    return `${commands.TENANT_SERVICE_MESSAGE_LIST}`;
+  }
+
+  public get description(): string {
+    return 'Gets the service messages regarding services in Office 365 from the Office 365 Management API';
+  }
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+    if (this.verbose) {
+      cmd.log(`Getting the service messages regarding services in Office 365 from the Office 365 Management API`);
+    }
+
+    const serviceUrl: string = 'https://manage.office.com/api/v1.0';
+    const statusEndpoint: string = (typeof args.options.workload !='undefined' && args.options.workload) ? `ServiceComms/Messages?$filter=Workload eq '${args.options.workload}'` : 'ServiceComms/Messages';
+
+    this
+      .getTenantId(cmd, this.debug)
+      .then((tenantId: string): Promise<string> => {
+        const pos: number = tenantId.indexOf(':') + 1;
+        const tenantIdentifier = tenantId.substr(pos, tenantId.indexOf('&') - pos);
+
+        const requestOptions: any = {
+          url: `${serviceUrl}/${tenantIdentifier}/${statusEndpoint}`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          json: true
+        };
+
+        return request.get(requestOptions);
+      })
+      .then((res: any): void => {
+        if (res.error) {
+          cb(new CommandError(res.error_description));
+          return;
+        }
+        
+        if (args.options.output === 'json') {
+          cmd.log(res);
+        }
+        else {
+          cmd.log(res.value.map((r: any) => {
+            return {
+              Workload: r.Workload,
+              Id: r.Id,              
+              Classification: r.Classification,
+              Status: r.Status,
+              ImpactDescription: r.ImpactDescription,
+              LastUpdatedTime: r.LastUpdatedTime
+            }
+          }));
+        }
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
+        cb();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
+
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-w, --workload [workload]	',
+        description: 'Allows retrieval of the service messages for only one particular service. If not provided, the service messages of all services will be returned.'
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
+  public commandHelp(args: any, log: (help: string) => void): void {
+    log(vorpal.find(commands.TENANT_SERVICE_MESSAGE_LIST).helpInformation());
+    log(
+      `  Examples:
+
+    Gets the service messages regarding services in Office 365
+      ${commands.TENANT_SERVICE_MESSAGE_LIST}
+    `);
+  }
+}
+
+module.exports = new TenantServiceMessageListCommand();
