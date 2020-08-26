@@ -274,4 +274,108 @@ describe(commands.TENANT_STATUS_LIST, () => {
     });
   });
 
+  it('gets the status of Microsoft 365 services - JSON Output With Workload', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      requests.push(opts);
+      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
+        return Promise.resolve(jsonOutput);
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        workload: 'Forms',
+        output: 'json',
+        debug: false
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets the status of Microsoft 365 services - JSON Output With Workload (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      requests.push(opts);
+      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
+        return Promise.resolve(jsonOutput);
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        workload: 'Forms',
+        output: 'json',
+        debug: true
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets the status of Microsoft 365 services - text Output With Workload', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      requests.push(opts);
+      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
+        return Promise.resolve(jsonOutput);
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        workload: 'Forms',
+        output: 'text',
+        debug: false
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('gets the status of Microsoft 365 services - text Output With Workload (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      requests.push(opts);
+      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
+        return Promise.resolve(jsonOutput);
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        workload: 'Forms',
+        output: 'text',
+        debug: true
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
 });
