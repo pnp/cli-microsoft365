@@ -1,7 +1,17 @@
 import request from '../../../../request';
 import commands from '../../commands';
 import SpoCommand from '../../../base/SpoCommand';
+import GlobalOptions from '../../../../GlobalOptions';
+import { CommandOption } from '../../../../Command';
 const vorpal: Vorpal = require('../../../../vorpal-init');
+
+interface CommandArgs {
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  workload?: string;
+}
 
 class TenantStatusListCommand extends SpoCommand {
   public get name(): string {
@@ -12,13 +22,19 @@ class TenantStatusListCommand extends SpoCommand {
     return 'Gets health status of the different services in Microsoft 365';
   }
 
-  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.sharingCapabilities = args.options.workload;
+    return telemetryProps;
+  }
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
       cmd.log(`Getting the health status of the different services in Microsoft 365.`);
     }
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
-    const statusEndpoint: string = 'ServiceComms/CurrentStatus';
+    const statusEndpoint: string = typeof args.options.workload !== 'undefined' ? `ServiceComms/CurrentStatus?$filter=Workload eq '${encodeURIComponent(args.options.workload)}'` : 'ServiceComms/CurrentStatus';
 
     this
       .getSpoUrl(cmd, this.debug)
@@ -54,13 +70,35 @@ class TenantStatusListCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
 
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-w, --workload [workload]',
+        description: 'Retrieve service status for the specified service. If not provided, will list the current service status of all services'
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
   public commandHelp(args: {}, log: (help: string) => void): void {
+    const chalk = vorpal.chalk;
     log(vorpal.find(this.name).helpInformation());
     log(
-      `  Examples:
+      `  Remarks:
+
+    To get the name of the particular workload for use with the ${chalk.grey('workload')}
+    option, execute ${chalk.grey(`${commands.TENANT_STATUS_LIST} --output json`)} and get
+    the value of the ${chalk.grey('Workload')} property for the particular service.
+      
+  Examples:
   
-    Gets health status of the different services in Microsoft 365
+    Gets health status of all services in Microsoft 365
       ${commands.TENANT_STATUS_LIST}
+
+    Gets health status for SharePoint Online
+      ${commands.TENANT_STATUS_LIST} -w "SharePoint"
 
   More information:
     
