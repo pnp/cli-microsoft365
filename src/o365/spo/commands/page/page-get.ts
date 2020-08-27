@@ -5,7 +5,6 @@ import {
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { PageItem } from './PageItem';
 import { ClientSidePage } from './clientsidepages';
 import Utils from '../../../../Utils';
 
@@ -51,8 +50,8 @@ class SpoPageGetCommand extends SpoCommand {
     };
 
     request
-      .get<PageItem>(requestOptions)
-      .then((res: PageItem): void => {
+      .get<any>(requestOptions)
+      .then((res: any): void => {
         if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
           cb(new CommandError(`Page ${args.options.name} is not a modern page.`));
           return;
