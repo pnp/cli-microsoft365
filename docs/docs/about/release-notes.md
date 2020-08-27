@@ -8,6 +8,12 @@
 
 - [teams app user remove](../cmd/teams/user/user-app-remove.md) - uninstall an app from the personal scope of the specified user [#1711](https://github.com/pnp/cli-microsoft365/issues/1711)
 
+**Microsoft To Do:**
+
+- [todo list list](../cmd/todo/list/list-list.md) - returns a list of Microsoft To Do task lists [#1609](https://github.com/pnp/cli-microsoft365/issues/1609)
+- [todo list remove](../cmd/todo/list/list-remove.md) - removes a Microsoft To Do task list [#1611](https://github.com/pnp/cli-microsoft365/issues/1611)
+- [todo list set](../cmd/todo/list/list-set.md) - updates a Microsoft To Do task list [#1612](https://github.com/pnp/cli-microsoft365/issues/1612)
+
 **SharePoint:**
 
 - [spo group list](../cmd/spo/group/group-list.md) - lists groups from specific web [#1691](https://github.com/pnp/cli-microsoft365/issues/1691)
