@@ -1,6 +1,7 @@
 const prefix: string = 'pa';
 
 export default {
+  APP_LIST: `${prefix} app list`,
   CONNECTOR_EXPORT: `${prefix} connector export`,
   CONNECTOR_LIST: `${prefix} connector list`,
   PCF_INIT: `${prefix} pcf init`,
