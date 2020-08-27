@@ -86,25 +86,25 @@ This completes the configuration required in the Azure portal. We can now move o
 
 To configure the CLI for Microsoft 365 to use our newly created custom application, we need to tell it the Client ID of our custom application and the Tenant ID of where the custom application has been created.
 
-To do that, we need to create two environment variables, named `OFFICE365CLI_AADAPPID` and `OFFICE365CLI_TENANT`, giving them the values that you saved earlier.
+To do that, we need to create two environment variables, named `CLIMICROSOFT365_AADAPPID` and `CLIMICROSOFT365_TENANT`, giving them the values that you saved earlier.
 
 How you set the environment variables depends on the operating system and shell that you are using.
 
 If you are on Windows, you can set the environment variables using the `$env:<variable-name>` approach in a PowerShell session.
 
 ```powershell
-$env:OFFICE365CLI_AADAPPID="506af689-32aa-46c8-afb5-972ebf9d218a"
-$env:OFFICE365CLI_TENANT="e8954f17-a373-4b61-b54d-45c038fe3188"
+$env:CLIMICROSOFT365_AADAPPID="506af689-32aa-46c8-afb5-972ebf9d218a"
+$env:CLIMICROSOFT365_TENANT="e8954f17-a373-4b61-b54d-45c038fe3188"
 ```
 
 !!! tip
-    Execute `$env:OFFICE365CLI_AADAPPID` and `$env:OFFICE365CLI_TENANT` to verify that the environment variables have been created correctly
+    Execute `$env:CLIMICROSOFT365_AADAPPID` and `$env:CLIMICROSOFT365_TENANT` to verify that the environment variables have been created correctly
 
 If you are using Linux or macOS, you can set the environment variables using the `export` command from your terminal prompt.
 
 ```sh
-export OFFICE365CLI_AADAPPID=506af689-32aa-46c8-afb5-972ebf9d218a
-export OFFICE365CLI_TENANT=e8954f17-a373-4b61-b54d-45c038fe3188
+export CLIMICROSOFT365_AADAPPID=506af689-32aa-46c8-afb5-972ebf9d218a
+export CLIMICROSOFT365_TENANT=e8954f17-a373-4b61-b54d-45c038fe3188
 ```
 
 !!! tip
@@ -142,9 +142,9 @@ How you permanently set the environment variable is dependant on the operating s
 
 If you are on Windows, you can set the environment variables using the `Edit the system environment variables` approach in the Windows UI.
 
-Search for `Edit the system environment variables` in Start Menu and launch it. Select `Environment Variables`, under the `User variables for <user-name>` section, select `New...` to add a new variable. In the dialog, in the variable name field enter `OFFICE365CLI_AADAPPID` and set the value using the Client ID (quotes should be omitted). Select `OK` to save the value and repeat the process for the `OFFICE365CLI_TENANT` variable. Select `OK` until all windows are closed to persist the changes.
+Search for `Edit the system environment variables` in Start Menu and launch it. Select `Environment Variables`, under the `User variables for <user-name>` section, select `New...` to add a new variable. In the dialog, in the variable name field enter `CLIMICROSOFT365_AADAPPID` and set the value using the Client ID (quotes should be omitted). Select `OK` to save the value and repeat the process for the `CLIMICROSOFT365_TENANT` variable. Select `OK` until all windows are closed to persist the changes.
 
-Open a new PowerShell session and execute `$env:OFFICE365CLI_AADAPPID` and `$env:OFFICE365CLI_TENANT` to verify that the environment variables have been created correctly.
+Open a new PowerShell session and execute `$env:CLIMICROSOFT365_AADAPPID` and `$env:CLIMICROSOFT365_TENANT` to verify that the environment variables have been created correctly.
 
 If you are on Linux or MacOS, depending on your terminal, add the  `export` lines to `.bashrc` or `.zshrc` file in your home directory.
 

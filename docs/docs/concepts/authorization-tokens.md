@@ -14,7 +14,7 @@ CLI for Microsoft 365 gets access to Microsoft 365 through a custom Azure AD app
     When you decide to use your own Azure AD application, you need to choose the application to be a **public client**. Despite the setting's description, the application will not be publicly accessible. This setting enables the use of the device flow for your own application. Without activating this setting, it is not possible to complete the authentication process. The option is currently only available in the preview blade for managing for Azure AD applications.
     [![The 'public client' enabled for an Azure AD application](../images/activate-public-client-aad-app.png)](../images/activate-public-client-aad-app.png)
 
-When specifying a custom Azure AD application to be used by the CLI for Microsoft 365, set the `OFFICE365CLI_AADAPPID` environment variable to the ID of your Azure AD application.
+When specifying a custom Azure AD application to be used by the CLI for Microsoft 365, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of your Azure AD application.
 
 CLI for Microsoft 365 requires the following permissions to Microsoft 365 services:
 

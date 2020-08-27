@@ -35,7 +35,7 @@ When logging in to Microsoft 365 using the user name and password, next to the a
 
 When logging in to Microsoft 365 using a certificate, the CLI for Microsoft 365 will store the contents of the certificate so that it can automatically re-authenticate if necessary. The contents of the certificate are removed by re-authenticating using the device code or by calling the [logout](logout.md) command.
 
-To log in to Microsoft 365 using a certificate, you will typically create a custom Azure AD application. To use this application with the CLI for Microsoft 365, you will set the `OFFICE365CLI_AADAPPID` environment variable to the application's ID and the `OFFICE365CLI_TENANT` environment variable to the ID of the Azure AD tenant, where you created the Azure AD application.
+To log in to Microsoft 365 using a certificate, you will typically create a custom Azure AD application. To use this application with the CLI for Microsoft 365, you will set the `CLIMICROSOFT365_AADAPPID` environment variable to the application's ID and the `CLIMICROSOFT365_TENANT` environment variable to the ID of the Azure AD tenant, where you created the Azure AD application.
 
 Managed identity in Azure Cloud Shell is the identity of the user. It is neither system- nor user-assigned and it can't be configured. To log in to Microsoft 365 using managed identity in Azure Cloud Shell, set `authType` to `identity` and don't specify the `userName` option.
 
