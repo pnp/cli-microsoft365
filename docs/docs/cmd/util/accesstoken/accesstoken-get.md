@@ -22,9 +22,6 @@ Option|Description
 
 ## Remarks
 
-!!! attention
-    The 'accesstoken get' command is deprecated. Please use 'util accesstoken get' instead.
-
 The `util accesstoken get` command returns an access token for the specified resource. If an access token has been previously retrieved and is still valid, the command will return the cached token. If you want to ensure that the returned access token is valid for as long as possible, you can force the command to retrieve a new access token by using the `--new` option.
 
 ## Examples
