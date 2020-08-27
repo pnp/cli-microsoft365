@@ -231,8 +231,8 @@ class LoginCommand extends Command {
 
     To log in to Microsoft 365 using a certificate, you will typically create
     a custom Azure AD application. To use this application with
-    the CLI for Microsoft 365, you will set the ${chalk.grey('OFFICE365CLI_AADAPPID')}
-    environment variable to the application's ID and the ${chalk.grey('OFFICE365CLI_TENANT')}
+    the CLI for Microsoft 365, you will set the ${chalk.grey('CLIMICROSOFT365_AADAPPID')}
+    environment variable to the application's ID and the ${chalk.grey('CLIMICROSOFT365_TENANT')}
     environment variable to the ID of the Azure AD tenant, where you created
     the Azure AD application.
 
