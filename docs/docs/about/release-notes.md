@@ -34,6 +34,8 @@
 - added 'owners' option for CommunicationSite creation using 'spo site add' [#1734](https://github.com/pnp/cli-microsoft365/issues/1734)
 - added LCID validation to 'spo site add' [#1749](https://github.com/pnp/cli-microsoft365/issues/1749)
 - added "Caveats when certificate login" doc [#1734](https://github.com/pnp/cli-microsoft365/issues/1734), [#1738](https://github.com/pnp/cli-microsoft365/issues/1738)
+- removed obsolete `outputFile` option [#1769](https://github.com/pnp/cli-microsoft365/issues/1769)
+- renamed environment variables from `OFFICE365CLI` to `CLIMICROSOFT365` [#1787](https://github.com/pnp/cli-microsoft365/pull/1787)
 
 ## [v2.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v2.13.0)
 
