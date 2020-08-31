@@ -38,10 +38,8 @@ class SpoPageGetCommand extends SpoCommand {
       pageName += '.aspx';
     }
 
-    let ListItemAllFieldsString: string = this.verbose ? 'ListItemAllFields,' : '';
-
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=${ListItemAllFieldsString}ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
+      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
       headers: {
         'content-type': 'application/json;charset=utf-8',
         accept: 'application/json;odata=nometadata'
@@ -50,7 +48,7 @@ class SpoPageGetCommand extends SpoCommand {
     };
 
     request
-      .get<any>(requestOptions)
+      .get(requestOptions)
       .then((res: any): void => {
         if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
           cb(new CommandError(`Page ${args.options.name} is not a modern page.`));
@@ -65,16 +63,32 @@ class SpoPageGetCommand extends SpoCommand {
           });
         });
 
-        if (res.ListItemAllFields.PageLayoutType) {
-          res.layoutType = res.ListItemAllFields.PageLayoutType;
+        if (args.options.output === 'json') {
+          res.commentsDisabled = res.ListItemAllFields.CommentsDisabled;
+          res.numSections = clientSidePage.sections.length;
+          res.numControls = numControls;
+          res.title = res.ListItemAllFields.Title;
+
+          if (res.ListItemAllFields.PageLayoutType) {
+            res.layoutType = res.ListItemAllFields.PageLayoutType;
+          }
+
+          cmd.log(res);
         }
+        else {
+          const page: any = {
+            commentsDisabled: res.ListItemAllFields.CommentsDisabled,
+            numSections: clientSidePage.sections.length,
+            numControls: numControls,
+            title: res.ListItemAllFields.Title
+          };
 
-        res.commentsDisabled = res.ListItemAllFields.CommentsDisabled;
-        res.numSections = clientSidePage.sections.length;
-        res.numControls = numControls;
-        res.title = res.ListItemAllFields.Title;
+          if (res.ListItemAllFields.PageLayoutType) {
+            page.layoutType = res.ListItemAllFields.PageLayoutType;
+          }
 
-        cmd.log(res);
+          cmd.log(page);
+        }
 
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
