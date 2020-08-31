@@ -17,6 +17,7 @@
 **SharePoint:**
 
 - [spo group list](../cmd/spo/group/group-list.md) - lists groups from specific web [#1691](https://github.com/pnp/cli-microsoft365/issues/1691)
+- [spo knowledgehub set](../cmd/spo/knowledgehub/knowledgehub-set.md) - sets the Knowledge Hub Site for your tenant [#1576](https://github.com/pnp/cli-microsoft365/issues/1576)
 
 ### Changes
 
@@ -36,6 +37,7 @@
 - added "Caveats when certificate login" doc [#1734](https://github.com/pnp/cli-microsoft365/issues/1734), [#1738](https://github.com/pnp/cli-microsoft365/issues/1738)
 - removed obsolete `outputFile` option [#1769](https://github.com/pnp/cli-microsoft365/issues/1769)
 - renamed environment variables from `OFFICE365CLI` to `CLIMICROSOFT365` [#1787](https://github.com/pnp/cli-microsoft365/pull/1787)
+- extended 'spo web set' with welcomePage [#1730](https://github.com/pnp/cli-microsoft365/pull/1730)
 
 ## [v2.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v2.13.0)
 
