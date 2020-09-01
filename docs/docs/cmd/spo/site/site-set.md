@@ -91,5 +91,5 @@ spo site set --url https://contoso.sharepoint.com/sites/sales --title "My new si
 Restrict external sharing to already available external users only
 
 ```sh
-spo site set --url https://contoso.sharepoint.com/sites/sales  --sharingCapability ExistingExternalUserSharingOnly
+spo site set --url https://contoso.sharepoint.com/sites/sales --sharingCapability ExistingExternalUserSharingOnly
 ```

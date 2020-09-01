@@ -66,31 +66,31 @@ When trying to create a team site using app-only permissions, you will get an _I
 Create modern team site with private group
 
 ```sh
-spo site add --alias team1 --title Team 1
+spo site add --alias team1 --title "Team 1"
 ```
 
 Create modern team site with description and classification
 
 ```sh
-spo site add --type TeamSite --alias team1 --title Team 1 --description Site of team 1 --classification LBI
+spo site add --type TeamSite --alias team1 --title "Team 1" --description "Site of team 1" --classification LBI
 ```
 
 Create modern team site with public group
 
 ```sh
-spo site add --type TeamSite --alias team1 --title Team 1 --isPublic
+spo site add --type TeamSite --alias team1 --title "Team 1" --isPublic
 ```
 
 Create modern team site using the Dutch language
 
 ```sh
-spo site add --alias team1 --title Team 1 --lcid 1043
+spo site add --alias team1 --title "Team 1" --lcid 1043
 ```
 
 Create modern team site with the specified users as owners
 
 ```sh
-spo site add --alias team1 --title Team 1 --owners "steve@contoso.com, bob@contoso.com"
+spo site add --alias team1 --title "Team 1" --owners "steve@contoso.com, bob@contoso.com"
 ```
 
 Create communication site using the Topic design
