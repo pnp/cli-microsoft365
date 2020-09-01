@@ -176,7 +176,7 @@ class OutlookSendmailCommand extends GraphCommand {
       ${this.name} --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site"
 
     Send an HTML e-mail to the specified e-mail addresses
-      ${this.name} --to "chris@contoso.com,brian@contoso.com" --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the <a href="https://contoso.sharepoint.com/sites/marketing">team site</a>" --bodyContentType HTML
+      ${this.name} --to "chris@contoso.com,brian@contoso.com" --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the <a href='https://contoso.sharepoint.com/sites/marketing'>team site</a>" --bodyContentType HTML
 
     Send an HTML e-mail to the specified e-mail address loading e-mail contents
     from a file on disk

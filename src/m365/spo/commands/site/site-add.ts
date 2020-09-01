@@ -775,19 +775,19 @@ class SpoSiteAddCommand extends SpoCommand {
   Examples:
 
     Create modern team site with private group
-      ${commands.SITE_ADD} --alias team1 --title Team 1
+      ${commands.SITE_ADD} --alias team1 --title "Team 1"
 
     Create modern team site with description and classification
-      ${commands.SITE_ADD} --type TeamSite --alias team1 --title Team 1 --description Site of team 1 --classification LBI
+      ${commands.SITE_ADD} --type TeamSite --alias team1 --title "Team 1" --description "Site of Team 1" --classification LBI
 
     Create modern team site with public group
-      ${commands.SITE_ADD} --type TeamSite --alias team1 --title Team 1 --isPublic
+      ${commands.SITE_ADD} --type TeamSite --alias team1 --title "Team 1" --isPublic
 
     Create modern team site using the Dutch language
-      ${commands.SITE_ADD} --alias team1 --title Team 1 --lcid 1043
+      ${commands.SITE_ADD} --alias team1 --title "Team 1" --lcid 1043
 
     Create modern team site with the specified users as owners
-      ${commands.SITE_ADD} --alias team1 --title Team 1 --owners "steve@contoso.com, bob@contoso.com"
+      ${commands.SITE_ADD} --alias team1 --title "Team 1" --owners "steve@contoso.com, bob@contoso.com"
 
     Create communication site using the Topic design
       ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing

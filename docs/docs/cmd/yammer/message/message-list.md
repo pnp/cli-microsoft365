@@ -68,17 +68,17 @@ yammer message list --limit 10
 Returns the first 10 Yammer network messages from the Yammer group 312891231
 
 ```sh
-yammer message list --groupId 312891231  --limit 10
+yammer message list --groupId 312891231 --limit 10
 ```
 
 Returns the first 10 Yammer network messages from thread 5611239081
 
 ```sh
-yammer message list --threadId 5611239081  --limit 10
+yammer message list --threadId 5611239081 --limit 10
 ```
 
 Returns the first 20 Yammer message from the sent feed of the user
 
 ```sh
-yammer message list --feedType Sent  --limit 20
+yammer message list --feedType Sent --limit 20
 ```
