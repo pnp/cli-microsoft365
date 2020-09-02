@@ -479,7 +479,8 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   it('passes validation if the expirationDateTime is in the future but no more than six months from now', () => {
     const currentDate: Date = new Date();
     currentDate.setMonth(currentDate.getMonth() + 4);
-    const dateString: string = currentDate.getFullYear() + "-" + ("0" + currentDate.getMonth() + 1).slice(-2) + "-01";
+    currentDate.setDate(1);
+    const dateString: string = currentDate.toISOString().substr(0, 10);
 
     const actual = (command.validate() as CommandValidate)({
       options:
