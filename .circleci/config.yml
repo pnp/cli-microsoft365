@@ -92,7 +92,7 @@ jobs:
           command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run:
           name: Build docs
-          command: mkdocs gh-deploy
+          command: mkdocs gh-deploy -m "[ci skip]"
 
 workflows:
   version: 2
@@ -101,13 +101,13 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: /^(master|gh-pages)/
+              ignore: /^(master)/
       - test:
           requires:
             - build
           filters:
             branches:
-              ignore: /^(master|gh-pages)/
+              ignore: /^(master)/
   release_next:
     jobs:
       - build:
