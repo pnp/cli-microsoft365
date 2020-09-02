@@ -130,6 +130,58 @@ export default abstract class SpoCommand extends Command {
       });
   }
 
+  protected waitUntilCopyJobFinished(copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, cmd: CommandInstance, dots?: string, timeout?: NodeJS.Timer): void {
+    const requestUrl: string = `${siteUrl}/_api/site/GetCopyJobProgress`;
+    const requestOptions: any = {
+      url: requestUrl,
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      body: { "copyJobInfo": copyJobInfo },
+      json: true
+    };
+
+    if (!this.debug && this.verbose) {
+      dots += '.';
+      process.stdout.write(`\r${dots}`);
+    }
+
+    request
+      .post<{ JobState?: number, Logs: string[] }>(requestOptions)
+      .then((resp: { JobState?: number, Logs: string[] }): void => {
+
+        if (this.debug) {
+          cmd.log('getCopyJobProgress response...');
+          cmd.log(resp);
+        }
+
+        for (const item of resp.Logs) {
+          const log: { Event: string; Message: string } = JSON.parse(item);
+
+          // reject if progress error
+          if (log.Event === "JobError" || log.Event === "JobFatalError") {
+            return reject(log.Message);
+          }
+        }
+
+        // two possible scenarios
+        // job done = success promise returned
+        // job in progress = recursive call using setTimeout returned
+        if (resp.JobState === 0) {
+          // job done
+          if (this.verbose) {
+            process.stdout.write('\n');
+          }
+
+          resolve();
+        } else {
+          timeout = setTimeout(() => {
+            this.waitUntilCopyJobFinished(copyJobInfo, siteUrl, pollingInterval, resolve, reject, cmd, dots);
+          }, pollingInterval);
+        }
+      });
+  }
+
   protected getSpoUrl(stdout: Logger, debug: boolean): Promise<string> {
     if (auth.service.spoUrl) {
       if (debug) {
@@ -256,5 +308,29 @@ export default abstract class SpoCommand extends Command {
     }
 
     return true;
+  }
+
+  /**
+   * Combines base and relative url considering any missing slashes
+   * @param baseUrl https://contoso.com
+   * @param relativeUrl sites/abc
+   */
+  protected urlCombine(baseUrl: string, relativeUrl: string): string {
+    // remove last '/' of base if exists
+    if (baseUrl.lastIndexOf('/') === baseUrl.length - 1) {
+      baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+    }
+
+    // remove '/' at 0
+    if (relativeUrl.charAt(0) === '/') {
+      relativeUrl = relativeUrl.substring(1, relativeUrl.length);
+    }
+
+    // remove last '/' of next if exists
+    if (relativeUrl.lastIndexOf('/') === relativeUrl.length - 1) {
+      relativeUrl = relativeUrl.substring(0, relativeUrl.length - 1);
+    }
+
+    return `${baseUrl}/${relativeUrl}`;
   }
 }
