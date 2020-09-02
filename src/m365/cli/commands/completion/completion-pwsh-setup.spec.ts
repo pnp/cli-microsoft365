@@ -11,7 +11,7 @@ import * as os from 'os';
 import { autocomplete } from '../../../../autocomplete';
 
 describe(commands.COMPLETION_PWSH_SETUP, () => {
-  const completionScriptPath: string = path.resolve(__dirname, '..', '..', '..', '..', '..', 'scripts', 'Register-O365CLICompletion.ps1');
+  const completionScriptPath: string = path.resolve(__dirname, '..', '..', '..', '..', '..', 'scripts', 'Register-CLIM365Completion.ps1');
   let vorpal: Vorpal;
   let log: string[];
   let cmdInstance: any;
