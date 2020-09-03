@@ -1,6 +1,7 @@
 site_name: CLI for Microsoft 365
 nav:
   - Home: 'index.md'
+  - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
     - 'Using the CLI': 'user-guide/using-cli.md'
