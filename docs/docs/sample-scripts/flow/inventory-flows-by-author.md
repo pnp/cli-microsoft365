@@ -7,7 +7,7 @@ The [Power Automate Admin Center](https://admin.flow.microsoft.com) provides a l
 The `bash` version of this script uses an external file to process owner mapping. This is provided in the jq tab and should be saved to the same folder as the bash script and named `merge.jq`.
 
 !!! attention
-    There is a known issue when running scripts that retrieve large amounts of content. See issue [#1266](https://github.com/pnp/office365-cli/issues/1266) for further detail. A best practice is to use a temporary file to enable processing large return sets.
+    There is a known issue when running scripts that retrieve large amounts of content. See issue [#1266](https://github.com/pnp/cli-microsoft365/issues/1266) for further detail. A best practice is to use a temporary file to enable processing large return sets.
 
 ```powershell tab="PowerShell Core"
 #!/usr/local/bin/pwsh -File
@@ -40,7 +40,7 @@ try {
     Write-Host "Found default environment $defaultEnvironment, querying Flows..."
 
     # Step 2 - Get all of the flows using the cli and write flows json to a tmp file 
-    # Use a JMESPath query to filter the size of the file. See https://github.com/pnp/office365-cli/issues/1266
+    # Use a JMESPath query to filter the size of the file. See https://github.com/pnp/cli-microsoft365/issues/1266
     m365 flow list --environment $defaultEnvironment `
         --query '[].{name: name, displayName: properties.displayName,owner: properties.creator.userId, state: properties.state, created: properties.createdTime, lastModified: properties.lastModifiedTime, trigger: properties.definitionSummary.triggers[0].swaggerOperationId,  triggerType: properties.definitionSummary.triggers[0].type }' --asAdmin --output json |
         Out-File "$TMP_FLOWS" -Encoding ASCII
@@ -131,7 +131,7 @@ DEFAULT_ENVIRONMENT=$(m365 flow environment list --output json | jq -r '.[] | se
 echo "Found default environment $DEFAULT_ENVIRONMENT, querying Flows..."
 
 #Step 2 - Get all of the flows using the cli and write flows json to a tmp file
-#See https://github.com/pnp/office365-cli/issues/1266 for temp file usage reason
+#See https://github.com/pnp/cli-microsoft365/issues/1266 for temp file usage reason
 m365 flow list --environment $DEFAULT_ENVIRONMENT --asAdmin --output json > $TMP_FLOWS
 
 #Step 3 - Get a unique list of the flow owners from the tmp file

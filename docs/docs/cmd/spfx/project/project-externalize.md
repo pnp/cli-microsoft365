@@ -24,7 +24,7 @@ Option|Description
 ## Remarks
 
 !!! attention
-    This command is in preview and could change once it's officially released. If you see any room for improvement, we'd love to hear from you at [https://github.com/pnp/office365-cli/issues](https://github.com/pnp/office365-cli/issues).
+    This command is in preview and could change once it's officially released. If you see any room for improvement, we'd love to hear from you at [https://github.com/pnp/cli-microsoft365/issues](https://github.com/pnp/cli-microsoft365/issues).
 
 The `spfx project externalize` command helps you externalize your SharePoint Framework project dependencies using the [unpkg CDN](https://unpkg.com/).
 

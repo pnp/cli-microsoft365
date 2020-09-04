@@ -72,7 +72,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
     if (args.options.output !== 'json' || this.verbose) {
-      cmd.log(`This command is currently in preview. Feedback welcome at https://github.com/pnp/office365-cli/issues${os.EOL}`);
+      cmd.log(`This command is currently in preview. Feedback welcome at https://github.com/pnp/cli-microsoft365/issues${os.EOL}`);
     }
 
     this.projectRootPath = this.getProjectRoot(process.cwd());
@@ -234,7 +234,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
 
     ${chalk.yellow('Attention:')} This command is in preview and could change
     once it's officially released. If you see any room for improvement, we'd
-    love to hear from you at https://github.com/pnp/office365-cli/issues.
+    love to hear from you at https://github.com/pnp/cli-microsoft365/issues.
 
     The ${chalk.blue(this.name)} command helps you externalize your SharePoint
     Framework project dependencies using the unpkg CDN.

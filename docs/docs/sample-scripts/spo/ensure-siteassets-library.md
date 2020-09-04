@@ -4,7 +4,7 @@ Author: [Phillip Allan-Harding](https://github.com/phillipharding/)
 
 There are occasions when creating a new modern SharePoint site using the CLI/REST API that the Site Assets library isn't created, use this script to ensure that the Site Assets library is created.
 
-Reference: ['ensure' commands #1427](https://github.com/pnp/office365-cli/discussions/1427)
+Reference: ['ensure' commands #1427](https://github.com/pnp/cli-microsoft365/discussions/1427)
 
 - gets the collection of lists at the site url supplied
 - if a list with the title "Site Assets" isn't found

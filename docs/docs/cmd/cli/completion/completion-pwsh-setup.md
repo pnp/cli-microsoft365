@@ -35,4 +35,4 @@ cli completion pwsh setup --profile $profile
 
 ## More information
 
-- Command completion: [https://pnp.github.io/office365-cli/concepts/completion/](https://pnp.github.io/office365-cli/concepts/completion/)
+- Command completion: [https://pnp.github.io/cli-microsoft365/concepts/completion/](https://pnp.github.io/cli-microsoft365/concepts/completion/)

@@ -50,7 +50,7 @@ class CliCompletionShSetupCommand extends AnonymousCommand {
   More information:
 
     Command completion
-      https://pnp.github.io/office365-cli/concepts/completion/
+      https://pnp.github.io/cli-microsoft365/concepts/completion/
 `);
   }
 }

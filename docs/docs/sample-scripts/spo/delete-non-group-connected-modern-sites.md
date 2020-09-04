@@ -5,7 +5,7 @@ Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powersh
 When you delete Microsoft 365 groups, the modern group-connected team sites get deleted with them. The script below handles the remaining modern sites: communication sites and groupless team sites.
 
 !!! attention
-    There is a known issue running this script using PowerShell Core on macOS, see issue [#1266](https://github.com/pnp/office365-cli/issues/1266) for further detail
+    There is a known issue running this script using PowerShell Core on macOS, see issue [#1266](https://github.com/pnp/cli-microsoft365/issues/1266) for further detail
 
 ```powershell tab="PowerShell Core"
 $sparksjoy = "Cat Lovers United", "Extranet", "Hub"

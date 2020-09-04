@@ -6,7 +6,7 @@ This PowerShell script shows how to download and sync documents in a SharePoint 
 
 Prerequisites:
 
-- [Office 365 CLI](https://pnp.github.io/office365-cli/)
+- [Office 365 CLI](https://pnp.github.io/cli-microsoft365/)
 - [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest)
 - SharePoint Online Site
 - Document Library with documents

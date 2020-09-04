@@ -28,4 +28,4 @@ cli reconsent
 
 ## More information
 
-- Re-consent the PnP Microsoft 365 Management Shell Azure AD application: [https://pnp.github.io/office365-cli/user-guide/connecting-office-365/#re-consent-the-pnp-office-365-management-shell-azure-ad-application](https://pnp.github.io/office365-cli/user-guide/connecting-office-365/#re-consent-the-pnp-office-365-management-shell-azure-ad-application)
+- Re-consent the PnP Microsoft 365 Management Shell Azure AD application: [https://pnp.github.io/cli-microsoft365/user-guide/connecting-office-365/#re-consent-the-pnp-office-365-management-shell-azure-ad-application](https://pnp.github.io/cli-microsoft365/user-guide/connecting-office-365/#re-consent-the-pnp-office-365-management-shell-azure-ad-application)

@@ -7,13 +7,13 @@
 
 # CLI for Microsoft 365
 
-Using the CLI for Microsoft 365, you can manage your Microsoft 365 tenant and SharePoint Framework projects on any platform. No matter if you are on Windows, macOS or Linux, using Bash, Cmder or PowerShell, using the CLI for Microsoft 365 you can configure Microsoft 365, manage SharePoint Framework projects and build automation scripts.
+Using CLI for Microsoft 365, you can manage your Microsoft 365 tenant and SharePoint Framework projects on any platform. No matter if you are on Windows, macOS or Linux, using Bash, Cmder or PowerShell, using CLI for Microsoft 365 you can configure Microsoft 365, manage SharePoint Framework projects and build automation scripts.
 
 [![asciicast](https://asciinema.org/a/346365.png)](https://asciinema.org/a/346365)
 
 ## Installation
 
-The CLI for Microsoft 365 is distributed as an NPM package. To use it, install it globally using:
+CLI for Microsoft 365 is distributed as an NPM package. To use it, install it globally using:
 
 ```sh
 npm i -g @pnp/cli-microsoft365
@@ -25,7 +25,7 @@ or using yarn:
 yarn global add @pnp/cli-microsoft365
 ```
 
-The beta version of the CLI for Microsoft 365 can be installed by using the `@next` tag:
+The beta version of CLI for Microsoft 365 can be installed by using the `@next` tag:
 
 ```sh
 npm i -g @pnp/cli-microsoft365@next
@@ -41,13 +41,13 @@ m365 login
 
 > CLI for Microsoft 365 will automatically detect the URL of your tenant based on the account that you use to sign in.
 
-To list all available commands, type in the CLI for Microsoft 365 prompt `help`:
+To list all available commands, type in CLI for Microsoft 365 prompt `help`:
 
 ```sh
 m365 help
 ```
 
-See the [User Guide](docs/docs/user-guide/installing-cli.md) to learn more about the CLI for Microsoft 365 and its capabilities.
+See the [User Guide](docs/docs/user-guide/installing-cli.md) to learn more about CLI for Microsoft 365 and its capabilities.
 
 ## Sharing is Caring
 
@@ -57,7 +57,7 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
 contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
-![SharePoint Patterns and Practices](https://devofficecdn.azureedge.net/media/Default/PnP/sppnp.png)
+![Microsoft 365 Patterns and Practices](./docs/docs/images/parker-ms-logo-300.png)
 
 ## Disclaimer
 
