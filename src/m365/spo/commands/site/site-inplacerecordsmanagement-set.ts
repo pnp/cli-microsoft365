@@ -105,11 +105,11 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
   
     Activates in-place records management for site
     ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}
-      ${commands.SITE_INPLACERECORDSMANAGEMENT_SET} --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled true
+      m365 ${this.name} --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled true
 
     Deactivates in-place records management for site
     ${chalk.grey('https://contoso.sharepoint.com/sites/team-a')}
-      ${commands.SITE_INPLACERECORDSMANAGEMENT_SET} --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled false
+      m365 ${this.name} --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled false
   ` );
   }
 }

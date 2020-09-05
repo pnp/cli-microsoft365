@@ -5,7 +5,7 @@ Adds text to a modern page
 ## Usage
 
 ```sh
-spo page text add [options]
+m365 spo page text add [options]
 ```
 
 ## Options
@@ -33,17 +33,17 @@ If the specified `pageName` doesn't refer to an existing modern page, you will g
 Add text to a modern page in the first available location on the page
 
 ```sh
-spo page text add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world'
+m365 spo page text add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world'
 ```
 
 Add text to a modern page in the third column of the second section
 
 ```sh
-spo page text add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world' --section 2 --column 3
+m365 spo page text add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world' --section 2 --column 3
 ```
 
 Add text at the beginning of the default column on a modern page
 
 ```sh
-spo page text add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world' --order 1
+m365 spo page text add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --text 'Hello world' --order 1
 ```

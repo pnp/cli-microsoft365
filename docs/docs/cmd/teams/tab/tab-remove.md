@@ -5,7 +5,7 @@ Removes a tab from the specified channel
 ## Usage
 
 ```sh
-teams tab remove [options]
+m365 teams tab remove [options]
 ```
 
 ## Options
@@ -27,13 +27,13 @@ Option|Description
 Removes a tab from the specified channel. Will prompt for confirmation
 
 ```sh
-teams tab remove --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --tabId 06805b9e-77e3-4b93-ac81-525eb87513b8
+m365 teams tab remove --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --tabId 06805b9e-77e3-4b93-ac81-525eb87513b8
 ```
 
 Removes a tab from the specified channel without prompting for confirmation
 
 ```sh
-teams tab remove --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --tabId 06805b9e-77e3-4b93-ac81-525eb87513b8 --confirm
+m365 teams tab remove --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --tabId 06805b9e-77e3-4b93-ac81-525eb87513b8 --confirm
 ```
 
 ## Additional information

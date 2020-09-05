@@ -94,19 +94,19 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
       `  Examples:
 
     Return property bag values located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test
 
     Return property bag values located in site root folder ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test -f /
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test -f /
 
     Return property bag values located in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test --folder '/Shared Documents'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --folder '/Shared Documents'
 
     Return property bag values located in folder in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_LIST} -w https://contoso.sharepoint.com/sites/test -f '/Shared Documents/MyFolder'
+      m365 ${this.name} -w https://contoso.sharepoint.com/sites/test -f '/Shared Documents/MyFolder'
 
     Return property bag values located in site list ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_LIST} --webUrl https://contoso.sharepoint.com/sites/test --folder /Lists/MyList
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --folder /Lists/MyList
     `);
   }
 

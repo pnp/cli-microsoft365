@@ -5,7 +5,7 @@ Removes an Microsoft 365 Group
 ## Usage
 
 ```sh
-aad o365group remove [options]
+m365 aad o365group remove [options]
 ```
 
 ## Options
@@ -29,11 +29,11 @@ If the specified _id_ doesn't refer to an existing group, you will get a `Resour
 Remove group with id _28beab62-7540-4db1-a23f-29a6018a3848_. Will prompt for confirmation before removing the group
 
 ```sh
-aad o365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848
+m365 aad o365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848
 ```
 
 Remove group with id _28beab62-7540-4db1-a23f-29a6018a3848_ without prompting for confirmation
 
 ```sh
-aad o365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848 --confirm
+m365 aad o365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848 --confirm
 ```

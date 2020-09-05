@@ -258,25 +258,25 @@ class SpoListItemListCommand extends SpoCommand {
   Examples:
   
     Get all items from a list named ${chalk.grey('Demo List')}
-      ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x
+      m365 ${this.name} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x
 
     From a list named ${chalk.grey('Demo List')} get all items with title ${chalk.grey('Demo list item')}
     using a CAML query
-      ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<View><Query><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></Query></View>"
+      m365 ${this.name} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<View><Query><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></Query></View>"
     
     Get all items from a list with ID ${chalk.grey('935c13a0-cc53-4103-8b48-c1d0828eaa7f')} 
-      ${commands.LISTITEM_LIST} --id 935c13a0-cc53-4103-8b48-c1d0828eaa7f --webUrl https://contoso.sharepoint.com/sites/project-x
+      m365 ${this.name} --id 935c13a0-cc53-4103-8b48-c1d0828eaa7f --webUrl https://contoso.sharepoint.com/sites/project-x
 
     Get all items from list named ${chalk.grey('Demo List')}. For each item, retrieve the value
     of the ${chalk.grey('ID')}, ${chalk.grey('Title')} and ${chalk.grey('Modified')} fields
-      ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --fields "ID,Title,Modified"
+      m365 ${this.name} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --fields "ID,Title,Modified"
 
     From a list named ${chalk.grey('Demo List')} get all items with title ${chalk.grey('Demo list item')}
     using an OData filter 
-      ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --filter "Title eq 'Demo list item'"
+      m365 ${this.name} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --filter "Title eq 'Demo list item'"
 
     From a list named ${chalk.grey('Demo List')} get the third batch of 10 items
-      ${commands.LISTITEM_LIST} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --pageSize 10 --pageNumber 2
+      m365 ${this.name} --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --pageSize 10 --pageNumber 2
    `);
   }
 }

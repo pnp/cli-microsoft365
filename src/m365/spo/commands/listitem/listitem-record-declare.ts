@@ -203,22 +203,22 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
   
     Declare a document with id ${chalk.grey("1")} as a record in list with title ${chalk.grey("Demo List")}
     located in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
-      ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 1
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 1
 
     Declare a document with id ${chalk.grey("1")} as a record in list with id
     ${chalk.grey("ea8e1109-2013-1a69-bc05-1403201257fc")} located in site
     ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
-      ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId ea8e1109-2013-1a69-bc05-1403201257fc --id 1
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listId ea8e1109-2013-1a69-bc05-1403201257fc --id 1
   
     Declare a document with id ${chalk.grey("1")} as a record with record declaration date
     ${chalk.grey("March 14, 2012")} in list with title ${chalk.grey("Demo List")} located in site
     ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
-      ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 1 --date 2012-03-14
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle "Demo List" --id 1 --date 2012-03-14
 
     Declare a document with id ${chalk.grey("1")} as a record with record declaration date
     ${chalk.grey("September 3, 2013")} in list with id ${chalk.grey("ea8e1356-5910-abc9-bc05-2408198057fc")}
     located in site ${chalk.grey("https://contoso.sharepoint.com/sites/project-x")}
-      ${commands.LISTITEM_RECORD_DECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId ea8e1356-5910-abc9-bc05-2408198057fc --id 1 --date 2013-09-03
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listId ea8e1356-5910-abc9-bc05-2408198057fc --id 1 --date 2013-09-03
    `
     );
   }

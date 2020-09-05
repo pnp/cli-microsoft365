@@ -5,7 +5,7 @@ Retrieves the list of custom themes
 ## Usage
 
 ```sh
-spo theme list [options]
+m365 spo theme list [options]
 ```
 
 ## Options
@@ -26,7 +26,7 @@ Option|Description
 List available themes
 
 ```sh
-spo theme list
+m365 spo theme list
 ```
 
 ## More information

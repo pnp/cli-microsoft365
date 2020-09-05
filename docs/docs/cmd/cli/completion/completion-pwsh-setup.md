@@ -5,7 +5,7 @@ Sets up command completion for PowerShell
 ## Usage
 
 ```sh
-cli completion pwsh setup [options]
+m365 cli completion pwsh setup [options]
 ```
 
 ## Options

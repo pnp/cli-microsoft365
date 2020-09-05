@@ -175,12 +175,12 @@ class SpoListLabelSetCommand extends SpoCommand {
   
     Sets classification label "Confidential" for list ${chalk.grey('Shared Documents')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_LABEL_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --label 'Confidential'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --label 'Confidential'
 
     Sets classification label "Confidential" and disables editing and deleting
     items on the list and all existing items for list ${chalk.grey('Documents')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_LABEL_SET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --label 'Confidential' --blockEdit --blockDelete --syncToItems
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --label 'Confidential' --blockEdit --blockDelete --syncToItems
 `);
   }
 }

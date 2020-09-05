@@ -103,7 +103,7 @@ class AadOAuth2GrantSetCommand extends AadCommand {
   
     Update the existing OAuth2 permission grant with ID ${chalk.grey('YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek')}
     to the ${chalk.grey('Calendars.Read Mail.Read')} permissions
-      ${commands.OAUTH2GRANT_SET} --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek --scope "Calendars.Read Mail.Read"
+      m365 ${this.name} --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek --scope "Calendars.Read Mail.Read"
 
   More information:
   

@@ -130,10 +130,10 @@ class SpoCdnPolicyListCommand extends SpoCommand {
   Examples:
   
     Show the list of policies configured for the Public CDN
-      ${commands.CDN_POLICY_LIST}
+      m365 ${this.name}
 
     Show the list of policies configured for the Private CDN
-      ${commands.CDN_POLICY_LIST} --type Private
+      m365 ${this.name} --type Private
 
   More information:
 

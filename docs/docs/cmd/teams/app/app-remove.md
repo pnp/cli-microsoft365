@@ -5,7 +5,7 @@ Removes a Teams app from the organization's app catalog
 ## Usage
 
 ```sh
-teams app remove [options]
+m365 teams app remove [options]
 ```
 
 ## Options
@@ -29,11 +29,11 @@ You can only remove a Teams app as a global administrator.
 Remove the Teams app with ID _83cece1e-938d-44a1-8b86-918cf6151957_ from the organization's app catalog. Will prompt for confirmation before actually removing the app.
 
 ```sh
-teams app remove --id 83cece1e-938d-44a1-8b86-918cf6151957
+m365 teams app remove --id 83cece1e-938d-44a1-8b86-918cf6151957
 ```
 
 Remove the Teams app with ID _83cece1e-938d-44a1-8b86-918cf6151957_ from the organization's app catalog. Don't prompt for confirmation.
 
 ```sh
-teams app remove --id 83cece1e-938d-44a1-8b86-918cf6151957 --confirm
+m365 teams app remove --id 83cece1e-938d-44a1-8b86-918cf6151957 --confirm
 ```

@@ -28,17 +28,17 @@ class SpoReportSiteUsageSiteCountsCommand extends PeriodBasedReport {
       
     Gets the total number of files across all sites and the number of active
     files for the last week
-      ${commands.REPORT_SITEUSAGESITECOUNTS} --period D7
+      m365 ${this.name} --period D7
 
     Gets the total number of files across all sites and the number of active
     files for the last week and exports the report data in the specified path in
     text format
-      ${commands.REPORT_SITEUSAGESITECOUNTS} --period D7 --output text > "siteusagesitecounts.txt"
+      m365 ${this.name} --period D7 --output text > "siteusagesitecounts.txt"
 
     Gets the total number of files across all sites and the number of active
     files for the last week and exports the report data in the specified path in
     json format
-      ${commands.REPORT_SITEUSAGESITECOUNTS} --period D7 --output json > "siteusagesitecounts.json"
+      m365 ${this.name} --period D7 --output json > "siteusagesitecounts.json"
 `);
   }
 }

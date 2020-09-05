@@ -5,7 +5,7 @@ Gets access token for the specified resource
 ## Usage
 
 ```sh
-util accesstoken get [options]
+m365 util accesstoken get [options]
 ```
 
 ## Options
@@ -29,11 +29,11 @@ The `util accesstoken get` command returns an access token for the specified res
 Get access token for the Microsoft Graph
 
 ```sh
-util accesstoken get --resource https://graph.microsoft.com
+m365 util accesstoken get --resource https://graph.microsoft.com
 ```
 
 Get a new access token for SharePoint Online
 
 ```sh
-util accesstoken get --resource https://contoso.sharepoint.com --new
+m365 util accesstoken get --resource https://contoso.sharepoint.com --new
 ```

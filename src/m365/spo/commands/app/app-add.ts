@@ -171,15 +171,15 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
   Examples:
   
     Add the ${chalk.grey('spfx.sppkg')} package to the tenant app catalog
-      ${commands.APP_ADD} --filePath /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
+      m365 ${this.name} --filePath /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
 
     Overwrite the ${chalk.grey('spfx.sppkg')} package in the tenant app catalog with the newer
     version
-      ${commands.APP_ADD} --filePath sharepoint/solution/spfx.sppkg --overwrite
+      m365 ${this.name} --filePath sharepoint/solution/spfx.sppkg --overwrite
 
     Add the ${chalk.grey('spfx.sppkg')} package to the site collection app catalog 
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}
-      ${commands.APP_ADD} --filePath c:\\spfx.sppkg --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+      m365 ${this.name} --filePath c:\\spfx.sppkg --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 
   More information:
 

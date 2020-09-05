@@ -104,7 +104,7 @@ class CliConsentCommand extends Command {
   Examples:
   
     Consent permissions to the Yammer API
-      ${commands.CONSENT} --service yammer
+      m365 ${this.name} --service yammer
 `);
   }
 }

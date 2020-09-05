@@ -5,7 +5,7 @@ Gets the count of user mailboxes in each quota category
 ## Usage
 
 ```sh
-outlook report mailboxusagequotastatusmailboxcounts [options]
+m365 outlook report mailboxusagequotastatusmailboxcounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the count of user mailboxes in each quota category for the last week
 
 ```sh
-outlook report mailboxusagequotastatusmailboxcounts --period D7
+m365 outlook report mailboxusagequotastatusmailboxcounts --period D7
 ```
 
 Gets the count of user mailboxes in each quota category for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailboxusagequotastatusmailboxcounts --period D7 --output text > "mailboxusagequotastatusmailboxcounts.txt"
+m365 outlook report mailboxusagequotastatusmailboxcounts --period D7 --output text > "mailboxusagequotastatusmailboxcounts.txt"
 ```
 
 Gets the count of user mailboxes in each quota category for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailboxusagequotastatusmailboxcounts --period D7 --output json > "mailboxusagequotastatusmailboxcounts.json"
+m365 outlook report mailboxusagequotastatusmailboxcounts --period D7 --output json > "mailboxusagequotastatusmailboxcounts.json"
 ```

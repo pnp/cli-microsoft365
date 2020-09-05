@@ -5,13 +5,13 @@ Exports the specified power automate or power apps custom connector
 ## Usage
 
 ```sh
-pa connector export [options]
+m365 pa connector export [options]
 ```
 
 ## Alias
 
 ```sh
-flow connector export
+m365 flow connector export
 ```
 
 ## Options
@@ -38,11 +38,11 @@ If no output folder has been specified, the `pa connector export` command will c
 Export the specified custom connector
 
 ```sh
-pa connector export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --connector shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa
+m365 pa connector export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --connector shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa
 ```
 
 Export the specified custom connector to the specific directory
 
 ```sh
-pa connector export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --connector shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa --outputFolder connector
+m365 pa connector export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --connector shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa --outputFolder connector
 ```

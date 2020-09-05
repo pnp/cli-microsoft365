@@ -5,7 +5,7 @@ Gets details about OneDrive activity by user
 ## Usage
 
 ```sh
-onedrive report activityuserdetail [options]
+m365 onedrive report activityuserdetail [options]
 ```
 
 ## Options
@@ -25,23 +25,23 @@ Option|Description
 Gets details about OneDrive activity by user for the last week
 
 ```sh
-onedrive report activityuserdetail --period D7
+m365 onedrive report activityuserdetail --period D7
 ```
 
 Gets details about OneDrive activity by user for May 1, 2019
 
 ```sh
-onedrive report activityuserdetail --date 2019-05-01
+m365 onedrive report activityuserdetail --date 2019-05-01
 ```
 
 Gets details about OneDrive activity by user for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report activityuserdetail --period D7 --output text > "onedriveactivityuserdetail.txt"
+m365 onedrive report activityuserdetail --period D7 --output text > "onedriveactivityuserdetail.txt"
 ```
 
 Gets details about OneDrive activity by user for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report activityuserdetail --period D7 --output json > "onedriveactivityuserdetail.json"
+m365 onedrive report activityuserdetail --period D7 --output json > "onedriveactivityuserdetail.json"
 ```

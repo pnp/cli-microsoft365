@@ -5,7 +5,7 @@ Lists taxonomy term groups
 ## Usage
 
 ```sh
-spo term group list [options]
+m365 spo term group list [options]
 ```
 
 ## Options
@@ -26,5 +26,5 @@ Option|Description
 List taxonomy term groups
 
 ```sh
-spo term group list
+m365 spo term group list
 ```

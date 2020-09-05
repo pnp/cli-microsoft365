@@ -84,7 +84,7 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
   Examples:
   
     List all pending permission requests
-      ${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST}
+      m365 ${this.name}
 `);
   }
 }

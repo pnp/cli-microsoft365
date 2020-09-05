@@ -5,7 +5,7 @@ Get the number of group activities across group workloads
 ## Usage
 
 ```sh
-aad o365group report activitycounts [options]
+m365 aad o365group report activitycounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Get the number of group activities across group workloads for the last week
 
 ```sh
-aad o365group report activitycounts --period D7
+m365 aad o365group report activitycounts --period D7
 ```
 
 Get the number of group activities across group workloads for the last week and exports the report data in the specified path in text format
 
 ```sh
-aad o365group report activitycounts --period D7 --output text > "o365groupactivitycounts.txt"
+m365 aad o365group report activitycounts --period D7 --output text > "o365groupactivitycounts.txt"
 ```
 
 Get the number of group activities across group workloads for the last week and exports the report data in the specified path in json format
 
 ```sh
-aad o365group report activitycounts --period D7 --output json > "o365groupactivitycounts.json"
+m365 aad o365group report activitycounts --period D7 --output json > "o365groupactivitycounts.json"
 ```

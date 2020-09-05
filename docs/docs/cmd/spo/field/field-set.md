@@ -5,7 +5,7 @@ Updates existing list or site column
 ## Usage
 
 ```sh
-spo field set [options]
+m365 spo field set [options]
 ```
 
 ## Options
@@ -33,17 +33,17 @@ Specify properties to update using their names, eg. `--Title 'New Title' --JSLin
 Update the title of the site column specified by its internal name and push changes to existing lists
 
 ```sh
-spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --name 'MyColumn' --updateExistingLists --Title 'My column'
+m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --name 'MyColumn' --updateExistingLists --Title 'My column'
 ```
 
 Update the title of the list column specified by its ID
 
 ```sh
-spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --id 330f29c5-5c4c-465f-9f4b-7903020ae1ce --Title 'My column'
+m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --id 330f29c5-5c4c-465f-9f4b-7903020ae1ce --Title 'My column'
 ```
 
 Update column formatting of the specified list column
 
 ```sh
-spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --name 'MyColumn' --CustomFormatter '`{"schema":"https://developer.microsoft.com/json-schemas/sp/column-formatting.schema.json", "elmType": "div", "txtContent": "@currentField"}`'
+m365 spo field set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --name 'MyColumn' --CustomFormatter '`{"schema":"https://developer.microsoft.com/json-schemas/sp/column-formatting.schema.json", "elmType": "div", "txtContent": "@currentField"}`'
 ```

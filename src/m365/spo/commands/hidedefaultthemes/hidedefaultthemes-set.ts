@@ -99,7 +99,7 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
   Examples:
 
     Hide default themes and allow users to use organization themes only
-      ${commands.HIDEDEFAULTTHEMES_SET} --hideDefaultThemes true
+      m365 ${this.name} --hideDefaultThemes true
 
   More information:
 

@@ -5,7 +5,7 @@ Gets information about the specific list
 ## Usage
 
 ```sh
-spo list get [options]
+m365 spo list get [options]
 ```
 
 ## Options
@@ -26,13 +26,13 @@ Option|Description
 Return information about a list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list get --id 0cd891ef-afce-4e55-b836-fce03286cccf --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo list get --id 0cd891ef-afce-4e55-b836-fce03286cccf --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 Return information about a list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 ## More information

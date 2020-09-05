@@ -78,7 +78,7 @@ class SpoSetCommand extends SpoCommand {
   Examples:
   
     Set SPO URL to the specified URL
-      ${commands.SET} --url https://contoso.sharepoint.com
+      m365 ${this.name} --url https://contoso.sharepoint.com
 `);
   }
 }

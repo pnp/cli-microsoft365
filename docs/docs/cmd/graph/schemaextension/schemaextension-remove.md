@@ -5,7 +5,7 @@ Removes specified Microsoft Graph schema extension
 ## Usage
 
 ```sh
-graph schemaextension remove [options]
+m365 graph schemaextension remove [options]
 ```
 
 ## Options
@@ -30,11 +30,11 @@ extension.
 Removes specified Microsoft Graph schema extension with ID domain_myExtension. Will prompt for confirmation
 
 ```sh
-graph schemaextension remove --id domain_myExtension 
+m365 graph schemaextension remove --id domain_myExtension 
 ```
 
 Removes specified Microsoft Graph schema extension with ID domain_myExtension without prompt for confirmation
 
 ```sh
-graph schemaextension remove --id domain_myExtension --confirm
+m365 graph schemaextension remove --id domain_myExtension --confirm
 ```

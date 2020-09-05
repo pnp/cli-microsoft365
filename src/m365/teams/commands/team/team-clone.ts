@@ -169,11 +169,11 @@ class TeamsCloneCommand extends GraphCommand {
   Examples:
     
     Creates a clone of a Microsoft Teams team with mandatory parameters
-      ${commands.TEAMS_TEAM_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" 
+      m365 ${this.name} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" 
     
     Creates a clone of a Microsoft Teams team with mandatory and optional
     parameters
-      ${commands.TEAMS_TEAM_CLONE} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public" 
+      m365 ${this.name} --teamId 15d7a78e-fd77-4599-97a5-dbb6372846c5 --displayName "Library Assist" --partsToClone "apps,tabs,settings,channels,members" --description "Self help community for library" --classification "Library" --visibility "public" 
     `);
   }
 

@@ -5,7 +5,7 @@ Creates modern page
 ## Usage
 
 ```sh
-spo page add [options]
+m365 spo page add [options]
 ```
 
 ## Options
@@ -37,47 +37,47 @@ If you choose to promote the page using the `promoteAs` option or enable page co
 Create new modern page. Use the Article layout
 
 ```sh
-spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
+m365 spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
 ```
 
 Create new modern page and set its title
 
 ```sh
-spo page add --name new-page.aspx --title 'My page' --webUrl https://contoso.sharepoint.com/sites/a-team
+m365 spo page add --name new-page.aspx --title 'My page' --webUrl https://contoso.sharepoint.com/sites/a-team
 ```
 
 Create new modern page. Use the Home page layout and include the default set of web parts
 
 ```sh
-spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home
+m365 spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home
 ```
 
 Create new article page and promote it as a news article
 
 ```sh
-spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs NewsPage
+m365 spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs NewsPage
 ```
 
 Create new page and set it as the site's home page
 
 ```sh
-spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
+m365 spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
 ```
 
 Create new article page and promote it as a template
 
 ```sh
-spo page add --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs Template
+m365 spo page add --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs Template
 ```
 
 Create new article page and enable comments on the page
 
 ```sh
-spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --commentsEnabled
+m365 spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --commentsEnabled
 ```
 
 Create new article page and publish it
 
 ```sh
-spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --publish
+m365 spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --publish
 ```

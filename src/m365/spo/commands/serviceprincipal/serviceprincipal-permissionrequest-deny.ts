@@ -112,7 +112,7 @@ class SpoServicePrincipalPermissionRequestDenyCommand extends SpoCommand {
   Examples:
   
     Deny permission request with id ${chalk.grey('4dc4c043-25ee-40f2-81d3-b3bf63da7538')}
-      ${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY} --requestId 4dc4c043-25ee-40f2-81d3-b3bf63da7538
+      m365 ${this.name} --requestId 4dc4c043-25ee-40f2-81d3-b3bf63da7538
 `);
   }
 }

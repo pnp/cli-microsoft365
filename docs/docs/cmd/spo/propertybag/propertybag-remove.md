@@ -5,7 +5,7 @@ Removes specified property from the property bag
 ## Usage
 
 ```sh
-spo propertybag remove [options]
+m365 spo propertybag remove [options]
 ```
 
 ## Options
@@ -27,29 +27,29 @@ Option|Description
 Removes the value of the _key1_ property from the property bag located in site _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1
+m365 spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1
 ```
 
 Removes the value of the _key1_ property from the property bag located in site root folder _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder / --confirm
+m365 spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder / --confirm
 ```
 
 Removes the value of the _key1_ property from the property bag located in site document library _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
+m365 spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
 ```
 
 Removes the value of the _key1_ property from the property bag located in folder in site document library _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
+m365 spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
 ```
 
 Removes the value of the _key1_ property from the property bag located in site list _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList
+m365 spo propertybag remove --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList
 ```

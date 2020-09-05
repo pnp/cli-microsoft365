@@ -5,7 +5,7 @@ Removes tenant property stored on the specified SharePoint Online app catalog
 ## Usage
 
 ```sh
-spo storageentity remove [options]
+m365 spo storageentity remove [options]
 ```
 
 ## Options
@@ -33,13 +33,13 @@ Tenant properties are stored in the app catalog site associated with that tenant
 Remove the _AnalyticsId_ tenant property. Yields a confirmation prompt before actually removing the property
 
 ```sh
-spo storageentity remove -k AnalyticsId -u https://contoso.sharepoint.com/sites/appcatalog
+m365 spo storageentity remove -k AnalyticsId -u https://contoso.sharepoint.com/sites/appcatalog
 ```
 
 Remove the _AnalyticsId_ tenant property. Suppresses the confirmation prompt
 
 ```sh
-spo storageentity remove -k AnalyticsId --confirm -u https://contoso.sharepoint.com/sites/appcatalog
+m365 spo storageentity remove -k AnalyticsId --confirm -u https://contoso.sharepoint.com/sites/appcatalog
 ```
 
 ## More information

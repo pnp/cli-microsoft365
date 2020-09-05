@@ -116,7 +116,7 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
   Examples:
   
     Enable communication site features on an existing site
-      ${commands.SITE_COMMSITE_ENABLE} --url https://contoso.sharepoint.com
+      m365 ${this.name} --url https://contoso.sharepoint.com
 `);
   }
 }

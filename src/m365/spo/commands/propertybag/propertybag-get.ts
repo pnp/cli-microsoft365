@@ -108,23 +108,23 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
 
     Returns the value of the ${chalk.grey('key1')} property from the property bag located
     in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1
     
     Returns the value of the ${chalk.grey('key1')} property from the property bag located
     in site root folder ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /
 
     Returns the value of the ${chalk.grey('key1')} property from the property bag located
     in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
 
     Returns the value of the ${chalk.grey('key1')} property from the property bag located
     in folder in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
 
     Returns the value of the ${chalk.grey('key1')} property from the property bag located
     in site list ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_GET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList
       `);
   }
 

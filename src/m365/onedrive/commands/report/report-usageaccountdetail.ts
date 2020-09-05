@@ -22,18 +22,18 @@ class OneDriveReportUsageAccountDetailCommand extends DateAndPeriodBasedReport {
       `  Examples:
       
     Gets details about OneDrive usage by account for the last week
-      ${commands.REPORT_USAGEACCOUNTDETAIL} --period D7
+      m365 ${this.name} --period D7
 
     Gets details about OneDrive usage by account for May 1, 2019
-      ${commands.REPORT_USAGEACCOUNTDETAIL} --date 2019-05-01
+      m365 ${this.name} --date 2019-05-01
 
     Gets details about OneDrive usage by account for the last week
     and exports the report data in the specified path in text format
-      ${commands.REPORT_USAGEACCOUNTDETAIL} --period D7 --output text > "onedriveusageaccountdetail.txt"
+      m365 ${this.name} --period D7 --output text > "onedriveusageaccountdetail.txt"
 
     Gets details about OneDrive usage by account for the last week
     and exports the report data in the specified path in json format
-      ${commands.REPORT_USAGEACCOUNTDETAIL} --period D7 --output json > "onedriveusageaccountdetail.json"
+      m365 ${this.name} --period D7 --output json > "onedriveusageaccountdetail.json"
 `);
   }
 }

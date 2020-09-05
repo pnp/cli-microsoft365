@@ -5,7 +5,7 @@ Installs an app from the specified app catalog in the site
 ## Usage
 
 ```sh
-spo app install [options]
+m365 spo app install [options]
 ```
 
 ## Options
@@ -30,13 +30,13 @@ If the app with the specified ID doesn't exist in the app catalog, the command w
 Install the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ in the _https://contoso.sharepoint.com_ site.
 
 ```sh
-spo app install --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
+m365 spo app install --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
 ```
 
 Install the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ in the _https://contoso.sharepoint.com_ site from site collection app catalog.
 
 ```sh
-spo app install --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
+m365 spo app install --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
 ```
 
 ## More information

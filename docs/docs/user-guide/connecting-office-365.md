@@ -33,7 +33,7 @@ An alternative way to log in to Microsoft 365 in the CLI for Microsoft 365 is by
 To log in to Microsoft 365 using your user name and password, execute:
 
 ```sh
-login --authType password --userName user@contoso.com --password pass@word1
+m365 login --authType password --userName user@contoso.com --password pass@word1
 ```
 
 Using credentials to log in to Microsoft 365 is convenient in automation scenarios where you cannot authenticate interactively. The downside of this way of authenticating is, that it doesn't allow you to use any of the advanced security features that Azure AD offers. If your account for example uses multi-factor authentication, logging in to Microsoft 365 using credentials will fail.
@@ -50,13 +50,13 @@ Another way to log in to Microsoft 365 in the CLI for Microsoft 365 is by using 
 To log in to Microsoft 365 using a Personal Information Exchange (.pfx) file, execute:
 
 ```sh
-login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
 ```
 
 To log in to Microsoft 365 using a Privacy Enhanced Mail (PEM) certificate, execute:
 
 ```sh
-login --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
 ```
 
 Logging in to Microsoft 365 using a certificate is convenient for automation scenarios where you cannot authenticate interactively but also don't want to use credentials.
@@ -79,7 +79,7 @@ Generally, you should use the default device code flow. If you need to use a non
 Create a new self signed certificate:
 
 ```sh
-openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privateKey.key -out certificate.cer
+m365 openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privateKey.key -out certificate.cer
 ```
 
 Create a new Personal Information Exchange (.pfx) file
@@ -93,7 +93,7 @@ At this point the `protected.pfx` file can be used to log in the CLI for Microso
 If login with the .pfx file does not work then extract the private key from a protected .pfx and unprotect it:
 
 ```sh
-openssl pkcs12 -in protected.pfx -out privateKeyWithPassphrase.pem -nodes
+m365 openssl pkcs12 -in protected.pfx -out privateKeyWithPassphrase.pem -nodes
 ```
 
 At this point the `privateKeyWithPassphrase.pem` file can be used to log in the CLI for Microsoft 365 following the instructions above for logging in using a PEM certificate.
@@ -130,7 +130,7 @@ CLI for Microsoft 365 uses the _PnP Microsoft 365 Management Shell_ Azure AD app
 To re-consent the _PnP Microsoft 365 Management Shell_ application in your Azure AD, in the command line execute:
 
 ```sh
-o365 cli reconsent
+m365 o365 cli reconsent
 ```
 
 CLI for Microsoft 365 will provide you with a URL that you should open in the web browser and sign in with your organizational account. After authenticating, Azure AD will prompt you to approve the new set of permissions. Once you approved the permissions, you will be redirected to an empty page. You can now use all commands in the CLI for Microsoft 365.

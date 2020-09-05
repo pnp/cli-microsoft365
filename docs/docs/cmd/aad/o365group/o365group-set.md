@@ -5,7 +5,7 @@ Updates Microsoft 365 Group properties
 ## Usage
 
 ```sh
-aad o365group set [options]
+m365 aad o365group set [options]
 ```
 
 ## Options
@@ -36,29 +36,29 @@ When specifying the path to the logo image you can use both relative and absolut
 Update Microsoft 365 Group display name
 
 ```sh
-aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --displayName Finance
+m365 aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --displayName Finance
 ```
 
 Change Microsoft 365 Group visibility to public
 
 ```sh
-aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --isPrivate false
+m365 aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --isPrivate false
 ```
 
 Add new Microsoft 365 Group owners
 
 ```sh
-aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+m365 aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
 Add new Microsoft 365 Group members
 
 ```sh
-aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+m365 aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
 Update Microsoft 365 Group logo
 
 ```sh
-aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --logoPath images/logo.png
+m365 aad o365group set --id 28beab62-7540-4db1-a23f-29a6018a3848 --logoPath images/logo.png
 ```

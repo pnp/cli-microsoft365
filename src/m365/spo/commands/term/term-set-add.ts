@@ -234,17 +234,17 @@ class SpoTermSetAddCommand extends SpoCommand {
   Examples:
   
     Add taxonomy term set to the term group specified by ID
-      ${commands.TERM_SET_ADD} --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb
+      m365 ${this.name} --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb
 
     Add taxonomy term set to the term group specified by name. Create the term
     set with the specified ID
-      ${commands.TERM_SET_ADD} --name PnP-Organizations --termGroupName PnPTermSets --id aa70ede6-83d1-466d-8d95-30d29e9bbd7c
+      m365 ${this.name} --name PnP-Organizations --termGroupName PnPTermSets --id aa70ede6-83d1-466d-8d95-30d29e9bbd7c
 
     Add taxonomy term set and set its description
-      ${commands.TERM_SET_ADD} --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --description 'Contains a list of organizations'
+      m365 ${this.name} --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --description 'Contains a list of organizations'
 
     Add taxonomy term set and set its custom properties
-      ${commands.TERM_SET_ADD} --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --customProperties '\`{"Property":"Value"}\`'
+      m365 ${this.name} --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --customProperties '\`{"Property":"Value"}\`'
 `);
   }
 }

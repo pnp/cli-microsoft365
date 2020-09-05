@@ -106,7 +106,7 @@ class ListListCommand extends SpoCommand {
       `  Examples:
   
     Return all lists located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x
       `);
   }
 }

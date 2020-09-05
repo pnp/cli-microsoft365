@@ -27,15 +27,15 @@ class OneDriveReportUsageAccountCountsCommand extends PeriodBasedReport {
       
     Gets the trend in the number of active OneDrive for Business sites for the
     last week
-      ${commands.REPORT_USAGEACCOUNTCOUNTS} --period D7
+      m365 ${this.name} --period D7
 
     Gets the trend in the number of active OneDrive for Business sites for the
     last week and exports the report data in the specified path in text format
-      ${commands.REPORT_USAGEACCOUNTCOUNTS} --period D7 --output text > "usageaccountcounts.txt"
+      m365 ${this.name} --period D7 --output text > "usageaccountcounts.txt"
 
     Gets the trend in the number of active OneDrive for Business sites for the
     last week and exports the report data in the specified path in json format
-      ${commands.REPORT_USAGEACCOUNTCOUNTS} --period D7 --output json > "usageaccountcounts.json"
+      m365 ${this.name} --period D7 --output json > "usageaccountcounts.json"
 `);
   }
 }

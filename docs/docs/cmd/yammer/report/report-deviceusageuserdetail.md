@@ -5,7 +5,7 @@ Gets details about Yammer device usage by user
 ## Usage
 
 ```sh
-yammer report deviceusageuserdetail [options]
+m365 yammer report deviceusageuserdetail [options]
 ```
 
 ## Options
@@ -29,23 +29,23 @@ As this report is only available for the past 28 days, date parameter value shou
 Gets details about Yammer device usage by user for the last week
 
 ```sh
-yammer report deviceusageuserdetail --period D7
+m365 yammer report deviceusageuserdetail --period D7
 ```
 
 Gets details about Yammer device usage by user for July 1, 2019
 
 ```sh
-yammer report deviceusageuserdetail --date 2019-07-01
+m365 yammer report deviceusageuserdetail --date 2019-07-01
 ```
 
 Gets details about Yammer device usage by user for the last week and exports the report data in the specified path in text format
 
 ```sh
-yammer report deviceusageuserdetail --period D7 --output text > "deviceusageuserdetail.txt"
+m365 yammer report deviceusageuserdetail --period D7 --output text > "deviceusageuserdetail.txt"
 ```
 
 Gets details about Yammer device usage by user for the last week and exports the report data in the specified path in json format
 
 ```sh
-yammer report deviceusageuserdetail --period D7 --output json > "deviceusageuserdetail.json"
+m365 yammer report deviceusageuserdetail --period D7 --output json > "deviceusageuserdetail.json"
 ```

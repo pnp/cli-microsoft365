@@ -5,7 +5,7 @@ Updates properties of the specified hub site
 ## Usage
 
 ```sh
-spo hubsite set [options]
+m365 spo hubsite set [options]
 ```
 
 ## Options
@@ -37,13 +37,13 @@ If the specified `id` doesn't refer to an existing hub site, you will get an `Un
 Update hub site's title
 
 ```sh
-spo hubsite set --id 255a50b2-527f-4413-8485-57f4c17a24d1 --title Sales
+m365 spo hubsite set --id 255a50b2-527f-4413-8485-57f4c17a24d1 --title Sales
 ```
 
 Update hub site's title and description
 
 ```sh
-spo hubsite set --id 255a50b2-527f-4413-8485-57f4c17a24d1 --title Sales --description "All things sales"
+m365 spo hubsite set --id 255a50b2-527f-4413-8485-57f4c17a24d1 --title Sales --description "All things sales"
 ```
 
 ## More information

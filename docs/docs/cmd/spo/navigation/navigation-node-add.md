@@ -5,7 +5,7 @@ Adds a navigation node to the specified site navigation
 ## Usage
 
 ```sh
-spo navigation node add [options]
+m365 spo navigation node add [options]
 ```
 
 ## Options
@@ -29,17 +29,17 @@ Option|Description
 Add a navigation node pointing to a SharePoint page to the top navigation
 
 ```sh
-spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx
+m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx
 ```
 
 Add a navigation node pointing to an external page to the quick launch
 
 ```sh
-spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
+m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
 ```
 
 Add a navigation node below an existing node
 
 ```sh
-spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx
+m365 spo navigation node add --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx
 ```

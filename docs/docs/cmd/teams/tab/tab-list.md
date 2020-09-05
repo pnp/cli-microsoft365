@@ -5,7 +5,7 @@ Lists tabs in the specified Microsoft Teams channel
 ## Usage
 
 ```sh
-teams tab list [options]
+m365 teams tab list [options]
 ```
 
 ## Options
@@ -31,11 +31,11 @@ Tabs _Conversations_ and _Files_ are present in every team and therefore not inc
 List all tabs in a Microsoft Teams channel
 
 ```sh
-teams tab list --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype
+m365 teams tab list --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype
 ```
 
 Include all the values from the tab configuration and associated teams app
 
 ```sh
-teams tab list --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --output json
+m365 teams tab list --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --output json
 ```

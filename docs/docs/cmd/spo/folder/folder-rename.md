@@ -5,7 +5,7 @@ Renames a folder
 ## Usage
 
 ```sh
-spo folder rename [options]
+m365 spo folder rename [options]
 ```
 
 ## Options
@@ -26,5 +26,5 @@ Option|Description
 Renames a folder with site-relative URL _/Shared Documents/My Folder 1_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo folder rename --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder 1' --name 'My Folder 2'
+m365 spo folder rename --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder 1' --name 'My Folder 2'
 ```

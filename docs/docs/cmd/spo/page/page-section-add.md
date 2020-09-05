@@ -5,7 +5,7 @@ Adds section to modern page
 ## Usage
 
 ```sh
-spo page section add [options]
+m365 spo page section add [options]
 ```
 
 ## Options
@@ -31,5 +31,5 @@ If the specified `name` doesn't refer to an existing modern page, you will get a
 Add section to the modern page named _home.aspx_
 
 ```sh
-spo page section add --name home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter  --sectionTemplate OneColumn --order 1
+m365 spo page section add --name home.aspx --webUrl https://contoso.sharepoint.com/sites/newsletter  --sectionTemplate OneColumn --order 1
 ```

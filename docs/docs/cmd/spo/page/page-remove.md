@@ -5,7 +5,7 @@ Removes a modern page
 ## Usage
 
 ```sh
-spo page remove [options]
+m365 spo page remove [options]
 ```
 
 ## Options
@@ -32,11 +32,11 @@ If you set the `--confirm` flag, you will not be prompted for confirmation befor
 Remove a modern page.
 
 ```sh
-spo page remove --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
+m365 spo page remove --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team
 ```
 
 Remove a modern page without a confirmation prompt.
 
 ```sh
-spo page remove --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --confirm
+m365 spo page remove --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --confirm
 ```

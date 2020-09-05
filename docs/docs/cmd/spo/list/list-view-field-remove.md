@@ -5,7 +5,7 @@ Removes the specified field from list view
 ## Usage
 
 ```sh
-spo list view field remove [options]
+m365 spo list view field remove [options]
 ```
 
 ## Options
@@ -30,11 +30,11 @@ Option|Description
 Remove field with ID _330f29c5-5c4c-465f-9f4b-7903020ae1ce_ from view with ID _3d760127-982c-405e-9c93-e1f76e1a1110_ from the list with ID _1f187321-f086-4d3d-8523-517e94cc9df9_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list view field remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 1f187321-f086-4d3d-8523-517e94cc9df9 --viewId 3d760127-982c-405e-9c93-e1f76e1a1110 --fieldId 330f29c5-5c4c-465f-9f4b-7903020ae1ce
+m365 spo list view field remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 1f187321-f086-4d3d-8523-517e94cc9df9 --viewId 3d760127-982c-405e-9c93-e1f76e1a1110 --fieldId 330f29c5-5c4c-465f-9f4b-7903020ae1ce
 ```
 
 Remove field with title _Custom field_ from view with title _Custom view_ from the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list view field remove --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'Custom view'
+m365 spo list view field remove --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'Custom view'
 ```

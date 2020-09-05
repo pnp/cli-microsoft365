@@ -5,7 +5,7 @@ Deploys the specified app in the specified app catalog
 ## Usage
 
 ```sh
-spo app deploy [options]
+m365 spo app deploy [options]
 ```
 
 ## Options
@@ -36,31 +36,31 @@ If the app with the specified ID doesn't exist in the app catalog, the command w
 Deploy the specified app in the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically.
 
 ```sh
-spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3
+m365 spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3
 ```
 
 Deploy the specified app in the site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_
 
 ```sh
-spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+m365 spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 Deploy the app with the specified name in the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically.
 
 ```sh
-spo app deploy --name solution.sppkg
+m365 spo app deploy --name solution.sppkg
 ```
 
 Deploy the specified app in the tenant app catalog located at _https://contoso.sharepoint.com/sites/apps_
 
 ```sh
-spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
+m365 spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 ```
 
 Deploy the specified app to the whole tenant at once. Features included in the solution will not be activated.
 
 ```sh
-spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --skipFeatureDeployment
+m365 spo app deploy --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --skipFeatureDeployment
 ```
 
 ## More information

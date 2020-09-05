@@ -5,13 +5,13 @@ Sends e-mail on behalf of the current user
 ## Usage
 
 ```sh
-outlook mail send [options]
+m365 outlook mail send [options]
 ```
 
 ## Alias
 
 ```sh
-outlook sendmail [options]
+m365 outlook sendmail [options]
 ```
 
 ## Options
@@ -35,23 +35,23 @@ Option|Description
 Send a text e-mail to the specified e-mail address
 
 ```sh
-outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site"
+m365 outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site"
 ```
 
 Send an HTML e-mail to the specified e-mail addresses
 
 ```sh
-outlook mail send --to "chris@contoso.com,brian@contoso.com" --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the <a href='https://contoso.sharepoint.com/sites/marketing'>team site</a>" --bodyContentType HTML
+m365 outlook mail send --to "chris@contoso.com,brian@contoso.com" --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the <a href='https://contoso.sharepoint.com/sites/marketing'>team site</a>" --bodyContentType HTML
 ```
 
 Send an HTML e-mail to the specified e-mail address loading e-mail contents from a file on disk
 
 ```sh
-outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContentsFilePath email.html --bodyContentType HTML
+m365 outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContentsFilePath email.html --bodyContentType HTML
 ```
 
 Send a text e-mail to the specified e-mail address. Don't store the e-mail in sent items
 
 ```sh
-outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site" --saveToSentItems false
+m365 outlook mail send --to chris@contoso.com --subject "DG2000 Data Sheets" --bodyContents "The latest data sheets are in the team site" --saveToSentItems false
 ```

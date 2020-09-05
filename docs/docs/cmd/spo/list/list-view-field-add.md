@@ -5,7 +5,7 @@ Adds the specified field to list view
 ## Usage
 
 ```sh
-spo list view field add [options]
+m365 spo list view field add [options]
 ```
 
 ## Options
@@ -31,17 +31,17 @@ Option|Description
 Add field with ID _330f29c5-5c4c-465f-9f4b-7903020ae1ce_ to view with ID _3d760127-982c-405e-9c93-e1f76e1a1110_ of the list with ID _1f187321-f086-4d3d-8523-517e94cc9df9_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listId 1f187321-f086-4d3d-8523-517e94cc9df9 --viewId 3d760127-982c-405e-9c93-e1f76e1a1110 --fieldId 330f29c5-5c4c-465f-9f4b-7903020ae1ce
+m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listId 1f187321-f086-4d3d-8523-517e94cc9df9 --viewId 3d760127-982c-405e-9c93-e1f76e1a1110 --fieldId 330f29c5-5c4c-465f-9f4b-7903020ae1ce
 ```
 
 Add field with title _Custom field_ to view with title _All Documents_ of the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle 'All Documents' --fieldTitle 'Custom field'
+m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle 'All Documents' --fieldTitle 'Custom field'
 ```
 
 Add field with title _Custom field_ at the position _0_ to view with title _All Documents_ of the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle 'All Documents' --fieldTitle 'Custom field' --fieldPosition 0
+m365 spo list view field add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle 'All Documents' --fieldTitle 'Custom field' --fieldPosition 0
 ```

@@ -5,7 +5,7 @@ Gets information about specific list view
 ## Usage
 
 ```sh
-spo list view get [options]
+m365 spo list view get [options]
 ```
 
 ## Options
@@ -29,17 +29,17 @@ Option|Description
 Gets a list view by name from a list located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --viewTitle 'All Items'
+m365 spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'My List' --viewTitle 'All Items'
 ```
 
 Gets a list view by ID from a list located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Lists/My List' --viewId 330f29c5-5c4c-465f-9f4b-7903020ae1ce
+m365 spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Lists/My List' --viewId 330f29c5-5c4c-465f-9f4b-7903020ae1ce
 ```
 
 Gets a list view by name from a list located in site _https://contoso.sharepoint.com/sites/project-x_. Retrieve the list by its ID
 
 ```sh
-spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x --listId 330f29c5-5c4c-465f-9f4b-7903020ae1c1 --viewTitle 'All Items'
+m365 spo list view get --webUrl https://contoso.sharepoint.com/sites/project-x --listId 330f29c5-5c4c-465f-9f4b-7903020ae1c1 --viewTitle 'All Items'
 ```

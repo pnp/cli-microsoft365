@@ -5,7 +5,7 @@ Creates a new Microsoft Teams team under existing Microsoft 365 group
 ## Usage
 
 ```sh
-aad o365group teamify [options]
+m365 aad o365group teamify [options]
 ```
 
 ## Options
@@ -29,5 +29,5 @@ Option|Description
 Creates a new Microsoft Teams team under existing Microsoft 365 group
 
 ```sh
-aad o365group teamify --groupId e3f60f99-0bad-481f-9e9f-ff0f572fbd03
+m365 aad o365group teamify --groupId e3f60f99-0bad-481f-9e9f-ff0f572fbd03
 ```

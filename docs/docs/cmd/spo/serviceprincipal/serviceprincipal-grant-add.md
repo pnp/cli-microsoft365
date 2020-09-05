@@ -5,13 +5,13 @@ Grants the service principal permission to the specified API
 ## Usage
 
 ```sh
-spo serviceprincipal grant add [options]
+m365 spo serviceprincipal grant add [options]
 ```
 
 ## Alias
 
 ```sh
-spo sp grant add
+m365 spo sp grant add
 ```
 
 ## Options
@@ -34,11 +34,11 @@ Option|Description
 Grant the service principal permission to read email using the Microsoft Graph
 
 ```sh
-spo serviceprincipal grant add --resource 'Microsoft Graph' --scope 'Mail.Read'
+m365 spo serviceprincipal grant add --resource 'Microsoft Graph' --scope 'Mail.Read'
 ```
 
 Grant the service principal permission to a custom API
 
 ```sh
-spo serviceprincipal grant add --resource 'contoso-api' --scope 'user_impersonation'
+m365 spo serviceprincipal grant add --resource 'contoso-api' --scope 'user_impersonation'
 ```

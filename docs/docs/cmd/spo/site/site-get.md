@@ -5,7 +5,7 @@ Gets information about the specific site collection
 ## Usage
 
 ```sh
-spo site get [options]
+m365 spo site get [options]
 ```
 
 ## Options
@@ -28,5 +28,5 @@ This command can retrieve information for both classic and modern sites.
 Return information about the _https://contoso.sharepoint.com/sites/project-x_ site collection.
 
 ```sh
-spo site get -u https://contoso.sharepoint.com/sites/project-x
+m365 spo site get -u https://contoso.sharepoint.com/sites/project-x
 ```

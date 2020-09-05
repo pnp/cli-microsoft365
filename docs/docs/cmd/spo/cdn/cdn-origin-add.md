@@ -5,7 +5,7 @@ Adds CDN origin to the current SharePoint Online tenant
 ## Usage
 
 ```sh
-spo cdn origin add [options]
+m365 spo cdn origin add [options]
 ```
 
 ## Options
@@ -32,7 +32,7 @@ Using the `-t, --type` option you can choose whether you want to manage the sett
 Add _*/CDN_ to the list of origins of the Public CDN
 
 ```sh
-spo cdn origin add -t Public -r */CDN
+m365 spo cdn origin add -t Public -r */CDN
 ```
 
 ## More information

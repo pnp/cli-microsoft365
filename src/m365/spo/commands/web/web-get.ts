@@ -78,7 +78,7 @@ class SpoWebGetCommand extends SpoCommand {
       `  Examples:
   
     Retrieve information about the site ${chalk.grey('https://contoso.sharepoint.com/subsite')}
-      ${commands.WEB_GET} --webUrl https://contoso.sharepoint.com/subsite
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/subsite
       `);
   }
 }

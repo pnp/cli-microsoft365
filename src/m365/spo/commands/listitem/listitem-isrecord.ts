@@ -217,12 +217,12 @@ class SpoListItemIsRecordCommand extends SpoCommand {
     Check whether the document with id ${chalk.grey(1)} in the list with title
     ${chalk.grey('Documents')}, located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
     is a record
-      ${commands.LISTITEM_ISRECORD} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --id 1
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --id 1
     
     Check whether the document with id ${chalk.grey(1)} in list with ID
     ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}, located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} is a record
-      ${commands.LISTITEM_ISRECORD} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
       `);
   }
 }

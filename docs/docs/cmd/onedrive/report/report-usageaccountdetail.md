@@ -5,7 +5,7 @@ Gets details about OneDrive usage by account
 ## Usage
 
 ```sh
-onedrive report usageaccountdetail [options]
+m365 onedrive report usageaccountdetail [options]
 ```
 
 ## Options
@@ -25,23 +25,23 @@ Option|Description
 Gets details about OneDrive usage by account for the last week
 
 ```sh
-onedrive report usageaccountdetail --period D7
+m365 onedrive report usageaccountdetail --period D7
 ```
 
 Gets details about OneDrive usage by account for May 1, 2019
 
 ```sh
-onedrive report usageaccountdetail --date 2019-05-01
+m365 onedrive report usageaccountdetail --date 2019-05-01
 ```
 
 Gets details about OneDrive usage by account for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report usageaccountdetail --period D7 --output text > "onedriveusageaccountdetail.txt"
+m365 onedrive report usageaccountdetail --period D7 --output text > "onedriveusageaccountdetail.txt"
 ```
 
 Gets details about OneDrive usage by account for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report usageaccountdetail --period D7 --output json > "onedriveusageaccountdetail.json"
+m365 onedrive report usageaccountdetail --period D7 --output json > "onedriveusageaccountdetail.json"
 ```

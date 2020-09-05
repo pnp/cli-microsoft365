@@ -5,13 +5,13 @@ Revokes the specified set of permissions granted to the service principal
 ## Usage
 
 ```sh
-spo serviceprincipal grant revoke [options]
+m365 spo serviceprincipal grant revoke [options]
 ```
 
 ## Alias
 
 ```sh
-spo sp grant revoke
+m365 spo sp grant revoke
 ```
 
 ## Options
@@ -37,5 +37,5 @@ The permission grant you want to revoke is denoted using its `ObjectId`. You can
 Revoke permission grant with ObjectId _50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA_
 
 ```sh
-spo serviceprincipal grant revoke --grantId 50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA
+m365 spo serviceprincipal grant revoke --grantId 50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA
 ```

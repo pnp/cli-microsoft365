@@ -5,7 +5,7 @@ Updates existing site script
 ## Usage
 
 ```sh
-spo sitescript set [options]
+m365 spo sitescript set [options]
 ```
 
 ## Options
@@ -32,7 +32,7 @@ If the specified `id` doesn't refer to an existing site script, you will get a `
 Update title of the existing site script with ID _2c1ba4c4-cd9b-4417-832f-92a34bc34b2a_
 
 ```sh
-spo sitescript set --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --title "Contoso"
+m365 spo sitescript set --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a --title "Contoso"
 ```
 
 ## More information

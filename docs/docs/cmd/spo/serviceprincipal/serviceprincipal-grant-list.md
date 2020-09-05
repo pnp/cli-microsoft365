@@ -5,13 +5,13 @@ Lists permissions granted to the service principal
 ## Usage
 
 ```sh
-spo serviceprincipal grant list [options]
+m365 spo serviceprincipal grant list [options]
 ```
 
 ## Alias
 
 ```sh
-spo sp grant list
+m365 spo sp grant list
 ```
 
 ## Options
@@ -32,5 +32,5 @@ Option|Description
 List all permissions granted to the service principal
 
 ```sh
-spo serviceprincipal grant list
+m365 spo serviceprincipal grant list
 ```

@@ -27,18 +27,18 @@ class YammerReportDeviceUsageUserDetailCommand extends DateAndPeriodBasedReport 
   Examples:
       
     Gets details about Yammer device usage by user for the last week
-      ${commands.YAMMER_REPORT_DEVICEUSAGEUSERDETAIL} --period D7
+      m365 ${this.name} --period D7
 
     Gets details about Yammer device usage by user for July 1, 2019
-      ${commands.YAMMER_REPORT_DEVICEUSAGEUSERDETAIL} --date 2019-07-01
+      m365 ${this.name} --date 2019-07-01
 
     Gets details about Yammer device usage by user for the last week
     and exports the report data in the specified path in text format
-      ${commands.YAMMER_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output text > "deviceusageuserdetail.txt"
+      m365 ${this.name} --period D7 --output text > "deviceusageuserdetail.txt"
 
     Gets details about Yammer device usage by user for the last week
     and exports the report data in the specified path in json format
-      ${commands.YAMMER_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output json > "deviceusageuserdetail.json"
+      m365 ${this.name} --period D7 --output json > "deviceusageuserdetail.json"
 `);
   }
 }

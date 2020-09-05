@@ -51,7 +51,7 @@ class SpoHomeSiteGetCommand extends SpoCommand {
       `  Examples:
   
     Get information about the Home Site
-      ${commands.HOMESITE_GET}
+      m365 ${this.name}
 
   More information:
 

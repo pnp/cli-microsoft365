@@ -5,7 +5,7 @@ Adds site design for creating modern sites
 ## Usage
 
 ```sh
-spo sitedesign add [options]
+m365 spo sitedesign add [options]
 ```
 
 ## Options
@@ -36,13 +36,13 @@ When specifying IDs of site scripts to use with your site design, ensure that th
 Create new site design for provisioning modern team sites
 
 ```sh
-spo sitedesign add --title "Contoso team site" --webTemplate TeamSite --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e,b2307a39-e878-458b-bc90-03bc578531d6"
+m365 spo sitedesign add --title "Contoso team site" --webTemplate TeamSite --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e,b2307a39-e878-458b-bc90-03bc578531d6"
 ```
 
 Create new default site design for provisioning modern communication sites
 
 ```sh
-spo sitedesign add --title "Contoso communication site" --webTemplate CommunicationSite --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e" --isDefault
+m365 spo sitedesign add --title "Contoso communication site" --webTemplate CommunicationSite --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e" --isDefault
 ```
 
 ## More information

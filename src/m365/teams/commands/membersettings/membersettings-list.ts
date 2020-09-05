@@ -82,7 +82,7 @@ class TeamsMemberSettingsListCommand extends GraphCommand {
       `  Examples:
          
     Get member settings for a Microsoft Teams team
-      ${commands.TEAMS_MEMBERSETTINGS_LIST} --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
+      m365 ${this.name} --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 `);
   }
 }

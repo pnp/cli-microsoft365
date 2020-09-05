@@ -5,7 +5,7 @@ Returns a list of Microsoft To Do task lists
 ## Usage
 
 ```sh
-todo list list [options]
+m365 todo list list [options]
 ```
 
 ## Options
@@ -28,5 +28,5 @@ Option|Description
 Get the list of Microsoft To Do task lists
 
 ```sh
-todo list list
+m365 todo list list
 ```

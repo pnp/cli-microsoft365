@@ -175,17 +175,17 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
     Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
     list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')}
-      ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81
 
     Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
     list with title ${chalk.grey('Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')}
-      ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81
 
     Remove webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} from a
     list with title ${chalk.grey('Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} without being asked for confirmation
-      ${commands.LIST_WEBHOOK_REMOVE} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
       `);
   }
 }

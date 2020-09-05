@@ -270,10 +270,10 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
   Examples:
 
     Renames SharePoint Framework project to contoso
-      ${commands.PROJECT_RENAME} --newName contoso
+      m365 ${this.name} --newName contoso
 
     Renames SharePoint Framework project to contoso with new solution ID
-      ${commands.PROJECT_RENAME} --newName contoso --generateNewId
+      m365 ${this.name} --newName contoso --generateNewId
 `);
   }
 }

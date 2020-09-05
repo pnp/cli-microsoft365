@@ -5,7 +5,7 @@ Updates command completion for Clink (cmder)
 ## Usage
 
 ```sh
-cli completion clink update [options]
+m365 cli completion clink update [options]
 ```
 
 ## Options

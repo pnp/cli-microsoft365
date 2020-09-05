@@ -222,12 +222,12 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
     with ID ${chalk.grey('3d760127-982c-405e-9c93-e1f76e1a1110')} from the list
     with ID ${chalk.grey('1f187321-f086-4d3d-8523-517e94cc9df9')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_VIEW_FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldId 330f29c5-5c4c-465f-9f4b-7903020ae1ce --listId 1f187321-f086-4d3d-8523-517e94cc9df9 --viewId 3d760127-982c-405e-9c93-e1f76e1a1110
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldId 330f29c5-5c4c-465f-9f4b-7903020ae1ce --listId 1f187321-f086-4d3d-8523-517e94cc9df9 --viewId 3d760127-982c-405e-9c93-e1f76e1a1110
       
     Remove field with title ${chalk.grey('Custom field')} from view with title ${chalk.grey('Custom view')}
     from the list with title ${chalk.grey('Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_VIEW_FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'Custom view'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --fieldTitle 'Custom field' --listTitle Documents --viewTitle 'Custom view'
       `);
   }
 }

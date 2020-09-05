@@ -152,11 +152,11 @@ class SpoListRemoveCommand extends SpoCommand {
   
     Remove the list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
 
     Remove the list with title ${chalk.grey('List 1')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-      ${commands.LIST_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --title 'List 1'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --title 'List 1'
       `);
   }
 }

@@ -5,7 +5,7 @@ Creates new PowerApps component framework project
 ## Usage
 
 ```sh
-pa pcf init [options]
+m365 pa pcf init [options]
 ```
 
 ## Options
@@ -34,13 +34,13 @@ Template currently only supports Field or Dataset.
 Initialize the PowerApps Component Framework for a Field component
 
 ```sh
-pa pcf init --namespace yourNamespace --name yourCustomFieldComponent --template Field
+m365 pa pcf init --namespace yourNamespace --name yourCustomFieldComponent --template Field
 ```
 
 Initialize the PowerApps Component Framework for a Dataset component
 
 ```sh
-pa pcf init --namespace yourNamespace --name yourCustomFieldComponent --template Dataset
+m365 pa pcf init --namespace yourNamespace --name yourCustomFieldComponent --template Dataset
 ```
 
 ## More information

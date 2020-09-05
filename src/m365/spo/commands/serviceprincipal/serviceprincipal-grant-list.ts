@@ -81,7 +81,7 @@ class SpoServicePrincipalGrantListCommand extends SpoCommand {
   Examples:
   
     List all permissions granted to the service principal
-      ${commands.SERVICEPRINCIPAL_GRANT_LIST}
+      m365 ${this.name}
 `);
   }
 }

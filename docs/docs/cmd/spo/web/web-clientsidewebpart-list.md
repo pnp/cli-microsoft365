@@ -5,7 +5,7 @@ Lists available client-side web parts
 ## Usage
 
 ```sh
-spo web clientsidewebpart list [options]
+m365 spo web clientsidewebpart list [options]
 ```
 
 ## Options
@@ -24,5 +24,5 @@ Option|Description
 Lists all the available client-side web parts for the specified site
 
 ```sh
-spo web clientsidewebpart list --webUrl https://contoso.sharepoint.com
+m365 spo web clientsidewebpart list --webUrl https://contoso.sharepoint.com
 ```

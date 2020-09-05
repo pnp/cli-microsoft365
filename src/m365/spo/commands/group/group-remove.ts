@@ -160,11 +160,11 @@ class SpoGroupRemoveCommand extends SpoCommand {
       `  Examples:
 
     Removes group with id ${chalk.grey('5')} from web ${chalk.grey('https://contoso.sharepoint.com/sites/mysite')}
-      ${commands.GROUP_REMOVE} --webUrl https://contoso.sharepoint.com/sites/mysite --id 5
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/mysite --id 5
 
     Removes group with name ${chalk.grey('Team Site Owners')} from web
     ${chalk.grey('https://contoso.sharepoint.com/sites/mysite')}
-      ${commands.GROUP_REMOVE} --webUrl https://contoso.sharepoint.com/sites/mysite --name "Team Site Owners"
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/mysite --name "Team Site Owners"
       `);
   }
 }

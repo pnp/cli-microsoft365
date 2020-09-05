@@ -5,7 +5,7 @@ Enables site classification configuration
 ## Usage
 
 ```sh
-aad siteclassification enable [options]
+m365 aad siteclassification enable [options]
 ```
 
 ## Options
@@ -32,19 +32,19 @@ Option|Description
 Enable site classification
 
 ```sh
-aad siteclassification enable --classifications "High, Medium, Low" --defaultClassification "Medium"
+m365 aad siteclassification enable --classifications "High, Medium, Low" --defaultClassification "Medium"
 ```
 
 Enable site classification with a usage guidelines URL
 
 ```sh
-aad siteclassification enable --classifications "High, Medium, Low" --defaultClassification "Medium" --usageGuidelinesUrl "http://aka.ms/pnp"
+m365 aad siteclassification enable --classifications "High, Medium, Low" --defaultClassification "Medium" --usageGuidelinesUrl "http://aka.ms/pnp"
 ```
 
 Enable site classification with usage guidelines URLs for guests and members
 
 ```sh
-aad siteclassification enable --classifications "High, Medium, Low" --defaultClassification "Medium" --usageGuidelinesUrl "http://aka.ms/pnp" --guestUsageGuidelinesUrl "http://aka.ms/pnp"
+m365 aad siteclassification enable --classifications "High, Medium, Low" --defaultClassification "Medium" --usageGuidelinesUrl "http://aka.ms/pnp" --guestUsageGuidelinesUrl "http://aka.ms/pnp"
 ```
 
 ## More information

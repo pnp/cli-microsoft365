@@ -100,7 +100,7 @@ class SpoWebListCommand extends SpoCommand {
       `  Examples:
   
     Return all subsites from site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.WEB_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x
       `);
   }
 }

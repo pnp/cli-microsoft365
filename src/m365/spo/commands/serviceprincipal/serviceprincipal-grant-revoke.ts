@@ -109,7 +109,7 @@ class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
   
     Revoke permission grant with ObjectId
     ${chalk.grey('50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA')}
-      ${commands.SERVICEPRINCIPAL_GRANT_REVOKE} --grantId 50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA
+      m365 ${this.name} --grantId 50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA
 `);
   }
 }

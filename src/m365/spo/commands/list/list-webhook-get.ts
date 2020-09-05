@@ -151,12 +151,12 @@ class SpoListWebhookGetCommand extends SpoCommand {
     Return information about a webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e85')} which
     belongs to a list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_WEBHOOK_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e85
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e85
 
     Return information about a webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e85')} which
     belongs to a list with title ${chalk.grey('Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_WEBHOOK_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e85
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e85
       `);
   }
 }

@@ -5,7 +5,7 @@ Adds taxonomy term set
 ## Usage
 
 ```sh
-spo term set add [options]
+m365 spo term set add [options]
 ```
 
 ## Options
@@ -32,23 +32,23 @@ Option|Description
 Add taxonomy term set to the term group specified by ID
 
 ```sh
-spo term set add --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb
+m365 spo term set add --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb
 ```
 
 Add taxonomy term set to the term group specified by name. Create the term set with the specified ID
 
 ```sh
-spo term set add --name PnP-Organizations --termGroupName PnPTermSets --id aa70ede6-83d1-466d-8d95-30d29e9bbd7c
+m365 spo term set add --name PnP-Organizations --termGroupName PnPTermSets --id aa70ede6-83d1-466d-8d95-30d29e9bbd7c
 ```
 
 Add taxonomy term set and set its description
 
 ```sh
-spo term set add --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --description 'Contains a list of organizations'
+m365 spo term set add --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --description 'Contains a list of organizations'
 ```
 
 Add taxonomy term set and set its custom properties
 
 ```sh
-spo term set add --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --customProperties '`{"Property":"Value"}`'
+m365 spo term set add --name PnP-Organizations --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --customProperties '`{"Property":"Value"}`'
 ```

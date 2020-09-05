@@ -5,13 +5,13 @@ Adds user to specified Microsoft 365 Group or Microsoft Teams team
 ## Usage
 
 ```sh
-aad o365group user add [options]
+m365 aad o365group user add [options]
 ```
 
 ## Alias
 
 ```sh
-aad teams user add
+m365 aad teams user add
 ```
 
 ## Options
@@ -33,17 +33,17 @@ Option|Description
 Add a new member to the specified Microsoft 365 Group
 
 ```sh
-aad o365group user add --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+m365 aad o365group user add --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 ```
 
 Add a new owner to the specified Microsoft 365 Group
 
 ```sh
-aad o365group user add --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+m365 aad o365group user add --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 ```
 
 Add a new member to the specified Microsoft Teams team
 
 ```sh
-aad teams user add --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+m365 aad teams user add --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 ```

@@ -5,7 +5,7 @@ Lists Azure AD group settings templates
 ## Usage
 
 ```sh
-aad groupsettingtemplate list [options]
+m365 aad groupsettingtemplate list [options]
 ```
 
 ## Options
@@ -23,5 +23,5 @@ Option|Description
 List all group setting templates in the tenant
 
 ```sh
-aad groupsettingtemplate list
+m365 aad groupsettingtemplate list
 ```

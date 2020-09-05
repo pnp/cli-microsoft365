@@ -153,13 +153,13 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
       `  Examples:
   
     Add a navigation node pointing to a SharePoint page to the top navigation
-      ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --title About --url /sites/team-s/sitepages/about.aspx
 
     Add a navigation node pointing to an external page to the quick launch
-      ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --title "About us" --url https://contoso.com/about-us --isExternal
 
     Add a navigation node below an existing node
-      ${commands.NAVIGATION_NODE_ADD} --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --parentNodeId 2010 --title About --url /sites/team-s/sitepages/about.aspx
 `);
   }
 }

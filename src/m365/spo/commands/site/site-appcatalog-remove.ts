@@ -120,7 +120,7 @@ class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
   Examples:
   
     Remove the site collection app catalog from the specified site
-      ${commands.SITE_APPCATALOG_REMOVE} --url https://contoso.sharepoint.com/sites/site
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/site
 
   More information:
     

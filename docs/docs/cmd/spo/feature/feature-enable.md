@@ -5,7 +5,7 @@ Enables feature for the specified site or web
 ## Usage
 
 ```sh
-spo feature enable [options]
+m365 spo feature enable [options]
 ```
 
 ## Options
@@ -31,11 +31,11 @@ If the specified url doesn't refer to an existing site collection, you will get 
 Enable site feature
 
 ```sh
-spo feature enable --url https://contoso.sharepoint.com/sites/sales --featureId 915c240e-a6cc-49b8-8b2c-0bff8b553ed3 --scope Site
+m365 spo feature enable --url https://contoso.sharepoint.com/sites/sales --featureId 915c240e-a6cc-49b8-8b2c-0bff8b553ed3 --scope Site
 ```
 
 Enable web feature (with force to overwrite feature with same id)
 
 ```sh
-spo feature enable --url https://contoso.sharepoint.com/sites/sales --featureId 00bfea71-5932-4f9c-ad71-1557e5751100 --scope Web --force
+m365 spo feature enable --url https://contoso.sharepoint.com/sites/sales --featureId 00bfea71-5932-4f9c-ad71-1557e5751100 --scope Web --force
 ```

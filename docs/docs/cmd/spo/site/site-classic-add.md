@@ -5,7 +5,7 @@ Creates new classic site.
 ## Usage
 
 ```sh
-spo site classic add [options]
+m365 spo site classic add [options]
 ```
 
 ## Options
@@ -59,17 +59,17 @@ Deleting and creating classic site collections is by default asynchronous and de
 Create new classic site collection using the Team site template. Set time zone to `UTC+01:00`. Don't wait for the site provisioning to complete
 
 ```sh
-spo site classic add --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4
+m365 spo site classic add --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4
 ```
 
 Create new classic site collection using the Team site template. Set time zone to `UTC+01:00`. Wait for the site provisioning to complete
 
 ```sh
-spo site classic add --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --wait
+m365 spo site classic add --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --wait
 ```
 
 Create new classic site collection using the Team site template. Set time zone to `UTC+01:00`. If a site with the same URL is in the recycle bin, delete it. Wait for the site provisioning to complete
 
 ```sh
-spo site classic add --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --removeDeletedSite --wait
+m365 spo site classic add --url https://contoso.sharepoint.com/sites/team --title Team --owner admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --removeDeletedSite --wait
 ```

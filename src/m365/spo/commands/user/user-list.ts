@@ -92,7 +92,7 @@ class SpoUserListCommand extends SpoCommand {
       `  Examples:
   
     Get list of users in web ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.USER_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x 
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x 
     `);
   }
 }

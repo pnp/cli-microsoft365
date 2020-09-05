@@ -5,7 +5,7 @@ Get the daily total number of groups and how many of them were active based on e
 ## Usage
 
 ```sh
-aad o365group report activitygroupcounts [options]
+m365 aad o365group report activitygroupcounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Get the daily total number of groups and how many of them were active based on activities for the last week
 
 ```sh
-aad o365group report activitygroupcounts --period D7
+m365 aad o365group report activitygroupcounts --period D7
 ```
 
 Get the daily total number of groups and how many of them were active based on activities for the last week and exports the report data in the specified path in text format
 
 ```sh
-aad o365group report activitygroupcounts --period D7 --output text > "o365groupactivitygroupcounts.txt"
+m365 aad o365group report activitygroupcounts --period D7 --output text > "o365groupactivitygroupcounts.txt"
 ```
 
 Get the daily total number of groups and how many of them were active based on activities for the last week and exports the report data in the specified path in json format
 
 ```sh
-aad o365group report activitygroupcounts --period D7 --output json > "o365groupactivitygroupcounts.json"
+m365 aad o365group report activitygroupcounts --period D7 --output json > "o365groupactivitygroupcounts.json"
 ```

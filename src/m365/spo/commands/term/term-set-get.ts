@@ -157,10 +157,10 @@ class SpoTermSetGetCommand extends SpoCommand {
   Examples:
   
     Get information about a taxonomy term set using its ID
-      ${commands.TERM_SET_GET} --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termGroupName PnPTermSets
+      m365 ${this.name} --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termGroupName PnPTermSets
 
     Get information about a taxonomy term set using its name
-      ${commands.TERM_SET_GET} --name PnPTermSets --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb
+      m365 ${this.name} --name PnPTermSets --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb
 `);
   }
 }

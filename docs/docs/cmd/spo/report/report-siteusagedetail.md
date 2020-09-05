@@ -5,7 +5,7 @@ Gets details about SharePoint site usage
 ## Usage
 
 ```sh
-spo report siteusagedetail [options]
+m365 spo report siteusagedetail [options]
 ```
 
 ## Options
@@ -28,23 +28,23 @@ As this report is only available for the past 28 days, date parameter value shou
 Gets details about SharePoint site usage for the last week
 
 ```sh
-spo report siteusagedetail --period D7
+m365 spo report siteusagedetail --period D7
 ```
 
 Gets details about SharePoint site usage for May 1, 2019
 
 ```sh
-spo report siteusagedetail --date 2019-05-01
+m365 spo report siteusagedetail --date 2019-05-01
 ```
 
 Gets details about SharePoint site usage for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report siteusagedetail --period D7 --output text > "siteusagedetail.txt"
+m365 spo report siteusagedetail --period D7 --output text > "siteusagedetail.txt"
 ```
 
 Gets details about SharePoint site usage for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report siteusagedetail --period D7 --output json > "siteusagedetail.json"
+m365 spo report siteusagedetail --period D7 --output json > "siteusagedetail.json"
 ```

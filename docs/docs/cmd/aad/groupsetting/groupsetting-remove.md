@@ -5,7 +5,7 @@ Removes the particular group setting
 ## Usage
 
 ```sh
-aad groupsetting remove [options]
+m365 aad groupsetting remove [options]
 ```
 
 ## Options
@@ -29,11 +29,11 @@ If the specified _id_ doesn't refer to an existing group setting, you will get a
 Remove group setting with id _28beab62-7540-4db1-a23f-29a6018a3848_. Will prompt for confirmation before removing the group setting
 
 ```sh
-aad groupsetting remove --id 28beab62-7540-4db1-a23f-29a6018a3848
+m365 aad groupsetting remove --id 28beab62-7540-4db1-a23f-29a6018a3848
 ```
 
 Remove group setting with id _28beab62-7540-4db1-a23f-29a6018a3848_ without prompting for confirmation
 
 ```sh
-aad groupsetting remove --id 28beab62-7540-4db1-a23f-29a6018a3848 --confirm
+m365 aad groupsetting remove --id 28beab62-7540-4db1-a23f-29a6018a3848 --confirm
 ```

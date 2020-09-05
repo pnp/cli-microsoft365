@@ -5,7 +5,7 @@ Gets Microsoft 365 tenant ID for the specified domain
 ## Usage
 
 ```sh
-tenant id get [options]
+m365 tenant id get [options]
 ```
 
 ## Options
@@ -28,11 +28,11 @@ If no domain name is specified, the command will return the tenant ID of the ten
 Get Microsoft 365 tenant ID for the specified domain
 
 ```sh
-tenant id get --domainName contoso.com
+m365 tenant id get --domainName contoso.com
 ```
 
 Get Microsoft 365 tenant ID of the the tenant to which you are currently logged in
 
 ```sh
-tenant id get
+m365 tenant id get
 ```

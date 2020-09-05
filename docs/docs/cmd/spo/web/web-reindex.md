@@ -5,7 +5,7 @@ Requests reindexing the specified subsite
 ## Usage
 
 ```sh
-spo web reindex [options]
+m365 spo web reindex [options]
 ```
 
 ## Options
@@ -28,5 +28,5 @@ If the subsite to be reindexed is a no-script site, the command will request rei
 Request reindexing the subsite _https://contoso.sharepoint.com/subsite_
 
 ```sh
-spo web reindex --webUrl https://contoso.sharepoint.com/subsite
+m365 spo web reindex --webUrl https://contoso.sharepoint.com/subsite
 ```

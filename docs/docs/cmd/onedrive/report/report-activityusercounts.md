@@ -5,7 +5,7 @@ Gets the trend in the number of active OneDrive users
 ## Usage
 
 ```sh
-onedrive report activityusercounts [options]
+m365 onedrive report activityusercounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the trend in the number of active OneDrive users for the last week
 
 ```sh
-onedrive report activityusercounts --period D7
+m365 onedrive report activityusercounts --period D7
 ```
 
 Gets the trend in the number of active OneDrive users for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report activityusercounts --period D7 --output text > "activityusercounts.txt"
+m365 onedrive report activityusercounts --period D7 --output text > "activityusercounts.txt"
 ```
 
 Gets the trend in the number of active OneDrive users for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report activityusercounts --period D7 --output json > "activityusercounts.json"
+m365 onedrive report activityusercounts --period D7 --output json > "activityusercounts.json"
 ```

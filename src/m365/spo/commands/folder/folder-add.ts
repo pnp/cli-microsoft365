@@ -108,7 +108,7 @@ class SpoFolderAddCommand extends SpoCommand {
   
     Creates folder in a parent folder with site relative url ${chalk.grey('/Shared Documents')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.FOLDER_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents' --name 'My Folder Name'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents' --name 'My Folder Name'
     `);
   }
 }

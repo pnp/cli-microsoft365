@@ -174,16 +174,16 @@ class SpoFileRemoveCommand extends SpoCommand {
   
     Remove the file with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.FILE_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
 
     Remove the file with site-relative URL ${chalk.grey('SharedDocuments/Test.docx')} located in
     site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.FILE_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --url SharedDocuments/Test.docx
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --url SharedDocuments/Test.docx
 
     Move the file with server-relative URL ${chalk.grey('/sites/project-x/SharedDocuments/Test.docx')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
     to the recycle bin
-      ${commands.FILE_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --url /sites/project-x/SharedDocuments/Test.docx --recycle
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --url /sites/project-x/SharedDocuments/Test.docx --recycle
       `);
   }
 }

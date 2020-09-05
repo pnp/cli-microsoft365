@@ -5,7 +5,7 @@ Promotes an existing library to become an organization assets library
 ## Usage
 
 ```sh
-spo orgassetslibrary add [options]
+m365 spo orgassetslibrary add [options]
 ```
 
 ## Options
@@ -29,11 +29,11 @@ Option|Description
 Promotes an existing library to become an organization assets library
 
 ```sh
-spo orgassetslibrary add --libraryUrl "https://contoso.sharepoint.com/assets"
+m365 spo orgassetslibrary add --libraryUrl "https://contoso.sharepoint.com/assets"
 ```
 
 Promotes an existing library to become an organization assets library with Thumbnail
 
 ```sh
-spo orgassetslibrary --libraryUrl "https://contoso.sharepoint.com/assets" --thumbnailUrl "https://contoso.sharepoint.com/assets/logo.png"
+m365 spo orgassetslibrary --libraryUrl "https://contoso.sharepoint.com/assets" --thumbnailUrl "https://contoso.sharepoint.com/assets/logo.png"
 ```

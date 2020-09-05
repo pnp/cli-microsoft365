@@ -5,7 +5,7 @@ Returns all folders under the specified parent folder
 ## Usage
 
 ```sh
-spo folder list [options]
+m365 spo folder list [options]
 ```
 
 ## Options
@@ -25,5 +25,5 @@ Option|Description
 Gets list of folders under a parent folder with site-relative url _/Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents'
+m365 spo folder list --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents'
 ```

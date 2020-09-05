@@ -5,7 +5,7 @@ Updates settings of a Microsoft Teams team
 ## Usage
 
 ```sh
-teams team set [options]
+m365 teams team set [options]
 ```
 
 ## Options
@@ -34,11 +34,11 @@ Option|Description
 Set Microsoft Teams team visibility as Private
 
 ```sh
-teams team set --teamId '00000000-0000-0000-0000-000000000000' --visibility Private
+m365 teams team set --teamId '00000000-0000-0000-0000-000000000000' --visibility Private
 ```
 
 Set Microsoft Teams team classification as MBI
 
 ```sh
-teams team set --teamId '00000000-0000-0000-0000-000000000000' --classification MBI
+m365 teams team set --teamId '00000000-0000-0000-0000-000000000000' --classification MBI
 ```

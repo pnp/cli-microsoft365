@@ -5,13 +5,13 @@ Lists users for the specified Microsoft 365 group or Microsoft Teams team
 ## Usage
 
 ```sh
-aad o365group user list [options]
+m365 aad o365group user list [options]
 ```
 
 ## Alias
 
 ```sh
-teams user list
+m365 teams user list
 ```
 
 ## Options
@@ -32,29 +32,29 @@ Option|Description
 List all users and their role in the specified Microsoft 365 group
 
 ```sh
-aad o365group user list --groupId '00000000-0000-0000-0000-000000000000'
+m365 aad o365group user list --groupId '00000000-0000-0000-0000-000000000000'
 ```
 
 List all owners and their role in the specified Microsoft 365 group
 
 ```sh
-aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --role Owner
+m365 aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --role Owner
 ```
 
  List all guests and their role in the specified Microsoft 365 group
 
 ```sh
-aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --role Guest
+m365 aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --role Guest
 ```
 
 List all users and their role in the specified Microsoft teams team
 
 ```sh
-teams user list --teamId '00000000-0000-0000-0000-000000000000'
+m365 teams user list --teamId '00000000-0000-0000-0000-000000000000'
 ```
 
 List all owners and their role in the specified Microsoft teams team
 
 ```sh
-teams user list --teamId '00000000-0000-0000-0000-000000000000' --role Owner
+m365 teams user list --teamId '00000000-0000-0000-0000-000000000000' --role Owner
 ```

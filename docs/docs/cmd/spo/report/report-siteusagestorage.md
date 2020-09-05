@@ -5,7 +5,7 @@ Gets the trend of storage allocated and consumed during the reporting period
 ## Usage
 
 ```sh
-spo report siteusagestorage [options]
+m365 spo report siteusagestorage [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the trend of storage allocated and consumed during the last week
 
 ```sh
-spo report siteusagestorage --period D7
+m365 spo report siteusagestorage --period D7
 ```
 
 Gets the trend of storage allocated and consumed during the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report siteusagestorage --period D7 --output text > "siteusagestorage.txt"
+m365 spo report siteusagestorage --period D7 --output text > "siteusagestorage.txt"
 ```
 
 Gets the trend of storage allocated and consumed during the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report siteusagestorage --period D7 --output json > "siteusagestorage.json"
+m365 spo report siteusagestorage --period D7 --output json > "siteusagestorage.json"
 ```

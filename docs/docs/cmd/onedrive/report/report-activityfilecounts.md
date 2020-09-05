@@ -5,7 +5,7 @@ Gets the number of unique, licensed users that performed file interactions again
 ## Usage
 
 ```sh
-onedrive report activityfilecounts [options]
+m365 onedrive report activityfilecounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the number of unique, licensed users that performed file interactions against any OneDrive account for the last week
 
 ```sh
-onedrive report activityfilecounts --period D7
+m365 onedrive report activityfilecounts --period D7
 ```
 
 Gets the number of unique, licensed users that performed file interactions against any OneDrive account for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report activityfilecounts --period D7 --output text > "activityfilecounts.txt"
+m365 onedrive report activityfilecounts --period D7 --output text > "activityfilecounts.txt"
 ```
 
 Gets the number of unique, licensed users that performed file interactions against any OneDrive account for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report activityfilecounts --period D7 --output json > "activityfilecounts.json"
+m365 onedrive report activityfilecounts --period D7 --output json > "activityfilecounts.json"
 ```

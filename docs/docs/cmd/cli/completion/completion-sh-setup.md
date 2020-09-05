@@ -5,7 +5,7 @@ Sets up command completion for Zsh, Bash and Fish
 ## Usage
 
 ```sh
-cli completion sh setup [options]
+m365 cli completion sh setup [options]
 ```
 
 ## Options

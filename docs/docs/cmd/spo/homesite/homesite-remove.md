@@ -5,7 +5,7 @@ Removes the current Home Site
 ## Usage
 
 ```sh
-spo homesite remove [options]
+m365 spo homesite remove [options]
 ```
 
 ## Options
@@ -27,7 +27,7 @@ Option|Description
 Removes the current Home Site without confirmation
 
 ```sh
-spo homesite remove --confirm
+m365 spo homesite remove --confirm
 ```
 
 ## More information

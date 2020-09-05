@@ -5,13 +5,13 @@ Lists custom connectors in the given environment
 ## Usage
 
 ```sh
-pa connector list [options]
+m365 pa connector list [options]
 ```
 
 ## Alias
 
 ```sh
-flow connector list
+m365 flow connector list
 ```
 
 ## Options
@@ -35,5 +35,5 @@ Option|Description
 List all custom connectors in the given environment
 
 ```sh
-pa connector list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5
+m365 pa connector list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 ```

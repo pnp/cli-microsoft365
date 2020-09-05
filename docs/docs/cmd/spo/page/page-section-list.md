@@ -5,7 +5,7 @@ List sections in the specific modern page
 ## Usage
 
 ```sh
-spo page section list [options]
+m365 spo page section list [options]
 ```
 
 ## Options
@@ -29,5 +29,5 @@ If the specified name doesn't refer to an existing modern page, you will get a _
 List sections of a modern page named _home.aspx_
 
 ```sh
-spo page section list --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
+m365 spo page section list --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
 ```

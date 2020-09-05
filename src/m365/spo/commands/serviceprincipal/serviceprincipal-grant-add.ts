@@ -120,10 +120,10 @@ class SpoServicePrincipalGrantAddCommand extends SpoCommand {
   
     Grant the service principal permission to read email using the Microsoft
     Graph
-      ${commands.SERVICEPRINCIPAL_GRANT_ADD} --resource 'Microsoft Graph' --scope 'Mail.Read'
+      m365 ${this.name} --resource 'Microsoft Graph' --scope 'Mail.Read'
 
     Grant the service principal permission to a custom API
-      ${commands.SERVICEPRINCIPAL_GRANT_ADD} --resource 'contoso-api' --scope 'user_impersonation'
+      m365 ${this.name} --resource 'contoso-api' --scope 'user_impersonation'
 `);
   }
 }

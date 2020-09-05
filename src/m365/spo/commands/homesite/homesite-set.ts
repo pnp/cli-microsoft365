@@ -101,7 +101,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   Examples:
   
     Set the specified site as the Home Site
-      ${commands.HOMESITE_SET} --siteUrl https://contoso.sharepoint.com/sites/comms
+      m365 ${this.name} --siteUrl https://contoso.sharepoint.com/sites/comms
 
   More information:
 

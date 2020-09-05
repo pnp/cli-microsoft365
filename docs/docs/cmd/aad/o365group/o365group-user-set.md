@@ -5,13 +5,13 @@ Updates role of the specified user in the specified Microsoft 365 Group or Micro
 ## Usage
 
 ```sh
-aad o365group user set [options]
+m365 aad o365group user set [options]
 ```
 
 ## Alias
 
 ```sh
-aad teams user set
+m365 aad teams user set
 ```
 
 ## Options
@@ -37,23 +37,23 @@ The command will return an error if the user already has the specified role in t
 Promote the specified user to owner of the given Microsoft 365 Group
 
 ```sh
-aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+m365 aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 ```
 
 Demote the specified user from owner to member in the given Microsoft 365 Group
 
 ```sh
-aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+m365 aad o365group user list --groupId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
 ```
 
 Promote the specified user to owner of the given Microsoft Teams team
 
 ```sh
-aad teams user list --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
+m365 aad teams user list --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Owner
 ```
 
 Demote the specified user from owner to member in the given Microsoft Teams team
 
 ```sh
-aad teams user list --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
+m365 aad teams user list --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com' --role Member
 ```

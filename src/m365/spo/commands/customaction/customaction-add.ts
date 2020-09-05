@@ -309,7 +309,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
     JSON, XML or JavaScript values, because the command shell treat quotes differently. For example,
     this is how ApplicationCustomizer user custom action can be created from the Windows cmd.exe:
 
-      m365 ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourAppCustomizer" -n "YourName" -l "ClientSideExtension.ApplicationCustomizer" -c b41916e7-e69d-467f-b37f-ff8ecf8f99f2 -p '{\"testMessage\":\"Test message\"}'
+      m365 m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -t "YourAppCustomizer" -n "YourName" -l "ClientSideExtension.ApplicationCustomizer" -c b41916e7-e69d-467f-b37f-ff8ecf8f99f2 -p '{\"testMessage\":\"Test message\"}'
     
     Note, how the clientSideComponentProperties option (-p) has escaped double quotes
     ${chalk.grey(`'{\"testMessage\":\"Test message\"}'`)} compared to execution from bash:
@@ -321,34 +321,34 @@ class SpoCustomActionAddCommand extends SpoCommand {
     
     Adds tenant-wide SharePoint Framework Application Customizer extension in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourAppCustomizer" -n "YourName" -l "ClientSideExtension.ApplicationCustomizer" -c b41916e7-e69d-467f-b37f-ff8ecf8f99f2 -p '{"testMessage":"Test message"}'
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -t "YourAppCustomizer" -n "YourName" -l "ClientSideExtension.ApplicationCustomizer" -c b41916e7-e69d-467f-b37f-ff8ecf8f99f2 -p '{"testMessage":"Test message"}'
     
     Adds tenant-wide SharePoint Framework ${chalk.blue('modern list view')} Command Set extension in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourCommandSet" -n "YourName" -l "ClientSideExtension.ListViewCommandSet" -c db3e6e35-363c-42b9-a254-ca661e437848 -p '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}' --registrationId 100 --registrationType List
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -t "YourCommandSet" -n "YourName" -l "ClientSideExtension.ListViewCommandSet" -c db3e6e35-363c-42b9-a254-ca661e437848 -p '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}' --registrationId 100 --registrationType List
     
     Creates url custom action in the SiteActions menu in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "Microsoft.SharePoint.StandardMenu" -g "SiteActions" --actionUrl "~site/SitePages/Home.aspx" --sequence 100
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "Microsoft.SharePoint.StandardMenu" -g "SiteActions" --actionUrl "~site/SitePages/Home.aspx" --sequence 100
     
     Creates custom action in ${chalk.blue('classic')} Document Library edit context menu in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "EditControlBlock" --actionUrl "javascript:(function(){ return console.log('CLI for Microsoft 365 rocks!'); })();" --registrationId 101 --registrationType List
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "EditControlBlock" --actionUrl "javascript:(function(){ return console.log('CLI for Microsoft 365 rocks!'); })();" --registrationId 101 --registrationType List
     
     Creates ScriptLink custom action with script source in ${chalk.blue('classic pages')} in
     site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "ScriptLink" --scriptSrc "~sitecollection/SiteAssets/YourScript.js" --sequence 101 -s Site
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "ScriptLink" --scriptSrc "~sitecollection/SiteAssets/YourScript.js" --sequence 101 -s Site
     
     Creates ScriptLink custom action with script block in ${chalk.blue('classic pages')} in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "ScriptLink" --scriptBlock "(function(){ return console.log('Hello CLI for Microsoft 365!'); })();" --sequence 102
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "ScriptLink" --scriptBlock "(function(){ return console.log('Hello CLI for Microsoft 365!'); })();" --sequence 102
     
     Creates ${chalk.blue('classic List View')} custom action located in the Ribbon in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "CommandUI.Ribbon" --commandUIExtension '<CommandUIExtension><CommandUIDefinitions><CommandUIDefinition Location="Ribbon.List.Share.Controls._children"><Button Id="Ribbon.List.Share.GetItemsCountButton" Alt="Get list items count" Sequence="11" Command="Invoke_GetItemsCountButtonRequest" LabelText="Get Items Count" TemplateAlias="o1" Image32by32="_layouts/15/images/placeholder32x32.png" Image16by16="_layouts/15/images/placeholder16x16.png" /></CommandUIDefinition></CommandUIDefinitions><CommandUIHandlers><CommandUIHandler Command="Invoke_GetItemsCountButtonRequest" CommandAction="javascript: alert(ctx.TotalListItems);" EnabledScript="javascript: function checkEnable() { return (true);} checkEnable();"/></CommandUIHandlers></CommandUIExtension>'
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "CommandUI.Ribbon" --commandUIExtension '<CommandUIExtension><CommandUIDefinitions><CommandUIDefinition Location="Ribbon.List.Share.Controls._children"><Button Id="Ribbon.List.Share.GetItemsCountButton" Alt="Get list items count" Sequence="11" Command="Invoke_GetItemsCountButtonRequest" LabelText="Get Items Count" TemplateAlias="o1" Image32by32="_layouts/15/images/placeholder32x32.png" Image16by16="_layouts/15/images/placeholder16x16.png" /></CommandUIDefinition></CommandUIDefinitions><CommandUIHandlers><CommandUIHandler Command="Invoke_GetItemsCountButtonRequest" CommandAction="javascript: alert(ctx.TotalListItems);" EnabledScript="javascript: function checkEnable() { return (true);} checkEnable();"/></CommandUIHandlers></CommandUIExtension>'
     
     Creates custom action with delegated rights in the SiteActions menu in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_ADD} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "Microsoft.SharePoint.StandardMenu" -g "SiteActions" --actionUrl "~site/SitePages/Home.aspx" --rights "AddListItems,DeleteListItems,ManageLists"
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -t "YourTitle" -n "YourName" -l "Microsoft.SharePoint.StandardMenu" -g "SiteActions" --actionUrl "~site/SitePages/Home.aspx" --rights "AddListItems,DeleteListItems,ManageLists"
   
   More information:
 

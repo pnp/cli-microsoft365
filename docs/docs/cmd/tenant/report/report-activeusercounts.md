@@ -5,7 +5,7 @@ Gets the count of daily active users in the reporting period by product.
 ## Usage
 
 ```sh
-tenant report activeusercounts [options]
+m365 tenant report activeusercounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the count of daily active users in the reporting period by product for the last week
 
 ```sh
-tenant report activeusercounts --period D7
+m365 tenant report activeusercounts --period D7
 ```
 
 Gets the count of daily active users in the reporting period by product for the last week and exports the report data in the specified path in text format
 
 ```sh
-tenant report activeusercounts --period D7 --output text > "activeusercounts.txt"
+m365 tenant report activeusercounts --period D7 --output text > "activeusercounts.txt"
 ```
 
 Gets the count of daily active users in the reporting period by product for the last week and exports the report data in the specified path in json format
 
 ```sh
-tenant report activeusercounts --period D7 --output json > "activeusercounts.json"
+m365 tenant report activeusercounts --period D7 --output json > "activeusercounts.json"
 ```

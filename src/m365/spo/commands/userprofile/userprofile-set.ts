@@ -127,10 +127,10 @@ class SpoUserProfileSetCommand extends SpoCommand {
   Examples:
   
     Updates the single-value ${chalk.grey('AboutMe')} property
-      ${commands.USERPROFILE_SET} --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'AboutMe' --propertyValue 'Working as a Microsoft 365 developer'
+      m365 ${this.name} --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'AboutMe' --propertyValue 'Working as a Microsoft 365 developer'
   
     Updates the multi-value ${chalk.grey('SPS-Skills')} property
-      ${commands.USERPROFILE_SET} --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'SPS-Skills' --propertyValue 'CSS, HTML'
+      m365 ${this.name} --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'SPS-Skills' --propertyValue 'CSS, HTML'
 `);
   }
 }

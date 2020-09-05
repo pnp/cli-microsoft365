@@ -5,7 +5,7 @@ Gets the count of users by activity type and service.
 ## Usage
 
 ```sh
-tenant report servicesusercounts [options]
+m365 tenant report servicesusercounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the count of users by activity type and service for the last week
 
 ```sh
-tenant report servicesusercounts --period D7
+m365 tenant report servicesusercounts --period D7
 ```
 
 Gets the count of users by activity type and service for the last week and exports the report data in the specified path in text format
 
 ```sh
-tenant report servicesusercounts --period D7 --output text > "servicesusercounts.txt"
+m365 tenant report servicesusercounts --period D7 --output text > "servicesusercounts.txt"
 ```
 
 Gets the count of users by activity type and service for the last week and exports the report data in the specified path in json format
 
 ```sh
-tenant report servicesusercounts --period D7 --output json > "servicesusercounts.json"
+m365 tenant report servicesusercounts --period D7 --output json > "servicesusercounts.json"
 ```

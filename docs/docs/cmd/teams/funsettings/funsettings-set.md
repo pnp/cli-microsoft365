@@ -5,7 +5,7 @@ Updates fun settings of a Microsoft Teams team
 ## Usage
 
 ```sh
-graph teams funsettings set [options]
+m365 graph teams funsettings set [options]
 ```
 
 ## Options
@@ -28,23 +28,23 @@ Option|Description
 Allow giphy usage within a given Microsoft Teams team, setting the content rating for giphy to Moderate
 
 ```sh
-graph teams funsettings set --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy true --giphyContentRating Moderate
+m365 graph teams funsettings set --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy true --giphyContentRating Moderate
 ```
 
 Disable usage of giphy within a given Microsoft Teams team
 
 ```sh
-graph teams funsettings set --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy false
+m365 graph teams funsettings set --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowGiphy false
 ```
 
 Allow usage of stickers and memes within a given Microsoft Teams team
 
 ```sh
-graph teams funsettings set --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowStickersAndMemes true
+m365 graph teams funsettings set --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowStickersAndMemes true
 ```
 
 Disable usage custom memes within a given Microsoft Teams team
 
 ```sh
-graph teams funsettings set --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowCustomMemes false
+m365 graph teams funsettings set --teamId 83cece1e-938d-44a1-8b86-918cf6151957 --allowCustomMemes false
 ```

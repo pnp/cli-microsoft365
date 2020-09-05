@@ -50,7 +50,7 @@ Command completion is based on the static `commands.json` file located in the fo
 To disable completion, edit your shell's profile file (for Zsh `~/.zshrc`) and remove the following lines:
 
 ```sh
-# begin m365 completion
+m365 # begin m365 completion
 . <(m365 --completion)
 # end m365 completion
 ```

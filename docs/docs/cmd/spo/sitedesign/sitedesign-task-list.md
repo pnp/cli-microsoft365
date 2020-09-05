@@ -5,7 +5,7 @@ Lists site designs scheduled for execution on the specified site
 ## Usage
 
 ```sh
-spo sitedesign task list [options]
+m365 spo sitedesign task list [options]
 ```
 
 ## Options
@@ -24,7 +24,7 @@ Option|Description
 List site designs scheduled for execution on the specified site
 
 ```sh
-spo sitedesign task list --webUrl https://contoso.sharepoint.com/sites/team-a
+m365 spo sitedesign task list --webUrl https://contoso.sharepoint.com/sites/team-a
 ```
 
 ## More information

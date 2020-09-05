@@ -5,7 +5,7 @@ Deletes the specified view from the list
 ## Usage
 
 ```sh
-spo list view remove [options]
+m365 spo list view remove [options]
 ```
 
 ## Options
@@ -29,23 +29,23 @@ Option|Description
 Remove view with ID _cc27a922-8224-4296-90a5-ebbc54da2e81_ from the list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --viewId cc27a922-8224-4296-90a5-ebbc54da2e81
+m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --viewId cc27a922-8224-4296-90a5-ebbc54da2e81
 ```
 
 Remove view with ID _cc27a922-8224-4296-90a5-ebbc54da2e81_ from the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewId cc27a922-8224-4296-90a5-ebbc54da2e81
+m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewId cc27a922-8224-4296-90a5-ebbc54da2e81
 ```
 
 Remove view with title _MyView_ from a list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle MyView
+m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewTitle MyView
 ```
 
 Remove view with ID _cc27a922-8224-4296-90a5-ebbc54da2e81_ from a list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_ without being asked for confirmation
 
 ```sh
-spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewId cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
+m365 spo list view remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --viewId cc27a922-8224-4296-90a5-ebbc54da2e81 --confirm
 ```

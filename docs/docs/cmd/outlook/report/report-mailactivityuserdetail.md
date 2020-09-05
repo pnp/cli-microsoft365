@@ -5,7 +5,7 @@ Gets details about email activity users have performed
 ## Usage
 
 ```sh
-outlook report mailactivityuserdetail [options]
+m365 outlook report mailactivityuserdetail [options]
 ```
 
 ## Options
@@ -25,23 +25,23 @@ Option|Description
 Gets details about email activity users have performed for the last week
 
 ```sh
-outlook report mailactivityuserdetail --period D7
+m365 outlook report mailactivityuserdetail --period D7
 ```
 
 Gets details about email activity users have performed for May 1st, 2019
 
 ```sh
-outlook report mailactivityuserdetail --date 2019-05-01
+m365 outlook report mailactivityuserdetail --date 2019-05-01
 ```
 
 Gets details about email activity users have performed for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailactivityuserdetail --period D7 --output text > "mailactivityuserdetail.txt"
+m365 outlook report mailactivityuserdetail --period D7 --output text > "mailactivityuserdetail.txt"
 ```
 
 Gets details about email activity users have performed for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailactivityuserdetail --period D7 --output json > "mailactivityuserdetail.json"
+m365 outlook report mailactivityuserdetail --period D7 --output json > "mailactivityuserdetail.json"
 ```

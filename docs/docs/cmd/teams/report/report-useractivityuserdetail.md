@@ -5,7 +5,7 @@ Get details about Microsoft Teams user activity by user.
 ## Usage
 
 ```sh
-teams report useractivityuserdetail [options]
+m365 teams report useractivityuserdetail [options]
 ```
 
 ## Options
@@ -25,23 +25,23 @@ Option|Description
 Gets details about Microsoft Teams user activity by user for the last week
 
 ```sh
-teams report useractivityuserdetail --period D7
+m365 teams report useractivityuserdetail --period D7
 ```
 
 Gets details about Microsoft Teams user activity by user for July 13, 2019
 
 ```sh
-teams report useractivityuserdetail --date 2019-07-13
+m365 teams report useractivityuserdetail --date 2019-07-13
 ```
 
 Gets details about Microsoft Teams user activity by user for the last week and exports the report data in the specified path in text format
 
 ```sh
-teams report useractivityuserdetail --period D7 --output text > "useractivityuserdetail.txt"
+m365 teams report useractivityuserdetail --period D7 --output text > "useractivityuserdetail.txt"
 ```
 
 Gets details about Microsoft Teams user activity by user for the last week and exports the report data in the specified path in json format
 
 ```sh
-teams report useractivityuserdetail --period D7 --output json > "useractivityuserdetail.json"
+m365 teams report useractivityuserdetail --period D7 --output json > "useractivityuserdetail.json"
 ```

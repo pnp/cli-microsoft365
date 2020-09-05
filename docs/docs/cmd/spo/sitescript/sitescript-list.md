@@ -5,7 +5,7 @@ Lists site script available for use with site designs
 ## Usage
 
 ```sh
-spo sitescript list [options]
+m365 spo sitescript list [options]
 ```
 
 ## Options
@@ -23,7 +23,7 @@ Option|Description
 List all site scripts available for use with site designs
 
 ```sh
-spo sitescript list
+m365 spo sitescript list
 ```
 
 ## More information

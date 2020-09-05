@@ -22,15 +22,15 @@ class OutlookReportMailboxUsageDetailCommand extends PeriodBasedReport {
       `  Examples:
       
     Gets details about mailbox usage for the last week
-      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEDETAIL} --period D7
+      m365 ${this.name} --period D7
 
     Gets details about mailbox usage for the last week
     and exports the report data in the specified path in text format
-      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEDETAIL} --period D7 --output text > "mailboxusagedetails.txt"
+      m365 ${this.name} --period D7 --output text > "mailboxusagedetails.txt"
 
     Gets  details about mailbox usage for the last week
     and exports the report data in the specified path in json format
-      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEDETAIL} --period D7 --output json > "mailboxusagedetails.json"
+      m365 ${this.name} --period D7 --output json > "mailboxusagedetails.json"
 `);
   }
 }

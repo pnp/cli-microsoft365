@@ -5,7 +5,7 @@ Enable or disable the specified Microsoft 365 CDN
 ## Usage
 
 ```sh
-spo cdn set [options]
+m365 spo cdn set [options]
 ```
 
 ## Options
@@ -37,31 +37,31 @@ Using the `--noDefaultOrigins` option you can specify to skip the creation of th
 Enable the Microsoft 365 Public CDN on the current tenant
 
 ```sh
-spo cdn set -t Public -e true
+m365 spo cdn set -t Public -e true
 ```
 
 Disable the Microsoft 365 Public CDN on the current tenant
 
 ```sh
-spo cdn set -t Public -e false
+m365 spo cdn set -t Public -e false
 ```
 
 Enable the Microsoft 365 Private CDN on the current tenant
 
 ```sh
-spo cdn set -t Private -e true
+m365 spo cdn set -t Private -e true
 ```
 
 Enable the Microsoft 365 Private and Public CDN on the current tenant with default origins
 
 ```sh
-spo cdn set -t Both -e true
+m365 spo cdn set -t Both -e true
 ```
 
 Enable the Microsoft 365 Private and Public CDN on the current tenant without default origins
 
 ```sh
-spo cdn set -t Both -e true --noDefaultOrigins
+m365 spo cdn set -t Both -e true --noDefaultOrigins
 ```
 
 ## More information

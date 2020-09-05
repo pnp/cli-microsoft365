@@ -5,7 +5,7 @@ Deletes all custom actions from site or site collection
 ## Usage
 
 ```sh
-spo customaction clear [options]
+m365 spo customaction clear [options]
 ```
 
 ## Options
@@ -27,17 +27,17 @@ Clears all user custom actions for both site and site collection _https://contos
 Skips the confirmation prompt message.
 
 ```sh
-spo customaction clear -u https://contoso.sharepoint.com/sites/test --confirm
+m365 spo customaction clear -u https://contoso.sharepoint.com/sites/test --confirm
 ```
 
 Clears all user custom actions for site _https://contoso.sharepoint.com/sites/test_. 
 
 ```sh
-spo customaction clear -u https://contoso.sharepoint.com/sites/test -s Web
+m365 spo customaction clear -u https://contoso.sharepoint.com/sites/test -s Web
 ```
 
 Clears all user custom actions for site collection _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo customaction clear --url https://contoso.sharepoint.com/sites/test --scope Site
+m365 spo customaction clear --url https://contoso.sharepoint.com/sites/test --scope Site
 ```

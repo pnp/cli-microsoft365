@@ -5,7 +5,7 @@ Revokes rights to join sites to the specified hub site for one or more principal
 ## Usage
 
 ```sh
-spo hubsite rights revoke [options]
+m365 spo hubsite rights revoke [options]
 ```
 
 ## Options
@@ -34,13 +34,13 @@ Option|Description
 Revoke rights to join sites to the hub site with URL _https://contoso.sharepoint.com/sites/sales_ from user with alias _PattiF_. Will prompt for confirmation before revoking the rights
 
 ```sh
-spo hubsite rights revoke --url https://contoso.sharepoint.com/sites/sales --principals PattiF
+m365 spo hubsite rights revoke --url https://contoso.sharepoint.com/sites/sales --principals PattiF
 ```
 
 Revoke rights to join sites to the hub site with URL _https://contoso.sharepoint.com/sites/sales_ from user with aliases _PattiF_ and _AdeleV_ without prompting for confirmation
 
 ```sh
-spo hubsite rights revoke --url https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --confirm
+m365 spo hubsite rights revoke --url https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --confirm
 ```
 
 ## More information

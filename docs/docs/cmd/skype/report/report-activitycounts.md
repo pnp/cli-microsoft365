@@ -5,7 +5,7 @@ Gets the trends on how many users organized and participated in conference sessi
 ## Usage
 
 ```sh
-skype report activitycounts [options]
+m365 skype report activitycounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the trends on how many users organized and participated in conference sessions held in your organization through Skype for Business. The report also includes the number of peer-to-peer sessions for the last week
 
 ```sh
-skype report activitycounts --period D7
+m365 skype report activitycounts --period D7
 ```
 
 Gets the trends on how many users organized and participated in conference sessions held in your organization through Skype for Business. The report also includes the number of peer-to-peer sessions for the last week and exports the report data in the specified path in text format
 
 ```sh
-skype report activitycounts --period D7 --output text > "activitycounts.txt"
+m365 skype report activitycounts --period D7 --output text > "activitycounts.txt"
 ```
 
 Gets the trends on how many users organized and participated in conference sessions held in your organization through Skype for Business. The report also includes the number of peer-to-peer sessions for the last week and exports the report data in the specified path in json format
 
 ```sh
-skype report activitycounts --period D7 --output json > "activitycounts.json"
+m365 skype report activitycounts --period D7 --output json > "activitycounts.json"
 ```

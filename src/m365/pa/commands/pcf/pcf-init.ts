@@ -197,11 +197,11 @@ class PaPcfInitCommand extends Command {
 
     Initialize the PowerApps Component Framework for a ${chalk.grey('Field')} component, using
     ${chalk.grey('yourCustomFieldComponent')} as name and ${chalk.grey('yourNamespace')} as namespace
-      ${commands.PCF_INIT} --namespace yourNamespace --name yourCustomFieldComponent --template Field
+      m365 ${this.name} --namespace yourNamespace --name yourCustomFieldComponent --template Field
 
     Initialize the PowerApps Component Framework for a ${chalk.grey('Dataset')} component, using
     ${chalk.grey('yourCustomDatasetComponent')} as name and ${chalk.grey('yourNamespace')} as namespace
-      ${commands.PCF_INIT} --namespace yourNamespace --name yourCustomDatasetComponent --template Dataset
+      m365 ${this.name} --namespace yourNamespace --name yourCustomDatasetComponent --template Dataset
 
   More information:
 

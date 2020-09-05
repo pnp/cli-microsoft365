@@ -5,7 +5,7 @@ Updates guest settings of a Microsoft Teams team
 ## Usage
 
 ```sh
-teams guestsettings set [options]
+m365 teams guestsettings set [options]
 ```
 
 ## Options
@@ -26,11 +26,11 @@ Option|Description
 Allow guests to create and edit channels
 
 ```sh
-teams guestsettings set --teamId '00000000-0000-0000-0000-000000000000' --allowCreateUpdateChannels true
+m365 teams guestsettings set --teamId '00000000-0000-0000-0000-000000000000' --allowCreateUpdateChannels true
 ```
 
 Disallow guests to delete channels
 
 ```sh
-teams guestsettings set --teamId '00000000-0000-0000-0000-000000000000' --allowDeleteChannels false
+m365 teams guestsettings set --teamId '00000000-0000-0000-0000-000000000000' --allowDeleteChannels false
 ```

@@ -146,12 +146,12 @@ class SpoFolderRemoveCommand extends SpoCommand {
 
     Removes a folder with site-relative URL ${chalk.grey('/Shared Documents/My Folder')} located
     in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.FOLDER_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder'
 
     Moves a folder with site-relative URL ${chalk.grey('/Shared Documents/My Folder')} located in
     site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
     to the site recycle bin
-      ${commands.FOLDER_REMOVE} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder' --recycle
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder' --recycle
     `)
   }
 }

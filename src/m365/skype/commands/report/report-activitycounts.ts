@@ -24,19 +24,19 @@ class SkypeReportActivityCountsCommand extends PeriodBasedReport {
     Gets the trends on how many users organized and participated in conference 
     sessions held in your organization through Skype for Business. The report 
     also includes the number of peer-to-peer sessions for the last week
-      ${commands.SKYPE_REPORT_ACTIVITYCOUNTS} --period D7
+      m365 ${this.name} --period D7
 
     Gets the trends on how many users organized and participated in conference 
     sessions held in your organization through Skype for Business. The report 
     also includes the number of peer-to-peer sessions for the last week and 
     exports the report data in the specified path in text format
-      ${commands.SKYPE_REPORT_ACTIVITYCOUNTS} --period D7 --output text > "activitycounts.txt"
+      m365 ${this.name} --period D7 --output text > "activitycounts.txt"
 
     Gets the trends on how many users organized and participated in conference 
     sessions held in your organization through Skype for Business. The report 
     also includes the number of peer-to-peer sessions for the last week and 
     exports the report data in the specified path in json format
-      ${commands.SKYPE_REPORT_ACTIVITYCOUNTS} --period D7 --output json > "activitycounts.json"
+      m365 ${this.name} --period D7 --output json > "activitycounts.json"
 `);
   }
 }

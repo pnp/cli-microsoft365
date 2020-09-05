@@ -5,7 +5,7 @@ Gets the amount of mailbox storage used in your organization
 ## Usage
 
 ```sh
-outlook report mailboxusagestorage [options]
+m365 outlook report mailboxusagestorage [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the amount of mailbox storage used in your organization for the last week
 
 ```sh
-outlook report mailboxusagestorage --period D7
+m365 outlook report mailboxusagestorage --period D7
 ```
 
 Gets the amount of mailbox storage used in your organization for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailboxusagestorage --period D7 --output text > "mailboxusagestorage.txt"
+m365 outlook report mailboxusagestorage --period D7 --output text > "mailboxusagestorage.txt"
 ```
 
 Gets the amount of mailbox storage used in your organization for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailboxusagestorage --period D7 --output json > "mailboxusagestorage.json"
+m365 outlook report mailboxusagestorage --period D7 --output json > "mailboxusagestorage.json"
 ```

@@ -5,7 +5,7 @@ Gets the trends on the number of unique users who posted, read, and liked Yammer
 ## Usage
 
 ```sh
-yammer report activityusercounts [options]
+m365 yammer report activityusercounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the trends on the number of unique users who posted, read, and liked Yammer messages for the last week
 
 ```sh
-yammer report activityusercounts --period D7
+m365 yammer report activityusercounts --period D7
 ```
 
 Gets the trends on the number of unique users who posted, read, and liked Yammer messages for the last week and exports the report data in the specified path in text format
 
 ```sh
-yammer report activityusercounts --period D7 --output text > "activityusercounts.txt"
+m365 yammer report activityusercounts --period D7 --output text > "activityusercounts.txt"
 ```
 
 Gets the trends on the number of unique users who posted, read, and liked Yammer messages for the last week and exports the report data in the specified path in json format
 
 ```sh
-yammer report activityusercounts --period D7 --output json > "activityusercounts.json"
+m365 yammer report activityusercounts --period D7 --output json > "activityusercounts.json"
 ```

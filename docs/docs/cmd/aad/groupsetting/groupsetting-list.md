@@ -5,7 +5,7 @@ Lists Azure AD group settings
 ## Usage
 
 ```sh
-aad groupsetting list [options]
+m365 aad groupsetting list [options]
 ```
 
 ## Options
@@ -23,5 +23,5 @@ Option|Description
 List all group settings in the tenant
 
 ```sh
-aad groupsetting list
+m365 aad groupsetting list
 ```

@@ -180,13 +180,13 @@ class SpoMailSendCommand extends SpoCommand {
   Examples:
 
     Send an e-mail to ${chalk.grey('user@contoso.com')}
-      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to "user@contoso.com" --subject "Email sent via CLI for Microsoft 365" --body "<h1>CLI for Microsoft 365</h1>Email sent via <b>command</b>."
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --to "user@contoso.com" --subject "Email sent via CLI for Microsoft 365" --body "<h1>CLI for Microsoft 365</h1>Email sent via <b>command</b>."
 
     Send an e-mail to multiples addresses
-      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to "user1@contoso.com,user2@contoso.com" --subject "Email sent via CLI for Microsoft 365" --body "<h1>CLI for Microsoft 365</h1>Email sent via <b>command</b>." --cc "user3@contoso.com" --bcc "user4@contoso.com"
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --to "user1@contoso.com,user2@contoso.com" --subject "Email sent via CLI for Microsoft 365" --body "<h1>CLI for Microsoft 365</h1>Email sent via <b>command</b>." --cc "user3@contoso.com" --bcc "user4@contoso.com"
 
     Send an e-mail to ${chalk.grey('user@contoso.com')} with additional headers
-      ${commands.MAIL_SEND} --webUrl https://contoso.sharepoint.com/sites/project-x --to "user@contoso.com" --subject "Email sent via CLI for Microsoft 365" --body "<h1>CLI for Microsoft 365</h1>Email sent via <b>command</b>." --additionalHeaders "'{\"X-MC-Tags\":\"CLI for Microsoft 365\"}'"
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --to "user@contoso.com" --subject "Email sent via CLI for Microsoft 365" --body "<h1>CLI for Microsoft 365</h1>Email sent via <b>command</b>." --additionalHeaders "'{\"X-MC-Tags\":\"CLI for Microsoft 365\"}'"
       `);
   }
 }

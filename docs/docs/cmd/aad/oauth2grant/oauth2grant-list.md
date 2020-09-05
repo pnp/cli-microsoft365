@@ -5,7 +5,7 @@ Lists OAuth2 permission grants for the specified service principal
 ## Usage
 
 ```sh
-aad oauth2grant list [options]
+m365 aad oauth2grant list [options]
 ```
 
 ## Options
@@ -30,7 +30,7 @@ When using the text output type (default), the command lists only the values of 
 List OAuth2 permissions granted to service principal with `objectId` _b2307a39-e878-458b-bc90-03bc578531d6_.
 
 ```sh
-aad oauth2grant list --clientId b2307a39-e878-458b-bc90-03bc578531d6
+m365 aad oauth2grant list --clientId b2307a39-e878-458b-bc90-03bc578531d6
 ```
 
 ## More information

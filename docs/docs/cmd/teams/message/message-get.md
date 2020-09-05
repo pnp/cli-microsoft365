@@ -5,7 +5,7 @@ Retrieves a message from a channel in a Microsoft Teams team
 ## Usage
 
 ```sh
-teams message get [options]
+m365 teams message get [options]
 ```
 
 ## Options
@@ -33,5 +33,5 @@ You can only retrieve a message from a Microsoft Teams team if you are a member 
 Retrieve the specified message from a channel of the Microsoft Teams team
 
 ```sh
-teams message get --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --channelId 19:88f7e66a8dfe42be92db19505ae912a8@thread.skype --messageId 1540747442203
+m365 teams message get --teamId 5f5d7b71-1161-44d8-bcc1-3da710eb4171 --channelId 19:88f7e66a8dfe42be92db19505ae912a8@thread.skype --messageId 1540747442203
 ```

@@ -146,17 +146,17 @@ class SpoAppUninstallCommand extends SpoCommand {
   
     Uninstall the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     from the ${chalk.grey('https://contoso.sharepoint.com')} site.
-      ${commands.APP_UNINSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
+      m365 ${this.name} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
 
     Uninstall the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     from the ${chalk.grey('https://contoso.sharepoint.com')} site without prompting
     for confirmation.
-      ${commands.APP_UNINSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --confirm
+      m365 ${this.name} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --confirm
 
     Uninstall the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     from the ${chalk.grey('https://contoso.sharepoint.com')} site where the app is deployed
     to the site collection app catalog of ${chalk.grey('https://contoso.sharepoint.com')}.
-      ${commands.APP_UNINSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
+      m365 ${this.name} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
 
   More information:
   

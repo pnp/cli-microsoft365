@@ -5,7 +5,7 @@ Lists subsites of the specified site
 ## Usage
 
 ```sh
-spo web list [options]
+m365 spo web list [options]
 ```
 
 ## Options
@@ -24,5 +24,5 @@ Option|Description
 Return all subsites from site _https://contoso.sharepoint.com/_
 
 ```sh
-spo web list -u https://contoso.sharepoint.com
+m365 spo web list -u https://contoso.sharepoint.com
 ```

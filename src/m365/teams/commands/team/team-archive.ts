@@ -102,11 +102,11 @@ class TeamsArchiveCommand extends GraphCommand {
   Examples:
     
     Archive the specified Microsoft Teams team
-      ${commands.TEAMS_TEAM_ARCHIVE} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
+      m365 ${this.name} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
     
     Archive the specified Microsoft Teams team and set permissions for team
     members to read-only on the SharePoint Online site associated with the team
-      ${commands.TEAMS_TEAM_ARCHIVE} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55 --shouldSetSpoSiteReadOnlyForMembers
+      m365 ${this.name} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55 --shouldSetSpoSiteReadOnlyForMembers
     `);
   }
 }

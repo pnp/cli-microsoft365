@@ -5,7 +5,7 @@ Sets modern page header
 ## Usage
 
 ```sh
-spo page header set [options]
+m365 spo page header set [options]
 ```
 
 ## Options
@@ -42,23 +42,23 @@ The `showKicker`, `kicker` and `authors` options are based on preview functional
 Reset the page header to default
 
 ```sh
-spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx
+m365 spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx
 ```
 
 Reset the page header to default and set authors
 
 ```sh
-spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --authors "steve@contoso.com, bob@contoso.com"
+m365 spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --authors "steve@contoso.com, bob@contoso.com"
 ```
 
 Use the specified image focused on the given coordinates in the page header
 
 ```sh
-spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --type Custom --imageUrl /sites/team-a/SiteAssets/hero.jpg --altText 'Sunset over the ocean' --translateX 42.3837520042758 --translateY 56.4285714285714
+m365 spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --type Custom --imageUrl /sites/team-a/SiteAssets/hero.jpg --altText 'Sunset over the ocean' --translateX 42.3837520042758 --translateY 56.4285714285714
 ```
 
 Center the page title in the header and show the publishing date
 
 ```sh
-spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --textAlignment Center --showPublishDate
+m365 spo page header set --webUrl https://contoso.sharepoint.com/sites/team-a --pageName home.aspx --textAlignment Center --showPublishDate
 ```

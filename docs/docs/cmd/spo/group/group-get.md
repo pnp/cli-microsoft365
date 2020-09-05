@@ -5,7 +5,7 @@ Gets site group
 ## Usage
 
 ```sh
-spo group get [options]
+m365 spo group get [options]
 ```
 
 ## Options
@@ -26,11 +26,11 @@ Option|Description
 Get group with ID _7_ for web _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --id 7
+m365 spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --id 7
 ```
 
 Get group with name _Team Site Members_ for web _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --name "Team Site Members"
+m365 spo group get --webUrl https://contoso.sharepoint.com/sites/project-x --name "Team Site Members"
 ```

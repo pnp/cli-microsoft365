@@ -257,19 +257,19 @@ class SpoFileMoveCommand extends SpoCommand {
   Examples:
 
     Move file to a document library in another site collection
-      ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
 
     Move file to a document library in the same site collection
-        ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
 
     Move file to a document library in another site collection. If a file with
     the same name already exists in the target document library, move it
     to the recycle bin
-        ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
-
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
+    
     Moves file to a document library in another site collection. Will ignore any missing fields in the target destination and move anyway
-      ${commands.FILE_MOVE} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
-
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+   
   More information:
 
     Move items from a SharePoint document library

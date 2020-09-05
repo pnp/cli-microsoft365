@@ -5,7 +5,7 @@ Creates a site collection app catalog in the specified site
 ## Usage
 
 ```sh
-spo site appcatalog add [options]
+m365 spo site appcatalog add [options]
 ```
 
 ## Options
@@ -27,7 +27,7 @@ Option|Description
 Add a site collection app catalog to the specified site
 
 ```sh
-spo site appcatalog add --url https://contoso.sharepoint/sites/site
+m365 spo site appcatalog add --url https://contoso.sharepoint/sites/site
 ```
 
 ## More information

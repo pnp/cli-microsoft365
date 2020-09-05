@@ -5,7 +5,7 @@ Gets the count of unique users that connected to Exchange Online using any email
 ## Usage
 
 ```sh
-outlook report mailappusageusercounts [options]
+m365 outlook report mailappusageusercounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the count of unique users that connected to Exchange Online using any email app for the last week
 
 ```sh
-outlook report mailappusageusercounts --period D7
+m365 outlook report mailappusageusercounts --period D7
 ```
 
 Gets the count of unique users that connected to Exchange Online using any email app for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailappusageusercounts --period D7 --output text > "mailappusageusercounts.txt"
+m365 outlook report mailappusageusercounts --period D7 --output text > "mailappusageusercounts.txt"
 ```
 
 Gets the count of unique users that connected to Exchange Online using any email app for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailappusageusercounts --period D7 --output json > "mailappusageusercounts.json"
+m365 outlook report mailappusageusercounts --period D7 --output json > "mailappusageusercounts.json"
 ```

@@ -5,7 +5,7 @@ Removes the specified app from the specified app catalog
 ## Usage
 
 ```sh
-spo app remove [options]
+m365 spo app remove [options]
 ```
 
 ## Options
@@ -35,25 +35,25 @@ If the app with the specified ID doesn't exist in the app catalog, the command w
 Remove the specified app from the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically. Additionally, will prompt for confirmation before actually retracting the app.
 
 ```sh
-spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3
+m365 spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3
 ```
 
 Remove the specified app from the tenant app catalog located at _https://contoso.sharepoint.com/sites/apps_. Additionally, will prompt for confirmation before actually retracting the app.
 
 ```sh
-spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
+m365 spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 ```
 
 Remove the specified app from the tenant app catalog located at _https://contoso.sharepoint.com/sites/apps_. Don't prompt for confirmation.
 
 ```sh
-spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps --confirm
+m365 spo app remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps --confirm
 ```
 
 Remove the specified app from a site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.
 
 ```sh
-spo app remove --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1/AppCatalog
+m365 spo app remove --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1/AppCatalog
 ```
 
 ## More information

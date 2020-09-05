@@ -5,7 +5,7 @@ Applies a site design to an existing site collection
 ## Usage
 
 ```sh
-spo sitedesign apply [options]
+m365 spo sitedesign apply [options]
 ```
 
 ## Options
@@ -26,13 +26,13 @@ Option|Description
 Apply the site design with ID 9b142c22-037f-4a7f-9017-e9d8c0e34b98 to the site collection https://contoso.sharepoint.com/sites/project-x
 
 ```sh
-spo sitedesign apply --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo sitedesign apply --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 Apply large site design to the specified site
 
 ```sh
-spo sitedesign apply --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webUrl https://contoso.sharepoint.com/sites/project-x --asTask
+m365 spo sitedesign apply --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webUrl https://contoso.sharepoint.com/sites/project-x --asTask
 ```
 
 ## More information

@@ -148,11 +148,11 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
   
     Remove the ${chalk.grey('AnalyticsId')} tenant property. Yields a confirmation prompt
     before actually removing the property
-      ${commands.STORAGEENTITY_REMOVE} --key AnalyticsId --appCatalogUrl https://contoso.sharepoint.com/sites/appcatalog
+      m365 ${this.name} --key AnalyticsId --appCatalogUrl https://contoso.sharepoint.com/sites/appcatalog
 
     Remove the ${chalk.grey('AnalyticsId')} tenant property. Suppresses the confirmation
     prompt
-      ${commands.STORAGEENTITY_REMOVE} --key AnalyticsId --confirm --appCatalogUrl https://contoso.sharepoint.com/sites/appcatalog
+      m365 ${this.name} --key AnalyticsId --confirm --appCatalogUrl https://contoso.sharepoint.com/sites/appcatalog
 
   More information:
 

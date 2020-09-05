@@ -5,7 +5,7 @@ Remove specified service principal OAuth2 permissions
 ## Usage
 
 ```sh
-aad oauth2grant remove [options]
+m365 aad oauth2grant remove [options]
 ```
 
 ## Options
@@ -26,7 +26,7 @@ Before you can remove service principal's OAuth2 permissions, you need to get th
 If the `objectId` listed when using the [aad oauth2grant list](./oauth2grant-list.md) command has a minus sign ('-') prefix, you may receive an error indicating `--grantId` is missing.  To resolve this issue simply escape the leading '-'.  
 
 ```sh
-aad oauth2grant remove --grantId \\-Zc1JRY8REeLxmXz5KtixAYU3Q6noCBPlhwGiX7pxmU
+m365 aad oauth2grant remove --grantId \\-Zc1JRY8REeLxmXz5KtixAYU3Q6noCBPlhwGiX7pxmU
 ```
 
 ## Examples
@@ -34,7 +34,7 @@ aad oauth2grant remove --grantId \\-Zc1JRY8REeLxmXz5KtixAYU3Q6noCBPlhwGiX7pxmU
 Remove the OAuth2 permission grant with ID _YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek_
 
 ```sh
-aad oauth2grant remove --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek
+m365 aad oauth2grant remove --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek
 ```
 
 ## More information

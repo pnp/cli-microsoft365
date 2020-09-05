@@ -5,13 +5,13 @@ Enable or disable the service principal
 ## Usage
 
 ```sh
-spo serviceprincipal set [options]
+m365 spo serviceprincipal set [options]
 ```
 
 ## Alias
 
 ```sh
-spo sp set
+m365 spo sp set
 ```
 
 ## Options
@@ -38,17 +38,17 @@ Using the `-e, --enabled` option you can specify whether the service principal s
 Enable the service principal. Will prompt for confirmation
 
 ```sh
-spo serviceprincipal set --enabled true
+m365 spo serviceprincipal set --enabled true
 ```
 
 Disable the service principal. Will prompt for confirmation
 
 ```sh
-spo serviceprincipal set --enabled false
+m365 spo serviceprincipal set --enabled false
 ```
 
 Enable the service principal without prompting for confirmation
 
 ```sh
-spo serviceprincipal set --enabled true --confirm
+m365 spo serviceprincipal set --enabled true --confirm
 ```

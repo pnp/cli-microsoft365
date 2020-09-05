@@ -174,11 +174,11 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
     Undeclare the list item as a record with ID ${chalk.grey(1)} from list with ID
     ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-      ${commands.LISTITEM_RECORD_UNDECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
 
     Undeclare the list item as a record with ID ${chalk.grey(1)} from list with title
     ${chalk.grey('List 1')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
-      ${commands.LISTITEM_RECORD_UNDECLARE} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --id 1
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --id 1
      `);
   }
 }

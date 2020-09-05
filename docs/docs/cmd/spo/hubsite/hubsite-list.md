@@ -5,7 +5,7 @@ Lists hub sites in the current tenant
 ## Usage
 
 ```sh
-spo hubsite list [options]
+m365 spo hubsite list [options]
 ```
 
 ## Options
@@ -31,13 +31,13 @@ When using the text output type (default), the command lists only the values of 
 List hub sites in the current tenant
 
 ```sh
-spo hubsite list
+m365 spo hubsite list
 ```
 
 List hub sites, including their associated sites, in the current tenant. Associated site info is only shown in JSON output.
 
 ```sh
-spo hubsite list --includeAssociatedSites --output json
+m365 spo hubsite list --includeAssociatedSites --output json
 ```
 
 ## More information

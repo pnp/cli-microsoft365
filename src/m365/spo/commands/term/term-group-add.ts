@@ -186,13 +186,13 @@ class SpoTermGroupAddCommand extends SpoCommand {
   Examples:
   
     Add a new taxonomy term group with the specified name
-      ${commands.TERM_GROUP_ADD} --name PnPTermSets
+      m365 ${this.name} --name PnPTermSets
 
     Add a new taxonomy term group with the specified name and id
-      ${commands.TERM_GROUP_ADD} --name PnPTermSets --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
+      m365 ${this.name} --name PnPTermSets --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
 
     Add a new taxonomy term group with the specified name and description
-      ${commands.TERM_GROUP_ADD} --name PnPTermSets --description 'Term sets for PnP'
+      m365 ${this.name} --name PnPTermSets --description 'Term sets for PnP'
 `);
   }
 }

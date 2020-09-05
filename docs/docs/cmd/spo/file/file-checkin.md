@@ -5,7 +5,7 @@ Checks in specified file
 ## Usage
 
 ```sh
-spo file checkin [options]
+m365 spo file checkin [options]
 ```
 
 ## Options
@@ -28,23 +28,23 @@ Option|Description
 Checks in file with UniqueId _b2307a39-e878-458b-bc90-03bc578531d6_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6'
+m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6'
 ```
 
 Checks in file with server-relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx'
+m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx'
 ```
 
 Checks in minor version of file with server-relative url _/sites/project-x/documents/Test1.docx_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --type Minor
+m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --type Minor
 ```
 
 Checks in file _/sites/project-x/documents/Test1.docx_ with comment located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --comment 'approved'
+m365 spo file checkin --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx' --comment 'approved'
 ```

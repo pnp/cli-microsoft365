@@ -181,19 +181,19 @@ class SpoCustomActionGetCommand extends SpoCommand {
   
     Return details about the user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_GET} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test
+      m365 ${this.name} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test
 
     Return details about the user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test
+      m365 ${this.name} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test
 
     Return details about the user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_GET} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test -s Site
+      m365 ${this.name} -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test -s Site
 
     Return details about the user custom action with ID ${chalk.grey('058140e3-0e37-44fc-a1d3-79c487d371a3')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_GET} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test --scope Web
+      m365 ${this.name} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test --scope Web
 
   More information:
 

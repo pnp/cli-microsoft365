@@ -5,7 +5,7 @@ Get information about a specific column of a modern page
 ## Usage
 
 ```sh
-spo page column get [options]
+m365 spo page column get [options]
 ```
 
 ## Options
@@ -31,5 +31,5 @@ If the specified name doesn't refer to an existing modern page, you will get a _
 Get information about the first column in the first section of a modern page with name _home.aspx_
 
 ```sh
-spo page column get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1 --column 1
+m365 spo page column get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1 --column 1
 ```

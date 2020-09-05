@@ -90,7 +90,7 @@ class SpoGroupListCommand extends SpoCommand {
       `  Examples:
 
     Lists all the groups within specific web
-      ${commands.GROUP_LIST} --webUrl "https://contoso.sharepoint.com/sites/contoso"  
+      m365 ${this.name} --webUrl "https://contoso.sharepoint.com/sites/contoso"  
     `);
   }
 }

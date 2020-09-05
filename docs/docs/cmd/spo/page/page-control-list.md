@@ -5,7 +5,7 @@ Lists controls on the specific modern page
 ## Usage
 
 ```sh
-spo page control list [options]
+m365 spo page control list [options]
 ```
 
 ## Options
@@ -29,5 +29,5 @@ If the specified name doesn't refer to an existing modern page, you will get a `
 List controls on the modern page with name _home.aspx_
 
 ```sh
-spo page control list --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
+m365 spo page control list --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
 ```

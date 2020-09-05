@@ -5,7 +5,7 @@ Returns users from the current network
 ## Usage
 
 ```sh
-yammer user list [options]
+m365 yammer user list [options]
 ```
 
 ## Options
@@ -33,23 +33,23 @@ Option|Description
 Returns all Yammer network users
 
 ```sh
-yammer user list
+m365 yammer user list
 ```
 
 Returns all Yammer network users with usernames beginning with "a"
 
 ```sh
-yammer user list --letter a
+m365 yammer user list --letter a
 ```
 
 Returns all Yammer network users sorted alphabetically in descending order
 
 ```sh
-yammer user list --reverse
+m365 yammer user list --reverse
 ```
 
 Returns the first 10 Yammer network users within the group 5785177
 
 ```sh
-user list --groupId 5785177 --limit 10
+m365 user list --groupId 5785177 --limit 10
 ```

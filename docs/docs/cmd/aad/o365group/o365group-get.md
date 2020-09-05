@@ -5,7 +5,7 @@ Gets information about the specified Microsoft 365 Group
 ## Usage
 
 ```sh
-aad o365group get [options]
+m365 aad o365group get [options]
 ```
 
 ## Options
@@ -25,11 +25,11 @@ Option|Description
 Get information about the Microsoft 365 Group with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_
 
 ```sh
-aad o365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
+m365 aad o365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844
 ```
 
 Get information about the Microsoft 365 Group with id _1caf7dcd-7e83-4c3a-94f7-932a1299c844_ and also retrieve the URL of the corresponding SharePoint site
 
 ```sh
-aad o365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --includeSiteUrl
+m365 aad o365group get --id 1caf7dcd-7e83-4c3a-94f7-932a1299c844 --includeSiteUrl
 ```

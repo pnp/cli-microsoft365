@@ -5,7 +5,7 @@ Lists all webhooks for the specified list
 ## Usage
 
 ```sh
-spo list webhook list [options]
+m365 spo list webhook list [options]
 ```
 
 ## Options
@@ -28,11 +28,11 @@ Option|Description
 List all webhooks for a list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list webhook list --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
+m365 spo list webhook list --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
 ```
 
 List all webhooks for a list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list webhook list --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
+m365 spo list webhook list --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
 ```

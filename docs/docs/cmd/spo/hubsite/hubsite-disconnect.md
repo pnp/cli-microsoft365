@@ -5,7 +5,7 @@ Disconnects the specifies site collection from its hub site
 ## Usage
 
 ```sh
-spo hubsite disconnect [options]
+m365 spo hubsite disconnect [options]
 ```
 
 ## Options
@@ -30,13 +30,13 @@ Option|Description
 Disconnect the site collection with URL _https://contoso.sharepoint.com/sites/sales_ from its hub site. Will prompt for confirmation before disconnecting from the hub site.
 
 ```sh
-spo hubsite disconnect --url https://contoso.sharepoint.com/sites/sales
+m365 spo hubsite disconnect --url https://contoso.sharepoint.com/sites/sales
 ```
 
 Disconnect the site collection with URL _https://contoso.sharepoint.com/sites/sales- from its hub site without prompting for confirmation
 
 ```sh
-spo hubsite disconnect --url https://contoso.sharepoint.com/sites/sales --confirm
+m365 spo hubsite disconnect --url https://contoso.sharepoint.com/sites/sales --confirm
 ```
 
 ## More information

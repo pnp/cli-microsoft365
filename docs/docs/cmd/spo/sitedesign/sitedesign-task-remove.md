@@ -5,7 +5,7 @@ Removes the specified site design scheduled for execution
 ## Usage
 
 ```sh
-spo sitedesign task remove [options]
+m365 spo sitedesign task remove [options]
 ```
 
 ## Options
@@ -25,13 +25,13 @@ Option|Description
 Removes the specified site design task with taskId _6ec3ca5b-d04b-4381-b169-61378556d76e_ scheduled for execution without prompting confirmation
 
 ```sh
-spo sitedesign task remove --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e --confirm
+m365 spo sitedesign task remove --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e --confirm
 ```
 
 Removes the specified site design task with taskId _6ec3ca5b-d04b-4381-b169-61378556d76e_ scheduled for execution with prompt for confirmation before removing
 
 ```sh
-spo sitedesign task remove --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e
+m365 spo sitedesign task remove --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e
 ```
 
 ## More information

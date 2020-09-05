@@ -5,7 +5,7 @@ Get the number of Microsoft Teams unique users by device type.
 ## Usage
 
 ```sh
-teams report deviceusagedistributionusercounts [options]
+m365 teams report deviceusagedistributionusercounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the number of Microsoft Teams unique users by device type for the last week
 
 ```sh
-teams report deviceusagedistributionusercounts --period D7
+m365 teams report deviceusagedistributionusercounts --period D7
 ```
 
 Gets the number of Microsoft Teams unique users by device type for the last week and exports the report data in the specified path in text format
 
 ```sh
-teams report deviceusagedistributionusercounts --period D7 --output text > "deviceusagedistributionusercounts.txt"
+m365 teams report deviceusagedistributionusercounts --period D7 --output text > "deviceusagedistributionusercounts.txt"
 ```
 
 Gets the number of Microsoft Teams unique users by device type for the last week and exports the report data in the specified path in json format
 
 ```sh
-teams report deviceusagedistributionusercounts --period D7 --output json > "deviceusagedistributionusercounts.json"
+m365 teams report deviceusagedistributionusercounts --period D7 --output json > "deviceusagedistributionusercounts.json"
 ```

@@ -5,7 +5,7 @@ Log in to Microsoft 365
 ## Usage
 
 ```sh
-login [options]
+m365 login [options]
 ```
 
 ## Options
@@ -44,48 +44,48 @@ Managed identity in Azure Cloud Shell is the identity of the user. It is neither
 Log in to Microsoft 365 using the device code
 
 ```sh
-login
+m365 login
 ```
 
 Log in to Microsoft 365 using the device code in debug mode including detailed debug information in the console output
 
 ```sh
-login --debug
+m365 login --debug
 ```
 
 Log in to Microsoft 365 using a user name and password
 
 ```sh
-login --authType password --userName user@contoso.com --password pass@word1
+m365 login --authType password --userName user@contoso.com --password pass@word1
 ```
 
 Log in to Microsoft 365 using a PEM certificate
 
 ```sh
-login --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
 ```
 
 Log in to Microsoft 365 using a personal information exchange (.pfx) file
 
 ```sh
-login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
 ```
 
 Log in to Microsoft 365 using a system assigned managed identity. Applies to Azure resources with managed identity enabled,
 such as Azure Virtual Machines, Azure App Service or Azure Functions
 
 ```sh
-login --authType identity
+m365 login --authType identity
 ```
 
 Log in to Microsoft 365 using managed identity in Azure Cloud Shell. Uses the identity of the current user.
 
 ```sh
-login --authType identity
+m365 login --authType identity
 ```
 
 Log in to Microsoft 365 using a user-assigned managed identity. Client id or principal id also known as object id value can be specified in the `userName` option. Applies to Azure resources with managed identity enabled, such as Azure Virtual Machines, Azure App Service or Azure Functions
 
 ```sh
-login --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
+m365 login --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
 ```

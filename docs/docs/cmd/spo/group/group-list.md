@@ -5,7 +5,7 @@ Lists all the groups within specific web
 ## Usage
 
 ```sh
-spo group list [options]
+m365 spo group list [options]
 ```
 
 ## Options
@@ -25,5 +25,5 @@ Option|Description
 Lists all the groups within specific web _https://contoso.sharepoint.com/sites/contoso_
 
 ```sh
-spo group list --webUrl "https://contoso.sharepoint.com/sites/contoso"
+m365 spo group list --webUrl "https://contoso.sharepoint.com/sites/contoso"
 ```

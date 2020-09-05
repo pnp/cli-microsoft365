@@ -5,7 +5,7 @@ Gets health status of the different services in Microsoft 365
 ## Usage
 
 ```sh
-tenant status list [options]
+m365 tenant status list [options]
 ```
 
 ## Options
@@ -28,13 +28,13 @@ To get the name of the particular workload for use with the `workload` option, e
 Gets health status of the different services in Microsoft 365
 
 ```sh
-tenant status list
+m365 tenant status list
 ```
 
 Gets health status for SharePoint Online
 
 ```sh
-tenant status list -w "SharePoint"
+m365 tenant status list --workload "SharePoint"
 ```
 
 ## More information

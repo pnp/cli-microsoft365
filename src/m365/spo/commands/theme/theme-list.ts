@@ -67,7 +67,7 @@ class SpoThemeListCommand extends SpoCommand {
   Examples:
   
     List available themes
-      ${commands.THEME_LIST}
+      m365 ${this.name}
 
   More information:
 

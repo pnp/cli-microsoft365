@@ -28,17 +28,17 @@ class OneDriveReportUsageFileCountsCommand extends PeriodBasedReport {
       
     Gets the total number of files across all sites and how many are active
     files for the last week
-      ${commands.REPORT_USAGEFILECOUNTS} --period D7
+      m365 ${this.name} --period D7
 
     Gets the total number of files across all sites and how many are active
     files for the last week and exports the report data in the specified path in
     text format
-      ${commands.REPORT_USAGEFILECOUNTS} --period D7 --output text > "usagefilecounts.txt"
+      m365 ${this.name} --period D7 --output text > "usagefilecounts.txt"
 
     Gets the total number of files across all sites and how many are active
     files for the last week and exports the report data in the specified path in
     json format
-      ${commands.REPORT_USAGEFILECOUNTS} --period D7 --output json > "usagefilecounts.json"
+      m365 ${this.name} --period D7 --output json > "usagefilecounts.json"
 `);
   }
 }

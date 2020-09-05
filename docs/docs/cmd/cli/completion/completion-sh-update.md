@@ -5,7 +5,7 @@ Updates command completion for Zsh, Bash and Fish
 ## Usage
 
 ```sh
-cli completion sh update [options]
+m365 cli completion sh update [options]
 ```
 
 ## Options
@@ -27,7 +27,7 @@ This commands updates the list of commands and their options used by command com
 Update list of commands for Zsh, Bash and Fish command completion
 
 ```sh
-cli completion sh update
+m365 cli completion sh update
 ```
 
 ## More information

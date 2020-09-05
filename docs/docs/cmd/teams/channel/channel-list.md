@@ -5,7 +5,7 @@ Lists channels in the specified Microsoft Teams team
 ## Usage
 
 ```sh
-teams channel list [options]
+m365 teams channel list [options]
 ```
 
 ## Options
@@ -24,5 +24,5 @@ Option|Description
 List the channels in a specified Microsoft Teams team
 
 ```sh
-teams channel list --teamId 00000000-0000-0000-0000-000000000000
+m365 teams channel list --teamId 00000000-0000-0000-0000-000000000000
 ```

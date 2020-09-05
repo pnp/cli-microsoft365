@@ -5,7 +5,7 @@ Adds or updates a site column reference in a site content type
 ## Usage
 
 ```sh
-spo contenttype field set [options]
+m365 spo contenttype field set [options]
 ```
 
 ## Options
@@ -32,17 +32,17 @@ If the field reference already exists, the command will update its _required_ an
 Add the specified site column to the specified content type as an optional and visible field
 
 ```sh
-spo contenttype field set --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5
+m365 spo contenttype field set --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5
 ```
 
 Add the specified site column to the specified content type as a required field
 
 ```sh
-spo contenttype field set --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5 --required true
+m365 spo contenttype field set --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5 --required true
 ```
 
 Update the existing site column reference in the specified content type to optional
 
 ```sh
-spo contenttype field set --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5 --required false
+m365 spo contenttype field set --webUrl https://contoso.sharepoint.com/sites/portal --contentTypeId 0x01007926A45D687BA842B947286090B8F67D --fieldId ebe7e498-44ff-43da-a7e5-99b444f656a5 --required false
 ```

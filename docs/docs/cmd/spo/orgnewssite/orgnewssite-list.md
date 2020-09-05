@@ -5,7 +5,7 @@ Lists all organizational news sites
 ## Usage
 
 ```sh
-spo orgnewssite list [options]
+m365 spo orgnewssite list [options]
 ```
 
 ## Options
@@ -26,5 +26,5 @@ Option|Description
 List all organizational news sites
 
 ```sh
-spo orgnewssite list
+m365 spo orgnewssite list
 ```

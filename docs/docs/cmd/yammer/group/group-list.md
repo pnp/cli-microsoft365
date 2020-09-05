@@ -5,7 +5,7 @@ Returns the list of groups in a Yammer network or the groups for a specific user
 ## Usage
 
 ```sh
-yammer group list [options]
+m365 yammer group list [options]
 ```
 
 ## Options
@@ -29,23 +29,23 @@ Option|Description
 Returns all Yammer network groups
 
 ```sh
-yammer group list
+m365 yammer group list
 ```
 
 Returns all Yammer network groups for the user with the ID `5611239081`
 
 ```sh
-yammer group list --userId 5611239081
+m365 yammer group list --userId 5611239081
 ```
 
 Returns the first 10 Yammer network groups
 
 ```sh
-yammer group list --limit 10
+m365 yammer group list --limit 10
 ```
 
 Returns the first 10 Yammer network groups for the user with the ID `5611239081`
 
 ```sh
-yammer group list --userId 5611239081 --limit 10
+m365 yammer group list --userId 5611239081 --limit 10
 ```

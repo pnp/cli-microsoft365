@@ -136,11 +136,11 @@ class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
   Examples:
   
     Remove a site from the list of organizational news sites
-      ${chalk.grey(config.delimiter)} ${commands.ORGNEWSSITE_REMOVE} --url https://contoso.sharepoint.com/sites/site1
+      ${chalk.grey(config.delimiter)} m365 ${this.name} --url https://contoso.sharepoint.com/sites/site1
 
     Remove a site from the list of organizational news sites, without prompting
     for confirmation
-      ${chalk.grey(config.delimiter)} ${commands.ORGNEWSSITE_REMOVE} --url https://contoso.sharepoint.com/sites/site1 --confirm
+      ${chalk.grey(config.delimiter)} m365 ${this.name} --url https://contoso.sharepoint.com/sites/site1 --confirm
   `);
   }
 }

@@ -19,7 +19,7 @@ By persisting the connection information the CLI for Microsoft 365 can be used t
 _Deploy all apps that are not yet deployed in the tenant app catalog:_
 
 ```sh
-# get all apps available in the tenant app catalog
+m365 # get all apps available in the tenant app catalog
 apps=$(m365 spo app list -o json)
 
 # get IDs of all apps that are not deployed

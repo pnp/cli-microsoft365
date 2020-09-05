@@ -5,7 +5,7 @@ Get the total number of files and how many of them were active across all group 
 ## Usage
 
 ```sh
-aad o365group report activityfilecounts [options]
+m365 aad o365group report activityfilecounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Get the total number of files and how many of them were active across all group sites associated with an Microsoft 365 Group for the last week
 
 ```sh
-aad o365group report activityfilecounts --period D7
+m365 aad o365group report activityfilecounts --period D7
 ```
 
 Get the total number of files and how many of them were active across all group sites associated with an Microsoft 365 Group for the last week and exports the report data in the specified path in text format
 
 ```sh
-aad o365group report activityfilecounts --period D7 --output text > "o365groupactivityfilecounts.txt"
+m365 aad o365group report activityfilecounts --period D7 --output text > "o365groupactivityfilecounts.txt"
 ```
 
 Get the total number of files and how many of them were active across all group sites associated with an Microsoft 365 Group for the last week and exports the report data in the specified path in json format
 
 ```sh
-aad o365group report activityfilecounts --period D7 --output json > "o365groupactivityfilecounts.json"
+m365 aad o365group report activityfilecounts --period D7 --output json > "o365groupactivityfilecounts.json"
 ```

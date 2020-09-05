@@ -763,10 +763,10 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
   Examples:
   
     Sets single tenant global setting
-      ${commands.TENANT_SETTINGS_SET} --UserVoiceForFeedbackEnabled true
+      m365 ${this.name} --UserVoiceForFeedbackEnabled true
 
     Sets multiple tenant global settings at once
-      ${commands.TENANT_SETTINGS_SET} --UserVoiceForFeedbackEnabled true --HideSyncButtonOnODB true --DisabledWebPartIds c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201
+      m365 ${this.name} --UserVoiceForFeedbackEnabled true --HideSyncButtonOnODB true --DisabledWebPartIds c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201
   ` );
   }
 }

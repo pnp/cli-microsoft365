@@ -155,14 +155,14 @@ class SpoFolderCopyCommand extends SpoCommand {
 
     Copies folder from a document library located in one site collection to
     another site collection
-      ${commands.FOLDER_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/
 
     Copies folder from a document library to another site in the same site
     collection
-      ${commands.FOLDER_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
-
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
+      
     Copy folder to a document library in another site collection. Will ignore any missing fields in the target destination and copy anyway
-      ${commands.FILE_COPY} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 
   More information:
 

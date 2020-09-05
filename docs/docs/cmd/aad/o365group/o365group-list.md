@@ -5,7 +5,7 @@ Lists Microsoft 365 Groups in the current tenant
 ## Usage
 
 ```sh
-aad o365group list [options]
+m365 aad o365group list [options]
 ```
 
 ## Options
@@ -36,42 +36,42 @@ Using the `--orphaned` option, you can retrieve Microsoft 365 Groups without own
 List all Microsoft 365 Groups in the tenant
 
 ```sh
-aad o365group list
+m365 aad o365group list
 ```
 
 List Microsoft 365 Groups with display name starting with _Project_
 
 ```sh
-aad o365group list --displayName Project
+m365 aad o365group list --displayName Project
 ```
 
 List Microsoft 365 Groups mail nick name starting with _team_
 
 ```sh
-aad o365group list --mailNickname team
+m365 aad o365group list --mailNickname team
 ```
 
 List deleted Microsoft 365 Groups with display name starting with _Project_
 
 ```sh
-aad o365group list --displayName Project --deleted
+m365 aad o365group list --displayName Project --deleted
 ```
 
 List deleted Microsoft 365 Groups mail nick name starting with _team_
 
 ```sh
-aad o365group list --mailNickname team --deleted
+m365 aad o365group list --mailNickname team --deleted
 ```
 
 List Microsoft 365 Groups with display name starting with _Project_ including
 the URL of the corresponding SharePoint site
 
 ```sh
-aad o365group list --displayName Project --includeSiteUrl
+m365 aad o365group list --displayName Project --includeSiteUrl
 ```
 
 List Microsoft 365 Groups without owners
 
 ```sh
-aad o365group list --orphaned
+m365 aad o365group list --orphaned
 ```

@@ -5,7 +5,7 @@ Deletes the specified folder
 ## Usage
 
 ```sh
-spo folder remove [options]
+m365 spo folder remove [options]
 ```
 
 ## Options
@@ -31,11 +31,11 @@ The `spo folder remove` command will remove folder only if it is empty. If the f
 Removes a folder with site-relative URL _/Shared Documents/My Folder_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder'
+m365 spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder'
 ```
 
 Moves a folder with site-relative URL _/Shared Documents/My Folder_ located in site _https://contoso.sharepoint.com/sites/project-x_ to the site recycle bin
 
 ```sh
-spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder' --recycle
+m365 spo folder remove --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder' --recycle
 ```

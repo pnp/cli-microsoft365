@@ -117,7 +117,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
   Examples:
 
     Removes the current Home Site without confirmation
-      ${chalk.grey(config.delimiter)} ${commands.HOMESITE_REMOVE} --confirm
+      ${chalk.grey(config.delimiter)} m365 ${this.name} --confirm
 
   More information:
 

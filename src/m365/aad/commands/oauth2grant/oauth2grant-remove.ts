@@ -87,7 +87,7 @@ class AadOAuth2GrantRemoveCommand extends AadCommand {
   Examples:
   
     Remove the OAuth2 permission grant with ID ${chalk.grey('YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek')}
-      ${commands.OAUTH2GRANT_REMOVE} --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek
+      m365 ${this.name} --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek
 
   More information:
   

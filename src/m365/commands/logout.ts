@@ -71,11 +71,11 @@ class LogoutCommand extends Command {
   Examples:
   
     Log out from Microsoft 365
-      ${commands.LOGOUT}
+      m365 ${this.name}
 
     Log out from Microsoft 365 in debug mode including detailed debug
     information in the console output
-      ${commands.LOGOUT} --debug
+      m365 ${this.name} --debug
 `);
   }
 }

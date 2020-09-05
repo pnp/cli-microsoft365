@@ -5,7 +5,7 @@ Uninstalls an app from the site
 ## Usage
 
 ```sh
-spo app uninstall [options]
+m365 spo app uninstall [options]
 ```
 
 ## Options
@@ -31,19 +31,19 @@ If the app with the specified ID doesn't exist in the app catalog, the command w
 Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site.
 
 ```sh
-spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
+m365 spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
 ```
 
 Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site without prompting for confirmation.
 
 ```sh
-spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
+m365 spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
 ```
 
 Uninstall the app with ID _b2307a39-e878-458b-bc90-03bc578531d6_ from the _https://contoso.sharepoint.com_ site where the app is deployed to the site collection app catalog of _https://contoso.sharepoint.com_.
 
 ```sh
-spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
+m365 spo app uninstall --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
 ```
 
 ## More information

@@ -95,10 +95,10 @@ class TenantStatusListCommand extends SpoCommand {
   Examples:
   
     Gets health status of all services in Microsoft 365
-      ${commands.TENANT_STATUS_LIST}
+      m365 ${this.name}
 
     Gets health status for SharePoint Online
-      ${commands.TENANT_STATUS_LIST} -w "SharePoint"
+      m365 ${this.name} --workload "SharePoint"
 
   More information:
     

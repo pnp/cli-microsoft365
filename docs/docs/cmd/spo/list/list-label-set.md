@@ -5,7 +5,7 @@ Sets classification label on the specified list
 ## Usage
 
 ```sh
-spo list label set  [options]
+m365 spo list label set  [options]
 ```
 
 ## Options
@@ -31,11 +31,11 @@ Option|Description
 Sets classification label "Confidential" for list _Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list label set --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --label 'Confidential'
+m365 spo list label set --webUrl https://contoso.sharepoint.com/sites/project-x --listUrl 'Shared Documents' --label 'Confidential'
 ```
 
 Sets classification label "Confidential" and disables editing and deleting items on the list and all existing items for list for list _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list label set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --label 'Confidential' --blockEdit --blockDelete --syncToItems
+m365 spo list label set --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'Documents' --label 'Confidential' --blockEdit --blockDelete --syncToItems
 ```

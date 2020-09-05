@@ -74,7 +74,7 @@ class StatusCommand extends Command {
   Examples:
   
     Show the information about the current login to Microsoft 365
-      ${commands.STATUS}
+      m365 ${this.name}
 `);
   }
 }

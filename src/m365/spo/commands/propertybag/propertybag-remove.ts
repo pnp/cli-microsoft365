@@ -165,19 +165,19 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
       `  Examples:
 
     Removes the value of the ${chalk.grey('key1')} property from the property bag located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1
 
     Removes the value of the ${chalk.grey('key1')} property from the property bag located in site root folder ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder / --confirm
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder / --confirm
 
     Removes the value of the ${chalk.grey('key1')} property from the property bag located in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents'
     
     Removes property bag value located in folder in site document library ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder '/Shared Documents/MyFolder'
 
     Removes the value of the ${chalk.grey('key1')} property from the property bag located in site list ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_REMOVE} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --folder /Lists/MyList
     `);
   }
 }

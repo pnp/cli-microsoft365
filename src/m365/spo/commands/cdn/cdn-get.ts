@@ -125,10 +125,10 @@ class SpoCdnGetCommand extends SpoCommand {
   Examples:
   
     Show if the Public CDN is currently enabled or not
-      ${commands.CDN_GET}
+      m365 ${this.name}
 
     Show if the Private CDN is currently enabled or not
-      ${commands.CDN_GET} --type Private
+      m365 ${this.name} --type Private
 
   More information:
 

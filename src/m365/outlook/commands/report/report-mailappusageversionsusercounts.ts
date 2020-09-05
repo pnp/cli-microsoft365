@@ -22,15 +22,15 @@ class OutlookReportMailAppUsageVersionsUserCountsCommand extends PeriodBasedRepo
       `  Examples:
       
     Gets the count of unique users by Outlook desktop version for the last week
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS} --period D7
+      m365 ${this.name} --period D7
 
     Gets the count of unique users by Outlook desktop version for the last week
     and exports the report data in the specified path in text format
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS} --period D7 --output text > "mailappusageversionusercounts.txt"
+      m365 ${this.name} --period D7 --output text > "mailappusageversionusercounts.txt"
 
     Gets the count of unique users by Outlook desktop version for the last week
     and exports the report data in the specified path in json format
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS} --period D7 --output json > "mailappusageversionusercounts.json"
+      m365 ${this.name} --period D7 --output json > "mailappusageversionusercounts.json"
 `);
   }
 }

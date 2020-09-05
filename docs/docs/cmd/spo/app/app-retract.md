@@ -5,7 +5,7 @@ Retracts the specified app from the specified app catalog
 ## Usage
 
 ```sh
-spo app retract [options]
+m365 spo app retract [options]
 ```
 
 ## Options
@@ -35,25 +35,25 @@ If the app with the specified ID doesn't exist in the app catalog, the command w
 Retract the specified app from the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically. Additionally, will prompt for confirmation before actually retracting the app.
 
 ```sh
-spo app retract --id 058140e3-0e37-44fc-a1d3-79c487d371a3
+m365 spo app retract --id 058140e3-0e37-44fc-a1d3-79c487d371a3
 ```
 
 Retract the specified app from the tenant app catalog located at _https://contoso.sharepoint.com/sites/apps_. Additionally, will prompt for confirmation before actually retracting the app.
 
 ```sh
-spo app retract --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
+m365 spo app retract --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 ```
 
 Retract the specified app from the tenant app catalog. Try to resolve the URL of the tenant app catalog automatically. Will not prompt for confirmation before retracting the app.
 
 ```sh
-spo app retract --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --confirm
+m365 spo app retract --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --confirm
 ```
 
 Retract the specified app from a site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.
 
 ```sh
-spo app retract --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+m365 spo app retract --id d95f8c94-67a1-4615-9af8-361ad33be93c --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 ## More information

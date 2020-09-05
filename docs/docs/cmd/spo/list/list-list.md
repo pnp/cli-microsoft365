@@ -5,7 +5,7 @@ Gets all lists within the specified site
 ## Usage
 
 ```sh
-spo list list [options]
+m365 spo list list [options]
 ```
 
 ## Options
@@ -24,7 +24,7 @@ Option|Description
 Return all lists located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list list --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo list list --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 ## More information

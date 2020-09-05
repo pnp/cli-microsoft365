@@ -5,7 +5,7 @@ Removes group from specific web
 ## Usage
 
 ```sh
-spo group remove [options]
+m365 spo group remove [options]
 ```
 
 ## Options
@@ -27,11 +27,11 @@ Option|Description
 Removes group with id _5_ from web _https://contoso.sharepoint.com/sites/mysite_
 
 ```sh
-spo group remove --webUrl https://contoso.sharepoint.com/sites/mysite --id 5
+m365 spo group remove --webUrl https://contoso.sharepoint.com/sites/mysite --id 5
 ```
 
 Removes group with name _Team Site Owners_ from web _https://contoso.sharepoint.com/sites/mysite_
 
 ```sh
-spo group remove --webUrl https://contoso.sharepoint.com/sites/mysite --name "Team Site Owners"
+m365 spo group remove --webUrl https://contoso.sharepoint.com/sites/mysite --name "Team Site Owners"
 ```

@@ -46,7 +46,7 @@ class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
       `  Examples:
   
     Get the URL of the tenant app catalog
-      ${commands.TENANT_APPCATALOGURL_GET}
+      m365 ${this.name}
   ` );
   }
 }

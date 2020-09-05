@@ -5,7 +5,7 @@ Sets the Knowledge Hub Site for your tenant
 ## Usage
 
 ```sh
-spo knowledgehub set [options]
+m365 spo knowledgehub set [options]
 ```
 
 ## Options
@@ -31,5 +31,5 @@ If the specified url doesn't refer to an existing site collection, you will get 
 Sets the Knowledge Hub Site for your tenant
 
 ```sh
-spo knowledgehub set --url https://contoso.sharepoint.com/sites/knowledgesite
+m365 spo knowledgehub set --url https://contoso.sharepoint.com/sites/knowledgesite
 ```

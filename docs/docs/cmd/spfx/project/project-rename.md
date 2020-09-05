@@ -5,7 +5,7 @@ Renames SharePoint Framework project
 ## Usage
 
 ```sh
-spfx project rename [options]
+m365 spfx project rename [options]
 ```
 
 ## Options
@@ -32,11 +32,11 @@ This command will update the project name in: _package.json_, _.yo-rc.json_, _pa
 Renames SharePoint Framework project to contoso
 
 ```sh
-spfx project rename --newName contoso
+m365 spfx project rename --newName contoso
 ```
 
 Renames SharePoint Framework project to contoso with new solution ID
 
 ```sh
-spfx project rename --newName contoso --generateNewId
+m365 spfx project rename --newName contoso --generateNewId
 ```

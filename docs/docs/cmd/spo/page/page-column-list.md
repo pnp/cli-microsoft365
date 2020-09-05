@@ -5,7 +5,7 @@ Lists columns in the specific section of a modern page
 ## Usage
 
 ```sh
-spo page column list [options]
+m365 spo page column list [options]
 ```
 
 ## Options
@@ -30,5 +30,5 @@ If the specified name doesn't refer to an existing modern page, you will get a _
 List columns in the first section of a modern page with name _home.aspx_
 
 ```sh
-spo page column list --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1
+m365 spo page column list --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1
 ```

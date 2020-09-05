@@ -5,7 +5,7 @@ Adds content type to list
 ## Usage
 
 ```sh
-spo list contenttype add [options]
+m365 spo list contenttype add [options]
 ```
 
 ## Options
@@ -27,11 +27,11 @@ Option|Description
 Add existing content type with ID _0x0120_ to the list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list contenttype add --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --contentTypeId 0x0120
+m365 spo list contenttype add --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --contentTypeId 0x0120
 ```
 
 Add existing content type with ID _0x0120_ to the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list contenttype add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --contentTypeId 0x0120
+m365 spo list contenttype add --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --contentTypeId 0x0120
 ```

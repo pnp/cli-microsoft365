@@ -5,7 +5,7 @@ Gets the URL of the tenant app catalog
 ## Usage
 
 ```sh
-spo tenant appcatalogurl get [options]
+m365 spo tenant appcatalogurl get [options]
 ```
 
 ## Options
@@ -26,5 +26,5 @@ Option|Description
 Get the URL of the tenant app catalog
 
 ```sh
-spo tenant appcatalogurl get
+m365 spo tenant appcatalogurl get
 ```

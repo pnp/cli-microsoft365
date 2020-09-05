@@ -5,7 +5,7 @@ Gets the total number of user mailboxes in your organization and how many are ac
 ## Usage
 
 ```sh
-outlook report mailboxusagemailboxcount [options]
+m365 outlook report mailboxusagemailboxcount [options]
 ```
 
 ## Options
@@ -28,17 +28,17 @@ A mailbox is considered active if the user sent or read any email.
 Gets the total number of user mailboxes in your organization and how many are active each day for the last week.
 
 ```sh
-outlook report mailboxusagemailboxcount --period D7
+m365 outlook report mailboxusagemailboxcount --period D7
 ```
 
 Gets the total number of user mailboxes in your organization and how many are active each day for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailboxusagemailboxcount --period D7 --output text > "mailboxusagemailboxcount.txt"
+m365 outlook report mailboxusagemailboxcount --period D7 --output text > "mailboxusagemailboxcount.txt"
 ```
 
 Gets the total number of user mailboxes in your organization and how many are active each day for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailboxusagemailboxcount --period D7 --output json > "mailboxusagemailboxcount.json"
+m365 outlook report mailboxusagemailboxcount --period D7 --output json > "mailboxusagemailboxcount.json"
 ```

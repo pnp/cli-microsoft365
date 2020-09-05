@@ -5,7 +5,7 @@ Marks site as an organizational news site
 ## Usage
 
 ```sh
-spo orgnewssite set [options]
+m365 spo orgnewssite set [options]
 ```
 
 ## Options
@@ -31,5 +31,5 @@ Using the `-u, --url` option you can specify which site to add to the list of or
 Set a site as an organizational news site
 
 ```sh
-spo orgnewssite set --url https://contoso.sharepoint.com/sites/site1
+m365 spo orgnewssite set --url https://contoso.sharepoint.com/sites/site1
 ```

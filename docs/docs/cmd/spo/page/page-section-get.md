@@ -5,7 +5,7 @@ Get information about the specified modern page section
 ## Usage
 
 ```sh
-spo page section get [options]
+m365 spo page section get [options]
 ```
 
 ## Options
@@ -30,5 +30,5 @@ If the specified name doesn't refer to an existing modern page, you will get a _
 Get information about the specified section of the modern page named _home.aspx_
 
 ```sh
-spo page section get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1
+m365 spo page section get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --section 1
 ```

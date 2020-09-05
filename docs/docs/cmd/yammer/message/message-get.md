@@ -5,7 +5,7 @@ Returns a Yammer message
 ## Usage
 
 ```sh
-yammer message get [options]
+m365 yammer message get [options]
 ```
 
 ## Options
@@ -29,11 +29,11 @@ Option|Description
 Returns the Yammer message with the id 1239871123
 
 ```sh
-yammer message get --id 1239871123
+m365 yammer message get --id 1239871123
 ```
 
 Returns the Yammer message with the id 1239871123 in JSON format
 
 ```sh
-yammer message get --id 1239871123 --output json
+m365 yammer message get --id 1239871123 --output json
 ```

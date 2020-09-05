@@ -5,7 +5,7 @@ Removes a Yammer message
 ## Usage
 
 ```sh
-yammer message remove [options]
+m365 yammer message remove [options]
 ```
 
 ## Options
@@ -36,11 +36,11 @@ To remove a message, you must either:
 Removes the Yammer message with the id _1239871123_
 
 ```sh
-yammer message remove --id 1239871123
+m365 yammer message remove --id 1239871123
 ```
 
 Removes the Yammer message with the id _1239871123_ without prompting for confirmation.
 
 ```sh
-yammer message remove --id 1239871123 --confirm
+m365 yammer message remove --id 1239871123 --confirm
 ```

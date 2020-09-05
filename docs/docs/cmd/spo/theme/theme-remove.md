@@ -5,7 +5,7 @@ Removes existing theme
 ## Usage
 
 ```sh
-spo theme remove [options]
+m365 spo theme remove [options]
 ```
 
 ## Options
@@ -28,13 +28,13 @@ Option|Description
 Remove theme. Will prompt for confirmation before removing the theme
 
 ```sh
-spo theme remove --name Contoso-Blue
+m365 spo theme remove --name Contoso-Blue
 ```
 
 Remove theme without prompting for confirmation
 
 ```sh
-spo theme remove --name Contoso-Blue --confirm
+m365 spo theme remove --name Contoso-Blue --confirm
 ```
 
 ## More information

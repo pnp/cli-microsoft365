@@ -5,7 +5,7 @@ Moves a file to another location
 ## Usage
 
 ```sh
-spo file move [options]
+m365 spo file move [options]
 ```
 
 ## Options
@@ -32,25 +32,25 @@ When you move a file using the `spo file move` command, all of the versions are 
 Move file to a document library in another site collection
 
 ```sh
-spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
+m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/
 ```
 
 Move file to a document library in the same site collection
 
 ```sh
-spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
+m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test1/HRDocuments/
 ```
 
 Move file to a document library in another site collection. If a file with the same name already exists in the target document library, move it to the recycle bin
 
 ```sh
-spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
+m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --deleteIfAlreadyExists
 ```
 
 Move file to a document library in another site collection. Allow for schema mismatch
 
  ```sh
-spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 ```
 
 

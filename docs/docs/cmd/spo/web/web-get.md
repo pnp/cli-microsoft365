@@ -5,7 +5,7 @@ Retrieve information about the specified site
 ## Usage
 
 ```sh
-spo web get [options]
+m365 spo web get [options]
 ```
 
 ## Options
@@ -24,5 +24,5 @@ Option|Description
 Retrieve information about the site _https://contoso.sharepoint.com/subsite_
 
 ```sh
-spo web get --webUrl https://contoso.sharepoint.com/subsite
+m365 spo web get --webUrl https://contoso.sharepoint.com/subsite
 ```

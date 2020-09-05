@@ -103,7 +103,7 @@ $env:CLIMICROSOFT365_TENANT="e8954f17-a373-4b61-b54d-45c038fe3188"
 If you are using Linux or macOS, you can set the environment variables using the `export` command from your terminal prompt.
 
 ```sh
-export CLIMICROSOFT365_AADAPPID=506af689-32aa-46c8-afb5-972ebf9d218a
+m365 export CLIMICROSOFT365_AADAPPID=506af689-32aa-46c8-afb5-972ebf9d218a
 export CLIMICROSOFT365_TENANT=e8954f17-a373-4b61-b54d-45c038fe3188
 ```
 
@@ -125,7 +125,7 @@ Returning back to your command line, you can now verify that the sign in has bee
 Finally, to test that we can indeed read SharePoint Online site collections, let's invoke the following command
 
 ```sh
-m365 spo site get --url https://trinder365dev.sharepoint.com -o json
+m365 m365 spo site get --url https://trinder365dev.sharepoint.com -o json
 ```
 
 The JSON representation of the SharePoint Online site will be returned to the console.

@@ -71,7 +71,7 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         if (response.ErrorInfo) {
           if (this.verbose && response.ErrorInfo.ErrorMessage.indexOf('Access denied.') > -1) {
             cmd.log('');
-            cmd.log(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the ${commands.STORAGEENTITY_SET} command is a valid app catalog URL and try again.`);
+            cmd.log(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the m365 ${this.name} command is a valid app catalog URL and try again.`);
             cmd.log('');
           }
 
@@ -150,7 +150,7 @@ class SpoStorageEntitySetCommand extends SpoCommand {
     Set ${chalk.grey('123')} as the value of the ${chalk.grey('AnalyticsId')} tenant property. Also include
     a description and a comment for additional clarification of the usage
     of the property.
-      ${commands.STORAGEENTITY_SET} --key AnalyticsId --value 123 --description 'Web analytics ID' --comment 'Use on all sites' --appCatalogUrl https://contoso.sharepoint.com/sites/appcatalog
+      m365 ${this.name} --key AnalyticsId --value 123 --description 'Web analytics ID' --comment 'Use on all sites' --appCatalogUrl https://contoso.sharepoint.com/sites/appcatalog
 
   More information:
 

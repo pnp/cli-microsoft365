@@ -5,7 +5,7 @@ Gets information about a specific run of the specified Microsoft Flow
 ## Usage
 
 ```sh
-flow run get [options]
+m365 flow run get [options]
 ```
 
 ## Options
@@ -37,5 +37,5 @@ If the run with the name you specified doesn't exist, you will get the `The prov
 Get information about the given run of the specified Microsoft Flow
 
 ```sh
-flow run get --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flow 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
+m365 flow run get --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flow 5923cb07-ce1a-4a5c-ab81-257ce820109a --name 08586653536760200319026785874CU62
 ```

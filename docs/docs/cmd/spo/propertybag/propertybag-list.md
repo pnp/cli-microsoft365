@@ -5,7 +5,7 @@ Gets property bag values
 ## Usage
 
 ```sh
-spo propertybag list [options]
+m365 spo propertybag list [options]
 ```
 
 ## Options
@@ -25,29 +25,29 @@ Option|Description
 Return property bag values located in site _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo propertybag list --webUrl https://contoso.sharepoint.com/sites/test
+m365 spo propertybag list --webUrl https://contoso.sharepoint.com/sites/test
 ```
 
 Return property bag values located in site root folder _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo propertybag list --webUrl https://contoso.sharepoint.com/sites/test --folder /
+m365 spo propertybag list --webUrl https://contoso.sharepoint.com/sites/test --folder /
 ```
 
 Return property bag values located in site document library _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo propertybag list --webUrl https://contoso.sharepoint.com/sites/test --folder '/Shared Documents'
+m365 spo propertybag list --webUrl https://contoso.sharepoint.com/sites/test --folder '/Shared Documents'
 ```
 
 Return property bag values located in folder in site document library _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo propertybag list --webUrl https://contoso.sharepoint.com/sites/test --folder '/Shared Documents/MyFolder'
+m365 spo propertybag list --webUrl https://contoso.sharepoint.com/sites/test --folder '/Shared Documents/MyFolder'
 ```
 
 Return property bag values located in site list _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-spo propertybag list --webUrl https://contoso.sharepoint.com/sites/test --folder /Lists/MyList
+m365 spo propertybag list --webUrl https://contoso.sharepoint.com/sites/test --folder /Lists/MyList
 ```

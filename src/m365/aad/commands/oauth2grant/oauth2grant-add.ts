@@ -138,11 +138,11 @@ class AadOAuth2GrantAddCommand extends AadCommand {
   
     Grant the service principal ${chalk.grey('d03a0062-1aa6-43e1-8f49-d73e969c5812')} the
     ${chalk.grey('Calendars.Read')} OAuth2 permissions to the ${chalk.grey('c2af2474-2c95-423a-b0e5-e4895f22f9e9')} resource.
-      ${commands.OAUTH2GRANT_ADD} --clientId d03a0062-1aa6-43e1-8f49-d73e969c5812 --resourceId c2af2474-2c95-423a-b0e5-e4895f22f9e9 --scope Calendars.Read
+      m365 ${this.name} --clientId d03a0062-1aa6-43e1-8f49-d73e969c5812 --resourceId c2af2474-2c95-423a-b0e5-e4895f22f9e9 --scope Calendars.Read
 
     Grant the service principal ${chalk.grey('d03a0062-1aa6-43e1-8f49-d73e969c5812')} the
     ${chalk.grey('Calendars.Read')} and ${chalk.grey('Mail.Read')} OAuth2 permissions to the ${chalk.grey('c2af2474-2c95-423a-b0e5-e4895f22f9e9')} resource.
-      ${commands.OAUTH2GRANT_ADD} --clientId d03a0062-1aa6-43e1-8f49-d73e969c5812 --resourceId c2af2474-2c95-423a-b0e5-e4895f22f9e9 --scope "Calendars.Read Mail.Read"
+      m365 ${this.name} --clientId d03a0062-1aa6-43e1-8f49-d73e969c5812 --resourceId c2af2474-2c95-423a-b0e5-e4895f22f9e9 --scope "Calendars.Read Mail.Read"
 
   More information:
   

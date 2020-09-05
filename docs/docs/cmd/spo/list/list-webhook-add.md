@@ -5,7 +5,7 @@ Adds a new webhook to the specified list
 ## Usage
 
 ```sh
-spo list webhook add [options]
+m365 spo list webhook add [options]
 ```
 
 ## Options
@@ -31,14 +31,14 @@ _https://contoso-funcions.azurewebsites.net/webhook_ and the default expiration
 date
 
 ```sh
-spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-funcions.azurewebsites.net/webhook
+m365 spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-funcions.azurewebsites.net/webhook
 ```
 
 Add a web hook to the list Documents located in site _https://contoso.sharepoint.com/sites/ninja_ with the notification url
 _https://contoso-funcions.azurewebsites.net/webhook_ and an expiration date of _January 21st, 2019_
 
 ```sh
-spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-funcions.azurewebsites.net/webhook --expirationDateTime 2019-01-21
+m365 spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-funcions.azurewebsites.net/webhook --expirationDateTime 2019-01-21
 ```
 
 Add a web hook to the list Documents located in site _https://contoso.sharepoint.com/sites/ninja_ with the notification url
@@ -46,5 +46,5 @@ _https://contoso-funcions.azurewebsites.net/webhook_, a very specific expiration
 a client state
 
 ```sh
-spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-funcions.azurewebsites.net/webhook --expirationDateTime '2019-03-02T18:15' --clientState "Hello State!"
+m365 spo list webhook add --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --notificationUrl https://contoso-funcions.azurewebsites.net/webhook --expirationDateTime '2019-03-02T18:15' --clientState "Hello State!"
 ```

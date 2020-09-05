@@ -5,7 +5,7 @@ Gets all files within the specified folder and site
 ## Usage
 
 ```sh
-spo file list [options]
+m365 spo file list [options]
 ```
 
 ## Options
@@ -25,5 +25,5 @@ Option|Description
 Return all files from folder _Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents'
+m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents'
 ```

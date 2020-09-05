@@ -270,28 +270,28 @@ class SpoWebSetCommand extends SpoCommand {
   Examples:
 
     Update subsite title
-      ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --title Team-a
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --title Team-a
 
     Hide quick launch on the subsite
-      ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --quickLaunchEnabled false
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --quickLaunchEnabled false
 
     Set site header layout to compact
-      ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --headerLayout compact
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --headerLayout compact
 
     Set site header color to primary theme background color
-      ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --headerEmphasis 0
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --headerEmphasis 0
 
     Enable megamenu in the site
-      ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --megaMenuEnabled true
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --megaMenuEnabled true
     
     Hide footer in the site
-      ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --footerEnabled false
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --footerEnabled false
 
     Set search scope to tenant scope
-      ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
   
     Set welcome page for the web
-      ${commands.WEB_SET} --webUrl https://contoso.sharepoint.com/sites/team-a --welcomePage "SitePages/new-home.aspx"
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --welcomePage "SitePages/new-home.aspx"
 
   More information:
     

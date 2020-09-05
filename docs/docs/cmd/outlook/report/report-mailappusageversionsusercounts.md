@@ -5,7 +5,7 @@ Gets the count of unique users by Outlook desktop version.
 ## Usage
 
 ```sh
-outlook report mailappusageversionsusercounts [options]
+m365 outlook report mailappusageversionsusercounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the count of unique users by Outlook desktop version for the last week
 
 ```sh
-outlook report mailappusageversionsusercounts --period D7
+m365 outlook report mailappusageversionsusercounts --period D7
 ```
 
 Gets the count of unique users by Outlook desktop version for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailappusageversionsusercounts --period D7 --output text > "mailappusageversionsusercounts.txt"
+m365 outlook report mailappusageversionsusercounts --period D7 --output text > "mailappusageversionsusercounts.txt"
 ```
 
 Gets the count of unique users by Outlook desktop version for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailappusageversionsusercounts --period D7 --output json > "mailappusageversionsusercounts.json"
+m365 outlook report mailappusageversionsusercounts --period D7 --output json > "mailappusageversionsusercounts.json"
 ```

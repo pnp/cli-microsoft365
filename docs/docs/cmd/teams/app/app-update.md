@@ -5,7 +5,7 @@ Updates Teams app in the organization's app catalog
 ## Usage
 
 ```sh
-teams app update [options]
+m365 teams app update [options]
 ```
 
 ## Options
@@ -29,5 +29,5 @@ You can only update a Teams app as a global administrator.
 Update the Teams app with ID _83cece1e-938d-44a1-8b86-918cf6151957_ from file _teams-manifest.zip_
 
 ```sh
-teams app update --id 83cece1e-938d-44a1-8b86-918cf6151957 --filePath ./teams-manifest.zip
+m365 teams app update --id 83cece1e-938d-44a1-8b86-918cf6151957 --filePath ./teams-manifest.zip
 ```

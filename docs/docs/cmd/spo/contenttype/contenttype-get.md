@@ -5,7 +5,7 @@ Retrieves information about the specified list or site content type
 ## Usage
 
 ```sh
-spo contenttype get [options]
+m365 spo contenttype get [options]
 ```
 
 ## Options
@@ -30,11 +30,11 @@ If no content type with the specified is found in the site or the list, you will
 Retrieve site content type
 
 ```sh
-spo contenttype get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 0x0100558D85B7216F6A489A499DB361E1AE2F
+m365 spo contenttype get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 0x0100558D85B7216F6A489A499DB361E1AE2F
 ```
 
 Retrieve list content type
 
 ```sh
-spo contenttype get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 0x0100558D85B7216F6A489A499DB361E1AE2F
+m365 spo contenttype get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 0x0100558D85B7216F6A489A499DB361E1AE2F
 ```

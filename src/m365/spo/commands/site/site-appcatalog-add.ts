@@ -112,7 +112,7 @@ class SpoSiteAppCatalogAddCommand extends SpoCommand {
   Examples:
   
     Add a site collection app catalog to the specified site
-      ${commands.SITE_APPCATALOG_ADD} --url https://contoso.sharepoint.com/sites/site
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/site
 
   More information:
     

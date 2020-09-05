@@ -775,47 +775,47 @@ class SpoSiteAddCommand extends SpoCommand {
   Examples:
 
     Create modern team site with private group
-      ${commands.SITE_ADD} --alias team1 --title "Team 1"
+      m365 ${this.name} --alias team1 --title "Team 1"
 
     Create modern team site with description and classification
-      ${commands.SITE_ADD} --type TeamSite --alias team1 --title "Team 1" --description "Site of Team 1" --classification LBI
+      m365 ${this.name} --type TeamSite --alias team1 --title "Team 1" --description "Site of Team 1" --classification LBI
 
     Create modern team site with public group
-      ${commands.SITE_ADD} --type TeamSite --alias team1 --title "Team 1" --isPublic
+      m365 ${this.name} --type TeamSite --alias team1 --title "Team 1" --isPublic
 
     Create modern team site using the Dutch language
-      ${commands.SITE_ADD} --alias team1 --title "Team 1" --lcid 1043
+      m365 ${this.name} --alias team1 --title "Team 1" --lcid 1043
 
     Create modern team site with the specified users as owners
-      ${commands.SITE_ADD} --alias team1 --title "Team 1" --owners "steve@contoso.com, bob@contoso.com"
+      m365 ${this.name} --alias team1 --title "Team 1" --owners "steve@contoso.com, bob@contoso.com"
 
     Create communication site using the Topic design
-      ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing
+      m365 ${this.name} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing
 
     Create communication site using app-only permissions
-      ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --owners "john.smith@contoso.com"
+      m365 ${this.name} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --owners "john.smith@contoso.com"
 
     Create communication site using the Showcase design
-      ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesign Showcase
+      m365 ${this.name} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesign Showcase
 
     Create communication site using a custom site design
-      ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesignId 99f410fe-dd79-4b9d-8531-f2270c9c621c
+      m365 ${this.name} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --siteDesignId 99f410fe-dd79-4b9d-8531-f2270c9c621c
 
     Create communication site using the Blank design with description and classification
-      ${commands.SITE_ADD} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --description Site of the marketing department --classification MBI --siteDesign Blank
+      m365 ${this.name} --type CommunicationSite --url https://contoso.sharepoint.com/sites/marketing --title Marketing --description Site of the marketing department --classification MBI --siteDesign Blank
 
     Create new classic site collection using the Team site template. Set time
     zone to UTC+01:00. Don't wait for the site provisioning to complete
-      ${commands.SITE_ADD} --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owners admin@contoso.onmicrosoft.com --timeZone 4
+      m365 ${this.name} --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owners admin@contoso.onmicrosoft.com --timeZone 4
 
     Create new classic site collection using the Team site template. Set time
     zone to UTC+01:00. Wait for the site provisioning to complete
-      ${commands.SITE_ADD} --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owners admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --wait
+      m365 ${this.name} --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owners admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --wait
 
     Create new classic site collection using the Team site template. Set time
     zone to UTC+01:00. If a site with the same URL is in the recycle bin, delete
     it. Wait for the site provisioning to complete
-      ${commands.SITE_ADD} --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owners admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --removeDeletedSite --wait 
+      m365 ${this.name} --type ClassicSite --url https://contoso.sharepoint.com/sites/team --title Team --owners admin@contoso.onmicrosoft.com --timeZone 4 --webTemplate STS#0 --removeDeletedSite --wait 
 
   More information
 

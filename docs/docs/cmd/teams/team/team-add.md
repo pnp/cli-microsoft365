@@ -5,7 +5,7 @@ Adds a new Microsoft Teams team
 ## Usage
 
 ```sh
-teams team add [options]
+m365 teams team add [options]
 ```
 
 ## Options
@@ -36,19 +36,19 @@ This command will return different responses based on the presence of the `--wai
 Add a new Microsoft Teams team
 
 ```sh
-teams team add --name 'Architecture' --description 'Architecture Discussion'
+m365 teams team add --name 'Architecture' --description 'Architecture Discussion'
 ```
 
 Add a new Microsoft Teams team using a template
 
 ```sh
-teams team add --name 'Architecture' --description 'Architecture Discussion' --templatePath 'template.json'
+m365 teams team add --name 'Architecture' --description 'Architecture Discussion' --templatePath 'template.json'
 ```
 
 Add a new Microsoft Teams team using a template and wait for the team to be provisioned
 
 ```sh
-teams team add --name 'Architecture' --description 'Architecture Discussion' --templatePath 'template.json' --wait
+m365 teams team add --name 'Architecture' --description 'Architecture Discussion' --templatePath 'template.json' --wait
 ```
 
 ## More information

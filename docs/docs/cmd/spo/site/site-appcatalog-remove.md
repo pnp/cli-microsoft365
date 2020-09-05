@@ -5,7 +5,7 @@ Removes site collection app catalog from the specified site
 ## Usage
 
 ```sh
-spo site appcatalog remove [options]
+m365 spo site appcatalog remove [options]
 ```
 
 ## Options
@@ -31,7 +31,7 @@ While the command uses the term *'remove'*, like its equivalent PowerShell cmdle
 Remove the site collection app catalog from specified site
 
 ```sh
-spo site appcatalog remove --url https://contoso.sharepoint/sites/site
+m365 spo site appcatalog remove --url https://contoso.sharepoint/sites/site
 ```
 
 ## More information

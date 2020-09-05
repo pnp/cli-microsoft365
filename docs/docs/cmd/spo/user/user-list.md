@@ -5,7 +5,7 @@ Lists all the users within specific web
 ## Usage
 
 ```sh
-spo user list [options]
+m365 spo user list [options]
 ```
 
 ## Options
@@ -24,5 +24,5 @@ Option|Description
 Get list of users in web _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo user list --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo user list --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
