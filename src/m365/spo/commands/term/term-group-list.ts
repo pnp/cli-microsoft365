@@ -89,7 +89,7 @@ class SpoTermGroupListCommand extends SpoCommand {
   Examples:
   
     List taxonomy term groups
-      ${commands.TERM_GROUP_LIST}
+      m365 ${this.name}
 `);
   }
 }

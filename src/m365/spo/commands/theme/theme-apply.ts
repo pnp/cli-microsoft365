@@ -213,10 +213,10 @@ class SpoThemeApplyCommand extends SpoCommand {
   Examples:
   
     Apply theme to the specified site
-      ${commands.THEME_APPLY} --name Contoso-Blue --webUrl https://contoso.sharepoint.com/sites/project-x
+      m365 ${this.name} --name Contoso-Blue --webUrl https://contoso.sharepoint.com/sites/project-x
 
     Apply a standard SharePoint theme to the specified site
-      ${commands.THEME_APPLY} --name Blue --webUrl https://contoso.sharepoint.com/sites/project-x --sharePointTheme
+      m365 ${this.name} --name Blue --webUrl https://contoso.sharepoint.com/sites/project-x --sharePointTheme
     
   More information:
 

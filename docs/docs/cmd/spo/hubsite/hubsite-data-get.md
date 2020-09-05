@@ -5,7 +5,7 @@ Get hub site data for the specified site
 ## Usage
 
 ```sh
-spo hubsite data get [options]
+m365 spo hubsite data get [options]
 ```
 
 ## Options
@@ -35,7 +35,7 @@ If the specified site is not connected to a hub site site and is not a hub site 
 Get information about the hub site data for a site with URL https://contoso.sharepoint.com/sites/project-x
 
 ```sh
-spo hubsite data get --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo hubsite data get --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 ## More information

@@ -5,7 +5,7 @@ Removes a site from the list of organizational news sites
 ## Usage
 
 ```sh
-spo orgnewssite remove [options]
+m365 spo orgnewssite remove [options]
 ```
 
 ## Options
@@ -28,11 +28,11 @@ Option|Description
 Remove a site from the list of organizational news
 
 ```sh
-spo orgnewssite remove --url https://contoso.sharepoint.com/sites/site1
+m365 spo orgnewssite remove --url https://contoso.sharepoint.com/sites/site1
 ```
 
 Remove a site from the list of organizational news sites, without prompting for confirmation
 
 ```sh
-spo orgnewssite remove --url https://contoso.sharepoint.com/sites/site1 --confirm
+m365 spo orgnewssite remove --url https://contoso.sharepoint.com/sites/site1 --confirm
 ```

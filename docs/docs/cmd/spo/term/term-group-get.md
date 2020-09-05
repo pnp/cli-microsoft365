@@ -5,7 +5,7 @@ Gets information about the specified taxonomy term group
 ## Usage
 
 ```sh
-spo term group get [options]
+m365 spo term group get [options]
 ```
 
 ## Options
@@ -28,11 +28,11 @@ Option|Description
 Get information about a taxonomy term group using its ID
 
 ```sh
-spo term group get --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
+m365 spo term group get --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
 ```
 
 Get information about a taxonomy term group using its name
 
 ```sh
-spo term group get --name PnPTermSets
+m365 spo term group get --name PnPTermSets
 ```

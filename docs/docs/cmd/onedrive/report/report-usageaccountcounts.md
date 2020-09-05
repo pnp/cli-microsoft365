@@ -5,7 +5,7 @@ Gets the trend in the number of active OneDrive for Business sites
 ## Usage
 
 ```sh
-onedrive report usageaccountcounts [options]
+m365 onedrive report usageaccountcounts [options]
 ```
 
 ## Options
@@ -28,17 +28,17 @@ Any site on which users viewed, modified, uploaded, downloaded, shared, or synce
 Gets the trend in the number of active OneDrive for Business sites for the last week
 
 ```sh
-onedrive report usageaccountcounts --period D7
+m365 onedrive report usageaccountcounts --period D7
 ```
 
 Gets the trend in the number of active OneDrive for Business sites for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report usageaccountcounts --period D7 --output text > "usageaccountcounts.txt"
+m365 onedrive report usageaccountcounts --period D7 --output text > "usageaccountcounts.txt"
 ```
 
 Gets the trend in the number of active OneDrive for Business sites for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report usageaccountcounts --period D7 --output json > "usageaccountcounts.json"
+m365 onedrive report usageaccountcounts --period D7 --output json > "usageaccountcounts.json"
 ```

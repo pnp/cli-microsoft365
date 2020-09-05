@@ -5,7 +5,7 @@ Lists member settings for a Microsoft Teams team
 ## Usage
 
 ```sh
-teams membersettings list [options]
+m365 teams membersettings list [options]
 ```
 
 ## Options
@@ -24,5 +24,5 @@ Option|Description
 Get member settings for a Microsoft Teams team
 
 ```sh
-teams membersettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
+m365 teams membersettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```

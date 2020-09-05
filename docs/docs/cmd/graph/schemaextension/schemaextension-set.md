@@ -5,7 +5,7 @@ Updates a Microsoft Graph schema extension
 ## Usage
 
 ```sh
-graph schemaextension set [options]
+m365 graph schemaextension set [options]
 ```
 
 ## Options
@@ -38,13 +38,13 @@ In addition, when using PowerShell, you should use the `--%` argument.
  Update the description of a schema extension
 
 ```sh
-graph schemaextension set --id MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --description "My schema extension" 
+m365 graph schemaextension set --id MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --description "My schema extension" 
 ```
 
 Update the target types and properties of a schema extension
 
 ```sh
-graph schemaextension set --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --targetTypes "Group,User" --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
+m365 graph schemaextension set --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --targetTypes "Group,User" --properties \`"[{""name"":""myProp1"",""type"":""Integer""},{""name"":""myProp2"",""type"":""String""}]\`
 ```
 
 Update the properties of a schema extension in PowerShell
@@ -56,5 +56,5 @@ graph schemaextension set --id contoso_MySchemaExtension --owner 62375ab9-6b52-4
 Change the status of a schema extension to 'Available'
 
 ```sh
-graph schemaextension set --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --status Available
+m365 graph schemaextension set --id contoso_MySchemaExtension --owner 62375ab9-6b52-47ed-826b-58e47e0e304b --status Available
 ```

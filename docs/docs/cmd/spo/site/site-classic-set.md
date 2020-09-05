@@ -5,7 +5,7 @@ Change classic site settings
 ## Usage
 
 ```sh
-spo site classic set [options]
+m365 spo site classic set [options]
 ```
 
 ## Options
@@ -56,17 +56,17 @@ Setting site properties is by default asynchronous and depending on the current 
 Change the title of the site collection. Don't wait for the configuration to complete
 
 ```sh
-spo site classic set --url https://contoso.sharepoint.com/sites/team --title Team
+m365 spo site classic set --url https://contoso.sharepoint.com/sites/team --title Team
 ```
 
 Add the specified user accounts as site collection administrators
 
 ```sh
-spo site classic set --url https://contoso.sharepoint.com/sites/team --owners "joe@contoso.com,steve@contoso.com"
+m365 spo site classic set --url https://contoso.sharepoint.com/sites/team --owners "joe@contoso.com,steve@contoso.com"
 ```
 
 Lock the site preventing users from accessing it. Wait for the configuration to complete
 
 ```sh
-spo site classic set --url https://contoso.sharepoint.com/sites/team --LockState NoAccess --wait
+m365 spo site classic set --url https://contoso.sharepoint.com/sites/team --LockState NoAccess --wait
 ```

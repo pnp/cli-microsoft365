@@ -146,16 +146,16 @@ class SiteClassicListCommand extends SpoCommand {
   Examples:
   
     List all sites in the tenant you're logged in to
-      ${commands.SITE_CLASSIC_LIST}
+      m365 ${this.name}
 
       List all sites (including OneDrive sites) in the tenant you're logged in to
-      ${commands.SITE_CLASSIC_LIST} --includeOneDriveSites    
+      m365 ${this.name} --includeOneDriveSites    
 
     List all classic team sites in the tenant you're logged in to
-      ${commands.SITE_CLASSIC_LIST} --webTemplate STS#0
+      m365 ${this.name} --webTemplate STS#0
 
     List all classic project sites that contain 'project' in the URL
-      ${commands.SITE_CLASSIC_LIST} --webTemplate PROJECTSITE#0 --filter "Url -like 'project'"
+      m365 ${this.name} --webTemplate PROJECTSITE#0 --filter "Url -like 'project'"
 `);
   }
 }

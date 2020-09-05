@@ -5,7 +5,7 @@ Exports the specified Microsoft Flow
 ## Usage
 
 ```sh
-flow export [options]
+m365 flow export [options]
 ```
 
 ## Options
@@ -40,23 +40,23 @@ If the Microsoft Flow with the id you specified doesn't exist, you will get the 
 Export the specified Microsoft Flow as a ZIP file
 
 ```sh
-flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d
+m365 flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d
 ```
 
 Export the specified Microsoft Flow as a JSON file
 
 ```sh
-flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --format json
+m365 flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --format json
 ```
 
 Export the specified Microsoft Flow as a ZIP file, specifying a Display Name of 'My flow name' to be embedded into the package
 
 ```sh
-flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --packageDisplayName 'My flow name'
+m365 flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --packageDisplayName 'My flow name'
 ```
 
 Export the specified Microsoft Flow as a ZIP file with the filename 'MyFlow.zip' saved to the current directory
 
 ```sh
-flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --path './MyFlow.zip'
+m365 flow export --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --id 3989cb59-ce1a-4a5c-bb78-257c5c39381d --path './MyFlow.zip'
 ```

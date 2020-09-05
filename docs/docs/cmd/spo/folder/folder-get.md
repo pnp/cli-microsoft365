@@ -5,7 +5,7 @@ Gets information about the specified folder
 ## Usage
 
 ```sh
-spo folder get [options]
+m365 spo folder get [options]
 ```
 
 ## Options
@@ -29,5 +29,5 @@ If no folder exists at the specified URL, you will get a `Please check the folde
 Get folder properties for folder with site-relative url _'/Shared Documents'_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo folder get --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents'
+m365 spo folder get --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents'
 ```

@@ -5,7 +5,7 @@ Adds site script for use with site designs
 ## Usage
 
 ```sh
-spo sitescript add [options]
+m365 spo sitescript add [options]
 ```
 
 ## Options
@@ -30,7 +30,7 @@ Each time you execute the `spo sitescript add` command, it will create a new sit
 Create new site script for use with site designs. Script contents are stored in the `$script` variable
 
 ```sh
-spo sitescript add --title "Contoso" --description "Contoso theme script" --content $script
+m365 spo sitescript add --title "Contoso" --description "Contoso theme script" --content $script
 ```
 
 ## More information

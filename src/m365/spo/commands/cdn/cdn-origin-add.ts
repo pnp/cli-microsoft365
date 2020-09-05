@@ -129,7 +129,7 @@ class SpoCdnOriginAddCommand extends SpoCommand {
   Examples:
   
     Add ${chalk.grey('*/CDN')} to the list of origins of the Public CDN
-      ${commands.CDN_ORIGIN_ADD} --type Public --origin */CDN
+      m365 ${this.name} --type Public --origin */CDN
 
   More information:
 

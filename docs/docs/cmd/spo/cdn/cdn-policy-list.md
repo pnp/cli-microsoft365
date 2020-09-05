@@ -5,7 +5,7 @@ Lists CDN policies settings for the current SharePoint Online tenant
 ## Usage
 
 ```sh
-spo cdn policy list [options]
+m365 spo cdn policy list [options]
 ```
 
 ## Options
@@ -31,13 +31,13 @@ Using the `-t, --type` option you can choose whether you want to manage the sett
 Show the list of policies configured for the Public CDN
 
 ```sh
-spo cdn policy list
+m365 spo cdn policy list
 ```
 
 Show the list of policies configured for the Private CDN
 
 ```sh
-spo cdn policy list -t Private
+m365 spo cdn policy list -t Private
 ```
 
 ## More information

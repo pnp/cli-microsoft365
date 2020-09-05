@@ -5,7 +5,7 @@ Adds a channel to the specified Microsoft Teams team
 ## Usage
 
 ```sh
-teams channel add [options]
+m365 teams channel add [options]
 ```
 
 ## Options
@@ -30,5 +30,5 @@ You can only add a channel to the Microsoft Teams team you are a member of.
 Add channel to the specified Microsoft Teams team
 
 ```sh
-teams channel add --teamId 6703ac8a-c49b-4fd4-8223-28f0ac3a6402 --name office365cli --description development
+m365 teams channel add --teamId 6703ac8a-c49b-4fd4-8223-28f0ac3a6402 --name office365cli --description development
 ```

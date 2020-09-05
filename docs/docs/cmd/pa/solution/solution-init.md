@@ -5,7 +5,7 @@ Initializes a directory with a new CDS solution project
 ## Usage
 
 ```sh
-pa solution init [options]
+m365 pa solution init [options]
 ```
 
 ## Options
@@ -31,7 +31,7 @@ PublisherPrefix must be 2 to 8 characters long, can only consist of alpha-numeri
 Initializes a CDS solution project using _yourPublisherName_ as publisher name and _ypn_ as publisher prefix
 
 ```sh
-pa solution init --publisherName yourPublisherName --publisherPrefix ypn
+m365 pa solution init --publisherName yourPublisherName --publisherPrefix ypn
 ```
 
 ## More information

@@ -5,7 +5,7 @@ Gets the number of unique pages visited by users
 ## Usage
 
 ```sh
-spo report activitypages [options]
+m365 spo report activitypages [options]
 ```
 
 ## Options
@@ -23,17 +23,17 @@ Option|Description
 Gets the number of unique pages visited by users for the last week
 
 ```sh
-spo report activitypages --period D7
+m365 spo report activitypages --period D7
 ```
 
 Gets the number of unique pages visited by users for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report activitypages --period D7 --output text > "activitypages.txt"
+m365 spo report activitypages --period D7 --output text > "activitypages.txt"
 ```
 
 Gets the number of unique pages visited by users for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report activitypages --period D7 --output json > "activitypages.json"
+m365 spo report activitypages --period D7 --output json > "activitypages.json"
 ```

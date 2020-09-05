@@ -121,11 +121,11 @@ class SpoAppInstallCommand extends SpoCommand {
   
     Install the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     in the ${chalk.grey('https://contoso.sharepoint.com')} site.
-      ${commands.APP_INSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
+      m365 ${this.name} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com
 
     Install the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     in the ${chalk.grey('https://contoso.sharepoint.com')} site from site collection app catalog.
-      ${commands.APP_INSTALL} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
+      m365 ${this.name} --id b2307a39-e878-458b-bc90-03bc578531d6 --siteUrl https://contoso.sharepoint.com --scope sitecollection
 
   More information:
   

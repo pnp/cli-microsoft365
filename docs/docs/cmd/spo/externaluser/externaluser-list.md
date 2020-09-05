@@ -5,7 +5,7 @@ Lists external users in the tenant
 ## Usage
 
 ```sh
-spo externaluser list [options]
+m365 spo externaluser list [options]
 ```
 
 ## Options
@@ -31,25 +31,25 @@ Option|Description
 List all external users from the current tenant. Show the first batch of 50 users.
 
 ```sh
-spo externaluser list --pageSize 50 --position 0
+m365 spo externaluser list --pageSize 50 --position 0
 ```
 
 List all external users from the current tenant whose first name, last name or email address
 begins with `Vesa`. Show the first batch of 50 users.
 
 ```sh
-spo externaluser list --pageSize 50 --position 0 --filter Vesa
+m365 spo externaluser list --pageSize 50 --position 0 --filter Vesa
 ```
 
 List all external users from the specified site. Show the first batch of 50 users.
 
 ```sh
-spo externaluser list --pageSize 50 --position 0 --siteUrl https://contoso.sharepoint.com
+m365 spo externaluser list --pageSize 50 --position 0 --siteUrl https://contoso.sharepoint.com
 ```
 
 List all external users from the current tenant. Show the first batch of 50 users sorted descending
 by e-mail.
 
 ```sh
-spo externaluser list --pageSize 50 --position 0 --sortOrder desc
+m365 spo externaluser list --pageSize 50 --position 0 --sortOrder desc
 ```

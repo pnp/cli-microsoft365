@@ -5,7 +5,7 @@ Gets information about the specified site design scheduled for execution
 ## Usage
 
 ```sh
-spo sitedesign task get [options]
+m365 spo sitedesign task get [options]
 ```
 
 ## Options
@@ -24,7 +24,7 @@ Option|Description
 Get information about the specified site design scheduled for execution
 
 ```sh
-spo sitedesign task get --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e
+m365 spo sitedesign task get --taskId 6ec3ca5b-d04b-4381-b169-61378556d76e
 ```
 
 ## More information

@@ -5,7 +5,7 @@ Applies theme to the specified site
 ## Usage
 
 ```sh
-spo theme apply [options]
+m365 spo theme apply [options]
 ```
 
 ## Options
@@ -33,13 +33,13 @@ Following standard SharePoint themes are supported by the CLI for Microsoft 365:
 Apply theme to the specified site
 
 ```sh
-spo theme apply --name Contoso-Blue --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo theme apply --name Contoso-Blue --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 Apply a standard SharePoint theme to the specified site
 
 ```sh
-spo theme apply --name Blue --webUrl https://contoso.sharepoint.com/sites/project-x --sharePointTheme
+m365 spo theme apply --name Blue --webUrl https://contoso.sharepoint.com/sites/project-x --sharePointTheme
 ```
 
 ## More information

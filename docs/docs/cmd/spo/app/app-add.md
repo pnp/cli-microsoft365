@@ -5,7 +5,7 @@ Adds an app to the specified SharePoint Online app catalog
 ## Usage
 
 ```sh
-spo app add [options]
+m365 spo app add [options]
 ```
 
 ## Options
@@ -37,19 +37,19 @@ If you try to upload a package that already exists in the app catalog without sp
 Add the _spfx.sppkg_ package to the tenant app catalog
 
 ```sh
-spo app add --filePath /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
+m365 spo app add --filePath /Users/pnp/spfx/sharepoint/solution/spfx.sppkg
 ```
 
 Overwrite the _spfx.sppkg_ package in the tenant app catalog with the newer version
 
 ```sh
-spo app add --filePath sharepoint/solution/spfx.sppkg --overwrite
+m365 spo app add --filePath sharepoint/solution/spfx.sppkg --overwrite
 ```
 
 Add the _spfx.sppkg_ package to the site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_
 
 ```sh
-spo app add --filePath c:\spfx.sppkg --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+m365 spo app add --filePath c:\spfx.sppkg --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 ## More information

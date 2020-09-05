@@ -5,7 +5,7 @@ Gets the total number of groups that existed and how many included group convers
 ## Usage
 
 ```sh
-yammer report groupsactivitygroupcounts [options]
+m365 yammer report groupsactivitygroupcounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the total number of groups that existed and how many included group conversation activity for the last week
 
 ```sh
-yammer report groupsactivitygroupcounts --period D7
+m365 yammer report groupsactivitygroupcounts --period D7
 ```
 
 Gets the total number of groups that existed and how many included group conversation activity for the last week and exports the report data in the specified path in text format
 
 ```sh
-yammer report groupsactivitygroupcounts --period D7 --output text > "groupsactivitygroupcounts.txt"
+m365 yammer report groupsactivitygroupcounts --period D7 --output text > "groupsactivitygroupcounts.txt"
 ```
 
 Gets the total number of groups that existed and how many included group conversation activity for the last week and exports the report data in the specified path in json format
 
 ```sh
-yammer report groupsactivitygroupcounts --period D7 --output json > "groupsactivitygroupcounts.json"
+m365 yammer report groupsactivitygroupcounts --period D7 --output json > "groupsactivitygroupcounts.json"
 ```

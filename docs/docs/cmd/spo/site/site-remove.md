@@ -5,7 +5,7 @@ Removes the specified site
 ## Usage
 
 ```sh
-spo site remove [options]
+m365 spo site remove [options]
 ```
 
 ## Options
@@ -35,23 +35,23 @@ Deleting a site collection is by default asynchronous and depending on the curre
 Remove the specified site and place it in the Recycle Bin
 
 ```sh
-spo site remove --url https://contoso.sharepoint.com/sites/demosite
+m365 spo site remove --url https://contoso.sharepoint.com/sites/demosite
 ```
 
 Remove the site without moving it to the Recycle Bin
 
 ```sh
-spo site remove --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
+m365 spo site remove --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
 ```
 
 Remove the previously deleted site from the Recycle Bin
 
 ```sh
-spo site remove --url https://contoso.sharepoint.com/sites/demosite --fromRecycleBin
+m365 spo site remove --url https://contoso.sharepoint.com/sites/demosite --fromRecycleBin
 ```
 
 Remove the site without moving it to the Recycle Bin and wait for completion
 
 ```sh
-spo site remove --url https://contoso.sharepoint.com/sites/demosite --wait --skipRecycleBin
+m365 spo site remove --url https://contoso.sharepoint.com/sites/demosite --wait --skipRecycleBin
 ```

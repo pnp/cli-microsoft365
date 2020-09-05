@@ -23,17 +23,17 @@ class YammerReportGroupsActivityGroupCountsCommand extends PeriodBasedReport {
       
     Gets the total number of groups that existed and how many included group
     conversation activity for the last week
-      ${commands.YAMMER_REPORT_GROUPSACTIVITYGROUPCOUNTS} --period D7
+      m365 ${this.name} --period D7
 
     Gets the total number of groups that existed and how many included group
     conversation activity for the last week and exports the report data in
     the specified path in text format
-      ${commands.YAMMER_REPORT_GROUPSACTIVITYGROUPCOUNTS} --period D7 --output text > "groupsactivitygroupcounts.txt"
+      m365 ${this.name} --period D7 --output text > "groupsactivitygroupcounts.txt"
 
     Gets the total number of groups that existed and how many included group
     conversation activity for the last week and exports the report data in
     the specified path in json format
-      ${commands.YAMMER_REPORT_GROUPSACTIVITYGROUPCOUNTS} --period D7 --output json > "groupsactivitygroupcounts.json"
+      m365 ${this.name} --period D7 --output json > "groupsactivitygroupcounts.json"
 `);
   }
 }

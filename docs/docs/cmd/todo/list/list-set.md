@@ -5,7 +5,7 @@ Updates a Microsoft To Do task list
 ## Usage
 
 ```sh
-todo list set [options]
+m365 todo list set [options]
 ```
 
 ## Options
@@ -30,5 +30,5 @@ Option|Description
 Rename the specified list to "My updated task list"
 
 ```sh
-todo list set --id "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=" --name "My updated task list"
+m365 todo list set --id "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=" --name "My updated task list"
 ```

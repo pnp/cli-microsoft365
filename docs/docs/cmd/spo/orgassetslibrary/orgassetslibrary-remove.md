@@ -5,7 +5,7 @@ Removes a library that was designated as a central location for organization ass
 ## Usage
 
 ```sh
-spo orgassetslibrary remove [options]
+m365 spo orgassetslibrary remove [options]
 ```
 
 ## Options
@@ -28,5 +28,5 @@ Option|Description
 Removes organization assets library without confirmation
 
 ```sh
-spo orgassetslibrary remove --libraryUrl "/sites/branding/assets" --confirm
+m365 spo orgassetslibrary remove --libraryUrl "/sites/branding/assets" --confirm
 ```

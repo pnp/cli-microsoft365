@@ -5,7 +5,7 @@ Gets the count of unique users per email app
 ## Usage
 
 ```sh
-outlook report mailappusageappsusercounts [options]
+m365 outlook report mailappusageappsusercounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the count of unique users per email app for the last week
 
 ```sh
-outlook report mailappusageappsusercounts --period D7
+m365 outlook report mailappusageappsusercounts --period D7
 ```
 
 Gets the count of unique users per email app for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailappusageappsusercounts --period D7 --output text > "mailappusageappsusercounts.txt"
+m365 outlook report mailappusageappsusercounts --period D7 --output text > "mailappusageappsusercounts.txt"
 ```
 
 Gets the count of unique users per email app for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailappusageappsusercounts --period D7 --output json > "mailappusageappsusercounts.json"
+m365 outlook report mailappusageappsusercounts --period D7 --output json > "mailappusageappsusercounts.json"
 ```

@@ -5,7 +5,7 @@ Update OAuth2 permissions for the service principal
 ## Usage
 
 ```sh
-aad oauth2grant set [options]
+m365 aad oauth2grant set [options]
 ```
 
 ## Options
@@ -27,7 +27,7 @@ Before you can update service principal's OAuth2 permissions, you need to get th
 If the `objectId` listed when using the [aad oauth2grant list](./oauth2grant-list.md) command has a minus sign ('-') prefix, you may receive an error indicating `--grantId` is missing.  To resolve this issue simply escape the leading '-'.  
 
 ```sh
-aad oauth2grant set --grantId \\-Zc1JRY8REeLxmXz5KtixAYU3Q6noCBPlhwGiX7pxmU
+m365 aad oauth2grant set --grantId \\-Zc1JRY8REeLxmXz5KtixAYU3Q6noCBPlhwGiX7pxmU
 ```
 
 ## Examples
@@ -35,7 +35,7 @@ aad oauth2grant set --grantId \\-Zc1JRY8REeLxmXz5KtixAYU3Q6noCBPlhwGiX7pxmU
 Update the existing OAuth2 permission grant with ID _YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek_ to the _Calendars.Read Mail.Read_ permissions
 
 ```sh
-aad oauth2grant set --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek --scope "Calendars.Read Mail.Read"
+m365 aad oauth2grant set --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek --scope "Calendars.Read Mail.Read"
 ```
 
 ## More information

@@ -256,13 +256,13 @@ class SpoWebAddCommand extends SpoCommand {
       `  Examples:
     
       Create subsite using the ${chalk.grey('Team site')} template in the ${chalk.grey('en-US')} locale
-        ${commands.WEB_ADD} --title Subsite --description Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033
+        m365 ${this.name} --title Subsite --description Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --locale 1033
 
       Create subsite with unique permissions using the default ${chalk.grey('en-US')} locale
-        ${commands.WEB_ADD} --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --breakInheritance
+        m365 ${this.name} --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --breakInheritance
 
       Create subsite with the same navigation as the parent site
-        ${commands.WEB_ADD} --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --inheritNavigation
+        m365 ${this.name} --title Subsite --webUrl subsite --webTemplate STS#0 --parentWebUrl https://contoso.sharepoint.com --inheritNavigation
   ` );
   }
 }

@@ -154,11 +154,11 @@ class SpoAppListCommand extends SpoAppBaseCommand {
   
     Return the list of available apps from the tenant app catalog.
     Show the installed version in the site if applicable.
-      ${commands.APP_LIST}
+      m365 ${this.name}
 
     Return the list of available apps from a site collection app catalog
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      ${commands.APP_LIST} --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+      m365 ${this.name} --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 
   More information:
   

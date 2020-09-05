@@ -5,7 +5,7 @@ Updates properties of the specified site
 ## Usage
 
 ```sh
-spo site set [options]
+m365 spo site set [options]
 ```
 
 ## Options
@@ -43,53 +43,53 @@ When setting owners, the specified owners will be added to the already configure
 Update site collection's classification
 
 ```sh
-spo site set --url https://contoso.sharepoint.com/sites/sales --classification MBI
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --classification MBI
 ```
 
 Reset site collection's classification.
 
 ```sh
-spo site set --url https://contoso.sharepoint.com/sites/sales --classification
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --classification
 ```
 
 Disable using Microsoft Flow on the site collection
 
 ```sh
-spo site set --url https://contoso.sharepoint.com/sites/sales --disableFlows true
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --disableFlows true
 ```
 
 Update the visibility of the Microsoft 365 group behind the specified groupified site collection to public
 
 ```sh
-spo site set --url https://contoso.sharepoint.com/sites/sales --isPublic true
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --isPublic true
 ```
 
 Update site collection's owners
 
 ```sh
-spo site set --url https://contoso.sharepoint.com/sites/sales --owners "john@contoso.onmicrosoft.com,steve@contoso.onmicrosoft.com"
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --owners "john@contoso.onmicrosoft.com,steve@contoso.onmicrosoft.com"
 ```
 
 Allow sharing files in the site collection with guests
 
 ```sh
-spo site set --url https://contoso.sharepoint.com/sites/sales --shareByEmailEnabled true
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --shareByEmailEnabled true
 ```
 
 Apply the specified site ID to the site collection
 
 ```sh
-spo site set --url https://contoso.sharepoint.com/sites/sales --siteDesignId "eb2f31da-9461-4fbf-9ea1-9959b134b89e"
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --siteDesignId "eb2f31da-9461-4fbf-9ea1-9959b134b89e"
 ```
 
 Update site collection's title
 
 ```sh
-spo site set --url https://contoso.sharepoint.com/sites/sales --title "My new site"
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --title "My new site"
 ```
 
 Restrict external sharing to already available external users only
 
 ```sh
-spo site set --url https://contoso.sharepoint.com/sites/sales --sharingCapability ExistingExternalUserSharingOnly
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --sharingCapability ExistingExternalUserSharingOnly
 ```

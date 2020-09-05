@@ -5,7 +5,7 @@ Copies a folder to another location
 ## Usage
 
 ```sh
-spo folder copy [options]
+m365 spo folder copy [options]
 ```
 
 ## Options
@@ -31,19 +31,19 @@ When you copy a folder with documents that have version history, only the latest
 Copies folder from a document library located in one site collection to another site collection
 
 ```sh
-spo folder copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/
+m365 spo folder copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/
 ```
 
 Copies folder from a document library to another site in the same site collection
 
 ```sh
-spo folder copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
+m365 spo folder copy --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
 ```
 
 Copies folder to a document library in another site collection. Allow for schema mismatch
 
 ```sh
-spo folder cope --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+m365 spo folder cope --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 ```
 
 ## More information

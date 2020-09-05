@@ -152,7 +152,7 @@ class SpoCdnPolicySetCommand extends SpoCommand {
   Examples:
   
     Set the list of extensions supported by the Public CDN
-      ${commands.CDN_POLICY_SET} --type Public --policy IncludeFileExtensions --value CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON
+      m365 ${this.name} --type Public --policy IncludeFileExtensions --value CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON
 
   More information:
 

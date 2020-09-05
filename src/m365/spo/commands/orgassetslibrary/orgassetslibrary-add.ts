@@ -127,10 +127,10 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
   Examples:
 
     Promotes an existing library to become an organization assets library
-      ${commands.ORGASSETSLIBRARY_ADD} --libraryUrl "https://contoso.sharepoint.com/assets"
+      m365 ${this.name} --libraryUrl "https://contoso.sharepoint.com/assets"
 
     Promotes an existing library to become an organization assets library with Thumbnail
-      ${commands.ORGASSETSLIBRARY_ADD} --libraryUrl "https://contoso.sharepoint.com/assets" --thumbnailUrl "https://contoso.sharepoint.com/assets/logo.png"
+      m365 ${this.name} --libraryUrl "https://contoso.sharepoint.com/assets" --thumbnailUrl "https://contoso.sharepoint.com/assets/logo.png"
   `);
   }
 }

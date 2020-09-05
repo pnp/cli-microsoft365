@@ -22,15 +22,15 @@ class OutlookReportMailboxUsageStorageCommand extends PeriodBasedReport {
       `  Examples:
       
     Gets the amount of mailbox storage used in your organization for the last week
-      ${commands.OUTLOOK_REPORT_MAILBOXUSAGESTORAGE} --period D7
+      m365 ${this.name} --period D7
 
     Gets the amount of mailbox storage used in your organization for the last week
     and exports the report data in the specified path in text format
-      ${commands.OUTLOOK_REPORT_MAILBOXUSAGESTORAGE} --period D7 --output text > "mailboxusagestorage.txt"
+      m365 ${this.name} --period D7 --output text > "mailboxusagestorage.txt"
 
     Gets the amount of mailbox storage used in your organization for the last week
     and exports the report data in the specified path in json format
-      ${commands.OUTLOOK_REPORT_MAILBOXUSAGESTORAGE} --period D7 --output json > "mailboxusagestorage.json"
+      m365 ${this.name} --period D7 --output json > "mailboxusagestorage.json"
 `);
   }
 }

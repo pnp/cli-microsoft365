@@ -5,7 +5,7 @@ Gets the total number of files across all sites and how many are active files
 ## Usage
 
 ```sh
-onedrive report usagefilecounts [options]
+m365 onedrive report usagefilecounts [options]
 ```
 
 ## Options
@@ -28,17 +28,17 @@ A file is considered active if it has been saved, synced, modified, or shared wi
 Gets the total number of files across all sites and how many are active files for the last week
 
 ```sh
-onedrive report usagefilecounts --period D7
+m365 onedrive report usagefilecounts --period D7
 ```
 
 Gets the total number of files across all sites and how many are active files for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report usagefilecounts --period D7 --output text > "usagefilecounts.txt"
+m365 onedrive report usagefilecounts --period D7 --output text > "usagefilecounts.txt"
 ```
 
 Gets the total number of files across all sites and how many are active files for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report usagefilecounts --period D7 --output json > "usagefilecounts.json"
+m365 onedrive report usagefilecounts --period D7 --output json > "usagefilecounts.json"
 ```

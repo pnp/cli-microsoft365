@@ -5,7 +5,7 @@ Gets information about the specific webhook
 ## Usage
 
 ```sh
-spo list webhook get [options]
+m365 spo list webhook get [options]
 ```
 
 ## Options
@@ -31,11 +31,11 @@ If the specified `id` doesn't refer to an existing webhook, you will get a `404 
 Return information about a webhook with ID _cc27a922-8224-4296-90a5-ebbc54da2e85_ which belongs to a list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list webhook get --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e85
+m365 spo list webhook get --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e85
 ```
 
 Return information about a webhook with ID _cc27a922-8224-4296-90a5-ebbc54da2e85_ which belongs to a list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list webhook get --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e85
+m365 spo list webhook get --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e85
 ```

@@ -144,11 +144,11 @@ class SpoUserRemoveCommand extends SpoCommand {
   
     Removes user with id 10 from web https://contoso.sharepoint.com/sites/HR 
     without prompting for confirmation
-      ${commands.USER_REMOVE} --webUrl "https://contoso.sharepoint.com/sites/HR" --id 10 --confirm
+      m365 ${this.name} --webUrl "https://contoso.sharepoint.com/sites/HR" --id 10 --confirm
 
     Removes user with login name i:0#.f|membership|john.doe@mytenant.onmicrosoft.com 
     from web https://contoso.sharepoint.com/sites/HR
-      ${commands.USER_REMOVE} --webUrl "https://contoso.sharepoint.com/sites/HR" --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+      m365 ${this.name} --webUrl "https://contoso.sharepoint.com/sites/HR" --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
   `);
   }
 }

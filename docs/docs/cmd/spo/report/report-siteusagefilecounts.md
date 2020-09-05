@@ -5,7 +5,7 @@ Get the total number of files across all sites and the number of active files
 ## Usage
 
 ```sh
-spo report siteusagefilecounts [options]
+m365 spo report siteusagefilecounts [options]
 ```
 
 ## Options
@@ -28,17 +28,17 @@ A file (user or system) is considered active if it has been saved, synced, modif
 Get the total number of files across all sites and the number of active files for the last week
 
 ```sh
-spo report siteusagefilecounts --period D7
+m365 spo report siteusagefilecounts --period D7
 ```
 
 Get the total number of files across all sites and the number of active files for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report siteusagefilecounts --period D7 --output text > "siteusagefilecounts.txt"
+m365 spo report siteusagefilecounts --period D7 --output text > "siteusagefilecounts.txt"
 ```
 
 Get the total number of files across all sites and the number of active files for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report siteusagefilecounts --period D7 --output json > "siteusagefilecounts.json"
+m365 spo report siteusagefilecounts --period D7 --output json > "siteusagefilecounts.json"
 ```

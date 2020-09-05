@@ -269,16 +269,16 @@ class SpoSiteRemoveCommand extends SpoCommand {
   Examples:
 
     Remove the specified site and place it in the Recycle Bin
-      ${commands.SITE_REMOVE} --url https://contoso.sharepoint.com/sites/demosite 
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/demosite 
 
     Remove the site without moving it to the Recycle Bin
-      ${commands.SITE_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/demosite --skipRecycleBin
 
     Remove the previously deleted site from the Recycle Bin
-      ${commands.SITE_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --fromRecycleBin
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/demosite --fromRecycleBin
 
     Remove the site without moving it to the Recycle Bin and wait for completion 
-      ${commands.SITE_REMOVE} --url https://contoso.sharepoint.com/sites/demosite --wait --skipRecycleBin
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/demosite --wait --skipRecycleBin
 `);
   }
 }

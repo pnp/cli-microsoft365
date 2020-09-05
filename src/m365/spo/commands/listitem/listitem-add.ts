@@ -283,32 +283,32 @@ class SpoListItemAddCommand extends SpoCommand {
   
     Add an item with Title ${chalk.grey('Demo Item')} and content type name ${chalk.grey('Item')} to list with
     title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Item"
+      m365 ${this.name} --contentType Item --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Item"
 
     Add an item with Title ${chalk.grey('Demo Multi Managed Metadata Field')} and
     a single-select metadata field named ${chalk.grey('SingleMetadataField')} to list with
     title ${chalk.grey('Demo List')} in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Managed Metadata Field" --SingleMetadataField "TermLabel1|fa2f6bfd-1fad-4d18-9c89-289fe6941377;"
+      m365 ${this.name} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Managed Metadata Field" --SingleMetadataField "TermLabel1|fa2f6bfd-1fad-4d18-9c89-289fe6941377;"
 
     Add an item with Title ${chalk.grey('Demo Multi Managed Metadata Field')} and a multi-select
     metadata field named ${chalk.grey('MultiMetadataField')} to list with title ${chalk.grey('Demo List')}
     in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Managed Metadata Field" --MultiMetadataField "TermLabel1|cf8c72a1-0207-40ee-aebd-fca67d20bc8a;TermLabel2|e5cc320f-8b65-4882-afd5-f24d88d52b75;"
+      m365 ${this.name} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Managed Metadata Field" --MultiMetadataField "TermLabel1|cf8c72a1-0207-40ee-aebd-fca67d20bc8a;TermLabel2|e5cc320f-8b65-4882-afd5-f24d88d52b75;"
   
     Add an item with Title ${chalk.grey('Demo Single Person Field')} and a single-select people
     field named ${chalk.grey('SinglePeopleField')} to list with title ${chalk.grey('Demo List')} in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Person Field" --SinglePeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'}]"
+      m365 ${this.name} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Single Person Field" --SinglePeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'}]"
       
     Add an item with Title ${chalk.grey('Demo Multi Person Field')} and a multi-select people
     field named ${chalk.grey('MultiPeopleField')} to list with title ${chalk.grey('Demo List')} in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
+      m365 ${this.name} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Multi Person Field" --MultiPeopleField "[{'Key':'i:0#.f|membership|markh@conotoso.com'},{'Key':'i:0#.f|membership|adamb@conotoso.com'}]"
     
     Add an item with Title ${chalk.grey('Demo Hyperlink Field')} and a hyperlink field named
     ${chalk.grey('CustomHyperlink')} to list with title ${chalk.grey('Demo List')} in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LISTITEM_ADD} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
+      m365 ${this.name} --listTitle "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --Title "Demo Hyperlink Field" --CustomHyperlink "https://www.bing.com, Bing"
    `);
   }
 

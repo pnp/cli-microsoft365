@@ -120,10 +120,10 @@ class SpoThemeRemoveCommand extends SpoCommand {
   Examples:
 
     Remove theme. Will prompt for confirmation before removing the theme
-      ${commands.THEME_REMOVE} --name Contoso-Blue
+      m365 ${this.name} --name Contoso-Blue
   
     Remove theme without prompting for confirmation
-      ${commands.THEME_REMOVE} --name Contoso-Blue --confirm
+      m365 ${this.name} --name Contoso-Blue --confirm
 
   More information:
 

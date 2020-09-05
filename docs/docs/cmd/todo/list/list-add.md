@@ -5,7 +5,7 @@ Adds a new Microsoft To Do task list
 ## Usage
 
 ```sh
-todo list add [options]
+m365 todo list add [options]
 ```
 
 ## Options
@@ -29,5 +29,5 @@ Option|Description
 Add a task list with the name _My task list_
       
 ```sh
-todo list add --name "My task list"
+m365 todo list add --name "My task list"
 ```

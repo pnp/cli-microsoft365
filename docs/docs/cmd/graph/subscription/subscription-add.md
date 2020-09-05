@@ -5,7 +5,7 @@ Creates a Microsoft Graph subscription
 ## Usage
 
 ```sh
-graph subscription add [options]
+m365 graph subscription add [options]
 ```
 
 ## Options
@@ -42,19 +42,19 @@ To subscribe to change notifications of Outlook contacts, events, or messages in
 Create a subscription
 
 ```sh
-graph subscription add --resource "me/mailFolders('Inbox')/messages" --changeType "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
+m365 graph subscription add --resource "me/mailFolders('Inbox')/messages" --changeType "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
 
 ```
 
 Create a subscription on multiple change types
 
 ```sh
-graph subscription add --resource groups --changeType updated,deleted --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
+m365 graph subscription add --resource groups --changeType updated,deleted --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient" --expirationDateTime "2016-11-20T18:23:45.935Z" --clientState "secretClientState"
 
 ```
 
 Create a subscription using the maximum allowed expiration for Group resources
 
 ```sh
-graph subscription add --resource groups --changeType "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient"
+m365 graph subscription add --resource groups --changeType "updated" --notificationUrl "https://webhook.azurewebsites.net/api/send/myNotifyClient"
 ```

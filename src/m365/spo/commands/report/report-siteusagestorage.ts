@@ -22,15 +22,15 @@ class SpoReportSiteUsageStorageCommand extends PeriodBasedReport {
       `  Examples:
       
     Gets the trend of storage allocated and consumed during the last week
-      ${commands.REPORT_SITEUSAGESTORAGE} --period D7
+      m365 ${this.name} --period D7
 
     Gets the trend of storage allocated and consumed during the last week
     and exports the report data in the specified path in text format
-      ${commands.REPORT_SITEUSAGESTORAGE} --period D7 --output text > "siteusagestorage.txt"
+      m365 ${this.name} --period D7 --output text > "siteusagestorage.txt"
 
     Gets the trend of storage allocated and consumed during the last week
     and exports the report data in the specified path in json format
-      ${commands.REPORT_SITEUSAGESTORAGE} --period D7 --output json > "siteusagestorage.json"
+      m365 ${this.name} --period D7 --output json > "siteusagestorage.json"
 `);
   }
 }

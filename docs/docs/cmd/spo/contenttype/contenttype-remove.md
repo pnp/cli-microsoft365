@@ -5,7 +5,7 @@ Deletes site content type
 ## Usage
 
 ```sh
-spo contenttype remove [options]
+m365 spo contenttype remove [options]
 ```
 
 ## Options
@@ -33,17 +33,17 @@ The content type you wish to remove can be selected by the ID or Name of the con
 Remove a site content type by ID
 
 ```sh
-spo contenttype remove --id "0x01007926A45D687BA842B947286090B8F67D" --webUrl https://contoso.sharepoint.com
+m365 spo contenttype remove --id "0x01007926A45D687BA842B947286090B8F67D" --webUrl https://contoso.sharepoint.com
 ```
 
 Remove a site content type by Name
 
 ```sh
-spo contenttype remove --name "My Content Type" --webUrl https://contoso.sharepoint.com --confirm
+m365 spo contenttype remove --name "My Content Type" --webUrl https://contoso.sharepoint.com --confirm
 ```
 
 Remove a site content type without prompting for confirmation
 
 ```sh
-spo contenttype remove --name "My Content Type" --webUrl https://contoso.sharepoint.com --confirm
+m365 spo contenttype remove --name "My Content Type" --webUrl https://contoso.sharepoint.com --confirm
 ```

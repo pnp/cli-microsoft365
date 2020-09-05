@@ -5,7 +5,7 @@ Activates or deactivates in-place records management for a site collection
 ## Usage
 
 ```sh
-spo site inplacerecordsmanagement set [options]
+m365 spo site inplacerecordsmanagement set [options]
 ```
 
 ## Options
@@ -25,11 +25,11 @@ Option|Description
 Activates in-place records management for site _https://contoso.sharepoint.com/sites/team-a_
 
 ```sh
-spo site inplacerecordsmanagement set --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled true
+m365 spo site inplacerecordsmanagement set --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled true
 ```
 
 Deactivates in-place records management for site _https://contoso.sharepoint.com/sites/team-a_
 
 ```sh
-spo site inplacerecordsmanagement set --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled false
+m365 spo site inplacerecordsmanagement set --siteUrl https://contoso.sharepoint.com/sites/team-a --enabled false
 ```

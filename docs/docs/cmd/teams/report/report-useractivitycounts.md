@@ -5,7 +5,7 @@ Get the number of Microsoft Teams activities by activity type. The activity type
 ## Usage
 
 ```sh
-teams report useractivitycounts [options]
+m365 teams report useractivitycounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the number of Microsoft Teams activities by activity type for the last week
 
 ```sh
-teams report useractivitycounts --period D7
+m365 teams report useractivitycounts --period D7
 ```
 
 Gets the number of Microsoft Teams activities by activity type for the last week and exports the report data in the specified path in text format
 
 ```sh
-teams report useractivitycounts --period D7 --output text > "useractivitycounts.txt"
+m365 teams report useractivitycounts --period D7 --output text > "useractivitycounts.txt"
 ```
 
 Gets the number of Microsoft Teams activities by activity type for the last week and exports the report data in the specified path in json format
 
 ```sh
-teams report useractivitycounts --period D7 --output json > "useractivitycounts.json"
+m365 teams report useractivitycounts --period D7 --output json > "useractivitycounts.json"
 ```

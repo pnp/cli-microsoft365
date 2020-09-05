@@ -160,7 +160,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
   Examples:
   
     Remove ${chalk.grey('*/CDN')} from the list of origins of the Public CDN
-      ${commands.CDN_ORIGIN_REMOVE} -t Public -r */CDN
+      m365 ${this.name} -t Public -r */CDN
 
   More information:
 

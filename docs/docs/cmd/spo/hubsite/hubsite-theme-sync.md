@@ -5,7 +5,7 @@ Applies any theme updates from the parent hub site.
 ## Usage
 
 ```sh
-spo hubsite theme sync [options]
+m365 spo hubsite theme sync [options]
 ```
 
 ## Options
@@ -29,7 +29,7 @@ Option|Description
 Applies any theme updates from the parent hub site to the site with URL https://contoso.sharepoint.com/sites/project-x
 
 ```sh
-spo hubsite theme sync --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo hubsite theme sync --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 ## More information

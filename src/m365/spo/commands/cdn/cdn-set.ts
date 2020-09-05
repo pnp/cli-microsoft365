@@ -198,21 +198,21 @@ class SpoCdnSetCommand extends SpoCommand {
   Examples:
   
     Enable the Microsoft 365 Public CDN on the current tenant
-      ${commands.CDN_SET} --type Public --enabled true
+      m365 ${this.name} --type Public --enabled true
 
     Disable the Microsoft 365 Public CDN on the current tenant
-      ${commands.CDN_SET} --type Public --enabled false
+      m365 ${this.name} --type Public --enabled false
 
     Enable the Microsoft 365 Private CDN on the current tenant
-      ${commands.CDN_SET} --type Private --enabled true
+      m365 ${this.name} --type Private --enabled true
   
     Enable the Microsoft 365 Private and Public CDN on the current tenant with
     default origins 
-      ${commands.CDN_SET} --type Both --enabled true 
+      m365 ${this.name} --type Both --enabled true 
 
     Enable the Microsoft 365 Private and Public CDN on the current tenant without
     the default origins 
-      ${commands.CDN_SET} --type Both --enabled true --noDefaultOrigins
+      m365 ${this.name} --type Both --enabled true --noDefaultOrigins
 
   More information:
 

@@ -5,7 +5,7 @@ Sets user profile property for a SharePoint user
 ## Usage
 
 ```sh
-spo userprofile set [options]
+m365 spo userprofile set [options]
 ```
 
 ## Options
@@ -30,11 +30,11 @@ You have to have tenant admin permissions in order to use this command to update
  Updates the single-value _AboutMe_ property
 
 ```sh
-spo userprofile set --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'AboutMe' --propertyValue 'Working as a Microsoft 365 developer'
+m365 spo userprofile set --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'AboutMe' --propertyValue 'Working as a Microsoft 365 developer'
 ```
 
 Updates the multi-value _SPS-Skills_ property
 
 ```sh
-spo userprofile set --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'SPS-Skills' --propertyValue 'CSS, HTML'
+m365 spo userprofile set --userName 'john.doe@mytenant.onmicrosoft.com' --propertyName 'SPS-Skills' --propertyValue 'CSS, HTML'
 ```

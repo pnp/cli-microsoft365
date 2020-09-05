@@ -5,7 +5,7 @@ Gets information about the site scripts executed for the specified site design
 ## Usage
 
 ```sh
-spo sitedesign run status get [options]
+m365 spo sitedesign run status get [options]
 ```
 
 ## Options
@@ -29,7 +29,7 @@ For text output mode, displays the name of the action, site script and the outco
 List information about site scripts executed for the specified site design
 
 ```sh
-spo sitedesign run status get --webUrl https://contoso.sharepoint.com/sites/team-a --runId b4411557-308b-4545-a3c4-55297d5cd8c8
+m365 spo sitedesign run status get --webUrl https://contoso.sharepoint.com/sites/team-a --runId b4411557-308b-4545-a3c4-55297d5cd8c8
 ```
 
 ## More information

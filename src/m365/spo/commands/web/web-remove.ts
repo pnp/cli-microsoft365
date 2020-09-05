@@ -115,7 +115,7 @@ class SpoWebAddCommand extends SpoCommand {
       `  Examples:
   
     Delete subsite without prompting for confirmation
-      ${commands.WEB_REMOVE} --webUrl https://contoso.sharepoint.com/subsite --confirm
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/subsite --confirm
   ` );
   }
 }

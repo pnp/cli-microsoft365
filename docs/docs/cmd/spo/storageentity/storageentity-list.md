@@ -5,7 +5,7 @@ Lists tenant properties stored on the specified SharePoint Online app catalog
 ## Usage
 
 ```sh
-spo storageentity list [options]
+m365 spo storageentity list [options]
 ```
 
 ## Options
@@ -28,7 +28,7 @@ Tenant properties are stored in the app catalog site. To list all tenant propert
 List all tenant properties stored in the _https://contoso.sharepoint.com/sites/appcatalog_ app catalog site
 
 ```sh
-spo storageentity list -u https://contoso.sharepoint.com/sites/appcatalog
+m365 spo storageentity list -u https://contoso.sharepoint.com/sites/appcatalog
 ```
 
 ## More information

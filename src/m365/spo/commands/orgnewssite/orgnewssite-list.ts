@@ -82,7 +82,7 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
   Examples:
   
     List all organizational news sites
-      ${commands.ORGNEWSSITE_LIST}
+      m365 ${this.name}
   `);
 
   }

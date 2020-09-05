@@ -5,7 +5,7 @@ Externalizes SharePoint Framework project dependencies
 ## Usage
 
 ```sh
-spfx project externalize [options]
+m365 spfx project externalize [options]
 ```
 
 ## Options
@@ -35,11 +35,11 @@ This command doesn't change your project files. Instead, it gives you a report w
 Get instructions to externalize the current SharePoint Framework project dependencies and save the findings in a Markdown file
 
 ```sh
-spfx project externalize --output md > "deps-report.md"
+m365 spfx project externalize --output md > "deps-report.md"
 ```
 
 Get instructions to externalize the current SharePoint Framework project dependencies and show the summary of the findings in the terminal
 
 ```sh
-spfx project externalize
+m365 spfx project externalize
 ```

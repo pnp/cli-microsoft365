@@ -5,7 +5,7 @@ Connects the specified site collection to the given hub site
 ## Usage
 
 ```sh
-spo hubsite connect [options]
+m365 spo hubsite connect [options]
 ```
 
 ## Options
@@ -34,7 +34,7 @@ If the specified `hubSiteId` doesn't point to a valid hub site, you will get a `
 Connect the site collection with URL _https://contoso.sharepoint.com/sites/contoso-sales_ to the hub site with ID _255a50b2-527f-4413-8485-57f4c17a24d1_
 
 ```sh
-spo hubsite connect --url https://contoso.sharepoint.com/sites/contoso-sales --hubSiteId 255a50b2-527f-4413-8485-57f4c17a24d1
+m365 spo hubsite connect --url https://contoso.sharepoint.com/sites/contoso-sales --hubSiteId 255a50b2-527f-4413-8485-57f4c17a24d1
 ```
 
 ## More information

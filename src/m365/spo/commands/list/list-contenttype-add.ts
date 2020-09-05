@@ -151,11 +151,11 @@ class SpoListContentTypeAddCommand extends SpoCommand {
     Add existing content type with ID ${chalk.grey('0x0120')} to the list with ID
     ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_CONTENTTYPE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --contentTypeId 0x0120
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --contentTypeId 0x0120
 
     Add existing content type with ID ${chalk.grey('0x0120')} to the list with title ${chalk.grey('Documents')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_CONTENTTYPE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --contentTypeId 0x0120
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --contentTypeId 0x0120
       `);
   }
 }

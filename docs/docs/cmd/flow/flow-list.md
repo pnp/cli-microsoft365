@@ -5,7 +5,7 @@ Lists Microsoft Flows in the given environment
 ## Usage
 
 ```sh
-flow list [options]
+m365 flow list [options]
 ```
 
 ## Options
@@ -34,11 +34,11 @@ By default, the `flow list` command returns only your Flows. To list all Flows, 
 List all your Flows in the given environment
 
 ```sh
-flow list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5
+m365 flow list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 ```
 
 List all Flows in the given environment
 
 ```sh
-flow list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
+m365 flow list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --asAdmin
 ```

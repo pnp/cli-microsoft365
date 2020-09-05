@@ -5,7 +5,7 @@ Gets details about SharePoint activity by user.
 ## Usage
 
 ```sh
-spo report activityuserdetail [options]
+m365 spo report activityuserdetail [options]
 ```
 
 ## Options
@@ -28,23 +28,23 @@ As this report is only available for the past 28 days, date parameter value shou
 Gets details about SharePoint activity by user for the last week
 
 ```sh
-spo report activityuserdetail --period D7
+m365 spo report activityuserdetail --period D7
 ```
 
 Gets details about SharePoint activity by user for May 1, 2019
 
 ```sh
-spo report activityuserdetail --date 2019-05-01
+m365 spo report activityuserdetail --date 2019-05-01
 ```
 
 Gets details about SharePoint activity by user for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report activityuserdetail --period D7 --output text > "activityuserdetail.txt"
+m365 spo report activityuserdetail --period D7 --output text > "activityuserdetail.txt"
 ```
 
 Gets details about SharePoint activity by user for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report activityuserdetail --period D7 --output json > "activityuserdetail.json"
+m365 spo report activityuserdetail --period D7 --output json > "activityuserdetail.json"
 ```

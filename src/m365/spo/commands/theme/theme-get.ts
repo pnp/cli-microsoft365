@@ -105,7 +105,7 @@ class SpoThemeGetCommand extends SpoCommand {
   Examples:
   
     Get information about a theme
-      ${commands.THEME_GET} --name Contoso-Blue
+      m365 ${this.name} --name Contoso-Blue
 
   More information:
 

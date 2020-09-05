@@ -5,7 +5,7 @@ Lists app role assignments for the specified application registration
 ## Usage
 
 ```sh
-aad approleassignment list [options]
+m365 aad approleassignment list [options]
 ```
 
 ## Options
@@ -30,19 +30,19 @@ Specify either the `appId`, `objectId` or `displayName`. If you specify more tha
 List app roles assigned to service principal with Application (client) ID _b2307a39-e878-458b-bc90-03bc578531d6_.
 
 ```sh
-aad approleassignment list --appId b2307a39-e878-458b-bc90-03bc578531d6
+m365 aad approleassignment list --appId b2307a39-e878-458b-bc90-03bc578531d6
 ```
 
 List app roles assigned to service principal with Application display name _MyAppName_.
 
 ```sh
-aad approleassignment list --displayName 'MyAppName'
+m365 aad approleassignment list --displayName 'MyAppName'
 ```
 
 List app roles assigned to service principal with ObjectId _b2307a39-e878-458b-bc90-03bc578531dd_.
 
 ```sh
-aad approleassignment list --objectId b2307a39-e878-458b-bc90-03bc578531dd
+m365 aad approleassignment list --objectId b2307a39-e878-458b-bc90-03bc578531dd
 ```
 
 ## More information

@@ -86,7 +86,7 @@ class SpoTenantRecycleBinItemListCommand extends SpoCommand {
   Examples:
   
     Returns all modern and classic site collections in the tenant scoped recycle bin
-      ${commands.TENANT_RECYCLEBINITEM_LIST}
+      m365 ${this.name}
   `);
   }
 }

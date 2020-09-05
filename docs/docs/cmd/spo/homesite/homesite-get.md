@@ -5,7 +5,7 @@ Gets information about the Home Site
 ## Usage
 
 ```sh
-spo homesite get [options]
+m365 spo homesite get [options]
 ```
 
 ## Options
@@ -23,7 +23,7 @@ Option|Description
 Get information about the Home Site
 
 ```sh
-spo homesite get
+m365 spo homesite get
 ```
 
 ## More information

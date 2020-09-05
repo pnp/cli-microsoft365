@@ -107,7 +107,7 @@ class SpoFolderListCommand extends SpoCommand {
     Gets list of folders under a parent folder with site-relative url
     ${chalk.grey('/Shared Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.FOLDER_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents'
     `);
   }
 }

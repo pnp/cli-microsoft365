@@ -53,7 +53,7 @@ class SpoHideDefaultThemesGetCommand extends SpoCommand {
   Examples:
   
     Get the current value of the HideDefaultThemes setting
-      ${commands.HIDEDEFAULTTHEMES_GET}
+      m365 ${this.name}
 
   More information:
 

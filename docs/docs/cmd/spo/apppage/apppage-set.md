@@ -5,7 +5,7 @@ Updates the single-part app page
 ## Usage
 
 ```sh
-spo apppage set [options]
+m365 spo apppage set [options]
 ```
 
 ## Options
@@ -26,5 +26,5 @@ Option|Description
 Updates the single-part app page located in a site with url https://contoso.sharepoint.com. Web part data is stored in the `$webPartData` variable
 
 ```sh
-spo apppage set --webUrl "https://contoso.sharepoint.com" --pageName "Contoso.aspx" --webPartData $webPartData
+m365 spo apppage set --webUrl "https://contoso.sharepoint.com" --pageName "Contoso.aspx" --webPartData $webPartData
 ```

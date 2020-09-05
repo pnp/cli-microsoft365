@@ -5,7 +5,7 @@ Returns Azure AD URL to open in the browser to re-consent CLI for Microsoft 365 
 ## Usage
 
 ```sh
-cli reconsent [options]
+m365 cli reconsent [options]
 ```
 
 ## Options
@@ -23,7 +23,7 @@ Option|Description
 Get the URL to open in the browser to re-consent CLI for Microsoft 365 permissions
 
 ```sh
-cli reconsent
+m365 cli reconsent
 ```
 
 ## More information

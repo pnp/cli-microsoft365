@@ -246,15 +246,15 @@ class SpoSiteRenameCommand extends SpoCommand {
   
     Starts the rename of the site collection with name "samplesite" to "renamed"
     without modifying the title
-      ${commands.SITE_RENAME}  --siteUrl http://contoso.sharepoint.com/samplesite --newSiteUrl http://contoso.sharepoint.com/renamed
+      m365 ${this.name}  --siteUrl http://contoso.sharepoint.com/samplesite --newSiteUrl http://contoso.sharepoint.com/renamed
 
     Starts the rename of the site collection with name "samplesite" to "renamed"
     modifying the title of the site to "New Title"
-      ${commands.SITE_RENAME} --siteUrl http://contoso.sharepoint.com/samplesite --newSiteUrl http://contoso.sharepoint.com/renamed --newSiteTitle "New Title"
+      m365 ${this.name} --siteUrl http://contoso.sharepoint.com/samplesite --newSiteUrl http://contoso.sharepoint.com/renamed --newSiteTitle "New Title"
 
     Renames the specified site collection and waits for the operation to
     complete
-      ${commands.SITE_RENAME} --siteUrl http://contoso.sharepoint.com/samplesite --newSiteUrl http://contoso.sharepoint.com/renamed --newSiteTitle "New Title" --wait
+      m365 ${this.name} --siteUrl http://contoso.sharepoint.com/samplesite --newSiteUrl http://contoso.sharepoint.com/renamed --newSiteTitle "New Title" --wait
 `);
   }
 }

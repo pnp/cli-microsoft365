@@ -187,21 +187,21 @@ class SpoListWebhookSetCommand extends SpoCommand {
     ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} to
     ${chalk.grey('https://contoso-functions.azurewebsites.net/webhook')}
-      ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/ninja --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook
 
     Update the expiration date of a webhook with ID
     ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} which belongs to a list with title
     ${chalk.grey('Documents')} located in site 
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} to
     ${chalk.grey('October 9th, 2018 at 6:15 PM')}
-      ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime 2018-10-09T18:15
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --expirationDateTime 2018-10-09T18:15
 
     From the webhook with ID ${chalk.grey('cc27a922-8224-4296-90a5-ebbc54da2e81')} which
     belongs to a list with title ${chalk.grey('Documents')} located in site 
     ${chalk.grey('https://contoso.sharepoint.com/sites/ninja')} update the notification url to 
     to ${chalk.grey('https://contoso-functions.azurewebsites.net/webhook')} and the expiration
     date to ${chalk.grey('March 2nd, 2019')}
-      ${commands.LIST_WEBHOOK_SET} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-03-02
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/ninja --listTitle Documents --id cc27a922-8224-4296-90a5-ebbc54da2e81 --notificationUrl https://contoso-functions.azurewebsites.net/webhook --expirationDateTime 2019-03-02
       `);
   }
 }

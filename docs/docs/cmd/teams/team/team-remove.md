@@ -5,7 +5,7 @@ Removes the specified Microsoft Teams team
 ## Usage
 
 ```sh
-teams team remove [options]
+m365 teams team remove [options]
 ```
 
 ## Options
@@ -29,13 +29,13 @@ When deleted, Microsoft 365 groups are moved to a temporary container and can be
 Removes the specified team
 
 ```sh
-teams team remove --teamId '00000000-0000-0000-0000-000000000000'
+m365 teams team remove --teamId '00000000-0000-0000-0000-000000000000'
 ```
 
 Removes the specified team without confirmation
 
 ```sh
-teams team remove --teamId '00000000-0000-0000-0000-000000000000' --confirm
+m365 teams team remove --teamId '00000000-0000-0000-0000-000000000000' --confirm
 ```
 
 ## More information

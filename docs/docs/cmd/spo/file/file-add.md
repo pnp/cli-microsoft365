@@ -5,7 +5,7 @@ Uploads file to the specified folder
 ## Usage
 
 ```sh
-spo file add [options]
+m365 spo file add [options]
 ```
 
 ## Options
@@ -37,103 +37,103 @@ This command allows using unknown properties. Each property corresponds to the l
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg'
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg'
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in sub folder _Shared Documents/Sub Folder 1_
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents/Sub Folder 1' --path 'C:\MS365.jpg'
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents/Sub Folder 1' --path 'C:\MS365.jpg'
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ specifying server-relative folder url
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder '/sites/project-x/Shared Documents' --path 'C:\MS365.jpg'
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder '/sites/project-x/Shared Documents' --path 'C:\MS365.jpg'
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ with specified content type
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --contentType 'Picture'
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --contentType 'Picture'
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_, but checks out existing file before the upload
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --checkOut --checkInComment 'check in comment x'
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --checkOut --checkInComment 'check in comment x'
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and approves it (when list moderation is enabled)
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --approve --approveComment 'approve comment x'
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --approve --approveComment 'approve comment x'
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and publishes it
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --publish --publishComment 'publish comment x'
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --publish --publishComment 'publish comment x'
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and changes single text field value of the list item
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --Title "New Title"
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --Title "New Title"
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and changes person/group field and DateTime field values
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --Editor "[{'Key':'i:0#.f|membership|john.smith@contoso.com'}]" --Modified '6/23/2018 10:15 PM'
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --Editor "[{'Key':'i:0#.f|membership|john.smith@contoso.com'}]" --Modified '6/23/2018 10:15 PM'
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and changes hyperlink or picture field
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --URL 'https://contoso.com, Contoso'
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --URL 'https://contoso.com, Contoso'
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and changes taxonomy field
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --Topic "HR services|c17baaeb-67cd-4378-9389-9d97a945c701"
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --Topic "HR services|c17baaeb-67cd-4378-9389-9d97a945c701"
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and changes taxonomy multi-value field
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --Topic "HR services|c17baaeb-67cd-4378-9389-9d97a945c701;Inclusion ＆ Diversity|66a67671-ed89-44a7-9be4-e80c06b41f35"
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --Topic "HR services|c17baaeb-67cd-4378-9389-9d97a945c701;Inclusion ＆ Diversity|66a67671-ed89-44a7-9be4-e80c06b41f35"
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and changes choice field and multi-choice field
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --ChoiceField1 'Option3' --MultiChoiceField1 'Option2;#Option3'
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --ChoiceField1 'Option3' --MultiChoiceField1 'Option2;#Option3'
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and changes person/group field that allows multi-user selection
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --AllowedUsers "[{'Key':'i:0#.f|membership|john.smith@contoso.com'},{'Key':'i:0#.f|membership|velin.georgiev@contoso.com'}]"
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --AllowedUsers "[{'Key':'i:0#.f|membership|john.smith@contoso.com'},{'Key':'i:0#.f|membership|velin.georgiev@contoso.com'}]"
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and changes yes/no field
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --HasCar true
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --HasCar true
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and changes number field and currency field
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --NumberField 100 --CurrencyField 20
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --NumberField 100 --CurrencyField 20
 ```
 
 Adds file _MS365.jpg_ to site _https://contoso.sharepoint.com/sites/project-x_ in folder _Shared Documents_ and changes lookup field and multi-lookup field
 
 ```sh
-spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --LookupField 1 --MultiLookupField "2;#;#3;#;#4;#"
+m365 spo file add --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\MS365.jpg' --LookupField 1 --MultiLookupField "2;#;#3;#;#4;#"
 ```
 
 ## More information

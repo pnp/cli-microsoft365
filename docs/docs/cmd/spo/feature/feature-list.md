@@ -5,7 +5,7 @@ Lists Features activated in the specified site or site collection
 ## Usage
 
 ```sh
-spo feature list [options]
+m365 spo feature list [options]
 ```
 
 ## Options
@@ -25,11 +25,11 @@ Option|Description
 Return details about Features activated in the specified site collection
 
 ```sh
-spo feature list --url https://contoso.sharepoint.com/sites/test --scope Site
+m365 spo feature list --url https://contoso.sharepoint.com/sites/test --scope Site
 ```
 
 Return details about Features activated in the specified site
 
 ```sh
-spo feature list --url https://contoso.sharepoint.com/sites/test --scope Web
+m365 spo feature list --url https://contoso.sharepoint.com/sites/test --scope Web
 ```

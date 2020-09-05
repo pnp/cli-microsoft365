@@ -5,7 +5,7 @@ Registers the specified site collection as a hub site
 ## Usage
 
 ```sh
-spo hubsite register [options]
+m365 spo hubsite register [options]
 ```
 
 ## Options
@@ -31,7 +31,7 @@ If the specified site collection is already registered as a hub site, you will g
 Register the site collection with URL _https://contoso.sharepoint.com/sites/sales_ as a hub site
 
 ```sh
-spo hubsite register --url https://contoso.sharepoint.com/sites/sales
+m365 spo hubsite register --url https://contoso.sharepoint.com/sites/sales
 ```
 
 ## More information

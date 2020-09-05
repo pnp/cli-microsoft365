@@ -5,7 +5,7 @@ Extracts a site script from a SharePoint list
 ## Usage
 
 ```sh
-spo list sitescript get [options]
+m365 spo list sitescript get [options]
 ```
 
 ## Options
@@ -26,12 +26,12 @@ Option|Description
 Extract a site script from an existing SharePoint list with title _ContosoList_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list sitescript get --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle ContosoList
+m365 spo list sitescript get --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle ContosoList
 ```
 
 Extract a site script from an existing SharePoint list with id _cc27a922-8224-4296-90a5-ebbc54da2e85_
 located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list sitescript get --webUrl https://contoso.sharepoint.com/sites/project-x --listId cc27a922-8224-4296-90a5-ebbc54da2e85
+m365 spo list sitescript get --webUrl https://contoso.sharepoint.com/sites/project-x --listId cc27a922-8224-4296-90a5-ebbc54da2e85
 ```

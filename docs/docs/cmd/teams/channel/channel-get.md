@@ -5,7 +5,7 @@ Gets information about the specific Microsoft Teams team channel
 ## Usage
 
 ```sh
-teams channel get [options]
+m365 teams channel get [options]
 ```
 
 ## Options
@@ -25,5 +25,5 @@ Option|Description
 Get information about Microsoft Teams team channel with id _19:493665404ebd4a18adb8a980a31b4986@thread.skype_
 
 ```sh
-teams channel get --teamId '00000000-0000-0000-0000-000000000000' --channelId '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
+m365 teams channel get --teamId '00000000-0000-0000-0000-000000000000' --channelId '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
 ```

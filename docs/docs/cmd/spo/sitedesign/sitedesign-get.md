@@ -5,7 +5,7 @@ Gets information about the specified site design
 ## Usage
 
 ```sh
-spo sitedesign get [options]
+m365 spo sitedesign get [options]
 ```
 
 ## Options
@@ -28,7 +28,7 @@ If the specified `id` doesn't refer to an existing site design, you will get a `
 Get information about the site design with ID _2c1ba4c4-cd9b-4417-832f-92a34bc34b2a_
 
 ```sh
-spo sitedesign get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
+m365 spo sitedesign get --id 2c1ba4c4-cd9b-4417-832f-92a34bc34b2a
 ```
 
 ## More information

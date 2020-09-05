@@ -136,7 +136,7 @@ class SpoFolderRenameCommand extends SpoCommand {
   
     Renames a folder with site-relative URL ${chalk.grey('/Shared Documents/My Folder 1')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.FOLDER_RENAME} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder 1' --name 'My Folder 2'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents/My Folder 1' --name 'My Folder 2'
     `);
   }
 }

@@ -5,7 +5,7 @@ Likes or unlikes a Yammer message
 ## Usage
 
 ```sh
-yammer message like set [options]
+m365 yammer message like set [options]
 ```
 
 ## Options
@@ -30,17 +30,17 @@ Option|Description
 Likes the message with the ID `5611239081`
 
 ```sh
-yammer message like set --id 5611239081
+m365 yammer message like set --id 5611239081
 ```
 
 Unlike the message with the ID `5611239081`
 
 ```sh
-yammer message like set --id 5611239081 --enable false
+m365 yammer message like set --id 5611239081 --enable false
 ```
 
 Unlike the message with the ID `5611239081` without asking for confirmation
 
 ```sh
-yammer message like set --id 5611239081 --enable false --confirm
+m365 yammer message like set --id 5611239081 --enable false --confirm
 ```

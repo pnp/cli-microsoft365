@@ -5,7 +5,7 @@ Lists Microsoft Flow environments in the current tenant
 ## Usage
 
 ```sh
-flow environment list [options]
+m365 flow environment list [options]
 ```
 
 ## Options
@@ -28,5 +28,5 @@ Option|Description
 List Microsoft Flow environments in the current tenant
 
 ```sh
-flow environment list
+m365 flow environment list
 ```

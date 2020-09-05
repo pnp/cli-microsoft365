@@ -5,13 +5,13 @@ Denies the specified permission request
 ## Usage
 
 ```sh
-spo serviceprincipal permissionrequest deny [options]
+m365 spo serviceprincipal permissionrequest deny [options]
 ```
 
 ## Alias
 
 ```sh
-spo sp permissionrequest deny
+m365 spo sp permissionrequest deny
 ```
 
 ## Options
@@ -37,5 +37,5 @@ The permission request you want to approve is denoted using its `ID`. You can re
 Deny permission request with id _4dc4c043-25ee-40f2-81d3-b3bf63da7538_
 
 ```sh
-spo serviceprincipal permissionrequest deny --requestId 4dc4c043-25ee-40f2-81d3-b3bf63da7538
+m365 spo serviceprincipal permissionrequest deny --requestId 4dc4c043-25ee-40f2-81d3-b3bf63da7538
 ```

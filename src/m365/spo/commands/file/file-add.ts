@@ -443,74 +443,74 @@ class SpoFileAddCommand extends SpoCommand {
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')}
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg'
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in sub folder ${chalk.grey('Shared Documents/Sub Folder 1')}
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents/Sub Folder 1' --path 'C:\\MS365.jpg'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents/Sub Folder 1' --path 'C:\\MS365.jpg'
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} specifying server-relative folder url
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder '/sites/project-x/Shared Documents' --path 'C:\\MS365.jpg'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder '/sites/project-x/Shared Documents' --path 'C:\\MS365.jpg'
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} with specified content type
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --contentType 'Picture'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --contentType 'Picture'
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')}, but checks out existing file before the upload
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --checkOut --checkInComment 'check in comment x'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --checkOut --checkInComment 'check in comment x'
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and approves it (when list moderation is enabled)
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --approve --approveComment 'approve comment x'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --approve --approveComment 'approve comment x'
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and publishes it
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --publish --publishComment 'publish comment x'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --publish --publishComment 'publish comment x'
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and changes single text field value of
     the list item
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Title "New Title"
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Title "New Title"
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and changes person/group field and
     DateTime field values
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Editor "[{'Key':'i:0#.f|membership|john.smith@contoso.com'}]" --Modified '6/23/2018 10:15 PM'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Editor "[{'Key':'i:0#.f|membership|john.smith@contoso.com'}]" --Modified '6/23/2018 10:15 PM'
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and changes hyperlink or picture field
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --URL 'https://contoso.com, Contoso'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --URL 'https://contoso.com, Contoso'
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and changes taxonomy field
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Topic "HR services|c17baaeb-67cd-4378-9389-9d97a945c701"
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Topic "HR services|c17baaeb-67cd-4378-9389-9d97a945c701"
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and changes taxonomy multi-value field
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Topic "HR services|c17baaeb-67cd-4378-9389-9d97a945c701;Inclusion ＆ Diversity|66a67671-ed89-44a7-9be4-e80c06b41f35"
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --Topic "HR services|c17baaeb-67cd-4378-9389-9d97a945c701;Inclusion ＆ Diversity|66a67671-ed89-44a7-9be4-e80c06b41f35"
   
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and changes choice field and multi-choice field
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --ChoiceField1 'Option3' --MultiChoiceField1 'Option2;#Option3'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --ChoiceField1 'Option3' --MultiChoiceField1 'Option2;#Option3'
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and changes person/group field that allows
     multi-user selection
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --AllowedUsers "[{'Key':'i:0#.f|membership|john.smith@contoso.com'},{'Key':'i:0#.f|membership|velin.georgiev@contoso.com'}]"
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --AllowedUsers "[{'Key':'i:0#.f|membership|john.smith@contoso.com'},{'Key':'i:0#.f|membership|velin.georgiev@contoso.com'}]"
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and changes yes/no field
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --HasCar true
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --HasCar true
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and changes number field and currency field
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --NumberField 100 --CurrencyField 20
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --NumberField 100 --CurrencyField 20
 
     Adds file MS365.jpg to site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')} 
     in folder ${chalk.grey('Shared Documents')} and changes lookup field and multi-lookup field
-      ${commands.FILE_ADD} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --LookupField 1 --MultiLookupField "2;#;#3;#;#4;#"
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --path 'C:\\MS365.jpg' --LookupField 1 --MultiLookupField "2;#;#3;#;#4;#"
       
   More information:
 

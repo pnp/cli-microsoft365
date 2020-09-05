@@ -5,7 +5,7 @@ Gets the properties of the specified schema extension definition
 ## Usage
 
 ```sh
-graph schemaextension get [options]
+m365 graph schemaextension get [options]
 ```
 
 ## Options
@@ -29,5 +29,5 @@ extension.
 Gets properties of a schema extension definition with ID domain_myExtension
 
 ```sh
-graph schemaextension get --id domain_myExtension 
+m365 graph schemaextension get --id domain_myExtension 
 ```

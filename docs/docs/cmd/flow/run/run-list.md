@@ -5,7 +5,7 @@ Lists runs of the specified Microsoft Flow
 ## Usage
 
 ```sh
-flow run list [options]
+m365 flow run list [options]
 ```
 
 ## Options
@@ -34,5 +34,5 @@ If the Microsoft Flow with the name you specified doesn't exist, you will get th
 List runs of the specified Microsoft Flow
 
 ```sh
-flow run list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flow 5923cb07-ce1a-4a5c-ab81-257ce820109a
+m365 flow run list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --flow 5923cb07-ce1a-4a5c-ab81-257ce820109a
 ```

@@ -5,7 +5,7 @@ Gets the number of daily users by device type
 ## Usage
 
 ```sh
-yammer report deviceusageusercounts [options]
+m365 yammer report deviceusageusercounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the number of daily users by device type for the last week
 
 ```sh
-yammer report deviceusageusercounts --period D7
+m365 yammer report deviceusageusercounts --period D7
 ```
 
 Gets the number of daily users by device type for the last week and exports the report data in the specified path in text format
 
 ```sh
-yammer report deviceusageusercounts --period D7 --output text > "deviceusageusercounts.txt"
+m365 yammer report deviceusageusercounts --period D7 --output text > "deviceusageusercounts.txt"
 ```
 
 Gets the number of daily users by device type for the last week and exports the report data in the specified path in json format
 
 ```sh
-yammer report deviceusageusercounts --period D7 --output json > "deviceusageusercounts.json"
+m365 yammer report deviceusageusercounts --period D7 --output json > "deviceusageusercounts.json"
 ```

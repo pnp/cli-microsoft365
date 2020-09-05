@@ -5,7 +5,7 @@ Gets the number of pages viewed across all sites
 ## Usage
 
 ```sh
-spo report siteusagepages [options]
+m365 spo report siteusagepages [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the number of pages viewed across all sites for the last week
 
 ```sh
-spo report siteusagepages --period D7
+m365 spo report siteusagepages --period D7
 ```
 
 Gets the number of pages viewed across all sites for the last week and exports the report data in the specified path in text format
 
 ```sh
-spo report siteusagepages --period D7 --output text > "siteusagepages.txt"
+m365 spo report siteusagepages --period D7 --output text > "siteusagepages.txt"
 ```
 
 Gets the number of pages viewed across all sites for the last week and exports the report data in the specified path in json format
 
 ```sh
-spo report siteusagepages --period D7 --output json > "siteusagepages.json"
+m365 spo report siteusagepages --period D7 --output json > "siteusagepages.json"
 ```

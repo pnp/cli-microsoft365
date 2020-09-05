@@ -5,7 +5,7 @@ Posts a Yammer network message on behalf of the current user
 ## Usage
 
 ```sh
-yammer message add [options]
+m365 yammer message add [options]
 ```
 
 ## Options
@@ -32,41 +32,41 @@ Option|Description
 Posts a message to the "All Company" feed
 
 ```sh
-yammer message add --body "Hello everyone!"
+m365 yammer message add --body "Hello everyone!"
 ```
 
 Replies to a message with the ID 1231231231
 
 ```sh
-yammer message add --body "Hello everyone!" --repliedToId 1231231231
+m365 yammer message add --body "Hello everyone!" --repliedToId 1231231231
 ```
 
 Sends a private conversation to the user with the ID 1231231231
 
 ```sh
-yammer message add --body "Hello everyone!" --directToUserIds 1231231231
+m365 yammer message add --body "Hello everyone!" --directToUserIds 1231231231
 ```
 
 Sends a private conversation to multiple users by ID
 
 ```sh
-yammer message add --body "Hello everyone!" --directToUserIds "1231231231,1121312"
+m365 yammer message add --body "Hello everyone!" --directToUserIds "1231231231,1121312"
 ```
 
 Sends a private conversation to the user with the e-mail pl@nubo.eu and sc@nubo.eu
 
 ```sh
-yammer message add --body "Hello everyone!" --directToUserIds "pl@nubo.eu,sc@nubo.eu"
+m365 yammer message add --body "Hello everyone!" --directToUserIds "pl@nubo.eu,sc@nubo.eu"
 ```
 
 Posts a message to the group with the ID 12312312312
 
 ```sh
-yammer message add --body "Hello everyone!" --groupId 12312312312
+m365 yammer message add --body "Hello everyone!" --groupId 12312312312
 ```
 
 Posts a message to the "All Company" feed of the network 11112312
 
 ```sh
-yammer message add --body "Hello everyone!" --networkId 11112312
+m365 yammer message add --body "Hello everyone!" --networkId 11112312
 ```

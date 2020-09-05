@@ -5,7 +5,7 @@ Creates a single-part app page
 ## Usage
 
 ```sh
-spo apppage add [options]
+m365 spo apppage add [options]
 ```
 
 ## Options
@@ -31,5 +31,5 @@ If you want to add the single-part app page to quick launch, use the addToQuickL
 Create a single-part app page in a site with url https://contoso.sharepoint.com, webpart data is stored in the `$webPartData` variable
 
 ```sh
-spo apppage add --title "Contoso" --webUrl "https://contoso.sharepoint.com" --webPartData $webPartData --addToQuickLaunch
+m365 spo apppage add --title "Contoso" --webUrl "https://contoso.sharepoint.com" --webPartData $webPartData --addToQuickLaunch
 ```

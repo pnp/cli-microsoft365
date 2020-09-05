@@ -197,15 +197,15 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
   
     List app roles assigned to service principal with Application (client) ID
     ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}.
-      ${commands.APPROLEASSIGNMENT_LIST} --appId b2307a39-e878-458b-bc90-03bc578531d6
+      m365 ${this.name} --appId b2307a39-e878-458b-bc90-03bc578531d6
 
     List app roles assigned to service principal with Application display name
     ${chalk.grey('MyAppName')}.
-      ${commands.APPROLEASSIGNMENT_LIST} --displayName 'MyAppName'
+      m365 ${this.name} --displayName 'MyAppName'
 
     List app roles assigned to service principal with ObjectId
     ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531dd')}.
-      ${commands.APPROLEASSIGNMENT_LIST} --objectId b2307a39-e878-458b-bc90-03bc578531dd
+      m365 ${this.name} --objectId b2307a39-e878-458b-bc90-03bc578531dd
 
   More information:
   

@@ -5,7 +5,7 @@ Adds taxonomy term group
 ## Usage
 
 ```sh
-spo term group add [options]
+m365 spo term group add [options]
 ```
 
 ## Options
@@ -29,17 +29,17 @@ Option|Description
 Add a new taxonomy term group with the specified name
 
 ```sh
-spo term group add --name PnPTermSets
+m365 spo term group add --name PnPTermSets
 ```
 
 Add a new taxonomy term group with the specified name and id
 
 ```sh
-spo term group add --name PnPTermSets --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
+m365 spo term group add --name PnPTermSets --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
 ```
 
 Add a new taxonomy term group with the specified name and description
 
 ```sh
-spo term group add --name PnPTermSets --description 'Term sets for PnP'
+m365 spo term group add --name PnPTermSets --description 'Term sets for PnP'
 ```

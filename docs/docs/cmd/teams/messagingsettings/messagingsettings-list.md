@@ -5,7 +5,7 @@ Lists messaging settings for a Microsoft Teams team
 ## Usage
 
 ```sh
-teams messagingsettings list [options]
+m365 teams messagingsettings list [options]
 ```
 
 ## Options
@@ -24,5 +24,5 @@ Option|Description
 Get messaging settings for a Microsoft Teams team
 
 ```sh
-teams messagingsettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
+m365 teams messagingsettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```

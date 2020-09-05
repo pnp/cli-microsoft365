@@ -130,7 +130,7 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
   Examples:
 
     Removes organization assets library without confirmation
-      ${commands.ORGASSETSLIBRARY_REMOVE} --libraryUrl "/sites/branding/assets" --confirm
+      m365 ${this.name} --libraryUrl "/sites/branding/assets" --confirm
   `);
   }
 }

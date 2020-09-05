@@ -5,7 +5,7 @@ Updates a site design with new values
 ## Usage
 
 ```sh
-spo sitedesign set [options]
+m365 spo sitedesign set [options]
 ```
 
 ## Options
@@ -38,20 +38,20 @@ When specifying IDs of site scripts to use with your site design, ensure that th
 Update the site design title and version
 
 ```sh
-spo sitedesign set --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --title "Contoso site design" --version 2
+m365 spo sitedesign set --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --title "Contoso site design" --version 2
 ```
 
 Update the site design to be the default design for provisioning modern communication sites
 
 ```sh
-spo sitedesign set --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webTemplate CommunicationSite  --isDefault true
+m365 spo sitedesign set --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webTemplate CommunicationSite  --isDefault true
 ```
 
 
 Update the site design to be the default design for provisioning modern communication sites, with specific scripts
 
 ```sh
-spo sitedesign set --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webTemplate CommunicationSite  --isDefault true --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e,b2307a39-e878-458b-bc90-03bc578531d6"
+m365 spo sitedesign set --id 9b142c22-037f-4a7f-9017-e9d8c0e34b98 --webTemplate CommunicationSite  --isDefault true --siteScripts "19b0e1b2-e3d1-473f-9394-f08c198ef43e,b2307a39-e878-458b-bc90-03bc578531d6"
 ```
 
 ## More information

@@ -5,7 +5,7 @@ View current status of the specified Microsoft 365 CDN
 ## Usage
 
 ```sh
-spo cdn get [options]
+m365 spo cdn get [options]
 ```
 
 ## Options
@@ -31,13 +31,13 @@ Using the `-t, --type` option you can choose whether you want to manage the sett
 Show if the Public CDN is currently enabled or not
 
 ```sh
-spo cdn get
+m365 spo cdn get
 ```
 
 Show if the Private CDN is currently enabled or not
 
 ```sh
-spo cdn get -t Private
+m365 spo cdn get -t Private
 ```
 
 ## More information

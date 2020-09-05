@@ -149,10 +149,10 @@ class SpoThemeSetCommand extends SpoCommand {
   Examples:
   
     Add or update a theme from a theme JSON file
-      ${commands.THEME_SET} --name Contoso-Blue --filePath /Users/rjesh/themes/contoso-blue.json
+      m365 ${this.name} --name Contoso-Blue --filePath /Users/rjesh/themes/contoso-blue.json
 
     Add or update an inverted theme from a theme JSON file
-      ${commands.THEME_SET} --name Contoso-Blue --filePath /Users/rjesh/themes/contoso-blue.json --isInverted
+      m365 ${this.name} --name Contoso-Blue --filePath /Users/rjesh/themes/contoso-blue.json --isInverted
     
   More information:
 

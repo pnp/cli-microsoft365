@@ -5,7 +5,7 @@ Lists taxonomy terms from the given term set
 ## Usage
 
 ```sh
-spo term list [options]
+m365 spo term list [options]
 ```
 
 ## Options
@@ -30,11 +30,11 @@ Option|Description
 List taxonomy terms from the term group and term set with the given name
 
 ```sh
-spo term list --termGroupName PnPTermSets --termSetName PnP-Organizations
+m365 spo term list --termGroupName PnPTermSets --termSetName PnP-Organizations
 ```
 
 List taxonomy terms from the term group and term set with the given ID
 
 ```sh
-spo term list --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termSetId 0e8f395e-ff58-4d45-9ff7-e331ab728bec
+m365 spo term list --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termSetId 0e8f395e-ff58-4d45-9ff7-e331ab728bec
 ```

@@ -238,20 +238,20 @@ class SpoFieldRemoveCommand extends SpoCommand {
 
     Remove the site column with the specified ID, located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/contoso-sales')}
-      ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
     
     Remove the list column with the specified ID, located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/contoso-sales')}.
     Retrieves the list by its title
-      ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
 
     Remove the list column with the specified display name, located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/contoso-sales')}.
     Retrieves the list by its url
-      ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl 'Lists/Events' --fieldTitle 'Title'     
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl 'Lists/Events' --fieldTitle 'Title'     
     
     Remove all site columns from group "MyGroup"
-      ${commands.FIELD_REMOVE} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --group 'MyGroup'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/contoso-sales --group 'MyGroup'
       `);
   }
 }

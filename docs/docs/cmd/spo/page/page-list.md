@@ -5,7 +5,7 @@ Lists all modern pages in the given site
 ## Usage
 
 ```sh
-spo page list [options]
+m365 spo page list [options]
 ```
 
 ## Options
@@ -24,5 +24,5 @@ Option|Description
 List all modern pages in the specific site
 
 ```sh
-spo page list --webUrl https://contoso.sharepoint.com/sites/team-a
+m365 spo page list --webUrl https://contoso.sharepoint.com/sites/team-a
 ```

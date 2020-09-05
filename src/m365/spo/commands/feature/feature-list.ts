@@ -99,10 +99,10 @@ class SpoFeatureListCommand extends SpoCommand {
       `  Examples:
   
     Return details about Features activated in the specified site collection
-      ${commands.FEATURE_LIST} --url https://contoso.sharepoint.com/sites/test --scope Site
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test --scope Site
 
     Return details about Features activated in the specified site
-      ${commands.FEATURE_LIST} --url https://contoso.sharepoint.com/sites/test --scope Web
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test --scope Web
       `);
   }
 }

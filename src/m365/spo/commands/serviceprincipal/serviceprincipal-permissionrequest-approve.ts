@@ -117,7 +117,7 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
   Examples:
   
     Approve permission request with id ${chalk.grey('4dc4c043-25ee-40f2-81d3-b3bf63da7538')}
-      ${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE} --requestId 4dc4c043-25ee-40f2-81d3-b3bf63da7538
+      m365 ${this.name} --requestId 4dc4c043-25ee-40f2-81d3-b3bf63da7538
 `);
   }
 }

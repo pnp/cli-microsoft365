@@ -5,7 +5,7 @@ Gets site classification configuration
 ## Usage
 
 ```sh
-aad siteclassification get [options]
+m365 aad siteclassification get [options]
 ```
 
 ## Options
@@ -28,7 +28,7 @@ Option|Description
 Get information about the Microsoft 365 Tenant site classification
 
 ```sh
-aad siteclassification get
+m365 aad siteclassification get
 ```
 
 ## More information

@@ -5,7 +5,7 @@ Updates the particular group setting
 ## Usage
 
 ```sh
-aad groupsetting set [options]
+m365 aad groupsetting set [options]
 ```
 
 ## Options
@@ -34,5 +34,5 @@ If the specified id doesn't reference a valid group setting, you will get a _Res
 Configure classification for modern SharePoint sites
 
 ```sh
-aad groupsetting set --id c391b57d-5783-4c53-9236-cefb5c6ef323 --UsageGuidelinesUrl https://contoso.sharepoint.com/sites/compliance --ClassificationList 'HBI, MBI, LBI, GDPR' --DefaultClassification MBI
+m365 aad groupsetting set --id c391b57d-5783-4c53-9236-cefb5c6ef323 --UsageGuidelinesUrl https://contoso.sharepoint.com/sites/compliance --ClassificationList 'HBI, MBI, LBI, GDPR' --DefaultClassification MBI
 ```

@@ -5,7 +5,7 @@ Executes a search query
 ## Usage
 
 ```sh
-spo search [options]
+m365 spo search [options]
 ```
 
 ## Options
@@ -47,23 +47,23 @@ Option|Description
 Execute search query to retrieve all Document Sets (ContentTypeId = _0x0120D520_) for the English locale
 
 ```sh
-spo search --queryText "ContentTypeId:0x0120D520" --culture 1033
+m365 spo search --queryText "ContentTypeId:0x0120D520" --culture 1033
 ```
 
 Retrieve all documents. For each document, retrieve the _Path_, _Author_ and _FileType_.
 
 ```sh
-spo search --queryText "IsDocument:1" --selectProperties "Path,Author,FileType" --allResults
+m365 spo search --queryText "IsDocument:1" --selectProperties "Path,Author,FileType" --allResults
 ```
 
 Return the top 50 items of which the title starts with _Marketing_ while trimming duplicates.
 
 ```sh
-spo search --queryText "Title:Marketing*" --rowLimit=50 --trimDuplicates
+m365 spo search --queryText "Title:Marketing*" --rowLimit=50 --trimDuplicates
 ```
 
 Return only items from a specific result source (using the source id).
 
 ```sh
-spo search --queryText "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083"
+m365 spo search --queryText "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083"
 ```

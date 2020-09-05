@@ -5,7 +5,7 @@ Lists apps from the specified app catalog
 ## Usage
 
 ```sh
-spo app list [options]
+m365 spo app list [options]
 ```
 
 ## Options
@@ -33,13 +33,13 @@ When using the text output type (default), the command lists only the values of 
 Return the list of available apps from the tenant app catalog. Show the installed version in the site if applicable.
 
 ```sh
-spo app list
+m365 spo app list
 ```
 
 Return the list of available apps from a site collection app catalog of site _https://contoso.sharepoint.com/sites/site1_.
 
 ```sh
-spo app list --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+m365 spo app list --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 ```
 
 ## More information

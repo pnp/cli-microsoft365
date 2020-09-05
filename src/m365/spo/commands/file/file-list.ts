@@ -99,7 +99,7 @@ class SpoFileListCommand extends SpoCommand {
       `  Examples:
   
     Return all files from folder ${chalk.grey('Shared Documents')} located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.FILE_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents'
       `);
   }
 }

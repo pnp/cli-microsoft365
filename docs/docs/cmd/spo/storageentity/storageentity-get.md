@@ -5,7 +5,7 @@ Get details for the specified tenant property
 ## Usage
 
 ```sh
-spo storageentity get [options]
+m365 spo storageentity get [options]
 ```
 
 ## Options
@@ -28,7 +28,7 @@ Tenant properties are stored in the app catalog site associated with the site to
 Show the value, description and comment of the _AnalyticsId_ tenant property
 
 ```sh
-spo storageentity get -k AnalyticsId
+m365 spo storageentity get -k AnalyticsId
 ```
 
 ## More information

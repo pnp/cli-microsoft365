@@ -27,17 +27,17 @@ class OutlookReportMailboxUsageMailboxCountCommand extends PeriodBasedReport {
     
     Gets the total number of user mailboxes in your organization and how many
     are active each day for the last week.
-      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEMAILBOXCOUNT} --period D7
+      m365 ${this.name} --period D7
 
     Gets the total number of user mailboxes in your organization and how many
     are active each day for the last week and exports the report data in the
     specified path in text format
-      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEMAILBOXCOUNT} --period D7 --output text > "mailboxusagemailboxcounts.txt"
+      m365 ${this.name} --period D7 --output text > "mailboxusagemailboxcounts.txt"
 
     Gets the total number of user mailboxes in your organization and how many
     are active each day for the last week and exports the report data in the
     specified path in json format
-      ${commands.OUTLOOK_REPORT_MAILBOXUSAGEMAILBOXCOUNT} --period D7 --output json > "mailboxusagemailboxcounts.json"
+      m365 ${this.name} --period D7 --output json > "mailboxusagemailboxcounts.json"
 `);
   }
 }

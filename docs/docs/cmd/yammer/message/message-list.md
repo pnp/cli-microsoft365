@@ -5,7 +5,7 @@ Returns all accessible messages from the user's Yammer network
 ## Usage
 
 ```sh
-yammer message list [options]
+m365 yammer message list [options]
 ```
 
 ## Options
@@ -44,41 +44,41 @@ Feed types
 Returns all Yammer network messages
 
 ```sh
-yammer message list
+m365 yammer message list
 ```
 
 Returns all Yammer network messages older than the message ID 5611239081
 
 ```sh
-yammer message list --olderThanId 5611239081
+m365 yammer message list --olderThanId 5611239081
 ```
 
 Returns all Yammer network thread starter (first message) for each thread
 
 ```sh
-yammer message list --threaded
+m365 yammer message list --threaded
 ```
 
 Returns the first 10 Yammer network messages
 
 ```sh
-yammer message list --limit 10
+m365 yammer message list --limit 10
 ```
 
 Returns the first 10 Yammer network messages from the Yammer group 312891231
 
 ```sh
-yammer message list --groupId 312891231 --limit 10
+m365 yammer message list --groupId 312891231 --limit 10
 ```
 
 Returns the first 10 Yammer network messages from thread 5611239081
 
 ```sh
-yammer message list --threadId 5611239081 --limit 10
+m365 yammer message list --threadId 5611239081 --limit 10
 ```
 
 Returns the first 20 Yammer message from the sent feed of the user
 
 ```sh
-yammer message list --feedType Sent --limit 20
+m365 yammer message list --feedType Sent --limit 20
 ```

@@ -5,7 +5,7 @@ Get details about Microsoft 365 Groups activity by group.
 ## Usage
 
 ```sh
-aad o365group report activitydetail [options]
+m365 aad o365group report activitydetail [options]
 ```
 
 ## Options
@@ -25,23 +25,23 @@ Option|Description
 Get details about Microsoft 365 Groups activity by group for the last week
 
 ```sh
-aad o365group report activitydetail --period D7
+m365 aad o365group report activitydetail --period D7
 ```
 
 Get details about Microsoft 365 Groups activity by group for September 09, 2019
 
 ```sh
-aad o365group report activitydetail --date 2019-09-28
+m365 aad o365group report activitydetail --date 2019-09-28
 ```
 
 Get details about Microsoft 365 Groups activity by group for the last week and exports the report data in the specified path in text format
 
 ```sh
-aad o365group report activitydetail --period D7 --output text > "o365groupactivitydetail.txt"
+m365 aad o365group report activitydetail --period D7 --output text > "o365groupactivitydetail.txt"
 ```
 
 Get details about Microsoft 365 Groups activity by group for the last week and exports the report data in the specified path in json format
 
 ```sh
-aad o365group report activitydetail --period D7 --output json > "o365groupactivitydetail.json"
+m365 aad o365group report activitydetail --period D7 --output json > "o365groupactivitydetail.json"
 ```

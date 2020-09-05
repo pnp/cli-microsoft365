@@ -5,7 +5,7 @@ Gets the context URL for the root SharePoint site collection and SharePoint tena
 ## Usage
 
 ```sh
-spo get [options]
+m365 spo get [options]
 ```
 
 ## Options
@@ -27,5 +27,5 @@ CLI for Microsoft 365 automatically discovers the URL of the root SharePoint sit
 Get the context URL for the root SharePoint site collection and SharePoint tenant admin site
 
 ```sh
-spo get --output json
+m365 spo get --output json
 ```

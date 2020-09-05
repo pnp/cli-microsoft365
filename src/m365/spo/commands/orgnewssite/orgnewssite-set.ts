@@ -109,7 +109,7 @@ class SpoOrgNewsSiteSetCommand extends SpoCommand {
   Examples:
   
     Set a site as an organizational news site
-      ${chalk.grey(config.delimiter)} ${commands.ORGNEWSSITE_SET} --url https://contoso.sharepoint.com/sites/site1
+      ${chalk.grey(config.delimiter)} m365 ${this.name} --url https://contoso.sharepoint.com/sites/site1
   `);
   }
 }

@@ -5,7 +5,7 @@ Sets the specified site as the Home Site
 ## Usage
 
 ```sh
-spo homesite set [options]
+m365 spo homesite set [options]
 ```
 
 ## Options
@@ -27,7 +27,7 @@ Option|Description
 Set the specified site as the Home Site
 
 ```sh
-spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms
+m365 spo homesite set --siteUrl https://contoso.sharepoint.com/sites/comms
 ```
 
 ## More information

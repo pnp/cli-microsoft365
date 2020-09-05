@@ -5,7 +5,7 @@ Returns all modern and classic site collections in the tenant scoped recycle bin
 ## Usage
 
 ```sh
-spo tenant recyclebinitem list [options]
+m365 spo tenant recyclebinitem list [options]
 ```
 
 ## Options
@@ -26,5 +26,5 @@ Option|Description
 Returns all modern and classic site collections in the tenant scoped recycle bin
 
 ```sh
-spo tenant recyclebinitem list
+m365 spo tenant recyclebinitem list
 ```

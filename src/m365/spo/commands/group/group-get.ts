@@ -116,11 +116,11 @@ class SpoUserGetCommand extends SpoCommand {
       `  Examples:
 
     Get group with id ${chalk.grey('7')} from site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.GROUP_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 7
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 7
 
     Get group with name ${chalk.grey('Team Site Members')} from site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.GROUP_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --name "Team Site Members"
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --name "Team Site Members"
     `);
   }
 }

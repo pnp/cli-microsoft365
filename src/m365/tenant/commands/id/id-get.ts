@@ -83,11 +83,11 @@ class TenantIdGetCommand extends Command {
   Examples:
 
     Get Microsoft 365 tenant ID for the specified domain
-      ${commands.TENANT_ID_GET} --domainName contoso.com
+      m365 ${this.name} --domainName contoso.com
 
     Get Microsoft 365 tenant ID of the the tenant to which you are currently logged
     in
-      ${commands.TENANT_ID_GET}
+      m365 ${this.name}
 `);
   }
 }

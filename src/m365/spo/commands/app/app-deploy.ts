@@ -193,23 +193,23 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
   
     Deploy the specified app in the tenant app catalog. Try to resolve the URL
     of the tenant app catalog automatically.
-      ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3
+      m365 ${this.name} --id 058140e3-0e37-44fc-a1d3-79c487d371a3
 
     Deploy the specified app in the site collection app catalog 
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+      m365 ${this.name} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 
     Deploy the app with the specified name in the tenant app catalog.
     Try to resolve the URL of the tenant app catalog automatically.
-      ${commands.APP_DEPLOY} --name solution.sppkg
+      m365 ${this.name} --name solution.sppkg
 
     Deploy the specified app in the tenant app catalog located at
     ${chalk.grey('https://contoso.sharepoint.com/sites/apps')}
-      ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
+      m365 ${this.name} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 
     Deploy the specified app to the whole tenant at once. Features included in
     the solution will not be activated.
-      ${commands.APP_DEPLOY} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --skipFeatureDeployment
+      m365 ${this.name} --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --skipFeatureDeployment
     
   More information:
   

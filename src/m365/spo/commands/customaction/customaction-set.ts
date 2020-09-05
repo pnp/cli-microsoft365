@@ -260,7 +260,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
     ApplicationCustomizer user custom action can be created from the Windows
     cmd.exe:
 
-      m365 spo ${commands.CUSTOMACTION_SET} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{\"testMessage\":\"Test message\"}'
+      m365 spo m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{\"testMessage\":\"Test message\"}'
     
     Note, how the clientSideComponentProperties option (-p) has escaped double
     quotes ${chalk.grey(`'{\"testMessage\":\"Test message\"}'`)} compared to execution from bash:
@@ -277,23 +277,23 @@ class SpoCustomActionSetCommand extends SpoCommand {
     
     Updates tenant-wide SharePoint Framework Application Customizer extension
     properties in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_SET} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{"testMessage":"Test message"}'
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{"testMessage":"Test message"}'
     
     Updates tenant-wide SharePoint Framework ${chalk.blue('modern list view')} Command Set
     extension properties and sequence in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_SET} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}' --sequence 100
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}' --sequence 100
     
     Updates url custom action in the SiteActions menu in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_SET} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --actionUrl "~site/SitePages/Home.aspx"
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --actionUrl "~site/SitePages/Home.aspx"
     
     Updates ScriptLink custom action with script source in ${chalk.blue('classic pages')} in
     site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_SET} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --scriptSrc "~sitecollection/SiteAssets/YourScript.js"
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --scriptSrc "~sitecollection/SiteAssets/YourScript.js"
     
     Updates custom action with delegated rights in the SiteActions menu in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_SET} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --rights "AddListItems,DeleteListItems,ManageLists"
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --rights "AddListItems,DeleteListItems,ManageLists"
   
   More information:
 

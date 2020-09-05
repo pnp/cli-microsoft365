@@ -5,7 +5,7 @@ Gets details about Yammer groups activity by group
 ## Usage
 
 ```sh
-yammer report groupsactivitydetail [options]
+m365 yammer report groupsactivitydetail [options]
 ```
 
 ## Options
@@ -29,23 +29,23 @@ As this report is only available for the past 28 days, date parameter value shou
 Gets details about Yammer groups activity by group for the last week
 
 ```sh
-yammer report groupsactivitydetail --period D7
+m365 yammer report groupsactivitydetail --period D7
 ```
 
 Gets details about Yammer groups activity by group for July 1, 2019
 
 ```sh
-yammer report groupsactivitydetail --date 2019-07-01
+m365 yammer report groupsactivitydetail --date 2019-07-01
 ```
 
 Gets details about Yammer groups activity by group for the last week and exports the report data in the specified path in text format
 
 ```sh
-yammer report groupsactivitydetail --period D7 --output text > "groupsactivitydetail.txt"
+m365 yammer report groupsactivitydetail --period D7 --output text > "groupsactivitydetail.txt"
 ```
 
 Gets details about Yammer groups activity by group for the last week and exports the report data in the specified path in json format
 
 ```sh
-yammer report groupsactivitydetail --period D7 --output json > "groupsactivitydetail.json"
+m365 yammer report groupsactivitydetail --period D7 --output json > "groupsactivitydetail.json"
 ```

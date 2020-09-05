@@ -5,7 +5,7 @@ Adds a new list or site content type
 ## Usage
 
 ```sh
-spo contenttype add [options]
+m365 spo contenttype add [options]
 ```
 
 ## Options
@@ -35,13 +35,13 @@ The ID of the content type specifies the parent content type from which this con
 Create a site content type that inherits from the List item content type
 
 ```sh
-spo contenttype add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D --group 'PnP Content Types'
+m365 spo contenttype add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D --group 'PnP Content Types'
 ```
 
 Create a list content type that inherits from the List item content type
 
 ```sh
-spo contenttype add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Alerts --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D
+m365 spo contenttype add --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Alerts --name 'PnP Alert' --id 0x01007926A45D687BA842B947286090B8F67D
 ```
 
 ## More information

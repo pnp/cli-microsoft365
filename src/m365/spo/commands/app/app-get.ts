@@ -172,20 +172,20 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
   
     Return details about the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     available in the tenant app catalog.
-      ${commands.APP_GET} --id b2307a39-e878-458b-bc90-03bc578531d6
+      m365 ${this.name} --id b2307a39-e878-458b-bc90-03bc578531d6
 
     Return details about the app with name ${chalk.grey('solution.sppkg')}
     available in the tenant app catalog. Will try to detect the app catalog URL
-      ${commands.APP_GET} --name solution.sppkg
+      m365 ${this.name} --name solution.sppkg
 
     Return details about the app with name ${chalk.grey('solution.sppkg')}
     available in the tenant app catalog using the specified app catalog URL
-      ${commands.APP_GET} --name solution.sppkg --appCatalogUrl https://contoso.sharepoint.com/sites/apps
+      m365 ${this.name} --name solution.sppkg --appCatalogUrl https://contoso.sharepoint.com/sites/apps
 
     Return details about the app with ID ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     available in the site collection app catalog
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/site1')}.
-      ${commands.APP_GET} --id b2307a39-e878-458b-bc90-03bc578531d6 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
+      m365 ${this.name} --id b2307a39-e878-458b-bc90-03bc578531d6 --scope sitecollection --appCatalogUrl https://contoso.sharepoint.com/sites/site1
 
   More information:
   

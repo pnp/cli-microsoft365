@@ -5,7 +5,7 @@ Moves a folder to another location
 ## Usage
 
 ```sh
-spo folder move [options]
+m365 spo folder move [options]
 ```
 
 ## Options
@@ -31,19 +31,19 @@ When you move a folder using the `spo folder move` command, all of the document 
 Move folder to a document library in another site collection
 
 ```sh
-spo folder move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/
+m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test2/Shared%20Documents/
 ```
 
 Move folder to a document library in the same site collection
 
 ```sh
-spo folder move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
+m365 spo folder move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/MyFolder --targetUrl /sites/test1/HRDocuments/
 ```
 
 Move folder to a document library in another site collection. Allow for schema mismatch
 
 ```sh
-spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
+m365 spo file move --webUrl https://contoso.sharepoint.com/sites/test1 --sourceUrl /Shared%20Documents/sp1.pdf --targetUrl /sites/test2/Shared%20Documents/ --allowSchemaMismatch
 ```
 
 ## More information

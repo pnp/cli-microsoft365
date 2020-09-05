@@ -5,7 +5,7 @@ Gets label set on the specified list
 ## Usage
 
 ```sh
-spo list label get  [options]
+m365 spo list label get  [options]
 ```
 
 ## Options
@@ -26,11 +26,11 @@ Option|Description
 Gets label set on the list with title _ContosoList_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list label get  --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle ContosoList
+m365 spo list label get  --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle ContosoList
 ```
 
 Gets label set on the list with id _cc27a922-8224-4296-90a5-ebbc54da2e85_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list label get  --webUrl https://contoso.sharepoint.com/sites/project-x --listId cc27a922-8224-4296-90a5-ebbc54da2e85
+m365 spo list label get  --webUrl https://contoso.sharepoint.com/sites/project-x --listId cc27a922-8224-4296-90a5-ebbc54da2e85
 ```

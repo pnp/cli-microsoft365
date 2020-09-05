@@ -22,15 +22,15 @@ class TeamsReportDeviceUsageUserCountsCommand extends PeriodBasedReport {
       `  Examples: 
 
     Gets the number of Microsoft Teams daily unique users by device type for the last week
-      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS} --period D7
+      m365 ${this.name} --period D7
 
     Gets the number of Microsoft Teams daily unique users by device type for the last week
     and exports the report data in the specified path in text format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS} --period D7 --output text > "deviceusageusercounts.txt"
+      m365 ${this.name} --period D7 --output text > "deviceusageusercounts.txt"
 
     Gets the number of Microsoft Teams daily unique users by device type for the last week
     and exports the report data in the specified path in json format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS} --period D7 --output json > "deviceusageusercounts.json"
+      m365 ${this.name} --period D7 --output json > "deviceusageusercounts.json"
 `);
   }
 }

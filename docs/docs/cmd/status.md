@@ -5,7 +5,7 @@ Shows Microsoft 365 login status
 ## Usage
 
 ```sh
-status [options]
+m365 status [options]
 ```
 
 ## Options
@@ -27,5 +27,5 @@ If you are logged in to Microsoft 365, the `status` command will show you inform
 Show the information about the current login to the Microsoft 365
 
 ```sh
-status
+m365 status
 ```

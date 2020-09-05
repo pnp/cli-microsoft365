@@ -5,7 +5,7 @@ Grants permissions to join the hub site for one or more principals
 ## Usage
 
 ```sh
-spo hubsite rights grant [options]
+m365 spo hubsite rights grant [options]
 ```
 
 ## Options
@@ -34,19 +34,19 @@ Option|Description
 Grant user with alias _PattiF_ permission to join sites to the hub site with URL _https://contoso.sharepoint.com/sites/sales_
 
 ```sh
-spo hubsite rights grant --url https://contoso.sharepoint.com/sites/sales --principals PattiF --rights Join
+m365 spo hubsite rights grant --url https://contoso.sharepoint.com/sites/sales --principals PattiF --rights Join
 ```
 
 Grant users with aliases _PattiF_ and _AdeleV_ permission to join sites to the hub site with URL _https://contoso.sharepoint.com/sites/sales_
 
 ```sh
-spo hubsite rights grant --url https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --rights Join
+m365 spo hubsite rights grant --url https://contoso.sharepoint.com/sites/sales --principals "PattiF,AdeleV" --rights Join
 ```
 
 Grant user with email _PattiF@contoso.com_ permission to join sites to the hub site with URL _https://contoso.sharepoint.com/sites/sales_
 
 ```sh
-spo hubsite rights grant --url https://contoso.sharepoint.com/sites/sales --principals PattiF@contoso.com --rights Join
+m365 spo hubsite rights grant --url https://contoso.sharepoint.com/sites/sales --principals PattiF@contoso.com --rights Join
 ```
 
 ## More information

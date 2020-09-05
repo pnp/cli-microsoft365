@@ -5,7 +5,7 @@ Removes the specified list
 ## Usage
 
 ```sh
-spo list remove [options]
+m365 spo list remove [options]
 ```
 
 ## Options
@@ -27,11 +27,11 @@ Option|Description
 Remove the list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list remove --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
+m365 spo list remove --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
 ```
 
 Remove the list with title _List 1_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list remove --webUrl https://contoso.sharepoint.com/sites/project-x --title 'List 1'
+m365 spo list remove --webUrl https://contoso.sharepoint.com/sites/project-x --title 'List 1'
 ```

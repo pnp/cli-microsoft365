@@ -5,7 +5,7 @@ Enables you to understand the trends of email activity (like how many were sent,
 ## Usage
 
 ```sh
-outlook report mailactivitycounts [options]
+m365 outlook report mailactivitycounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the trends of email activity (like how many were sent, read, and received) in your organization for the last week
 
 ```sh
-outlook report mailactivitycounts --period D7
+m365 outlook report mailactivitycounts --period D7
 ```
 
 Gets the trends of email activity (like how many were sent, read, and received) in your organization for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailactivitycounts --period D7 --output text > "mailactivitycounts.txt"
+m365 outlook report mailactivitycounts --period D7 --output text > "mailactivitycounts.txt"
 ```
 
 Gets the trends of email activity (like how many were sent, read, and received) in your organization for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailactivitycounts --period D7 --output json > "mailactivitycounts.json"
+m365 outlook report mailactivitycounts --period D7 --output json > "mailactivitycounts.json"
 ```

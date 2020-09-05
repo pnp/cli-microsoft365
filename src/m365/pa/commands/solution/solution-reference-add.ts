@@ -143,7 +143,7 @@ class PaSolutionReferenceAddCommand extends Command {
 
     Adds a reference inside the CDS Solution project in the current directory
     to the PowerApps component framework project at ${chalk.grey('./projects/ExampleProject')}
-      ${commands.SOLUTION_REFERENCE_ADD} --path ./projects/ExampleProject
+      m365 ${this.name} --path ./projects/ExampleProject
 
   More information:
 

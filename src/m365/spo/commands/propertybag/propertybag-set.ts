@@ -139,24 +139,24 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
 
     Sets the value of the ${chalk.grey('key1')} property in the property bag of site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1
 
     Sets the value of the ${chalk.grey('key1')} property in the property bag of the root folder
     of site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /
 
     Sets the value of the ${chalk.grey('key1')} property in the property bag of a document
     library located in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents'
     
     Sets the value of the ${chalk.grey('key1')} property in the property bag of a folder
     in a document library located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents/MyFolder'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder '/Shared Documents/MyFolder'
 
     Sets the value of the ${chalk.grey('key1')} property in the property bag of a list in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.PROPERTYBAG_SET} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /Lists/MyList
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/test --key key1 --value value1 --folder /Lists/MyList
     `);
   }
 }

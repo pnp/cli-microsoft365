@@ -105,7 +105,7 @@ class AadOAuth2GrantListCommand extends AadCommand {
   Examples:
   
     List OAuth2 permissions granted to service principal with objectId ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}.
-      ${commands.OAUTH2GRANT_LIST} --clientId b2307a39-e878-458b-bc90-03bc578531d6
+      m365 ${this.name} --clientId b2307a39-e878-458b-bc90-03bc578531d6
 
   More information:
   

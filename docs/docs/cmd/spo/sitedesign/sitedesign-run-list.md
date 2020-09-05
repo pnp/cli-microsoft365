@@ -5,7 +5,7 @@ Lists information about site designs applied to the specified site
 ## Usage
 
 ```sh
-spo sitedesign run list [options]
+m365 spo sitedesign run list [options]
 ```
 
 ## Options
@@ -25,13 +25,13 @@ Option|Description
 List site designs applied to the specified site
 
 ```sh
-spo sitedesign run list --webUrl https://contoso.sharepoint.com/sites/team-a
+m365 spo sitedesign run list --webUrl https://contoso.sharepoint.com/sites/team-a
 ```
 
 List information about the specified site design applied to the specified site
 
 ```sh
-spo sitedesign run list --webUrl https://contoso.sharepoint.com/sites/team-a --siteDesignId 6ec3ca5b-d04b-4381-b169-61378556d76e
+m365 spo sitedesign run list --webUrl https://contoso.sharepoint.com/sites/team-a --siteDesignId 6ec3ca5b-d04b-4381-b169-61378556d76e
 ```
 
 ## More information

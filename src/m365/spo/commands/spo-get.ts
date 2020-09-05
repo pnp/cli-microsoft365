@@ -60,7 +60,7 @@ class SpoGetCommand extends SpoCommand {
   Examples:
   
     Get the context URL for the root SharePoint site collection and SharePoint tenant admin site
-      ${commands.GET} --output json
+      m365 ${this.name} --output json
 `);
   }
 }

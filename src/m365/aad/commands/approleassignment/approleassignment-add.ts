@@ -277,15 +277,15 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
   
     Adds SharePoint ${chalk.grey('Sites.Read.All')} application permissions to Azure AD
     application with app id ${chalk.grey('57907bf8-73fa-43a6-89a5-1f603e29e451')}
-      ${commands.APPROLEASSIGNMENT_ADD} --appId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "SharePoint" --scope "Sites.Read.All"
+      m365 ${this.name} --appId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "SharePoint" --scope "Sites.Read.All"
 
     Adds multiple Microsoft Graph application permissions to an Azure AD
     application with name ${chalk.grey('MyAppName')}
-      ${commands.APPROLEASSIGNMENT_ADD} --displayName "MyAppName" --resource "Microsoft Graph" --scope "Mail.Read,Mail.Send"
+      m365 ${this.name} --displayName "MyAppName" --resource "Microsoft Graph" --scope "Mail.Read,Mail.Send"
 
     Adds Microsoft Graph ${chalk.grey('Mail.Read')} application permissions to a system-managed
     identity app with objectId ${chalk.grey('57907bf8-73fa-43a6-89a5-1f603e29e451')}
-      ${commands.APPROLEASSIGNMENT_ADD} --objectId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "Microsoft Graph" --scope "Mail.Read"
+      m365 ${this.name} --objectId "57907bf8-73fa-43a6-89a5-1f603e29e451" --resource "Microsoft Graph" --scope "Mail.Read"
 
   More information:
   

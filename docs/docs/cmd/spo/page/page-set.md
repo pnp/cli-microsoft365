@@ -5,7 +5,7 @@ Updates modern page properties
 ## Usage
 
 ```sh
-spo page set [options]
+m365 spo page set [options]
 ```
 
 ## Options
@@ -36,35 +36,35 @@ If you choose to promote the page using the `promoteAs` option or enable page co
 Change the layout of the existing page to _Article_
 
 ```sh
-spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Article
+m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Article
 ```
 
 Promote the existing article page as a news article
 
 ```sh
-spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs NewsPage
+m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs NewsPage
 ```
 
 Promote the existing article page as a template
 
 ```sh
-spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs Template
+m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --promoteAs Template
 ```
 
 Change the page's layout to Home and set it as the site's home page
 
 ```sh
-spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
+m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --layoutType Home --promoteAs HomePage
 ```
 
 Enable comments on the existing page
 
 ```sh
-spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --commentsEnabled true
+m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --commentsEnabled true
 ```
 
 Publish existing page
 
 ```sh
-spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --publish
+m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --publish
 ```

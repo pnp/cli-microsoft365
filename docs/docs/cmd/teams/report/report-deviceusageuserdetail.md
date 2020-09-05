@@ -5,7 +5,7 @@ Gets detail about Microsoft Teams device usage by user.
 ## Usage
 
 ```sh
-teams report deviceusageuserdetail [options]
+m365 teams report deviceusageuserdetail [options]
 ```
 
 ## Options
@@ -29,23 +29,23 @@ As this report is only available for the past 28 days, date parameter value shou
 Gets information about Microsoft Teams device usage by user for the last week
 
 ```sh
-teams report deviceusageuserdetail --period D7
+m365 teams report deviceusageuserdetail --period D7
 ```
 
 Gets information about Microsoft Teams device usage by user for July 1, 2019
 
 ```sh
-teams report deviceusageuserdetail --date 2019-07-01
+m365 teams report deviceusageuserdetail --date 2019-07-01
 ```
 
 Gets information about Microsoft Teams device usage by user for the last week and exports the report data in the specified path in text format
 
 ```sh
-teams report deviceusageuserdetail --period D7 --output text > "deviceusageuserdetail.txt"
+m365 teams report deviceusageuserdetail --period D7 --output text > "deviceusageuserdetail.txt"
 ```
 
 Gets information about Microsoft Teams device usage by user for the last week and exports the report data in the specified path in json format
 
 ```sh
-teams report deviceusageuserdetail --period D7 --output json > "deviceusageuserdetail.json"
+m365 teams report deviceusageuserdetail --period D7 --output json > "deviceusageuserdetail.json"
 ```

@@ -5,7 +5,7 @@ Gets the trend on the amount of storage you are using in OneDrive for Business
 ## Usage
 
 ```sh
-onedrive report usagestorage [options]
+m365 onedrive report usagestorage [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the trend on the amount of storage you are using in OneDrive for Business for the last week
 
 ```sh
-onedrive report usagestorage --period D7
+m365 onedrive report usagestorage --period D7
 ```
 
 Gets the trend on the amount of storage you are using in OneDrive for Business for the last week and exports the report data in the specified path in text format
 
 ```sh
-onedrive report usagestorage --period D7 --output text > "usagestorage.txt"
+m365 onedrive report usagestorage --period D7 --output text > "usagestorage.txt"
 ```
 
 Gets the trend on the amount of storage you are using in OneDrive for Business for the last week and exports the report data in the specified path in json format
 
 ```sh
-onedrive report usagestorage --period D7 --output json > "usagestorage.json"
+m365 onedrive report usagestorage --period D7 --output json > "usagestorage.json"
 ```

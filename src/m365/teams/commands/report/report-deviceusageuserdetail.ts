@@ -27,19 +27,19 @@ class TeamsReportDeviceUsageUserDetailCommand extends DateAndPeriodBasedReport {
   Examples:
 
     Gets information about Microsoft Teams device usage by user for the last week
-      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7
+      m365 ${this.name} --period D7
 
     Gets information about Microsoft Teams device usage by user for
     May 1, 2019
-      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --date 2019-05-01
+      m365 ${this.name} --date 2019-05-01
 
     Gets information about Microsoft Teams device usage by user for the last week 
     and exports the report data in the specified path in text format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output text > "deviceusageuserdetails.txt"
+      m365 ${this.name} --period D7 --output text > "deviceusageuserdetails.txt"
 
     Gets information about Microsoft Teams device usage by user for the last week
     and exports the report data in the specified path in json format
-      ${commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL} --period D7 --output json > "deviceusageuserdetails.json"
+      m365 ${this.name} --period D7 --output json > "deviceusageuserdetails.json"
 `);
   }
 }

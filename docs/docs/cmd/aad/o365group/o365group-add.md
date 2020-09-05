@@ -5,7 +5,7 @@ Creates Microsoft 365 Group
 ## Usage
 
 ```sh
-aad o365group add [options]
+m365 aad o365group add [options]
 ```
 
 ## Options
@@ -34,29 +34,29 @@ When specifying the path to the logo image you can use both relative and absolut
 Create a public Microsoft 365 Group
 
 ```sh
-aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance
+m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance
 ```
 
 Create a private Microsoft 365 Group
 
 ```sh
-aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --isPrivate true
+m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --isPrivate true
 ```
 
 Create a public Microsoft 365 Group and set specified users as its owners
 
 ```sh
-aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --owners "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
 Create a public Microsoft 365 Group and set specified users as its members
 
 ```sh
-aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
+m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --members "DebraB@contoso.onmicrosoft.com,DiegoS@contoso.onmicrosoft.com"
 ```
 
 Create a public Microsoft 365 Group and set its logo
 
 ```sh
-aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --logoPath images/logo.png
+m365 aad o365group add --displayName Finance --description 'This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.' --mailNickname finance --logoPath images/logo.png
 ```

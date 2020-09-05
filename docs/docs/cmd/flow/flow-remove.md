@@ -5,7 +5,7 @@ Removes the specified Microsoft Flow
 ## Usage
 
 ```sh
-flow remove [options]
+m365 flow remove [options]
 ```
 
 ## Options
@@ -35,23 +35,23 @@ If the Microsoft Flow with the name you specified doesn't exist, you will get th
 Removes the specified Microsoft Flow owned by the currently signed-in user
 
 ```sh
-flow remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d
+m365 flow remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d
 ```
 
 Removes the specified Microsoft Flow owned by the currently signed-in user without confirmation
 
 ```sh
-flow remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --confirm
+m365 flow remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --confirm
 ```
 
 Removes the specified Microsoft Flow owned by another user
 
 ```sh
-flow remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin
+m365 flow remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin
 ```
 
 Removes the specified Microsoft Flow owned by another user without confirmation
 
 ```sh
-flow remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin --confirm
+m365 flow remove --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5 --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d --asAdmin --confirm
 ```

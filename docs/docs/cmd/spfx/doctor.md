@@ -5,7 +5,7 @@ Verifies environment configuration for using the specific version of the SharePo
 ## Usage
 
 ```sh
-spfx doctor [options]
+m365 spfx doctor [options]
 ```
 
 ## Options
@@ -39,11 +39,11 @@ Next to verifying the readiness of your environment to use a particular version 
 Verify if your environment meets the requirements to work with the SharePoint Framework
 
 ```sh
-spfx doctor
+m365 spfx doctor
 ```
 
 Verify if your environment meets the requirements to work with the SharePoint Framework and also if the version of the SharePoint Framework that you're using is compatible with SharePoint 2019
 
 ```sh
-spfx doctor --env sp2019
+m365 spfx doctor --env sp2019
 ```

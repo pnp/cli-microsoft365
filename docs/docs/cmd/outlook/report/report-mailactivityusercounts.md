@@ -5,7 +5,7 @@ Enables you to understand trends on the number of unique users who are performin
 ## Usage
 
 ```sh
-outlook report mailactivityusercounts [options]
+m365 outlook report mailactivityusercounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the trends on the number of unique users who are performing email activities like send, read, and receive for the last week
 
 ```sh
-outlook report mailactivityusercounts --period D7
+m365 outlook report mailactivityusercounts --period D7
 ```
 
 Gets the trends on the number of unique users who are performing email activities like send, read, and receive for the last week and exports the report data in the specified path in text format
 
 ```sh
-outlook report mailactivityusercounts --period D7 --output text > "mailactivityusercounts.txt"
+m365 outlook report mailactivityusercounts --period D7 --output text > "mailactivityusercounts.txt"
 ```
 
 Gets the trends on the number of unique users who are performing email activities like send, read, and receive for the last week and exports the report data in the specified path in json format
 
 ```sh
-outlook report mailactivityusercounts --period D7 --output json > "mailactivityusercounts.json"
+m365 outlook report mailactivityusercounts --period D7 --output json > "mailactivityusercounts.json"
 ```

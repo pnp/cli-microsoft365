@@ -60,7 +60,7 @@ class TenantStatusListCommand extends SpoCommand {
       `  Examples:
   
     Gets health status of the different services in Microsoft 365
-      ${commands.TENANT_STATUS_LIST}
+      m365 ${this.name}
 
   More information:
     

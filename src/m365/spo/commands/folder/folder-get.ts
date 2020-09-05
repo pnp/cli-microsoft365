@@ -107,7 +107,7 @@ class SpoFolderGetCommand extends SpoCommand {
     Get folder properties for folder with site-relative url
     ${chalk.grey('/Shared Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.FOLDER_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --folderUrl '/Shared Documents'
     `);
   }
 }

@@ -5,7 +5,7 @@ Lists the global tenant settings
 ## Usage
 
 ```sh
-spo tenant settings list [options]
+m365 spo tenant settings list [options]
 ```
 
 ## Options
@@ -26,5 +26,5 @@ Option|Description
 Lists the settings of the tenant
 
 ```sh
-spo tenant settings list
+m365 spo tenant settings list
 ```

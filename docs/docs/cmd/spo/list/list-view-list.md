@@ -5,7 +5,7 @@ Lists views configured on the specified list
 ## Usage
 
 ```sh
-spo list view list [options]
+m365 spo list view list [options]
 ```
 
 ## Options
@@ -26,11 +26,11 @@ Option|Description
 List all views for a list with title *Documents* located in site *https://contoso.sharepoint.com/sites/project-x*
 
 ```sh
-spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
+m365 spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
 ```
 
 List all views for a list with ID *0cd891ef-afce-4e55-b836-fce03286cccf* located in site *https://contoso.sharepoint.com/sites/project-x*
 
 ```sh
-spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
+m365 spo list view list --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
 ```

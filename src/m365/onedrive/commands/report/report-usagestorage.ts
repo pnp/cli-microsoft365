@@ -23,17 +23,17 @@ class OneDriveReportUsageStorageCommand extends PeriodBasedReport {
       
     Gets the trend on the amount of storage you are using in OneDrive for
     Business for the last week
-      ${commands.REPORT_USAGESTORAGE} --period D7
+      m365 ${this.name} --period D7
 
     Gets the trend on the amount of storage you are using in OneDrive for
     Business for the last week and exports the report data in the specified path
     in text format
-      ${commands.REPORT_USAGESTORAGE} --period D7 --output text > "usagestorage.txt"
+      m365 ${this.name} --period D7 --output text > "usagestorage.txt"
 
     Gets the trend on the amount of storage you are using in OneDrive for
     Business for the last week and exports the report data in the specified path
     in json format
-      ${commands.REPORT_USAGESTORAGE} --period D7 --output json > "usagestorage.json"
+      m365 ${this.name} --period D7 --output json > "usagestorage.json"
 `);
   }
 }

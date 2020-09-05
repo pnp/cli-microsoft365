@@ -90,7 +90,7 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
       `  Examples:
   
     Retrieve the Content Type Hub URL
-      ${commands.CONTENTTYPEHUB_GET}
+      m365 ${this.name}
     `);
   }
 }

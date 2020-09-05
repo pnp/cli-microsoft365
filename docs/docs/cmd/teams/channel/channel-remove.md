@@ -5,7 +5,7 @@ Removes the specified channel in the Microsoft Teams team
 ## Usage
 
 ```sh
-teams channel remove [options]
+m365 teams channel remove [options]
 ```
 
 ## Options
@@ -31,25 +31,25 @@ When deleted, Microsoft Teams channels are moved to a recycle bin and can be res
 Remove the specified Microsoft Teams channel by Id
 
 ```sh
-teams channel remove --channelId 19:f3dcbb1674574677abcae89cb626f1e6@thread.skype --teamId d66b8110-fcad-49e8-8159-0d488ddb7656
+m365 teams channel remove --channelId 19:f3dcbb1674574677abcae89cb626f1e6@thread.skype --teamId d66b8110-fcad-49e8-8159-0d488ddb7656
 ```
 
 Remove the specified Microsoft Teams channel by Id without confirmation
 
 ```sh
-teams channel remove --channelId 19:f3dcbb1674574677abcae89cb626f1e6@thread.skype --teamId d66b8110-fcad-49e8-8159-0d488ddb7656 --confirm
+m365 teams channel remove --channelId 19:f3dcbb1674574677abcae89cb626f1e6@thread.skype --teamId d66b8110-fcad-49e8-8159-0d488ddb7656 --confirm
 ```
 
 Remove the specified Microsoft Teams channel by Name
 
 ```sh
-teams channel remove --channelName 'channelName' --teamId d66b8110-fcad-49e8-8159-0d488ddb7656
+m365 teams channel remove --channelName 'channelName' --teamId d66b8110-fcad-49e8-8159-0d488ddb7656
 ```
 
 Remove the specified Microsoft Teams channel by Name without confirmation
 
 ```sh
-teams channel remove --channelName 'channelName' --teamId d66b8110-fcad-49e8-8159-0d488ddb7656 --confirm 
+m365 teams channel remove --channelName 'channelName' --teamId d66b8110-fcad-49e8-8159-0d488ddb7656 --confirm 
 ```
 
 ## More information

@@ -5,7 +5,7 @@ Lists guest settings for a Microsoft Teams team
 ## Usage
 
 ```sh
-teams guestsettings list [options]
+m365 teams guestsettings list [options]
 ```
 
 ## Options
@@ -24,5 +24,5 @@ Option|Description
 Get guest settings for a Microsoft Teams team
 
 ```sh
-teams guestsettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
+m365 teams guestsettings list --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```

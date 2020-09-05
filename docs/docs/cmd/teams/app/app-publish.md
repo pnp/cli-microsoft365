@@ -5,7 +5,7 @@ Publishes Teams app to the organization's app catalog
 ## Usage
 
 ```sh
-teams app publish [options]
+m365 teams app publish [options]
 ```
 
 ## Options
@@ -28,5 +28,5 @@ You can only publish a Teams app as a global administrator.
 Add the _teams-manifest.zip_ file to the organization's app catalog
 
 ```sh
-teams app publish --filePath ./teams-manifest.zip
+m365 teams app publish --filePath ./teams-manifest.zip
 ```

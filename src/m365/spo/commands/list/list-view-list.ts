@@ -138,11 +138,11 @@ class SpoListViewListCommand extends SpoCommand {
 
     List all views for a list with title ${chalk.grey('Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_VIEW_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
 
     List all views for a list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_VIEW_LIST} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 1f187321-f086-4d3d-8523-517e94cc9df9
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --listId 1f187321-f086-4d3d-8523-517e94cc9df9
     `);
   }
 }

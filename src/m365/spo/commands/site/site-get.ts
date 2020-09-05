@@ -85,7 +85,7 @@ class SpoSiteGetCommand extends SpoCommand {
   
     Return information about the ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
     site collection.
-      ${commands.SITE_GET} --url https://contoso.sharepoint.com/sites/project-x
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/project-x
 `);
   }
 }

@@ -88,7 +88,7 @@ class SpoTenantSettingsListCommand extends SpoCommand {
   Examples:
   
     Lists the settings of the tenant
-      ${commands.TENANT_SETTINGS_LIST}
+      m365 ${this.name}
   ` );
   }
 }

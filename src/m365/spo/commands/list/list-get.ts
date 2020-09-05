@@ -126,11 +126,11 @@ class ListGetCommand extends SpoCommand {
   
     Return information about a list with ID ${chalk.grey('0cd891ef-afce-4e55-b836-fce03286cccf')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 0cd891ef-afce-4e55-b836-fce03286cccf
 
     Return information about a list with title ${chalk.grey('Documents')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.LIST_GET} --webUrl https://contoso.sharepoint.com/sites/project-x --title Documents
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --title Documents
       `);
   }
 }

@@ -22,15 +22,15 @@ class TeamsReportUserActivityUserCountsCommand extends PeriodBasedReport {
       `  Examples: 
 
     Gets the number of Microsoft Teams users by activity type for last week
-      ${commands.TEAMS_REPORT_USERACTIVITYUSERCOUNTS} --period D7
+      m365 ${this.name} --period D7
 
     Gets the number of Microsoft Teams users by activity type for last week
     and exports the report data in the specified path in text format
-      ${commands.TEAMS_REPORT_USERACTIVITYUSERCOUNTS} --period D7 --output text > "useractivityusercounts.txt"
+      m365 ${this.name} --period D7 --output text > "useractivityusercounts.txt"
 
     Gets the number of Microsoft Teams users by activity type for last week
     and exports the report data in the specified path in json format
-      ${commands.TEAMS_REPORT_USERACTIVITYUSERCOUNTS} --period D7 --output json > "useractivityusercounts.json"
+      m365 ${this.name} --period D7 --output json > "useractivityusercounts.json"
 `);
   }
 }

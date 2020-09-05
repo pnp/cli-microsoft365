@@ -5,7 +5,7 @@ Gets the number of Yammer messages posted, read, and liked in groups
 ## Usage
 
 ```sh
-yammer report groupsactivitycounts [options]
+m365 yammer report groupsactivitycounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the number of Yammer messages posted, read, and liked in groups for the last week
 
 ```sh
-yammer report groupsactivitycounts --period D7
+m365 yammer report groupsactivitycounts --period D7
 ```
 
 Gets the number of Yammer messages posted, read, and liked in groups for the last week and exports the report data in the specified path in text format
 
 ```sh
-yammer report groupsactivitycounts --period D7 --output text > "groupsactivitycounts.txt"
+m365 yammer report groupsactivitycounts --period D7 --output text > "groupsactivitycounts.txt"
 ```
 
 Gets the number of Yammer messages posted, read, and liked in groups for the last week and exports the report data in the specified path in json format
 
 ```sh
-yammer report groupsactivitycounts --period D7 --output json > "groupsactivitycounts.json"
+m365 yammer report groupsactivitycounts --period D7 --output json > "groupsactivitycounts.json"
 ```

@@ -107,7 +107,7 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
   Examples:
 
     List all libraries that are assigned as asset library
-      ${commands.ORGASSETSLIBRARY_LIST}
+      m365 ${this.name}
   `);
 
   }

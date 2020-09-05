@@ -5,7 +5,7 @@ Updates subsite properties
 ## Usage
 
 ```sh
-spo web set [options]
+m365 spo web set [options]
 ```
 
 ## Options
@@ -38,49 +38,49 @@ Next to updating web properties corresponding to the options of this command, yo
 Update subsite title
 
 ```sh
-spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --title Team-a
+m365 spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --title Team-a
 ```
 
 Hide quick launch on the subsite
 
 ```sh
-spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --quickLaunchEnabled false
+m365 spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --quickLaunchEnabled false
 ```
 
 Set site header layout to compact
 
 ```sh
-spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --headerLayout compact
+m365 spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --headerLayout compact
 ```
 
 Set site header color to primary theme background color
 
 ```sh
-spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --headerEmphasis 0
+m365 spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --headerEmphasis 0
 ```
 
 Enable megamenu in the site
 
 ```sh
-spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --megaMenuEnabled true
+m365 spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --megaMenuEnabled true
 ```
 
 Hide footer in the site
 
 ```sh
-spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --footerEnabled false
+m365 spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --footerEnabled false
 ```
 
 Set search scope to tenant scope
 
 ```sh
-spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
+m365 spo web set --webUrl https://contoso.sharepoint.com/sites/team-a --searchScope tenant
 ```
 
 Set welcome page for the web
 
 ```sh
-spo web set  --webUrl https://contoso.sharepoint.com/sites/team-a --welcomePage "SitePages/new-home.aspx"
+m365 spo web set  --webUrl https://contoso.sharepoint.com/sites/team-a --welcomePage "SitePages/new-home.aspx"
 ```
 
 ## More information

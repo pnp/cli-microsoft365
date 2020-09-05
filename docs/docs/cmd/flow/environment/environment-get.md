@@ -5,7 +5,7 @@ Gets information about the specified Microsoft Flow environment
 ## Usage
 
 ```sh
-flow environment get [options]
+m365 flow environment get [options]
 ```
 
 ## Options
@@ -31,5 +31,5 @@ If the environment with the name you specified doesn't exist, you will get the `
 Get information about the Microsoft Flow environment named _Default-d87a7535-dd31-4437-bfe1-95340acd55c5_
 
 ```sh
-flow environment get --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5
+m365 flow environment get --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 ```

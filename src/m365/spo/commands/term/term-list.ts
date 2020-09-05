@@ -169,10 +169,10 @@ class SpoTermListCommand extends SpoCommand {
   Examples:
   
     List taxonomy terms from the term group and term set with the given name
-      ${commands.TERM_LIST} --termGroupName PnPTermSets --termSetName PnP-Organizations
+      m365 ${this.name} --termGroupName PnPTermSets --termSetName PnP-Organizations
 
     List taxonomy terms from the term group and term set with the given ID
-      ${commands.TERM_LIST} --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termSetId 0e8f395e-ff58-4d45-9ff7-e331ab728bec
+      m365 ${this.name} --termGroupId 0e8f395e-ff58-4d45-9ff7-e331ab728beb --termSetId 0e8f395e-ff58-4d45-9ff7-e331ab728bec
 `);
   }
 }

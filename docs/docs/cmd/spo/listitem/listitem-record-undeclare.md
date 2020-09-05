@@ -5,7 +5,7 @@ Undeclares list item as a record
 ## Usage
 
 ```sh
-spo listitem record undeclare [options]
+m365 spo listitem record undeclare [options]
 ```
 
 ## Options
@@ -33,5 +33,5 @@ spo listitem record undeclare --webUrl https://contoso.sharepoint.com/sites/proj
 Undeclare the list item as a record with ID _1_ from list with title _List 1_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo listitem record undeclare --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --id 1
+m365 spo listitem record undeclare --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle 'List 1' --id 1
 ```

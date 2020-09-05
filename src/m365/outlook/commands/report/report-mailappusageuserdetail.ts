@@ -22,18 +22,18 @@ class OutlookReportMailAppUsageUserDetailCommand extends DateAndPeriodBasedRepor
       `  Examples:
       
     Gets details about which activities users performed on the various email apps for the last week
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL} --period D7
+      m365 ${this.name} --period D7
 
     Gets details about which activities users performed on the various email apps for May 1st, 2019
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL} --date 2019-05-01
+      m365 ${this.name} --date 2019-05-01
 
     Gets details about which activities users performed on the various email apps for the last week
     and exports the report data in the specified path in text format
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL} --period D7 --output text > "mailappusageuserdetails.txt"
+      m365 ${this.name} --period D7 --output text > "mailappusageuserdetails.txt"
 
     Gets details about which activities users performed on the various email apps for the last week
     and exports the report data in the specified path in json format
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEUSERDETAIL} --period D7 --output json > "mailappusageuserdetails.json"
+      m365 ${this.name} --period D7 --output json > "mailappusageuserdetails.json"
 `);
   }
 }

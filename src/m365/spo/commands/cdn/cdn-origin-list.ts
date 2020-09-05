@@ -120,10 +120,10 @@ class SpoCdnOriginListCommand extends SpoCommand {
   Examples:
   
     Show the list of origins configured for the Public CDN
-      ${commands.CDN_ORIGIN_LIST}
+      m365 ${this.name}
 
     Show the list of origins configured for the Private CDN
-      ${commands.CDN_ORIGIN_LIST} --type Private
+      m365 ${this.name} --type Private
 
   More information:
 

@@ -22,15 +22,15 @@ class OutlookReportMailAppUsageAppsUserCountsCommand extends PeriodBasedReport {
       `  Examples:
       
     Gets the count of unique users per email app for the last week
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEAPPSUSERCOUNTS} --period D7
+      m365 ${this.name} --period D7
 
     Gets the count of unique users per email app for the last week
     and exports the report data in the specified path in text format
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEAPPSUSERCOUNTS} --period D7 --output text > "mailappusageappusercounts.txt"
+      m365 ${this.name} --period D7 --output text > "mailappusageappusercounts.txt"
 
     Gets the count of unique users per email app for the last week
     and exports the report data in the specified path in json format
-      ${commands.OUTLOOK_REPORT_MAILAPPUSAGEAPPSUSERCOUNTS} --period D7 --output json > "mailappusageappusercounts.json"
+      m365 ${this.name} --period D7 --output json > "mailappusageappusercounts.json"
 `);
   }
 }

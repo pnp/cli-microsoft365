@@ -5,7 +5,7 @@ Lists Microsoft Teams teams in the current tenant
 ## Usage
 
 ```sh
-teams team list [options]
+m365 teams team list [options]
 ```
 
 ## Options
@@ -28,11 +28,11 @@ You can only see the details or archived status of the Microsoft Teams you are a
 List all Microsoft Teams in the tenant
 
 ```sh
-teams team list
+m365 teams team list
 ```
 
 List all Microsoft Teams in the tenant you are a member of
 
 ```sh
-teams team list --joined
+m365 teams team list --joined
 ```

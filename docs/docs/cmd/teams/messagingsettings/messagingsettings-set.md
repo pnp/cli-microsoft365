@@ -5,7 +5,7 @@ Updates messaging settings of a Microsoft Teams team
 ## Usage
 
 ```sh
-teams messagingsettings set [options]
+m365 teams messagingsettings set [options]
 ```
 
 ## Options
@@ -29,11 +29,11 @@ Option|Description
 Allow users to edit messages in channels
 
 ```sh
-teams messagingsettings set --teamId '00000000-0000-0000-0000-000000000000' --allowUserEditMessages true
+m365 teams messagingsettings set --teamId '00000000-0000-0000-0000-000000000000' --allowUserEditMessages true
 ```
 
 Disallow users to delete messages in channels
 
 ```sh
-teams messagingsettings set --teamId '00000000-0000-0000-0000-000000000000' --allowUserDeleteMessages false
+m365 teams messagingsettings set --teamId '00000000-0000-0000-0000-000000000000' --allowUserDeleteMessages false
 ```

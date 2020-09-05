@@ -5,7 +5,7 @@ Install an app in the personal scope of the specified user
 ## Usage
 
 ```sh
-teams user app add [options]
+m365 teams user app add [options]
 ```
 
 ## Options
@@ -32,5 +32,5 @@ The `appId` has to be the ID of the app from the Microsoft Teams App Catalog. Do
 Install an app from the catalog for the specified user
 
 ```sh
-teams user app add --appId 4440558e-8c73-4597-abc7-3644a64c4bce --userId 2609af39-7775-4f94-a3dc-0dd67657e900
+m365 teams user app add --appId 4440558e-8c73-4597-abc7-3644a64c4bce --userId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```

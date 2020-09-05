@@ -5,7 +5,7 @@ Gets information about the specified taxonomy term
 ## Usage
 
 ```sh
-spo term get [options]
+m365 spo term get [options]
 ```
 
 ## Options
@@ -36,17 +36,17 @@ When retrieving term by its ID, it's sufficient to specify just the ID. When ret
 Get information about a taxonomy term using its ID
 
 ```sh
-spo term get --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
+m365 spo term get --id 0e8f395e-ff58-4d45-9ff7-e331ab728beb
 ```
 
 Get information about a taxonomy term using its name, retrieving the parent term group and term set using their names
 
 ```sh
-spo term get --name IT --termGroupName People --termSetName Department
+m365 spo term get --name IT --termGroupName People --termSetName Department
 ```
 
 Get information about a taxonomy term using its name, retrieving the parent term group and term set using their IDs
 
 ```sh
-spo term get --name IT --termGroupId 5c928151-c140-4d48-aab9-54da901c7fef --termSetId 8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f
+m365 spo term get --name IT --termGroupId 5c928151-c140-4d48-aab9-54da901c7fef --termSetId 8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f
 ```

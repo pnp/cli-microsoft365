@@ -5,7 +5,7 @@ Gets a list item from the specified list
 ## Usage
 
 ```sh
-spo listitem get [options]
+m365 spo listitem get [options]
 ```
 
 ## Options
@@ -28,12 +28,12 @@ Option|Description
 Get an item with ID _147_ from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x
+m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
 
 Get an items Title and Created column and with ID _147_ from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --fields "Title,Created"
+m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --fields "Title,Created"
 ```

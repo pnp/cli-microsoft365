@@ -158,13 +158,13 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
   Examples:
   
     Enable the service principal. Will prompt for confirmation
-      ${commands.SERVICEPRINCIPAL_SET} --enabled true
+      m365 ${this.name} --enabled true
 
     Disable the service principal. Will prompt for confirmation
-      ${commands.SERVICEPRINCIPAL_SET} --enabled false
+      m365 ${this.name} --enabled false
 
     Enable the service principal without prompting for confirmation
-      ${commands.SERVICEPRINCIPAL_SET} --enabled true --confirm
+      m365 ${this.name} --enabled true --confirm
 `);
   }
 }

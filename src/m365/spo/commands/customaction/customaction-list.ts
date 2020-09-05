@@ -183,19 +183,19 @@ class SpoCustomActionListCommand extends SpoCommand {
   
     Return details about all user custom actions located
     in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_LIST} --url https://contoso.sharepoint.com/sites/test
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test
 
     Return details about all user custom actions located
     in site or site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_LIST} --url https://contoso.sharepoint.com/sites/test
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test
 
     Return details about all user custom actions located 
     in site collection ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_LIST} --url https://contoso.sharepoint.com/sites/test --scope Site
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test --scope Site
 
     Return details about all user custom actions located 
     in site ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_LIST} --url https://contoso.sharepoint.com/sites/test --scope Web
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test --scope Web
 
   More information:
 

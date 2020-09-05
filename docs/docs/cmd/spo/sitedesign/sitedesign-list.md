@@ -5,7 +5,7 @@ Lists available site designs for creating modern sites
 ## Usage
 
 ```sh
-spo sitedesign list [options]
+m365 spo sitedesign list [options]
 ```
 
 ## Options
@@ -23,7 +23,7 @@ Option|Description
 List available site designs
 
 ```sh
-spo sitedesign list
+m365 spo sitedesign list
 ```
 
 ## More information

@@ -5,7 +5,7 @@ Removes CDN origin for the current SharePoint Online tenant
 ## Usage
 
 ```sh
-spo cdn origin remove [options]
+m365 spo cdn origin remove [options]
 ```
 
 ## Options
@@ -33,7 +33,7 @@ Using the `-t, --type` option you can choose whether you want to manage the sett
 Remove _*/CDN_ from the list of origins of the Public CDN
 
 ```sh
-spo cdn origin remove -t Public -r */CDN
+m365 spo cdn origin remove -t Public -r */CDN
 ```
 
 ## More information

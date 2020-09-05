@@ -5,7 +5,7 @@ Returns the URL of the SharePoint Content Type Hub of the Tenant
 ## Usage
 
 ```sh
-spo contenttypehub get [options]
+m365 spo contenttypehub get [options]
 ```
 
 ## Options
@@ -23,5 +23,5 @@ Option|Description
 Retrieve the Content Type Hub URL
 
 ```sh
-spo contenttypehub get
+m365 spo contenttypehub get
 ```

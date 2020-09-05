@@ -5,7 +5,7 @@ Restores an archived Microsoft Teams team
 ## Usage
 
 ```sh
-teams team unarchive [options]
+m365 teams team unarchive [options]
 ```
 
 ## Options
@@ -30,5 +30,5 @@ This command restores users' ability to send messages and edit the team, abiding
 Restore an archived Microsoft Teams team
 
 ```sh
-teams team unarchive --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
+m365 teams team unarchive --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
 ```

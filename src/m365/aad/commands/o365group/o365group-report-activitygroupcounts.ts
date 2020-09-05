@@ -23,17 +23,17 @@ class O365GroupReportActivityGroupCountsCommand extends PeriodBasedReport {
 
     Get the daily total number of groups and how many of them were active based
     on activities for the last week
-      ${commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS} --period D7
+      m365 ${this.name} --period D7
 
     Get the daily total number of groups and how many of them were active based
     on activities for the last week and exports the report data in the specified
     path in text format
-      ${commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS} --period D7 --output text > "o365groupactivitygroupcounts.txt"
+      m365 ${this.name} --period D7 --output text > "o365groupactivitygroupcounts.txt"
 
     Get the daily total number of groups and how many of them were active based
     on activities for the last week and exports the report data in the specified
     path in json format
-      ${commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS} --period D7 --output json > "o365groupactivitygroupcounts.json"
+      m365 ${this.name} --period D7 --output json > "o365groupactivitygroupcounts.json"
 `);
   }
 }

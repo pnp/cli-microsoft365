@@ -22,15 +22,15 @@ class TenantReportActiveUserCountsCommand extends PeriodBasedReport {
       `  Examples: 
 
     Gets the count of daily active users in the reporting period by product for last week
-      ${commands.TENANT_REPORT_ACTIVEUSERCOUNTS} --period D7
+      m365 ${this.name} --period D7
 
     Gets the count of daily active users in the reporting period by product for last week
     and exports the report data in the specified path in text format
-      ${commands.TENANT_REPORT_ACTIVEUSERCOUNTS} --period D7 --output text > "activeusercounts.txt"
+      m365 ${this.name} --period D7 --output text > "activeusercounts.txt"
 
     Gets the count of daily active users in the reporting period by product for last week
     and exports the report data in the specified path in json format
-      ${commands.TENANT_REPORT_ACTIVEUSERCOUNTS} --period D7 --output json > "activeusercounts.json"
+      m365 ${this.name} --period D7 --output json > "activeusercounts.json"
 `);
   }
 }

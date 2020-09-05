@@ -5,7 +5,7 @@ Gets the current value of the HideDefaultThemes setting
 ## Usage
 
 ```sh
-spo hidedefaultthemes get [options]
+m365 spo hidedefaultthemes get [options]
 ```
 
 ## Options
@@ -26,7 +26,7 @@ Option|Description
 Get the current value of the HideDefaultThemes setting
 
 ```sh
-spo hidedefaultthemes get
+m365 spo hidedefaultthemes get
 ```
 
 ## More information

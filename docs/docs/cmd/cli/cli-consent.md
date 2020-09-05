@@ -5,7 +5,7 @@ Consent additional permissions for the Azure AD application used by the CLI for 
 ## Usage
 
 ```sh
-cli consent [options]
+m365 cli consent [options]
 ```
 
 ## Options
@@ -32,5 +32,5 @@ To simplify things, rather than wondering which permissions you should grant for
 Consent permissions to the Yammer API
 
 ```sh
-cli consent --service yammer
+m365 cli consent --service yammer
 ```

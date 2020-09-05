@@ -5,7 +5,7 @@ Gets a site user within specific web
 ## Usage
 
 ```sh
-spo user get [options]
+m365 spo user get [options]
 ```
 
 ## Options
@@ -27,17 +27,17 @@ Option|Description
 Get user with email _john.doe@mytenant.onmicrosoft.com_ for web _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --email john.doe@mytenant.onmicrosoft.com
+m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --email john.doe@mytenant.onmicrosoft.com
 ```
 
 Get user with ID _6_ for web _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --id 6
+m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --id 6
 ```
 
 Get user with login name 'i:0#.f|membership|john.doe@mytenant.onmicrosoft.com' for web _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+m365 spo user get --webUrl https://contoso.sharepoint.com/sites/project-x --loginName "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
 ```

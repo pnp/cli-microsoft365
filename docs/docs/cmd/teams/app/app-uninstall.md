@@ -5,7 +5,7 @@ Uninstalls an app from a Microsoft Team team
 ## Usage
 
 ```sh
-teams app uninstall [options]
+m365 teams app uninstall [options]
 ```
 
 ## Options
@@ -31,5 +31,5 @@ Do not use the ID from the manifest of the zip app package or the id from the Mi
 Uninstall an app from a Microsoft Teams team
 
 ```sh
-teams app uninstall --appId YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY= --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
+m365 teams app uninstall --appId YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY= --teamId 2609af39-7775-4f94-a3dc-0dd67657e900
 ```

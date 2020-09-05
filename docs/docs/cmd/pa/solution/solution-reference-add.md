@@ -5,7 +5,7 @@ Adds a project reference to the solution in the current directory
 ## Usage
 
 ```sh
-pa solution reference add [options]
+m365 pa solution reference add [options]
 ```
 
 ## Options
@@ -30,7 +30,7 @@ The CDS solution project and the PowerApps component framework project cannot ha
 Adds a reference inside the CDS Solution project in the current directory to the PowerApps component framework project at `./projects/ExampleProject`
 
 ```sh
-pa solution reference add --path ./projects/ExampleProject
+m365 pa solution reference add --path ./projects/ExampleProject
 ```
 
 ## More information

@@ -5,7 +5,7 @@ Renews Microsoft 365 group's expiration
 ## Usage
 
 ```sh
-aad o365group renew [options]
+m365 aad o365group renew [options]
 ```
 
 ## Options
@@ -28,5 +28,5 @@ If the specified _id_ doesn't refer to an existing group, you will get a `The re
 Renew the Microsoft 365 group with id _28beab62-7540-4db1-a23f-29a6018a3848_
 
 ```sh
-aad o365group renew --id 28beab62-7540-4db1-a23f-29a6018a3848
+m365 aad o365group renew --id 28beab62-7540-4db1-a23f-29a6018a3848
 ```

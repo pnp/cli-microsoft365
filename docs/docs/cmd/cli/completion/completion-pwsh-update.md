@@ -5,7 +5,7 @@ Updates command completion for PowerShell
 ## Usage
 
 ```sh
-cli completion pwsh update [options]
+m365 cli completion pwsh update [options]
 ```
 
 ## Options

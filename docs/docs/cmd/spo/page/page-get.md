@@ -5,7 +5,7 @@ Gets information about the specific modern page
 ## Usage
 
 ```sh
-spo page get [options]
+m365 spo page get [options]
 ```
 
 ## Options
@@ -29,5 +29,5 @@ If the specified name doesn't refer to an existing modern page, you will get a `
 Get information about the modern page with name _home.aspx_
 
 ```sh
-spo page get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
+m365 spo page get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
 ```

@@ -5,7 +5,7 @@ Creates a group setting
 ## Usage
 
 ```sh
-aad groupsetting add [options]
+m365 aad groupsetting add [options]
 ```
 
 ## Options
@@ -36,5 +36,5 @@ If you try to add a group setting using a template, for which a setting already 
 Configure classification for modern SharePoint sites
 
 ```sh
-aad groupsetting add --templateId 62375ab9-6b52-47ed-826b-58e47e0e304b --UsageGuidelinesUrl https://contoso.sharepoint.com/sites/compliance --ClassificationList 'HBI, MBI, LBI, GDPR' --DefaultClassification MBI
+m365 aad groupsetting add --templateId 62375ab9-6b52-47ed-826b-58e47e0e304b --UsageGuidelinesUrl https://contoso.sharepoint.com/sites/compliance --ClassificationList 'HBI, MBI, LBI, GDPR' --DefaultClassification MBI
 ```

@@ -5,7 +5,7 @@ List CDN origins settings for the current SharePoint Online tenant
 ## Usage
 
 ```sh
-spo cdn origin list [options]
+m365 spo cdn origin list [options]
 ```
 
 ## Options
@@ -31,13 +31,13 @@ Using the `-t, --type` option you can choose whether you want to manage the sett
 Show the list of origins configured for the Public CDN
 
 ```sh
-spo cdn origin list
+m365 spo cdn origin list
 ```
 
 Show the list of origins configured for the Private CDN
 
 ```sh
-spo cdn origin list -t Private
+m365 spo cdn origin list -t Private
 ```
 
 ## More information

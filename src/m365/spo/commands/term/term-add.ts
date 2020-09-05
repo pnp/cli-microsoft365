@@ -304,20 +304,20 @@ class SpoTermAddCommand extends SpoCommand {
   
     Add taxonomy term with the specified name to the term group and term set
     specified by their names
-      ${commands.TERM_ADD} --name IT --termSetName Department --termGroupName People
+      m365 ${this.name} --name IT --termSetName Department --termGroupName People
 
     Add taxonomy term with the specified name to the term group and term set
     specified by their IDs
-      ${commands.TERM_ADD} --name IT --termSetId 8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f --termGroupId 5c928151-c140-4d48-aab9-54da901c7fef
+      m365 ${this.name} --name IT --termSetId 8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f --termGroupId 5c928151-c140-4d48-aab9-54da901c7fef
 
     Add taxonomy term with the specified name and ID
-      ${commands.TERM_ADD} --name IT --id 5c928151-c140-4d48-aab9-54da901c7fef --termSetName Department --termGroupName People
+      m365 ${this.name} --name IT --id 5c928151-c140-4d48-aab9-54da901c7fef --termSetName Department --termGroupName People
 
     Add taxonomy term with custom properties
-      ${commands.TERM_ADD} --name IT --termSetName Department --termGroupName People --customProperties '{"Property": "Value"}'
+      m365 ${this.name} --name IT --termSetName Department --termGroupName People --customProperties '{"Property": "Value"}'
 
     Add taxonomy term below the specified term
-      ${commands.TERM_ADD} --name IT --parentTermId 5c928151-c140-4d48-aab9-54da901c7fef --termGroupName People
+      m365 ${this.name} --name IT --parentTermId 5c928151-c140-4d48-aab9-54da901c7fef --termGroupName People
 `);
   }
 }

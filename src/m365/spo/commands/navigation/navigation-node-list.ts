@@ -114,10 +114,10 @@ class SpoNavigationNodeListCommand extends SpoCommand {
       `  Examples:
   
     Retrieve nodes from the top navigation
-      ${commands.NAVIGATION_NODE_LIST} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar
 
     Retrieve nodes from the quick launch
-      ${commands.NAVIGATION_NODE_LIST} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch
 `);
   }
 }

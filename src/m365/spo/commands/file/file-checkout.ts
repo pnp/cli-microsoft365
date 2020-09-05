@@ -123,12 +123,12 @@ class SpoFileCheckoutCommand extends SpoCommand {
   
     Checks out file with UniqueId ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}
     located in site ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.FILE_CHECKOUT} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' 
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --id 'b2307a39-e878-458b-bc90-03bc578531d6' 
 
     Checks out file with server-relative url
     ${chalk.grey('/sites/project-x/documents/Test1.docx')} located in site
     ${chalk.grey('https://contoso.sharepoint.com/sites/project-x')}
-      ${commands.FILE_CHECKOUT} --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx'
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/project-x --fileUrl '/sites/project-x/documents/Test1.docx'
       `);
   }
 }

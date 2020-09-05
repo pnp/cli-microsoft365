@@ -412,18 +412,18 @@ class SpoSearchCommand extends SpoCommand {
 
     Execute search query to retrieve all Document Sets
     (ContentTypeId = '${chalk.grey('0x0120D520')}') for the English locale
-      ${commands.SEARCH} --queryText "ContentTypeId:0x0120D520" --culture 1033
+      m365 ${this.name} --queryText "ContentTypeId:0x0120D520" --culture 1033
 
     Retrieve all documents. For each document, retrieve the Path, Author
     and FileType.
-      ${commands.SEARCH} --queryText "IsDocument:1" --selectProperties "Path,Author,FileType" --allResults
+      m365 ${this.name} --queryText "IsDocument:1" --selectProperties "Path,Author,FileType" --allResults
 
     Return the top 50 items of which the title starts with 'Marketing' while
     trimming duplicates.
-      ${commands.SEARCH} --queryText "Title:Marketing*" --rowLimit=50 --trimDuplicates
+      m365 ${this.name} --queryText "Title:Marketing*" --rowLimit=50 --trimDuplicates
 
     Return only items from a specific result source (using the source id).
-      ${commands.SEARCH} --queryText "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083"
+      m365 ${this.name} --queryText "*" --sourceId "6e71030e-5e16-4406-9bff-9c1829843083"
       `);
   }
 }

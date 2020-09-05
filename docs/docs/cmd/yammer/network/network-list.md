@@ -5,7 +5,7 @@ Returns a list of networks to which the current user has access
 ## Usage
 
 ```sh
-yammer network list [options]
+m365 yammer network list [options]
 ```
 
 ## Options
@@ -29,11 +29,11 @@ Option|Description
 Returns the current user's networks
 
 ```sh
-yammer network list
+m365 yammer network list
 ```
 
 Returns the current user's networks including the networks in which the user is suspended
 
 ```sh
-yammer network list --includeSuspended
+m365 yammer network list --includeSuspended
 ```

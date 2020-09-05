@@ -5,7 +5,7 @@ Gets information about the specific service principal
 ## Usage
 
 ```sh
-aad sp get [options]
+m365 aad sp get [options]
 ```
 
 ## Options
@@ -30,19 +30,19 @@ Specify either the `appId`, `objectId` or `displayName`. If you specify more tha
 Return details about the service principal with appId _b2307a39-e878-458b-bc90-03bc578531d6_.
 
 ```sh
-aad sp get --appId b2307a39-e878-458b-bc90-03bc578531d6
+m365 aad sp get --appId b2307a39-e878-458b-bc90-03bc578531d6
 ```
 
 Return details about the _Microsoft Graph_ service principal.
 
 ```sh
-aad sp get --displayName "Microsoft Graph"
+m365 aad sp get --displayName "Microsoft Graph"
 ```
 
 Return details about the service principal with ObjectId _b2307a39-e878-458b-bc90-03bc578531dd_.
 
 ```sh
-aad sp get --objectId b2307a39-e878-458b-bc90-03bc578531dd
+m365 aad sp get --objectId b2307a39-e878-458b-bc90-03bc578531dd
 ```
 
 ## More information

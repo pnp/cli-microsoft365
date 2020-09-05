@@ -5,7 +5,7 @@ Removes the specified list- or site column
 ## Usage
 
 ```sh
-spo field remove [options]
+m365 spo field remove [options]
 ```
 
 ## Options
@@ -31,23 +31,23 @@ Option|Description
 Remove the site column with the specified ID, located in site _https://contoso.sharepoint.com/sites/contoso-sales_
 
 ```sh
-spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
+m365 spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
 ```
 
 Remove the list column with the specified ID, located in site _https://contoso.sharepoint.com/sites/contoso-sales_. Retrieves the list by its title
 
 ```sh
-spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
+m365 spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listTitle Events --id 5ee2dd25-d941-455a-9bdb-7f2c54aed11b
 ```
 
 Remove the list column with the specified display name, located in site _https://contoso.sharepoint.com/sites/contoso-sales_. Retrieves the list by its url
 
 ```sh
-spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl 'Lists/Events' --fieldTitle 'Title'
+m365 spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --listUrl 'Lists/Events' --fieldTitle 'Title'
 ```
 
 Remove all site columns from group _MyGroup_
 
 ```sh
-spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --group 'MyGroup'
+m365 spo field remove --webUrl https://contoso.sharepoint.com/sites/contoso-sales --group 'MyGroup'
 ```

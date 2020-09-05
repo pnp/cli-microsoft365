@@ -5,7 +5,7 @@ Removes the specified navigation node
 ## Usage
 
 ```sh
-spo navigation node remove [options]
+m365 spo navigation node remove [options]
 ```
 
 ## Options
@@ -27,11 +27,11 @@ Option|Description
 Remove a node from the top navigation. Will prompt for confirmation
 
 ```sh
-spo navigation node remove --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --id 2003
+m365 spo navigation node remove --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --id 2003
 ```
 
 Remove a node from the quick launch without prompting for confirmation
 
 ```sh
-spo navigation node remove --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --id 2003 --confirm
+m365 spo navigation node remove --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --id 2003 --confirm
 ```

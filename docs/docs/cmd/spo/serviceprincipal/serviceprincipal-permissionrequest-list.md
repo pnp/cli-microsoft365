@@ -5,13 +5,13 @@ Lists pending permission requests
 ## Usage
 
 ```sh
-spo serviceprincipal permissionrequest list [options]
+m365 spo serviceprincipal permissionrequest list [options]
 ```
 
 ## Alias
 
 ```sh
-spo sp permissionrequest list
+m365 spo sp permissionrequest list
 ```
 
 ## Options
@@ -32,5 +32,5 @@ Option|Description
 List all pending permission requests
 
 ```sh
-spo serviceprincipal permissionrequest list
+m365 spo serviceprincipal permissionrequest list
 ```

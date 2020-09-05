@@ -169,7 +169,7 @@ class PaSolutionInitCommand extends Command {
 
     Initializes a CDS solution project using ${chalk.grey('yourPublisherName')} as publisher
     name and ${chalk.grey('ypn')} as publisher prefix
-      ${commands.SOLUTION_INIT} --publisherName yourPublisherName --publisherPrefix ypn
+      m365 ${this.name} --publisherName yourPublisherName --publisherPrefix ypn
 
   More information:
 

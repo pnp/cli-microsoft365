@@ -5,7 +5,7 @@ Creates new tenant app catalog site
 ## Usage
 
 ```sh
-spo tenant appcatalog add [options]
+m365 spo tenant appcatalog add [options]
 ```
 
 ## Options
@@ -39,17 +39,17 @@ Creating an app catalog site might take a while. If you need to wait for the sit
 Creates new app catalog. Will fail if another app catalog or site at the specified URL exists
 
 ```sh
-spo tenant appcatalog add --url https://contoso.sharepoint.com/sites/apps --owner admin@contoso.com --timeZone 4
+m365 spo tenant appcatalog add --url https://contoso.sharepoint.com/sites/apps --owner admin@contoso.com --timeZone 4
 ```
 
 Creates new app catalog and waits for completion. Will fail if another app catalog or site at the specified URL exists
 
 ```sh
-spo tenant appcatalog add --url https://contoso.sharepoint.com/sites/apps --owner admin@contoso.com --timeZone 4 --wait
+m365 spo tenant appcatalog add --url https://contoso.sharepoint.com/sites/apps --owner admin@contoso.com --timeZone 4 --wait
 ```
 
 Creates new app catalog and deletes existing app catalog and existing site at the specified URL
 
 ```sh
-spo tenant appcatalog add --url https://contoso.sharepoint.com/sites/apps --owner admin@contoso.com --timeZone 4 --force
+m365 spo tenant appcatalog add --url https://contoso.sharepoint.com/sites/apps --owner admin@contoso.com --timeZone 4 --force
 ```

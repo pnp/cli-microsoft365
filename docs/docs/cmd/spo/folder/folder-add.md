@@ -5,7 +5,7 @@ Creates a folder within a parent folder
 ## Usage
 
 ```sh
-spo folder add [options]
+m365 spo folder add [options]
 ```
 
 ## Options
@@ -26,5 +26,5 @@ Option|Description
 Creates folder in a parent folder with site relative url _/Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo folder add --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents' --name 'My Folder Name'
+m365 spo folder add --webUrl https://contoso.sharepoint.com/sites/project-x --parentFolderUrl '/Shared Documents' --name 'My Folder Name'
 ```

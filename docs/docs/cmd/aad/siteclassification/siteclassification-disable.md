@@ -5,7 +5,7 @@ Disables site classification
 ## Usage
 
 ```sh
-aad siteclassification disable [options]
+m365 aad siteclassification disable [options]
 ```
 
 ## Options
@@ -29,13 +29,13 @@ Option|Description
 Disable site classification
 
 ```sh
-aad siteclassification disable
+m365 aad siteclassification disable
 ```
 
 Disable site classification without confirmation
 
 ```sh
-aad siteclassification disable --confirm
+m365 aad siteclassification disable --confirm
 ```
 
 ## More information

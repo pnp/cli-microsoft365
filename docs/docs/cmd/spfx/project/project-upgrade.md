@@ -5,7 +5,7 @@ Upgrades SharePoint Framework project to the specified version
 ## Usage
 
 ```sh
-spfx project upgrade [options]
+m365 spfx project upgrade [options]
 ```
 
 ## Options
@@ -37,35 +37,35 @@ Using this command you can upgrade SharePoint Framework projects built using ver
 Get instructions to upgrade the current SharePoint Framework project to SharePoint Framework version 1.5.0 and save the findings in a Markdown file
 
 ```sh
-spfx project upgrade --toVersion 1.5.0 --output md > "upgrade-report.md"
+m365 spfx project upgrade --toVersion 1.5.0 --output md > "upgrade-report.md"
 ```
 
 Get instructions to Upgrade the current SharePoint Framework project to SharePoint Framework version 1.5.0 and show the summary of the findings in the shell
 
 ```sh
-spfx project upgrade --toVersion 1.5.0
+m365 spfx project upgrade --toVersion 1.5.0
 ```
 
 Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the CLI for Microsoft 365 using pnpm
 
 ```sh
-spfx project upgrade --packageManager pnpm
+m365 spfx project upgrade --packageManager pnpm
 ```
 
 Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the CLI for Microsoft 365
 
 ```sh
-spfx project upgrade
+m365 spfx project upgrade
 ```
 
 Get instructions to upgrade the current SharePoint Framework project to the latest SharePoint Framework version supported by the CLI for Microsoft 365 using PowerShell
 
 ```sh
-spfx project upgrade --shell powershell
+m365 spfx project upgrade --shell powershell
 ```
 
 Get instructions to upgrade the current SharePoint Framework project to the latest version of SharePoint Framework and save the findings in a [CodeTour](https://aka.ms/codetour) file
 
 ```sh
-spfx project upgrade  --output tour
+m365 spfx project upgrade  --output tour
 ```

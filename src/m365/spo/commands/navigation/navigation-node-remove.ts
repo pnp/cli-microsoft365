@@ -151,10 +151,10 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
       `  Examples:
   
     Remove a node from the top navigation. Will prompt for confirmation
-      ${commands.NAVIGATION_NODE_REMOVE} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --id 2003
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --location TopNavigationBar --id 2003
 
     Remove a node from the quick launch without prompting for confirmation
-      ${commands.NAVIGATION_NODE_REMOVE} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --id 2003 --confirm
+      m365 ${this.name} --webUrl https://contoso.sharepoint.com/sites/team-a --location QuickLaunch --id 2003 --confirm
 `);
   }
 }

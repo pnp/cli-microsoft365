@@ -5,7 +5,7 @@ Adds taxonomy term
 ## Usage
 
 ```sh
-spo term add [options]
+m365 spo term add [options]
 ```
 
 ## Options
@@ -36,29 +36,29 @@ Option|Description
 Add taxonomy term with the specified name to the term group and term set specified by their names
 
 ```sh
-spo term add --name IT --termSetName Department --termGroupName People
+m365 spo term add --name IT --termSetName Department --termGroupName People
 ```
 
 Add taxonomy term with the specified name to the term group and term set specified by their IDs
 
 ```sh
-spo term add --name IT --termSetId 8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f --termGroupId 5c928151-c140-4d48-aab9-54da901c7fef
+m365 spo term add --name IT --termSetId 8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f --termGroupId 5c928151-c140-4d48-aab9-54da901c7fef
 ```
 
 Add taxonomy term with the specified name and ID
 
 ```sh
-spo term add --name IT --id 5c928151-c140-4d48-aab9-54da901c7fef --termSetName Department --termGroupName People
+m365 spo term add --name IT --id 5c928151-c140-4d48-aab9-54da901c7fef --termSetName Department --termGroupName People
 ```
 
 Add taxonomy term with custom properties
 
 ```sh
-spo term add --name IT --termSetName Department --termGroupName People --customProperties '{"Property": "Value"}'
+m365 spo term add --name IT --termSetName Department --termGroupName People --customProperties '{"Property": "Value"}'
 ```
 
 Add taxonomy term below the specified term
 
 ```sh
-spo term add --name IT --parentTermId 5c928151-c140-4d48-aab9-54da901c7fef --termGroupName People
+m365 spo term add --name IT --parentTermId 5c928151-c140-4d48-aab9-54da901c7fef --termGroupName People
 ```

@@ -249,32 +249,32 @@ class LoginCommand extends Command {
 
     Log in to Microsoft 365 using the device code in debug mode including detailed
     debug information in the console output
-      ${commands.LOGIN} --debug
+      m365 ${this.name} --debug
 
     Log in to Microsoft 365 using a user name and password
-      ${commands.LOGIN} --authType password --userName user@contoso.com --password pass@word1
+      m365 ${this.name} --authType password --userName user@contoso.com --password pass@word1
 
     Log in to Microsoft 365 using a PEM certificate
-      ${commands.LOGIN} --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+      m365 ${this.name} --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
 
     Log in to Microsoft 365 using a personal information exchange (.pfx) file
-      ${commands.LOGIN} --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+      m365 ${this.name} --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
     
     Log in to Microsoft 365 using a system assigned managed identity. 
     Applies to Azure resources with managed identity enabled, 
     such as Azure Virtual Machines, Azure App Service or Azure Functions
-      ${commands.LOGIN} --authType identity
+      m365 ${this.name} --authType identity
 
     Log in to Microsoft 365 using managed identity in Azure Cloud Shell.
     Uses the identity of the current user.
-      ${commands.LOGIN} --authType identity
+      m365 ${this.name} --authType identity
 
     Log in to Microsoft 365 using a user-assigned managed identity. 
     Client id or principal id also known as object id value can be specified in
     the userName option. Applies to Azure resources with managed identity
     enabled, such as Azure Virtual Machines, Azure App Service or
     Azure Functions
-      ${commands.LOGIN} --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
+      m365 ${this.name} --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
 `);
   }
 }

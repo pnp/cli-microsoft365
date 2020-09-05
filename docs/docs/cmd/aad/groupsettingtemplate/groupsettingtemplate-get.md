@@ -5,7 +5,7 @@ Gets information about the specified Azure AD group settings template
 ## Usage
 
 ```sh
-aad groupsettingtemplate get [options]
+m365 aad groupsettingtemplate get [options]
 ```
 
 ## Options
@@ -25,11 +25,11 @@ Option|Description
 Get information about the group setting template with id _62375ab9-6b52-47ed-826b-58e47e0e304b_
 
 ```sh
-aad groupsettingtemplate get --id 62375ab9-6b52-47ed-826b-58e47e0e304b
+m365 aad groupsettingtemplate get --id 62375ab9-6b52-47ed-826b-58e47e0e304b
 ```
 
 Get information about the group setting template with display name _Group.Unified_
 
 ```sh
-aad groupsettingtemplate get --displayName Group.Unified
+m365 aad groupsettingtemplate get --displayName Group.Unified
 ```

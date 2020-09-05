@@ -5,7 +5,7 @@ Lists Planner tasks for the currently logged in user
 ## Usage
 
 ```sh
-planner task list [options]
+m365 planner task list [options]
 ```
 
 ## Options
@@ -23,5 +23,5 @@ Option|Description
 List tasks for the currently logged in user
 
 ```sh
-planner task list
+m365 planner task list
 ```

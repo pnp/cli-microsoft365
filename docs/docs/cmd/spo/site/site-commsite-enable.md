@@ -5,7 +5,7 @@ Enables communication site features on the specified site
 ## Usage
 
 ```sh
-spo site commsite enable [options]
+m365 spo site commsite enable [options]
 ```
 
 ## Options
@@ -28,5 +28,5 @@ Option|Description
 Enable communication site features on an existing site
 
 ```sh
-spo site commsite enable --url https://contoso.sharepoint.com
+m365 spo site commsite enable --url https://contoso.sharepoint.com
 ```

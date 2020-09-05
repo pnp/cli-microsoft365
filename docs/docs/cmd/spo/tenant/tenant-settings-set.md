@@ -5,7 +5,7 @@ Sets tenant global settings
 ## Usage
 
 ```sh
-spo tenant settings set [options]
+m365 spo tenant settings set [options]
 ```
 
 ## Options
@@ -107,11 +107,11 @@ Option|Description
 Sets single tenant global setting
 
 ```sh
-spo tenant settings set --UserVoiceForFeedbackEnabled true
+m365 spo tenant settings set --UserVoiceForFeedbackEnabled true
 ```
 
 Sets multiple tenant global settings at once
 
 ```sh
-spo tenant settings set --UserVoiceForFeedbackEnabled true --HideSyncButtonOnODB true --AllowedDomainListForSyncClient c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201
+m365 spo tenant settings set --UserVoiceForFeedbackEnabled true --HideSyncButtonOnODB true --AllowedDomainListForSyncClient c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201
 ```

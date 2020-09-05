@@ -5,7 +5,7 @@ List all libraries that are assigned as asset library
 ## Usage
 
 ```sh
-spo orgassetslibrary list [options]
+m365 spo orgassetslibrary list [options]
 ```
 
 ## Options
@@ -26,5 +26,5 @@ Option|Description
 List all libraries that are assigned as asset library
 
 ```sh
-spo orgassetslibrary list
+m365 spo orgassetslibrary list
 ```

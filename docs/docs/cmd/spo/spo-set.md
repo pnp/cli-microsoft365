@@ -5,7 +5,7 @@ Sets the URL of the root SharePoint site collection for use in SPO commands
 ## Usage
 
 ```sh
-spo set [options]
+m365 spo set [options]
 ```
 
 ## Options
@@ -28,5 +28,5 @@ CLI for Microsoft 365 automatically discovers the URL of the root SharePoint sit
 Set SPO URL to the specified URL
 
 ```sh
-spo set --url https://contoso.sharepoint.com
+m365 spo set --url https://contoso.sharepoint.com
 ```

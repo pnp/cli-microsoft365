@@ -126,15 +126,15 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
   Examples:
 
     List all Microsoft Teams apps from your organization's app catalog only
-      ${commands.TEAMS_APP_LIST}
+      m365 ${this.name}
          
     List all apps from the Microsoft Teams app catalog and the Microsoft Teams
     store
-      ${commands.TEAMS_APP_LIST} --all
+      m365 ${this.name} --all
 
     List your organization's apps installed in the specified Microsoft Teams
     team
-      ${commands.TEAMS_APP_LIST} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
+      m365 ${this.name} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
 `);
   }
 }

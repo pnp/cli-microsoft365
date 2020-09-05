@@ -5,7 +5,7 @@ Removes content type from list
 ## Usage
 
 ```sh
-spo list contenttype remove [options]
+m365 spo list contenttype remove [options]
 ```
 
 ## Options
@@ -28,11 +28,11 @@ Option|Description
 Remove content type with ID _0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A_ from the list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A
+m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A
 ```
 
 Remove content type with ID _0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A_ from the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A
+m365 spo list contenttype remove --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents --contentTypeId 0x010109010053EE7AEB1FC54A41B4D9F66ADBDC312A
 ```

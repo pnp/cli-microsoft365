@@ -5,7 +5,7 @@ Gets custom theme information
 ## Usage
 
 ```sh
-spo theme get [options]
+m365 spo theme get [options]
 ```
 
 ## Options
@@ -27,7 +27,7 @@ Option|Description
 Get information about a theme
 
 ```sh
-spo theme get --name Contoso-Blue
+m365 spo theme get --name Contoso-Blue
 ```
 
 ## More information

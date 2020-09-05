@@ -5,7 +5,7 @@ Updates the settings of the specified list
 ## Usage
 
 ```sh
-spo list set [options]
+m365 spo list set [options]
 ```
 
 ## Options
@@ -86,19 +86,19 @@ Option|Description
 Update the _allowContentTypes_ property of the list with id _3EA5A977-315E-4E25-8B0F-E4F949BF6B8F_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --allowContentTypes true
+m365 spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --allowContentTypes true
 ```
 
 Enable versioning and set the number of major versions to keep on the list with id _3EA5A977-315E-4E25-8B0F-E4F949BF6B8F_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --enableVersioning true --majorVersionLimit 50
+m365 spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --enableVersioning true --majorVersionLimit 50
 ```
 
 Enable content types and versioning in the list with id _3EA5A977-315E-4E25-8B0F-E4F949BF6B8F_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --contentTypesEnabled true --enableVersioning true --majorVersionLimit 50 --majorWithMinorVersionsLimit 100
+m365 spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --contentTypesEnabled true --enableVersioning true --majorVersionLimit 50 --majorWithMinorVersionsLimit 100
 ```
 
 ## More information

@@ -5,7 +5,7 @@ Lists content types configured on the list
 ## Usage
 
 ```sh
-spo list contenttype list [options]
+m365 spo list contenttype list [options]
 ```
 
 ## Options
@@ -26,11 +26,11 @@ Option|Description
 List all content types configured on the list with ID _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list contenttype list --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
+m365 spo list contenttype list --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf
 ```
 
 List all content types configured on the list with title _Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-spo list contenttype list --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
+m365 spo list contenttype list --webUrl https://contoso.sharepoint.com/sites/project-x --listTitle Documents
 ```

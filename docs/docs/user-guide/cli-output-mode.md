@@ -15,7 +15,7 @@ By default, all commands in CLI for Microsoft 365 present their output as plain-
 If the command output is a simple value, such as a number, boolean or a string, the value is returned as-is. For example, if the Microsoft 365 Public CDN is enabled on the currently connected tenant, executing the `spo cdn get` command, will return `true`:
 
 ```sh
-$ m365 spo cdn get
+m365 $ m365 spo cdn get
 true
 ```
 
@@ -24,7 +24,7 @@ true
 If the command returns information about an object such as a site, list or an app, that contains a number of properties, the output in text mode is formatted as key-value pairs. For example, getting information about a specific app, will return output similar to:
 
 ```sh
-$ m365 spo app get -i e6362993-d4fd-4c5a-8254-fd095a7291ad
+m365 $ m365 spo app get -i e6362993-d4fd-4c5a-8254-fd095a7291ad
 AppCatalogVersion     : 1.0.0.0
 CanUpgrade            : false
 CurrentVersionDeployed: false
@@ -40,7 +40,7 @@ Title                 : spfx-140-online-client-side-solution
 If the command returns information about multiple objects, the output is formatted as a table. For example, getting the list of available app, will return output similar to:
 
 ```sh
-$ m365 spo app list
+m365 $ m365 spo app list
 Title                                 ID                                    Deployed  AppCatalogVersion
 ------------------------------------  ------------------------------------  --------  -----------------
 spfx-140-online-client-side-solution  e6362993-d4fd-4c5a-8254-fd095a7291ad  false     1.0.0.0
@@ -50,7 +50,7 @@ spfx-134-client-side-solution         5ae74650-b00b-46a9-925f-9c9bd70a0cb6  fals
 If only one app is returned, it will be displayed as key-value pairs:
 
 ```sh
-$ m365 spo app list
+m365 $ m365 spo app list
 AppCatalogVersion: 1.0.0.0
 Deployed         : false
 ID               : e6362993-d4fd-4c5a-8254-fd095a7291ad
@@ -66,7 +66,7 @@ Optionally, you can have all CLI for Microsoft 365 commands return their output 
 Simple values in JSON output, are returned as-is. For example, if the Microsoft 365 Public CDN is enabled on the currently connected tenant, executing the `spo cdn get` command, will return `true`:
 
 ```sh
-$ m365 spo cdn get -o json
+m365 $ m365 spo cdn get -o json
 true
 ```
 
@@ -75,7 +75,7 @@ true
 If the command returns an object, that object will be formatted as a JSON string. For example, getting information about a specific app, will return output similar to:
 
 ```sh
-$ m365 spo app get -i e6362993-d4fd-4c5a-8254-fd095a7291ad
+m365 $ m365 spo app get -i e6362993-d4fd-4c5a-8254-fd095a7291ad
 {
   "AppCatalogVersion": "1.0.0.0",
   "CanUpgrade": false,
@@ -93,7 +93,7 @@ $ m365 spo app get -i e6362993-d4fd-4c5a-8254-fd095a7291ad
 If the command returns information about multiple objects, the command will return a JSON array with each array item representing one object. For example, getting the list of available app, will return output similar to:
 
 ```sh
-$ m365 spo app list -o json
+m365 $ m365 spo app list -o json
 [
   {
     "AppCatalogVersion": "1.0.0.0",
@@ -121,7 +121,7 @@ $ m365 spo app list -o json
 Even if the array contains only one item, for consistency it will be returned as a one-element JSON array:
 
 ```sh
-$ m365 spo app list -o json
+m365 $ m365 spo app list -o json
 [
   {
     "AppCatalogVersion": "1.0.0.0",
@@ -150,7 +150,7 @@ CLI for Microsoft 365 supports filtering, sorting and querying data returned by 
 For example, you can retrieve the list of all SharePoint site collections in your tenant, by executing:
 
 ```sh
-$ m365 spo site list
+m365 $ m365 spo site list
 Title                                Url
 -----------------------------------  -------------------------------------------------------------------------
 Digital Initiative Public Relations  https://contoso.sharepoint.com/sites/DigitalInitiativePublicRelations
@@ -164,7 +164,7 @@ Sales and Marketing                  https://contoso.sharepoint.com/sites/SalesA
 To retrieve information only about sites matching a specific title or URL, you could execute:
 
 ```sh
-$ m365 spo site list --query "[?Title == 'Retail']"
+m365 $ m365 spo site list --query "[?Title == 'Retail']"
 Title: Retail
 Url  : https://contoso.sharepoint.com/sites/Retail
 ```
@@ -175,14 +175,14 @@ Url  : https://contoso.sharepoint.com/sites/Retail
 If you wanted to find site collections using a specific site template, you would switch to the JSON output mode, to get access to all retrieved information, and apply the query to the returned data:
 
 ```sh
-$ m365 spo site list --output json --query "[?Template == 'GROUP#0'].{Title: Title, Url: Url}"
+m365 $ m365 spo site list --output json --query "[?Template == 'GROUP#0'].{Title: Title, Url: Url}"
 [{"Title":"Mark 8 Project Team","Url":"https://contoso.sharepoint.com/sites/Mark8ProjectTeam"},{"Title":"Operations","Url":"https://contoso.sharepoint.com/sites/operations"},{"Title":"Digital Initiative Public Relations","Url":"https://contoso.sharepoint.com/sites/DigitalInitiativePublicRelations"},{"Title":"Retail","Url":"https://contoso.sharepoint.com/sites/Retail"},{"Title":"Leadership Team","Url":"https://contoso.sharepoint.com/sites/leadership"},{"Title":"Sales and Marketing","Url":"https://contoso.sharepoint.com/sites/SalesAndMarketing"}]
 ```
 
 To make the output more readable, you could pass it to a JSON processor such as [jq](https://stedolan.github.io/jq/):
 
 ```sh
-$ m365 spo site list --output json --query "[?Template == 'GROUP#0'].{Title: Title, Url: Url}" | jq
+m365 $ m365 spo site list --output json --query "[?Template == 'GROUP#0'].{Title: Title, Url: Url}" | jq
 [
   {
     "Title": "Mark 8 Project Team",
@@ -222,7 +222,7 @@ Using the JSON output mode allows you to build scripts using the CLI for Microso
 Following, is a sample script, that you could build using the CLI for Microsoft 365 in Bash:
 
 ```sh
-# get all apps available in the tenant app catalog
+m365 # get all apps available in the tenant app catalog
 apps=$(m365 spo app list -o json)
 
 # get IDs of all apps that are not deployed

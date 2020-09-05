@@ -160,19 +160,19 @@ class SpoSiteListCommand extends SpoCommand {
   Examples:
   
     List all modern team sites in the tenant you're logged in to
-      ${commands.SITE_LIST}
+      m365 ${this.name}
 
     List all modern team sites in the tenant you're logged in to
-      ${commands.SITE_LIST} --type TeamSite
+      m365 ${this.name} --type TeamSite
 
     List all modern communication sites in the tenant you're logged in to
-      ${commands.SITE_LIST} --type CommunicationSite
+      m365 ${this.name} --type CommunicationSite
 
     List all modern team sites that contain 'project' in the URL
-      ${commands.SITE_LIST} --type TeamSite --filter "Url -like 'project'"
+      m365 ${this.name} --type TeamSite --filter "Url -like 'project'"
 
     List all deleted sites in the tenant you're logged in to
-      ${commands.SITE_LIST} --deleted
+      m365 ${this.name} --deleted
 `);
   }
 }

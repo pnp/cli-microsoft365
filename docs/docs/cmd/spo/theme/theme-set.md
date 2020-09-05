@@ -5,7 +5,7 @@ Add or update a theme
 ## Usage
 
 ```sh
-spo theme set [options]
+m365 spo theme set [options]
 ```
 
 ## Options
@@ -29,13 +29,13 @@ Option|Description
 Add or update a theme from a theme JSON file
 
 ```sh
-spo theme set -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json
+m365 spo theme set -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json
 ```
 
 Add or update an inverted theme from a theme JSON file
 
 ```sh
-spo theme set -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json --isInverted
+m365 spo theme set -n Contoso-Blue -p /Users/rjesh/themes/contoso-blue.json --isInverted
 ```
 
 ## More information

@@ -5,7 +5,7 @@ Gets the trends on the amount of Yammer activity in your organization by how man
 ## Usage
 
 ```sh
-yammer report activitycounts [options]
+m365 yammer report activitycounts [options]
 ```
 
 ## Options
@@ -24,17 +24,17 @@ Option|Description
 Gets the trends on the amount of Yammer activity in your organization by how many messages were posted, read, and liked for the last week
 
 ```sh
-yammer report activitycounts --period D7
+m365 yammer report activitycounts --period D7
 ```
 
 Gets the trends on the amount of Yammer activity in your organization by how many messages were posted, read, and liked for the last week and exports the report data in the specified path in text format
 
 ```sh
-yammer report activitycounts --period D7 --output text > "activitycounts.txt"
+m365 yammer report activitycounts --period D7 --output text > "activitycounts.txt"
 ```
 
 Gets the trends on the amount of Yammer activity in your organization by how many messages were posted, read, and liked for the last week and exports the report data in the specified path in json format
 
 ```sh
-yammer report activitycounts --period D7 --output json > "activitycounts.json"
+m365 yammer report activitycounts --period D7 --output json > "activitycounts.json"
 ```

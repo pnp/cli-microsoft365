@@ -5,7 +5,7 @@ Removes a Microsoft To Do task list
 ## Usage
 
 ```sh
-todo list remove [options]
+m365 todo list remove [options]
 ```
 
 ## Options
@@ -31,11 +31,11 @@ Option|Description
 Remove a task list with the name _My task list_
 
 ```sh
-todo list remove --name "My task list"
+m365 todo list remove --name "My task list"
 ```
 
 Remove a task list with the ID _AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA=_
 
 ```sh
-todo list remove --id "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA="
+m365 todo list remove --id "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIhAAA="
 ```

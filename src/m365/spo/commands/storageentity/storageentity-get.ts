@@ -82,7 +82,7 @@ class SpoStorageEntityGetCommand extends SpoCommand {
   Examples:
   
     Show the value, description and comment of the ${chalk.grey('AnalyticsId')} tenant property
-      ${commands.STORAGEENTITY_GET} --key AnalyticsId
+      m365 ${this.name} --key AnalyticsId
 
   More information:
 

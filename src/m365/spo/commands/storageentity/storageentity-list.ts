@@ -116,7 +116,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
   
     List all tenant properties stored in the
     ${chalk.grey('https://contoso.sharepoint.com/sites/appcatalog')} app catalog site
-      ${commands.STORAGEENTITY_LIST} --appCatalogUrl https://contoso.sharepoint.com/sites/appcatalog
+      m365 ${this.name} --appCatalogUrl https://contoso.sharepoint.com/sites/appcatalog
 
   More information:
 

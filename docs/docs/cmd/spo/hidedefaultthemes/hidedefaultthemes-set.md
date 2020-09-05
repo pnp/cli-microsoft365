@@ -5,7 +5,7 @@ Sets the value of the HideDefaultThemes setting
 ## Usage
 
 ```sh
-spo hidedefaultthemes set [options]
+m365 spo hidedefaultthemes set [options]
 ```
 
 ## Options
@@ -27,7 +27,7 @@ Option|Description
 Hide default themes and allow users to use organization themes only
 
 ```sh
-spo hidedefaultthemes set --hideDefaultThemes true
+m365 spo hidedefaultthemes set --hideDefaultThemes true
 ```
 
 ## More information

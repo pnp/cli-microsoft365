@@ -87,7 +87,7 @@ class TeamsUnarchiveCommand extends GraphCommand {
   Examples:
     
     Restore an archived Microsoft Teams team
-      ${commands.TEAMS_TEAM_UNARCHIVE} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
+      m365 ${this.name} --teamId 6f6fd3f7-9ba5-4488-bbe6-a789004d0d55
     `);
   }
 }

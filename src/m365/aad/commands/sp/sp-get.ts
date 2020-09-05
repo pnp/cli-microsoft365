@@ -127,13 +127,13 @@ class AadSpGetCommand extends AadCommand {
   Examples:
   
     Return details about the service principal with appId ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531d6')}.
-      ${commands.SP_GET} --appId b2307a39-e878-458b-bc90-03bc578531d6
+      m365 ${this.name} --appId b2307a39-e878-458b-bc90-03bc578531d6
 
     Return details about the ${chalk.grey('Microsoft Graph')} service principal.
-      ${commands.SP_GET} --displayName "Microsoft Graph"
+      m365 ${this.name} --displayName "Microsoft Graph"
 
     Return details about the service principal with ObjectId ${chalk.grey('b2307a39-e878-458b-bc90-03bc578531dd')}.
-      ${commands.SP_GET} --objectId b2307a39-e878-458b-bc90-03bc578531dd
+      m365 ${this.name} --objectId b2307a39-e878-458b-bc90-03bc578531dd
 
   More information:
   

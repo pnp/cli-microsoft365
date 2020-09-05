@@ -5,7 +5,7 @@ Log out from Microsoft 365
 ## Usage
 
 ```sh
-logout [options]
+m365 logout [options]
 ```
 
 ## Options
@@ -27,11 +27,11 @@ The `logout` command logs out from Microsoft 365 and removes any access and refr
 Log out from Microsoft 365
 
 ```sh
-logout
+m365 logout
 ```
 
 Log out from Microsoft 365 in debug mode including detailed debug information in the console output
 
 ```sh
-logout --debug
+m365 logout --debug
 ```

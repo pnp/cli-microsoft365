@@ -158,15 +158,15 @@ class SpoCustomActionClearCommand extends SpoCommand {
     Clears all user custom actions for both site and site collection
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}. Skips the confirmation prompt
     message.
-      ${commands.CUSTOMACTION_CLEAR} -u https://contoso.sharepoint.com/sites/test --confirm
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test --confirm
 
     Clears all user custom actions for site
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_CLEAR} -u https://contoso.sharepoint.com/sites/test -s Web
+      m365 ${this.name} -u https://contoso.sharepoint.com/sites/test -s Web
 
     Clears all user custom actions for site collection
     ${chalk.grey('https://contoso.sharepoint.com/sites/test')}
-      ${commands.CUSTOMACTION_CLEAR} --url https://contoso.sharepoint.com/sites/test --scope Site
+      m365 ${this.name} --url https://contoso.sharepoint.com/sites/test --scope Site
     `);
   }
 }

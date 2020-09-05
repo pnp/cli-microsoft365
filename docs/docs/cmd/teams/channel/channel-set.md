@@ -5,7 +5,7 @@ Updates properties of the specified channel in the given Microsoft Teams team
 ## Usage
 
 ```sh
-teams channel set [options]
+m365 teams channel set [options]
 ```
 
 ## Options
@@ -27,11 +27,11 @@ Option|Description
 Set new description and display name for the specified channel in the given Microsoft Teams team
 
 ```sh
-teams channel set --teamId "00000000-0000-0000-0000-000000000000" --channelName Reviews --newChannelName Projects --description "Channel for new projects"
+m365 teams channel set --teamId "00000000-0000-0000-0000-000000000000" --channelName Reviews --newChannelName Projects --description "Channel for new projects"
 ```
 
 Set new display name for the specified channel in the given Microsoft Teams team
 
 ```sh
-teams channel set --teamId "00000000-0000-0000-0000-000000000000" --channelName Reviews --newChannelName Projects
+m365 teams channel set --teamId "00000000-0000-0000-0000-000000000000" --channelName Reviews --newChannelName Projects
 ```
