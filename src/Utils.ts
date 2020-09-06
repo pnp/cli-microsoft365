@@ -705,4 +705,8 @@ export default class Utils {
       });
     });
   }
+
+  public static parseJsonWithBom(s: string): any {
+    return JSON.parse(s.replace(/^\uFEFF/, ''));
+  }
 }

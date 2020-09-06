@@ -1,6 +1,7 @@
 import Command from "../../../../Command";
 import { TsFile, Manifest, Project, ScssFile } from "./model";
 import { Utils } from './project-upgrade/';
+import GlobalUtils from  '../../../../Utils';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -137,7 +138,7 @@ export abstract class BaseProjectCommand extends Command {
     const manifestFiles = srcFiles.filter(f => f.endsWith('.manifest.json'));
     const manifests: Manifest[] = manifestFiles.map((f) => {
       const manifestStr = Utils.removeSingleLineComments(fs.readFileSync(f, 'utf-8'));
-      const manifest: Manifest = JSON.parse(manifestStr);
+      const manifest: Manifest = GlobalUtils.parseJsonWithBom(manifestStr);
       manifest.path = f;
       return manifest;
     });
