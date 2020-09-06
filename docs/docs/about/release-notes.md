@@ -1,5 +1,11 @@
 # Release notes
 
+## [v3.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.1.0)
+
+### Changes
+
+- added the 'Remove orphaned redirect sites' sample script [#1717](https://github.com/pnp/cli-microsoft365/issues/1717)
+
 ## [v3.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.0.0)
 
 ### New commands
