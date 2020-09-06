@@ -137,7 +137,7 @@ export abstract class BaseProjectCommand extends Command {
     const manifestFiles = srcFiles.filter(f => f.endsWith('.manifest.json'));
     const manifests: Manifest[] = manifestFiles.map((f) => {
       const manifestStr = Utils.removeSingleLineComments(fs.readFileSync(f, 'utf-8'));
-      const manifest: Manifest = JSON.parse(manifestStr);
+      const manifest: Manifest = Utils.handleUTF8BOMEncoding(manifestStr);
       manifest.path = f;
       return manifest;
     });

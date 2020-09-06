@@ -29,4 +29,7 @@ export class Utils {
       (typeof project.packageJson !== 'undefined' &&
       typeof project.packageJson.dependencies['knockout'] !== 'undefined');
   }
+  public static handleUTF8BOMEncoding(s: string): any {
+    return JSON.parse(s.replace(/^\uFEFF/, ''));
+  }
 }
