@@ -345,7 +345,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'json',
         debug: true,
-        queryText: '*'
+        query: '*'
       }
     }, () => {
       try {
@@ -366,7 +366,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: 'IsDocument:1'
+        query: 'IsDocument:1'
       }
     }, () => {
       try {
@@ -387,7 +387,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: 'IsDocument:1',
+        query: 'IsDocument:1',
         allResults: true,
         rowLimit: 1
       }
@@ -410,7 +410,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: '*',
+        query: '*',
         trimDuplicates: true
       }
     }, () => {
@@ -432,7 +432,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: '*',
+        query: '*',
         sortList: 'Rank:ascending'
       }
     }, () => {
@@ -454,7 +454,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: '*',
+        query: '*',
         enableStemming: false
       }
     }, () => {
@@ -476,7 +476,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: '*',
+        query: '*',
         enableStemming: true
       }
     }, () => {
@@ -498,7 +498,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: '*',
+        query: '*',
         culture: 1043
       }
     }, () => {
@@ -520,7 +520,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'json',
         debug: false,
-        queryText: 'IsDocument:1',
+        query: 'IsDocument:1',
         allResults: true,
         rowLimit: 1
       }
@@ -543,7 +543,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: 'IsDocument:1',
+        query: 'IsDocument:1',
         selectProperties: 'Path'
       }
     }, () => {
@@ -565,7 +565,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: '*',
+        query: '*',
         refinementFilters: 'fileExtension:equals("docx")'
       }
     }, () => {
@@ -587,7 +587,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: '*',
+        query: '*',
         queryTemplate: '{searchterms} fileType:docx'
       }
     }, () => {
@@ -609,7 +609,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: '*',
+        query: '*',
         sourceId: '6e71030e-5e16-4406-9bff-9c1829843083'
       }
     }, () => {
@@ -631,7 +631,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: false,
-        queryText: '*',
+        query: '*',
         rankingModelId: 'd4ac6500-d1d0-48aa-86d4-8fe9a57a74af'
       }
     }, () => {
@@ -653,7 +653,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         rowLimit: 1
       }
     }, () => {
@@ -675,7 +675,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         startRow: 1
       }
     }, () => {
@@ -697,7 +697,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         properties: 'termid:guid'
       }
     }, () => {
@@ -719,7 +719,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         sourceName: 'Local SharePoint Results'
       }
     }, () => {
@@ -741,7 +741,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         properties: 'some:property,',
         sourceName: 'Local SharePoint Results'
       }
@@ -764,7 +764,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         properties: 'some:property',
         sourceName: 'Local SharePoint Results'
       }
@@ -787,7 +787,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         refiners: 'author,size'
       }
     }, () => {
@@ -809,7 +809,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         webUrl: 'https://contoso.sharepoint.com/sites/subsite'
       }
     }, () => {
@@ -831,7 +831,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         hiddenConstraints: 'developer'
       }
     }, () => {
@@ -853,7 +853,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         clientType: 'custom'
       }
     }, () => {
@@ -875,7 +875,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         enablePhonetic: true
       }
     }, () => {
@@ -897,7 +897,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         processBestBets: true
       }
     }, () => {
@@ -919,7 +919,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         enableQueryRules: false
       }
     }, () => {
@@ -941,7 +941,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'text',
         debug: true,
-        queryText: '*',
+        query: '*',
         processPersonalFavorites: true
       }
     }, () => {
@@ -963,7 +963,7 @@ describe(commands.SEARCH, () => {
       options: {
         output: 'json',
         debug: true,
-        queryText: '*',
+        query: '*',
         rawOutput: true
       }
     }, () => {
@@ -982,7 +982,7 @@ describe(commands.SEARCH, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         sourceId: '123',
-        queryText: '*'
+        query: '*'
       }
     });
     assert.notEqual(actual, true);
@@ -992,7 +992,7 @@ describe(commands.SEARCH, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         sourceId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844',
-        queryText: '*'
+        query: '*'
       }
     });
     assert.equal(actual, true);
@@ -1002,7 +1002,7 @@ describe(commands.SEARCH, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         rankingModelId: '123',
-        queryText: '*'
+        query: '*'
       }
     });
     assert.notEqual(actual, true);
@@ -1012,7 +1012,7 @@ describe(commands.SEARCH, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         rankingModelId: 'd4ac6500-d1d0-48aa-86d4-8fe9a57a74af',
-        queryText: '*'
+        query: '*'
       }
     });
     assert.equal(actual, true);
@@ -1022,7 +1022,7 @@ describe(commands.SEARCH, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         rowLimit: '1X',
-        queryText: '*'
+        query: '*'
       }
     });
     assert.notEqual(actual, true);
@@ -1032,7 +1032,7 @@ describe(commands.SEARCH, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         startRow: '1X',
-        queryText: '*'
+        query: '*'
       }
     });
     assert.notEqual(actual, true);
@@ -1042,7 +1042,7 @@ describe(commands.SEARCH, () => {
     const actual = (command.validate() as CommandValidate)({
       options: {
         culture: '1X',
-        queryText: '*'
+        query: '*'
       }
     });
     assert.notEqual(actual, true);
@@ -1095,34 +1095,34 @@ describe(commands.SEARCH, () => {
     assert(containsDebugOption);
   });
 
-  it('supports specifying queryText', () => {
+  it('supports specifying query', () => {
     const options = (command.options() as CommandOption[]);
     let containsTypeOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('<queryText>') > -1) {
+      if (o.option.indexOf('<query>') > -1) {
         containsTypeOption = true;
       }
     });
     assert(containsTypeOption);
   });
 
-  it('fails validation if the queryText option is not specified', () => {
+  it('fails validation if the query option is not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {} });
     assert.notEqual(actual, true);
   });
 
   it('passes validation if all options are provided', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { queryText: '*' } });
+    const actual = (command.validate() as CommandValidate)({ options: { query: '*' } });
     assert.equal(actual, true);
   });
 
   it('fails validation if sortList is in an invalid format', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { queryText: '*', sortList: 'property1:wrongvalue' } });
+    const actual = (command.validate() as CommandValidate)({ options: { query: '*', sortList: 'property1:wrongvalue' } });
     assert.notEqual(actual, true);
   });
 
   it('passes validation if sortList is in a valid format', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { queryText: '*', sortList: 'property1:ascending,property2:descending' } });
+    const actual = (command.validate() as CommandValidate)({ options: { query: '*', sortList: 'property1:ascending,property2:descending' } });
     assert.equal(actual, true);
   });
 
