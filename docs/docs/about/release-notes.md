@@ -5,6 +5,8 @@
 ### Changes
 
 - added the 'Remove orphaned redirect sites' sample script [#1717](https://github.com/pnp/cli-microsoft365/issues/1717)
+- extended 'spo page get' json output to include all returned properties [#1729](https://github.com/pnp/cli-microsoft365/issues/1729)
+- extended 'spfx doctor' with support for SPFx v1.11 [#1721](https://github.com/pnp/cli-microsoft365/issues/1721)
 
 ## [v3.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.0.0)
 
