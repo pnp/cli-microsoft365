@@ -1,8 +1,8 @@
+import auth from '../../../../Auth';
 import commands from '../../commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
-import { CommandOption } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import Command, { CommandOption } from '../../../../Command';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   workload: string;
 }
 
-class TenantServiceMessageListCommand extends SpoCommand {
+class TenantServiceMessageListCommand extends Command {
   public get name(): string {
     return `${commands.TENANT_SERVICE_MESSAGE_LIST}`;
   }
@@ -29,25 +29,19 @@ class TenantServiceMessageListCommand extends SpoCommand {
     }
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
-    const statusEndpoint: string = (typeof args.options.workload !='undefined' && args.options.workload) ? `ServiceComms/Messages?$filter=Workload eq '${args.options.workload}'` : 'ServiceComms/Messages';
+    const statusEndpoint: string = (typeof args.options.workload != 'undefined' && args.options.workload) ? `ServiceComms/Messages?$filter=Workload eq '${escape(args.options.workload)}'` : 'ServiceComms/Messages';
+    
+    const requestOptions: any = {
+      url: `${serviceUrl}/${auth.service.tenantId}/${statusEndpoint}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    };
 
-    this
-      .getTenantId(cmd, this.debug)
-      .then((tenantId: string): Promise<string> => {
-        const pos: number = tenantId.indexOf(':') + 1;
-        const tenantIdentifier = tenantId.substr(pos, tenantId.indexOf('&') - pos);
-
-        const requestOptions: any = {
-          url: `${serviceUrl}/${tenantIdentifier}/${statusEndpoint}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          json: true
-        };
-
-        return request.get(requestOptions);
-      })
-      .then((res: any): void => {        
+    request
+      .get(requestOptions)
+      .then((res: any): void => {
         if (args.options.output === 'json') {
           cmd.log(res);
         }
@@ -55,17 +49,16 @@ class TenantServiceMessageListCommand extends SpoCommand {
           cmd.log(res.value.map((r: any) => {
             return {
               Workload: r.Workload,
-              Id: r.Id,              
-              Classification: r.Classification,
-              Status: r.Status,
-              ImpactDescription: r.ImpactDescription,
-              LastUpdatedTime: r.LastUpdatedTime
+              Id: r.Id,
+              ImpactDescription: r.ImpactDescription
             }
           }));
         }
+        
         if (this.verbose) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
+
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }
@@ -87,8 +80,16 @@ class TenantServiceMessageListCommand extends SpoCommand {
     log(
       `  Examples:
 
-    Gets the service messages regarding services in Office 365
-      ${commands.TENANT_SERVICE_MESSAGE_LIST}
+        Get service messages of all services in Microsoft 365
+          ${commands.TENANT_SERVICE_MESSAGE_LIST}
+
+        Get service messages of only one particular service in Microsoft 365
+          ${commands.TENANT_SERVICE_MESSAGE_LIST} -w SharePoint
+
+        More information:
+
+          Microsoft 365 Service Communications API reference
+            https://docs.microsoft.com/office/office-365-management-api/office-365-service-communications-api-reference#get-messages
     `);
   }
 }

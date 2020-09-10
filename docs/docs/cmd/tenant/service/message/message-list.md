@@ -13,6 +13,7 @@ tenant service message list [options]
 Option|Description
 ------|-----------
 `-w, --workload [workload]`|Allows retrieval of the service messages for only one particular service. If not provided, the service messages of all services will be returned.
+`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 `-o, --output [output]`|Output type. `json|text`. Default `text`
 `--verbose`|Runs command with verbose logging
 `--debug`|Runs command with debug logging
@@ -28,7 +29,7 @@ tenant service message list
 Get service messages of only one particular service in Microsoft 365
 
 ```sh
-tenant service message list -w "Exchange Online"
+tenant service message list -w SharePoint
 ```
 
 ## More information

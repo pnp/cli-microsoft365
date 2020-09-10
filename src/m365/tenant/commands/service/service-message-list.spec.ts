@@ -19,34 +19,22 @@ describe(commands.TENANT_SERVICE_MESSAGE_LIST, () => {
     {
       Workload: "Exchange",
       Id: "EX213379",
-      Classification: "Advisory",
-      Status: "Extended recovery",
-      ImpactDescription: "Users with an ESN policy scoped by a rule using specific conditions will see unexpected delivery results.",
-      LastUpdatedTime: "2020-08-21T18:59:16.387Z"
+      ImpactDescription: "Users with an ESN policy scoped by a rule using specific conditions will see unexpected delivery results."
     },
     {
       Workload: "Lync",
-      Id: "LY220759",
-      Classification: "Incident",
-      Status: "False positive",
-      ImpactDescription: "Users may have been unable to view Skype Meeting Broadcasts in Skype for Business.",
-      LastUpdatedTime: "2020-08-21T21:05:16.937Z"
+      Id: "LY220759",      
+      ImpactDescription: "Users may have been unable to view Skype Meeting Broadcasts in Skype for Business."
     },
     {
       Workload: "SharePoint",
       Id: "SP220211",
-      Classification: "Incident",
-      Status: "Service restored",
-      ImpactDescription: "Users may be unable to access second level sub-menu links in the navigation bar of SharePoint Online sites.",
-      LastUpdatedTime: "2020-08-14T17:41:03.37Z"
+      ImpactDescription: "Users may be unable to access second level sub-menu links in the navigation bar of SharePoint Online sites."
     },
     {
       Workload: "microsoftteams",
       Id: "TM218696",
-      Classification: "Advisory",
-      Status: "Service restored",
-      ImpactDescription: "Users may have been intermittently unable to open non-Microsoft Office file links when using the web app.",
-      LastUpdatedTime: "2020-08-07T13:16:37.037Z"
+      ImpactDescription: "Users may have been intermittently unable to open non-Microsoft Office file links when using the web app."
     }
   ];
 
@@ -54,10 +42,7 @@ describe(commands.TENANT_SERVICE_MESSAGE_LIST, () => {
     {
       Workload: "SharePoint",
       Id: "SP220211",
-      Classification: "Incident",
-      Status: "Service restored",
-      ImpactDescription: "Users may be unable to access second level sub-menu links in the navigation bar of SharePoint Online sites.",
-      LastUpdatedTime: "2020-08-14T17:41:03.37Z"
+      ImpactDescription: "Users may be unable to access second level sub-menu links in the navigation bar of SharePoint Online sites."
     }
   ];
 
@@ -422,11 +407,7 @@ describe(commands.TENANT_SERVICE_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
-      options: {
-
-      }
-    }, (err?: any) => {
+    cmdInstance.action({ options: {}}, (err?: any) => {
       try {
         assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
