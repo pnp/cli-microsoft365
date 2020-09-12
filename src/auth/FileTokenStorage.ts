@@ -4,7 +4,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 
 export class FileTokenStorage implements TokenStorage {
-  private filePath: string = path.join(os.homedir(), '.o365cli-tokens.json');
+  private filePath: string = path.join(os.homedir(), '.cli-m365-tokens.json');
 
   public get(): Promise<string> {
     return new Promise<string>((resolve: (connectionInfo: string) => void, reject: (error: any) => void): void => {
