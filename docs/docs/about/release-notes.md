@@ -2,11 +2,21 @@
 
 ## [v3.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.1.0)
 
+### New commands
+
+**Power Apps:**
+
+- [pa app list](../cmd/pa/app/app-list.md) - lists all Power Apps apps [#1789](https://github.com/pnp/cli-microsoft365/issues/1789)
+
 ### Changes
 
 - added the 'Remove orphaned redirect sites' sample script [#1717](https://github.com/pnp/cli-microsoft365/issues/1717)
 - extended 'spo page get' json output to include all returned properties [#1729](https://github.com/pnp/cli-microsoft365/issues/1729)
 - extended 'spfx doctor' with support for SPFx v1.11 [#1721](https://github.com/pnp/cli-microsoft365/issues/1721)
+- extended 'tenant status list' with filtering by workload [#1743](https://github.com/pnp/cli-microsoft365/issues/1743)
+- fixed long running copy and move operations [#1698](https://github.com/pnp/cli-microsoft365/issues/1698)
+- added 'm365' alias to examples in docs and help [#1694](https://github.com/pnp/cli-microsoft365/issues/1694)
+- added support for parsing JSON with BOM to 'spfx project upgrade' [#1723](https://github.com/pnp/cli-microsoft365/issues/1723)
 
 ## [v3.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.0.0)
 
