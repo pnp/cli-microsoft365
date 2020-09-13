@@ -18,17 +18,17 @@ if (-not (Test-Path -Path "$outputDir" -PathType Container)) {
     New-Item -ItemType Directory -Path "$outputDir"
 }
 
-$appCatalogUrl = o365 spo tenant appcatalogurl get
+$appCatalogUrl = m365 spo tenant appcatalogurl get
 
 if ($appCatalogUrl) {
-    $spolItems = (o365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields $fields  -o json).ToString().Replace("ID", "_ID") | ConvertFrom-Json
+    $spolItems = (m365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields $fields  -o json).ToString().Replace("ID", "_ID") | ConvertFrom-Json
 
     if ($spolItems.Count -gt 0) {
         $deletedSpfxExtensionConfigs = @()
 
         foreach ($spolItem in $spolItems) {
-            $author = o365 spo user get --webUrl $appCatalogUrl --id $spolItem.AuthorId -o json | ConvertFrom-Json
-            $editor = o365 spo user get --webUrl $appCatalogUrl --id $spolItem.EditorId -o json | ConvertFrom-Json
+            $author = m365 spo user get --webUrl $appCatalogUrl --id $spolItem.AuthorId -o json | ConvertFrom-Json
+            $editor = m365 spo user get --webUrl $appCatalogUrl --id $spolItem.EditorId -o json | ConvertFrom-Json
 
             $configurationObject = New-Object -TypeName PSObject
 
@@ -48,7 +48,7 @@ if ($appCatalogUrl) {
             $configurationObject | Add-Member -MemberType NoteProperty -Name "TenantWideExtensionDisabled" -Value $spolItem.TenantWideExtensionDisabled
 
             # you can add --recyle parameter to Recycle the list item
-            o365 spo listitem remove --webUrl $appCatalogUrl --listTitle $listName --id $spolItem.Id --confirm
+            m365 spo listitem remove --webUrl $appCatalogUrl --listTitle $listName --id $spolItem.Id --confirm
             $deletedSpfxExtensionConfigs += $configurationObject
         }
 
