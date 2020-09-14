@@ -1,9 +1,11 @@
 import commands from '../../commands';
 import request from '../../../../request';
-import SpoCommand from '../../../base/SpoCommand';
+import auth from '../../../../Auth';
+import Command from '../../../../Command';
+import Utils from '../../../../Utils';
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
-class TenantServiceListCommand extends SpoCommand {
+class TenantServiceListCommand extends Command {
   public get name(): string {
     return `${commands.TENANT_SERVICE_LIST}`;
   }
@@ -20,22 +22,17 @@ class TenantServiceListCommand extends SpoCommand {
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
     const statusEndpoint: string = 'ServiceComms/Services';
 
-    this
-      .getTenantId(cmd, this.debug)
-      .then((tenantId: string): Promise<string> => {
-        const pos: number = tenantId.indexOf(':') + 1;
-        const tenantIdentifier = tenantId.substr(pos, tenantId.indexOf('&') - pos);
+    const tenantId = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
 
-        const requestOptions: any = {
-          url: `${serviceUrl}/${tenantIdentifier}/${statusEndpoint}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${serviceUrl}/${tenantId}/${statusEndpoint}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    };
 
-        return request.get(requestOptions);
-      })
+    request.get(requestOptions)
       .then((res: any): void => {
         if (args.options.output === 'json') {
           cmd.log(res);
