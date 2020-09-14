@@ -444,6 +444,7 @@ nav:
         - report useractivityuserdetail: 'cmd/teams/report/report-useractivityuserdetail.md'
       - tab:
         - tab add: 'cmd/teams/tab/tab-add.md'
+        - tab get: 'cmd/teams/tab/tab-get.md'
         - tab list: 'cmd/teams/tab/tab-list.md'
         - tab remove: 'cmd/teams/tab/tab-remove.md'
       - team:
