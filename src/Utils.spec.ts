@@ -1040,6 +1040,16 @@ describe('Utils', () => {
     assert.equal(actual, '');
   });
 
+  it('shows tenant id from valid access token', () => {
+    const jwt = JSON.stringify({
+      tid: 'de349bc7-1aeb-4506-8cb3-98db021cadb4'
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
+    const actual = Utils.getTenantIdFromAccessToken(accessToken);
+    assert.equal(actual, 'de349bc7-1aeb-4506-8cb3-98db021cadb4');
+  });
+
   it('returns empty tenant id when access token is undefined', () => {
     const actual = Utils.getTenantIdFromAccessToken(undefined as any);
     assert.equal(actual, '');

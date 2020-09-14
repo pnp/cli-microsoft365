@@ -217,29 +217,27 @@ export default class Utils {
     }
   }
 
-  public static getTenantIdFromAccessToken(accessToken: string): Promise<string> {
+  public static getTenantIdFromAccessToken(accessToken: string): string {
     let tenantId: string = '';
 
     if (!accessToken || accessToken.length === 0) {
-      return Promise.resolve(tenantId);
+      return tenantId;
     }
 
     const chunks = accessToken.split('.');
     if (chunks.length !== 3) {
-      return Promise.resolve(tenantId);
+      return tenantId;
     }
 
     const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
     try {
       const token: any = JSON.parse(tokenString);
-      // if authenticated using certificate, there is no upn so use
-      // app display name instead
       tenantId = token.tid;
     }
     catch {
     }
 
-    return Promise.resolve(tenantId);
+    return tenantId;
   }
 
   public static getUserNameFromAccessToken(accessToken: string): string {
