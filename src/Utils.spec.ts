@@ -1040,6 +1040,21 @@ describe('Utils', () => {
     assert.equal(actual, '');
   });
 
+  it('returns empty tenant id when access token is undefined', () => {
+    const actual = Utils.getTenantIdFromAccessToken(undefined as any);
+    assert.equal(actual, '');
+  });
+
+  it('returns empty tenant id when empty access token passed', () => {
+    const actual = Utils.getTenantIdFromAccessToken('');
+    assert.equal(actual, '');
+  });
+
+  it('returns empty tenant id when invalid access token passed', () => {
+    const actual = Utils.getTenantIdFromAccessToken('abc.def.ghi');
+    assert.equal(actual, '');
+  });
+
   it('isJavascriptReservedWord returns true if value equals a JavaScript Reserved Word (eg. onload)', () => {
     const result = Utils.isJavascriptReservedWord('onload');
     assert.strictEqual(result, true);

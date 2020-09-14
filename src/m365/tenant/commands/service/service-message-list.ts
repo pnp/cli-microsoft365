@@ -3,6 +3,7 @@ import commands from '../../commands';
 import request from '../../../../request';
 import GlobalOptions from '../../../../GlobalOptions';
 import Command, { CommandOption } from '../../../../Command';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -30,9 +31,10 @@ class TenantServiceMessageListCommand extends Command {
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
     const statusEndpoint: string = (typeof args.options.workload != 'undefined' && args.options.workload) ? `ServiceComms/Messages?$filter=Workload eq '${escape(args.options.workload)}'` : 'ServiceComms/Messages';
-    
+    const tenantId: string = Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
+
     const requestOptions: any = {
-      url: `${serviceUrl}/${auth.service.tenantId}/${statusEndpoint}`,
+      url: `${serviceUrl}/${tenantId}/${statusEndpoint}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
