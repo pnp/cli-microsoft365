@@ -11,11 +11,12 @@ Thank you, [Sam Boutros](https://www.linkedin.com/in/sam-boutros-powershell/), f
 Prerequisites:
 
 - [CLI for Microsoft 365](https://pnp.github.io/cli-microsoft365/)
-- SharePoint Online Document Library files containing dummy/real common PII data in txt, csv, xlsx, docx, aspx file formats
+- SharePoint Online Document Library files containing dummy/real common PII data in txt, csv, aspx file formats
 - [Here](https://dlptest.com/sample-data/) is some test data and test files that can be used to test.
 
 ```powershell tab="PowerShell Core"
-$supportedFileExtensions = "txt", "csv", "xlsx", "docx", "aspx"
+# This script is created to support only the following file extensions.
+$supportedFileExtensions = "txt", "csv", "aspx"
 $spolHostName = "https://tenant-name.sharepoint.com"
 $spolSiteRelativeUrl = "/sites/site-name"
 $spolDocLibTitle = "library-title"
