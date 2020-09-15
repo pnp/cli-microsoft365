@@ -1,12 +1,13 @@
 import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import {
-  CommandOption, CommandValidate, CommandError
+  CommandOption, CommandValidate
 } from '../../../../Command';
 import GraphCommand from '../../../base/GraphCommand';
 import Utils from '../../../../Utils';
 import request from '../../../../request';
 import { Team } from '../../Team';
+import { Channel } from '../../Channel';
 import { Tab } from '../../Tab';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
@@ -44,28 +45,155 @@ class TeamsTabGetCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}/tabs/${encodeURIComponent(args.options.tabId)}`;
-
-    const requestOptions: any = {
-      url: endpoint,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      json: true
+  public getTeamId(teamName: string): Promise<string> {
+    if (Utils.isValidGuid(teamName as string)) {
+      return Promise.resolve(teamName);
     }
 
-    request
-      .get<Tab>(requestOptions)
-      .then((res: Tab): void => {
-        cmd.log(res.webUrl);
+    return new Promise<string>((resolve: (result: string) => void, reject: (error: any) => void): void => {
+      const teamRequestOptions: any = {
+        url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(teamName)}'`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        json: true
+      }
 
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
+      request
+        .get<{ value: Team[] }>(teamRequestOptions)
+        .then((res: { value: Team[] }): Promise<string> => {
+          const teamItem: Team | undefined = res.value[0];
+
+          if (res.value.length > 1) {
+            Promise.reject(`Multiple Microsoft Teams team found with ids ${res.value.map(x => x.id)}`);
+          }
+
+          if (!teamItem) {
+            Promise.reject(`The specified team does not exist in the Microsoft Teams`);
+          }
+
+          const teamId: string = res.value[0].id;
+          return Promise.resolve(teamId);
+        })
+        .then((teamId: string): void => {
+          resolve(teamId);
+        })
+        .catch((error?: string): void => {
+          reject(error);
+        });
+    });
+  }
+
+  public getChannelId(teamId: string, channelName: string): Promise<string> {
+    if (Utils.isValidTeamsChannelId(channelName as string)) {
+      return Promise.resolve(channelName);
+    }
+
+    return new Promise((resolve: (result: string) => void, reject: (error: any) => void): void => {
+      const channelRequestOptions: any = {
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(channelName)}'`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        json: true
+      }
+
+      request
+        .get<{ value: Channel[] }>(channelRequestOptions)
+        .then((res: { value: Channel[] }): Promise<string> => {
+          const channelItem: Channel | undefined = res.value[0];
+
+          if (!channelItem) {
+            return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
+          }
+
+          const channelId: string = res.value[0].id;
+          return Promise.resolve(channelId);
+        })
+        .then((channelId: string): void => {
+          resolve(channelId);
+        })
+        .catch((error?: string): void => {
+          reject(error);
+        });
+    });
+  }
+
+  public getTabId(teamId: string, channelId: string, tabName: string): Promise<string> {
+    if (Utils.isValidGuid(tabName as string)) {
+      return Promise.resolve(tabName);
+    }
+
+    return new Promise((resolve: (result: string) => void, reject: (error: any) => void): void => {
+      const channelRequestOptions: any = {
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}/tabs?$filter=displayName eq '${encodeURIComponent(tabName)}'`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        json: true
+      }
+
+      request
+        .get<{ value: Tab[] }>(channelRequestOptions)
+        .then((res: { value: Tab[] }): Promise<string> => {
+          const tabItem: Tab | undefined = res.value[0];
+
+          if (!tabItem) {
+            return Promise.reject(`The specified tabItem does not exist in the Microsoft Teams team channel`);
+          }
+
+          const tabId: string = res.value[0].id;
+          return Promise.resolve(tabId);
+        })
+        .then((tabId: string): void => {
+          resolve(tabId);
+        })
+        .catch((error?: string): void => {
+          reject(error);
+        });
+    });
+  }
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {    
+    let teamInput: string = args.options.teamName ? args.options.teamName : args.options.teamId;
+    let channelInput: string = args.options.channelName ? args.options.channelName : args.options.channelId;
+    let tabInput: string = args.options.tabName ? args.options.tabName : args.options.tabId;
+    let teamId: string;
+    let channelId: string;
+
+    this
+      .getTeamId(teamInput)
+      .then((_teamId: string) => {
+        teamId = _teamId;
+        return this.getChannelId(teamId, channelInput);
+      })
+      .then((_channelId: string) => {
+        channelId = _channelId;
+        return this.getTabId(teamId, channelId, tabInput);
+      })
+      .then((tabId: string) => {
+        const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}/tabs/${encodeURIComponent(tabId)}`;
+
+        const requestOptions: any = {
+          url: endpoint,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          json: true
         }
 
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        request
+          .get<Tab>(requestOptions)
+          .then((res: Tab): void => {
+            cmd.log(res.webUrl);
+
+            if (this.verbose) {
+              cmd.log(vorpal.chalk.green('DONE'));
+            }
+
+            cb();
+          }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      })
   }
 
   public options(): CommandOption[] {
