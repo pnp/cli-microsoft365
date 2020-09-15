@@ -6,5 +6,6 @@ export default {
   TENANT_REPORT_ACTIVEUSERDETAIL: `${prefix} report activeuserdetail`,
   TENANT_REPORT_SERVICESUSERCOUNTS: `${prefix} report servicesusercounts`,
   TENANT_SERVICE_MESSAGE_LIST: `${prefix} service message list`,
+  TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS: `${prefix} service report historicalservicestatus`,
   TENANT_STATUS_LIST: `${prefix} status list`
 }; 
