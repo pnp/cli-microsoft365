@@ -468,6 +468,7 @@ nav:
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
       - service:
         - service message list: 'cmd/tenant/service/service-message-list.md'
+        - service report historicalservicestatus: 'cmd/tenant/service/service-report-historicalservicestatus.md'
       - status:
         - status list: 'cmd/tenant/status/status-list.md'
     - To Do (todo):
