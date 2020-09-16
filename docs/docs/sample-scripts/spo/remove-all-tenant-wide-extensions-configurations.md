@@ -1,8 +1,8 @@
-# Restore Configurations of Tenant Wide Extensions
+# Remove all entries from the Tenant Wide Extensions List exist in the Tenant App Catalog Site
 
 Author: [Joseph Velliah](https://sprider.blog/restore-configs-tenant-wide-extensions)
 
-The SharePoint Admin Center provides various governance features, but there is no way to easily restore the Configurations of Tenant Wide Extensions from the SharePoint admin center for governance activities. This sample script shows how to remove all entries from the Tenant Wide Extensions list exist in the Tenant App Catalog Site.
+The SharePoint Admin Center provides various governance features, but there is no way to easily remove all entries from the Tenant Wide Extensions list exist in the Tenant App Catalog Site from the SharePoint admin center for governance activities. This sample script shows how to do this and exports the deleted entries in a comma-separated values (CSV) file for reference.
 
 ```powershell tab="PowerShell Core"
 $resultDir = "Output"
