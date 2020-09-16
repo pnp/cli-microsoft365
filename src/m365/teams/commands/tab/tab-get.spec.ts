@@ -404,12 +404,7 @@ describe(commands.TEAMS_TAB_GET, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/channels?$filter=displayName eq '`) > -1) {
         done();
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('00000000-0000-0000-0000-000000000000')/channels",
-          "@odata.count": 0,
-          "value": []
-        }
-        );
+        return Promise.resolve({ value: [] });
       }
       done();
       return Promise.reject('Invalid request');
@@ -419,7 +414,7 @@ describe(commands.TEAMS_TAB_GET, () => {
     cmdInstance.action({
       options: {
         debug: true,
-        teamName: 'Team Name',
+        teamId: '00000000-0000-0000-0000-000000000000',
         channelName: 'Channel Name',
         tabName: 'Tab Name'
       }
@@ -438,11 +433,7 @@ describe(commands.TEAMS_TAB_GET, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/tabs?$filter=displayName eq '`) > -1) {
         done();
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('00000000-0000-0000-0000-000000000000')/channels('19%3A00000000000000000000000000000000%40thread.tacv2')/tabs",
-          "@odata.count": 0,
-          "value": []
-        });
+        return Promise.resolve({ value: [] });
       }
       done();
       return Promise.reject('Invalid request');
@@ -452,8 +443,8 @@ describe(commands.TEAMS_TAB_GET, () => {
     cmdInstance.action({
       options: {
         debug: true,
-        teamName: 'Team Name',
-        channelName: 'Channel Name',
+        teamId: '00000000-0000-0000-0000-000000000000',
+        channelId: '19:00000000000000000000000000000000@thread.skype',
         tabName: 'Tab Name'
       }
     }, (err?: any) => {
