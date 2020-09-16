@@ -384,6 +384,7 @@ nav:
         - theme remove: 'cmd/spo/theme/theme-remove.md'
         - theme set: 'cmd/spo/theme/theme-set.md'
       - user:
+        - user add: 'cmd/spo/user/user-add.md'
         - user get: 'cmd/spo/user/user-get.md'
         - user list: 'cmd/spo/user/user-list.md'
         - user remove: 'cmd/spo/user/user-remove.md'
