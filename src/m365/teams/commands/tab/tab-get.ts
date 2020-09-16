@@ -139,7 +139,7 @@ class TeamsTabGetCommand extends GraphCommand {
           const tabItem: Tab | undefined = res.value[0];
 
           if (!tabItem) {
-            return Promise.reject(`The specified tabItem does not exist in the Microsoft Teams team channel`);
+            return Promise.reject(`The specified tab does not exist in the Microsoft Teams team channel`);
           }
 
           const tabId: string = res.value[0].id;
