@@ -259,152 +259,14 @@ describe(commands.TEAMS_TAB_GET, () => {
     });
   });
 
-  it('should get team id of a Microsoft Teams Tab by team name', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/me/joinedTeams?$filter=displayName eq') > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
-          "@odata.count": 1,
-          "value": [
-            {
-              "id": "00000000-0000-0000-0000-000000000000",
-              "createdDateTime": null,
-              "displayName": "Team Name",
-              "description": "Team Description",
-              "internalId": null,
-              "classification": null,
-              "specialization": null,
-              "visibility": null,
-              "webUrl": null,
-              "isArchived": false,
-              "isMembershipLimitedToOwners": null,
-              "memberSettings": null,
-              "guestSettings": null,
-              "messagingSettings": null,
-              "funSettings": null,
-              "discoverySettings": null
-            }
-          ]
-        });
-      }
-      done();
-      return Promise.reject('Invalid request');
-    });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        debug: true,
-        teamName: 'Team Name',
-        channelName: 'Channel Name',
-        tabName: 'Tab Name'
-      }
-    }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith(
-          "https://teams.microsoft.com/l/entity/00000000-0000-0000-0000-000000000000/_djb2_msteams_prefix_00000000-0000-0000-0000-000000000000?label=TeamsTab&context=%7b%0d%0a++%22canvasUrl%22%3a+%22https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fTeamsLogon.aspx%3fSPFX%3dtrue%26dest%3d%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fteamshostedapp.aspx%253Flist%3d7d7f911a-bf19-46a0-86d9-187c3f32cce2%2526id%3d2%2526webPartInstanceId%3d1c8e5fda-7fd7-416f-9930-b3e90f009ea5%22%2c%0d%0a++%22channelId%22%3a+%2219%3a7b6aabe5c04d4a12b813f9272b0774f8%40thread.skype%22%2c%0d%0a++%22subEntityId%22%3a+null%0d%0a%7d&groupId=00000000-0000-0000-0000-000000000000&tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4"
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should get channel id of a Microsoft Teams Tab by channel name', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/channels?$filter=displayName eq ') > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('340537cc-f8e0-41f8-97b0-6cf0218d3357')/channels",
-          "@odata.count": 1,
-          "value": [
-            {
-              "id": "19:a169ff3b9bb344e382e0fb7972826e1c@thread.tacv2",
-              "displayName": "Channel Name",
-              "description": "Channel description",
-              "email": "",
-              "webUrl": "https://teams.microsoft.com/l/channel/19%3aa169ff3b9bb344e382e0fb7972826e1c%40thread.tacv2/General?groupId=340537cc-f8e0-41f8-97b0-6cf0218d3357&tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4",
-              "membershipType": "standard"
-            }
-          ]
-        });
-      }
-      done();
-      return Promise.reject('Invalid request');
-    });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        debug: true,
-        teamName: 'Team Name',
-        channelName: 'Channel Name',
-        tabName: 'Tab Name'
-      }
-    }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith(
-          "https://teams.microsoft.com/l/entity/00000000-0000-0000-0000-000000000000/_djb2_msteams_prefix_00000000-0000-0000-0000-000000000000?label=TeamsTab&context=%7b%0d%0a++%22canvasUrl%22%3a+%22https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fTeamsLogon.aspx%3fSPFX%3dtrue%26dest%3d%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fteamshostedapp.aspx%253Flist%3d7d7f911a-bf19-46a0-86d9-187c3f32cce2%2526id%3d2%2526webPartInstanceId%3d1c8e5fda-7fd7-416f-9930-b3e90f009ea5%22%2c%0d%0a++%22channelId%22%3a+%2219%3a7b6aabe5c04d4a12b813f9272b0774f8%40thread.skype%22%2c%0d%0a++%22subEntityId%22%3a+null%0d%0a%7d&groupId=00000000-0000-0000-0000-000000000000&tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4"
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should get tab id of a Microsoft Teams Tab by tab name', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/tabs?$filter=displayName eq ') > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('00000000-0000-0000-0000-000000000000')/channels('19%3A7b6aabe5c04d4a12b813f9272b0774f8%40thread.skype')/tabs(teamsApp())/$entity",
-          "id": "00000000-0000-0000-0000-000000000000",
-          "displayName": "Tab Name",
-          "webUrl": "https://teams.microsoft.com/l/entity/00000000-0000-0000-0000-000000000000/_djb2_msteams_prefix_00000000-0000-0000-0000-000000000000?label=TeamsTab&context=%7b%0d%0a++%22canvasUrl%22%3a+%22https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fTeamsLogon.aspx%3fSPFX%3dtrue%26dest%3d%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fteamshostedapp.aspx%253Flist%3d7d7f911a-bf19-46a0-86d9-187c3f32cce2%2526id%3d2%2526webPartInstanceId%3d1c8e5fda-7fd7-416f-9930-b3e90f009ea5%22%2c%0d%0a++%22channelId%22%3a+%2219%3a7b6aabe5c04d4a12b813f9272b0774f8%40thread.skype%22%2c%0d%0a++%22subEntityId%22%3a+null%0d%0a%7d&groupId=00000000-0000-0000-0000-000000000000&tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4",
-          "configuration": {
-            "entityId": "sharepointtab_00000000-0000-0000-0000-000000000000",
-            "contentUrl": "https://contoso.sharepoint.com/sites/PrototypeTeam/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/sites/PrototypeTeam/_layouts/15/teamshostedapp.aspx%3Flist=7d7f911a-bf19-46a0-86d9-187c3f32cce2%26id=2%26webPartInstanceId=1c8e5fda-7fd7-416f-9930-b3e90f009ea5",
-            "removeUrl": "https://contoso.sharepoint.com/sites/PrototypeTeam/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/sites/PrototypeTeam/_layouts/15/teamshostedapp.aspx%3Flist=7d7f911a-bf19-46a0-86d9-187c3f32cce2%26id=2%26webPartInstanceId=1c8e5fda-7fd7-416f-9930-b3e90f009ea5%26removeTab",
-            "websiteUrl": null,
-            "dateAdded": "2020-07-18T19:27:22.03Z"
-          }
-        });
-      }
-      done();
-      return Promise.reject('Invalid request');
-    });
-
-    cmdInstance.action = command.action();
-    cmdInstance.action({
-      options: {
-        debug: true,
-        teamName: 'Team Name',
-        channelName: 'Channel Name',
-        tabName: 'Tab Name'
-      }
-    }, () => {
-      try {
-        assert(cmdInstanceLogSpy.calledWith(
-          "https://teams.microsoft.com/l/entity/00000000-0000-0000-0000-000000000000/_djb2_msteams_prefix_00000000-0000-0000-0000-000000000000?label=TeamsTab&context=%7b%0d%0a++%22canvasUrl%22%3a+%22https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fTeamsLogon.aspx%3fSPFX%3dtrue%26dest%3d%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fteamshostedapp.aspx%253Flist%3d7d7f911a-bf19-46a0-86d9-187c3f32cce2%2526id%3d2%2526webPartInstanceId%3d1c8e5fda-7fd7-416f-9930-b3e90f009ea5%22%2c%0d%0a++%22channelId%22%3a+%2219%3a7b6aabe5c04d4a12b813f9272b0774f8%40thread.skype%22%2c%0d%0a++%22subEntityId%22%3a+null%0d%0a%7d&groupId=00000000-0000-0000-0000-000000000000&tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4"
-        ));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should get url of a Microsoft Teams Tab', (done) => {
+  it('should get url of a Microsoft Teams Tab by id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/00000000-0000-0000-0000-000000000000/channels/19%3A00000000000000000000000000000000%40thread.skype/tabs/00000000-0000-0000-0000-000000000000`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('00000000-0000-0000-0000-000000000000')/channels('19%3A7b6aabe5c04d4a12b813f9272b0774f8%40thread.skype')/tabs(teamsApp())/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('00000000-0000-0000-0000-000000000000')/channels('19%3000000000000000000000000000000008%40thread.skype')/tabs(teamsApp())/$entity",
           "id": "00000000-0000-0000-0000-000000000000",
           "displayName": "TeamsTab",
-          "webUrl": "https://teams.microsoft.com/l/entity/00000000-0000-0000-0000-000000000000/_djb2_msteams_prefix_00000000-0000-0000-0000-000000000000?label=TeamsTab&context=%7b%0d%0a++%22canvasUrl%22%3a+%22https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fTeamsLogon.aspx%3fSPFX%3dtrue%26dest%3d%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fteamshostedapp.aspx%253Flist%3d7d7f911a-bf19-46a0-86d9-187c3f32cce2%2526id%3d2%2526webPartInstanceId%3d1c8e5fda-7fd7-416f-9930-b3e90f009ea5%22%2c%0d%0a++%22channelId%22%3a+%2219%3a7b6aabe5c04d4a12b813f9272b0774f8%40thread.skype%22%2c%0d%0a++%22subEntityId%22%3a+null%0d%0a%7d&groupId=00000000-0000-0000-0000-000000000000&tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4",
+          "webUrl": "https://teams.microsoft.com/l/entity/00000000-0000-0000-0000-000000000000/_djb2_msteams_prefix_00000000-0000-0000-0000-000000000000?label=TeamsTab&context=%7b%0d%0a++%22canvasUrl%22%3a+%22https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fTeamsLogon.aspx%3fSPFX%3dtrue%26dest%3d%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fteamshostedapp.aspx%253Flist%3d7d7f911a-bf19-46a0-86d9-187c3f32cce2%2526id%3d2%2526webPartInstanceId%3d1c8e5fda-7fd7-416f-9930-b3e90f009ea5%22%2c%0d%0a++%22channelId%22%3a+%2219%3000000000000000000000000000000008%40thread.skype%22%2c%0d%0a++%22subEntityId%22%3a+null%0d%0a%7d&groupId=00000000-0000-0000-0000-000000000000&tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4",
           "configuration": {
             "entityId": "sharepointtab_00000000-0000-0000-0000-000000000000",
             "contentUrl": "https://contoso.sharepoint.com/sites/PrototypeTeam/_layouts/15/TeamsLogon.aspx?SPFX=true&dest=/sites/PrototypeTeam/_layouts/15/teamshostedapp.aspx%3Flist=7d7f911a-bf19-46a0-86d9-187c3f32cce2%26id=2%26webPartInstanceId=1c8e5fda-7fd7-416f-9930-b3e90f009ea5",
@@ -429,7 +291,7 @@ describe(commands.TEAMS_TAB_GET, () => {
     }, () => {
       try {
         assert(cmdInstanceLogSpy.calledWith(
-          "https://teams.microsoft.com/l/entity/00000000-0000-0000-0000-000000000000/_djb2_msteams_prefix_00000000-0000-0000-0000-000000000000?label=TeamsTab&context=%7b%0d%0a++%22canvasUrl%22%3a+%22https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fTeamsLogon.aspx%3fSPFX%3dtrue%26dest%3d%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fteamshostedapp.aspx%253Flist%3d7d7f911a-bf19-46a0-86d9-187c3f32cce2%2526id%3d2%2526webPartInstanceId%3d1c8e5fda-7fd7-416f-9930-b3e90f009ea5%22%2c%0d%0a++%22channelId%22%3a+%2219%3a7b6aabe5c04d4a12b813f9272b0774f8%40thread.skype%22%2c%0d%0a++%22subEntityId%22%3a+null%0d%0a%7d&groupId=00000000-0000-0000-0000-000000000000&tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4"
+          "https://teams.microsoft.com/l/entity/00000000-0000-0000-0000-000000000000/_djb2_msteams_prefix_00000000-0000-0000-0000-000000000000?label=TeamsTab&context=%7b%0d%0a++%22canvasUrl%22%3a+%22https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fTeamsLogon.aspx%3fSPFX%3dtrue%26dest%3d%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fteamshostedapp.aspx%253Flist%3d7d7f911a-bf19-46a0-86d9-187c3f32cce2%2526id%3d2%2526webPartInstanceId%3d1c8e5fda-7fd7-416f-9930-b3e90f009ea5%22%2c%0d%0a++%22channelId%22%3a+%2219%3000000000000000000000000000000008%40thread.skype%22%2c%0d%0a++%22subEntityId%22%3a+null%0d%0a%7d&groupId=00000000-0000-0000-0000-000000000000&tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4"
         ));
         done();
       }
@@ -512,7 +374,7 @@ describe(commands.TEAMS_TAB_GET, () => {
               "discoverySettings": null
             }
           ]
-        }          
+        }
         );
       }
       done();
@@ -595,9 +457,6 @@ describe(commands.TEAMS_TAB_GET, () => {
       }
     });
   });
-
-
-
 
   it('supports debug mode', () => {
     const options = (command.options() as CommandOption[]);
