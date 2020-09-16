@@ -34,7 +34,7 @@ m365 yarn global add @pnp/cli-microsoft365
 To check which version of the CLI for Microsoft 365 you have installed on your computer, execute in the command line:
 
 ```sh
-m365 m365 version
+m365 version
 ```
 
 Alternatively, you can check the version of the Node.js package you have installed, by executing:

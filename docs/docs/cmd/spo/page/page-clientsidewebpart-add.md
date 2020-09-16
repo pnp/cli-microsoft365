@@ -64,7 +64,7 @@ m365 --% spo page clientsidewebpart add --webUrl https://contoso.sharepoint.com/
 Using Windows command line, add the standard Bing Map web part with the specific properties to a modern page
 
 ```sh
-m365 m365 spo page clientsidewebpart add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --webPartProperties `"{""Title"":""Foo location""}"`
+m365 spo page clientsidewebpart add --webUrl https://contoso.sharepoint.com/sites/a-team --pageName page.aspx --standardWebPart BingMap --webPartProperties `"{""Title"":""Foo location""}"`
 ```
 
 Add the standard Image web part with the preconfigured image
