@@ -1,8 +1,10 @@
+import auth from '../../../../Auth';
 import request from '../../../../request';
 import commands from '../../commands';
-import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
-import { CommandOption } from '../../../../Command';
+import Command, { CommandOption } from '../../../../Command';
+import Utils from '../../../../Utils';
+
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
@@ -13,9 +15,9 @@ interface Options extends GlobalOptions {
   workload?: string;
 }
 
-class TenantStatusListCommand extends SpoCommand {
+class TenantStatusListCommand extends Command {
   public get name(): string {
-    return commands.TENANT_STATUS_LIST;
+    return `${commands.TENANT_STATUS_LIST}`;
   }
 
   public get description(): string {
@@ -24,7 +26,7 @@ class TenantStatusListCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.sharingCapabilities = args.options.workload;
+    telemetryProps.workload = args.options.workload;
     return telemetryProps;
   }
 
@@ -35,21 +37,18 @@ class TenantStatusListCommand extends SpoCommand {
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
     const statusEndpoint: string = typeof args.options.workload !== 'undefined' ? `ServiceComms/CurrentStatus?$filter=Workload eq '${encodeURIComponent(args.options.workload)}'` : 'ServiceComms/CurrentStatus';
+    const tenantId: string = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
 
-    this
-      .getSpoUrl(cmd, this.debug)
-      .then((_spoUrl: string): Promise<string> => {
-        const tenantIdentifier: string = _spoUrl.replace('https://', '');
-        const requestOptions: any = {
-          url: `${serviceUrl}/${tenantIdentifier}/${statusEndpoint}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none'
-          },
-          json: true
-        };
+    const requestOptions: any = {
+      url: `${serviceUrl}/${tenantId}/${statusEndpoint}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    };
 
-        return request.get(requestOptions);
-      })
+    request
+      .get(requestOptions)
       .then((res: any): void => {
         if (args.options.output === 'json') {
           cmd.log(res);

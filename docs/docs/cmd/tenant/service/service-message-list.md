@@ -27,10 +27,10 @@ Get service messages of all services in Microsoft 365
 m365 tenant service message list
 ```
 
-Get service messages for SharePoint
+Get service messages for Microsoft Teams
 
 ```sh
-m365 tenant service message list --workload SharePoint
+m365 tenant service message list --workload microsoftteams
 ```
 
 ## More information

@@ -85,8 +85,8 @@ class TenantServiceMessageListCommand extends Command {
     Get service messages of all services in Microsoft 365
       m365 ${commands.TENANT_SERVICE_MESSAGE_LIST}
 
-    Get service messages for SharePoint
-      m365 ${commands.TENANT_SERVICE_MESSAGE_LIST} --workload SharePoint
+    Get service messages for Microsoft Teams
+      m365 ${commands.TENANT_SERVICE_MESSAGE_LIST} --workload microsoftteams
 
   More information:
 
