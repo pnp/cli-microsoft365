@@ -11,7 +11,6 @@ import auth from '../../../../Auth';
 describe(commands.TENANT_STATUS_LIST, () => {
   let vorpal: Vorpal;
   let log: any[];
-  let requests: any[];
   let cmdInstance: any;
 
   let cmdInstanceLogSpy: sinon.SinonSpy;
@@ -62,13 +61,12 @@ describe(commands.TENANT_STATUS_LIST, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
-    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.service.tenantId = '48526e9f-60c5-3000-31d7-aa1dc75ecf3c|908bel80-a04a-4422-b4a0-883d9847d110:c8e761e2-d528-34d1-8776-dc51157d619a&#xA;Tenant';
   });
 
   beforeEach(() => {
     vorpal = require('../../../../vorpal-init');
     log = [];
-    requests = [];
     cmdInstance = {
       commandWrapper: {
         command: command.name
@@ -94,7 +92,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
-    auth.service.spoUrl = undefined;
+    auth.service.tenantId = undefined;
   });
 
   it('has correct name', () => {
@@ -152,7 +150,6 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('handles promise error while getting status of Microsoft 365 services', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      requests.push(opts);
       if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.reject('An error has occurred');
       }
@@ -176,7 +173,6 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      requests.push(opts);
       if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
@@ -201,7 +197,6 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      requests.push(opts);
       if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
@@ -226,7 +221,6 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services as text', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      requests.push(opts);
       if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
@@ -251,7 +245,6 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services as text (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      requests.push(opts);
       if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
@@ -276,7 +269,6 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services - JSON Output With Workload', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      requests.push(opts);
       if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
@@ -302,7 +294,6 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services - JSON Output With Workload (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      requests.push(opts);
       if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
@@ -328,7 +319,6 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services - text Output With Workload', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      requests.push(opts);
       if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
@@ -354,7 +344,6 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services - text Output With Workload (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      requests.push(opts);
       if ((opts.url as string).indexOf('CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
