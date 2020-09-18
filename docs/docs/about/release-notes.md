@@ -8,6 +8,11 @@
 
 - [tenant service message list](../cmd/tenant/service/service-message-list.md) - gets service messages Microsoft 365 [#1741](https://github.com/pnp/cli-microsoft365/issues/1741)
 
+**Outlook:**
+
+- [outlook message list](../cmd/outlook/message/message-list.md) - gets all mail messages from the specified folder [#1764](https://github.com/pnp/cli-microsoft365/issues/1764)
+- [outlook message move](../cmd/outlook/message/message-move.md) - moves message to the specified folder [#1765](https://github.com/pnp/cli-microsoft365/issues/1765)
+
 **Power Apps:**
 
 - [pa app list](../cmd/pa/app/app-list.md) - lists all Power Apps apps [#1789](https://github.com/pnp/cli-microsoft365/issues/1789)
