@@ -48,7 +48,7 @@ if (-not (Test-Path -Path "$outputDir" -PathType Container)) {
 }
 
 $spolSiteUrl = $spolHostName + $spolSiteRelativeUrl
-$spolLibItems = o365 spo listitem list --webUrl $spolSiteUrl --title $spolDocLibTitle --fields 'FileRef,FileLeafRef,File_x0020_Type' --filter "FSObjType eq 0" -o json | ConvertFrom-Json
+$spolLibItems = o365 spo listitem list --webUrl $spolSiteUrl --title $spolDocLibTitle --fields 'FileRef,FileLeafRef,File_x0020_Type' --filter "FSObjType eq 0" -o json | ConvertFrom-Json -AsHashtable
 
 if ($spolLibItems.Count -gt 0) {
     $spFileFindings = @()
