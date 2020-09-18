@@ -21,7 +21,7 @@ if (-not (Test-Path -Path "$outputDir" -PathType Container)) {
 $appCatalogUrl = m365 spo tenant appcatalogurl get
 
 if ($appCatalogUrl) {
-    $spolItems = (m365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields $fields  -o json).ToString().Replace("ID", "_ID") | ConvertFrom-Json
+    $spolItems = m365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields $fields  -o json | ConvertFrom-Json -AsHashtable
 
     if ($spolItems.Count -gt 0) {
         $deletedSpfxExtensionConfigs = @()
