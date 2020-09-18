@@ -23,13 +23,16 @@ CLI for Microsoft 365 requires the following permissions to Microsoft 365 servic
   - Read user profiles
   - Read and write managed metadata
 - Microsoft Graph
-  - Invite guest users to the organization
+  - Read and write to all app catalogs
   - Read and write all groups
   - Read and write directory data
   - Access directory as the signed in user
   - Read and write identity providers
+  - Read and write access to user mail
   - Send mail as a user
-  - Read and write to all app catalogs
+  - Read all usage reports
+  - Invite guest users to the organization
+  - Create, read, update and delete user tasks and projects
 - Microsoft 365 Management APIs
   - Read service health information for your organization
 - Windows Azure Active Directory
