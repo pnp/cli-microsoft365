@@ -115,7 +115,7 @@ Remove-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite remove](../cmd/spo/homesite/homesite-remove.md)
 Remove-SPOHubSiteAssociation|Microsoft.Online.SharePoint.PowerShell|[spo hubsite disconnect](../cmd/spo/hubsite/hubsite-disconnect.md)
 Remove-SPOHubToHubAssociation|Microsoft.Online.SharePoint.PowerShell|
-Remove-SPOKnowledgeHubSite|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPOKnowledgeHubSite|Microsoft.Online.SharePoint.PowerShell|[spo knowledgehub remove](../cmd/spo/knowledgehub/knowledgehub-remove.md)
 Remove-SPOMigrationJob|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOMultiGeoCompanyAllowedDataLocation|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOOrgAssetsLibrary|Microsoft.Online.SharePoint.PowerShell|[spo orgassetslibrary remove](../cmd/spo/orgassetslibrary/orgassetslibrary-remove.md)

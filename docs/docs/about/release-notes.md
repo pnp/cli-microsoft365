@@ -4,9 +4,22 @@
 
 ### New commands
 
+**Microsoft 365:**
+
+- [tenant service message list](../cmd/tenant/service/service-message-list.md) - gets service messages Microsoft 365 [#1741](https://github.com/pnp/cli-microsoft365/issues/1741)
+
+**Outlook:**
+
+- [outlook message list](../cmd/outlook/message/message-list.md) - gets all mail messages from the specified folder [#1764](https://github.com/pnp/cli-microsoft365/issues/1764)
+- [outlook message move](../cmd/outlook/message/message-move.md) - moves message to the specified folder [#1765](https://github.com/pnp/cli-microsoft365/issues/1765)
+
 **Power Apps:**
 
 - [pa app list](../cmd/pa/app/app-list.md) - lists all Power Apps apps [#1789](https://github.com/pnp/cli-microsoft365/issues/1789)
+
+**SharePoint:**
+
+- [spo knowledgehub remove](../cmd/spo/knowledgehub/knowledgehub-remove.md) - removes the Knowledge Hub Site setting for your tenant [#1577](https://github.com/pnp/cli-microsoft365/issues/1577)
 
 ### Changes
 
@@ -17,6 +30,7 @@
 - fixed long running copy and move operations [#1698](https://github.com/pnp/cli-microsoft365/issues/1698)
 - added 'm365' alias to examples in docs and help [#1694](https://github.com/pnp/cli-microsoft365/issues/1694)
 - added support for parsing JSON with BOM to 'spfx project upgrade' [#1723](https://github.com/pnp/cli-microsoft365/issues/1723)
+- renamed token file use the new CLI name [#1810](https://github.com/pnp/cli-microsoft365/pull/1810)
 
 ## [v3.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.0.0)
 

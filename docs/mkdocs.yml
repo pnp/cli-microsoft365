@@ -106,6 +106,9 @@ nav:
     - Outlook (outlook):
       - mail:
         - mail send: 'cmd/outlook/mail/mail-send.md'
+      - message:
+        - message list: 'cmd/outlook/message/message-list.md'
+        - message move: 'cmd/outlook/message/message-move.md'
       - report:
         - report mailactivitycounts: 'cmd/outlook/report/report-mailactivitycounts.md'
         - report mailactivityusercounts: 'cmd/outlook/report/report-mailactivityusercounts.md'
@@ -235,6 +238,7 @@ nav:
         - hubsite theme sync: 'cmd/spo/hubsite/hubsite-theme-sync.md'
         - hubsite unregister: 'cmd/spo/hubsite/hubsite-unregister.md'
       - knowledgehub:
+        - knowledgehub remove: 'cmd/spo/knowledgehub/knowledgehub-remove.md'
         - knowledgehub set: 'cmd/spo/knowledgehub/knowledgehub-set.md'
       - list:
         - list add: 'cmd/spo/list/list-add.md'
@@ -464,6 +468,7 @@ nav:
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
       - service:
         - service list: 'cmd/tenant/service/service-list.md'
+        - service message list: 'cmd/tenant/service/service-message-list.md'
       - status:
         - status list: 'cmd/tenant/status/status-list.md'
     - To Do (todo):
