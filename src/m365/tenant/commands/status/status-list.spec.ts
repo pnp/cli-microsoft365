@@ -15,15 +15,31 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   let cmdInstanceLogSpy: sinon.SinonSpy;
 
-  let textOutput = [
+  const textOutputForms = {
+    Name: "Microsoft Forms",
+    Status: "Normal service"
+  };
+
+  const textOutput = [
     {
       Name: "Microsoft Forms",
+      Status: "Normal service"
+    },
+    {
+      Name: "Planner",
+      Status: "Normal service"
+    },
+    {
+      Name: "Microsoft Stream",
+      Status: "Extended recovery"
+    },
+    {
+      Name: "SharePoint Online",
       Status: "Normal service"
     }
   ];
 
-  let jsonOutput = {
-    "@odata.context": "https://office365servicecomms-prod.cloudapp.net/api/v1.0/contoso.sharepoint.com/$metadata#CurrentStatus",
+  const jsonOutput = {
     "value": [
       {
         "FeatureStatus": [
@@ -50,18 +66,168 @@ describe(commands.TENANT_STATUS_LIST, () => {
         "IncidentIds": [],
         "Status": "ServiceOperational",
         "StatusDisplayName": "Normal service",
-        "StatusTime": "2020-03-24T23:32:35.7309744Z",
+        "StatusTime": "2020-09-18T13:15:36.6847769Z",
+        "Workload": "Forms",
+        "WorkloadDisplayName": "Microsoft Forms"
+      },
+      {
+        "FeatureStatus": [
+          {
+            "FeatureDisplayName": "Planner",
+            "FeatureName": "Planner",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          }
+        ],
+        "Id": "Planner",
+        "IncidentIds": [],
+        "Status": "ServiceOperational",
+        "StatusDisplayName": "Normal service",
+        "StatusTime": "2020-09-18T13:15:36.6847769Z",
+        "Workload": "Planner",
+        "WorkloadDisplayName": "Planner"
+      },
+      {
+        "FeatureStatus": [
+          {
+            "FeatureDisplayName": "Playback",
+            "FeatureName": "Playback",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "Live Events",
+            "FeatureName": "Live Events",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "Stream website",
+            "FeatureName": "Stream website",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          }
+        ],
+        "Id": "Stream",
+        "IncidentIds": [],
+        "Status": "ServiceOperational",
+        "StatusDisplayName": "Normal service",
+        "StatusTime": "2020-09-18T13:15:36.6847769Z",
+        "Workload": "Stream",
+        "WorkloadDisplayName": "Microsoft Stream"
+      },
+      {
+        "FeatureStatus": [
+          {
+            "FeatureDisplayName": "Provisioning",
+            "FeatureName": "provisioning",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "SharePoint Features",
+            "FeatureName": "spofeatures",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "Tenant Admin",
+            "FeatureName": "tenantadmin",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "Search and Delve",
+            "FeatureName": "search",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "Custom Solutions and Workflows",
+            "FeatureName": "customsolutionsworkflows",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "Project Online",
+            "FeatureName": "projectonline",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "Office Web Apps",
+            "FeatureName": "officewebapps",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "SP Designer",
+            "FeatureName": "spdesigner",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "Access Services",
+            "FeatureName": "accessservices",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "InfoPath Online",
+            "FeatureName": "infopathonline",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          }
+        ],
+        "Id": "SharePoint",
+        "IncidentIds": [],
+        "Status": "ServiceOperational",
+        "StatusDisplayName": "Normal service",
+        "StatusTime": "2020-09-18T13:15:36.6847769Z",
+        "Workload": "SharePoint",
+        "WorkloadDisplayName": "SharePoint Online"
+      }
+    ]
+  };
+  
+  const jsonOutputForms = {
+    "value": [
+      {
+        "FeatureStatus": [
+          {
+            "FeatureDisplayName": "Service",
+            "FeatureName": "service",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "Form functionality",
+            "FeatureName": "functionality",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          },
+          {
+            "FeatureDisplayName": "Integration",
+            "FeatureName": "integration",
+            "FeatureServiceStatus": "ServiceOperational",
+            "FeatureServiceStatusDisplayName": "Normal service"
+          }
+        ],
+        "Id": "Forms",
+        "IncidentIds": [],
+        "Status": "ServiceOperational",
+        "StatusDisplayName": "Normal service",
+        "StatusTime": "2020-09-18T14:29:02.7203865Z",
         "Workload": "Forms",
         "WorkloadDisplayName": "Microsoft Forms"
       }
     ]
-  };
+  }
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
-    auth.service.tenantId = '48526e9f-60c5-3000-31d7-aa1dc75ecf3c|908bel80-a04a-4422-b4a0-883d9847d110:c8e761e2-d528-34d1-8776-dc51157d619a&#xA;Tenant';
   });
 
   beforeEach(() => {
@@ -92,7 +258,6 @@ describe(commands.TENANT_STATUS_LIST, () => {
       appInsights.trackEvent
     ]);
     auth.service.connected = false;
-    auth.service.tenantId = undefined;
   });
 
   it('has correct name', () => {
@@ -283,7 +448,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(cmdInstanceLogSpy.calledWith(jsonOutputForms));
         done();
       }
       catch (e) {
@@ -308,7 +473,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(cmdInstanceLogSpy.calledWith(jsonOutputForms));
         done();
       }
       catch (e) {
@@ -333,7 +498,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(cmdInstanceLogSpy.calledWith(textOutputForms));
         done();
       }
       catch (e) {
@@ -345,8 +510,10 @@ describe(commands.TENANT_STATUS_LIST, () => {
   it('gets the status of Microsoft 365 services - text Output With Workload (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('CurrentStatus') > -1) {
+        done();
         return Promise.resolve(jsonOutput);
       }
+      done();
       return Promise.reject('Invalid request');
     });
 
@@ -358,7 +525,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(cmdInstanceLogSpy.calledWith(textOutputForms));
         done();
       }
       catch (e) {
