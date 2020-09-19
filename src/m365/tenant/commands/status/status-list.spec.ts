@@ -15,10 +15,12 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   let cmdInstanceLogSpy: sinon.SinonSpy;
 
-  const textOutputForms = {
-    Name: "Microsoft Forms",
-    Status: "Normal service"
-  };
+  const textOutputForms = [
+    {
+      Name: "Microsoft Forms",
+      Status: "Normal service"
+    }
+  ];
 
   const textOutput = [
     {
@@ -31,7 +33,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
     },
     {
       Name: "Microsoft Stream",
-      Status: "Extended recovery"
+      Status: "Normal service"
     },
     {
       Name: "SharePoint Online",
@@ -189,7 +191,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
       }
     ]
   };
-  
+
   const jsonOutputForms = {
     "value": [
       {
@@ -217,12 +219,12 @@ describe(commands.TENANT_STATUS_LIST, () => {
         "IncidentIds": [],
         "Status": "ServiceOperational",
         "StatusDisplayName": "Normal service",
-        "StatusTime": "2020-09-18T14:29:02.7203865Z",
+        "StatusTime": "2020-09-18T13:15:36.6847769Z",
         "Workload": "Forms",
         "WorkloadDisplayName": "Microsoft Forms"
       }
     ]
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -315,7 +317,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('handles promise error while getting status of Microsoft 365 services', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
+      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
         return Promise.reject('An error has occurred');
       }
       return Promise.reject('Invalid request');
@@ -338,7 +340,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
+      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
       return Promise.reject('Invalid request');
@@ -362,7 +364,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
+      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
       return Promise.reject('Invalid request');
@@ -386,7 +388,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services as text', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
+      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
       return Promise.reject('Invalid request');
@@ -410,7 +412,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services as text (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
+      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
         return Promise.resolve(jsonOutput);
       }
       return Promise.reject('Invalid request');
@@ -434,8 +436,8 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services - JSON Output With Workload', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
-        return Promise.resolve(jsonOutput);
+      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
+        return Promise.resolve(jsonOutputForms);
       }
       return Promise.reject('Invalid request');
     });
@@ -459,8 +461,8 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services - JSON Output With Workload (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
-        return Promise.resolve(jsonOutput);
+      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
+        return Promise.resolve(jsonOutputForms);
       }
       return Promise.reject('Invalid request');
     });
@@ -484,8 +486,8 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services - text Output With Workload', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
-        return Promise.resolve(jsonOutput);
+      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
+        return Promise.resolve(jsonOutputForms);
       }
       return Promise.reject('Invalid request');
     });
@@ -509,11 +511,9 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('gets the status of Microsoft 365 services - text Output With Workload (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('CurrentStatus') > -1) {
-        done();
-        return Promise.resolve(jsonOutput);
+      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
+        return Promise.resolve(jsonOutputForms);
       }
-      done();
       return Promise.reject('Invalid request');
     });
 
