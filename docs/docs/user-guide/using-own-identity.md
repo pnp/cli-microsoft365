@@ -103,7 +103,7 @@ $env:CLIMICROSOFT365_TENANT="e8954f17-a373-4b61-b54d-45c038fe3188"
 If you are using Linux or macOS, you can set the environment variables using the `export` command from your terminal prompt.
 
 ```sh
-m365 export CLIMICROSOFT365_AADAPPID=506af689-32aa-46c8-afb5-972ebf9d218a
+export CLIMICROSOFT365_AADAPPID=506af689-32aa-46c8-afb5-972ebf9d218a
 export CLIMICROSOFT365_TENANT=e8954f17-a373-4b61-b54d-45c038fe3188
 ```
 
