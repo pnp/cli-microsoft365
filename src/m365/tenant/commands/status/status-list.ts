@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TenantStatusListCommand extends Command {
   public get name(): string {
-    return commands.TENANT_STATUS_LIST;
+    return `${commands.TENANT_STATUS_LIST}`;
   }
 
   public get description(): string {
@@ -26,7 +26,7 @@ class TenantStatusListCommand extends Command {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.sharingCapabilities = args.options.workload;
+    telemetryProps.workload = args.options.workload;
     return telemetryProps;
   }
 
