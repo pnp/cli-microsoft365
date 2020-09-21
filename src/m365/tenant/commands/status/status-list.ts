@@ -24,7 +24,7 @@ class TenantStatusListCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.sharingCapabilities = args.options.workload;
+    telemetryProps.workload = args.options.workload;
     return telemetryProps;
   }
 
