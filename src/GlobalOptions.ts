@@ -8,4 +8,6 @@ export default interface GlobalOptions {
   output?: string;
   debug?: boolean;
   verbose?: boolean;
+  // allow command-specific options. Required for tests to avoid casting to 'any'
+  [arg: string]: any;
 }

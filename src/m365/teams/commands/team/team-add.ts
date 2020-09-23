@@ -1,14 +1,14 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
+import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 
 enum TeamsAsyncOperationStatus {
   Invalid = "invalid",
@@ -63,7 +63,7 @@ class TeamsTeamAddCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.dots = '';
 
     let requestBody: any;
@@ -71,20 +71,20 @@ class TeamsTeamAddCommand extends GraphCommand {
       const fullPath: string = path.resolve(args.options.templatePath);
 
       if (this.verbose) {
-        cmd.log(`Using template '${fullPath}'...`);
+        logger.log(`Using template '${fullPath}'...`);
       };
       requestBody = JSON.parse(fs.readFileSync(fullPath, 'utf-8'))
 
       if (args.options.name) {
         if (this.verbose) {
-          cmd.log(`Using '${args.options.name}' as name...`);
+          logger.log(`Using '${args.options.name}' as name...`);
         };
         requestBody.displayName = args.options.name;
       }
 
       if (args.options.description) {
         if (this.verbose) {
-          cmd.log(`Using '${args.options.description}' as description...`);
+          logger.log(`Using '${args.options.description}' as description...`);
         };
         requestBody.description = args.options.description;
       }
@@ -127,7 +127,7 @@ class TeamsTeamAddCommand extends GraphCommand {
                 resolve(teamsAsyncOperation);
               } else {
                 this.timeout = setTimeout(() => {
-                  this.waitUntilFinished(requestOptions, resolve, reject, cmd, this.dots, this.timeout)
+                  this.waitUntilFinished(requestOptions, resolve, reject, logger, this.dots, this.timeout)
                 }, this.pollingInterval);
               }
             });
@@ -146,17 +146,17 @@ class TeamsTeamAddCommand extends GraphCommand {
         });
       })
       .then((output: any) => {
-        cmd.log(output);
+        logger.log(output);
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, cmd, cb)
+        this.handleRejectedODataJsonPromise(err, logger, cb)
       });
   }
 
-  private waitUntilFinished(requestOptions: any, resolve: (teamsAsyncOperation: TeamsAsyncOperation) => void, reject: (error: any) => void, cmd: CommandInstance, dots?: string, timeout?: NodeJS.Timer): void {
+  private waitUntilFinished(requestOptions: any, resolve: (teamsAsyncOperation: TeamsAsyncOperation) => void, reject: (error: any) => void, logger: Logger, dots?: string, timeout?: NodeJS.Timer): void {
     if (!this.debug && this.verbose) {
       dots += '.';
       process.stdout.write(`\r${dots}`);
@@ -177,7 +177,7 @@ class TeamsTeamAddCommand extends GraphCommand {
           return;
         }
         timeout = setTimeout(() => {
-          this.waitUntilFinished(requestOptions, resolve, reject, cmd, dots)
+          this.waitUntilFinished(requestOptions, resolve, reject, logger, dots)
         }, this.pollingInterval);
       }).catch(err => reject(err));
   }
@@ -206,24 +206,22 @@ class TeamsTeamAddCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.templatePath) {
-        if (!args.options.name) {
-          return `Required parameter name missing`
-        }
-
-        if (!args.options.description) {
-          return `Required parameter description missing`
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.templatePath) {
+      if (!args.options.name) {
+        return `Required parameter name missing`
       }
 
-      if (args.options.templatePath && !fs.existsSync(args.options.templatePath)) {
-        return 'Specified path of the template does not exist';
-      };
+      if (!args.options.description) {
+        return `Required parameter description missing`
+      }
+    }
 
-      return true;
+    if (args.options.templatePath && !fs.existsSync(args.options.templatePath)) {
+      return 'Specified path of the template does not exist';
     };
+
+    return true;
   }
 }
 

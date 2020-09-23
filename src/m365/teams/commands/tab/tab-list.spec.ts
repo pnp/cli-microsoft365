@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./tab-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./tab-list');
 
 describe(commands.TEAMS_TAB_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.TEAMS_TAB_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -53,7 +50,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000',
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
@@ -68,7 +65,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
   });
 
   it('fails validates for a incorrect channelId missing leading 19:.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
@@ -79,7 +76,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
   });
 
   it('fails validates for a incorrect channelId missing trailing @thread.skpye.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
@@ -90,7 +87,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
   });
 
   it('validates for a correct input.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
@@ -117,8 +114,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -174,8 +170,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
@@ -183,7 +178,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(
+        assert(loggerSpy.calledWith(
           [
             {
               "id": "e7cb46d2-b291-409a-b4bc-f5bdd26f10d4",
@@ -227,10 +222,9 @@ describe(commands.TEAMS_TAB_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", channelId: "19:00000000000000000000000000000000@thread.skype" } }, () => {
+    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", channelId: "19:00000000000000000000000000000000@thread.skype" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "e7cb46d2-b291-409a-b4bc-f5bdd26f10d4",
             "displayName": "Document%20Library",
@@ -300,8 +294,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         output: 'json',
@@ -310,7 +303,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(
+        assert(loggerSpy.calledWith(
           [
             {
               "id": "e7cb46d2-b291-409a-b4bc-f5bdd26f10d4",
@@ -352,7 +345,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

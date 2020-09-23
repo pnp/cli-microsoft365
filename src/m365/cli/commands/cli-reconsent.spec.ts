@@ -1,14 +1,15 @@
-import commands from '../commands';
-import Command from '../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
-const command: Command = require('./cli-reconsent');
-import * as assert from 'assert';
+import { Logger } from '../../../cli';
+import Command from '../../../Command';
 import Utils from '../../../Utils';
+import commands from '../commands';
+const command: Command = require('./cli-reconsent');
 
 describe(commands.COMPLETION_SH_SETUP, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -16,11 +17,7 @@ describe(commands.COMPLETION_SH_SETUP, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -42,7 +39,7 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   });
 
   it('generates file with commands info', (done) => {
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(log[0].indexOf('/oauth2/authorize?client_id') > -1);
         done();

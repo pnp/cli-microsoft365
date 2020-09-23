@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./web-remove');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./web-remove');
 
 describe(commands.WEB_REMOVE, () => {
   let log: any[];
   let requests: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -23,27 +24,24 @@ describe(commands.WEB_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
     requests = [];
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     promptOptions = undefined;
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     Utils.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -64,7 +62,7 @@ describe(commands.WEB_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -75,7 +73,7 @@ describe(commands.WEB_REMOVE, () => {
   });
 
   it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'foo'
@@ -85,7 +83,7 @@ describe(commands.WEB_REMOVE, () => {
   });
 
   it('passes validation if all required options are specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite"
       }
@@ -94,7 +92,7 @@ describe(commands.WEB_REMOVE, () => {
   });
 
   it('should prompt before deleting subsite when confirmation argument not passed', (done) => {
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/subsite' } }, () => {
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/subsite' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -121,7 +119,7 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         confirm: true
@@ -156,10 +154,11 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({
+    });
+    command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite"
       }
@@ -192,7 +191,7 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
@@ -209,7 +208,7 @@ describe(commands.WEB_REMOVE, () => {
       });
       try {
         assert(correctRequestIssued);
-        assert(cmdInstanceLogSpy.calledWith(sinon.match('DONE')));
+        assert(loggerSpy.calledWith(sinon.match('DONE')));
         done();
       }
       catch (e) {
@@ -228,7 +227,7 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
@@ -263,12 +262,12 @@ describe(commands.WEB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         confirm: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

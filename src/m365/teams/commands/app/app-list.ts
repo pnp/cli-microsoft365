@@ -1,12 +1,12 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import { CommandOption, CommandValidate } from '../../../../Command';
-import { TeamsApp } from '../../TeamsApp'
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand'
-import { TeamsAppInstallation } from '../../TeamsAppInstallation';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import Utils from '../../../../Utils';
+import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import commands from '../../commands';
+import { TeamsApp } from '../../TeamsApp';
+import { TeamsAppInstallation } from '../../TeamsAppInstallation';
 
 interface CommandArgs {
   options: Options;
@@ -33,7 +33,7 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let endpoint: string = '';
     if (args.options.teamId) {
       endpoint = `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/installedApps?$expand=teamsApp`;
@@ -51,14 +51,14 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
     }
 
     this
-      .getAllItems(endpoint, cmd, true)
+      .getAllItems(endpoint, logger, true)
       .then((): void => {
         if (args.options.output === 'json') {
-          cmd.log(this.items);
+          logger.log(this.items);
         }
         else {
           if (args.options.teamId) {
-            cmd.log((this.items as unknown as TeamsAppInstallation[]).map(i => {
+            logger.log((this.items as unknown as TeamsAppInstallation[]).map(i => {
               return {
                 id: i.id,
                 displayName: i.teamsApp.displayName,
@@ -67,7 +67,7 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
             }));
           }
           else {
-            cmd.log(this.items.map(i => {
+            logger.log(this.items.map(i => {
               return {
                 id: i.id,
                 displayName: i.displayName,
@@ -78,11 +78,11 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -101,14 +101,12 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
-        return `${args.options.teamId} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
+      return `${args.options.teamId} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

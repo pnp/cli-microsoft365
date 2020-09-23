@@ -1,4 +1,4 @@
-﻿import {IInputs, IOutputs} from "./generated/ManifestTypes";
+﻿import { IInputs, IOutputs } from "./generated/ManifestTypes";
 
 export class $controlnameplaceholder$ implements ComponentFramework.VirtualControl<IInputs, IOutputs> {
 

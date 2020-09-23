@@ -1,10 +1,10 @@
 import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { Finding } from '../Finding';
-import { Project, ScssFile } from '../../model';
-import { FN022001_SCSS_remove_fabric_react } from './FN022001_SCSS_remove_fabric_react';
 import * as fs from 'fs';
-import { Utils }  from '../';
+import * as sinon from 'sinon';
+import { Utils } from '../';
+import { Project, ScssFile } from '../../model';
+import { Finding } from '../Finding';
+import { FN022001_SCSS_remove_fabric_react } from './FN022001_SCSS_remove_fabric_react';
 
 describe('FN022001_SCSS_remove_fabric_react', () => {
   let findings: Finding[];

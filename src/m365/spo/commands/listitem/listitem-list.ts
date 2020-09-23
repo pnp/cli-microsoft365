@@ -1,16 +1,15 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
 import {
   CommandOption,
-  CommandValidate,
   CommandTypes
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { ListItemInstanceCollection } from './ListItemInstanceCollection';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { ContextInfo } from '../../spo';
-import { CommandInstance } from '../../../../cli';
+import { ListItemInstanceCollection } from './ListItemInstanceCollection';
 
 interface CommandArgs {
   options: Options;
@@ -48,7 +47,7 @@ class SpoListItemListCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const listIdArgument = args.options.id || '';
     const listTitleArgument = args.options.title || '';
 
@@ -64,7 +63,7 @@ class SpoListItemListCommand extends SpoCommand {
     ((): Promise<any> => {
       if (args.options.query) {
         if (this.debug) {
-          cmd.log(`getting request digest for query request`);
+          logger.log(`getting request digest for query request`);
         }
 
         return this.getRequestDigest(args.options.webUrl);
@@ -126,16 +125,16 @@ class SpoListItemListCommand extends SpoCommand {
       })
       .then((listItemInstances: ListItemInstanceCollection): void => {
         if (args.options.output === 'json') {
-          cmd.log(listItemInstances.value);
+          logger.log(listItemInstances.value);
         }
         else {
-          cmd.log(listItemInstances.value.map(l => {
+          logger.log(listItemInstances.value.map(l => {
             if ((<any>l)["ID"] && l["Id"]) delete (<any>l)["ID"];
             return l;
           }));
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -193,52 +192,50 @@ class SpoListItemListCommand extends SpoCommand {
     };
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (!args.options.id && !args.options.title) {
-        return `Specify list id or title`;
-      }
+    if (!args.options.id && !args.options.title) {
+      return `Specify list id or title`;
+    }
 
-      if (args.options.id && args.options.title) {
-        return `Specify list id or title but not both`;
-      }
+    if (args.options.id && args.options.title) {
+      return `Specify list id or title but not both`;
+    }
 
-      if (args.options.query && args.options.fields) {
-        return `Specify query or fields but not both`;
-      }
+    if (args.options.query && args.options.fields) {
+      return `Specify query or fields but not both`;
+    }
 
-      if (args.options.query && args.options.pageSize) {
-        return `Specify query or pageSize but not both`;
-      }
+    if (args.options.query && args.options.pageSize) {
+      return `Specify query or pageSize but not both`;
+    }
 
-      if (args.options.query && args.options.pageNumber) {
-        return `Specify query or pageNumber but not both`;
-      }
+    if (args.options.query && args.options.pageNumber) {
+      return `Specify query or pageNumber but not both`;
+    }
 
-      if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
-        return `pageSize must be numeric`;
-      }
+    if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
+      return `pageSize must be numeric`;
+    }
 
-      if (args.options.pageNumber && !args.options.pageSize) {
-        return `pageSize must be specified if pageNumber is specified`;
-      }
+    if (args.options.pageNumber && !args.options.pageSize) {
+      return `pageSize must be specified if pageNumber is specified`;
+    }
 
-      if (args.options.pageNumber && isNaN(Number(args.options.pageNumber))) {
-        return `pageNumber must be numeric`;
-      }
+    if (args.options.pageNumber && isNaN(Number(args.options.pageNumber))) {
+      return `pageNumber must be numeric`;
+    }
 
-      if (args.options.id &&
-        !Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} in option id is not a valid GUID`;
-      }
+    if (args.options.id &&
+      !Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} in option id is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

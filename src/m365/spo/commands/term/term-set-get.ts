@@ -1,17 +1,16 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
   CommandError,
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { TermSet } from './TermSet';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -42,18 +41,18 @@ class SpoTermSetGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
         return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Retrieving taxonomy term set...`);
+          logger.log(`Retrieving taxonomy term set...`);
         }
 
         const termGroupQuery: string = args.options.termGroupId ? `<Method Id="62" ParentId="60" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="62" ParentId="60" Name="GetByName"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`;
@@ -83,9 +82,9 @@ class SpoTermSetGetCommand extends SpoCommand {
         termSet.CreatedDate = new Date(Number(termSet.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
         termSet.Id = termSet.Id.replace('/Guid(', '').replace(')/', '');
         termSet.LastModifiedDate = new Date(Number(termSet.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-        cmd.log(termSet);
+        logger.log(termSet);
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -112,38 +111,36 @@ class SpoTermSetGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.id && !args.options.name) {
-        return 'Specify either id or name';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.id && !args.options.name) {
+      return 'Specify either id or name';
+    }
 
-      if (args.options.id && args.options.name) {
-        return 'Specify either id or name but not both';
-      }
+    if (args.options.id && args.options.name) {
+      return 'Specify either id or name but not both';
+    }
 
-      if (args.options.id) {
-        if (!Utils.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
+    if (args.options.id) {
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
       }
+    }
 
-      if (!args.options.termGroupId && !args.options.termGroupName) {
-        return 'Specify termGroupId or termGroupName';
+    if (!args.options.termGroupId && !args.options.termGroupName) {
+      return 'Specify termGroupId or termGroupName';
+    }
+
+    if (args.options.termGroupId && args.options.termGroupName) {
+      return 'Specify termGroupId or termGroupName but not both';
+    }
+
+    if (args.options.termGroupId) {
+      if (!Utils.isValidGuid(args.options.termGroupId)) {
+        return `${args.options.termGroupId} is not a valid GUID`;
       }
+    }
 
-      if (args.options.termGroupId && args.options.termGroupName) {
-        return 'Specify termGroupId or termGroupName but not both';
-      }
-
-      if (args.options.termGroupId) {
-        if (!Utils.isValidGuid(args.options.termGroupId)) {
-          return `${args.options.termGroupId} is not a valid GUID`;
-        }
-      }
-
-      return true;
-    };
+    return true;
   }
 }
 

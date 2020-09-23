@@ -1,16 +1,15 @@
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import config from '../../../../config';
-import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import { ContextInfo } from '../../spo';
+import SpoCommand from '../../../base/SpoCommand';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
+import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -39,8 +38,8 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    const clientSvcCommons: ClientSvc = new ClientSvc(logger, this.debug);
     const listIdArgument: string = args.options.listId || '';
     const listTitleArgument: string = args.options.listTitle || '';
     const listRestUrl: string = (args.options.listId ?
@@ -56,7 +55,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
       }
 
       if (this.verbose) {
-        cmd.log(`Getting list id...`);
+        logger.log(`Getting list id...`);
       }
       const listRequestOptions: any = {
         url: `${listRestUrl}/id`,
@@ -72,7 +71,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
         environmentListId = res.value;
 
         if (this.debug) {
-          cmd.log(`getting request digest for request`);
+          logger.log(`getting request digest for request`);
         }
 
         return this.getRequestDigest(args.options.webUrl);
@@ -84,7 +83,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
       })
       .then((objectIdentity: IdentityResponse): Promise<void> => {
         if (this.verbose) {
-          cmd.log(`Undeclare list item as a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+          logger.log(`Undeclare list item as a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
         const requestOptions: any = {
@@ -101,7 +100,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
       .then((): void => {
         // REST post call doesn't return anything
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   };
 
   public options(): CommandOption[] {
@@ -128,33 +127,31 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const id: number = parseInt(args.options.id);
-      if (isNaN(id)) {
-        return `${args.options.id} is not a valid list item ID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const id: number = parseInt(args.options.id);
+    if (isNaN(id)) {
+      return `${args.options.id} is not a valid list item ID`;
+    }
 
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (!args.options.listId && !args.options.listTitle) {
-        return `Specify listId or listTitle`;
-      }
+    if (!args.options.listId && !args.options.listTitle) {
+      return `Specify listId or listTitle`;
+    }
 
-      if (args.options.listId && args.options.listTitle) {
-        return `Specify listId or listTitle but not both`;
-      }
+    if (args.options.listId && args.options.listTitle) {
+      return `Specify listId or listTitle but not both`;
+    }
 
-      if (args.options.listId &&
-        !Utils.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} in option listId is not a valid GUID`;
-      }
+    if (args.options.listId &&
+      !Utils.isValidGuid(args.options.listId)) {
+      return `${args.options.listId} in option listId is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./siteclassification-set');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./siteclassification-set');
 
 describe(commands.SITECLASSIFICATION_SET, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -20,11 +21,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -55,7 +52,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -66,7 +63,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
   });
 
   it('fails validation if none of the options are specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
       }
@@ -75,7 +72,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
   });
 
   it('passes validation if at least one option is specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false, classifications: "Confidential"
       }
@@ -84,7 +81,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
   });
 
   it('passes validation if all options are passed', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "https://aka.ms/pnp", guestUsageGuidelinesUrl: "https://aka.ms/pnp"
       }
@@ -103,7 +100,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
+    command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("There is no previous defined site classification which can updated.")));
         done();
@@ -198,7 +195,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { debug: true, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } }, (err: any) => {
+    command.action(logger, { options: { debug: true, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, (err: any) => {
       try {
         assert(updateRequestIssued);
         done();
@@ -293,7 +290,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { debug: false, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } }, (err: any) => {
+    command.action(logger, { options: { debug: false, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, (err: any) => {
       try {
         assert(updateRequestIssued);
         done();
@@ -388,7 +385,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { usageGuidelinesUrl: "http://aka.ms/pnp" } }, (err: any) => {
+    command.action(logger, { options: { usageGuidelinesUrl: "http://aka.ms/pnp" } } as any, (err: any) => {
       try {
         assert(updateRequestIssued);
         done();
@@ -483,7 +480,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { debug: false, guestUsageGuidelinesUrl: "http://aka.ms/pnp" } }, (err: any) => {
+    command.action(logger, { options: { debug: false, guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, (err: any) => {
       try {
         assert(updateRequestIssued);
         done();
@@ -578,7 +575,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { classifications: "top secret,high,middle,low" } }, (err: any) => {
+    command.action(logger, { options: { classifications: "top secret,high,middle,low" } } as any, (err: any) => {
       try {
         assert(updateRequestIssued);
         done();
@@ -672,7 +669,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { defaultClassification: "low" } }, (err: any) => {
+    command.action(logger, { options: { defaultClassification: "low" } } as any, (err: any) => {
       try {
         assert(updateRequestIssued);
         done();
@@ -767,7 +764,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { classifications: "area 51,high,middle,low", defaultClassification: "high" } }, (err: any) => {
+    command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high" } } as any, (err: any) => {
       try {
         assert(updateRequestIssued);
         done();
@@ -862,7 +859,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { classifications: "area 51,high,middle,low", defaultClassification: "high", usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } }, (err: any) => {
+    command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high", usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, (err: any) => {
       try {
         assert(updateRequestIssued);
         done();

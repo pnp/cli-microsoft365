@@ -1,9 +1,9 @@
-import { CommandOption, CommandValidate } from '../../../../Command';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -31,7 +31,7 @@ class YammerGroupUserAddCommand extends YammerCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/v1/group_memberships.json`,
       headers: {
@@ -50,7 +50,7 @@ class YammerGroupUserAddCommand extends YammerCommand {
       .post(requestOptions)
       .then((res: any): void => {
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   };
 
   public options(): CommandOption[] {
@@ -73,18 +73,16 @@ class YammerGroupUserAddCommand extends YammerCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.id && typeof args.options.id !== 'number') {
-        return `${args.options.id} is not a number`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.id && typeof args.options.id !== 'number') {
+      return `${args.options.id} is not a number`;
+    }
 
-      if (args.options.userId && typeof args.options.userId !== 'number') {
-        return `${args.options.userId} is not a number`;
-      }
+    if (args.options.userId && typeof args.options.userId !== 'number') {
+      return `${args.options.userId} is not a number`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

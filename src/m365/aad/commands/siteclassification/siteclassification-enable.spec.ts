@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./siteclassification-enable');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./siteclassification-enable');
 
 describe(commands.SITECLASSIFICATION_ENABLE, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -20,11 +21,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -55,7 +52,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -136,7 +133,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
+    command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\"")));
         done();
@@ -232,7 +229,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
+    command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
       try {
         assert(enableRequestIssued);
         done();
@@ -328,7 +325,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
+    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
       try {
         assert(enableRequestIssued);
         done();
@@ -424,7 +421,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
+    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
       try {
         assert(enableRequestIssued);
         done();
@@ -520,7 +517,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } }, (err: any) => {
+    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
       try {
         assert(enableRequestIssued);
         done();
@@ -616,7 +613,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    cmdInstance.action({ options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } }, (err: any) => {
+    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any, (err: any) => {
       try {
         assert(enableRequestIssued);
         done();
@@ -719,7 +716,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } }, (err: any) => {
+    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`)));
         done();

@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
-import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
-const command: Command = require('./project-rename');
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./project-rename');
 
 describe(commands.PROJECT_RENAME, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
   let trackEvent: any;
   let telemetry: any;
   let writeFileSyncSpy: sinon.SinonStub;
@@ -24,11 +25,7 @@ describe(commands.PROJECT_RENAME, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -65,7 +62,7 @@ describe(commands.PROJECT_RENAME, () => {
   it('calls telemetry', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
-    cmdInstance.action({ options: { newName: 'spfx-react' } }, () => {
+    command.action(logger, { options: { newName: 'spfx-react' } }, () => {
       assert(trackEvent.called);
     });
   });
@@ -73,7 +70,7 @@ describe(commands.PROJECT_RENAME, () => {
   it('logs correct telemetry event', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
-    cmdInstance.action({ options: { newName: 'spfx-react' } }, () => {
+    command.action(logger, { options: { newName: 'spfx-react' } }, () => {
       assert.strictEqual(telemetry.name, commands.PROJECT_RENAME);
     });
   });
@@ -81,7 +78,7 @@ describe(commands.PROJECT_RENAME, () => {
   it('shows error if the project path couldn\'t be determined', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => null);
 
-    cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
+    command.action(logger, { options: { newName: 'spfx-react' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
         done();
@@ -104,7 +101,7 @@ describe(commands.PROJECT_RENAME, () => {
       }
     });
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
-    cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
+    command.action(logger, { options: { newName: 'spfx-react' } } as any, (err?: any) => {
       try {
         assert(writeFileSyncSpy.notCalled);
         done();
@@ -127,7 +124,7 @@ describe(commands.PROJECT_RENAME, () => {
       }
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => { throw 'error'; });
-    cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
+    command.action(logger, { options: { newName: 'spfx-react' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error')));
         done();
@@ -182,7 +179,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    cmdInstance.action({ options: { newName: 'spfx-react', generateNewId: true } }, (err?: any) => {
+    command.action(logger, { options: { newName: 'spfx-react', generateNewId: true } } as any, (err?: any) => {
       try {
         assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
@@ -214,7 +211,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
+    command.action(logger, { options: { newName: 'spfx-react' } } as any, (err?: any) => {
       try {
         assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
@@ -250,7 +247,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    cmdInstance.action({ options: { newName: 'spfx-react', generateNewId: true, debug: true } }, (err?: any) => {
+    command.action(logger, { options: { newName: 'spfx-react', generateNewId: true, debug: true } } as any, (err?: any) => {
       try {
         assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
@@ -278,7 +275,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
+    command.action(logger, { options: { newName: 'spfx-react' } } as any, (err?: any) => {
       try {
         assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
@@ -310,7 +307,7 @@ describe(commands.PROJECT_RENAME, () => {
   }
 }`;
 
-    cmdInstance.action({ options: { newName: 'spfx-react', generateNewId: true } }, (err?: any) => {
+    command.action(logger, { options: { newName: 'spfx-react', generateNewId: true } } as any, (err?: any) => {
       try {
         assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
@@ -332,7 +329,7 @@ describe(commands.PROJECT_RENAME, () => {
   "accessKey": "<!-- ACCESS KEY -->"
 }`;
 
-    cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
+    command.action(logger, { options: { newName: 'spfx-react' } } as any, (err?: any) => {
       try {
         assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
@@ -374,7 +371,7 @@ gulp bundle - TODO
 gulp package-solution - TODO
 `;
 
-    cmdInstance.action({ options: { newName: 'spfx-react' } }, (err?: any) => {
+    command.action(logger, { options: { newName: 'spfx-react' } } as any, (err?: any) => {
       try {
         assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
         done();
@@ -386,7 +383,7 @@ gulp package-solution - TODO
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

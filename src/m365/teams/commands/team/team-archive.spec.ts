@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./team-archive');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./team-archive');
 
 describe(commands.TEAMS_TEAM_ARCHIVE, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -57,7 +54,7 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
   });
 
   it('fails validation if the teamId is not a valid guid.', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: 'invalid'
       }
@@ -66,7 +63,7 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
   });
 
   it('passes validation when the input is correct', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
       }
@@ -83,14 +80,13 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
       }
-    }, () => {
+    } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -108,13 +104,12 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
         shouldSetSpoSiteReadOnlyForMembers: true
       }
-    }, () => {
+    } as any, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].body.shouldSetSpoSiteReadOnlyForMembers, true);
         done();
@@ -134,12 +129,11 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
       }
-    }, () => {
+    } as any, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].body["shouldSetSpoSiteReadOnlyForMembers"], false);
         done();
@@ -169,12 +163,11 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, 'No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6');
         done();
@@ -194,15 +187,14 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
         debug: true
       }
-    }, () => {
+    } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.called);
+        assert(loggerSpy.called);
         done();
       }
       catch (e) {
@@ -216,13 +208,12 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
         debug: false
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -234,7 +225,7 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

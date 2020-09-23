@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./list-webhook-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError, CommandOption } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./list-webhook-add');
 
 describe(commands.LIST_WEBHOOK_ADD, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
+      }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -64,7 +61,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
@@ -93,7 +90,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
@@ -128,7 +125,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: true,
@@ -138,7 +135,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           'clientState': 'null',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
@@ -169,7 +166,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         verbose: true,
@@ -179,7 +176,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           'clientState': 'null',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
@@ -210,7 +207,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
@@ -220,7 +217,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           'clientState': 'null',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
@@ -251,7 +248,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
@@ -262,7 +259,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           'clientState': 'awesome state',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
@@ -293,7 +290,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
@@ -304,7 +301,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           'clientState': 'null',
           'expirationDateTime': '2019-01-09T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
@@ -325,7 +322,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
@@ -334,7 +331,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
         expirationDateTime: '2019-01-09'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -346,7 +343,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('fails validation if both list id and title options are not passed', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -357,7 +354,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'foo',
@@ -369,7 +366,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -381,7 +378,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('fails validation if the list id option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -393,7 +390,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('passes validation if the listid option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -405,7 +402,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('fails validation if both id and title options are passed', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -422,7 +419,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     const currentMonth: number = currentDate.getMonth() + 1;
     const dateString: string = `${(currentDate.getFullYear() - 1)}-${currentMonth < 10 ? '0' : ''}${currentMonth}-01`;
 
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -439,7 +436,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     const currentMonth: number = currentDate.getMonth() + 1;
     const dateString: string = `${(currentDate.getFullYear() + 1)}-${currentMonth < 10 ? '0' : ''}${currentMonth}-01`;
 
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -457,7 +454,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     currentDate.setDate(1);
     const dateString: string = currentDate.toISOString().substr(0, 10);
 
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -470,7 +467,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('fails validation if the expirationDateTime option is not a valid date string', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -483,7 +480,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('fails validation if the expirationDateTime option is not a valid date string (json output)', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',

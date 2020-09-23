@@ -1,14 +1,14 @@
-import commands from '../../commands';
-import teamsCommands from '../../../teams/commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import Utils from '../../../../Utils';
-import request from '../../../../request';
-import GraphCommand from '../../../base/GraphCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import GraphCommand from '../../../base/GraphCommand';
+import teamsCommands from '../../../teams/commands';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -42,7 +42,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let userId = '';
     const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string
 
@@ -85,18 +85,18 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
 
           cb();
-        }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
       removeUser();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -136,26 +136,24 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.groupId && !args.options.teamId) {
-        return 'Please provide one of the following parameters: groupId or teamId';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.groupId && !args.options.teamId) {
+      return 'Please provide one of the following parameters: groupId or teamId';
+    }
 
-      if (args.options.groupId && args.options.teamId) {
-        return 'You cannot provide both a groupId and teamId parameter, please provide only one';
-      }
+    if (args.options.groupId && args.options.teamId) {
+      return 'You cannot provide both a groupId and teamId parameter, please provide only one';
+    }
 
-      if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
-        return `${args.options.teamId} is not a valid GUID`;
-      }
+    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
+      return `${args.options.teamId} is not a valid GUID`;
+    }
 
-      if (args.options.groupId && !Utils.isValidGuid(args.options.groupId as string)) {
-        return `${args.options.groupId} is not a valid GUID`;
-      }
+    if (args.options.groupId && !Utils.isValidGuid(args.options.groupId as string)) {
+      return `${args.options.groupId} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

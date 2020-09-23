@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./service-report-historicalservicestatus');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./service-report-historicalservicestatus');
 
 describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
 
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let loggerSpy: sinon.SinonSpy;
 
   let textOutput = [
     {
@@ -186,16 +187,12 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -222,7 +219,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -240,7 +237,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
 
       }
@@ -263,14 +260,14 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: false
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(loggerSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -287,14 +284,14 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: true
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(loggerSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -311,14 +308,14 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'text',
         debug: false
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(loggerSpy.calledWith(textOutput));
         done();
       }
       catch (e) {
@@ -335,14 +332,14 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'text',
         debug: true
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(loggerSpy.calledWith(textOutput));
         done();
       }
       catch (e) {
@@ -359,7 +356,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         workload: 'Bookings',
         output: 'json',
@@ -367,7 +364,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(loggerSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -384,7 +381,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         workload: 'Bookings',
         output: 'json',
@@ -392,7 +389,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(loggerSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -409,7 +406,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         workload: 'Bookings',
         output: 'text',
@@ -417,7 +414,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(loggerSpy.calledWith(textOutput));
         done();
       }
       catch (e) {
@@ -434,7 +431,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         workload: 'Bookings',
         output: 'text',
@@ -442,7 +439,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(loggerSpy.calledWith(textOutput));
         done();
       }
       catch (e) {

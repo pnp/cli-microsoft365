@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./apppage-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./apppage-add');
 
 describe(commands.APPPAGE_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.APPPAGE_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -65,9 +62,9 @@ describe(commands.APPPAGE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } }, () => {
+    command.action(logger, { options: { debug: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("Done"));
+        assert(loggerSpy.calledWith("Done"));
         done();
       }
       catch (e) {
@@ -86,9 +83,9 @@ describe(commands.APPPAGE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, addToQuickLaunch: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } }, () => {
+    command.action(logger, { options: { debug: true, addToQuickLaunch: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("Done"));
+        assert(loggerSpy.calledWith("Done"));
         done();
       }
       catch (e) {
@@ -106,7 +103,7 @@ describe(commands.APPPAGE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, title: 'failme', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Failed to create a single-part app page`)));
         done();
@@ -118,7 +115,7 @@ describe(commands.APPPAGE_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -129,7 +126,7 @@ describe(commands.APPPAGE_ADD, () => {
   });
 
   it('supports specifying title', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--title') > -1) {
@@ -140,7 +137,7 @@ describe(commands.APPPAGE_ADD, () => {
   });
 
   it('supports specifying webUrl', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--webUrl') > -1) {
@@ -151,7 +148,7 @@ describe(commands.APPPAGE_ADD, () => {
   });
 
   it('supports specifying webPartData', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--webPartData') > -1) {
@@ -161,11 +158,11 @@ describe(commands.APPPAGE_ADD, () => {
     assert(containsOption);
   });
   it('fails validation if webPartData is not a valid JSON string', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { title: 'Contoso', webUrl: 'https://contoso', webPartData: 'abc' } });
+    const actual = command.validate({ options: { title: 'Contoso', webUrl: 'https://contoso', webPartData: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
   it('validation passes on all required options', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { title: 'Contoso', webPartData: '{}', webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { title: 'Contoso', webPartData: '{}', webUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
 });

@@ -1,5 +1,5 @@
-import commands from '../../commands';
 import PeriodBasedReport from '../../../base/PeriodBasedReport';
+import commands from '../../commands';
 
 class YammerReportDeviceUsageDistributionUserCountsCommand extends PeriodBasedReport {
   public get name(): string {

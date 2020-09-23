@@ -1,13 +1,13 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -58,12 +58,12 @@ class GraphSubscriptionAddCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const body: any = {
       changeType: args.options.changeType,
       resource: args.options.resource,
       notificationUrl: args.options.notificationUrl,
-      expirationDateTime: this.getExpirationDateTimeOrDefault(cmd, args)
+      expirationDateTime: this.getExpirationDateTimeOrDefault(logger, args)
     };
 
     if (args.options.clientState) {
@@ -83,27 +83,27 @@ class GraphSubscriptionAddCommand extends GraphCommand {
     request
       .post(requestOptions)
       .then((res: any): void => {
-        cmd.log(res);
+        logger.log(res);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getExpirationDateTimeOrDefault(cmd: CommandInstance, args: CommandArgs): string {
+  private getExpirationDateTimeOrDefault(logger: Logger, args: CommandArgs): string {
     if (args.options.expirationDateTime) {
       if (this.debug) {
-        cmd.log(`Expiration date time is specified (${args.options.expirationDateTime}).`);
+        logger.log(`Expiration date time is specified (${args.options.expirationDateTime}).`);
       }
 
       return args.options.expirationDateTime;
     }
 
     if (this.debug) {
-      cmd.log(`Expiration date time is not specified. Will try to get appropriate maximum value`);
+      logger.log(`Expiration date time is not specified. Will try to get appropriate maximum value`);
     }
 
     const fromNow = (minutes: number) => {
@@ -125,13 +125,13 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       const actualExpirationIsoString = actualExpiration.toISOString();
 
       if (this.debug) {
-        cmd.log(`Matching resource in default values '${args.options.resource}' => '${resource}'`);
-        cmd.log(`Resolved expiration delay: ${resolvedExpirationDelay} (safe delta: ${SAFE_MINUTES_DELTA})`);
-        cmd.log(`Actual expiration date time: ${actualExpirationIsoString}`);
+        logger.log(`Matching resource in default values '${args.options.resource}' => '${resource}'`);
+        logger.log(`Resolved expiration delay: ${resolvedExpirationDelay} (safe delta: ${SAFE_MINUTES_DELTA})`);
+        logger.log(`Actual expiration date time: ${actualExpirationIsoString}`);
       }
 
       if (this.verbose) {
-        cmd.log(`An expiration maximum delay is resolved for the resource '${args.options.resource}' : ${resolvedExpirationDelay} minutes.`);
+        logger.log(`An expiration maximum delay is resolved for the resource '${args.options.resource}' : ${resolvedExpirationDelay} minutes.`);
       }
 
       return actualExpirationIsoString;
@@ -139,14 +139,14 @@ class GraphSubscriptionAddCommand extends GraphCommand {
 
     // If an resource specific expiration has not been found, return a default expiration delay
     if (this.verbose) {
-      cmd.log(`An expiration maximum delay couldn't be resolved for the resource '${args.options.resource}'. Will use generic default value: ${DEFAULT_EXPIRATION_DELAY_IN_MINUTES} minutes.`);
+      logger.log(`An expiration maximum delay couldn't be resolved for the resource '${args.options.resource}'. Will use generic default value: ${DEFAULT_EXPIRATION_DELAY_IN_MINUTES} minutes.`);
     }
 
     const actualExpiration = fromNow(DEFAULT_EXPIRATION_DELAY_IN_MINUTES - SAFE_MINUTES_DELTA);
     const actualExpirationIsoString = actualExpiration.toISOString();
 
     if (this.debug) {
-      cmd.log(`Actual expiration date time: ${actualExpirationIsoString}`);
+      logger.log(`Actual expiration date time: ${actualExpirationIsoString}`);
     }
 
     return actualExpirationIsoString;
@@ -181,26 +181,24 @@ class GraphSubscriptionAddCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.notificationUrl.indexOf('https://') !== 0) {
-        return `The specified notification URL '${args.options.notificationUrl}' does not start with 'https://'`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.notificationUrl.indexOf('https://') !== 0) {
+      return `The specified notification URL '${args.options.notificationUrl}' does not start with 'https://'`;
+    }
 
-      if (!this.isValidChangeTypes(args.options.changeType)) {
-        return `The specified changeType is invalid. Valid options are 'created', 'updated' and 'deleted'`;
-      }
+    if (!this.isValidChangeTypes(args.options.changeType)) {
+      return `The specified changeType is invalid. Valid options are 'created', 'updated' and 'deleted'`;
+    }
 
-      if (args.options.expirationDateTime && !Utils.isValidISODateTime(args.options.expirationDateTime)) {
-        return 'The expirationDateTime is not a valid ISO date string';
-      }
+    if (args.options.expirationDateTime && !Utils.isValidISODateTime(args.options.expirationDateTime)) {
+      return 'The expirationDateTime is not a valid ISO date string';
+    }
 
-      if (args.options.clientState && args.options.clientState.length > 128) {
-        return 'The clientState value exceeds the maximum length of 128 characters';
-      }
+    if (args.options.clientState && args.options.clientState.length > 128) {
+      return 'The clientState value exceeds the maximum length of 128 characters';
+    }
 
-      return true;
-    };
+    return true;
   }
 
 

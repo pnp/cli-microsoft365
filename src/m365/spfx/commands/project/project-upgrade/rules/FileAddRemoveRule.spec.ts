@@ -1,10 +1,10 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { Finding } from '../Finding';
-import { Project } from '../../model';
-import { FileAddRemoveRule } from './FileAddRemoveRule';
 import Utils from '../../../../../../Utils';
+import { Project } from '../../model';
+import { Finding } from '../Finding';
+import { FileAddRemoveRule } from './FileAddRemoveRule';
 
 class FileAddRule extends FileAddRemoveRule {
   constructor(add: boolean) {

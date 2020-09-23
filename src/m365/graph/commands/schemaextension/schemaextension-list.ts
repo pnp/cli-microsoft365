@@ -1,13 +1,13 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -36,7 +36,7 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
     telemetryProps.pageSize = typeof args.options.pageSize !== 'undefined';
     return telemetryProps;
   }
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const filter: string = this.getFilter(args.options);
     let url = `${this.resource}/v1.0/schemaExtensions?$select=*${(filter.length > 0 ? '&' + filter : '')}`;
 
@@ -57,9 +57,9 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
         if (res.value && res.value.length > 0) {
           const size = args.options.pageSize ? parseInt(args.options.pageSize) : parseInt(res.value.length);
           const result = res.value.slice(-size);
-          if(args.options.output !== 'json' && result.length > 1) {
-            cmd.log(result.map((x: any) => ({
-              id: x.id, 
+          if (args.options.output !== 'json' && result.length > 1) {
+            logger.log(result.map((x: any) => ({
+              id: x.id,
               description: x.description,
               targetTypes: x.targetTypes,
               status: x.status,
@@ -67,14 +67,14 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
               properties: JSON.stringify(x.properties)
             })));
           } else {
-            cmd.log(result);
+            logger.log(result);
           }
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
         }
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
 
@@ -123,23 +123,21 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.owner && !Utils.isValidGuid(args.options.owner)) {
-        return `${args.options.owner} is not a valid GUID`;
-      }
-      if (args.options.pageNumber && parseInt(args.options.pageNumber) < 1) {
-        return 'pageNumber must be a positive number';
-      }
-      if (args.options.pageSize && parseInt(args.options.pageSize) < 1) {
-        return 'pageSize must be a positive number';
-      }
-      if (args.options.status &&
-        ['Available', 'InDevelopment', 'Deprecated'].indexOf(args.options.status) === -1) {
-        return `${args.options.status} is not a valid status value. Allowed values are Available|InDevelopment|Deprecated`;
-      }
-      return true;
-    };
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.owner && !Utils.isValidGuid(args.options.owner)) {
+      return `${args.options.owner} is not a valid GUID`;
+    }
+    if (args.options.pageNumber && parseInt(args.options.pageNumber) < 1) {
+      return 'pageNumber must be a positive number';
+    }
+    if (args.options.pageSize && parseInt(args.options.pageSize) < 1) {
+      return 'pageSize must be a positive number';
+    }
+    if (args.options.status &&
+      ['Available', 'InDevelopment', 'Deprecated'].indexOf(args.options.status) === -1) {
+      return `${args.options.status} is not a valid status value. Allowed values are Available|InDevelopment|Deprecated`;
+    }
+    return true;
   }
 }
 module.exports = new GraphSchemaExtensionListCommand();

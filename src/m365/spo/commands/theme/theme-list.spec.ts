@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./theme-list');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./theme-list');
 
 describe(commands.THEME_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,16 +23,12 @@ describe(commands.THEME_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -66,7 +63,7 @@ describe(commands.THEME_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
       }
@@ -91,7 +88,7 @@ describe(commands.THEME_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
       }
@@ -100,7 +97,7 @@ describe(commands.THEME_LIST, () => {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/GetTenantThemingOptions');
         assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
         assert.strictEqual(postStub.lastCall.args[0].json, true);
-        assert.strictEqual(cmdInstanceLogSpy.called, true);
+        assert.strictEqual(loggerSpy.called, true);
         done();
       }
       catch (e) {
@@ -120,9 +117,9 @@ describe(commands.THEME_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, verbose: true } }, () => {
+    command.action(logger, { options: { debug: true, verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([{
+        assert(loggerSpy.calledWith([{
           Name: 'Mint',
         },
         {
@@ -147,9 +144,9 @@ describe(commands.THEME_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, verbose: true, output: 'json' } }, () => {
+    command.action(logger, { options: { debug: true, verbose: true, output: 'json' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(expected.themePreviews), 'Invalid request');
+        assert(loggerSpy.calledWith(expected.themePreviews), 'Invalid request');
         done();
       }
       catch (e) {
@@ -169,9 +166,9 @@ describe(commands.THEME_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, verbose: true } }, () => {
+    command.action(logger, { options: { debug: true, verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('No themes found'), 'Invalid request');
+        assert(loggerSpy.calledWith('No themes found'), 'Invalid request');
         done();
       }
       catch (e) {
@@ -188,7 +185,7 @@ describe(commands.THEME_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, verbose: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, verbose: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -200,7 +197,7 @@ describe(commands.THEME_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

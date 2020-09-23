@@ -1,17 +1,16 @@
-import config from '../../../../config';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
 import {
   CommandOption,
-  CommandValidate,
   CommandTypes
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { ListItemInstance } from './ListItemInstance';
-import { ContextInfo, ClientSvcResponseContents, ClientSvcResponse } from '../../spo';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -48,7 +47,7 @@ class SpoListItemSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
     const listRestUrl: string = (args.options.listId ?
@@ -62,7 +61,7 @@ class SpoListItemSetCommand extends SpoCommand {
     ((): Promise<any> => {
       if (args.options.systemUpdate) {
         if (this.verbose) {
-          cmd.log(`Getting list id...`);
+          logger.log(`Getting list id...`);
         }
 
         const listRequestOptions: any = {
@@ -86,7 +85,7 @@ class SpoListItemSetCommand extends SpoCommand {
 
         if (args.options.contentType) {
           if (this.verbose) {
-            cmd.log(`Getting content types for list...`);
+            logger.log(`Getting content types for list...`);
           }
 
           const requestOptions: any = {
@@ -106,23 +105,23 @@ class SpoListItemSetCommand extends SpoCommand {
       .then((response: any): Promise<ContextInfo> => {
         if (args.options.contentType) {
           if (this.debug) {
-            cmd.log('content type lookup response...');
-            cmd.log(response);
+            logger.log('content type lookup response...');
+            logger.log(response);
           }
 
           const foundContentType: { Name: string; }[] = response.value.filter((ct: any) => {
             const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
 
             if (this.debug) {
-              cmd.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
+              logger.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
             }
 
             return contentTypeMatch;
           });
 
           if (this.debug) {
-            cmd.log('content type filter output...');
-            cmd.log(foundContentType);
+            logger.log('content type filter output...');
+            logger.log(foundContentType);
           }
 
           if (foundContentType.length > 0) {
@@ -135,12 +134,12 @@ class SpoListItemSetCommand extends SpoCommand {
           }
 
           if (this.debug) {
-            cmd.log(`using content type name: ${contentTypeName}`);
+            logger.log(`using content type name: ${contentTypeName}`);
           }
         }
         if (args.options.systemUpdate) {
           if (this.debug) {
-            cmd.log(`getting request digest for systemUpdate request`);
+            logger.log(`getting request digest for systemUpdate request`);
           }
 
           return this.getRequestDigest(args.options.webUrl);
@@ -151,13 +150,13 @@ class SpoListItemSetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+          logger.log(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
         formDigestValue = args.options.systemUpdate ? res['FormDigestValue'] : '';
 
         if (args.options.systemUpdate) {
-          return this.requestObjectIdentity(args.options.webUrl, cmd, formDigestValue);
+          return this.requestObjectIdentity(args.options.webUrl, logger, formDigestValue);
         }
 
         return Promise.resolve('');
@@ -186,7 +185,7 @@ class SpoListItemSetCommand extends SpoCommand {
 
         if (args.options.contentType && contentTypeName !== '' && !args.options.systemUpdate) {
           if (this.debug) {
-            cmd.log(`Specifying content type name [${contentTypeName}] in request body`);
+            logger.log(`Specifying content type name [${contentTypeName}] in request body`);
           }
 
           requestBody.formValues.push({
@@ -247,9 +246,9 @@ class SpoListItemSetCommand extends SpoCommand {
         return request.get(requestOptions);
       })
       .then((response: any): void => {
-        cmd.log(<ListItemInstance>response);
+        logger.log(<ListItemInstance>response);
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -299,28 +298,26 @@ class SpoListItemSetCommand extends SpoCommand {
     };
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (!args.options.listId && !args.options.listTitle) {
-        return `Specify listId or listTitle`;
-      }
+    if (!args.options.listId && !args.options.listTitle) {
+      return `Specify listId or listTitle`;
+    }
 
-      if (args.options.listId && args.options.listTitle) {
-        return `Specify listId or listTitle but not both`;
-      }
+    if (args.options.listId && args.options.listTitle) {
+      return `Specify listId or listTitle but not both`;
+    }
 
-      if (args.options.listId &&
-        !Utils.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} in option listId is not a valid GUID`;
-      }
+    if (args.options.listId &&
+      !Utils.isValidGuid(args.options.listId)) {
+      return `${args.options.listId} in option listId is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 
   private mapRequestBody(options: Options): any {
@@ -366,7 +363,7 @@ class SpoListItemSetCommand extends SpoCommand {
    * @param webUrl web url
    * @param cmd command cmd
    */
-  private requestObjectIdentity(webUrl: string, cmd: CommandInstance, formDigestValue: string): Promise<string> {
+  private requestObjectIdentity(webUrl: string, logger: Logger, formDigestValue: string): Promise<string> {
     const requestOptions: any = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
@@ -378,7 +375,7 @@ class SpoListItemSetCommand extends SpoCommand {
     return new Promise<string>((resolve: any, reject: any): void => {
       request.post(requestOptions).then((res: any) => {
         if (this.debug) {
-          cmd.log('Attempt to get _ObjectIdentity_ key values');
+          logger.log('Attempt to get _ObjectIdentity_ key values');
         }
 
         const json: ClientSvcResponse = JSON.parse(res);

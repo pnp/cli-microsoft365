@@ -1,19 +1,18 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
 import { v4 } from 'uuid';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
   CommandError,
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { TermStore } from './TermStore';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { TermGroup } from './TermGroup';
-import { CommandInstance } from '../../../../cli';
+import { TermStore } from './TermStore';
 
 interface CommandArgs {
   options: Options;
@@ -41,13 +40,13 @@ class SpoTermGroupAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let formDigest: string = '';
     let termGroup: TermGroup;
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
         return this.getRequestDigest(spoAdminUrl);
@@ -56,7 +55,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
         formDigest = res.FormDigestValue;
 
         if (this.verbose) {
-          cmd.log(`Getting taxonomy term store...`);
+          logger.log(`Getting taxonomy term store...`);
         }
 
         const requestOptions: any = {
@@ -80,7 +79,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
         const termGroupId: string = args.options.id || v4();
 
         if (this.verbose) {
-          cmd.log(`Adding taxonomy term group...`);
+          logger.log(`Adding taxonomy term group...`);
         }
 
         const requestOptions: any = {
@@ -107,7 +106,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Setting taxonomy term group description...`);
+          logger.log(`Setting taxonomy term group description...`);
         }
 
         const requestOptions: any = {
@@ -134,9 +133,9 @@ class SpoTermGroupAddCommand extends SpoCommand {
         delete termGroup._ObjectType_;
         termGroup.Id = termGroup.Id.replace('/Guid(', '').replace(')/', '');
         termGroup.Description = args.options.description || '';
-        cmd.log(termGroup);
+        logger.log(termGroup);
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -159,16 +158,14 @@ class SpoTermGroupAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.id) {
-        if (!Utils.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.id) {
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
       }
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

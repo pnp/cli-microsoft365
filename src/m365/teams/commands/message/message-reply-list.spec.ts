@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./message-reply-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./message-reply-list');
 
 describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      action: command.action(),
-      commandWrapper: {
-        command: command.name
-      },
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -56,7 +53,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
   });
 
   it('fails validation if teamId, channelId and messageId are not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
       }
@@ -65,7 +62,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
   });
 
   it('fails validation if channelId and messageId are not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
@@ -75,7 +72,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
   });
 
   it('fails validation if the teamId is not a valid guid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: "5f5d7b71-1161-44",
         channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
@@ -87,7 +84,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
 
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -98,7 +95,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
   });
 
   it('validates for a correct input', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
         channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
@@ -109,7 +106,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
   });
 
   it('fails validates for a incorrect channelId missing leading 19:.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
@@ -121,7 +118,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
   });
 
   it('fails validates for a incorrect channelId missing trailing @thread.skpye.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
@@ -210,7 +207,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -219,7 +216,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "1501527483334",
             "body": "<div>Hey team, I'm Lidia! I've been here about six months so far and I really like it! We've got a great team and although there's always so much to do, I enjoy how well we work together.</div>"
@@ -313,7 +310,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
@@ -322,7 +319,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "1501527483334",
             "body": "<div>Hey team, I'm Lidia! I've been here about six months so far and I really like it! We've got a great team and although there's always so much to do, I enjoy how well we work together.</div>"
@@ -416,7 +413,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         output: 'json',
@@ -426,7 +423,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "1501527483334",
             "replyToId": "1501527481624",
@@ -506,14 +503,14 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
         channelId: "19:d0bba23c2fc8413991125a43a54cc30e@thread.skype",
         messageId: "1501527481624"
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

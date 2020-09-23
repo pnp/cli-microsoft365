@@ -1,15 +1,13 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate,
-  CommandError
+  CommandError, CommandOption
 } from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -34,17 +32,17 @@ class SpoCdnGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     let spoAdminUrl: string = '';
     let tenantId: string = '';
 
     this
-      .getTenantId(cmd, this.debug)
+      .getTenantId(logger, this.debug)
       .then((_tenantId: string): Promise<string> => {
         tenantId = _tenantId;
-        return this.getSpoAdminUrl(cmd, this.debug);
+        return this.getSpoAdminUrl(logger, this.debug);
       })
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
@@ -52,7 +50,7 @@ class SpoCdnGetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Retrieving status of ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
+          logger.log(`Retrieving status of ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
         }
 
         const requestOptions: any = {
@@ -74,14 +72,14 @@ class SpoCdnGetCommand extends SpoCommand {
         else {
           const result: boolean = json[json.length - 1];
           if (this.verbose) {
-            cmd.log(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${spoAdminUrl} is ${(result === true ? 'enabled' : 'disabled')}`);
+            logger.log(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${spoAdminUrl} is ${(result === true ? 'enabled' : 'disabled')}`);
           }
           else {
-            cmd.log(result);
+            logger.log(result);
           }
           cb();
         }
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -95,17 +93,15 @@ class SpoCdnGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.type) {
-        if (args.options.type !== 'Public' &&
-          args.options.type !== 'Private') {
-          return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.type) {
+      if (args.options.type !== 'Public' &&
+        args.options.type !== 'Private') {
+        return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
       }
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./page-control-get');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
 import { ClientSidePage, ClientSideText } from './clientsidepages';
+const command: Command = require('./page-control-get');
 
 describe(commands.PAGE_CONTROL_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,16 +23,12 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -123,9 +120,9 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
+        assert(loggerSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
         done();
       }
       catch (e) {
@@ -200,9 +197,9 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "dynamicDataPaths": { "dynamicProperty0": "WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText" }, "dynamicDataValues": { "dynamicProperty1": "" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
+        assert(loggerSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "dynamicDataPaths": { "dynamicProperty0": "WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText" }, "dynamicDataValues": { "dynamicProperty1": "" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
         done();
       }
       catch (e) {
@@ -277,9 +274,9 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
+        assert(loggerSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
         done();
       }
       catch (e) {
@@ -354,9 +351,9 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
+        assert(loggerSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
         done();
       }
       catch (e) {
@@ -431,7 +428,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5', output: 'json' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({ "controlType": 3, "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
         done();
@@ -514,7 +511,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
     sinon.stub(page, 'findControlById').callsFake(() => emptyColumn);
     sinon.stub(ClientSidePage, 'fromHtml').callsFake(() => page);
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({"controlType":"Empty column","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":"<p></p>"}));
         done();
@@ -596,7 +593,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
     sinon.stub(page, 'findControlById').callsFake(() => emptyColumn);
     sinon.stub(ClientSidePage, 'fromHtml').callsFake(() => page);
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({"controlType":"Client-side text","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":"<p></p>"}));
         done();
@@ -679,7 +676,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
     sinon.stub(page, 'findControlById').callsFake(() => unknown);
     sinon.stub(ClientSidePage, 'fromHtml').callsFake(() => page);
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({"controlType":"5","dataVersion":"1.0","order":1,"id":"88f7b5b2-83a8-45d1-bc61-c11425f233e3","controlData":null,"_text":"<p></p>"}));
         done();
@@ -753,7 +750,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Page home.aspx is not a modern page.')));
         done();
@@ -830,9 +827,9 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -907,9 +904,9 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, () => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('Control with ID 3ede60d3-dc2c-438b-b5bf-cc40bb2351e6 not found on page home.aspx'));
+        assert(loggerSpy.calledWith('Control with ID 3ede60d3-dc2c-438b-b5bf-cc40bb2351e6 not found on page home.aspx'));
         done();
       }
       catch (e) {
@@ -933,7 +930,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.')));
         done();
@@ -949,7 +946,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -961,7 +958,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -972,17 +969,17 @@ describe(commands.PAGE_CONTROL_GET, () => {
   });
 
   it('fails validation if the specified id is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'abc', name: 'home.aspx', webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { id: 'abc', name: 'home.aspx', webUrl: 'https://contoso.sharepoint.com' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } });
+    const actual = command.validate({ options: { webUrl: 'foo', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the webUrl is a valid SharePoint URL and name and id are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } });
     assert.strictEqual(actual, true);
   });
 });

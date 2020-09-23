@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./page-section-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError, CommandOption } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./page-section-add');
 
 describe(commands.PAGE_SECTION_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -20,11 +21,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -77,7 +74,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         name: 'home',
@@ -121,7 +118,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         name: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
@@ -160,7 +157,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         name: 'home.aspx',
@@ -200,7 +197,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         name: 'home.aspx',
@@ -241,7 +238,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         name: 'home.aspx',
@@ -281,7 +278,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         name: 'home.aspx',
@@ -322,7 +319,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         name: 'home.aspx',
@@ -363,7 +360,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         name: 'home.aspx',
@@ -403,7 +400,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         name: 'home.aspx',
@@ -444,7 +441,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         name: 'home.aspx',
@@ -485,7 +482,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         name: 'home.aspx',
@@ -526,7 +523,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         name: 'home.aspx',
@@ -550,7 +547,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         name: 'home.aspx',
@@ -558,7 +555,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
         sectionTemplate: 'TwoColumn',
         order: 2
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -570,7 +567,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   });
 
   it('fails validation if order has invalid (negative) value', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         name: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -582,7 +579,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   });
 
   it('fails validation if order has invalid (non number) value', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         name: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -594,7 +591,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   });
 
   it('fails validation if sectionTemplate is not valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         name: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -606,7 +603,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   });
 
   it('fails validation if webUrl is not valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         name: 'page.aspx',
         order: 1,
@@ -618,7 +615,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   });
 
   it('passes validation if all the parameters are specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         order: 1,
         sectionTemplate: 'OneColumn',
@@ -630,7 +627,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   });
 
   it('passes validation if order is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         sectionTemplate: 'OneColumn',
         webUrl: 'https://contoso.sharepoint.com',

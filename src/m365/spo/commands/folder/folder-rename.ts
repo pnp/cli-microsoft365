@@ -1,16 +1,15 @@
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import config from '../../../../config';
-import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import SpoCommand from '../../../base/SpoCommand';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -32,8 +31,8 @@ class SpoFolderRenameCommand extends SpoCommand {
     return 'Renames a folder';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const clientSvc: ClientSvc = new ClientSvc(cmd, this.debug);
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    const clientSvc: ClientSvc = new ClientSvc(logger, this.debug);
     let formDigestValue: string = '';
 
     this
@@ -48,7 +47,7 @@ class SpoFolderRenameCommand extends SpoCommand {
       })
       .then((folderObjectIdentity: IdentityResponse): Promise<void> => {
         if (this.verbose) {
-          cmd.log(`Renaming folder ${args.options.folderUrl} to ${args.options.name}`);
+          logger.log(`Renaming folder ${args.options.folderUrl} to ${args.options.name}`);
         }
 
         const serverRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
@@ -77,11 +76,11 @@ class SpoFolderRenameCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log('DONE');
+          logger.log('DONE');
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -104,10 +103,8 @@ class SpoFolderRenameCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

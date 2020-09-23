@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -41,29 +40,29 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let appId: string = '';
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     let appCatalogUrl: string = '';
 
     this
-      .getSpoUrl(cmd, this.debug)
+      .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<string> => {
-        return this.getAppCatalogSiteUrl(cmd, spoUrl, args)
+        return this.getAppCatalogSiteUrl(logger, spoUrl, args)
       })
       .then((_appCatalogUrl: string): Promise<{ UniqueId: string; }> => {
         appCatalogUrl = _appCatalogUrl;
 
         if (args.options.id) {
           if (this.verbose) {
-            cmd.log(`Using the specified app id ${args.options.id}`);
+            logger.log(`Using the specified app id ${args.options.id}`);
           }
 
           return Promise.resolve({ UniqueId: args.options.id });
         }
         else {
           if (this.verbose) {
-            cmd.log(`Looking up app id for app named ${args.options.name}...`);
+            logger.log(`Looking up app id for app named ${args.options.name}...`);
           }
 
           const requestOptions: any = {
@@ -81,7 +80,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
         appId = res.UniqueId;
 
         if (this.verbose) {
-          cmd.log(`Deploying app...`);
+          logger.log(`Deploying app...`);
         }
 
         const requestOptions: any = {
@@ -98,11 +97,11 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -134,38 +133,36 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      // verify either 'tenant' or 'sitecollection' specified if scope provided
-      if (args.options.scope) {
-        const testScope: string = args.options.scope.toLowerCase();
-        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-          return `Scope must be either 'tenant' or 'sitecollection'`
-        }
-
-        if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-          return `You must specify appCatalogUrl when the scope is sitecollection`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    // verify either 'tenant' or 'sitecollection' specified if scope provided
+    if (args.options.scope) {
+      const testScope: string = args.options.scope.toLowerCase();
+      if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+        return `Scope must be either 'tenant' or 'sitecollection'`
       }
 
-      if (!args.options.id && !args.options.name) {
-        return 'Specify either the id or the name';
+      if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+        return `You must specify appCatalogUrl when the scope is sitecollection`;
       }
+    }
 
-      if (args.options.id && args.options.name) {
-        return 'Specify either the id or the name but not both';
-      }
+    if (!args.options.id && !args.options.name) {
+      return 'Specify either the id or the name';
+    }
 
-      if (args.options.id && !Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
+    if (args.options.id && args.options.name) {
+      return 'Specify either the id or the name but not both';
+    }
 
-      if (args.options.appCatalogUrl) {
-        return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
-      }
+    if (args.options.id && !Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    if (args.options.appCatalogUrl) {
+      return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+    }
+
+    return true;
   }
 }
 

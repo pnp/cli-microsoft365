@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./orgassetslibrary-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./orgassetslibrary-add');
 
 describe(commands.ORGASSETSLIBRARY_ADD, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,16 +28,12 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -80,9 +77,9 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets' } }, () => {
+    command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets' } }, () => {
       try {
-        assert(orgAssetLibAddCallIssued && cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(orgAssetLibAddCallIssued && loggerSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -110,9 +107,9 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public' } }, () => {
+    command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public' } }, () => {
       try {
-        assert(orgAssetLibAddCallIssued && cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(orgAssetLibAddCallIssued && loggerSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -140,9 +137,9 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } }, () => {
+    command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } }, () => {
       try {
-        assert(orgAssetLibAddCallIssued && cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(orgAssetLibAddCallIssued && loggerSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -170,7 +167,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`This library is already an organization assets library.`)));
 
@@ -198,11 +195,11 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert(svcListRequest.called);
         assert.strictEqual(err.message, 'An error has occurred');
@@ -217,7 +214,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -229,22 +226,22 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
   });
 
   it('fails validation if the libraryUrl is not valid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { libraryUrl: 'invalid' } });
+    const actual = command.validate({ options: { libraryUrl: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the thumbnail is not valid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets', thumbnailUrl: 'invalid' } });
+    const actual = command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets', thumbnailUrl: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the libraryUrl option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets' } });
+    const actual = command.validate({ options: { libraryUrl: 'https://contoso.sharepoint.com/siteassets' } });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

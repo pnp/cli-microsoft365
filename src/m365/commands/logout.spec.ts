@@ -1,15 +1,16 @@
-import commands from './commands';
-import Command, { CommandError } from '../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../appInsights';
 import auth from '../../Auth';
-const command: Command = require('./logout');
-import * as assert from 'assert';
+import { Logger } from '../../cli';
+import Command, { CommandError } from '../../Command';
 import Utils from '../../Utils';
+import commands from './commands';
+const command: Command = require('./logout');
 
 describe(commands.LOGOUT, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let authClearConnectionInfoStub: sinon.SinonStub;
 
   before(() => {
@@ -20,10 +21,7 @@ describe(commands.LOGOUT, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: 'logout'
-      },
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -47,8 +45,7 @@ describe(commands.LOGOUT, () => {
 
   it('logs out from Microsoft 365 when logged in', (done) => {
     auth.service.connected = true;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
         assert(!auth.service.connected);
         done();
@@ -61,8 +58,7 @@ describe(commands.LOGOUT, () => {
 
   it('logs out from Microsoft 365 when not logged in', (done) => {
     auth.service.connected = false;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
         assert(!auth.service.connected);
         done();
@@ -75,8 +71,7 @@ describe(commands.LOGOUT, () => {
 
   it('clears persisted connection info when logging out', (done) => {
     auth.service.connected = true;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
         assert(authClearConnectionInfoStub.called);
         done();
@@ -92,8 +87,7 @@ describe(commands.LOGOUT, () => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(logoutSpy.called);
         done();
@@ -114,8 +108,7 @@ describe(commands.LOGOUT, () => {
     sinon.stub(auth, 'clearConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
     const logoutSpy = sinon.spy(auth.service, 'logout');
     auth.service.connected = true;
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
         assert(logoutSpy.called);
         done();
@@ -135,8 +128,7 @@ describe(commands.LOGOUT, () => {
   it('correctly handles error when restoring auth information', (done) => {
     Utils.restore(auth.restoreAuth);
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

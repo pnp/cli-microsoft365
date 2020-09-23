@@ -1,13 +1,13 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
-import Utils from '../../../../Utils';
-import { Message } from '../../Message';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import Utils from '../../../../Utils';
+import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import commands from '../../commands';
+import { Message } from '../../Message';
 
 interface CommandArgs {
   options: Options;
@@ -28,18 +28,18 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
     return 'Lists all messages from a channel in a Microsoft Teams team';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const deltaExtension: string = args.options.since !== undefined ? `/delta?$filter=lastModifiedDateTime gt ${args.options.since}` : '';
     const endpoint: string = `${this.resource}/beta/teams/${args.options.teamId}/channels/${args.options.channelId}/messages${deltaExtension}`;
 
     this
-    .getAllItems(endpoint, cmd, true)
-    .then((): void => {
+      .getAllItems(endpoint, logger, true)
+      .then((): void => {
         if (args.options.output === 'json') {
-          cmd.log(this.items);
+          logger.log(this.items);
         }
         else {
-          cmd.log(this.items.map(m => {
+          logger.log(this.items.map(m => {
             return {
               id: m.id,
               summary: m.summary,
@@ -47,12 +47,12 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
             }
           }));
         }
-        
+
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
-    }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -75,26 +75,24 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.teamId)) {
-        return `${args.options.teamId} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.teamId)) {
+      return `${args.options.teamId} is not a valid GUID`;
+    }
 
-      if (!Utils.isValidTeamsChannelId(args.options.channelId as string)) {
-        return `${args.options.channelId} is not a valid Teams ChannelId`;
-      }
+    if (!Utils.isValidTeamsChannelId(args.options.channelId as string)) {
+      return `${args.options.channelId} is not a valid Teams ChannelId`;
+    }
 
-      if (args.options.since && !Utils.isValidISODateDashOnly(args.options.since as string)) {
-        return `${args.options.since} is not a valid ISO Date (with dash separator)`;
-      }
-      
-      if (args.options.since && !Utils.isDateInRange(args.options.since as string, 8)) {
-        return `${args.options.since} is not in the last 8 months (for delta messages)`;
-      }
+    if (args.options.since && !Utils.isValidISODateDashOnly(args.options.since as string)) {
+      return `${args.options.since} is not a valid ISO Date (with dash separator)`;
+    }
 
-      return true;
-    };
+    if (args.options.since && !Utils.isDateInRange(args.options.since as string, 8)) {
+      return `${args.options.since} is not in the last 8 months (for delta messages)`;
+    }
+
+    return true;
   }
 }
 

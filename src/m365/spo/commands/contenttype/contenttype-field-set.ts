@@ -1,19 +1,18 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate,
-  CommandError,
+  CommandError, CommandOption,
+
   CommandTypes
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { FieldLink } from './FieldLink';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -62,11 +61,11 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     };
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let schemaXmlWithResourceTokens: string = '';
 
     if (this.verbose) {
-      cmd.log(`Retrieving field link for field ${args.options.fieldId}...`);
+      logger.log(`Retrieving field link for field ${args.options.fieldId}...`);
     }
 
     const requestOptions: any = {
@@ -82,15 +81,15 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       .then((res: FieldLink): Promise<{ SchemaXmlWithResourceTokens: string; }> => {
         if (res["odata.null"] !== true) {
           if (this.verbose) {
-            cmd.log('Field link found');
+            logger.log('Field link found');
           }
           this.fieldLink = res;
           return Promise.resolve(undefined as any);
         }
 
         if (this.verbose) {
-          cmd.log('Field link not found. Creating...');
-          cmd.log(`Retrieving information about site column ${args.options.fieldId}...`);
+          logger.log('Field link not found. Creating...');
+          logger.log(`Retrieving information about site column ${args.options.fieldId}...`);
         }
 
         const requestOptions: any = {
@@ -109,7 +108,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         schemaXmlWithResourceTokens = res.SchemaXmlWithResourceTokens;
-        return this.createFieldLink(cmd, args, schemaXmlWithResourceTokens);
+        return this.createFieldLink(logger, args, schemaXmlWithResourceTokens);
       })
       .then((): Promise<FieldLink> => {
         if (this.fieldLink) {
@@ -117,7 +116,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Retrieving information about field link for field ${args.options.fieldId}...`);
+          logger.log(`Retrieving information about field link for field ${args.options.fieldId}...`);
         }
 
         const requestOptions: any = {
@@ -152,7 +151,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
         if (!updateHidden && !updateRequired) {
           if (this.verbose) {
-            cmd.log('Field link already up-to-date');
+            logger.log('Field link already up-to-date');
           }
           return Promise.reject('DONE');
         }
@@ -162,7 +161,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Retrieving site collection id...`);
+          logger.log(`Retrieving site collection id...`);
         }
 
         const requestOptions: any = {
@@ -185,7 +184,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Retrieving site id...`);
+          logger.log(`Retrieving site id...`);
         }
 
         const requestOptions: any = {
@@ -204,7 +203,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Updating field link...`);
+          logger.log(`Updating field link...`);
         }
 
         const requiredProperty: string = typeof args.options.required !== 'undefined' &&
@@ -230,24 +229,24 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
           cb();
         }
       }, (error: any): void => {
         if (error === 'DONE') {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
           cb();
         }
         else {
-          this.handleRejectedODataJsonPromise(error, cmd, cb);
+          this.handleRejectedODataJsonPromise(error, logger, cb);
         }
       });
   }
 
-  private createFieldLink(cmd: CommandInstance, args: CommandArgs, schemaXmlWithResourceTokens: string): Promise<void> {
+  private createFieldLink(logger: Logger, args: CommandArgs, schemaXmlWithResourceTokens: string): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       let requiresUpdate: boolean = false;
       const match: RegExpExecArray = /(<Field[^>]+>)(.*)/.exec(schemaXmlWithResourceTokens) as RegExpExecArray;
@@ -265,10 +264,10 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       }
 
       this
-        .updateField(xField, requiresUpdate, cmd, args)
+        .updateField(xField, requiresUpdate, logger, args)
         .then((): Promise<{ Id: string; }> => {
           if (this.verbose) {
-            cmd.log(`Retrieving site collection id...`);
+            logger.log(`Retrieving site collection id...`);
           }
 
           const requestOptions: any = {
@@ -285,7 +284,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           this.siteId = res.Id;
 
           if (this.verbose) {
-            cmd.log(`Retrieving site id...`);
+            logger.log(`Retrieving site id...`);
           }
 
           const requestOptions: any = {
@@ -301,7 +300,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         .then((res: { Id: string }): Promise<void> => {
           this.webId = res.Id;
 
-          return this.ensureRequestDigest(args.options.webUrl, cmd);
+          return this.ensureRequestDigest(args.options.webUrl, logger);
         })
         .then((): Promise<string> => {
           const requestOptions: any = {
@@ -329,21 +328,21 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     });
   }
 
-  private updateField(schemaXml: string, requiresUpdate: boolean, cmd: CommandInstance, args: CommandArgs): Promise<void> {
+  private updateField(schemaXml: string, requiresUpdate: boolean, logger: Logger, args: CommandArgs): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (!requiresUpdate) {
         if (this.verbose) {
-          cmd.log(`Schema of field ${args.options.fieldId} is already up-to-date`);
+          logger.log(`Schema of field ${args.options.fieldId} is already up-to-date`);
         }
         resolve();
         return;
       }
 
       this
-        .ensureRequestDigest(args.options.webUrl, cmd)
+        .ensureRequestDigest(args.options.webUrl, logger)
         .then((): Promise<void> => {
           if (this.verbose) {
-            cmd.log(`Updating field schema...`);
+            logger.log(`Updating field schema...`);
           }
 
           const requestOptions: any = {
@@ -370,18 +369,18 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     });
   }
 
-  private ensureRequestDigest(siteUrl: string, cmd: CommandInstance): Promise<void> {
+  private ensureRequestDigest(siteUrl: string, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (this.requestDigest) {
         if (this.debug) {
-          cmd.log('Request digest already present');
+          logger.log('Request digest already present');
         }
         resolve();
         return;
       }
 
       if (this.debug) {
-        cmd.log('Retrieving request digest...');
+        logger.log('Retrieving request digest...');
       }
 
       this
@@ -423,28 +422,26 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.fieldId)) {
-        return `${args.options.fieldId} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.fieldId)) {
+      return `${args.options.fieldId} is not a valid GUID`;
+    }
 
-      if (typeof args.options.required !== 'undefined') {
-        if (args.options.required !== 'true' &&
-          args.options.required !== 'false') {
-          return `${args.options.required} is not a valid boolean value. Allowed values are true|false`;
-        }
+    if (typeof args.options.required !== 'undefined') {
+      if (args.options.required !== 'true' &&
+        args.options.required !== 'false') {
+        return `${args.options.required} is not a valid boolean value. Allowed values are true|false`;
       }
+    }
 
-      if (typeof args.options.hidden !== 'undefined') {
-        if (args.options.hidden !== 'true' &&
-          args.options.hidden !== 'false') {
-          return `${args.options.hidden} is not a valid boolean value. Allowed values are true|false`;
-        }
+    if (typeof args.options.hidden !== 'undefined') {
+      if (args.options.hidden !== 'true' &&
+        args.options.hidden !== 'false') {
+        return `${args.options.hidden} is not a valid boolean value. Allowed values are true|false`;
       }
+    }
 
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

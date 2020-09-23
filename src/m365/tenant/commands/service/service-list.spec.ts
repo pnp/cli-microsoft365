@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
@@ -10,8 +11,8 @@ const command: Command = require('./service-list');
 
 describe(commands.TENANT_SERVICE_LIST, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   const textOutput = [
     {
@@ -77,16 +78,12 @@ describe(commands.TENANT_SERVICE_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -105,7 +102,7 @@ describe(commands.TENANT_SERVICE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TENANT_SERVICE_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.TENANT_SERVICE_LIST), true);
   });
 
   it('has a description', () => {
@@ -131,13 +128,13 @@ describe(commands.TENANT_SERVICE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
 
       }
     }, (err?: any) => {
       try {
-        assert.equal(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
       }
       catch (e) {
@@ -154,14 +151,14 @@ describe(commands.TENANT_SERVICE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: false
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(loggerSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -178,14 +175,14 @@ describe(commands.TENANT_SERVICE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: true
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(loggerSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -202,14 +199,14 @@ describe(commands.TENANT_SERVICE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'text',
         debug: false
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(loggerSpy.calledWith(textOutput));
         done();
       }
       catch (e) {
@@ -226,14 +223,14 @@ describe(commands.TENANT_SERVICE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'text',
         debug: true
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(loggerSpy.calledWith(textOutput));
         done();
       }
       catch (e) {

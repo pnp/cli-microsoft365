@@ -1,13 +1,13 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { ClientSidePage, ClientSidePart } from './clientsidepages';
 import { Page } from './Page';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -27,9 +27,9 @@ class SpoPageControlListCommand extends SpoCommand {
     return 'Lists controls on the specific modern page';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     Page
-      .getPage(args.options.name, args.options.webUrl, cmd, this.debug, this.verbose)
+      .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
       .then((clientSidePage: ClientSidePage): void => {
         let controls: ClientSidePart[] = [];
         clientSidePage.sections.forEach(s => {
@@ -52,10 +52,10 @@ class SpoPageControlListCommand extends SpoCommand {
 
         if (args.options.output === 'json') {
           // drop the information about original classes from clientsidepages.ts
-          cmd.log(JSON.parse(JSON.stringify(controls)));
+          logger.log(JSON.parse(JSON.stringify(controls)));
         }
         else {
-          cmd.log(controls.map(c => {
+          logger.log(controls.map(c => {
             return {
               id: c.id,
               type: SpoPageControlListCommand.getControlTypeDisplayName((c as any).controlType),
@@ -65,11 +65,11 @@ class SpoPageControlListCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private static getControlTypeDisplayName(controlType: number): string {
@@ -101,10 +101,8 @@ class SpoPageControlListCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

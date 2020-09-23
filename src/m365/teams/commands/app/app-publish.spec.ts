@@ -1,19 +1,20 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
-import appInsights from '../../../../appInsights';
-import request from '../../../../request';
-import * as fs from 'fs';
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
-import auth from '../../../../Auth';
-const command: Command = require('./app-publish');
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
+import * as fs from 'fs';
+import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./app-publish');
 
 describe(commands.TEAMS_APP_PUBLISH, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -23,16 +24,12 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -62,7 +59,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
 
   it('fails validation if the filePath does not exist', (done) => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { filePath: 'invalid.zip' }
     });
     assert.notStrictEqual(actual, true);
@@ -75,7 +72,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { filePath: './' }
     });
     Utils.restore([
@@ -91,7 +88,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
 
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         filePath: 'teamsapp.zip'
       }
@@ -120,10 +117,9 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, filePath: 'teamsapp.zip' } }, () => {
+    command.action(logger, { options: { debug: false, filePath: 'teamsapp.zip' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
+        assert(loggerSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
         done();
       } catch (e) {
         done(e);
@@ -148,11 +144,10 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, filePath: 'teamsapp.zip' } }, () => {
+    command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
 
         done();
       } catch (e) {
@@ -168,8 +163,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
 
     sinon.stub(fs, 'readFileSync').callsFake(() => '123');
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, filePath: 'teamsapp.zip' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, filePath: 'teamsapp.zip' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -180,7 +174,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

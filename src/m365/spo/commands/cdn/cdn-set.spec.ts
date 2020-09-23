@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./cdn-set');
-import * as assert from 'assert';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./cdn-set');
 
 describe(commands.CDN_SET, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let requests: any[];
 
   before(() => {
@@ -41,11 +42,7 @@ describe(commands.CDN_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -76,7 +73,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables public CDN when Public type specified and enabled set to true', (done) => {
-    cmdInstance.action({ options: { debug: false, enabled: 'true', type: 'Public' } }, () => {
+    command.action(logger, { options: { debug: false, enabled: 'true', type: 'Public' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -97,7 +94,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables public CDN when Public type specified and enabled set to true (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'true', type: 'Public' } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Public' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -118,7 +115,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables public CDN when Public type specified and enabled set to true without default origins (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'true', type: 'Public', noDefaultOrigins: true } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Public', noDefaultOrigins: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -139,7 +136,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables public CDN when no type specified and enabled set to true', (done) => {
-    cmdInstance.action({ options: { debug: false, enabled: true } }, () => {
+    command.action(logger, { options: { debug: false, enabled: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -160,7 +157,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables private CDN when Private type specified and enabled set to true (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'true', type: 'Private' } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Private' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -181,7 +178,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables private CDN when Private type specified and enabled set to true without default origins (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'true', type: 'Private', noDefaultOrigins: true } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Private', noDefaultOrigins: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -202,7 +199,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables both CDN\'s when Both type specified and enabled set to true (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'true', type: 'Both' } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -223,7 +220,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables both CDN\'s when Both type specified and enabled set to true, with default origins', (done) => {
-    cmdInstance.action({ options: { enabled: 'true', type: 'Both', noDefaultOrigins: false } }, () => {
+    command.action(logger, { options: { enabled: 'true', type: 'Both', noDefaultOrigins: false } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -244,7 +241,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables both CDN\'s when Both type specified and enabled set to true, with origins (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: false } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: false } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -265,7 +262,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables both CDN\'s when Both type specified and enabled set to true, without Default Origins', (done) => {
-    cmdInstance.action({ options: { enabled: 'true', type: 'Both', noDefaultOrigins: true } }, () => {
+    command.action(logger, { options: { enabled: 'true', type: 'Both', noDefaultOrigins: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -286,7 +283,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('enables both CDN\'s when Both type specified and enabled set to true, without default origins (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: true } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'true', type: 'Both', noDefaultOrigins: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -307,7 +304,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disable both CDN\'s when Both type specified and enabled set to false, with default (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: false } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: false } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -328,7 +325,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disable both CDN\'s when Both type specified and enabled set to false, without default origins (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: true } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both', noDefaultOrigins: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -349,7 +346,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables both CDN\'s when Both type specified and enabled set to false', (done) => {
-    cmdInstance.action({ options: { debug: false, enabled: 'false', type: 'Both' } }, () => {
+    command.action(logger, { options: { debug: false, enabled: 'false', type: 'Both' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -370,7 +367,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables both CDN\'s when Both type specified and enabled set to false (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'false', type: 'Both' } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Both' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -391,7 +388,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables public CDN when Public type specified and enabled set to false (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'false', type: 'Public' } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Public' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -412,7 +409,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables public CDN when Public type specified and enabled set to false and noDefaultOrigins is passed (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'false', type: 'Public', noDefaultOrigins: true } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Public', noDefaultOrigins: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -433,7 +430,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables public CDN when Public type specified and enabled set to false and noDefaultOrigins is passed', (done) => {
-    cmdInstance.action({ options: { debug: false, enabled: 'false', type: 'Public', noDefaultOrigins: true } }, () => {
+    command.action(logger, { options: { debug: false, enabled: 'false', type: 'Public', noDefaultOrigins: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -454,7 +451,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables public CDN when Public type specified and enabled set to false', (done) => {
-    cmdInstance.action({ options: { debug: false, enabled: 'false', type: 'Public' } }, () => {
+    command.action(logger, { options: { debug: false, enabled: 'false', type: 'Public' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -475,7 +472,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables Private CDN when Private type specified and enabled set to false (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'false', type: 'Private' } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Private' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -496,7 +493,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables Private CDN when Private type specified and enabled set to false and noDefaultOrigins is passed (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, enabled: 'false', type: 'Private', noDefaultOrigins: true } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'false', type: 'Private', noDefaultOrigins: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -517,7 +514,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables Private CDN when Private type specified and enabled set to false and noDefaultOrigins is passed', (done) => {
-    cmdInstance.action({ options: { debug: false, enabled: 'false', type: 'Private', noDefaultOrigins: true } }, () => {
+    command.action(logger, { options: { debug: false, enabled: 'false', type: 'Private', noDefaultOrigins: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -538,7 +535,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('disables Private CDN when Private type specified and enabled set to false', (done) => {
-    cmdInstance.action({ options: { debug: false, enabled: 'false', type: 'Private' } }, () => {
+    command.action(logger, { options: { debug: false, enabled: 'false', type: 'Private' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -588,7 +585,7 @@ describe(commands.CDN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, enabled: 'true' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, enabled: 'true' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -603,7 +600,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -614,7 +611,7 @@ describe(commands.CDN_SET, () => {
   });
 
   it('requires tenant enabled state', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let requiresOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<enabled>') > -1) {
@@ -626,70 +623,70 @@ describe(commands.CDN_SET, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('accepts Public SharePoint Online CDN type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'Public', enabled: 'true' } });
+    const actual = command.validate({ options: { type: 'Public', enabled: 'true' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'Private', enabled: 'true' } });
+    const actual = command.validate({ options: { type: 'Private', enabled: 'true' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts Both SharePoint Online CDN type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'Both', enabled: 'true' } });
+    const actual = command.validate({ options: { type: 'Both', enabled: 'true' } });
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', () => {
     const type = 'foo';
-    const actual = (command.validate() as CommandValidate)({ options: { type: type, enabled: 'true' } });
+    const actual = command.validate({ options: { type: type, enabled: 'true' } });
     assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private|Both`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { enabled: 'true' } });
+    const actual = command.validate({ options: { enabled: 'true' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts true SharePoint Online CDN enabled state', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { enabled: 'true' } });
+    const actual = command.validate({ options: { enabled: 'true' } });
     assert.strictEqual(actual, true);
   });
 
   it('does not accept True SharePoint Online CDN enabled state', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { enabled: 'True' } });
+    const actual = command.validate({ options: { enabled: 'True' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('does not accept TRUE SharePoint Online CDN enabled state', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { enabled: 'TRUE' } });
+    const actual = command.validate({ options: { enabled: 'TRUE' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('accepts false SharePoint Online CDN enabled state', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { enabled: 'false' } });
+    const actual = command.validate({ options: { enabled: 'false' } });
     assert.strictEqual(actual, true);
   });
 
   it('does not accept False SharePoint Online CDN enabled state', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { enabled: 'False' } });
+    const actual = command.validate({ options: { enabled: 'False' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('does not accept FALSE SharePoint Online CDN enabled state', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { enabled: 'FALSE' } });
+    const actual = command.validate({ options: { enabled: 'FALSE' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN enabled state', () => {
     const enabled = 'foo';
-    const actual = (command.validate() as CommandValidate)({ options: { enabled: enabled } });
+    const actual = command.validate({ options: { enabled: enabled } });
     assert.strictEqual(actual, `${enabled} is not a valid boolean value. Allowed values are true|false`);
   });
 });

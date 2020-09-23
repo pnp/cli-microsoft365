@@ -1,19 +1,18 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import { CommandOption, CommandValidate } from '../../../../Command';
-import { v4 } from 'uuid';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  ClientSideWebpart,
-  ClientSidePageComponent
-} from './clientsidepages';
-import { StandardWebPart, StandardWebPartUtils } from '../../StandardWebPartTypes';
-import { isNumber } from 'util';
-import { Control } from './canvasContent';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { isNumber } from 'util';
+import { v4 } from 'uuid';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { StandardWebPart, StandardWebPartUtils } from '../../StandardWebPartTypes';
+import { Control } from './canvasContent';
+import {
+  ClientSidePageComponent, ClientSideWebpart
+} from './clientsidepages';
 
 interface CommandArgs {
   options: Options;
@@ -52,7 +51,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let canvasContent: Control[];
 
     let pageFullName: string = args.options.pageName;
@@ -61,7 +60,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      cmd.log(`Retrieving page information...`);
+      logger.log(`Retrieving page information...`);
     }
 
     const requestOptions: any = {
@@ -93,20 +92,20 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       })
       .then((): Promise<ClientSideWebpart> => {
         if (this.verbose) {
-          cmd.log(
+          logger.log(
             `Retrieving definition for web part ${args.options.webPartId ||
             args.options.standardWebPart}...`
           );
         }
         // Get the WebPart according to arguments
-        return this.getWebPart(cmd, args);
+        return this.getWebPart(logger, args);
       })
       .then((webPart: ClientSideWebpart): Promise<void> => {
         if (this.verbose) {
-          cmd.log(`Setting client-side web part layout and properties...`);
+          logger.log(`Setting client-side web part layout and properties...`);
         }
 
-        this.setWebPartProperties(webPart, cmd, args);
+        this.setWebPartProperties(webPart, logger, args);
 
         // if no section exists (canvasContent array only has 1 default object), add a default section (1 col)
         if (canvasContent.length === 1) {
@@ -238,14 +237,14 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
       })
-      .catch((err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getWebPart(cmd: CommandInstance, args: CommandArgs): Promise<any> {
+  private getWebPart(logger: Logger, args: CommandArgs): Promise<any> {
     return new Promise<any>((resolve: (webPart: any) => void, reject: (error: any) => void): void => {
       const standardWebPart: string | undefined = args.options.standardWebPart;
 
@@ -254,8 +253,8 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         : args.options.webPartId;
 
       if (this.debug) {
-        cmd.log(`StandardWebPart: ${standardWebPart}`);
-        cmd.log(`WebPartId: ${webPartId}`);
+        logger.log(`StandardWebPart: ${standardWebPart}`);
+        logger.log(`WebPartId: ${webPartId}`);
       }
 
       const requestOptions: any = {
@@ -276,13 +275,13 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
           }
 
           if (this.debug) {
-            cmd.log('WebPart definition:');
-            cmd.log(webPartDefinition);
-            cmd.log('');
+            logger.log('WebPart definition:');
+            logger.log(webPartDefinition);
+            logger.log('');
           }
 
           if (this.verbose) {
-            cmd.log(`Creating instance from definition of WebPart ${webPartId}...`);
+            logger.log(`Creating instance from definition of WebPart ${webPartId}...`);
           }
           const component: ClientSidePageComponent = webPartDefinition[0];
           const id: string = v4();
@@ -308,12 +307,12 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     });
   }
 
-  private setWebPartProperties(webPart: ClientSideWebpart, cmd: CommandInstance, args: CommandArgs): void {
+  private setWebPartProperties(webPart: ClientSideWebpart, logger: Logger, args: CommandArgs): void {
     if (args.options.webPartProperties) {
       if (this.debug) {
-        cmd.log('WebPart properties: ');
-        cmd.log(args.options.webPartProperties);
-        cmd.log('');
+        logger.log('WebPart properties: ');
+        logger.log(args.options.webPartProperties);
+        logger.log('');
       }
 
       try {
@@ -326,9 +325,9 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
     if (args.options.webPartData) {
       if (this.debug) {
-        cmd.log('WebPart data:');
-        cmd.log(args.options.webPartData);
-        cmd.log('');
+        logger.log('WebPart data:');
+        logger.log(args.options.webPartData);
+        logger.log('');
       }
 
       const webPartData = JSON.parse(args.options.webPartData);
@@ -396,58 +395,56 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.standardWebPart && !args.options.webPartId) {
-        return 'Specify either the standardWebPart or the webPartId option';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.standardWebPart && !args.options.webPartId) {
+      return 'Specify either the standardWebPart or the webPartId option';
+    }
 
-      if (args.options.standardWebPart && args.options.webPartId) {
-        return 'Specify either the standardWebPart or the webPartId option but not both';
-      }
+    if (args.options.standardWebPart && args.options.webPartId) {
+      return 'Specify either the standardWebPart or the webPartId option but not both';
+    }
 
-      if (args.options.webPartId && !Utils.isValidGuid(args.options.webPartId)) {
-        return `The webPartId '${args.options.webPartId}' is not a valid GUID`;
-      }
+    if (args.options.webPartId && !Utils.isValidGuid(args.options.webPartId)) {
+      return `The webPartId '${args.options.webPartId}' is not a valid GUID`;
+    }
 
-      if (args.options.standardWebPart && !StandardWebPartUtils.isValidStandardWebPartType(args.options.standardWebPart)) {
-        return `${args.options.standardWebPart} is not a valid standard web part type`;
-      }
+    if (args.options.standardWebPart && !StandardWebPartUtils.isValidStandardWebPartType(args.options.standardWebPart)) {
+      return `${args.options.standardWebPart} is not a valid standard web part type`;
+    }
 
-      if (args.options.webPartProperties && args.options.webPartData) {
-        return 'Specify webPartProperties or webPartData but not both';
-      }
+    if (args.options.webPartProperties && args.options.webPartData) {
+      return 'Specify webPartProperties or webPartData but not both';
+    }
 
-      if (args.options.webPartProperties) {
-        try {
-          JSON.parse(args.options.webPartProperties);
-        }
-        catch (e) {
-          return `Specified webPartProperties is not a valid JSON string. Input: ${args.options
-            .webPartProperties}. Error: ${e}`;
-        }
+    if (args.options.webPartProperties) {
+      try {
+        JSON.parse(args.options.webPartProperties);
       }
-
-      if (args.options.webPartData) {
-        try {
-          JSON.parse(args.options.webPartData);
-        }
-        catch (e) {
-          return `Specified webPartData is not a valid JSON string. Input: ${args.options
-            .webPartData}. Error: ${e}`;
-        }
+      catch (e) {
+        return `Specified webPartProperties is not a valid JSON string. Input: ${args.options
+          .webPartProperties}. Error: ${e}`;
       }
+    }
 
-      if (args.options.section && (!isNumber(args.options.section) || args.options.section < 1)) {
-        return 'The value of parameter section must be 1 or higher';
+    if (args.options.webPartData) {
+      try {
+        JSON.parse(args.options.webPartData);
       }
-
-      if (args.options.column && (!isNumber(args.options.column) || args.options.column < 1)) {
-        return 'The value of parameter column must be 1 or higher';
+      catch (e) {
+        return `Specified webPartData is not a valid JSON string. Input: ${args.options
+          .webPartData}. Error: ${e}`;
       }
+    }
 
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+    if (args.options.section && (!isNumber(args.options.section) || args.options.section < 1)) {
+      return 'The value of parameter section must be 1 or higher';
+    }
+
+    if (args.options.column && (!isNumber(args.options.column) || args.options.column < 1)) {
+      return 'The value of parameter column must be 1 or higher';
+    }
+
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

@@ -1,13 +1,12 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import Utils from '../../../../Utils';
 import AadCommand from '../../../base/AadCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -36,9 +35,9 @@ class AadSpGetCommand extends AadCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving service principal information...`);
+      logger.log(`Retrieving service principal information...`);
     }
 
     let spMatchQuery: string = '';
@@ -64,11 +63,11 @@ class AadSpGetCommand extends AadCommand {
       .get<{ value: any[] }>(requestOptions)
       .then((res: { value: any[] }): void => {
         if (res.value && res.value.length > 0) {
-          cmd.log(res.value[0]);
+          logger.log(res.value[0]);
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -91,26 +90,24 @@ class AadSpGetCommand extends AadCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      let optionsSpecified: number = 0;
-      optionsSpecified += args.options.appId ? 1 : 0;
-      optionsSpecified += args.options.displayName ? 1 : 0;
-      optionsSpecified += args.options.objectId ? 1 : 0;
-      if (optionsSpecified !== 1) {
-        return 'Specify either appId, objectId or displayName';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    let optionsSpecified: number = 0;
+    optionsSpecified += args.options.appId ? 1 : 0;
+    optionsSpecified += args.options.displayName ? 1 : 0;
+    optionsSpecified += args.options.objectId ? 1 : 0;
+    if (optionsSpecified !== 1) {
+      return 'Specify either appId, objectId or displayName';
+    }
 
-      if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
-        return `${args.options.appId} is not a valid appId GUID`;
-      }
+    if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
+      return `${args.options.appId} is not a valid appId GUID`;
+    }
 
-      if (args.options.objectId && !Utils.isValidGuid(args.options.objectId)) {
-        return `${args.options.objectId} is not a valid objectId GUID`;
-      }
+    if (args.options.objectId && !Utils.isValidGuid(args.options.objectId)) {
+      return `${args.options.objectId} is not a valid objectId GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

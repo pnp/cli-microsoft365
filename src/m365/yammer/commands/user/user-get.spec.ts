@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./user-get');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./user-get');
 
 describe(commands.YAMMER_USER_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.YAMMER_USER_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -65,9 +62,9 @@ describe(commands.YAMMER_USER_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { email: "pl@nubo.eu" } }, (err?: any) => {
+    command.action(logger, { options: { email: "pl@nubo.eu" } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -85,9 +82,9 @@ describe(commands.YAMMER_USER_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { userId: 1496550646 } }, (err?: any) => {
+    command.action(logger, { options: { userId: 1496550646 } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].id, 1496550646)
+        assert.strictEqual(loggerSpy.lastCall.args[0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -105,9 +102,9 @@ describe(commands.YAMMER_USER_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].id, 1496550646)
+        assert.strictEqual(loggerSpy.lastCall.args[0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -125,7 +122,7 @@ describe(commands.YAMMER_USER_GET, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -143,7 +140,7 @@ describe(commands.YAMMER_USER_GET, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Not found (404)")));
         done();
@@ -155,27 +152,27 @@ describe(commands.YAMMER_USER_GET, () => {
   });
 
   it('passes validation without parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation with parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { userId: 1496550646 } });
+    const actual = command.validate({ options: { userId: 1496550646 } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation with parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { email: "pl@nubo.eu" } });
+    const actual = command.validate({ options: { email: "pl@nubo.eu" } });
     assert.strictEqual(actual, true);
   });
 
   it('does not pass with userId and e-mail', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { userId: 1496550646, email: "pl@nubo.eu" } });
+    const actual = command.validate({ options: { userId: 1496550646, email: "pl@nubo.eu" } });
     assert.strictEqual(actual, "You are only allowed to search by ID or e-mail but not both");
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

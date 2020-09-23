@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./term-set-get');
-import * as assert from 'assert';
-import request from '../../../../request';
-import config from '../../../../config';
-import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./term-set-get');
 
 describe(commands.TERM_SET_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.TERM_SET_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -140,9 +137,9 @@ describe(commands.TERM_SET_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
+    command.action(logger, { options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",
@@ -249,9 +246,9 @@ describe(commands.TERM_SET_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, name: 'PnP-CollabFooter-SharedLinks', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
+    command.action(logger, { options: { debug: true, name: 'PnP-CollabFooter-SharedLinks', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",
@@ -358,9 +355,9 @@ describe(commands.TERM_SET_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupName: 'PnPTermSets' } }, () => {
+    command.action(logger, { options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",
@@ -467,9 +464,9 @@ describe(commands.TERM_SET_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",
@@ -576,9 +573,9 @@ describe(commands.TERM_SET_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets>' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets>' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",
@@ -685,9 +682,9 @@ describe(commands.TERM_SET_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, name: 'PnP-CollabFooter-SharedLinks>', termGroupName: 'PnPTermSets' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'PnP-CollabFooter-SharedLinks>', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",
@@ -724,7 +721,7 @@ describe(commands.TERM_SET_GET, () => {
         }
       ]));
     });
-    cmdInstance.action({ options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
@@ -745,7 +742,7 @@ describe(commands.TERM_SET_GET, () => {
         }
       ]));
     });
-    cmdInstance.action({ options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
@@ -766,7 +763,7 @@ describe(commands.TERM_SET_GET, () => {
         }
       ]));
     });
-    cmdInstance.action({ options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
@@ -787,7 +784,7 @@ describe(commands.TERM_SET_GET, () => {
         }
       ]));
     });
-    cmdInstance.action({ options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
@@ -808,7 +805,7 @@ describe(commands.TERM_SET_GET, () => {
         }
       ]));
     });
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
         done();
@@ -820,57 +817,57 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('fails validation if neither id nor name specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { termGroupName: 'PnPTermSets' } });
+    const actual = command.validate({ options: { termGroupName: 'PnPTermSets' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both id and name specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } });
+    const actual = command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'invalid', termGroupName: 'PnPTermSets' } });
+    const actual = command.validate({ options: { id: 'invalid', termGroupName: 'PnPTermSets' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if neither termGroupId nor termGroupName specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26' } });
+    const actual = command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both termGroupId and termGroupName specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termGroupName: 'PnPTermSets' } });
+    const actual = command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termGroupName: 'PnPTermSets' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if termGroupId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupId: 'invalid' } });
+    const actual = command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupId: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when id and termGroupName specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupName: 'PnPTermSets' } });
+    const actual = command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupName: 'PnPTermSets' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when name and termGroupName specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'People', termGroupName: 'PnPTermSets' } });
+    const actual = command.validate({ options: { name: 'People', termGroupName: 'PnPTermSets' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when id and termGroupId specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27' } });
+    const actual = command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when name and termGroupId specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'PnP-CollabFooter-SharedLinks', termGroupId: '9e54299e-208a-4000-8546-cc4139091b26' } });
+    const actual = command.validate({ options: { name: 'PnP-CollabFooter-SharedLinks', termGroupId: '9e54299e-208a-4000-8546-cc4139091b26' } });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -884,9 +881,9 @@ describe(commands.TERM_SET_GET, () => {
     Utils.restore((command as any).getRequestDigest);
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
     
-    cmdInstance.action({
+    command.action(logger, {
       options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getRequestDigest error')));
         done();

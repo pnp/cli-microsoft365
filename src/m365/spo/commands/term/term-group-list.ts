@@ -1,14 +1,14 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
-  CommandError
+    CommandError
 } from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { TermGroupCollection } from './TermGroupCollection';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -23,18 +23,18 @@ class SpoTermGroupListCommand extends SpoCommand {
     return 'Lists taxonomy term groups';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
         return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Retrieving taxonomy term groups...`);
+          logger.log(`Retrieving taxonomy term groups...`);
         }
 
         const requestOptions: any = {
@@ -58,7 +58,7 @@ class SpoTermGroupListCommand extends SpoCommand {
         const result: TermGroupCollection = json[json.length - 1];
         if (result._Child_Items_ && result._Child_Items_.length > 0) {
           if (args.options.output === 'json') {
-            cmd.log(result._Child_Items_.map(t => {
+            logger.log(result._Child_Items_.map(t => {
               t.CreatedDate = new Date(Number(t.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
               t.Id = t.Id.replace('/Guid(', '').replace(')/', '');
               t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
@@ -66,7 +66,7 @@ class SpoTermGroupListCommand extends SpoCommand {
             }));
           }
           else {
-            cmd.log(result._Child_Items_.map(t => {
+            logger.log(result._Child_Items_.map(t => {
               return {
                 Id: t.Id.replace('/Guid(', '').replace(')/', ''),
                 Name: t.Name
@@ -75,7 +75,7 @@ class SpoTermGroupListCommand extends SpoCommand {
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 }
 

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
+import { CommandSetManifest, Manifest, Project } from '../../model';
 import { Finding } from '../Finding';
-import { Project, CommandSetManifest, Manifest } from '../../model';
 import { FN011006_MAN_listViewCommandSet_items } from './FN011006_MAN_listViewCommandSet_items';
 
 describe('FN011006_MAN_listViewCommandSet_items', () => {

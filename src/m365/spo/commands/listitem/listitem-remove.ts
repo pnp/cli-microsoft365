@@ -1,13 +1,12 @@
-import commands from '../../commands';
+import { Cli, Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import { CommandInstance } from '../../../../cli';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -40,10 +39,10 @@ class SpoListItemRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeListItem: () => void = (): void => {
       if (this.verbose) {
-        cmd.log(`Removing list item in site at ${args.options.webUrl}...`);
+        logger.log(`Removing list item in site at ${args.options.webUrl}...`);
       }
 
       let requestUrl: string = '';
@@ -77,14 +76,14 @@ class SpoListItemRemoveCommand extends SpoCommand {
         .then((): void => {
           // REST post call doesn't return anything
           cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
       removeListItem();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -132,33 +131,31 @@ class SpoListItemRemoveCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const id: number = parseInt(args.options.id);
-      if (isNaN(id)) {
-        return `${args.options.id} is not a valid list item ID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const id: number = parseInt(args.options.id);
+    if (isNaN(id)) {
+      return `${args.options.id} is not a valid list item ID`;
+    }
 
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.listId &&
-        !Utils.isValidGuid(args.options.listId as string)) {
-        return `${args.options.listId} is not a valid GUID`;
-      }
+    if (args.options.listId &&
+      !Utils.isValidGuid(args.options.listId as string)) {
+      return `${args.options.listId} is not a valid GUID`;
+    }
 
-      if (args.options.listId && args.options.listTitle) {
-        return 'Specify id or title, but not both';
-      }
+    if (args.options.listId && args.options.listTitle) {
+      return 'Specify id or title, but not both';
+    }
 
-      if (!args.options.listId && !args.options.listTitle) {
-        return 'Specify id or title';
-      }
+    if (!args.options.listId && !args.options.listTitle) {
+      return 'Specify id or title';
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

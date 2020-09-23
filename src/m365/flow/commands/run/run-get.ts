@@ -1,11 +1,11 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption
+    CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -26,9 +26,9 @@ class FlowRunGetCommand extends AzmgmtCommand {
     return 'Gets information about a specific run of the specified Microsoft Flow';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
+      logger.log(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
     }
 
     const requestOptions: any = {
@@ -43,7 +43,7 @@ class FlowRunGetCommand extends AzmgmtCommand {
       .get(requestOptions)
       .then((res: any): void => {
         if (args.options.output === 'json') {
-          cmd.log(res);
+          logger.log(res);
         }
         else {
           const summary: any = {
@@ -53,11 +53,11 @@ class FlowRunGetCommand extends AzmgmtCommand {
             status: res.properties.status,
             triggerName: res.properties.trigger.name
           };
-          cmd.log(summary);
+          logger.log(summary);
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {

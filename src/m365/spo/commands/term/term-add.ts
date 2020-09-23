@@ -1,18 +1,17 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
 import { v4 } from 'uuid';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
   CommandError,
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { Term } from './Term';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -54,13 +53,13 @@ class SpoTermAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let term: Term;
     let formDigest: string;
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
         return this.getRequestDigest(spoAdminUrl);
@@ -69,7 +68,7 @@ class SpoTermAddCommand extends SpoCommand {
         formDigest = res.FormDigestValue;
 
         if (this.verbose) {
-          cmd.log(`Adding taxonomy term...`);
+          logger.log(`Adding taxonomy term...`);
         }
 
         const termGroupQuery: string = args.options.termGroupId ? `<Method Id="11" ParentId="9" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="11" ParentId="9" Name="GetByName"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`;
@@ -107,7 +106,7 @@ class SpoTermAddCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Setting term properties...`);
+          logger.log(`Setting term properties...`);
         }
 
         const properties: string[] = [];
@@ -167,9 +166,9 @@ class SpoTermAddCommand extends SpoCommand {
         term.CreatedDate = new Date(Number(term.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
         term.Id = term.Id.replace('/Guid(', '').replace(')/', '');
         term.LastModifiedDate = new Date(Number(term.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-        cmd.log(term);
+        logger.log(term);
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -220,72 +219,70 @@ class SpoTermAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.id) {
-        if (!Utils.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.id) {
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
+      }
+    }
+
+    if (args.options.parentTermId) {
+      if (!Utils.isValidGuid(args.options.parentTermId)) {
+        return `${args.options.parentTermId} is not a valid GUID`;
       }
 
-      if (args.options.parentTermId) {
-        if (!Utils.isValidGuid(args.options.parentTermId)) {
-          return `${args.options.parentTermId} is not a valid GUID`;
-        }
-
-        if (args.options.termSetId || args.options.termSetName) {
-          return 'Specify either parentTermId, termSetId or termSetName but not both';
-        }
+      if (args.options.termSetId || args.options.termSetName) {
+        return 'Specify either parentTermId, termSetId or termSetName but not both';
       }
+    }
 
-      if (!args.options.termGroupId && !args.options.termGroupName) {
-        return 'Specify termGroupId or termGroupName';
+    if (!args.options.termGroupId && !args.options.termGroupName) {
+      return 'Specify termGroupId or termGroupName';
+    }
+
+    if (args.options.termGroupId && args.options.termGroupName) {
+      return 'Specify termGroupId or termGroupName but not both';
+    }
+
+    if (args.options.termGroupId) {
+      if (!Utils.isValidGuid(args.options.termGroupId)) {
+        return `${args.options.termGroupId} is not a valid GUID`;
       }
+    }
 
-      if (args.options.termGroupId && args.options.termGroupName) {
-        return 'Specify termGroupId or termGroupName but not both';
+    if (!args.options.termSetId && !args.options.termSetName && !args.options.parentTermId) {
+      return 'Specify termSetId, termSetName or parentTermId';
+    }
+
+    if (args.options.termSetId && args.options.termSetName) {
+      return 'Specify termSetId or termSetName but not both';
+    }
+
+    if (args.options.termSetId) {
+      if (!Utils.isValidGuid(args.options.termSetId)) {
+        return `${args.options.termSetId} is not a valid GUID`;
       }
+    }
 
-      if (args.options.termGroupId) {
-        if (!Utils.isValidGuid(args.options.termGroupId)) {
-          return `${args.options.termGroupId} is not a valid GUID`;
-        }
+    if (args.options.customProperties) {
+      try {
+        JSON.parse(args.options.customProperties);
       }
-
-      if (!args.options.termSetId && !args.options.termSetName && !args.options.parentTermId) {
-        return 'Specify termSetId, termSetName or parentTermId';
+      catch (e) {
+        return `An error has occurred while parsing customProperties: ${e}`;
       }
+    }
 
-      if (args.options.termSetId && args.options.termSetName) {
-        return 'Specify termSetId or termSetName but not both';
+    if (args.options.localCustomProperties) {
+      try {
+        JSON.parse(args.options.localCustomProperties);
       }
-
-      if (args.options.termSetId) {
-        if (!Utils.isValidGuid(args.options.termSetId)) {
-          return `${args.options.termSetId} is not a valid GUID`;
-        }
+      catch (e) {
+        return `An error has occurred while parsing localCustomProperties: ${e}`;
       }
+    }
 
-      if (args.options.customProperties) {
-        try {
-          JSON.parse(args.options.customProperties);
-        }
-        catch (e) {
-          return `An error has occurred while parsing customProperties: ${e}`;
-        }
-      }
-
-      if (args.options.localCustomProperties) {
-        try {
-          JSON.parse(args.options.localCustomProperties);
-        }
-        catch (e) {
-          return `An error has occurred while parsing localCustomProperties: ${e}`;
-        }
-      }
-
-      return true;
-    };
+    return true;
   }
 }
 

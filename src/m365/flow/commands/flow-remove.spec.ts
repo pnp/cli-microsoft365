@@ -1,18 +1,19 @@
-import commands from '../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
-const command: Command = require('./flow-remove');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../cli';
+import Command, { CommandError } from '../../../Command';
 import request from '../../../request';
 import Utils from '../../../Utils';
-import * as chalk from 'chalk';
+import commands from '../commands';
+const command: Command = require('./flow-remove');
 
 describe(commands.FLOW_REMOVE, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -23,26 +24,23 @@ describe(commands.FLOW_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
     promptOptions = undefined;
   });
 
   afterEach(() => {
     Utils.restore([
-      request.delete
+      request.delete,
+      Cli.prompt
     ]);
   });
 
@@ -63,7 +61,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('fails validation if the name is not valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: 'invalid'
@@ -73,7 +71,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('passes validation when the name and environment specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
@@ -83,7 +81,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('prompts before removing the specified Microsoft Flow owned by the currently signed-in user when confirm option not passed', (done) => {
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -108,10 +106,11 @@ describe(commands.FLOW_REMOVE, () => {
 
   it('aborts removing the specified Microsoft Flow owned by the currently signed-in user when confirm option not passed and prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action({
+    });
+    command.action(logger, {
       options: {
         debug: false,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -137,10 +136,11 @@ describe(commands.FLOW_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({
+    });
+    command.action(logger, {
       options: {
         debug: true,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -148,7 +148,7 @@ describe(commands.FLOW_REMOVE, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.called);
+        assert(loggerSpy.called);
         done();
       }
       catch (e) {
@@ -158,7 +158,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('prompts before removing the specified Microsoft Flow owned by another user when confirm option not passed', (done) => {
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -184,10 +184,11 @@ describe(commands.FLOW_REMOVE, () => {
 
   it('aborts removing the specified Microsoft Flow owned by another user when confirm option not passed and prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action({
+    });
+    command.action(logger, {
       options: {
         debug: false,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -214,10 +215,11 @@ describe(commands.FLOW_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({
+    });
+    command.action(logger, {
       options: {
         debug: true,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -226,7 +228,7 @@ describe(commands.FLOW_REMOVE, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -244,7 +246,7 @@ describe(commands.FLOW_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -252,9 +254,9 @@ describe(commands.FLOW_REMOVE, () => {
         confirm: true
       }
     }, () => {
-      assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+      assert(loggerSpy.calledWith(chalk.green('DONE')));
       done();
-    }, (err: any) => done(err));
+    });
   });
 
   it('removes the specified Microsoft Flow as Admin without prompting when confirm specified (debug)', (done) => {
@@ -266,7 +268,7 @@ describe(commands.FLOW_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
@@ -275,9 +277,9 @@ describe(commands.FLOW_REMOVE, () => {
         asAdmin: true
       }
     }, () => {
-      assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+      assert(loggerSpy.calledWith(chalk.green('DONE')));
       done();
-    }, (err: any) => done(err));
+    });
   });
 
   it('correctly handles no environment found without prompting when confirm specified', (done) => {
@@ -290,7 +292,7 @@ describe(commands.FLOW_REMOVE, () => {
       });
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
@@ -298,7 +300,7 @@ describe(commands.FLOW_REMOVE, () => {
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         confirm: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`)));
         done();
@@ -319,18 +321,19 @@ describe(commands.FLOW_REMOVE, () => {
       });
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
+    });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`)));
         done();
@@ -346,20 +349,21 @@ describe(commands.FLOW_REMOVE, () => {
       return Promise.resolve({ statusCode: 204 });
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
+    });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
+        assert(loggerSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
         done();
       }
       catch (e) {
@@ -373,7 +377,7 @@ describe(commands.FLOW_REMOVE, () => {
       return Promise.resolve({ statusCode: 204 });
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
@@ -381,9 +385,9 @@ describe(commands.FLOW_REMOVE, () => {
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         confirm: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
+        assert(loggerSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
         done();
       }
       catch (e) {
@@ -393,7 +397,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -404,7 +408,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('supports specifying name', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--name') > -1) {
@@ -415,7 +419,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('supports specifying environment', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--environment') > -1) {

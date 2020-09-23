@@ -1,14 +1,14 @@
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import {
+    CommandError
+} from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandError
-} from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { SPOWebAppServicePrincipalPermissionRequest } from './SPOWebAppServicePrincipalPermissionRequest';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
   public get name(): string {
@@ -23,16 +23,16 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
     return [commands.SP_PERMISSIONREQUEST_LIST];
   }
 
-  public commandAction(cmd: CommandInstance, args: {}, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: {}, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
 
         if (this.verbose) {
-          cmd.log(`Retrieving request digest...`);
+          logger.log(`Retrieving request digest...`);
         }
 
         return this.getRequestDigest(spoAdminUrl);
@@ -57,7 +57,7 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
         }
         else {
           const result: SPOWebAppServicePrincipalPermissionRequest[] = json[json.length - 1]._Child_Items_;
-          cmd.log(result.map(r => {
+          logger.log(result.map(r => {
             return {
               Id: r.Id.replace('/Guid(', '').replace(')/', ''),
               Resource: r.Resource,
@@ -67,11 +67,11 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
           }));
 
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 }
 

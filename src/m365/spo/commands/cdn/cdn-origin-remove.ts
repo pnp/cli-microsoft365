@@ -1,17 +1,15 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -39,7 +37,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     let spoAdminUrl: string = '';
@@ -47,10 +45,10 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
 
     const removeCdnOrigin = (): void => {
       this
-        .getTenantId(cmd, this.debug)
+        .getTenantId(logger, this.debug)
         .then((_tenantId: string): Promise<string> => {
           tenantId = _tenantId;
-          return this.getSpoAdminUrl(cmd, this.debug);
+          return this.getSpoAdminUrl(logger, this.debug);
         })
         .then((_spoAdminUrl: string): Promise<ContextInfo> => {
           spoAdminUrl = _spoAdminUrl;
@@ -58,7 +56,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
         })
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
-            cmd.log(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
+            logger.log(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
           }
 
           const requestOptions: any = {
@@ -79,21 +77,21 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
           }
           else {
             if (this.verbose) {
-              cmd.log(chalk.green('DONE'));
+              logger.log(chalk.green('DONE'));
             }
             cb();
           }
-        }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
       if (this.debug) {
-        cmd.log('Confirmation suppressed through the confirm option. Removing CDN origin...');
+        logger.log('Confirmation suppressed through the confirm option. Removing CDN origin...');
       }
       removeCdnOrigin();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -130,17 +128,15 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.type) {
-        if (args.options.type !== 'Public' &&
-          args.options.type !== 'Private') {
-          return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.type) {
+      if (args.options.type !== 'Public' &&
+        args.options.type !== 'Private') {
+        return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
       }
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

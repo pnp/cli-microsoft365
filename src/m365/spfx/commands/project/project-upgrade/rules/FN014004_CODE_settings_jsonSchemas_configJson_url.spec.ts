@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Finding } from '../Finding';
 import { Project } from '../../model';
+import { Finding } from '../Finding';
 import { FN014004_CODE_settings_jsonSchemas_configJson_url } from './FN014004_CODE_settings_jsonSchemas_configJson_url';
 
 describe('FN014004_CODE_settings_jsonSchemas_configJson_url', () => {

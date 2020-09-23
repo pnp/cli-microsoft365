@@ -1,12 +1,13 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./approleassignment-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./approleassignment-list');
 
 class ServicePrincipalCollections {
 
@@ -394,8 +395,8 @@ class RequestStub {
 
 describe(commands.APPROLEASSIGNMENT_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   let textOutput = [
     {
@@ -432,16 +433,12 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -469,9 +466,9 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('retrieves App Role assignments for the specified displayName', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    cmdInstance.action({ options: { output: 'json', displayName: CommandActionParameters.appNameWithRoleAssignments } }, () => {
+    command.action(logger, { options: { output: 'json', displayName: CommandActionParameters.appNameWithRoleAssignments } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(loggerSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -484,9 +481,9 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('retrieves App Role assignments for the specified appId', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    cmdInstance.action({ options: { output: 'json', appId: CommandActionParameters.appIdWithRoleAssignments } }, () => {
+    command.action(logger, { options: { output: 'json', appId: CommandActionParameters.appIdWithRoleAssignments } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(loggerSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -498,9 +495,9 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('retrieves App Role assignments for the specified appId and outputs text', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    cmdInstance.action({ options: { output: 'text', appId: CommandActionParameters.appIdWithRoleAssignments } }, () => {
+    command.action(logger, { options: { output: 'text', appId: CommandActionParameters.appIdWithRoleAssignments } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(loggerSpy.calledWith(textOutput));
         done();
       }
       catch (e) {
@@ -512,9 +509,9 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('retrieves App Role assignments for the specified objectId and outputs text', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    cmdInstance.action({ options: { output: 'text', objectId: CommandActionParameters.objectIdWithRoleAssigments } }, () => {
+    command.action(logger, { options: { output: 'text', objectId: CommandActionParameters.objectIdWithRoleAssigments } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(loggerSpy.calledWith(textOutput));
         done();
       }
       catch (e) {
@@ -526,7 +523,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('correctly handles an appId that does not exist', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    cmdInstance.action({ options: { appId: CommandActionParameters.invalidAppId } }, (err?: any) => {
+    command.action(logger, { options: { appId: CommandActionParameters.invalidAppId } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('app registration not found')));
         done();
@@ -540,7 +537,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('correctly handles no app role assignments for the specified app', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    cmdInstance.action({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } }, (err?: any) => {
+    command.action(logger, { options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('app registration not found')));
         done();
@@ -565,7 +562,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, appId: '36e3a540-6f25-4483-9542-9f5fa00bb633' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
         done();
@@ -577,37 +574,37 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   });
 
   it('fails validation if neither appId nor displayName are not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the appId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { appId: '123' } });
+    const actual = command.validate({ options: { appId: '123' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the objectId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { objectId: '123' } });
+    const actual = command.validate({ options: { objectId: '123' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both appId and displayName are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments, displayName: CommandActionParameters.appNameWithRoleAssignments } });
+    const actual = command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments, displayName: CommandActionParameters.appNameWithRoleAssignments } });
     assert.notStrictEqual(actual, true);
   })
 
   it('fails validation if objectId and displayName are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: CommandActionParameters.appNameWithRoleAssignments, objectId: CommandActionParameters.objectIdWithRoleAssigments } });
+    const actual = command.validate({ options: { displayName: CommandActionParameters.appNameWithRoleAssignments, objectId: CommandActionParameters.objectIdWithRoleAssigments } });
     assert.notStrictEqual(actual, true);
   })
 
   it('passes validation when the appId option specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } });
+    const actual = command.validate({ options: { appId: CommandActionParameters.appIdWithNoRoleAssignments } });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -618,7 +615,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   });
 
   it('supports specifying appId', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--appId') > -1) {
@@ -629,7 +626,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   });
 
   it('supports specifying displayName', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--displayName') > -1) {

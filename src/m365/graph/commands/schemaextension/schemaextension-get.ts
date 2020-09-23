@@ -1,12 +1,12 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption
-} from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+    CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -25,9 +25,9 @@ class GraphSchemaExtensionGet extends GraphCommand {
     return 'Gets the properties of the specified schema extension definition';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
         if (this.verbose) {
-          cmd.log(`Gets the properties of the specified schema extension definition with id '${args.options.id}'...`);
+          logger.log(`Gets the properties of the specified schema extension definition with id '${args.options.id}'...`);
         }
 
         const requestOptions: any = {
@@ -42,14 +42,14 @@ class GraphSchemaExtensionGet extends GraphCommand {
       request.get(requestOptions)
       .then((res: any): void => {
 
-        cmd.log(res);
+        logger.log(res);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

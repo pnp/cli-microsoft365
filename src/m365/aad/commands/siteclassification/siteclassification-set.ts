@@ -1,14 +1,14 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 import { DirectorySetting, UpdateDirectorySetting } from './DirectorySetting';
 import { DirectorySettingValue } from './DirectorySettingValue';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -39,7 +39,7 @@ class AadSiteClassificationUpdateCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const requestOptions: any = {
       url: `${this.resource}/beta/settings`,
       headers: {
@@ -143,11 +143,11 @@ class AadSiteClassificationUpdateCommand extends GraphCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -174,16 +174,14 @@ class AadSiteClassificationUpdateCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.classifications &&
-        !args.options.defaultClassification &&
-        !args.options.usageGuidelinesUrl &&
-        !args.options.guestUsageGuidelinesUrl) {
-        return 'Specify at least one property to update';
-      }
-      return true;
-    };
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.classifications &&
+      !args.options.defaultClassification &&
+      !args.options.usageGuidelinesUrl &&
+      !args.options.guestUsageGuidelinesUrl) {
+      return 'Specify at least one property to update';
+    }
+    return true;
   }
 }
 

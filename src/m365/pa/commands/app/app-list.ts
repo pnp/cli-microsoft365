@@ -1,7 +1,7 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -18,18 +18,18 @@ class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string, properties
     return 'Lists all Power Apps apps';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const url: string = `${this.resource}providers/Microsoft.PowerApps/apps?api-version=2017-08-01`;
 
     this
-      .getAllItems(url, cmd, true)
+      .getAllItems(url, logger, true)
       .then((): void => {
         if (this.items.length > 0) {
           if (args.options.output === 'json') {
-            cmd.log(this.items);
+            logger.log(this.items);
           }
           else {
-            cmd.log(this.items.map(f => {
+            logger.log(this.items.map(f => {
               return {
                 name: f.name,
                 displayName: f.properties.displayName
@@ -39,12 +39,12 @@ class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string, properties
         }
         else {
           if (this.verbose) {
-            cmd.log('No apps found');
+            logger.log('No apps found');
           }
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 }
 

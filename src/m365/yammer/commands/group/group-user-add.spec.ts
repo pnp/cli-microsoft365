@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./group-user-add');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./group-user-add');
 
 describe(commands.YAMMER_GROUP_USER_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -20,20 +21,17 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
+      }
     };
   });
 
   afterEach(() => {
     Utils.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -62,7 +60,7 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -74,22 +72,22 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
   });
 
   it('passes validation with parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 10123123 } });
+    const actual = command.validate({ options: { id: 10123123 } });
     assert.strictEqual(actual, true);
   });
 
   it('id must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'abc' } });
+    const actual = command.validate({ options: { id: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('userId must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 10, userId: 'abc' } });
+    const actual = command.validate({ options: { id: 10, userId: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -107,11 +105,11 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
+    });
 
-    cmdInstance.action({ options: { debug: true, id: 1231231 } }, () => {
+    command.action(logger, { options: { debug: true, id: 1231231 } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -130,7 +128,7 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: 1231231, userId: 989998789 } }, () => {
+    command.action(logger, { options: { debug: true, id: 1231231, userId: 989998789 } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -149,7 +147,7 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: 1231231, email: "suzy@contoso.com" } }, () => {
+    command.action(logger, { options: { debug: true, id: 1231231, email: "suzy@contoso.com" } }, () => {
       try {
         assert(requestPostedStub.called);
         done();

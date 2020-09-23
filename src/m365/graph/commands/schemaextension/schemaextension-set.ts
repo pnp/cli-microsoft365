@@ -1,13 +1,13 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -40,9 +40,9 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Updating schema extension with id '${args.options.id}'...`);
+      logger.log(`Updating schema extension with id '${args.options.id}'...`);
     }
 
     // The default request body always contains owner
@@ -59,7 +59,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     // Add the description to request body if any
     if (args.options.description) {
       if (this.debug) {
-        cmd.log(`Will update description to '${args.options.description}'...`);
+        logger.log(`Will update description to '${args.options.description}'...`);
       }
       body.description = args.options.description;
     }
@@ -67,7 +67,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     // Add the status to request body if any
     if (args.options.status) {
       if (this.debug) {
-        cmd.log(`Will update status to '${args.options.status}'...`);
+        logger.log(`Will update status to '${args.options.status}'...`);
       }
       body.status = args.options.status;
     }
@@ -78,7 +78,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       : [];
     if (targetTypes.length > 0) {
       if (this.debug) {
-        cmd.log(`Will update targetTypes to '${args.options.targetTypes}'...`);
+        logger.log(`Will update targetTypes to '${args.options.targetTypes}'...`);
       }
       body.targetTypes = targetTypes;
     }
@@ -89,7 +89,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       : null;
     if (properties) {
       if (this.debug) {
-        cmd.log(`Will update properties to '${args.options.properties}'...`);
+        logger.log(`Will update properties to '${args.options.properties}'...`);
       }
       body.properties = properties;
     }
@@ -108,15 +108,15 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       .patch(requestOptions)
       .then((res: any): void => {
         if (this.debug) {
-          cmd.log("Schema extension successfully updated.");
+          logger.log("Schema extension successfully updated.");
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -151,27 +151,25 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.owner)) {
-        return `The specified owner '${args.options.owner}' is not a valid App Id`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.owner)) {
+      return `The specified owner '${args.options.owner}' is not a valid App Id`;
+    }
 
-      if (!args.options.status && !args.options.properties && !args.options.targetTypes && !args.options.description) {
-        return `No updates were specified. Please specify at least one argument among --status, --targetTypes, --description or --properties`
-      }
+    if (!args.options.status && !args.options.properties && !args.options.targetTypes && !args.options.description) {
+      return `No updates were specified. Please specify at least one argument among --status, --targetTypes, --description or --properties`
+    }
 
-      const validStatusValues = ['Available', 'Deprecated'];
-      if (args.options.status && validStatusValues.indexOf(args.options.status) < 0) {
-        return `Status option is invalid. Valid statuses are: Available or Deprecated`;
-      }
+    const validStatusValues = ['Available', 'Deprecated'];
+    if (args.options.status && validStatusValues.indexOf(args.options.status) < 0) {
+      return `Status option is invalid. Valid statuses are: Available or Deprecated`;
+    }
 
-      if (args.options.properties) {
-        return this.validateProperties(args.options.properties);
-      }
+    if (args.options.properties) {
+      return this.validateProperties(args.options.properties);
+    }
 
-      return true;
-    };
+    return true;
   }
 
   private validateProperties(propertiesString: string): boolean | string {

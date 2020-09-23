@@ -1,18 +1,16 @@
+import { Auth } from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
 import config from '../../../../config';
-import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import { Auth } from '../../../../Auth';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import SpoCommand from '../../../base/SpoCommand';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -47,8 +45,8 @@ class SpoListItemIsRecordCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    const clientSvcCommons: ClientSvc = new ClientSvc(logger, this.debug);
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     const listIdArgument: string = args.options.listId || '';
     const listTitleArgument: string = args.options.listTitle || '';
@@ -60,20 +58,20 @@ class SpoListItemIsRecordCommand extends SpoCommand {
     let listId: string = '';
 
     if (this.debug) {
-      cmd.log(`Retrieving access token for ${resource}...`);
+      logger.log(`Retrieving access token for ${resource}...`);
     }
 
     ((): Promise<{ Id: string; }> => {
       if (typeof args.options.listId !== 'undefined') {
         if (this.verbose) {
-          cmd.log(`List Id passed in as an argument.`);
+          logger.log(`List Id passed in as an argument.`);
         }
 
         return Promise.resolve({ Id: args.options.listId });
       }
 
       if (this.verbose) {
-        cmd.log(`Getting list id...`);
+        logger.log(`Getting list id...`);
       }
       const requestOptions: any = {
         url: `${listRestUrl}?$select=Id`,
@@ -89,7 +87,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
         listId = res.Id;
 
         if (this.debug) {
-          cmd.log(`Getting request digest for request`);
+          logger.log(`Getting request digest for request`);
         }
 
         return this.getRequestDigest(args.options.webUrl);
@@ -100,7 +98,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
       })
       .then((webIdentityResp: IdentityResponse): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Checking if list item is a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+          logger.log(`Checking if list item is a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
         const requestBody = this.getIsRecordRequestBody(webIdentityResp.objectIdentity, listId, args.options.id)
@@ -124,10 +122,10 @@ class SpoListItemIsRecordCommand extends SpoCommand {
         }
         else {
           const result: boolean = json[json.length - 1];
-          cmd.log(result);
+          logger.log(result);
           cb();
         }
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   };
 
   private getIsRecordRequestBody(webIdentity: string, listId: string, id: string): string {
@@ -167,37 +165,35 @@ class SpoListItemIsRecordCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const id: number = parseInt(args.options.id);
-      if (isNaN(id)) {
-        return `${args.options.id} is not a valid list item ID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const id: number = parseInt(args.options.id);
+    if (isNaN(id)) {
+      return `${args.options.id} is not a valid list item ID`;
+    }
 
-      if (id < 1) {
-        return `Item ID must be a positive number`;
-      }
+    if (id < 1) {
+      return `Item ID must be a positive number`;
+    }
 
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (!args.options.listId && !args.options.listTitle) {
-        return `Specify listId or listTitle`;
-      }
+    if (!args.options.listId && !args.options.listTitle) {
+      return `Specify listId or listTitle`;
+    }
 
-      if (args.options.listId && args.options.listTitle) {
-        return `Specify listId or listTitle but not both`;
-      }
+    if (args.options.listId && args.options.listTitle) {
+      return `Specify listId or listTitle but not both`;
+    }
 
-      if (args.options.listId &&
-        !Utils.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} in option listId is not a valid GUID`;
-      }
+    if (args.options.listId &&
+      !Utils.isValidGuid(args.options.listId)) {
+      return `${args.options.listId} in option listId is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

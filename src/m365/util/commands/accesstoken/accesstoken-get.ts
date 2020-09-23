@@ -1,11 +1,10 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import Command, {
-  CommandOption,
-  CommandError
-} from '../../../../Command';
 import auth from '../../../../Auth';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import Command, {
+    CommandError, CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -25,11 +24,11 @@ class AccessTokenGetCommand extends Command {
     return 'Gets access token for the specified resource';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     auth
-      .ensureAccessToken(args.options.resource, cmd, this.debug, args.options.new)
+      .ensureAccessToken(args.options.resource, logger, this.debug, args.options.new)
       .then((accessToken: string): void => {
-        cmd.log(accessToken);
+        logger.log(accessToken);
         cb();
       }, (err: any): void => cb(new CommandError(err)));
   }

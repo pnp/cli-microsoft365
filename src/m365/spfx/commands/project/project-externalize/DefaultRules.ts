@@ -1,4 +1,4 @@
-import { PnPJsRule, DynamicRule } from "./rules";
+import { DynamicRule, PnPJsRule } from "./rules";
 
 module.exports = [
   new PnPJsRule(),

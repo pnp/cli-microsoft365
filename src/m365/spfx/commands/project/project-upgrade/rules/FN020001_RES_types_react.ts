@@ -1,5 +1,5 @@
-import { Project } from "../../model";
 import { Utils } from "../";
+import { Project } from "../../model";
 import { ResolutionRule } from "./ResolutionRule";
 
 export class FN020001_RES_types_react extends ResolutionRule {

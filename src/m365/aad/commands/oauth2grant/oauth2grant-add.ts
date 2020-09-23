@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import Utils from '../../../../Utils';
 import AadCommand from '../../../base/AadCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -29,9 +28,9 @@ class AadOAuth2GrantAddCommand extends AadCommand {
     return 'Grant the specified service principal OAuth2 permissions to the specified resource';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Granting the service principal specified permissions...`);
+      logger.log(`Granting the service principal specified permissions...`);
     }
 
     const requestOptions: any = {
@@ -56,11 +55,11 @@ class AadOAuth2GrantAddCommand extends AadCommand {
       .post<void>(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -83,18 +82,16 @@ class AadOAuth2GrantAddCommand extends AadCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.clientId)) {
-        return `${args.options.clientId} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.clientId)) {
+      return `${args.options.clientId} is not a valid GUID`;
+    }
 
-      if (!Utils.isValidGuid(args.options.resourceId)) {
-        return `${args.options.resourceId} is not a valid GUID`;
-      }
+    if (!Utils.isValidGuid(args.options.resourceId)) {
+      return `${args.options.resourceId} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

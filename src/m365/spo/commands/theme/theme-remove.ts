@@ -1,12 +1,12 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Cli, Logger } from '../../../../cli';
+import {
+    CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption
-} from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -32,13 +32,13 @@ class SpoThemeRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeTheme = (): void => {
       this
-        .getSpoAdminUrl(cmd, this.debug)
+        .getSpoAdminUrl(logger, this.debug)
         .then((spoAdminUrl: string): Promise<void> => {
           if (this.verbose) {
-            cmd.log(`Removing theme from tenant...`);
+            logger.log(`Removing theme from tenant...`);
           }
 
           const requestOptions: any = {
@@ -56,18 +56,18 @@ class SpoThemeRemoveCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
 
           cb();
-        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     }
 
     if (args.options.confirm) {
       removeTheme();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,

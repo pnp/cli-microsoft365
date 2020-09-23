@@ -1,9 +1,9 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import commands from '../../commands';
 import { ToDoList } from '../../ToDoList';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -20,15 +20,15 @@ class TodoListListCommand extends GraphItemsListCommand<ToDoList> {
     return 'Returns a list of Microsoft To Do task lists';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
-      .getAllItems(`${this.resource}/beta/me/todo/lists`, cmd, true)
+      .getAllItems(`${this.resource}/beta/me/todo/lists`, logger, true)
       .then((): void => {
         if (args.options.output === 'json') {
-          cmd.log(this.items);
+          logger.log(this.items);
         }
         else {
-          cmd.log(this.items.map(i => {
+          logger.log(this.items.map(i => {
             return {
               displayName: i.displayName,
               id: i.id
@@ -37,11 +37,11 @@ class TodoListListCommand extends GraphItemsListCommand<ToDoList> {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

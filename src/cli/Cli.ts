@@ -1,15 +1,16 @@
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
-import * as minimist from 'minimist';
-import * as jmespath from 'jmespath';
 import * as chalk from 'chalk';
+import * as fs from 'fs';
 import * as inquirer from 'inquirer';
+import * as jmespath from 'jmespath';
 import * as markshell from 'markshell';
-import Table = require('easy-table');
-import Command, { CommandError, CommandValidate } from '../Command';
+import * as minimist from 'minimist';
+import * as os from 'os';
+import * as path from 'path';
+import { Logger } from '.';
+import Command, { CommandError } from '../Command';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
+import Table = require('easy-table');
 const packageJSON = require('../../package.json');
 
 export class Cli {
@@ -21,7 +22,7 @@ export class Cli {
   /**
    * Name of the command specified through args
    */
-  private currentCommandName: string | undefined;
+  public currentCommandName: string | undefined;
   private optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
   private commandsFolder: string = '';
   private static instance: Cli;
@@ -128,67 +129,46 @@ export class Cli {
       }
     }
 
-    // validate using command's validate method if specified
-    const validate: CommandValidate | undefined = this.commandToExecute.command.validate();
-    if (validate) {
-      const validationResult: boolean | string = validate(this.optionsFromArgs);
-      if (typeof validationResult === 'string') {
-        return this.closeWithError(validationResult, true);
-      }
+    const validationResult: boolean | string = this.commandToExecute.command.validate(this.optionsFromArgs);
+    if (typeof validationResult === 'string') {
+      return this.closeWithError(validationResult, true);
     }
 
     return Cli
-      .executeCommand(this.commandToExecute.name, this.commandToExecute.command, this.optionsFromArgs)
+      .executeCommand(this.commandToExecute.command, this.optionsFromArgs)
       .then(_ => process.exit(0), err => this.closeWithError(err));
   }
 
-  public static executeCommand(commandName: string, command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
+  public static executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const commandInstance = {
-        commandWrapper: {
-          command: commandName
-        },
-        action: command.action(),
+      const logger: Logger = {
         log: (message: any): void => {
           const output: any = Cli.logOutput(message, args.options);
           Cli.log(output);
-        },
-        prompt: (options: any, cb: (result: any) => void) => {
-          inquirer
-            .prompt(options)
-            .then(result => cb(result));
         }
       };
 
       if (args.options.debug) {
-        commandInstance.log(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
+        logger.log(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
       }
 
-      commandInstance.action(args, (err: any): void => {
-        if (err) {
-          return reject(err);
-        }
+      command
+        .action(logger, args as any, (err: any): void => {
+          if (err) {
+            return reject(err);
+          }
 
-        resolve();
-      });
+          resolve();
+        });
     });
   }
 
-  public static executeCommandWithOutput(commandName: string, command: Command, args: { options: minimist.ParsedArgs }): Promise<string> {
+  public static executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }): Promise<string> {
     return new Promise((resolve: (result: string) => void, reject: (error: any) => void): void => {
       const log: string[] = [];
-      const commandInstance = {
-        commandWrapper: {
-          command: commandName
-        },
-        action: command.action(),
+      const logger = {
         log: (message: any): void => {
           log.push(message);
-        },
-        prompt: (options: any, cb: (result: any) => void) => {
-          inquirer
-            .prompt(options)
-            .then(result => cb(result));
         }
       };
 
@@ -196,7 +176,7 @@ export class Cli {
         Cli.log(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
       }
 
-      commandInstance.action(args, (err: any): void => {
+      command.action(logger, args as any, (err: any): void => {
         if (err) {
           return reject(err);
         }
@@ -624,5 +604,11 @@ export class Cli {
 
   private static error(message?: any, ...optionalParams: any[]): void {
     console.error(message, ...optionalParams);
+  }
+
+  public static prompt(options: any, cb: (result: any) => void): void {
+    inquirer
+      .prompt(options)
+      .then(result => cb(result));
   }
 }

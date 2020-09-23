@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./site-commsite-enable');
-import * as assert from 'assert';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./site-commsite-enable');
 
 describe(commands.SITE_COMMSITE_ENABLE, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -23,11 +24,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: any) => {
         log.push(msg);
       }
@@ -71,7 +68,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(err, undefined);
         done();
@@ -95,7 +92,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(err, undefined);
         done();
@@ -119,7 +116,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com>' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com>' } } as any, (err?: any) => {
       try {
         assert.strictEqual(err, undefined);
         done();
@@ -146,7 +143,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -160,7 +157,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -172,7 +169,7 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -183,59 +180,59 @@ describe(commands.SITE_COMMSITE_ENABLE, () => {
   });
 
   it('requires site URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     assert(options.find(o => o.option.indexOf('<url>') > -1));
   });
 
   it('supports specifying design package ID', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     assert(options.find(o => o.option.indexOf('[designPackageId]') > -1));
   });
 
   it('fails validation when no site URL specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {}
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when invalid site URL specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { url: 'http://contoso.sharepoint.com' }
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when valid site URL specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { url: 'https://contoso.sharepoint.com' }
     });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when valid site URL specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { url: 'https://contoso.sharepoint.com' }
     });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation when invalid design package ID specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { url: 'https://contoso.sharepoint.com', designPackageId: 'invalid' }
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when no design package ID specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { url: 'https://contoso.sharepoint.com' }
     });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when valid design package ID specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { url: 'https://contoso.sharepoint.com', designPackageId: '18eefaa9-ca7b-4ca4-802c-db6d254c533d' }
     });
     assert.strictEqual(actual, true);

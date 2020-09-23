@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import auth from '../../../../Auth';
-const command: Command = require('./userprofile-set');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./userprofile-set');
 
 describe(commands.USERPROFILE_SET, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   const spoUrl = 'https://contoso.sharepoint.com';
 
   before(() => {
@@ -23,16 +24,12 @@ describe(commands.USERPROFILE_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -74,7 +71,7 @@ describe(commands.USERPROFILE_SET, () => {
       'propertyValue': 'Senior Developer'
     };
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         userName: 'john.doe@mytenant.onmicrosoft.com',
         propertyName: 'SPS-JobTitle',
@@ -102,7 +99,7 @@ describe(commands.USERPROFILE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         userName: 'john.doe@mytenant.onmicrosoft.com',
         propertyName: 'SPS-JobTitle',
@@ -111,7 +108,7 @@ describe(commands.USERPROFILE_SET, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       } catch (e) {
         done(e);
@@ -135,7 +132,7 @@ describe(commands.USERPROFILE_SET, () => {
       'propertyValues': ['CSS', 'HTML']
     };
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         userName: 'john.doe@mytenant.onmicrosoft.com',
         propertyName: 'SPS-Skills',
@@ -162,7 +159,7 @@ describe(commands.USERPROFILE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         userName: 'john.doe@mytenant.onmicrosoft.com',
         propertyName: 'SPS-Skills',
@@ -171,7 +168,7 @@ describe(commands.USERPROFILE_SET, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       } catch (e) {
         done(e);
@@ -184,14 +181,13 @@ describe(commands.USERPROFILE_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         userName: 'john.doe@mytenant.onmicrosoft.com',
         propertyName: 'SPS-JobTitle',
         propertyValue: 'Senior Developer'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -203,7 +199,7 @@ describe(commands.USERPROFILE_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,14 +1,14 @@
+import * as url from 'url';
+import { Logger } from '../../cli';
 import request from '../../request';
 import Utils from '../../Utils';
-import * as url from 'url';
-import { CommandInstance } from '../../cli';
 
 /**
  * Folder methods that are shared among multiple commands.
  */
 export class FolderExtensions {
 
-  public constructor(private cmd: CommandInstance, private debug: boolean) {
+  public constructor(private logger: Logger, private debug: boolean) {
   }
 
   /**
@@ -39,9 +39,9 @@ export class FolderExtensions {
     folderToEnsure = Utils.getWebRelativePath(webFullUrl, folderToEnsure);
 
     if (this.debug) {
-      this.cmd.log(`folderToEnsure`);
-      this.cmd.log(folderToEnsure);
-      this.cmd.log('');
+      this.logger.log(`folderToEnsure`);
+      this.logger.log(folderToEnsure);
+      this.logger.log('');
     }
 
     let nextFolder: string = '';
@@ -52,16 +52,16 @@ export class FolderExtensions {
     let folders: string[] = folderToEnsure.substring(1).split('/');
 
     if (this.debug) {
-      this.cmd.log('folders to process');
-      this.cmd.log(JSON.stringify(folders));
-      this.cmd.log('');
+      this.logger.log('folders to process');
+      this.logger.log(JSON.stringify(folders));
+      this.logger.log('');
     }
 
     // recursive function
     const checkOrAddFolder = (resolve: () => void, reject: (error: any) => void): void => {
       if (folderIndex === folders.length) {
         if (this.debug) {
-          this.cmd.log(`All sub-folders exist`);
+          this.logger.log(`All sub-folders exist`);
         }
 
         return resolve();
@@ -102,7 +102,7 @@ export class FolderExtensions {
             })
             .catch((err: any) => {
               if (this.debug) {
-                this.cmd.log(`Could not create sub-folder ${folderServerRelativeUrl}`);
+                this.logger.log(`Could not create sub-folder ${folderServerRelativeUrl}`);
               }
 
               reject(err);

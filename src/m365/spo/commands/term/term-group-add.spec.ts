@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./term-group-add');
-import * as assert from 'assert';
-import request from '../../../../request';
-import config from '../../../../config';
-import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./term-group-add');
 
 describe(commands.TERM_GROUP_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.TERM_GROUP_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -100,9 +97,9 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, name: 'PnPTermSets' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'PnPTermSets' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Name": "PnPTermSets",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",
           "Description": ""
@@ -155,9 +152,9 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8' } } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Name": "PnPTermSets",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a8",
           "Description": ""
@@ -218,9 +215,9 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, name: 'PnPTermSets', description: 'Term sets for PnP' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'PnPTermSets', description: 'Term sets for PnP' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Name": "PnPTermSets",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",
           "Description": "Term sets for PnP"
@@ -281,9 +278,9 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8', description: 'Term sets for PnP' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8', description: 'Term sets for PnP' } } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Name": "PnPTermSets",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a8",
           "Description": "Term sets for PnP"
@@ -312,7 +309,7 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, name: 'PnPTermSets' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, name: 'PnPTermSets' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -359,7 +356,7 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, name: 'PnPTermSets' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, name: 'PnPTermSets' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Group names must be unique.')));
         done();
@@ -406,7 +403,7 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Failed to read from or write to database. Refresh and try again. If the problem persists, please contact the administrator.')));
         done();
@@ -467,7 +464,7 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8', description: 'Term sets for PnP' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8', description: 'Term sets for PnP' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -518,9 +515,9 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, name: 'PnPTermSets>' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'PnPTermSets>' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Name": "PnPTermSets>",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",
           "Description": ""
@@ -581,9 +578,9 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, name: 'PnPTermSets', description: 'Term sets for PnP>' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'PnPTermSets', description: 'Term sets for PnP>' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Name": "PnPTermSets",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",
           "Description": "Term sets for PnP>"
@@ -597,22 +594,22 @@ describe(commands.TERM_GROUP_ADD, () => {
   });
 
   it('fails validation if id is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'PnPTermSets', id: 'invalid' } });
+    const actual = command.validate({ options: { name: 'PnPTermSets', id: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when id and name specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'PnPTermSets', id: '9e54299e-208a-4000-8546-cc4139091b26' } });
+    const actual = command.validate({ options: { name: 'PnPTermSets', id: '9e54299e-208a-4000-8546-cc4139091b26' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when name specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'People' } });
+    const actual = command.validate({ options: { name: 'People' } });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

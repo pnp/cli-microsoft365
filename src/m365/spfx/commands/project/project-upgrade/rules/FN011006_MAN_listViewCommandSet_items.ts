@@ -1,5 +1,5 @@
 import { Finding, Occurrence } from "../";
-import { Project, CommandSetManifest } from "../../model";
+import { CommandSetManifest, Project } from "../../model";
 import { ManifestRule } from "./ManifestRule";
 
 export class FN011006_MAN_listViewCommandSet_items extends ManifestRule {

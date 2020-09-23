@@ -1,4 +1,4 @@
-﻿import {IInputs, IOutputs} from "./generated/ManifestTypes";
+﻿import { IInputs, IOutputs } from "./generated/ManifestTypes";
 import DataSetInterfaces = ComponentFramework.PropertyHelper.DataSetApi;
 type DataSet = ComponentFramework.PropertyTypes.DataSet;
 

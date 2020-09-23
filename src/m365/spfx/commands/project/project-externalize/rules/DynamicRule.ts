@@ -1,9 +1,9 @@
-import { BasicDependencyRule } from "./BasicDependencyRule";
-import { Project } from "../../model";
 import * as fs from 'fs';
-import request from '../../../../../../request';
 import { ExternalizeEntry } from "../";
+import request from '../../../../../../request';
+import { Project } from "../../model";
 import { VisitationResult } from '../VisitationResult';
+import { BasicDependencyRule } from "./BasicDependencyRule";
 
 type ModuleType = 'CommonJs' | 'UMD' | 'AMD' | 'ES2015' | 'non-module';
 

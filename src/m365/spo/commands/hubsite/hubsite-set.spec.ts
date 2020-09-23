@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError, CommandTypes } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./hubsite-set');
-import * as assert from 'assert';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
+import Command, { CommandError, CommandTypes } from '../../../../Command';
 import config from '../../../../config';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./hubsite-set');
 
 describe(commands.HUBSITE_SET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.HUBSITE_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -80,9 +77,9 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, title: 'Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
+    command.action(logger, { options: { debug: false, title: 'Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Description: "Description",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -118,9 +115,9 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, description: 'All things sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
+    command.action(logger, { options: { debug: false, description: 'All things sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Description: "All things sales",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -156,9 +153,9 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
+    command.action(logger, { options: { debug: false, logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Description: "All things sales",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -194,9 +191,9 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, title: 'Sales', description: 'All things sales', logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
+    command.action(logger, { options: { debug: true, title: 'Sales', description: 'All things sales', logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Description: "All things sales",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -232,9 +229,9 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, title: '<Sales>', description: '<All things sales>', logoUrl: '<https://contoso.com/logo.png>', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
+    command.action(logger, { options: { debug: true, title: '<Sales>', description: '<All things sales>', logoUrl: '<https://contoso.com/logo.png>', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Description: "<All things sales>",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "<https://contoso.com/logo.png>",
@@ -270,9 +267,9 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, title: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
+    command.action(logger, { options: { debug: false, title: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Description: "Description",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -308,9 +305,9 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, description: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
+    command.action(logger, { options: { debug: false, description: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Description: "",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -346,9 +343,9 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, logoUrl: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
+    command.action(logger, { options: { debug: false, logoUrl: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Description: "All things sales",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "",
@@ -379,7 +376,7 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid URL: Logo.')));
         done();
@@ -395,7 +392,7 @@ describe(commands.HUBSITE_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({ options: { debug: false, logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, logoUrl: 'Logo', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -419,7 +416,7 @@ describe(commands.HUBSITE_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -430,7 +427,7 @@ describe(commands.HUBSITE_SET, () => {
   });
 
   it('supports specifying hub site ID', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -441,7 +438,7 @@ describe(commands.HUBSITE_SET, () => {
   });
 
   it('supports specifying hub site title', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--title') > -1) {
@@ -452,7 +449,7 @@ describe(commands.HUBSITE_SET, () => {
   });
 
   it('supports specifying hub site description', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--description') > -1) {
@@ -463,7 +460,7 @@ describe(commands.HUBSITE_SET, () => {
   });
 
   it('supports specifying hub site logoUrl', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--logoUrl') > -1) {
@@ -474,32 +471,32 @@ describe(commands.HUBSITE_SET, () => {
   });
 
   it('fails validation if id is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'abc', title: 'Sales' } });
+    const actual = command.validate({ options: { id: 'abc', title: 'Sales' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if no property to update specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
+    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if id and title specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', title: 'Sales' } });
+    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', title: 'Sales' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if id and description specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', description: 'All things sales' } });
+    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', description: 'All things sales' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if id and logoUrl specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', logoUrl: 'https://contoso.com/logo.png' } });
+    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', logoUrl: 'https://contoso.com/logo.png' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if all options specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', title: 'Sales', description: 'All things sales', logoUrl: 'https://contoso.com/logo.png' } });
+    const actual = command.validate({ options: { id: '255a50b2-527f-4413-8485-57f4c17a24d1', title: 'Sales', description: 'All things sales', logoUrl: 'https://contoso.com/logo.png' } });
     assert.strictEqual(actual, true);
   });
 });

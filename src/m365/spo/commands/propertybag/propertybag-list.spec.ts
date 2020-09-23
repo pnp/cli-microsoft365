@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./propertybag-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
+import commands from '../../commands';
+const command: Command = require('./propertybag-list');
 
 describe(commands.PROPERTYBAG_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let stubAllPostRequests: any = (
     requestObjectIdentityResp: any = null,
     getFolderPropertyBagResp: any = null,
@@ -90,16 +91,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -140,9 +137,9 @@ describe(commands.PROPERTYBAG_LIST, () => {
       serverRelativeUrl: "\u002fsites\u002fabc"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
-        assert(getWebPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', cmdInstance));
+        assert(getWebPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', logger));
         assert(getWebPropertyBagSpy.calledOnce === true);
         done();
       }
@@ -165,9 +162,9 @@ describe(commands.PROPERTYBAG_LIST, () => {
       serverRelativeUrl: "\u002fsites\u002fabc"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
-        assert(getFolderPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', '/', cmdInstance));
+        assert(getFolderPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', '/', logger));
         assert(getFolderPropertyBagSpy.calledOnce === true);
         done();
       }
@@ -185,7 +182,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
       folder: '/'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(getFolderPropertyBagSpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
@@ -205,7 +202,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
       debug: false
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(getWebPropertyBagSpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc1')));
@@ -227,7 +224,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
       verbose: true
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(getFolderPropertyBagSpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getFolderPropertyBag error')));
@@ -247,7 +244,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(getWebPropertyBagSpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getWebPropertyBag error')));
@@ -268,7 +265,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(requestObjectIdentitySpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
@@ -289,7 +286,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(requestObjectIdentitySpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
@@ -309,12 +306,12 @@ describe(commands.PROPERTYBAG_LIST, () => {
       folder: '/'
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
         assert(formatOutputSpy.calledOnce === true);
 
-        const out = cmdInstanceLogSpy.lastCall.args[0];
+        const out = loggerSpy.lastCall.args[0];
         const expectedDate = new Date(2017, 10, 7, 11, 29, 31, 0);
 
         assert.strictEqual(out[0].key, 'vti_folderitemcount');
@@ -348,7 +345,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsVerboseOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -359,7 +356,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
   });
 
   it('supports specifying folder', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsScopeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[folder]') > -1) {
@@ -371,7 +368,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
@@ -396,7 +393,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           webUrl: 'foo'
@@ -406,7 +403,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
   });
 
   it('passes validation when the url option specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           webUrl: "https://contoso.sharepoint.com"
@@ -416,7 +413,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
   });
 
   it('passes validation when the url and folder options specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           webUrl: "https://contoso.sharepoint.com",
@@ -427,7 +424,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
   });
 
   it('doesn\'t fail validation if the optional folder option not specified', () => {
-    const actual = (command.validate() as CommandValidate)(
+    const actual = command.validate(
       {
         options:
           {

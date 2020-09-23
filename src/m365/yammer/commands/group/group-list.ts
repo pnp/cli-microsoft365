@@ -1,9 +1,9 @@
-import { CommandOption, CommandValidate } from '../../../../Command';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -37,7 +37,7 @@ class YammerGroupListCommand extends YammerCommand {
     return telemetryProps;
   }
 
-  private getAllItems(cmd: CommandInstance, args: CommandArgs, page: number): Promise<void> {
+  private getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       let endpoint = `${this.resource}/v1`;
 
@@ -71,7 +71,7 @@ class YammerGroupListCommand extends YammerCommand {
             // we need to page by 50 items (hardcoded)
             if (this.items.length % 50 === 0) {
               this
-                .getAllItems(cmd, args, ++page)
+                .getAllItems(logger, args, ++page)
                 .then((): void => {
                   resolve();
                 }, (err: any): void => {
@@ -88,17 +88,17 @@ class YammerGroupListCommand extends YammerCommand {
     });
   };
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.items = []; // this will reset the items array in interactive mode
 
     this
-      .getAllItems(cmd, args, 1)
+      .getAllItems(logger, args, 1)
       .then((): void => {
         if (args.options.output === 'json') {
-          cmd.log(this.items);
+          logger.log(this.items);
         }
         else {
-          cmd.log(this.items.map((n: any) => {
+          logger.log(this.items.map((n: any) => {
             const item: any = {
               id: n.id,
               name: n.name,
@@ -112,7 +112,7 @@ class YammerGroupListCommand extends YammerCommand {
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   };
 
   public options(): CommandOption[] {
@@ -131,18 +131,16 @@ class YammerGroupListCommand extends YammerCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.userId && typeof args.options.userId !== 'number') {
-        return `${args.options.userId} is not a number`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.userId && typeof args.options.userId !== 'number') {
+      return `${args.options.userId} is not a number`;
+    }
 
-      if (args.options.limit && typeof args.options.limit !== 'number') {
-        return `${args.options.limit} is not a number`;
-      }
+    if (args.options.limit && typeof args.options.limit !== 'number') {
+      return `${args.options.limit} is not a number`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

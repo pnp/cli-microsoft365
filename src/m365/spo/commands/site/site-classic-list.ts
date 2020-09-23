@@ -1,13 +1,13 @@
+import { Logger } from '../../../../cli';
+import { CommandError, CommandOption } from '../../../../Command';
 import config from '../../../../config';
-import commands from '../../commands';
-import request from '../../../../request';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
-import { CommandOption, CommandError } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { SPOSitePropertiesEnumerable } from './SPOSitePropertiesEnumerable';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -36,13 +36,13 @@ class SiteClassicListCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const webTemplate: string = args.options.webTemplate || '';
     const includeOneDriveSites: boolean = args.options.includeOneDriveSites || false;
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
 
@@ -50,7 +50,7 @@ class SiteClassicListCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Retrieving list of site collections...`);
+          logger.log(`Retrieving list of site collections...`);
         }
 
         const personalSite: string = includeOneDriveSites === false ? '0' : '1';
@@ -75,10 +75,10 @@ class SiteClassicListCommand extends SpoCommand {
         else {
           const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
           if (args.options.output === 'json') {
-            cmd.log(sites._Child_Items_);
+            logger.log(sites._Child_Items_);
           }
           else {
-            cmd.log(sites._Child_Items_.map(s => {
+            logger.log(sites._Child_Items_.map(s => {
               return {
                 Title: s.Title,
                 Url: s.Url
@@ -98,7 +98,7 @@ class SiteClassicListCommand extends SpoCommand {
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

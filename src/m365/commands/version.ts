@@ -1,6 +1,6 @@
-import commands from './commands';
+import { Logger } from '../../cli';
 import AnonymousCommand from '../base/AnonymousCommand';
-import { CommandInstance } from '../../cli';
+import commands from './commands';
 const packageJSON = require('../../../package.json');
 
 class VersionCommand extends AnonymousCommand {
@@ -12,8 +12,8 @@ class VersionCommand extends AnonymousCommand {
     return 'Shows CLI for Microsoft 365 version';
   }
 
-  public commandAction(cmd: CommandInstance, args: {}, cb: (err?: any) => void): void {
-    cmd.log(`v${packageJSON.version}`);
+  public commandAction(logger: Logger, args: {}, cb: (err?: any) => void): void {
+    logger.log(`v${packageJSON.version}`);
     cb();
   }
 }

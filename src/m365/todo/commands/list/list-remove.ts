@@ -1,12 +1,12 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -35,7 +35,7 @@ class TodoListRemoveCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const getListId = () => {
       if (args.options.name) {
         // Search list by its name
@@ -73,18 +73,18 @@ class TodoListRemoveCommand extends GraphCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
 
           cb();
-        }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
       removeList();
     }
     else {
-      cmd.prompt(
+      Cli.prompt(
         {
           type: "confirm",
           name: "continue",
@@ -123,18 +123,16 @@ class TodoListRemoveCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.name && !args.options.id) {
-        return 'Specify name or id of the list to remove';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.name && !args.options.id) {
+      return 'Specify name or id of the list to remove';
+    }
 
-      if (args.options.name && args.options.id) {
-        return 'Specify either the name or the id of the list to remove but not both'
-      }
+    if (args.options.name && args.options.id) {
+      return 'Specify either the name or the id of the list to remove but not both'
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

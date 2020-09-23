@@ -1,10 +1,10 @@
-import { CommandOption, CommandValidate } from '../../../../Command';
+import * as chalk from 'chalk';
+import { Cli, Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -30,7 +30,7 @@ class YammerMessageRemoveCommand extends YammerCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeMessage: () => void = (): void => {
       const requestOptions: any = {
         url: `${this.resource}/v1/messages/${args.options.id}.json`,
@@ -45,18 +45,18 @@ class YammerMessageRemoveCommand extends YammerCommand {
         .delete(requestOptions)
         .then((res: any): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
 
           cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
       removeMessage();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -88,14 +88,12 @@ class YammerMessageRemoveCommand extends YammerCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (typeof args.options.id !== 'number') {
-        return `${args.options.id} is not a number`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (typeof args.options.id !== 'number') {
+      return `${args.options.id} is not a number`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

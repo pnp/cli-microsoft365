@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./tenant-appcatalogurl-get');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./tenant-appcatalogurl-get');
 
 describe(commands.TENANT_APPCATALOGURL_GET, () => {
   let log: any[];
   let requests: any[];
-  let cmdInstance: any;
+  let logger: Logger;
 
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,16 +27,12 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
   beforeEach(() => {
     log = [];
     requests = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -62,7 +59,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -82,11 +79,11 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
 
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -107,13 +104,13 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.args[0] === 'https://contoso.sharepoint.com/sites/apps');
+        assert(loggerSpy.lastCall.args[0] === 'https://contoso.sharepoint.com/sites/apps');
         done();
       }
       catch (e) {
@@ -132,13 +129,13 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -157,13 +154,13 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('Tenant app catalog is not configured.'));
+        assert(loggerSpy.calledWith('Tenant app catalog is not configured.'));
         done();
       }
       catch (e) {

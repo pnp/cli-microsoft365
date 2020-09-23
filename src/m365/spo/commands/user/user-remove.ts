@@ -1,13 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -37,10 +36,10 @@ class SpoUserRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeUser = (): void => {
       if (this.verbose) {
-        cmd.log(`Removing user from  subsite ${args.options.webUrl} ...`);
+        logger.log(`Removing user from  subsite ${args.options.webUrl} ...`);
       }
 
       let requestUrl: string = '';
@@ -65,18 +64,18 @@ class SpoUserRemoveCommand extends SpoCommand {
         .post(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
 
           cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
       removeUser();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -116,18 +115,16 @@ class SpoUserRemoveCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.id && !args.options.loginName) {
-        return 'Required option id or loginName missing, one is required';
-      }
-      
-      if (args.options.id && args.options.loginName) {
-        return 'Use either id or loginName, but not both';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.id && !args.options.loginName) {
+      return 'Required option id or loginName missing, one is required';
+    }
 
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+    if (args.options.id && args.options.loginName) {
+      return 'Use either id or loginName, but not both';
+    }
+
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

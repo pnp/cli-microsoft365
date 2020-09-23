@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./o365group-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./o365group-list');
 
 describe(commands.O365GROUP_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.O365GROUP_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -118,10 +115,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -203,10 +199,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -299,7 +294,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { orphaned: true } }, () => {
+    command.action(logger, { options: { orphaned: true } }, () => {
       try {
         assert([
           {
@@ -394,7 +389,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, orphaned: true } }, () => {
+    command.action(logger, { options: { debug: true, orphaned: true } }, () => {
       try {
         assert([
           {
@@ -478,10 +473,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, displayName: 'Team' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'Team' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -563,10 +557,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, mailNickname: 'team' } }, () => {
+    command.action(logger, { options: { debug: false, mailNickname: 'team' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -648,10 +641,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, displayName: 'Team', mailNickname: 'team' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'Team', mailNickname: 'team' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -733,10 +725,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -818,10 +809,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -903,10 +893,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, displayName: 'Team' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'Team' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -988,10 +977,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, mailNickname: 'team' } }, () => {
+    command.action(logger, { options: { debug: false, mailNickname: 'team' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -1073,10 +1061,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, displayName: 'Team', mailNickname: 'team' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'Team', mailNickname: 'team' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -1158,10 +1145,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, deleted: true } }, () => {
+    command.action(logger, { options: { debug: false, deleted: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Deleted Team 1",
@@ -1245,10 +1231,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, deleted: true } }, () => {
+    command.action(logger, { options: { debug: true, deleted: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Deleted Team 1",
@@ -1332,10 +1317,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { verbose: true, deleted: true } }, () => {
+    command.action(logger, { options: { verbose: true, deleted: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Deleted Team 1",
@@ -1419,10 +1403,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, deleted: true, displayName: 'Deleted' } }, () => {
+    command.action(logger, { options: { debug: false, deleted: true, displayName: 'Deleted' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Deleted Team 1",
@@ -1506,10 +1489,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, deleted: true, mailNickname: 'd_team' } }, () => {
+    command.action(logger, { options: { debug: false, deleted: true, mailNickname: 'd_team' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Deleted Team 1",
@@ -1593,10 +1575,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, deleted: true, displayName: 'Deleted', mailNickname: 'd_team' } }, () => {
+    command.action(logger, { options: { debug: false, deleted: true, displayName: 'Deleted', mailNickname: 'd_team' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Deleted Team 1",
@@ -1680,10 +1661,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, displayName: 'Team\'s #' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'Team\'s #' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team's #1",
@@ -1714,10 +1694,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, mailNickname: 'team\'s #' } }, () => {
+    command.action(logger, { options: { debug: false, mailNickname: 'team\'s #' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([]));
+        assert(loggerSpy.calledWith([]));
         done();
       }
       catch (e) {
@@ -1846,10 +1825,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -1946,8 +1924,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -2020,10 +1997,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, output: 'json' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "deletedDateTime": null,
@@ -2157,10 +2133,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, includeSiteUrl: true } }, () => {
+    command.action(logger, { options: { debug: false, includeSiteUrl: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -2256,10 +2231,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, includeSiteUrl: true } }, () => {
+    command.action(logger, { options: { debug: true, includeSiteUrl: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -2355,10 +2329,9 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, includeSiteUrl: true } }, () => {
+    command.action(logger, { options: { debug: false, includeSiteUrl: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
             "displayName": "Team 1",
@@ -2452,8 +2425,7 @@ describe(commands.O365GROUP_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, includeSiteUrl: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, includeSiteUrl: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -2465,7 +2437,7 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -2476,27 +2448,27 @@ describe(commands.O365GROUP_LIST, () => {
   });
 
   it('fails validation if both deleted and includeSiteUrl options set', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { deleted: true, includeSiteUrl: true } });
+    const actual = command.validate({ options: { deleted: true, includeSiteUrl: true } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if only deleted option set', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { deleted: true } });
+    const actual = command.validate({ options: { deleted: true } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if only includeSiteUrl option set', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { includeSiteUrl: true } });
+    const actual = command.validate({ options: { includeSiteUrl: true } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if only orphaned option set', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { orphaned: true } });
+    const actual = command.validate({ options: { orphaned: true } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if no options set', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, true);
   });
 });

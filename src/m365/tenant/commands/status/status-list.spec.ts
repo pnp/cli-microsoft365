@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./status-list');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./status-list');
 
 describe(commands.TENANT_STATUS_LIST, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
 
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let loggerSpy: sinon.SinonSpy;
 
   const textOutputForms = [
     {
@@ -238,16 +239,12 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -273,7 +270,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -291,11 +288,11 @@ describe(commands.TENANT_STATUS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
 
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -314,14 +311,14 @@ describe(commands.TENANT_STATUS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: false
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(loggerSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -338,14 +335,14 @@ describe(commands.TENANT_STATUS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: true
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutput));
+        assert(loggerSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -362,14 +359,14 @@ describe(commands.TENANT_STATUS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'text',
         debug: false
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(loggerSpy.calledWith(textOutput));
         done();
       }
       catch (e) {
@@ -386,14 +383,14 @@ describe(commands.TENANT_STATUS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'text',
         debug: true
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutput));
+        assert(loggerSpy.calledWith(textOutput));
         done();
       }
       catch (e) {
@@ -410,15 +407,15 @@ describe(commands.TENANT_STATUS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         workload: 'Forms',
         output: 'json',
         debug: false
       }
-    }, () => {
+    } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutputForms));
+        assert(loggerSpy.calledWith(jsonOutputForms));
         done();
       }
       catch (e) {
@@ -435,15 +432,15 @@ describe(commands.TENANT_STATUS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         workload: 'Forms',
         output: 'json',
         debug: true
       }
-    }, () => {
+    } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(jsonOutputForms));
+        assert(loggerSpy.calledWith(jsonOutputForms));
         done();
       }
       catch (e) {
@@ -460,15 +457,15 @@ describe(commands.TENANT_STATUS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         workload: 'Forms',
         output: 'text',
         debug: false
       }
-    }, () => {
+    } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutputForms));
+        assert(loggerSpy.calledWith(textOutputForms));
         done();
       }
       catch (e) {
@@ -485,15 +482,15 @@ describe(commands.TENANT_STATUS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         workload: 'Forms',
         output: 'text',
         debug: true
       }
-    }, () => {
+    } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(textOutputForms));
+        assert(loggerSpy.calledWith(textOutputForms));
         done();
       }
       catch (e) {

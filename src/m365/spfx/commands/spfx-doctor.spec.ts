@@ -1,18 +1,19 @@
-import commands from '../commands';
-import Command, { CommandError, CommandOption, CommandValidate, CommandTypes } from '../../../Command';
+import * as assert from 'assert';
+import * as child_process from 'child_process';
 import * as sinon from 'sinon';
 import { SinonSandbox } from 'sinon';
 import appInsights from '../../../appInsights';
-const command: Command = require('./spfx-doctor');
-import * as assert from 'assert';
+import { Logger } from '../../../cli';
+import Command, { CommandError, CommandTypes } from '../../../Command';
 import Utils from '../../../Utils';
-import * as child_process from 'child_process';
+import commands from '../commands';
+const command: Command = require('./spfx-doctor');
 
 describe(commands.DOCTOR, () => {
   let log: string[];
   let sandbox: SinonSandbox;
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   const packageVersionResponse = (name: string, version: string): string => {
     return `{
       "dependencies": {
@@ -32,16 +33,12 @@ describe(commands.DOCTOR, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     sinon.stub(process, 'platform').value('linux');
   });
 
@@ -99,15 +96,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.22.0')), 'Invalid Node version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.22.0')), 'Invalid Node version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -148,15 +145,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -200,15 +197,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -252,15 +249,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -304,15 +301,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -353,15 +350,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -402,15 +399,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -454,15 +451,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -506,15 +503,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -558,15 +555,15 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -591,11 +588,11 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
+        assert(loggerSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint Framework not found')));
-        assert(!cmdInstanceLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
+        assert(!loggerSpy.calledWith('Recommended fixes:'), 'Fixes provided');
         done();
       }
       catch (e) {
@@ -620,11 +617,11 @@ describe(commands.DOCTOR, () => {
       }
     });
 
-    cmdInstance.action({ options: { debug: true } }, (err: any) => {
+    command.action(logger, { options: { debug: true } } as any, (err: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
+        assert(loggerSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint Framework not found')));
-        assert(!cmdInstanceLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
+        assert(!loggerSpy.calledWith('Recommended fixes:'), 'Fixes provided');
         done();
       }
       catch (e) {
@@ -646,9 +643,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false, env: 'spo' } }, () => {
+    command.action(logger, { options: { debug: false, env: 'spo' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Supported in SPO')));
+        assert(loggerSpy.calledWith(getStatus(0, 'Supported in SPO')));
         done();
       }
       catch (e) {
@@ -670,9 +667,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false, env: 'spo' } }, () => {
+    command.action(logger, { options: { debug: false, env: 'spo' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Supported in SPO')));
+        assert(loggerSpy.calledWith(getStatus(0, 'Supported in SPO')));
         done();
       }
       catch (e) {
@@ -694,9 +691,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false, env: 'sp2019' } }, () => {
+    command.action(logger, { options: { debug: false, env: 'sp2019' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Supported in SP2019')));
+        assert(loggerSpy.calledWith(getStatus(0, 'Supported in SP2019')));
         done();
       }
       catch (e) {
@@ -718,10 +715,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false, env: 'sp2019' } }, () => {
+    command.action(logger, { options: { debug: false, env: 'sp2019' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'Not supported in SP2019')));
-        assert(cmdInstanceLogSpy.calledWith('- Use SharePoint Framework v1.4.1'), 'No fix provided');
+        assert(loggerSpy.calledWith(getStatus(1, 'Not supported in SP2019')));
+        assert(loggerSpy.calledWith('- Use SharePoint Framework v1.4.1'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -743,9 +740,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false, env: 'sp2016' } }, () => {
+    command.action(logger, { options: { debug: false, env: 'sp2016' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Supported in SP2016')));
+        assert(loggerSpy.calledWith(getStatus(0, 'Supported in SP2016')));
         done();
       }
       catch (e) {
@@ -767,10 +764,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false, env: 'sp2016' } }, () => {
+    command.action(logger, { options: { debug: false, env: 'sp2016' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'Not supported in SP2016')));
-        assert(cmdInstanceLogSpy.calledWith('- Use SharePoint Framework v1.1'), 'No fix provided');
+        assert(loggerSpy.calledWith(getStatus(1, 'Not supported in SP2016')));
+        assert(loggerSpy.calledWith('- Use SharePoint Framework v1.1'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -794,9 +791,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v10.18.0')));
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')));
         done();
       }
       catch (e) {
@@ -820,9 +817,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'Node v8.0.0')));
+        assert(loggerSpy.calledWith(getStatus(0, 'Node v8.0.0')));
         done();
       }
       catch (e) {
@@ -846,10 +843,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^10.0.0 required')));
-        assert(cmdInstanceLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
+        assert(loggerSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^10.0.0 required')));
+        assert(loggerSpy.calledWith('- Install Node.js v10'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -873,10 +870,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^8.0.0 || ^10.0.0 required')));
-        assert(cmdInstanceLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
+        assert(loggerSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^8.0.0 || ^10.0.0 required')));
+        assert(loggerSpy.calledWith('- Install Node.js v10'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -905,9 +902,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v5.0.0')));
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v5.0.0')));
         done();
       }
       catch (e) {
@@ -916,14 +913,14 @@ describe(commands.DOCTOR, () => {
     });
   });
 
-  it('passes npm.cmd check when os is Windows', (done) => {
+  it('passes npm.logger check when os is Windows', (done) => {
     Utils.restore(process.platform);
     sinon.stub(process, 'platform').value('win32');
 
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v8.0.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm.cmd' && args && args.length === 1 && args[0] === '-v') {
+      if (file === 'npm.logger' && args && args.length === 1 && args[0] === '-v') {
         callback(undefined, '5.0.0');
         return {} as child_process.ChildProcess;
       }
@@ -939,9 +936,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v5.0.0')));
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v5.0.0')));
         done();
       }
       catch (e) {
@@ -970,9 +967,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'npm v6.0.0')));
+        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.0.0')));
         done();
       }
       catch (e) {
@@ -1001,10 +998,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'npm v4.0.0 found, v^5.0.0 required')));
-        assert(cmdInstanceLogSpy.calledWith('- npm i -g npm@5'), 'No fix provided');
+        assert(loggerSpy.calledWith(getStatus(1, 'npm v4.0.0 found, v^5.0.0 required')));
+        assert(loggerSpy.calledWith('- npm i -g npm@5'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1033,10 +1030,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'npm v7.0.0 found, v^5.0.0 || ^6.0.0 required')));
-        assert(cmdInstanceLogSpy.calledWith('- npm i -g npm@6'), 'No fix provided');
+        assert(loggerSpy.calledWith(getStatus(1, 'npm v7.0.0 found, v^5.0.0 || ^6.0.0 required')));
+        assert(loggerSpy.calledWith('- npm i -g npm@6'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1053,10 +1050,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('npm not found')));
-        assert(!cmdInstanceLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
+        assert(!loggerSpy.calledWith('Recommended fixes:'), 'Fixes provided');
         done();
       }
       catch (e) {
@@ -1088,9 +1085,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'yo v3.1.1')));
+        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')));
         done();
       }
       catch (e) {
@@ -1119,10 +1116,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'yo not found')));
-        assert(cmdInstanceLogSpy.calledWith('- npm i -g yo'), 'No fix provided');
+        assert(loggerSpy.calledWith(getStatus(1, 'yo not found')));
+        assert(loggerSpy.calledWith('- npm i -g yo'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1155,9 +1152,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')));
+        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')));
         done();
       }
       catch (e) {
@@ -1186,10 +1183,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'gulp not found')));
-        assert(cmdInstanceLogSpy.calledWith('- npm i -g gulp'), 'No fix provided');
+        assert(loggerSpy.calledWith(getStatus(1, 'gulp not found')));
+        assert(loggerSpy.calledWith('- npm i -g gulp'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1218,10 +1215,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(!cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'react found');
-        assert(!cmdInstanceLogSpy.calledWith(getStatus(1, 'react not found, v16.8.5 required')), 'react not found');
+        assert(!loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'react found');
+        assert(!loggerSpy.calledWith(getStatus(1, 'react not found, v16.8.5 required')), 'react not found');
         done();
       }
       catch (e) {
@@ -1253,9 +1250,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v15.0.0')));
+        assert(loggerSpy.calledWith(getStatus(0, 'react v15.0.0')));
         done();
       }
       catch (e) {
@@ -1287,9 +1284,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'react v16.8.5')));
+        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')));
         done();
       }
       catch (e) {
@@ -1321,10 +1318,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'react v16.0.0 found, v^15 required')));
-        assert(cmdInstanceLogSpy.calledWith('- npm i react@15'), 'No fix provided');
+        assert(loggerSpy.calledWith(getStatus(1, 'react v16.0.0 found, v^15 required')));
+        assert(loggerSpy.calledWith('- npm i react@15'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1356,10 +1353,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'react v16.8.6 found, v16.8.5 required')));
-        assert(cmdInstanceLogSpy.calledWith('- npm i react@16.8.5'), 'No fix provided');
+        assert(loggerSpy.calledWith(getStatus(1, 'react v16.8.6 found, v16.8.5 required')));
+        assert(loggerSpy.calledWith('- npm i react@16.8.5'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1391,9 +1388,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'bundled typescript used')));
+        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')));
         done();
       }
       catch (e) {
@@ -1425,10 +1422,10 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(1, 'typescript v3.7.5 installed in the project')));
-        assert(cmdInstanceLogSpy.calledWith('- npm un typescript'), 'No fix provided');
+        assert(loggerSpy.calledWith(getStatus(1, 'typescript v3.7.5 installed in the project')));
+        assert(loggerSpy.calledWith('- npm un typescript'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1457,7 +1454,7 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`spfx doctor doesn't support SPFx v0.9.0 at this moment`)));
         done();
@@ -1495,9 +1492,9 @@ describe(commands.DOCTOR, () => {
       return {} as child_process.ChildProcess;
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         done();
       }
       catch (e) {
@@ -1507,7 +1504,7 @@ describe(commands.DOCTOR, () => {
   });
 
   it('supports specifying environment', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '-e, --env [env]') {
@@ -1530,27 +1527,27 @@ describe(commands.DOCTOR, () => {
   });
 
   it('passes validation when no options specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when sp2016 env specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { env: 'sp2016' } });
+    const actual = command.validate({ options: { env: 'sp2016' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when sp2019 env specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { env: 'sp2019' } });
+    const actual = command.validate({ options: { env: 'sp2019' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when spo env specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { env: 'spo' } });
+    const actual = command.validate({ options: { env: 'spo' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation when 2016 env specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { env: '2016' } });
+    const actual = command.validate({ options: { env: '2016' } });
     assert.notStrictEqual(actual, true);
   });
 });

@@ -1,16 +1,14 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -40,14 +38,14 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
     return [commands.SP_SET];
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const enabled: boolean = args.options.enabled === 'true';
 
     const toggleServicePrincipal: () => void = (): void => {
       let spoAdminUrl: string = '';
 
       this
-        .getSpoAdminUrl(cmd, this.debug)
+        .getSpoAdminUrl(logger, this.debug)
         .then((_spoAdminUrl: string): Promise<ContextInfo> => {
           spoAdminUrl = _spoAdminUrl;
 
@@ -55,7 +53,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
         })
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
-            cmd.log(`${(enabled ? 'Enabling' : 'Disabling')} service principal...`);
+            logger.log(`${(enabled ? 'Enabling' : 'Disabling')} service principal...`);
           }
 
           const requestOptions: any = {
@@ -79,21 +77,21 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
             const output: any = json[json.length - 1];
             delete output._ObjectType_;
 
-            cmd.log(output);
+            logger.log(output);
 
             if (this.verbose) {
-              cmd.log(chalk.green('DONE'));
+              logger.log(chalk.green('DONE'));
             }
           }
           cb();
-        }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
       toggleServicePrincipal();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -109,16 +107,14 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
     }
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const enabled: string = args.options.enabled.toLowerCase();
-      if (enabled !== 'true' &&
-        enabled !== 'false') {
-        return `${args.options.enabled} is not a valid boolean value. Allowed values are true|false`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const enabled: string = args.options.enabled.toLowerCase();
+    if (enabled !== 'true' &&
+      enabled !== 'false') {
+      return `${args.options.enabled} is not a valid boolean value. Allowed values are true|false`;
+    }
 
-      return true;
-    };
+    return true;
   }
 
   public options(): CommandOption[] {

@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./group-remove');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./group-remove');
 
 describe(commands.GROUP_REMOVE, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
   let trackEvent: any;
   let telemetry: any;
   let promptOptions: any;
@@ -25,25 +26,22 @@ describe(commands.GROUP_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     Utils.restore([
       request.post,
-      request.get
+      request.get,
+      Cli.prompt
     ]);
   });
 
@@ -71,7 +69,7 @@ describe(commands.GROUP_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, confirm: true } }, () => {
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, confirm: true } }, () => {
       assert(trackEvent.called);
     });
   });
@@ -84,7 +82,7 @@ describe(commands.GROUP_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, confirm: true } }, () => {
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, confirm: true } }, () => {
       assert.strictEqual(telemetry.name, commands.GROUP_REMOVE);
     });
   });
@@ -97,7 +95,7 @@ describe(commands.GROUP_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, confirm: true } }, () => {
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, confirm: true } }, () => {
       try {
         assert(requestPostSpy.called);
         done();
@@ -124,7 +122,7 @@ describe(commands.GROUP_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', name: 'Team Site Owners', debug: true, confirm: true } }, () => {
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', name: 'Team Site Owners', debug: true, confirm: true } }, () => {
       try {
         assert(requestPostSpy.called);
         done();
@@ -142,7 +140,7 @@ describe(commands.GROUP_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true } }, () => {
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true } }, () => {
       try {
         assert(requestPostSpy.notCalled);
         done();
@@ -160,10 +158,11 @@ describe(commands.GROUP_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true } }, () => {
+    });
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true } }, () => {
       try {
         assert(requestPostSpy.called);
         done();
@@ -182,7 +181,7 @@ describe(commands.GROUP_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, confirm: true } }, (error?: any) => {
+    command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, debug: true, confirm: true } } as any, (error?: any) => {
       try {
         assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
@@ -193,7 +192,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('prompts before removing group when confirmation argument not passed (id)', (done) => {
-    cmdInstance.action({ options: { debug: false, id: 7, webUrl: 'https://contoso.sharepoint.com/mysite' } }, () => {
+    command.action(logger, { options: { debug: false, id: 7, webUrl: 'https://contoso.sharepoint.com/mysite' } }, () => {
       let promptIssued = false;
       if (promptOptions && promptOptions.type === 'confirm') {
         promptIssued = true;
@@ -210,7 +209,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('prompts before removing group when confirmation argument not passed (name)', (done) => {
-    cmdInstance.action({ options: { debug: false, name: 'Team Site Owners', webUrl: 'https://contoso.sharepoint.com/mysite' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'Team Site Owners', webUrl: 'https://contoso.sharepoint.com/mysite' } }, () => {
       let promptIssued = false;
       if (promptOptions && promptOptions.type === 'confirm') {
         promptIssued = true;
@@ -227,7 +226,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -238,7 +237,7 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -249,32 +248,32 @@ describe(commands.GROUP_REMOVE, () => {
   });
 
   it('fails validation if both id and name options are not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/mysite' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo' } });
+    const actual = command.validate({ options: { webUrl: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7 } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7 } });
     assert(actual);
   });
 
   it('fails validation if the id option is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 'Hi' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 'Hi' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the id option is a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7 } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7 } });
     assert(actual);
   });
 
   it('fails validation if both id and name options are passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, name: 'Team Site Members' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com/mysite', id: 7, name: 'Team Site Members' } });
     assert.notStrictEqual(actual, true);
   });
 });

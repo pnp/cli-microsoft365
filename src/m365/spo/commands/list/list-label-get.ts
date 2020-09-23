@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { ListInstance } from './ListInstance';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -36,24 +35,24 @@ class SpoListLabelGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
       const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-      cmd.log(`Getting label set on the list ${list} in site at ${args.options.webUrl}...`);
+      logger.log(`Getting label set on the list ${list} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
 
     if (args.options.listId) {
       if (this.debug) {
-        cmd.log(`Retrieving List Url from Id '${args.options.listId}'...`);
+        logger.log(`Retrieving List Url from Id '${args.options.listId}'...`);
       }
 
       requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')?$expand=RootFolder&$select=RootFolder`;
     }
     else {
       if (this.debug) {
-        cmd.log(`Retrieving List Url from Title '${args.options.listTitle}'...`);
+        logger.log(`Retrieving List Url from Title '${args.options.listTitle}'...`);
       }
 
       requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')?$expand=RootFolder&$select=RootFolder`;
@@ -88,12 +87,12 @@ class SpoListLabelGetCommand extends SpoCommand {
       })
       .then((res: any): void => {
         if (res['odata.null'] !== true) {
-          cmd.log(res);
+          logger.log(res);
         }
 
         cb();
       }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, cmd, cb);
+        this.handleRejectedODataJsonPromise(err, logger, cb);
       });
   }
 
@@ -117,29 +116,27 @@ class SpoListLabelGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.listId) {
-        if (!Utils.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
+    if (args.options.listId) {
+      if (!Utils.isValidGuid(args.options.listId)) {
+        return `${args.options.listId} is not a valid GUID`;
       }
+    }
 
-      if (args.options.listId && args.options.listTitle) {
-        return 'Specify listId or listTitle, but not both';
-      }
+    if (args.options.listId && args.options.listTitle) {
+      return 'Specify listId or listTitle, but not both';
+    }
 
-      if (!args.options.listId && !args.options.listTitle) {
-        return 'Specify listId or listTitle, one is required';
-      }
+    if (!args.options.listId && !args.options.listTitle) {
+      return 'Specify listId or listTitle, one is required';
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

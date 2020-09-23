@@ -1,16 +1,15 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
 import {
   CommandOption,
-  CommandValidate,
   CommandTypes
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { ListItemInstance } from './ListItemInstance';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { FolderExtensions } from '../../FolderExtensions';
-import { CommandInstance } from '../../../../cli';
+import { ListItemInstance } from './ListItemInstance';
 
 interface CommandArgs {
   options: Options;
@@ -54,7 +53,7 @@ class SpoListItemAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
     const listRestUrl: string = (args.options.listId ?
@@ -62,10 +61,10 @@ class SpoListItemAddCommand extends SpoCommand {
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
     let contentTypeName: string = '';
     let targetFolderServerRelativeUrl: string = '';
-    const folderExtensions: FolderExtensions = new FolderExtensions(cmd, this.debug);
+    const folderExtensions: FolderExtensions = new FolderExtensions(logger, this.debug);
 
     if (this.verbose) {
-      cmd.log(`Getting content types for list...`);
+      logger.log(`Getting content types for list...`);
     }
 
     const requestOptions: any = {
@@ -84,15 +83,15 @@ class SpoListItemAddCommand extends SpoCommand {
             const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
 
             if (this.debug) {
-              cmd.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
+              logger.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
             }
 
             return contentTypeMatch;
           });
 
           if (this.debug) {
-            cmd.log('content type filter output...');
-            cmd.log(foundContentType);
+            logger.log('content type filter output...');
+            logger.log(foundContentType);
           }
 
           if (foundContentType.length > 0) {
@@ -105,13 +104,13 @@ class SpoListItemAddCommand extends SpoCommand {
           }
 
           if (this.debug) {
-            cmd.log(`using content type name: ${contentTypeName}`);
+            logger.log(`using content type name: ${contentTypeName}`);
           }
         }
 
         if (args.options.folder) {
           if (this.debug) {
-            cmd.log('setting up folder lookup response ...');
+            logger.log('setting up folder lookup response ...');
           }
 
           const requestOptions: any = {
@@ -136,7 +135,7 @@ class SpoListItemAddCommand extends SpoCommand {
       })
       .then((): Promise<any> => {
         if (this.verbose) {
-          cmd.log(`Creating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+          logger.log(`Creating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
         const requestBody: any = {
@@ -153,7 +152,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
         if (args.options.contentType && contentTypeName !== '') {
           if (this.debug) {
-            cmd.log(`Specifying content type name [${contentTypeName}] in request body`);
+            logger.log(`Specifying content type name [${contentTypeName}] in request body`);
           }
 
           requestBody.formValues.push({
@@ -181,9 +180,9 @@ class SpoListItemAddCommand extends SpoCommand {
         });
 
         if (this.debug) {
-          cmd.log(`field values returned:`)
-          cmd.log(fieldValues)
-          cmd.log(`Id returned by AddValidateUpdateItemUsingPath: ${idField}`);
+          logger.log(`field values returned:`)
+          logger.log(fieldValues)
+          logger.log(`Id returned by AddValidateUpdateItemUsingPath: ${idField}`);
         }
 
         if (idField.length === 0) {
@@ -201,9 +200,9 @@ class SpoListItemAddCommand extends SpoCommand {
         return request.get(requestOptions);
       })
       .then((response: any): void => {
-        cmd.log(<ListItemInstance>response);
+        logger.log(<ListItemInstance>response);
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -246,28 +245,26 @@ class SpoListItemAddCommand extends SpoCommand {
     };
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (!args.options.listId && !args.options.listTitle) {
-        return `Specify listId or listTitle`;
-      }
+    if (!args.options.listId && !args.options.listTitle) {
+      return `Specify listId or listTitle`;
+    }
 
-      if (args.options.listId && args.options.listTitle) {
-        return `Specify listId or listTitle but not both`;
-      }
+    if (args.options.listId && args.options.listTitle) {
+      return `Specify listId or listTitle but not both`;
+    }
 
-      if (args.options.listId &&
-        !Utils.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} in option listId is not a valid GUID`;
-      }
+    if (args.options.listId &&
+      !Utils.isValidGuid(args.options.listId)) {
+      return `${args.options.listId} in option listId is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 
   private mapRequestBody(options: Options): any {

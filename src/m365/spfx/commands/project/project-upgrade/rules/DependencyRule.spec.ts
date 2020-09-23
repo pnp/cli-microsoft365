@@ -1,7 +1,7 @@
-import { DependencyRule } from './DependencyRule';
 import * as assert from 'assert';
-import { Finding } from '../Finding';
 import { Project } from '../../model';
+import { Finding } from '../Finding';
+import { DependencyRule } from './DependencyRule';
 
 class DepRule extends DependencyRule {
   constructor() {

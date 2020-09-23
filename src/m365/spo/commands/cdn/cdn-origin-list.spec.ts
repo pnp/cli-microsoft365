@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./cdn-origin-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
+import commands from '../../commands';
+const command: Command = require('./cdn-origin-list');
 
 describe(commands.CDN_ORIGIN_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -82,9 +79,9 @@ describe(commands.CDN_ORIGIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'Public' } }, () => {
+    command.action(logger, { options: { debug: true, type: 'Public' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(['/master','*/cdn']));
+        assert(loggerSpy.calledWith(['/master','*/cdn']));
         done();
       }
       catch (e) {
@@ -117,9 +114,9 @@ describe(commands.CDN_ORIGIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'Private' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'Private' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(['/master']));
+        assert(loggerSpy.calledWith(['/master']));
         done();
       }
       catch (e) {
@@ -152,9 +149,9 @@ describe(commands.CDN_ORIGIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'Private' } }, () => {
+    command.action(logger, { options: { debug: true, type: 'Private' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(['/master']));
+        assert(loggerSpy.calledWith(['/master']));
         done();
       }
       catch (e) {
@@ -187,9 +184,9 @@ describe(commands.CDN_ORIGIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(['/master', '*/cdn']));
+        assert(loggerSpy.calledWith(['/master', '*/cdn']));
         done();
       }
       catch (e) {
@@ -231,7 +228,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, 'An error has occurred');
         done();
@@ -251,7 +248,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -266,7 +263,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -277,7 +274,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
   });
 
   it('supports specifying CDN type', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[type]') > -1) {
@@ -289,29 +286,29 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('accepts Public SharePoint Online CDN type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'Public' } });
+    const actual = command.validate({ options: { type: 'Public' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'Private' } });
+    const actual = command.validate({ options: { type: 'Private' } });
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', () => {
     const type = 'foo';
-    const actual = (command.validate() as CommandValidate)({ options: { type: type } });
+    const actual = command.validate({ options: { type: type } });
     assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, true);
   });
 });

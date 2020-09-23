@@ -1,10 +1,10 @@
-import GlobalOptions from '../../GlobalOptions';
+import { Logger } from '../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../Command';
-import GraphCommand from "./GraphCommand";
+import GlobalOptions from '../../GlobalOptions';
 import request from '../../request';
-import { CommandInstance } from '../../cli';
+import GraphCommand from "./GraphCommand";
 
 interface CommandArgs {
   options: UsagePeriodOptions;
@@ -17,12 +17,12 @@ interface UsagePeriodOptions extends GlobalOptions {
 export default abstract class PeriodBasedReport extends GraphCommand {
   public abstract get usageEndpoint(): string;
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const endpoint: string = `${this.resource}/v1.0/reports/${this.usageEndpoint}(period='${encodeURIComponent(args.options.period)}')`;
-    this.executeReport(endpoint, cmd, args.options.output, cb);
+    this.executeReport(endpoint, logger, args.options.output, cb);
   }
 
-  protected executeReport(endPoint: string, cmd: CommandInstance, output: string | undefined, cb: () => void): void {
+  protected executeReport(endPoint: string, logger: Logger, output: string | undefined, cb: () => void): void {
     const requestOptions: any = {
       url: endPoint,
       headers: {
@@ -45,10 +45,10 @@ export default abstract class PeriodBasedReport extends GraphCommand {
           content = cleanResponse;
         }
 
-          cmd.log(content);
-        
+        logger.log(content);
+
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private removeEmptyLines(input: string): string {
@@ -87,10 +87,8 @@ export default abstract class PeriodBasedReport extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return this.validatePeriod(args.options.period);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return this.validatePeriod(args.options.period);
   }
 
   protected validatePeriod(period: string | undefined): boolean | string {

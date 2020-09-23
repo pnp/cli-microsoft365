@@ -1,10 +1,10 @@
-import commands from '../commands';
-import GlobalOptions from '../../../GlobalOptions';
+import { Logger } from '../../../cli';
 import {
-  CommandOption
+    CommandOption
 } from '../../../Command';
+import GlobalOptions from '../../../GlobalOptions';
 import { AzmgmtItemsListCommand } from '../../base/AzmgmtItemsListCommand';
-import { CommandInstance } from '../../../cli';
+import commands from '../commands';
 
 interface CommandArgs {
   options: Options;
@@ -30,18 +30,18 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, properties:
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const url: string = `${this.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${encodeURIComponent(args.options.environment)}/flows?api-version=2016-11-01`;
 
     this
-      .getAllItems(url, cmd, true)
+      .getAllItems(url, logger, true)
       .then((): void => {
         if (this.items.length > 0) {
           if (args.options.output === 'json') {
-            cmd.log(this.items);
+            logger.log(this.items);
           }
           else {
-            cmd.log(this.items.map(f => {
+            logger.log(this.items.map(f => {
               return {
                 name: f.name,
                 displayName: f.properties.displayName
@@ -51,12 +51,12 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, properties:
         }
         else {
           if (this.verbose) {
-            cmd.log('No Flows found');
+            logger.log('No Flows found');
           }
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {

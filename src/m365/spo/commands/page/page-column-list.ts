@@ -1,13 +1,13 @@
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import GlobalOptions from '../../../../GlobalOptions';
-import { ClientSidePage, CanvasSection } from './clientsidepages';
-import { Page } from './Page';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { CanvasSection, ClientSidePage } from './clientsidepages';
+import { Page } from './Page';
 
 interface CommandArgs {
   options: Options;
@@ -28,16 +28,16 @@ class SpoPageColumnListCommand extends SpoCommand {
     return 'Lists columns in the specific section of a modern page';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     Page
-      .getPage(args.options.name, args.options.webUrl, cmd, this.debug, this.verbose)
+      .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
       .then((clientSidePage: ClientSidePage): void => {
         const sections: CanvasSection[] = clientSidePage.sections
           .filter(section => section.order === args.options.section);
 
         if (sections.length) {
           const isJSONOutput = args.options.output === 'json';
-          cmd.log(sections[0].columns.map(c => {
+          logger.log(sections[0].columns.map(c => {
             const column = Page.getColumnsInformation(c, isJSONOutput);
             column.controls = c.controls.length;
             return column;
@@ -45,11 +45,11 @@ class SpoPageColumnListCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -72,14 +72,12 @@ class SpoPageColumnListCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (isNaN(args.options.section)) {
-        return `${args.options.section} is not a number`;
-      }
-      
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    if (isNaN(args.options.section)) {
+      return `${args.options.section} is not a number`;
+    }
+
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

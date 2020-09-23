@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Finding } from '../Finding';
 import { Project } from '../../model';
+import { Finding } from '../Finding';
 import { FN003004_CFG_entries } from './FN003004_CFG_entries';
 
 describe('FN003004_CFG_entries', () => {

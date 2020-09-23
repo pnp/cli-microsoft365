@@ -1,13 +1,11 @@
-import commands from '../commands';
-import GlobalOptions from '../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../Command';
-import SpoCommand from '../../base/SpoCommand';
 import auth from '../../../Auth';
-import { CommandInstance } from '../../../cli';
+import { Logger } from '../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../Command';
+import GlobalOptions from '../../../GlobalOptions';
+import SpoCommand from '../../base/SpoCommand';
+import commands from '../commands';
 
 interface CommandArgs {
   options: Options;
@@ -26,7 +24,7 @@ class SpoSetCommand extends SpoCommand {
     return 'Sets the URL of the root SharePoint site collection for use in SPO commands';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     auth.service.spoUrl = args.options.url;
     auth.storeConnectionInfo().then(() => {
       cb();
@@ -47,10 +45,8 @@ class SpoSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.url);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.url);
   }
 }
 

@@ -1,20 +1,21 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
-import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
-const command: Command = require('./project-externalize');
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
-import Utils from '../../../../Utils';
-import { Project, ExternalConfiguration, External } from './model';
-import { ExternalizeEntry, FileEdit } from './project-externalize/';
 import * as requestNative from 'request-promise-native';
+import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+import { External, ExternalConfiguration, Project } from './model';
+import { ExternalizeEntry, FileEdit } from './project-externalize/';
+const command: Command = require('./project-externalize');
 
 describe(commands.PROJECT_EXTERNALIZE, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
   let trackEvent: any;
   let telemetry: any;
   const logEntryToCheck = 1; //necessary as long as we display the beta message
@@ -28,10 +29,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -67,8 +65,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   });
 
   it('calls telemetry', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
+    command.action(logger, { options: {} }, () => {
       try {
         assert(trackEvent.called);
         done();
@@ -80,8 +77,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   });
 
   it('logs correct telemetry event', (done) => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
+    command.action(logger, { options: {} }, () => {
       try {
         assert.strictEqual(telemetry.name, commands.PROJECT_EXTERNALIZE);
         done();
@@ -95,8 +91,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('shows error if the project path couldn\'t be determined', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => null);
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
         done();
@@ -117,8 +112,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Couldn't find project root folder`, 1)));
         done();
@@ -157,8 +151,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.8.1');
         done();
@@ -197,8 +190,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '0.4.1');
         done();
@@ -259,8 +251,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
         done();
@@ -282,8 +273,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Unable to determine the version of the current SharePoint Framework project`, 3)));
         done();
@@ -347,8 +337,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+    command.action(logger, { options: { toVersion: '1.4.1' } } as any, (err?: any) => {
       assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
     });
   });
@@ -365,8 +354,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { toVersion: '1.4.1' } }, (err?: any) => {
+    command.action(logger, { options: { toVersion: '1.4.1' } } as any, (err?: any) => {
       assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, undefined);
     });
   });
@@ -500,8 +488,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({ scriptType: 'module' })));
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'json', debug: true } }, (err?: any) => {
+    command.action(logger, { options: { output: 'json', debug: true } } as any, (err?: any) => {
       try {
         const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[logEntryToCheck + 3]; //because debug is enabled
         assert.strictEqual((findings.externalConfiguration.externals['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js');
@@ -544,8 +531,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       return Promise.resolve(JSON.stringify({ scriptType: 'script' }));
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'json', debug: false } }, (err?: any) => {
+    command.action(logger, { options: { output: 'json', debug: false } } as any, (err?: any) => {
       try {
         const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[0];
         assert.notStrictEqual(findings.edits.length, 0);
@@ -615,8 +601,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'json', debug: true } }, (err?: any) => {
+    command.action(logger, { options: { output: 'json', debug: true } } as any, (err?: any) => {
       try {
         assert.notStrictEqual(typeof err, 'undefined');
         done();
@@ -631,8 +616,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('outputs JSON object with output format json', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
       try {
         assert(JSON.stringify(log[0]).startsWith('{'));
         done();
@@ -646,8 +630,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('returns markdown report with output format md', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { output: 'md', } }, (err?: any) => {
+    command.action(logger, { options: { output: 'md', } } as any, (err?: any) => {
       try {
         assert(log[logEntryToCheck].indexOf('## Findings') > -1);
         done();
@@ -679,8 +662,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({ scriptType: 'module' })));
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.notStrictEqual(log[1].indexOf('externalConfiguration'), -1);
         done();
@@ -713,7 +695,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,11 +1,11 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
-import YammerCommand from './YammerCommand';
-import auth from '../../Auth';
-import Utils from '../../Utils';
-import { CommandError } from '../../Command';
+import * as sinon from 'sinon';
 import appInsights from '../../appInsights';
-import { CommandInstance } from '../../cli';
+import auth from '../../Auth';
+import { Logger } from '../../cli';
+import { CommandError } from '../../Command';
+import Utils from '../../Utils';
+import YammerCommand from './YammerCommand';
 
 class MockCommand extends YammerCommand {
   public get name(): string {
@@ -16,15 +16,15 @@ class MockCommand extends YammerCommand {
     return 'Mock command';
   }
 
-  public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
+  public commandAction(logger: Logger, args: {}, cb: () => void): void {
     cb();
   }
 
   public commandHelp(args: any, log: (message: string) => void): void {
   }
 
-  public handlePromiseError(response: any, cmd: CommandInstance, callback: (err?: any) => void): void {
-    this.handleRejectedODataJsonPromise(response, cmd, callback);
+  public handlePromiseError(response: any, logger: Logger, callback: (err?: any) => void): void {
+    this.handleRejectedODataJsonPromise(response, logger, callback);
   }
 }
 
@@ -44,15 +44,10 @@ describe('YammerCommand', () => {
   it('correctly reports an error while restoring auth info', (done) => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
-    const cmdInstance = {
-      commandWrapper: {
-        command: 'yammer command'
-      },
-      log: (msg: any) => { },
-      prompt: () => { },
-      action: command.action()
+    const logger: Logger = {
+      log: (msg: any) => { }
     };
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -66,16 +61,11 @@ describe('YammerCommand', () => {
   it('doesn\'t execute command when error occurred while restoring auth info', (done) => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
-    const cmdInstance = {
-      commandWrapper: {
-        command: 'yammer command'
-      },
-      log: (msg: any) => { },
-      prompt: () => { },
-      action: command.action()
+    const logger: Logger = {
+      log: (msg: any) => { }
     };
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    cmdInstance.action({ options: {} }, () => {
+    command.action(logger, { options: {} }, () => {
       try {
         assert(commandCommandActionSpy.notCalled);
         done();
@@ -89,17 +79,12 @@ describe('YammerCommand', () => {
   it('doesn\'t execute command when not logged in', (done) => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
-    const cmdInstance = {
-      commandWrapper: {
-        command: 'yammer command'
-      },
-      log: (msg: any) => { },
-      prompt: () => { },
-      action: command.action()
+    const logger: Logger = {
+      log: (msg: any) => { }
     };
     auth.service.connected = false;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    cmdInstance.action({ options: {} }, () => {
+    command.action(logger, { options: {} }, () => {
       try {
         assert(commandCommandActionSpy.notCalled);
         done();
@@ -113,17 +98,12 @@ describe('YammerCommand', () => {
   it('executes command when logged in', (done) => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
-    const cmdInstance = {
-      commandWrapper: {
-        command: 'yammer command'
-      },
-      log: (msg: any) => { },
-      prompt: () => { },
-      action: command.action()
+    const logger: Logger = {
+      log: (msg: any) => { }
     };
     auth.service.connected = true;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
-    cmdInstance.action({ options: {} }, () => {
+    command.action(logger, { options: {} }, () => {
       try {
         assert(commandCommandActionSpy.called);
         done();

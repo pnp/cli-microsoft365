@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Finding } from '../Finding';
 import { Project } from '../../model';
+import { Finding } from '../Finding';
 import { FN011004_MAN_fieldCustomizer_schema } from './FN011004_MAN_fieldCustomizer_schema';
 
 describe('FN011004_MAN_fieldCustomizer_schema', () => {

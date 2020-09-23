@@ -1,13 +1,12 @@
-import commands from '../../commands';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, {
+    CommandError, CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import Command, {
-  CommandOption,
-  CommandError
-} from '../../../../Command';
-import auth from '../../../../Auth';
 import Utils from '../../../../Utils';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -26,7 +25,7 @@ class TenantIdGetCommand extends Command {
     return 'Gets Microsoft 365 tenant ID for the specified domain';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let domainName: string = args.options.domainName;
     if (!domainName) {
       const userName: string = Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
@@ -52,11 +51,11 @@ class TenantIdGetCommand extends Command {
         }
 
         if (res.token_endpoint) {
-          cmd.log(res.token_endpoint.split('/')[3]);
+          logger.log(res.token_endpoint.split('/')[3]);
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

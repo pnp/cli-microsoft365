@@ -1,13 +1,12 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { WebPropertiesCollection } from "./WebPropertiesCollection";
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -26,9 +25,9 @@ class SpoWebListCommand extends SpoCommand {
     return 'Lists subsites of the specified site';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving all webs in site at ${args.options.webUrl}...`);
+      logger.log(`Retrieving all webs in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = `${args.options.webUrl}/_api/web/webs`;
@@ -49,10 +48,10 @@ class SpoWebListCommand extends SpoCommand {
       .get<WebPropertiesCollection>(requestOptions)
       .then((webProperties: WebPropertiesCollection): void => {
         if (args.options.output === 'json') {
-          cmd.log(webProperties);
+          logger.log(webProperties);
         }
         else {
-          cmd.log(webProperties.value.map(l => {
+          logger.log(webProperties.value.map(l => {
             return {
               Title: l.Title,
               Url: l.Url,
@@ -62,7 +61,7 @@ class SpoWebListCommand extends SpoCommand {
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -77,10 +76,8 @@ class SpoWebListCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

@@ -1,11 +1,11 @@
+import { Logger } from '../../../../cli';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { ClientSvcResponseContents, ClientSvcResponse } from "../../spo";
-import config from '../../../../config';
 import SpoCommand from '../../../base/SpoCommand';
-import { IdentityResponse, ClientSvc } from '../../ClientSvc';
 import { BasePermissions, PermissionKind } from '../../base-permissions';
-import { CommandInstance } from '../../../../cli';
+import { ClientSvc, IdentityResponse } from '../../ClientSvc';
+import { ClientSvcResponse, ClientSvcResponseContents } from "../../spo";
 
 export interface Property {
   key: string;
@@ -28,7 +28,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
    * Gets property bag for a folder or site rootFolder of a site where return type is "_ObjectType_\":\"SP.Folder\".
    * This method is executed when folder option is specified. PnP PowerShell behaves the same way.
    */
-  protected getFolderPropertyBag(identityResp: IdentityResponse, webUrl: string, folder: string, cmd: CommandInstance): Promise<any> {
+  protected getFolderPropertyBag(identityResp: IdentityResponse, webUrl: string, folder: string, logger: Logger): Promise<any> {
     let serverRelativeUrl: string = folder;
     if (identityResp.serverRelativeUrl !== '/') {
       serverRelativeUrl = `${identityResp.serverRelativeUrl}${serverRelativeUrl}`
@@ -47,7 +47,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
         .post<string>(requestOptions)
         .then((res: string) => {
           if (this.debug) {
-            cmd.log('Attempt to get Properties key values');
+            logger.log('Attempt to get Properties key values');
           }
 
           const json: ClientSvcResponse = JSON.parse(res);
@@ -71,7 +71,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
    * Gets property bag for site or sitecollection where return type is "_ObjectType_\":\"SP.Web\".
    * This method is executed when no folder specified. PnP PowerShell behaves the same way.
    */
-  protected getWebPropertyBag(identityResp: IdentityResponse, webUrl: string, cmd: CommandInstance): Promise<any> {
+  protected getWebPropertyBag(identityResp: IdentityResponse, webUrl: string, logger: Logger): Promise<any> {
     const requestOptions: any = {
       url: `${webUrl}/_vti_bin/client.svc/ProcessQuery`,
       headers: {
@@ -83,7 +83,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
     return new Promise<Object>((resolve: any, reject: any): void => {
       request.post(requestOptions).then((res: any) => {
         if (this.debug) {
-          cmd.log('Attempt to get AllProperties key values');
+          logger.log('Attempt to get AllProperties key values');
         }
 
         const json: ClientSvcResponse = JSON.parse(res);
@@ -142,7 +142,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
     return { key: objKey, value: objValue } as Property;
   }
 
-  public static setProperty(name: string, value: string, webUrl: string, formDigest: string, identityResp: IdentityResponse, cmd: CommandInstance, debug: boolean, folder?: string): Promise<any> {
+  public static setProperty(name: string, value: string, webUrl: string, formDigest: string, identityResp: IdentityResponse, logger: Logger, debug: boolean, folder?: string): Promise<any> {
     let objectType: string = 'AllProperties';
     if (folder) {
       objectType = 'Properties';

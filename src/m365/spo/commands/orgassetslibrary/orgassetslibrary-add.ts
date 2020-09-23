@@ -1,18 +1,14 @@
-import {
-  ContextInfo, ClientSvcResponse, ClientSvcResponseContents
-} from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandError,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -40,14 +36,14 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
     const cdnTypeString: string = args.options.cdnType || 'Private';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     const thumbnailSchema: string = typeof args.options.thumbnailUrl === 'undefined' ? `<Parameter Type="Null" />` : `<Parameter Type="String">${args.options.thumbnailUrl}</Parameter>`;
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
 
@@ -73,22 +69,20 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidThumbnailUrl = SpoCommand.isValidSharePointUrl((args.options.thumbnailUrl as string));
-      if (typeof args.options.thumbnailUrl !== 'undefined' && isValidThumbnailUrl !== true) {
-        return isValidThumbnailUrl
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidThumbnailUrl = SpoCommand.isValidSharePointUrl((args.options.thumbnailUrl as string));
+    if (typeof args.options.thumbnailUrl !== 'undefined' && isValidThumbnailUrl !== true) {
+      return isValidThumbnailUrl
+    }
 
-      return SpoCommand.isValidSharePointUrl(args.options.libraryUrl);
-    };
+    return SpoCommand.isValidSharePointUrl(args.options.libraryUrl);
   }
 
   public options(): CommandOption[] {

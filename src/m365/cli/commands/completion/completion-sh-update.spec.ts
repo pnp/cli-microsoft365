@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./completion-sh-update');
-import * as assert from 'assert';
-import Utils from '../../../../Utils';
 import { autocomplete } from '../../../../autocomplete';
-import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import Command from '../../../../Command';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./completion-sh-update');
 
 describe(commands.COMPLETION_SH_UPDATE, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let generateShCompletionStub: sinon.SinonStub;
 
   before(() => {
@@ -21,16 +22,12 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -53,7 +50,7 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
   });
 
   it('builds command completion', (done) => {
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(generateShCompletionStub.called);
         done();
@@ -65,9 +62,9 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
   });
 
   it('build command completion (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

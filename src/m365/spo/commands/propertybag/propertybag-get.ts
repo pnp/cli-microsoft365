@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import { ContextInfo } from '../../spo';
-import { SpoPropertyBagBaseCommand, Property } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
+import SpoCommand from '../../../base/SpoCommand';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
+import { ContextInfo } from '../../spo';
+import { Property, SpoPropertyBagBaseCommand } from './propertybag-base';
 
 export interface CommandArgs {
   options: Options;
@@ -35,8 +34,8 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    const clientSvcCommons: ClientSvc = new ClientSvc(logger, this.debug);
 
     this
       .getRequestDigest(args.options.webUrl)
@@ -48,21 +47,21 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
       .then((identityResp: IdentityResponse): Promise<any> => {
         const opts: Options = args.options;
         if (opts.folder) {
-          return this.getFolderPropertyBag(identityResp, opts.webUrl, opts.folder, cmd);
+          return this.getFolderPropertyBag(identityResp, opts.webUrl, opts.folder, logger);
         }
 
-        return this.getWebPropertyBag(identityResp, opts.webUrl, cmd);
+        return this.getWebPropertyBag(identityResp, opts.webUrl, logger);
       })
       .then((propertyBagData: any): void => {
         const property = this.filterByKey(propertyBagData, args.options.key);
 
         if (property) {
-          cmd.log(property.value);
+          logger.log(property.value);
         } else if (this.verbose) {
-          cmd.log('Property not found.');
+          logger.log('Property not found.');
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -85,10 +84,8 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 
   private filterByKey(propertyBag: any, key: string): Property | null {

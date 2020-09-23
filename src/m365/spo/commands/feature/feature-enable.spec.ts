@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError, CommandTypes } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./feature-enable');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError, CommandTypes } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./feature-enable');
 
 describe(commands.FEATURE_ENABLE, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let requests: any[];
 
   before(() => {
@@ -22,11 +23,7 @@ describe(commands.FEATURE_ENABLE, () => {
   beforeEach(() => {
     log = [];
     requests = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -83,7 +80,7 @@ describe(commands.FEATURE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, featureId: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } }, () => {
+    command.action(logger, { options: { debug: true, featureId: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -119,7 +116,7 @@ describe(commands.FEATURE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, featureId: '915c240e-a6cc-49b8-8b2c-0bff8b553ed3', url: 'https://contoso.sharepoint.com', scope: 'site', force: true } }, () => {
+    command.action(logger, { options: { debug: true, featureId: '915c240e-a6cc-49b8-8b2c-0bff8b553ed3', url: 'https://contoso.sharepoint.com', scope: 'site', force: true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -151,7 +148,7 @@ describe(commands.FEATURE_ENABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         url: 'https://contoso.sharepoint.com',
@@ -170,7 +167,7 @@ describe(commands.FEATURE_ENABLE, () => {
   });
 
   it('supports specifying scope', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsScopeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[scope]') > -1) {
@@ -181,7 +178,7 @@ describe(commands.FEATURE_ENABLE, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         url: 'foo'
@@ -191,7 +188,7 @@ describe(commands.FEATURE_ENABLE, () => {
   });
 
   it('passes validation when the required options specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         url: "https://contoso.sharepoint.com",
@@ -202,7 +199,7 @@ describe(commands.FEATURE_ENABLE, () => {
   });
 
   it('accepts scope to be Site', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         url: "https://contoso.sharepoint.com",
@@ -214,7 +211,7 @@ describe(commands.FEATURE_ENABLE, () => {
   });
 
   it('accepts scope to be Web', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         url: "https://contoso.sharepoint.com",
@@ -227,7 +224,7 @@ describe(commands.FEATURE_ENABLE, () => {
 
   it('rejects invalid string scope', () => {
     const scope = 'foo';
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: "https://contoso.sharepoint.com",
         featureId: "00bfea71-5932-4f9c-ad71-1557e5751100",
@@ -238,7 +235,7 @@ describe(commands.FEATURE_ENABLE, () => {
   });
   
   it('doesn\'t fail validation if the optional scope option not specified', () => {
-    const actual = (command.validate() as CommandValidate)(
+    const actual = command.validate(
       {
         options:
         {

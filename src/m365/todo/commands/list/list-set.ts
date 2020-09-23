@@ -1,7 +1,7 @@
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -34,7 +34,7 @@ class TodoListSetCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const body: any = {
       displayName: args.options.newName
     };
@@ -60,11 +60,11 @@ class TodoListSetCommand extends GraphCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getListId(args: CommandArgs): Promise<string> {
@@ -105,22 +105,20 @@ class TodoListSetCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.name && !args.options.id) {
-        return 'Specify name or id of the list to update';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.name && !args.options.id) {
+      return 'Specify name or id of the list to update';
+    }
 
-      if (args.options.name && args.options.id) {
-        return 'Specify either the name or the id of the list to update but not both'
-      }
+    if (args.options.name && args.options.id) {
+      return 'Specify either the name or the id of the list to update but not both'
+    }
 
-      if (!args.options.newName) {
-        return 'Required option newName is missing'
-      }
+    if (!args.options.newName) {
+      return 'Required option newName is missing'
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

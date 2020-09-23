@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
-import * as sinon from 'sinon';
-const command: Command = require('./id-get');
 import * as assert from 'assert';
-import Utils from '../../../../Utils';
-import request from '../../../../request';
+import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./id-get');
 
 describe(commands.TENANT_ID_GET, () => {
   let log: any[];
-  let cmdInstanceLogSpy: sinon.SinonSpy;
-  let cmdInstance: any;
+  let loggerSpy: sinon.SinonSpy;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -21,16 +22,12 @@ describe(commands.TENANT_ID_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: any) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -131,9 +128,9 @@ describe(commands.TENANT_ID_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: {} }, () => {
+    command.action(logger, { options: {} }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('31537af4-6d77-4bb9-a681-d2394888ea26'));
+        assert(loggerSpy.calledWith('31537af4-6d77-4bb9-a681-d2394888ea26'));
         Utils.restore(Utils.getUserNameFromAccessToken);
         done();
       }
@@ -215,9 +212,9 @@ describe(commands.TENANT_ID_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: { debug: false, domainName: 'contoso.com' } }, () => {
+    command.action(logger, { options: { debug: false, domainName: 'contoso.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('6babcaad-604b-40ac-a9d7-9fd97c0b779f'));
+        assert(loggerSpy.calledWith('6babcaad-604b-40ac-a9d7-9fd97c0b779f'));
         done();
       }
       catch (e) {
@@ -246,7 +243,7 @@ describe(commands.TENANT_ID_GET, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({ options: { debug: false, domainName: 'xyz.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, domainName: 'xyz.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("AADSTS90002: Tenant 'xyz.com' not found. This may happen if there are no active subscriptions for the tenant. Check with your subscription administrator.\r\nTrace ID: 8c0e5644-738f-460f-900c-edb4c918b100\r\nCorrelation ID: 69a7237f-1f84-4b88-aae7-8f7fd46d685a\r\nTimestamp: 2019-06-15 15:41:39Z")));
         done();
@@ -260,7 +257,7 @@ describe(commands.TENANT_ID_GET, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({ options: { debug: false, domainName: 'xyz.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, domainName: 'xyz.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -272,7 +269,7 @@ describe(commands.TENANT_ID_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

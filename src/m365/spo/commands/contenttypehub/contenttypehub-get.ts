@@ -1,13 +1,13 @@
+import { Logger } from '../../../../cli';
+import {
+    CommandError
+} from '../../../../Command';
 import config from '../../../../config';
-import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';  
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import { CommandInstance } from '../../../../cli';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -25,18 +25,18 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
     return 'Returns the URL of the SharePoint Content Type Hub of the Tenant';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoUrl: string = '';
 
     this
-      .getSpoUrl(cmd,this.debug)
+      .getSpoUrl(logger,this.debug)
       .then((_spoUrl: string): Promise<ContextInfo> => {
         spoUrl = _spoUrl;
         return this.getRequestDigest(spoUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Retrieving Content Type Hub URL`);
+          logger.log(`Retrieving Content Type Hub URL`);
         }
 
         const requestOptions: any = {
@@ -77,10 +77,10 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
           const result: any = {
             ContentTypePublishingHub: json[json.length - 1]["ContentTypePublishingHub"]
           } 
-          cmd.log(result);
+          logger.log(result);
           cb();
         }
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 }
 

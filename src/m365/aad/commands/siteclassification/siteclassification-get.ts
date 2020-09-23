@@ -1,13 +1,13 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import GraphCommand from '../../../base/GraphCommand';
-import { DirectorySettingTemplatesRsp } from './DirectorySettingTemplatesRsp';
-import { DirectorySetting } from './DirectorySetting';
-import { DirectorySettingValue } from './DirectorySettingValue';
-import { SiteClassificationSettings } from './SiteClassificationSettings'
+import { Logger } from '../../../../cli';
 import { CommandError } from '../../../../Command';
-import { CommandInstance } from '../../../../cli';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
+import { DirectorySetting } from './DirectorySetting';
+import { DirectorySettingTemplatesRsp } from './DirectorySettingTemplatesRsp';
+import { DirectorySettingValue } from './DirectorySettingValue';
+import { SiteClassificationSettings } from './SiteClassificationSettings';
 
 interface CommandArgs {
   options: Options;
@@ -25,7 +25,7 @@ class AadSiteClassificationGetCommand extends GraphCommand {
     return 'Gets site classification configuration';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const requestOptions: any = {
       url: `${this.resource}/beta/settings`,
       headers: {
@@ -93,10 +93,10 @@ class AadSiteClassificationGetCommand extends GraphCommand {
           siteClassificationsSettings.DefaultClassification = defaultClassification[0].value;
         }
 
-        cmd.log(JSON.parse(JSON.stringify(siteClassificationsSettings)));
+        logger.log(JSON.parse(JSON.stringify(siteClassificationsSettings)));
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

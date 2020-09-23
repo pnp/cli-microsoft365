@@ -1,18 +1,15 @@
-import {
-  ContextInfo, ClientSvcResponse, ClientSvcResponseContents
-} from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import { OrgAssetsResponse, OrgAssets } from './OrgAssets';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+    CommandError, CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
+import { OrgAssets, OrgAssetsResponse } from './OrgAssets';
 
 interface CommandArgs {
   options: Options;
@@ -30,11 +27,11 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
     return 'List all libraries that are assigned as asset library';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
 
@@ -63,7 +60,7 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
           const orgAssetsResponse: OrgAssetsResponse = json[json.length - 1];
 
           if (orgAssetsResponse === null || orgAssetsResponse.OrgAssetsLibraries === undefined) {
-            cmd.log("No libraries in Organization Assets");
+            logger.log("No libraries in Organization Assets");
           } else {
             const orgAssets: OrgAssets = {
               Url: orgAssetsResponse.Url.DecodedUrl,
@@ -78,18 +75,18 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
             }
 
             if (args.options.output === 'json') {
-              cmd.log(JSON.stringify(orgAssets));
+              logger.log(JSON.stringify(orgAssets));
             } else {
-              cmd.log(orgAssets);
+              logger.log(orgAssets);
             }
 
             if (this.verbose) {
-              cmd.log(chalk.green('DONE'));
+              logger.log(chalk.green('DONE'));
             }
           }
           cb();
         }
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

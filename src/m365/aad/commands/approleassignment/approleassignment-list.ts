@@ -1,15 +1,14 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
-import request from '../../../../request';
+import commands from '../../commands';
 import { AppRoleAssignment } from './AppRoleAssignment';
-import { ServicePrincipal, AppRole } from './ServicePrincipal';
-import { CommandInstance } from '../../../../cli';
+import { AppRole, ServicePrincipal } from './ServicePrincipal';
 
 interface CommandArgs {
   options: Options;
@@ -38,7 +37,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let sp: ServicePrincipal;
 
     // get the service principal associated with the appId
@@ -97,10 +96,10 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
         });
 
         if (args.options.output === 'json') {
-          cmd.log(results);
+          logger.log(results);
         }
         else {
-          cmd.log(results.map((r: any) => {
+          logger.log(results.map((r: any) => {
             return {
               resourceDisplayName: r.resourceDisplayName,
               roleName: r.roleName
@@ -109,7 +108,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getServicePrincipalForApp(filterParam: string): Promise<{ value: ServicePrincipal[] }> {
@@ -156,30 +155,28 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.appId && !args.options.displayName && !args.options.objectId) {
-        return 'Specify either appId, objectId or displayName';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.appId && !args.options.displayName && !args.options.objectId) {
+      return 'Specify either appId, objectId or displayName';
+    }
 
-      if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
-        return `${args.options.appId} is not a valid GUID`;
-      }
+    if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
+      return `${args.options.appId} is not a valid GUID`;
+    }
 
-      if (args.options.objectId && !Utils.isValidGuid(args.options.objectId)) {
-        return `${args.options.objectId} is not a valid GUID`;
-      }
+    if (args.options.objectId && !Utils.isValidGuid(args.options.objectId)) {
+      return `${args.options.objectId} is not a valid GUID`;
+    }
 
-      let optionsSpecified: number = 0;
-      optionsSpecified += args.options.appId ? 1 : 0;
-      optionsSpecified += args.options.displayName ? 1 : 0;
-      optionsSpecified += args.options.objectId ? 1 : 0;
-      if (optionsSpecified > 1) {
-        return 'Specify either appId, objectId or displayName';
-      }
+    let optionsSpecified: number = 0;
+    optionsSpecified += args.options.appId ? 1 : 0;
+    optionsSpecified += args.options.displayName ? 1 : 0;
+    optionsSpecified += args.options.objectId ? 1 : 0;
+    if (optionsSpecified > 1) {
+      return 'Specify either appId, objectId or displayName';
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import config from '../../../../config';
 import auth from '../../../../Auth';
-const command: Command = require('./site-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./site-list');
 
 describe(commands.SITE_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.SITE_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -90,9 +87,9 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Modern site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/mtest_101'
@@ -140,9 +137,9 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Modern site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/mtest_101'
@@ -190,9 +187,9 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'TeamSite' } }, () => {
+    command.action(logger, { options: { debug: true, type: 'TeamSite' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Modern site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/mtest_101'
@@ -238,9 +235,9 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'CommunicationSite' } }, () => {
+    command.action(logger, { options: { debug: true, type: 'CommunicationSite' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'ComTest 001',
             Url: 'https://m365x324230.sharepoint.com/sites/comtest_001'
@@ -284,9 +281,9 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { deleted: true } }, () => {
+    command.action(logger, { options: { deleted: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: undefined,
             Url: 'https://m365x324230.sharepoint.com/sites/mtest_201'
@@ -334,9 +331,9 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, filter: "Url -like 'mtest'" } }, () => {
+    command.action(logger, { options: { debug: true, filter: "Url -like 'mtest'" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Modern site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/mtest_101'
@@ -384,9 +381,9 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'TeamSite', filter: "Url -like 'mtest'" } }, () => {
+    command.action(logger, { options: { debug: true, type: 'TeamSite', filter: "Url -like 'mtest'" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Modern site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/mtest_101'
@@ -432,9 +429,9 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'CommunicationSite', filter: "Url -like 'mtest'" } }, () => {
+    command.action(logger, { options: { debug: true, type: 'CommunicationSite', filter: "Url -like 'mtest'" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'ComTest 001',
             Url: 'https://m365x324230.sharepoint.com/sites/comtest_001'
@@ -478,9 +475,9 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, filter: "Url -like '<mtest>'" } }, () => {
+    command.action(logger, { options: { debug: true, filter: "Url -like '<mtest>'" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Modern site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/mtest_101'
@@ -528,9 +525,9 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, output: 'json' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "487c379e-80f8-4000-80be-1d37a4995717|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fm365x324230.sharepoint.com%2fsites%2fmtest_101", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 2, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "HasHolds": false, "LastContentModifiedDate": "\/Date(2017,11,17,4,12,28,997)\/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "", "OwnerEmail": null, "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 1, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Active", "StorageMaximumLevel": 26214400, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 25574400, "Template": "GROUP#0", "TimeZoneId": 13, "Title": "Modern site 101", "Url": "https:\u002f\u002fm365x324230.sharepoint.com\u002fsites\u002fmtest_101", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0
           }, {
@@ -565,7 +562,7 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, filter: "Url like 'mtest'" } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, filter: "Url like 'mtest'" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Syntax error in the filter expression 'Url like 'test''.")));
         done();
@@ -611,9 +608,9 @@ describe(commands.SITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, filter: "Url -like 'mtest'" } }, () => {
+    command.action(logger, { options: { debug: true, filter: "Url -like 'mtest'" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Modern site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/mtest_101'
@@ -638,7 +635,7 @@ describe(commands.SITE_LIST, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({ options: { debug: true, filter: "Url like 'mtest'" } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, filter: "Url like 'mtest'" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
         done();
@@ -650,7 +647,7 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -661,23 +658,23 @@ describe(commands.SITE_LIST, () => {
   });
 
   it('accepts TeamSite site type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'TeamSite' } });
+    const actual = command.validate({ options: { type: 'TeamSite' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts CommunicationSite site type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'CommunicationSite' } });
+    const actual = command.validate({ options: { type: 'CommunicationSite' } });
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid site type', () => {
     const type = 'foo';
-    const actual = (command.validate() as CommandValidate)({ options: { type: type } });
+    const actual = command.validate({ options: { type: type } });
     assert.strictEqual(actual, `${type} is not a valid modern site type. Allowed types are TeamSite and CommunicationSite`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, true);
   });
 });

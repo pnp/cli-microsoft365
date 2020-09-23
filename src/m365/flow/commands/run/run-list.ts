@@ -1,11 +1,11 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption
+    CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -25,9 +25,9 @@ class FlowRunListCommand extends AzmgmtCommand {
     return 'Lists runs of the specified Microsoft Flow';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving list of runs for Microsoft Flow ${args.options.flow}...`);
+      logger.log(`Retrieving list of runs for Microsoft Flow ${args.options.flow}...`);
     }
 
     const requestOptions: any = {
@@ -43,10 +43,10 @@ class FlowRunListCommand extends AzmgmtCommand {
       .then((res: { value: [{ name: string, properties: { startTime: string, status: string } }] }): void => {
         if (res.value && res.value.length > 0) {
           if (args.options.output === 'json') {
-            cmd.log(res.value);
+            logger.log(res.value);
           }
           else {
-            cmd.log(res.value.map(e => {
+            logger.log(res.value.map(e => {
               return {
                 name: e.name,
                 startTime: e.properties.startTime,
@@ -57,12 +57,12 @@ class FlowRunListCommand extends AzmgmtCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log('No runs found');
+            logger.log('No runs found');
           }
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {

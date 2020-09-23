@@ -1,11 +1,11 @@
-import auth from '../../../../Auth';
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import Command, { CommandOption } from '../../../../Command';
-import Utils from '../../../../Utils';
-import { CommandInstance } from '../../../../cli';
 import * as chalk from 'chalk';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandOption } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -30,9 +30,9 @@ class TenantServiceReportHistoricalServiceStatusCommand extends Command {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      cmd.log(`Gets the historical service status of Microsoft 365 Services of the last 7 days`);
+      logger.log(`Gets the historical service status of Microsoft 365 Services of the last 7 days`);
     }
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
@@ -50,10 +50,10 @@ class TenantServiceReportHistoricalServiceStatusCommand extends Command {
     request.get(requestOptions)
       .then((res: any): void => {
         if (args.options.output === 'json') {
-          cmd.log(res);
+          logger.log(res);
         }
         else {
-          cmd.log(res.value.map((r: any) => {
+          logger.log(res.value.map((r: any) => {
             return {
               WorkloadDisplayName: r.WorkloadDisplayName,
               StatusDisplayName: r.StatusDisplayName,
@@ -63,10 +63,10 @@ class TenantServiceReportHistoricalServiceStatusCommand extends Command {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

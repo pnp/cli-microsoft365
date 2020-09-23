@@ -1,10 +1,10 @@
+import auth from '../../Auth';
+import { Logger } from '../../cli';
 import Command from '../../Command';
-import auth, { Logger } from '../../Auth';
+import config from '../../config';
 import request from '../../request';
 import { SpoOperation } from '../spo/commands/site/SpoOperation';
-import config from '../../config';
-import { FormDigestInfo, ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../spo/spo';
-import { CommandInstance } from '../../cli';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo, FormDigestInfo } from '../spo/spo';
 const csomDefs = require('../../../csom.json');
 
 export interface FormDigest {
@@ -38,11 +38,11 @@ export default abstract class SpoCommand extends Command {
     }
   }
 
-  public ensureFormDigest(siteUrl: string, cmd: CommandInstance, context: FormDigestInfo | undefined, debug: boolean): Promise<FormDigestInfo> {
+  public ensureFormDigest(siteUrl: string, logger: Logger, context: FormDigestInfo | undefined, debug: boolean): Promise<FormDigestInfo> {
     return new Promise<FormDigestInfo>((resolve: (context: FormDigestInfo) => void, reject: (error: any) => void): void => {
       if (this.isValidFormDigest(context)) {
         if (debug) {
-          cmd.log('Existing form digest still valid');
+          logger.log('Existing form digest still valid');
         }
 
         resolve(context as FormDigestInfo);
@@ -81,14 +81,14 @@ export default abstract class SpoCommand extends Command {
     return false;
   }
 
-  protected waitUntilFinished(operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, cmd: CommandInstance, currentContext: FormDigestInfo, dots?: string, timeout?: NodeJS.Timer): void {
+  protected waitUntilFinished(operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, logger: Logger, currentContext: FormDigestInfo, dots?: string, timeout?: NodeJS.Timer): void {
     this
-      .ensureFormDigest(siteUrl, cmd, currentContext, this.debug)
+      .ensureFormDigest(siteUrl, logger, currentContext, this.debug)
       .then((res: FormDigestInfo): Promise<string> => {
         currentContext = res;
 
         if (this.debug) {
-          cmd.log(`Checking if operation ${operationId} completed...`);
+          logger.log(`Checking if operation ${operationId} completed...`);
         }
 
         if (!this.debug && this.verbose) {
@@ -116,7 +116,7 @@ export default abstract class SpoCommand extends Command {
           const operation: SpoOperation = json[json.length - 1];
           let isComplete: boolean = operation.IsComplete;
           if (isComplete) {
-            if (this.verbose) {
+            if (!this.debug && this.verbose) {
               process.stdout.write('\n');
             }
 
@@ -125,13 +125,13 @@ export default abstract class SpoCommand extends Command {
           }
 
           timeout = setTimeout(() => {
-            this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), siteUrl, resolve, reject, cmd, currentContext, dots);
+            this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), siteUrl, resolve, reject, logger, currentContext, dots);
           }, operation.PollingInterval);
         }
       });
   }
 
-  protected waitUntilCopyJobFinished(copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, cmd: CommandInstance, dots?: string, timeout?: NodeJS.Timer): void {
+  protected waitUntilCopyJobFinished(copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, logger: Logger, dots?: string, timeout?: NodeJS.Timer): void {
     const requestUrl: string = `${siteUrl}/_api/site/GetCopyJobProgress`;
     const requestOptions: any = {
       url: requestUrl,
@@ -152,8 +152,8 @@ export default abstract class SpoCommand extends Command {
       .then((resp: { JobState?: number, Logs: string[] }): void => {
 
         if (this.debug) {
-          cmd.log('getCopyJobProgress response...');
-          cmd.log(resp);
+          logger.log('getCopyJobProgress response...');
+          logger.log(resp);
         }
 
         for (const item of resp.Logs) {
@@ -177,16 +177,16 @@ export default abstract class SpoCommand extends Command {
           resolve();
         } else {
           timeout = setTimeout(() => {
-            this.waitUntilCopyJobFinished(copyJobInfo, siteUrl, pollingInterval, resolve, reject, cmd, dots);
+            this.waitUntilCopyJobFinished(copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, dots);
           }, pollingInterval);
         }
       });
   }
 
-  protected getSpoUrl(stdout: Logger, debug: boolean): Promise<string> {
+  protected getSpoUrl(logger: Logger, debug: boolean): Promise<string> {
     if (auth.service.spoUrl) {
       if (debug) {
-        stdout.log(`SPO URL previously retrieved ${auth.service.spoUrl}. Returning...`);
+        logger.log(`SPO URL previously retrieved ${auth.service.spoUrl}. Returning...`);
       }
 
       return Promise.resolve(auth.service.spoUrl);
@@ -194,7 +194,7 @@ export default abstract class SpoCommand extends Command {
 
     return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
       if (debug) {
-        stdout.log(`No SPO URL available. Retrieving from MS Graph...`);
+        logger.log(`No SPO URL available. Retrieving from MS Graph...`);
       }
 
       const requestOptions: any = {
@@ -224,10 +224,10 @@ export default abstract class SpoCommand extends Command {
     });
   }
 
-  protected getSpoAdminUrl(stdout: Logger, debug: boolean): Promise<string> {
+  protected getSpoAdminUrl(logger: Logger, debug: boolean): Promise<string> {
     return new Promise<string>((resolve: (spoAdminUrl: string) => void, reject: (error: any) => void): void => {
       this
-        .getSpoUrl(stdout, debug)
+        .getSpoUrl(logger, debug)
         .then((spoUrl: string): void => {
           resolve(spoUrl.replace(/(https:\/\/)([^\.]+)(.*)/, '$1$2-admin$3'));
         }, (error: any): void => {
@@ -236,10 +236,10 @@ export default abstract class SpoCommand extends Command {
     });
   }
 
-  protected getTenantId(stdout: Logger, debug: boolean): Promise<string> {
+  protected getTenantId(logger: Logger, debug: boolean): Promise<string> {
     if (auth.service.tenantId) {
       if (debug) {
-        stdout.log(`SPO Tenant ID previously retrieved ${auth.service.tenantId}. Returning...`);
+        logger.log(`SPO Tenant ID previously retrieved ${auth.service.tenantId}. Returning...`);
       }
 
       return Promise.resolve(auth.service.tenantId);
@@ -247,13 +247,13 @@ export default abstract class SpoCommand extends Command {
 
     return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
       if (debug) {
-        stdout.log(`No SPO Tenant ID available. Retrieving...`);
+        logger.log(`No SPO Tenant ID available. Retrieving...`);
       }
 
       let spoAdminUrl: string = '';
 
       this
-        .getSpoAdminUrl(stdout, debug)
+        .getSpoAdminUrl(logger, debug)
         .then((_spoAdminUrl: string): Promise<ContextInfo> => {
           spoAdminUrl = _spoAdminUrl;
           return this.getRequestDigest(spoAdminUrl);

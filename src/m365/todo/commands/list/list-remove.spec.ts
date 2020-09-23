@@ -1,37 +1,34 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./list-remove');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./list-remove');
 
 describe(commands.LIST_REMOVE, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let promptOptions: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: true });
+    });
   });
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: true });
       }
     };
     (command as any).items = [];
@@ -47,7 +44,8 @@ describe(commands.LIST_REMOVE, () => {
   after(() => {
     Utils.restore([
       auth.restoreAuth,
-      appInsights.trackEvent
+      appInsights.trackEvent,
+      Cli.prompt
     ]);
     auth.service.connected = false;
   });
@@ -88,13 +86,12 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         name: "FooList"
       }
-    }, () => {
+    } as any, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -133,14 +130,13 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         name: "FooList",
         confirm: true
       }
-    }, () => {
+    } as any, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -180,14 +176,13 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         verbose: true,
         name: "FooList"
       }
-    }, () => {
+    } as any, () => {
       try {
         assert(log[log.length-1].indexOf('DONE') > -1);
         done();
@@ -226,13 +221,12 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA="
       }
-    }, () => {
+    } as any, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -258,13 +252,12 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.resolve();
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         name: "FooList"
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The list FooList cannot be found')));
         done();
@@ -299,13 +292,12 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         name: "FooList"
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -344,15 +336,16 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action({
+    });
+    command.action(logger, {
       options: {
         debug: false,
         name: "FooList"
       }
-    }, () => {
+    } as any, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -370,7 +363,7 @@ describe(commands.LIST_REMOVE, () => {
   });
 
   it('fails validation if both name and id are not set', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         name: null,
@@ -381,7 +374,7 @@ describe(commands.LIST_REMOVE, () => {
   });
 
   it('passes validation when all parameters are valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         name: 'Foo'
@@ -392,7 +385,7 @@ describe(commands.LIST_REMOVE, () => {
   });
 
   it('fails validation if both name and id are set', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         name: 'foo',
@@ -404,7 +397,7 @@ describe(commands.LIST_REMOVE, () => {
 
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

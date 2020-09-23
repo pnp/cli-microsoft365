@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./orgassetslibrary-remove');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./orgassetslibrary-remove');
 
 describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -28,26 +29,23 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
     promptOptions = undefined;
   });
 
   afterEach(() => {
     Utils.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -70,7 +68,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   });
 
   it('prompts before removing the Org Assets Library when confirm option is not passed', (done) => {
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
 
       try {
         let promptIssued = false;
@@ -91,11 +89,12 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   it('aborts removing the Org Assets Library when confirm option is not passed and prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'post');
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
+    });
 
-    cmdInstance.action({ options: {} }, () => {
+    command.action(logger, { options: {} }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -128,10 +127,11 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       return Promise.reject('Invalid request');
     })
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { libraryUrl: '/sites/branding/assets' } }, () => {
+    });
+    command.action(logger, { options: { libraryUrl: '/sites/branding/assets' } }, () => {
       try {
         assert(orgAssetLibRemoveCallIssued);
         done();
@@ -164,9 +164,9 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       return Promise.reject('Invalid request');
     })
 
-    cmdInstance.action({ options: { libraryUrl: '/sites/branding/assets', debug: true, verbose: true, confirm: true } }, () => {
+    command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, verbose: true, confirm: true } }, () => {
       try {
-        assert(orgAssetLibRemoveCallIssued && cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(orgAssetLibRemoveCallIssued && loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -197,10 +197,11 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       return Promise.reject('Invalid request');
     })
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { libraryUrl: '/sites/branding/assets', output: 'json' } }, () => {
+    });
+    command.action(logger, { options: { libraryUrl: '/sites/branding/assets', output: 'json' } }, () => {
       try {
         assert(orgAssetLibRemoveCallIssued);
         done();
@@ -229,7 +230,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { libraryUrl: '/sites/branding/assets', debug: true, confirm: true } }, (err?: any) => {
+    command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, confirm: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Run Add-SPOOrgAssetsLibrary first to set up the organization assets library feature for your organization.`)));
         done();
@@ -243,11 +244,11 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         confirm: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
         done();
@@ -259,7 +260,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

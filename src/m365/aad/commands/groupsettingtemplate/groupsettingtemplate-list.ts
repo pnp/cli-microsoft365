@@ -1,9 +1,9 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import commands from '../../commands';
 import { GroupSettingTemplate } from './GroupSettingTemplate';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -18,15 +18,15 @@ class AadGroupSettingTemplateListCommand extends GraphItemsListCommand<GroupSett
     return 'Lists Azure AD group settings templates';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
-      .getAllItems(`${this.resource}/v1.0/groupSettingTemplates`, cmd, true)
+      .getAllItems(`${this.resource}/v1.0/groupSettingTemplates`, logger, true)
       .then((): void => {
         if (args.options.output === 'json') {
-          cmd.log(this.items);
+          logger.log(this.items);
         }
         else {
-          cmd.log(this.items.map(i => {
+          logger.log(this.items.map(i => {
             return {
               id: i.id,
               displayName: i.displayName
@@ -35,11 +35,11 @@ class AadGroupSettingTemplateListCommand extends GraphItemsListCommand<GroupSett
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

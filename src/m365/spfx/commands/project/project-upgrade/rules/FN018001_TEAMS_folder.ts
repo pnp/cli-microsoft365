@@ -1,8 +1,8 @@
-import { Finding } from "../";
-import { Project, Manifest } from "../../model";
-import { Rule } from "./Rule";
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
+import { Finding } from "../";
+import { Manifest, Project } from "../../model";
+import { Rule } from "./Rule";
 
 export class FN018001_TEAMS_folder extends Rule {
   constructor() {

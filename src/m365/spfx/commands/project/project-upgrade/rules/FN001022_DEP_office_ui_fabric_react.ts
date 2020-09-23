@@ -1,6 +1,6 @@
-import { DependencyRule } from "./DependencyRule";
-import { Project } from "../../model";
 import { Utils } from "../";
+import { Project } from "../../model";
+import { DependencyRule } from "./DependencyRule";
 
 export class FN001022_DEP_office_ui_fabric_react extends DependencyRule {
   constructor(packageVersion: string) {

@@ -1,13 +1,13 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import { Group } from './Group';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import commands from '../../commands';
+import { Group } from './Group';
 
 interface CommandArgs {
   options: Options;
@@ -40,7 +40,7 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const groupFilter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
     const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g, `''`)}')` : '';
     const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.mailNickname).replace(/'/g, `''`)}')` : '';
@@ -54,7 +54,7 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
     }
 
     this
-      .getAllItems(endpoint, cmd, true)
+      .getAllItems(endpoint, logger, true)
       .then((): Promise<any> => {
         if (args.options.orphaned) {
           const orphanedGroups: Group[] = [];
@@ -69,7 +69,7 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
         }
 
         if (args.options.includeSiteUrl) {
-          return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id, cmd)));
+          return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id, logger)));
         }
         else {
           return Promise.resolve();
@@ -90,10 +90,10 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
         }
 
         if (args.options.output === 'json') {
-          cmd.log(this.items);
+          logger.log(this.items);
         }
         else {
-          cmd.log(this.items.map(g => {
+          logger.log(this.items.map(g => {
             const group: any = {
               id: g.id,
               displayName: g.displayName,
@@ -113,14 +113,14 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getGroupSiteUrl(groupId: string, cmd: CommandInstance): Promise<{ id: string, url: string }> {
+  private getGroupSiteUrl(groupId: string, logger: Logger): Promise<{ id: string, url: string }> {
     return new Promise<{ id: string, url: string }>((resolve: (siteInfo: { id: string, url: string }) => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
         url: `${this.resource}/v1.0/groups/${groupId}/drive?$select=webUrl`,
@@ -171,14 +171,12 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.deleted && args.options.includeSiteUrl) {
-        return 'You can\'t retrieve site URLs of deleted Microsoft 365 Groups';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.deleted && args.options.includeSiteUrl) {
+      return 'You can\'t retrieve site URLs of deleted Microsoft 365 Groups';
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./sitedesign-task-remove');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Cli, Logger } from '../../../../cli';
+import Command from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./sitedesign-task-remove');
 
 describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -25,25 +26,22 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: any) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     Utils.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -77,9 +75,9 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, confirm: true, taskId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    command.action(logger, { options: { debug: false, confirm: true, taskId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -102,9 +100,9 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, confirm: true, taskId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    command.action(logger, { options: { debug: true, confirm: true, taskId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -115,7 +113,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
 
   it('prompts before removing the specified site design task when confirm option not passed', (done) => {
 
-    cmdInstance.action({ options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+    command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -135,10 +133,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   it('aborts removing site design task when prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'post');
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    };
-    cmdInstance.action({ options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+    command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -152,10 +147,11 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   it('removes the site design task when prompt confirmed', (done) => {
     const postStub = sinon.stub(request, 'post').callsFake(() => Promise.resolve());
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+    });
+    command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       try {
         assert(postStub.called);
         done();
@@ -167,7 +163,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -178,7 +174,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   it('supports specifying taskId', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--taskId') > -1) {
@@ -189,7 +185,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   it('supports specifying confirmation flag', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {
@@ -200,12 +196,12 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   });
 
   it('fails validation if the taskId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { taskId: 'abc' } });
+    const actual = command.validate({ options: { taskId: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the taskId is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { taskId: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } });
+    const actual = command.validate({ options: { taskId: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } });
     assert.strictEqual(actual, true);
   });
 });

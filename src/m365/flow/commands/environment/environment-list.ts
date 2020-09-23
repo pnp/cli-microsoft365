@@ -1,8 +1,8 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -17,9 +17,9 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
     return 'Lists Microsoft Flow environments in the current tenant';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving list of Microsoft Flow environments...`);
+      logger.log(`Retrieving list of Microsoft Flow environments...`);
     }
 
     const requestOptions: any = {
@@ -35,10 +35,10 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
       .then((res: { value: [{ name: string, properties: { displayName: string } }] }): void => {
         if (res.value && res.value.length > 0) {
           if (args.options.output === 'json') {
-            cmd.log(res.value);
+            logger.log(res.value);
           }
           else {
-            cmd.log(res.value.map(e => {
+            logger.log(res.value.map(e => {
               return {
                 name: e.name,
                 displayName: e.properties.displayName
@@ -48,7 +48,7 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 }
 

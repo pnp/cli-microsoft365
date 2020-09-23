@@ -1,15 +1,16 @@
-import commands from '../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
-const command: Command = require('./spo-set');
-import * as assert from 'assert';
-import Utils from '../../../Utils';
 import auth from '../../../Auth';
+import { Logger } from '../../../cli';
+import Command, { CommandError } from '../../../Command';
+import Utils from '../../../Utils';
+import commands from '../commands';
+const command: Command = require('./spo-set');
 
 describe(commands.SET, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -20,11 +21,7 @@ describe(commands.SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -55,7 +52,7 @@ describe(commands.SET, () => {
   it('sets SPO URL when no URL was set previously', (done) => {
     auth.service.spoUrl = undefined;
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com' } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } }, () => {
       try {
         assert.strictEqual(auth.service.spoUrl, 'https://contoso.sharepoint.com');
         done();
@@ -69,7 +66,7 @@ describe(commands.SET, () => {
   it('sets SPO URL when other URL was set previously', (done) => {
     auth.service.spoUrl = 'https://northwind.sharepoint.com';
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com' } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } }, () => {
       try {
         assert.strictEqual(auth.service.spoUrl, 'https://contoso.sharepoint.com');
         done();
@@ -83,7 +80,7 @@ describe(commands.SET, () => {
   it('throws error when trying to set SPO URL when not logged in to O365', (done) => {
     auth.service.connected = false;
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com' } }, (err?: any) => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Log in to Microsoft 365 first')));
         assert.strictEqual(auth.service.spoUrl, undefined);
@@ -100,7 +97,7 @@ describe(commands.SET, () => {
     Utils.restore(auth.storeConnectionInfo);
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred while setting the password'))
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com' } }, (err?: any) => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred while setting the password')));
         done();
@@ -112,7 +109,7 @@ describe(commands.SET, () => {
   });
 
   it('supports specifying url', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--url') > -1) {
@@ -123,12 +120,12 @@ describe(commands.SET, () => {
   });
 
   it('fails validation if url is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'abc' } });
+    const actual = command.validate({ options: { url: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the url is a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com/sites/team-a' } });
+    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/team-a' } });
     assert.strictEqual(actual, true);
   });
 });

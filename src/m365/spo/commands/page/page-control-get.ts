@@ -1,14 +1,14 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { ClientSidePage, ClientSidePart } from './clientsidepages';
 import { Page } from './Page';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -29,29 +29,29 @@ class SpoPageControlGetCommand extends SpoCommand {
     return 'Gets information about the specific control on a modern page';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     Page
-      .getPage(args.options.name, args.options.webUrl, cmd, this.debug, this.verbose)
+      .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
       .then((clientSidePage: ClientSidePage): void => {
         const control: ClientSidePart | null = clientSidePage.findControlById(args.options.id);
 
         if (control) {
           const isJSONOutput = args.options.output === 'json';
 
-          cmd.log(JSON.parse(JSON.stringify(Page.getControlsInformation(control, isJSONOutput))));
+          logger.log(JSON.parse(JSON.stringify(Page.getControlsInformation(control, isJSONOutput))));
 
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
         }
         else {
           if (this.verbose) {
-            cmd.log(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
+            logger.log(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
           }
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -74,14 +74,12 @@ class SpoPageControlGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
 
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

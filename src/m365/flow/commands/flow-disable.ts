@@ -1,12 +1,12 @@
-import commands from '../commands';
-import GlobalOptions from '../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Logger } from '../../../cli';
 import {
-  CommandOption
+    CommandOption
 } from '../../../Command';
+import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
 import AzmgmtCommand from '../../base/AzmgmtCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../cli';
+import commands from '../commands';
 
 interface CommandArgs {
   options: Options;
@@ -27,9 +27,9 @@ class FlowDisableCommand extends AzmgmtCommand {
     return 'Disables specified Microsoft Flow';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Disables Microsoft Flow ${args.options.name}...`);
+      logger.log(`Disables Microsoft Flow ${args.options.name}...`);
     }
 
     const requestOptions: any = {
@@ -45,11 +45,11 @@ class FlowDisableCommand extends AzmgmtCommand {
       .then((): void => {
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {

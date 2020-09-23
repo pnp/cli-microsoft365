@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./team-clone');
-import * as assert from 'assert';
-import Utils from '../../../../Utils';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./team-clone');
 
 describe(commands.TEAMS_TEAM_CLONE, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -57,7 +54,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   });
 
   it('fails validation if the teamId is not a valid GUID.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: 'invalid',
         displayName: "Library Assist",
@@ -69,12 +66,12 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   });
 
   it('fails validation on invalid visibility', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { visibility: 'abc' } });
+    const actual = command.validate({ options: { visibility: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation on valid \'private\' visibility', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
@@ -86,7 +83,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   });
 
   it('passes validation on valid \'public\' visibility', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
@@ -98,7 +95,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   });
 
   it('passes validation when the input is correct with mandatory parameters', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
@@ -109,7 +106,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   });
 
   it('passes validation when the input is correct with mandatory and optional parameters', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
@@ -123,7 +120,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   });
 
   it('fails validation if visibility is set to private', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
@@ -135,7 +132,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   });
 
   it('fails validation if partsToClone is set to invalid value', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
@@ -146,7 +143,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   });
 
   it('passes validation if visibility is set to private', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
@@ -158,7 +155,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   });
 
   it('passes validation if visibility is set to private', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
@@ -180,16 +177,16 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
-    }, () => {
+    } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -209,16 +206,16 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
         displayName: "Library Assist",
         partsToClone: "apps,tabs,settings,channels,members"
       }
-    }, () => {
+    } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.called);
+        assert(loggerSpy.called);
         done();
       }
       catch (e) {
@@ -238,7 +235,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
@@ -248,7 +245,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
         visibility: 'public',
         classification: 'label'
       }
-    }, () => {
+    } as any, () => {
       try {
         assert.strictEqual(sinonStub.lastCall.args[0].url, 'https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone');
         assert.strictEqual(sinonStub.lastCall.args[0].body.displayName, 'Library Assist');
@@ -268,7 +265,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
@@ -278,7 +275,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
         visibility: 'public',
         classification: 'label'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -290,7 +287,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

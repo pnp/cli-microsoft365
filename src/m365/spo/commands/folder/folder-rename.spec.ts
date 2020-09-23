@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
+import commands from '../../commands';
 
 const command: Command = require('./folder-rename');
 
 describe(commands.FOLDER_RENAME, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let stubAllPostRequests: any;
 
   before(() => {
@@ -87,16 +88,12 @@ describe(commands.FOLDER_RENAME, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -133,7 +130,7 @@ describe(commands.FOLDER_RENAME, () => {
     }
     const folderObjectIdentity: string = "e52c649e-a019-5000-c38d-8d334a079fd2|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:7f1c42fe-5933-430d-bafb-6c839aa87a5c:web:30a3906a-a55e-4f48-aaae-ecf45346bf53:folder:10c46485-5035-475f-a40f-d842bab30708";
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="MoveTo" Id="32" ObjectPathId="26"><Parameters><Parameter Type="String">/sites/abc/Shared Documents/test1</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="26" Name="${folderObjectIdentity}" /></ObjectPaths></Request>`;
         assert.strictEqual(requestStub.lastCall.args[0].body, bodyPayload);
@@ -154,9 +151,9 @@ describe(commands.FOLDER_RENAME, () => {
       verbose: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
+        assert.strictEqual(loggerSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {
@@ -173,9 +170,9 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1'
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.called, false);
+        assert.strictEqual(loggerSpy.called, false);
         done();
       }
       catch (e) {
@@ -192,7 +189,7 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     }
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
         done();
@@ -212,7 +209,7 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     }
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity ClientSvc error')));
         done();
@@ -231,7 +228,7 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     }
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc 1')));
         done();
@@ -251,7 +248,7 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'test1',
       verbose: true
     }
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestFolderObjectIdentity error')));
         done();
@@ -272,7 +269,7 @@ describe(commands.FOLDER_RENAME, () => {
       verbose: true
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
@@ -291,7 +288,7 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'abc'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Folder _ObjectIdentity_ not found')));
         done();
@@ -310,7 +307,7 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'abc'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('folder remove promise error')));
         done();
@@ -330,7 +327,7 @@ describe(commands.FOLDER_RENAME, () => {
       name: 'abc'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found')));
         done();
@@ -351,7 +348,7 @@ describe(commands.FOLDER_RENAME, () => {
       verbose: true
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
@@ -363,7 +360,7 @@ describe(commands.FOLDER_RENAME, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsVerboseOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -375,18 +372,18 @@ describe(commands.FOLDER_RENAME, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('fails validation if the webUrl option is not valid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {webUrl:'abc'} });
+    const actual = command.validate({ options: {webUrl:'abc'} });
     assert.strictEqual(actual, "abc is not a valid SharePoint Online site URL");
   });
 
   it('passes validation when the url option specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           webUrl: 'https://contoso.sharepoint.com',

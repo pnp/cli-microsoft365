@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
+import * as os from 'os';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./message-list');
-import * as assert from 'assert';
-import * as os from 'os';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./message-list');
 
 describe(commands.OUTLOOK_MESSAGE_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   // #region emailResponse
   const emailResponse: any = {
     "value": [
@@ -187,16 +188,12 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -231,10 +228,9 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, folderName: 'inbox' } }, () => {
+    command.action(logger, { options: { debug: false, folderName: 'inbox' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "subject": "MyAnalytics | Focus Edition",
             "receivedDateTime": "2020-09-14T14:30:11Z"
@@ -265,10 +261,9 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, folderName: 'inbox' } }, () => {
+    command.action(logger, { options: { debug: true, folderName: 'inbox' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "subject": "MyAnalytics | Focus Edition",
             "receivedDateTime": "2020-09-14T14:30:11Z"
@@ -299,10 +294,9 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, folderId: 'inbox' } }, () => {
+    command.action(logger, { options: { debug: false, folderId: 'inbox' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "subject": "MyAnalytics | Focus Edition",
             "receivedDateTime": "2020-09-14T14:30:11Z"
@@ -342,10 +336,9 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, folderName: 'Inbox' } }, () => {
+    command.action(logger, { options: { debug: false, folderName: 'Inbox' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "subject": "MyAnalytics | Focus Edition",
             "receivedDateTime": "2020-09-14T14:30:11Z"
@@ -376,10 +369,9 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } }, () => {
+    command.action(logger, { options: { debug: false, folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "subject": "MyAnalytics | Focus Edition",
             "receivedDateTime": "2020-09-14T14:30:11Z"
@@ -412,8 +404,7 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, folderName: 'Imbox' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, folderName: 'Imbox' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Folder with name 'Imbox' not found`)))
         done();
@@ -442,8 +433,7 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, folderName: 'Archives' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, folderName: 'Archives' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple folders with name 'Archives' found. Please disambiguate:${os.EOL}${['- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', '- AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAB='].join(os.EOL)}`)));
         done();
@@ -463,10 +453,9 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, folderName: 'inbox', output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, folderName: 'inbox', output: 'json' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(emailResponse.value));
+        assert(loggerSpy.calledWith(emailResponse.value));
         done();
       }
       catch (e) {
@@ -478,7 +467,7 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -490,32 +479,32 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
   });
 
   it('fails validation if neither folderId nor folderName are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both folderId nor folderName are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', folderName: 'Inbox' } });
+    const actual = command.validate({ options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=', folderName: 'Inbox' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if folderId is specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } });
+    const actual = command.validate({ options: { folderId: 'AAMkAGVmMDEzMTM4LTZmYWUtNDdkNC1hMDZiLTU1OGY5OTZhYmY4OAAuAAAAAAAiQ8W967B7TKBjgx9rVEURAQAiIsqMbYjsT5e-T7KzowPTAAAAAAEMAAA=' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if folderName is specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { folderName: 'Inbox' } });
+    const actual = command.validate({ options: { folderName: 'Inbox' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if a well-known-name is specified as folderId', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { folderId: 'inbox' } });
+    const actual = command.validate({ options: { folderId: 'inbox' } });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

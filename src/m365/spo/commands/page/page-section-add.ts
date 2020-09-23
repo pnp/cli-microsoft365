@@ -1,15 +1,15 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import GlobalOptions from '../../../../GlobalOptions';
-import { CanvasSectionTemplate } from './clientsidepages';
-import { isNumber } from 'util';
-import { Control } from './canvasContent';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { isNumber } from 'util';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { Control } from './canvasContent';
+import { CanvasSectionTemplate } from './clientsidepages';
 
 interface CommandArgs {
   options: Options;
@@ -31,7 +31,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     return 'Adds section to modern page';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let pageFullName: string = args.options.name.toLowerCase();
     if (pageFullName.indexOf('.aspx') < 0) {
       pageFullName += '.aspx';
@@ -39,7 +39,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     let canvasContent: Control[];
 
     if (this.verbose) {
-      cmd.log(`Retrieving page information...`);
+      logger.log(`Retrieving page information...`);
     }
 
     const requestOptions: any = {
@@ -109,13 +109,13 @@ class SpoPageSectionAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
 
       }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, cmd, cb)
+        this.handleRejectedODataJsonPromise(err, logger, cb)
       });
   }
 
@@ -208,20 +208,18 @@ class SpoPageSectionAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!(args.options.sectionTemplate in CanvasSectionTemplate)) {
-        return `${args.options.sectionTemplate} is not a valid section template. Allowed values are OneColumn|OneColumnFullWidth|TwoColumn|ThreeColumn|TwoColumnLeft|TwoColumnRight`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!(args.options.sectionTemplate in CanvasSectionTemplate)) {
+      return `${args.options.sectionTemplate} is not a valid section template. Allowed values are OneColumn|OneColumnFullWidth|TwoColumn|ThreeColumn|TwoColumnLeft|TwoColumnRight`;
+    }
 
-      if (typeof args.options.order !== 'undefined') {
-        if (!isNumber(args.options.order) || args.options.order < 1) {
-          return 'The value of parameter order must be 1 or higher';
-        }
+    if (typeof args.options.order !== 'undefined') {
+      if (!isNumber(args.options.order) || args.options.order < 1) {
+        return 'The value of parameter order must be 1 or higher';
       }
+    }
 
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

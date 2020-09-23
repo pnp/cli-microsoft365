@@ -1,15 +1,16 @@
-import commands from '../../commands';
-import Command from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./completion-clink-update');
-import * as assert from 'assert';
-import Utils from '../../../../Utils';
 import { autocomplete } from '../../../../autocomplete';
+import { Logger } from '../../../../cli';
+import Command from '../../../../Command';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./completion-clink-update');
 
 describe(commands.COMPLETION_CLINK_UPDATE, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let generateClinkCompletionStub: sinon.SinonStub;
 
   before(() => {
@@ -19,11 +20,7 @@ describe(commands.COMPLETION_CLINK_UPDATE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -50,7 +47,7 @@ describe(commands.COMPLETION_CLINK_UPDATE, () => {
   });
 
   it('builds command completion', (done) => {
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(generateClinkCompletionStub.called);
         done();

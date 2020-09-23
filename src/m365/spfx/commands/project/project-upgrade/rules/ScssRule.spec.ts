@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Finding } from '../Finding';
 import { Project } from '../../model';
+import { Finding } from '../Finding';
 import { ScssRule } from './ScssRule';
 
 class MockScssRule extends ScssRule {

@@ -1,19 +1,18 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate,
-  CommandError,
+  CommandError, CommandOption,
+
   CommandTypes
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { HubSiteProperties } from './HubSiteProperties';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -43,11 +42,11 @@ class SpoHubSiteSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
 
@@ -55,7 +54,7 @@ class SpoHubSiteSetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Updating hub site ${args.options.id}...`);
+          logger.log(`Updating hub site ${args.options.id}...`);
         }
 
         const title: string = typeof args.options.title === 'string' ? `<SetProperty Id="13" ObjectPathId="10" Name="Title"><Parameter Type="String">${Utils.escapeXml(args.options.title)}</Parameter></SetProperty>` : '';
@@ -83,17 +82,17 @@ class SpoHubSiteSetCommand extends SpoCommand {
           const hubSite: HubSiteProperties = json.pop();
           delete hubSite._ObjectType_;
 
-          hubSite.ID = hubSite.ID.replace('/Guid(','').replace(')/','');
-          hubSite.SiteId = hubSite.SiteId.replace('/Guid(','').replace(')/','');
+          hubSite.ID = hubSite.ID.replace('/Guid(', '').replace(')/', '');
+          hubSite.SiteId = hubSite.SiteId.replace('/Guid(', '').replace(')/', '');
 
-          cmd.log(hubSite);
+          logger.log(hubSite);
 
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -120,20 +119,18 @@ class SpoHubSiteSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
 
-      if (!args.options.title &&
-        !args.options.description &&
-        !args.options.logoUrl) {
-        return 'Specify title, description or logoUrl to update';
-      }
+    if (!args.options.title &&
+      !args.options.description &&
+      !args.options.logoUrl) {
+      return 'Specify title, description or logoUrl to update';
+    }
 
-      return true;
-    };
+    return true;
   }
 
   public types(): CommandTypes {

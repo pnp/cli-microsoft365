@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./web-add');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./web-add');
 
 describe(commands.WEB_ADD, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,16 +23,12 @@ describe(commands.WEB_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -84,7 +81,7 @@ describe(commands.WEB_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -96,7 +93,7 @@ describe(commands.WEB_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
           Description: '',
@@ -157,7 +154,7 @@ describe(commands.WEB_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -167,7 +164,7 @@ describe(commands.WEB_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
           Description: "subsite",
@@ -228,7 +225,7 @@ describe(commands.WEB_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -239,7 +236,7 @@ describe(commands.WEB_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Configuration: 0,
           Created: "2018-01-24T18:24:20",
           Description: "subsite",
@@ -317,7 +314,7 @@ describe(commands.WEB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -393,7 +390,7 @@ describe(commands.WEB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -458,7 +455,7 @@ describe(commands.WEB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -467,7 +464,7 @@ describe(commands.WEB_ADD, () => {
         local: 1033,
         debug: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -497,7 +494,7 @@ describe(commands.WEB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -506,7 +503,7 @@ describe(commands.WEB_ADD, () => {
         local: 1033,
         debug: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("The Web site address \"/sites/test/subsite\" is already in use.")));
         done();
@@ -554,7 +551,7 @@ describe(commands.WEB_ADD, () => {
 
       return Promise.resolve('abc');
     });
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -563,7 +560,7 @@ describe(commands.WEB_ADD, () => {
         local: 1033,
         debug: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -578,7 +575,7 @@ describe(commands.WEB_ADD, () => {
     Utils.restore((command as any).getRequestDigest);
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } }); });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -587,7 +584,7 @@ describe(commands.WEB_ADD, () => {
         local: 1033,
         debug: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -604,7 +601,7 @@ describe(commands.WEB_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         title: "subsite",
         webUrl: "subsite",
@@ -613,7 +610,7 @@ describe(commands.WEB_ADD, () => {
         local: 1033,
         debug: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -625,7 +622,7 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -636,7 +633,7 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('passes validation if all required options are specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         title: "subsite", webUrl: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0"
@@ -646,7 +643,7 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('passes validation if all required options and valid locale are specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         title: "subsite", webUrl: "subsite",
         parentWebUrl: "https://contoso.sharepoint.com", webTemplate: "STS#0", locale: 1033
@@ -656,7 +653,7 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('fails validation if the parentWebUrl option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         title: "subsite",
         webUrl: "subsite", webTemplate: "STS#0", locale: 1033
@@ -666,7 +663,7 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('fails validation if the parentWebUrl option is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         title: "subsite",
         webUrl: "subsite", webTemplate: "STS#0", locale: 1033,
@@ -677,7 +674,7 @@ describe(commands.WEB_ADD, () => {
   });
 
   it('fails validation if the specified locale is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         title: "subsite", webUrl: "subsite", parentWebUrl: "https://contoso.sharepoint.com", webTemplate: 'STS#0', locale: 'abc'
       }

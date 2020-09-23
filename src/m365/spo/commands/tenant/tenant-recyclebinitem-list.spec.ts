@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./tenant-recyclebinitem-list');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./tenant-recyclebinitem-list');
 
 describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
 
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -61,7 +58,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -79,11 +76,11 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
 
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -108,11 +105,11 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
 
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -147,9 +144,9 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, output: 'json' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "85bb2b9f-5099-2000-af64-2c100126d549|908bed80-a04a-4433-b4a0-883d9847d110:c7d25483-6785-4e76-8b22-9c57c0b70134\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fClassicThrowaway", "DaysRemaining": 92, "DeletionTime": "\/Date(2020,0,15,11,4,3,893)\/", "SiteId": "\/Guid(7db536da-792b-4be7-b9b6-194778905606)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fClassicThrowaway", "UserCodeMaximumLevel": 0
           }, {
@@ -189,14 +186,14 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0]["DaysRemaining"], 92);
-        assert.deepEqual(cmdInstanceLogSpy.lastCall.args[0][0]["DeletionTime"], new Date(2020, 0, 15, 11, 4, 3, 893));
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0]["Url"], 'https://contoso.sharepoint.com/sites/ClassicThrowaway');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][1].DaysRemaining, 92);
-        assert.deepEqual(cmdInstanceLogSpy.lastCall.args[0][1].DeletionTime, new Date(2020, 0, 15, 11, 40, 58, 90));
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][1].Url, 'https://contoso.sharepoint.com/sites/ModernThrowaway');
+        assert.strictEqual(loggerSpy.lastCall.args[0][0]["DaysRemaining"], 92);
+        assert.deepEqual(loggerSpy.lastCall.args[0][0]["DeletionTime"], new Date(2020, 0, 15, 11, 4, 3, 893));
+        assert.strictEqual(loggerSpy.lastCall.args[0][0]["Url"], 'https://contoso.sharepoint.com/sites/ClassicThrowaway');
+        assert.strictEqual(loggerSpy.lastCall.args[0][1].DaysRemaining, 92);
+        assert.deepEqual(loggerSpy.lastCall.args[0][1].DeletionTime, new Date(2020, 0, 15, 11, 40, 58, 90));
+        assert.strictEqual(loggerSpy.lastCall.args[0][1].Url, 'https://contoso.sharepoint.com/sites/ModernThrowaway');
 
         done();
       }
@@ -233,9 +230,9 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             DaysRemaining: 92,
             DeletionTime: new Date(2020, 0, 15, 11, 4, 3, 893),
@@ -276,11 +273,11 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
 
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Timed out')));
         done();

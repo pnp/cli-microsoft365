@@ -1,8 +1,8 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -17,12 +17,12 @@ class SpoHideDefaultThemesGetCommand extends SpoCommand {
     return 'Gets the current value of the HideDefaultThemes setting';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((spoAdminUrl: string): Promise<any> => {
         if (this.verbose) {
-          cmd.log(`Getting the current value of the HideDefaultThemes setting...`);
+          logger.log(`Getting the current value of the HideDefaultThemes setting...`);
         }
 
         const requestOptions: any = {
@@ -36,10 +36,10 @@ class SpoHideDefaultThemesGetCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((rawRes: any): void => {
-        cmd.log(rawRes.value);
+        logger.log(rawRes.value);
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

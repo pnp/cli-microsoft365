@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./term-get');
-import * as assert from 'assert';
-import request from '../../../../request';
-import config from '../../../../config';
-import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./term-get');
 
 describe(commands.TERM_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.TERM_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -72,9 +69,9 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } }, () => {
+    command.action(logger, { options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:05:07.600Z", "Id": "16573ae2-0cc4-42fa-a2ff-8bf0407bd385", "LastModifiedDate": "2018-08-22T14:05:07.600Z", "Name": "Engineering", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Engineering", "TermsCount": 0 }));
+        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:05:07.600Z", "Id": "16573ae2-0cc4-42fa-a2ff-8bf0407bd385", "LastModifiedDate": "2018-08-22T14:05:07.600Z", "Name": "Engineering", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Engineering", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -95,9 +92,9 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } }, () => {
+    command.action(logger, { options: { debug: true, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -118,9 +115,9 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetName: 'Department' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetName: 'Department' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -141,9 +138,9 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, name: 'IT', termGroupName: 'People', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -164,9 +161,9 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -187,7 +184,7 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
@@ -210,9 +207,9 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } }, () => {
+    command.action(logger, { options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -233,7 +230,7 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
@@ -256,7 +253,7 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
@@ -279,9 +276,9 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, name: 'IT>', termGroupName: 'People', termSetName: 'Department' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'IT>', termGroupName: 'People', termSetName: 'Department' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT>", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT>", "TermsCount": 0 }));
+        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT>", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT>", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -302,9 +299,9 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, name: 'IT', termGroupName: 'People>', termSetName: 'Department' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People>', termSetName: 'Department' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -325,9 +322,9 @@ describe(commands.TERM_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department>' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department>' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -337,67 +334,67 @@ describe(commands.TERM_GET, () => {
   });
 
   it('fails validation if neither id nor name specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { termGroupName: 'People', termSetName: 'Department' } });
+    const actual = command.validate({ options: { termGroupName: 'People', termSetName: 'Department' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both id and name specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', name: 'IT', termGroupName: 'People', termSetName: 'Department' } });
+    const actual = command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', name: 'IT', termGroupName: 'People', termSetName: 'Department' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'invalid' } });
+    const actual = command.validate({ options: { id: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if only id specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26' } });
+    const actual = command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation when only name specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT' } });
+    const actual = command.validate({ options: { name: 'IT' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when only name and termGroupId specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b26' } });
+    const actual = command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b26' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both termGroupId and termGroupName specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termGroupName: 'People', termSetName: 'Department' } });
+    const actual = command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termGroupName: 'People', termSetName: 'Department' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if termGroupId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: 'invalid', termSetName: 'Department' } });
+    const actual = command.validate({ options: { name: 'IT', termGroupId: 'invalid', termSetName: 'Department' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both termSetId and termSetName specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetName: 'Department', termSetId: '9e54299e-208a-4000-8546-cc4139091b2a' } });
+    const actual = command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetName: 'Department', termSetId: '9e54299e-208a-4000-8546-cc4139091b2a' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if termSetId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termSetId: 'invalid', termGroupName: 'People' } });
+    const actual = command.validate({ options: { name: 'IT', termSetId: 'invalid', termGroupName: 'People' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when name, termGroupName and termSetName specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department' } });
+    const actual = command.validate({ options: { name: 'IT', termGroupName: 'People', termSetName: 'Department' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when name, termGroupId and termSetId specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: '9e54299e-208a-4000-8546-cc4139091b2a' } });
+    const actual = command.validate({ options: { name: 'IT', termGroupId: '9e54299e-208a-4000-8546-cc4139091b27', termSetId: '9e54299e-208a-4000-8546-cc4139091b2a' } });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -411,9 +408,9 @@ describe(commands.TERM_GET, () => {
     Utils.restore((command as any).getRequestDigest);
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
     
-    cmdInstance.action({
+    command.action(logger, {
       options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department>' }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getRequestDigest error')));
         done();

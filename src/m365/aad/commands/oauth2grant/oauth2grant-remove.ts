@@ -1,12 +1,12 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import {
+    CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption
-} from '../../../../Command';
 import AadCommand from '../../../base/AadCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -25,9 +25,9 @@ class AadOAuth2GrantRemoveCommand extends AadCommand {
     return 'Remove specified service principal OAuth2 permissions';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Removing OAuth2 permissions...`);
+      logger.log(`Removing OAuth2 permissions...`);
     }
 
     const requestOptions: any = {
@@ -39,11 +39,11 @@ class AadOAuth2GrantRemoveCommand extends AadCommand {
       .delete(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {

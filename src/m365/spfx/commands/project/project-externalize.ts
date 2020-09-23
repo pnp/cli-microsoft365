@@ -1,16 +1,14 @@
-import commands from '../../commands';
-import Command, {
-  CommandOption, CommandError, CommandAction
-} from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import * as path from 'path';
 import * as os from 'os';
-import { Project, ExternalConfiguration, External } from './model';
-import rules = require('./project-externalize/DefaultRules');
-import { BasicDependencyRule } from './project-externalize/rules';
-import { ExternalizeEntry, FileEdit } from './project-externalize/';
+import * as path from 'path';
+import { Logger } from '../../../../cli';
+import { CommandError, CommandOption } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import commands from '../../commands';
 import { BaseProjectCommand } from './base-project-command';
-import { CommandInstance } from '../../../../cli';
+import { External, ExternalConfiguration, Project } from './model';
+import { ExternalizeEntry, FileEdit } from './project-externalize/';
+import { BasicDependencyRule } from './project-externalize/rules';
+import rules = require('./project-externalize/DefaultRules');
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -60,17 +58,9 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     return 'Externalizes SharePoint Framework project dependencies';
   }
 
-  public action(): CommandAction {
-    const cmd: Command = this;
-    return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
-      (cmd as any).initAction(args, this);
-      cmd.commandAction(this, args, cb);
-    }
-  }
-
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (args.options.output !== 'json' || this.verbose) {
-      cmd.log(`This command is currently in preview. Feedback welcome at https://github.com/pnp/cli-microsoft365/issues${os.EOL}`);
+      logger.log(`This command is currently in preview. Feedback welcome at https://github.com/pnp/cli-microsoft365/issues${os.EOL}`);
     }
 
     this.projectRootPath = this.getProjectRoot(process.cwd());
@@ -91,13 +81,13 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     }
 
     if (this.verbose) {
-      cmd.log('Collecting project...');
+      logger.log('Collecting project...');
     }
     const project: Project = this.getProject(this.projectRootPath);
 
     if (this.debug) {
-      cmd.log('Collected project');
-      cmd.log(project);
+      logger.log('Collected project');
+      logger.log(project);
     }
 
     const asyncRulesResults = (rules as BasicDependencyRule[]).map(r => r.visit(project));
@@ -108,14 +98,14 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
         this.allEditSuggestions.push(...rulesResults.map(x => x.suggestions).reduce((x, y) => [...x, ...y]));
         //removing duplicates
         this.allFindings = this.allFindings.filter((x, i) => this.allFindings.findIndex(y => y.key === x.key) === i);
-        this.writeReport(this.allFindings, this.allEditSuggestions, cmd, args.options);
+        this.writeReport(this.allFindings, this.allEditSuggestions, logger, args.options);
         cb();
       }).catch((err) => {
         cb(new CommandError(err));
       });
   }
 
-  private writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], cmd: CommandInstance, options: GlobalOptions): void {
+  private writeReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[], logger: Logger, options: GlobalOptions): void {
     let report;
 
     switch (options.output) {
@@ -130,7 +120,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
         break;
     }
 
-    cmd.log(report);
+    logger.log(report);
   }
 
   private serializeMdReport(findingsToReport: ExternalizeEntry[], editsToReport: FileEdit[]): string {

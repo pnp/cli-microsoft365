@@ -1,9 +1,9 @@
-import { CommandOption, CommandValidate } from '../../../../Command';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -43,7 +43,7 @@ class YammerUserListCommand extends YammerCommand {
     return telemetryProps;
   }
 
-  private getAllItems(cmd: CommandInstance, args: CommandArgs, page: number): Promise<void> {
+  private getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (page === 1) {
         this.items = [];
@@ -96,7 +96,7 @@ class YammerUserListCommand extends YammerCommand {
             // if the groups endpoint is used, the more_available will tell if a new retrieval is required
             // if the user endpoint is used, we need to page by 50 items (hardcoded)
             if (res.more_available === true || this.items.length % 50 === 0) {
-              this.getAllItems(cmd, args, ++page)
+              this.getAllItems(logger, args, ++page)
                 .then((): void => {
                   resolve();
                 }, (err: any): void => {
@@ -113,17 +113,17 @@ class YammerUserListCommand extends YammerCommand {
     });
   };
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.items = []; // this will reset the items array in interactive mode
 
     this
-      .getAllItems(cmd, args, 1)
+      .getAllItems(logger, args, 1)
       .then((): void => {
         if (args.options.output === 'json') {
-          cmd.log(this.items);
+          logger.log(this.items);
         }
         else {
-          cmd.log(this.items.map((n: any) => {
+          logger.log(this.items.map((n: any) => {
             const item: any = {
               id: n.id,
               full_name: n.full_name,
@@ -133,7 +133,7 @@ class YammerUserListCommand extends YammerCommand {
           }));
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   };
 
   public options(): CommandOption[] {
@@ -165,31 +165,28 @@ class YammerUserListCommand extends YammerCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.groupId && typeof args.options.groupId !== 'number') {
+      return `${args.options.groupId} is not a number`;
+    }
 
-      if (args.options.groupId && typeof args.options.groupId !== 'number') {
-        return `${args.options.groupId} is not a number`;
-      }
+    if (args.options.limit && typeof args.options.limit !== 'number') {
+      return `${args.options.limit} is not a number`;
+    }
 
-      if (args.options.limit && typeof args.options.limit !== 'number') {
-        return `${args.options.limit} is not a number`;
-      }
+    if (args.options.sortBy && args.options.sortBy !== 'messages' && args.options.sortBy !== 'followers') {
+      return `sortBy accepts only the values "messages" or "followers"`;
+    }
 
-      if (args.options.sortBy && args.options.sortBy !== 'messages' && args.options.sortBy !== 'followers') {
-        return `sortBy accepts only the values "messages" or "followers"`;
-      }
+    if (args.options.letter && !/^(?!\d)[a-zA-Z]+$/i.test(args.options.letter)) {
+      return `Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed.`;
+    }
 
-      if (args.options.letter && !/^(?!\d)[a-zA-Z]+$/i.test(args.options.letter)) {
-        return `Value of 'letter' is invalid. Only characters within the ranges [A - Z], [a - z] are allowed.`;
-      }
+    if (args.options.letter && args.options.letter.length !== 1) {
+      return `Only one char as value of 'letter' accepted.`;
+    }
 
-      if (args.options.letter && args.options.letter.length !== 1) {
-        return `Only one char as value of 'letter' accepted.`;
-      }
-
-      return true;
-    };
+    return true;
   }
 }
 

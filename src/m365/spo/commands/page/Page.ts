@@ -1,14 +1,14 @@
+import { Logger } from '../../../../cli';
 import request from '../../../../request';
-import { PageItem } from './PageItem';
-import { ClientSidePage, CanvasSection, CanvasColumn, ClientSidePart } from './clientsidepages';
 import Utils from '../../../../Utils';
-import { CommandInstance } from '../../../../cli';
+import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './clientsidepages';
+import { PageItem } from './PageItem';
 
 export class Page {
-  public static getPage(name: string, webUrl: string, cmd: CommandInstance, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
+  public static getPage(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
     return new Promise((resolve: (page: ClientSidePage) => void, reject: (error: any) => void): void => {
       if (verbose) {
-        cmd.log(`Retrieving information about the page...`);
+        logger.log(`Retrieving information about the page...`);
       }
 
       let pageName: string = name;

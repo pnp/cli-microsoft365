@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./customaction-clear');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./customaction-clear');
 
 describe(commands.CUSTOMACTION_CLEAR, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
   const defaultPostCallsStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
@@ -37,26 +38,23 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
     promptOptions = undefined;
   });
 
   afterEach(() => {
     Utils.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -79,13 +77,13 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should user custom actions cleared successfully without prompting with confirmation argument', (done) => {
     defaultPostCallsStub();
 
-    cmdInstance.action({ options: {
+    command.action(logger, { options: {
       verbose: false,
       url: 'https://contoso.sharepoint.com',
       confirm: true
     } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -97,13 +95,13 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should user custom actions cleared successfully (verbose) without prompting with confirmation argument', (done) => {
     defaultPostCallsStub();
 
-    cmdInstance.action({ options: {
+    command.action(logger, { options: {
       verbose: true,
       url: 'https://contoso.sharepoint.com',
       confirm: true
     } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(sinon.match('DONE')));
+        assert(loggerSpy.calledWith(sinon.match('DONE')));
         done();
       }
       catch (e) {
@@ -113,7 +111,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('should prompt before clearing custom actions when confirmation argument not passed', (done) => {
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com'} }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com'} }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -132,11 +130,12 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
   it('should abort custom actions clear when prompt not confirmed', (done) => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
-
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action({ options: {  url: 'https://contoso.sharepoint.com'}}, () => {
+    });
+    command.action(logger, { options: {  url: 'https://contoso.sharepoint.com'}} as any, () => {
       try {
         assert(postCallsSpy.notCalled);
         done();
@@ -151,10 +150,11 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: {  url: 'https://contoso.sharepoint.com' }}, () => {
+    });
+    command.action(logger, { options: {  url: 'https://contoso.sharepoint.com' }} as any, () => {
       try {
         assert(postCallsSpy.calledTwice);
         assert(clearScopedCustomActionsSpy.calledWith(sinon.match(
@@ -183,7 +183,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert(postCallsSpy.calledOnce);
         assert(clearScopedCustomActionsSpy.calledWith({
@@ -214,7 +214,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert(postCallsSpy.calledOnce === true);
         assert(clearScopedCustomActionsSpy.calledWith(
@@ -240,7 +240,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         url: 'https://contoso.sharepoint.com',
@@ -269,7 +269,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert(clearScopedCustomActionsSpy.calledTwice, 'clearScopedCustomActionsSpy.calledTwice');
         done();
@@ -291,7 +291,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       confirm: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert(postCallsSpy.calledWith(sinon.match({
           url: 'https://contoso.sharepoint.com/_api/Web/UserCustomActions/clear'
@@ -319,7 +319,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         url: 'https://contoso.sharepoint.com',
         scope: 'All',
@@ -352,7 +352,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         url: 'https://contoso.sharepoint.com',
         scope: 'All',
@@ -370,7 +370,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsVerboseOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -381,7 +381,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('supports specifying scope', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsScopeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[scope]') > -1) {
@@ -393,18 +393,18 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('should fail validation if the url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { scope: "Web" } });
+    const actual = command.validate({ options: { scope: "Web" } });
     assert.notStrictEqual(actual, true);
   });
 
   it('should fail validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           url: 'foo'
@@ -414,7 +414,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('should pass validation when the url options specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           url: "https://contoso.sharepoint.com"
@@ -424,7 +424,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('should pass validation when the url and scope options specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           url: "https://contoso.sharepoint.com",
@@ -435,7 +435,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('should accept scope to be All', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           url: "https://contoso.sharepoint.com",
@@ -446,7 +446,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('should accept scope to be Site', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           url: "https://contoso.sharepoint.com",
@@ -457,7 +457,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   });
 
   it('should accept scope to be Web', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           url: "https://contoso.sharepoint.com",
@@ -469,7 +469,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
   it('should reject invalid string scope', () => {
     const scope = 'foo';
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: "https://contoso.sharepoint.com",
         scope: scope
@@ -480,7 +480,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
   it('should reject invalid scope value specified as number', () => {
     const scope = 123;
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: "https://contoso.sharepoint.com",
         scope: scope

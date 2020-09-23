@@ -1,17 +1,16 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import { v4 } from 'uuid';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
 import * as fs from 'fs';
 import * as path from 'path';
+import { v4 } from 'uuid';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { FolderExtensions } from '../../FolderExtensions';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -88,26 +87,26 @@ class SpoFileAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const folderPath: string = Utils.getServerRelativePath(args.options.webUrl, args.options.folder);
     const fullPath: string = path.resolve(args.options.path);
     const fileName: string = Utils.getSafeFileName(path.basename(fullPath));
-    const folderExtensions: FolderExtensions = new FolderExtensions(cmd, this.debug);
+    const folderExtensions: FolderExtensions = new FolderExtensions(logger, this.debug);
 
     let isCheckedOut: boolean = false;
     let listSettings: ListSettings;
 
     if (this.debug) {
-      cmd.log(`folder path: ${folderPath}...`);
+      logger.log(`folder path: ${folderPath}...`);
     }
 
     if (this.debug) {
-      cmd.log('Check if the specified folder exists.')
-      cmd.log('');
+      logger.log('Check if the specified folder exists.')
+      logger.log('');
     }
 
     if (this.debug) {
-      cmd.log(`file name: ${fileName}...`);
+      logger.log(`file name: ${fileName}...`);
     }
 
     const requestOptions: any = {
@@ -140,20 +139,20 @@ class SpoFileAddCommand extends SpoCommand {
       })
       .then((): Promise<void> => {
         if (this.verbose) {
-          cmd.log(`Upload file to site ${args.options.webUrl}...`);
+          logger.log(`Upload file to site ${args.options.webUrl}...`);
         }
 
         const fileStats: fs.Stats = fs.statSync(fullPath);
         const fileSize: number = fileStats.size;
         if (this.debug) {
-          cmd.log(`File size is ${fileSize} bytes`);
+          logger.log(`File size is ${fileSize} bytes`);
         }
 
         // only up to 250 MB are allowed in a single request
         if (fileSize > this.fileChunkingThreshold) {
           const fileChunkCount: number = Math.ceil(fileSize / this.fileChunkSize);
           if (this.verbose) {
-            cmd.log(`Uploading ${fileSize} bytes in ${fileChunkCount} chunks...`);
+            logger.log(`Uploading ${fileSize} bytes in ${fileChunkCount} chunks...`);
           }
 
           // initiate chunked upload session
@@ -181,17 +180,17 @@ class SpoFileAddCommand extends SpoCommand {
               };
 
               return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
-                this.uploadFileChunks(fileUploadInfo, cmd, resolve, reject);
+                this.uploadFileChunks(fileUploadInfo, logger, resolve, reject);
               })
                 .then((): Promise<void> => {
                   if (this.verbose) {
-                    cmd.log(`Finished uploading ${fileUploadInfo.Position} bytes in ${fileChunkCount} chunks`)
+                    logger.log(`Finished uploading ${fileUploadInfo.Position} bytes in ${fileChunkCount} chunks`)
                   }
                   return Promise.resolve();
                 })
                 .catch((err: any) => {
                   if (this.verbose) {
-                    cmd.log('Cancelling upload session due to error...')
+                    logger.log('Cancelling upload session due to error...')
                   }
 
                   const requestOptions: any = {
@@ -208,7 +207,7 @@ class SpoFileAddCommand extends SpoCommand {
                     })
                     .catch((err_: any) => {
                       if (this.debug) {
-                        cmd.log(`Failed to cancel upload session: ${err_}`);
+                        logger.log(`Failed to cancel upload session: ${err_}`);
                       }
                       return Promise.reject(err);  // original error
                     });
@@ -233,12 +232,12 @@ class SpoFileAddCommand extends SpoCommand {
       })
       .then((): Promise<void> => {
         if (args.options.contentType || args.options.publish || args.options.approve) {
-          return this.getFileParentList(fileName, args.options.webUrl, folderPath, cmd)
+          return this.getFileParentList(fileName, args.options.webUrl, folderPath, logger)
             .then((listSettingsResp: ListSettings) => {
               listSettings = listSettingsResp;
 
               if (args.options.contentType) {
-                return this.listHasContentType(args.options.contentType, args.options.webUrl, listSettings, cmd);
+                return this.listHasContentType(args.options.contentType, args.options.webUrl, listSettings, logger);
               }
 
               return Promise.resolve();
@@ -261,7 +260,7 @@ class SpoFileAddCommand extends SpoCommand {
 
         if (fieldsToUpdate.length > 0) {
           // perform list item update and checkin
-          return this.validateUpdateListItem(args.options.webUrl, folderPath, fileName, fieldsToUpdate, cmd, args.options.checkInComment);
+          return this.validateUpdateListItem(args.options.webUrl, folderPath, fileName, fieldsToUpdate, logger, args.options.checkInComment);
         }
         else if (isCheckedOut) {
           // perform checkin
@@ -276,7 +275,7 @@ class SpoFileAddCommand extends SpoCommand {
         // so then no need to publish afterwards
         if (args.options.approve) {
           if (this.verbose) {
-            cmd.log(`Approve file ${fileName}`);
+            logger.log(`Approve file ${fileName}`);
           }
 
           // approve the existing file with given comment
@@ -296,7 +295,7 @@ class SpoFileAddCommand extends SpoCommand {
           }
 
           if (this.verbose) {
-            cmd.log(`Publish file ${fileName}`);
+            logger.log(`Publish file ${fileName}`);
           }
 
           // publish the existing file with given comment
@@ -315,7 +314,7 @@ class SpoFileAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log('DONE');
+          logger.log('DONE');
         }
 
         cb();
@@ -329,19 +328,19 @@ class SpoFileAddCommand extends SpoCommand {
           };
 
           request.post(requestOptions)
-            .then(_ => this.handleRejectedODataJsonPromise(err, cmd, cb))
+            .then(_ => this.handleRejectedODataJsonPromise(err, logger, cb))
             .catch(checkoutError => {
               if (this.verbose) {
-                cmd.log('Could not rollback file checkout');
-                cmd.log(checkoutError);
-                cmd.log('');
+                logger.log('Could not rollback file checkout');
+                logger.log(checkoutError);
+                logger.log('');
               }
 
-              this.handleRejectedODataJsonPromise(err, cmd, cb);
+              this.handleRejectedODataJsonPromise(err, logger, cb);
             });
         }
         else {
-          this.handleRejectedODataJsonPromise(err, cmd, cb);
+          this.handleRejectedODataJsonPromise(err, logger, cb);
         }
       });
   }
@@ -394,32 +393,30 @@ class SpoFileAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.path && !fs.existsSync(args.options.path)) {
-        return 'Specified path of the file to add does not exist';
-      }
+    if (args.options.path && !fs.existsSync(args.options.path)) {
+      return 'Specified path of the file to add does not exist';
+    }
 
-      if (args.options.publishComment && !args.options.publish) {
-        return '--publishComment cannot be used without --publish';
-      }
+    if (args.options.publishComment && !args.options.publish) {
+      return '--publishComment cannot be used without --publish';
+    }
 
-      if (args.options.approveComment && !args.options.approve) {
-        return '--approveComment cannot be used without --approve';
-      }
+    if (args.options.approveComment && !args.options.approve) {
+      return '--approveComment cannot be used without --approve';
+    }
 
-      return true;
-    };
+    return true;
   }
 
-  private listHasContentType(contentType: string, webUrl: string, listSettings: ListSettings, cmd: any): Promise<void> {
+  private listHasContentType(contentType: string, webUrl: string, listSettings: ListSettings, logger: any): Promise<void> {
     if (this.verbose) {
-      cmd.log(`Getting list of available content types ...`);
+      logger.log(`Getting list of available content types ...`);
     }
 
     const requestOptions: any = {
@@ -466,7 +463,7 @@ class SpoFileAddCommand extends SpoCommand {
       });
   }
 
-  private uploadFileChunks(info: FileUploadInfo, cmd: any, resolve: () => void, reject: (err: any) => void): void {
+  private uploadFileChunks(info: FileUploadInfo, logger: any, resolve: () => void, reject: (err: any) => void): void {
     let fd: number = 0;
     try {
       fd = fs.openSync(info.FilePath, 'r');
@@ -492,23 +489,23 @@ class SpoFileAddCommand extends SpoCommand {
         .post<void>(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            cmd.log(`Uploaded ${info.Position} of ${info.Size} bytes (${Math.round(100 * info.Position / info.Size)}%)`);
+            logger.log(`Uploaded ${info.Position} of ${info.Size} bytes (${Math.round(100 * info.Position / info.Size)}%)`);
           }
 
           if (isLastChunk) {
             resolve();
           }
           else {
-            this.uploadFileChunks(info, cmd, resolve, reject);
+            this.uploadFileChunks(info, logger, resolve, reject);
           }
         })
         .catch((err: any) => {
           if (--info.RetriesLeft > 0) {
             if (this.verbose) {
-              cmd.log(`Retrying to upload chunk due to error: ${err}`);
+              logger.log(`Retrying to upload chunk due to error: ${err}`);
             }
             info.Position -= readCount;  // rewind
-            this.uploadFileChunks(info, cmd, resolve, reject);
+            this.uploadFileChunks(info, logger, resolve, reject);
           }
           else {
             reject(err);
@@ -526,9 +523,9 @@ class SpoFileAddCommand extends SpoCommand {
 
       if (--info.RetriesLeft > 0) {
         if (this.verbose) {
-          cmd.log(`Retrying to read chunk due to error: ${err}`);
+          logger.log(`Retrying to read chunk due to error: ${err}`);
         }
-        this.uploadFileChunks(info, cmd, resolve, reject);
+        this.uploadFileChunks(info, logger, resolve, reject);
       }
       else {
         reject(err);
@@ -536,9 +533,9 @@ class SpoFileAddCommand extends SpoCommand {
     }
   }
 
-  private getFileParentList(fileName: string, webUrl: string, folder: string, cmd: any): Promise<ListSettings> {
+  private getFileParentList(fileName: string, webUrl: string, folder: string, logger: any): Promise<ListSettings> {
     if (this.verbose) {
-      cmd.log(`Getting list details in order to get its available content types afterwards...`);
+      logger.log(`Getting list details in order to get its available content types afterwards...`);
     }
 
     const requestOptions: any = {
@@ -552,9 +549,9 @@ class SpoFileAddCommand extends SpoCommand {
     return request.get(requestOptions);
   }
 
-  private validateUpdateListItem(webUrl: string, folderPath: string, fileName: string, fieldsToUpdate: FieldValue[], cmd: any, checkInComment?: string): Promise<void> {
+  private validateUpdateListItem(webUrl: string, folderPath: string, fileName: string, fieldsToUpdate: FieldValue[], logger: any, checkInComment?: string): Promise<void> {
     if (this.verbose) {
-      cmd.log(`Validate and update list item values for file ${fileName}`);
+      logger.log(`Validate and update list item values for file ${fileName}`);
     }
 
     const requestBody: any = {
@@ -564,8 +561,8 @@ class SpoFileAddCommand extends SpoCommand {
     };
 
     if (this.debug) {
-      cmd.log('ValidateUpdateListItem will perform the checkin ...');
-      cmd.log('');
+      logger.log('ValidateUpdateListItem will perform the checkin ...');
+      logger.log('');
     }
 
     // update the existing file list item fields

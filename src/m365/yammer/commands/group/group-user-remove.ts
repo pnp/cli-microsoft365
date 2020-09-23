@@ -1,11 +1,11 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Cli, Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
-import YammerCommand from "../../../base/YammerCommand";
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { CommandInstance } from '../../../../cli';
+import YammerCommand from "../../../base/YammerCommand";
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -33,7 +33,7 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const executeRemoveAction: () => void = (): void => {
       let endpoint = `${this.resource}/v1/group_memberships.json`;
 
@@ -54,7 +54,7 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
         .delete(requestOptions)
         .then((res: any): void => {
           cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -66,7 +66,7 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
         messagePrompt = `Are you sure you want to remove the user ${args.options.userId} from the group ${args.options.id}?`;
       }
 
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -102,18 +102,16 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.id && typeof args.options.id !== 'number') {
-        return `${args.options.id} is not a number`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.id && typeof args.options.id !== 'number') {
+      return `${args.options.id} is not a number`;
+    }
 
-      if (args.options.userId && typeof args.options.userId !== 'number') {
-        return `${args.options.userId} is not a number`;
-      }
+    if (args.options.userId && typeof args.options.userId !== 'number') {
+      return `${args.options.userId} is not a number`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

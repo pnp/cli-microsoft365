@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./tab-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./tab-add');
 import Sinon = require('sinon');
-import * as chalk from 'chalk';
 
 describe(commands.TEAMS_TAB_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -23,16 +24,12 @@ describe(commands.TEAMS_TAB_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -55,7 +52,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000',
         appId: 'com.microsoft.teamspace.tab.web',
@@ -78,7 +75,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
   });
 
   it('fails validates for a incorrect channelId missing leading 19:.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
@@ -92,7 +89,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
   });
 
   it('fails validates for a incorrect channelId missing trailing @thread.skpye.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
@@ -106,7 +103,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
   });
 
   it('validates for a correct input.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
@@ -131,8 +128,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
@@ -143,12 +139,12 @@ describe(commands.TEAMS_TAB_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
           "displayName": "testweb",
           "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
         }));
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -170,8 +166,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
@@ -186,12 +181,12 @@ describe(commands.TEAMS_TAB_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "id": "19:f3dcbb1674574677abcae89cb626f1e6@thread.skype",
           "displayName": "testweb",
           "webUrl": "https://teams.microsoft.com/l/channel/19:f3dcbb1674574677abcae89cb626f1e6@thread.skype/"
         }));
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -213,8 +208,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         verbose: true,
@@ -255,8 +249,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: '3b4797e5-bdf3-48e1-a552-839af71562ef',
@@ -266,7 +259,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
         contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
         websiteUrl: 'https://xxx.sharepoint.com/Shared%20Documents/'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -278,7 +271,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

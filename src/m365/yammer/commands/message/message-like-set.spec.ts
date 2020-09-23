@@ -2,7 +2,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import Command, { CommandError, CommandOption, CommandValidate } from '../../../../Command';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
@@ -10,7 +11,7 @@ import commands from '../../commands';
 const command: Command = require('./message-like-set');
 describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let promptOptions: any;
   let requests: any[];
 
@@ -22,26 +23,23 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
     requests = [];
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     Utils.restore([
       request.delete,
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -70,7 +68,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -82,32 +80,32 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
   });
 
   it('passes validation with parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 10123123 } });
+    const actual = command.validate({ options: { id: 10123123 } });
     assert.strictEqual(actual, true);
   });
 
   it('id must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'abc' } });
+    const actual = command.validate({ options: { id: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('enable must be true or false', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 10123123, enable: 'true' } });
+    const actual = command.validate({ options: { id: 10123123, enable: 'true' } });
     assert.strictEqual(actual, true);
   });
 
   it('enable must be true or false', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 10123123, enable: 'false' } });
+    const actual = command.validate({ options: { id: 10123123, enable: 'false' } });
     assert.strictEqual(actual, true);
   });
 
   it('enable must be true or false', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 10123123, enable: 'fals' } });
+    const actual = command.validate({ options: { id: 10123123, enable: 'fals' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -118,7 +116,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
   });
 
   it('prompts when confirmation argument not passed', (done) => {
-    cmdInstance.action({ options: { debug: false, id: 1231231, enable: 'false' } }, () => {
+    command.action(logger, { options: { debug: false, id: 1231231, enable: 'false' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -143,7 +141,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: 1231231 } }, () => {
+    command.action(logger, { options: { debug: true, id: 1231231 } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -162,7 +160,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: 1231231, confirm: 'true' } }, () => {
+    command.action(logger, { options: { debug: true, id: 1231231, confirm: 'true' } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -181,7 +179,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: 1231231, enable: 'true' } }, () => {
+    command.action(logger, { options: { debug: true, id: 1231231, enable: 'true' } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -200,7 +198,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: 1231231, enable: 'false', confirm: true } }, () => {
+    command.action(logger, { options: { debug: true, id: 1231231, enable: 'false', confirm: true } }, () => {
       try {
         assert(requestPostedStub.called);
         done();
@@ -212,7 +210,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
   });
 
   it('prompts when disliking and confirmation parameter is denied', (done) => {
-    cmdInstance.action({ options: { debug: false, id: 1231231, enable: 'false', confirm: false } }, () => {
+    command.action(logger, { options: { debug: false, id: 1231231, enable: 'false', confirm: false } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -237,11 +235,12 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
+    });
 
-    cmdInstance.action({ options: { debug: true, id: 1231231, enable: 'false' } }, () => {
+    command.action(logger, { options: { debug: true, id: 1231231, enable: 'false' } }, () => {
       try {
         assert(requestDeleteStub.called);
         done();
@@ -253,10 +252,11 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
   });
 
   it('Aborts execution when enabled set to false and confirmation is not given', (done) => {
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action({ options: { debug: false, id: 1231231, enable: 'false' } }, () => {
+    });
+    command.action(logger, { options: { debug: false, id: 1231231, enable: 'false' } }, () => {
       try {
         assert(requests.length === 0);
         done();

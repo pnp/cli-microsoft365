@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
+import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./file-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as fs from 'fs';
+import commands from '../../commands';
 import { FolderExtensions } from '../../FolderExtensions';
+const command: Command = require('./file-add');
 
 describe(commands.FILE_ADD, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let ensureFolderStub: sinon.SinonStub;
 
   let stubPostResponses: any = (
@@ -157,16 +158,12 @@ describe(commands.FILE_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
     sinon.stub(fs, 'openSync').returns(3);
     sinon.stub(fs, 'readSync').returns(10485760);
@@ -217,7 +214,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(getFolderByServerRelativeUrlResp);
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -244,7 +241,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, fileNotFoundResp);
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -253,7 +250,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(loggerSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -270,7 +267,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(checkoutResp);
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -298,7 +295,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, fileAddResp);
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -326,7 +323,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, null, listResp);
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -354,7 +351,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, null, null, contentTypeResp);
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -380,7 +377,7 @@ describe(commands.FILE_ADD, () => {
 
     const folderServerRelativePath: string = '/sites/project-x/Shared%20Documents/t1';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: folderServerRelativePath,
@@ -391,7 +388,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.strictEqual(cmdInstanceLogSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
+        assert.strictEqual(loggerSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
         done();
       }
       catch (e) {
@@ -406,7 +403,7 @@ describe(commands.FILE_ADD, () => {
 
     const unsafePath: string = '/Users/user/Projects/TEST\'FOLDER/TEST\'FILE.txt';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -417,7 +414,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.strictEqual(cmdInstanceLogSpy.calledWith(`file name: TEST''FILE.txt...`), true);
+        assert.strictEqual(loggerSpy.calledWith(`file name: TEST''FILE.txt...`), true);
         done();
       }
       catch (e) {
@@ -430,7 +427,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -458,7 +455,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, validateUpdateListItemResp);
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -486,7 +483,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, validateUpdateListItemResp);
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -514,7 +511,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, null, null, null, null, checkinResp);
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -543,7 +540,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, null, aproveResp);
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -571,7 +568,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, null, null, null, publishResp);
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -599,7 +596,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses(null, null, listSettingsResp);
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -621,7 +618,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -631,7 +628,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
+        assert.strictEqual(loggerSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {
@@ -644,7 +641,7 @@ describe(commands.FILE_ADD, () => {
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -678,7 +675,7 @@ describe(commands.FILE_ADD, () => {
     Utils.restore([fs.statSync]);
     sinon.stub(fs, 'statSync').returns({ size: 250 * 1024 * 1024 } as any); // 250 MB
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -704,7 +701,7 @@ describe(commands.FILE_ADD, () => {
     Utils.restore([fs.statSync]);
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -749,7 +746,7 @@ describe(commands.FILE_ADD, () => {
     Utils.restore([fs.statSync]);
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -757,7 +754,7 @@ describe(commands.FILE_ADD, () => {
         debug: true,
         verbose: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, '123');
         done();
@@ -776,7 +773,7 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'statSync').returns({ size: 251 * 1024 * 1024 } as any); // 250 MB
     sinon.stub(fs, 'openSync').throws(new Error('openSync error'));
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -784,7 +781,7 @@ describe(commands.FILE_ADD, () => {
         debug: true,
         verbose: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, 'openSync error');
         done();
@@ -805,7 +802,7 @@ describe(commands.FILE_ADD, () => {
     sinon.stub(fs, 'readSync').throws(new Error('readSync error'));
     sinon.stub(fs, 'closeSync').throws(new Error('failed to closeSync'));
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -813,7 +810,7 @@ describe(commands.FILE_ADD, () => {
         debug: true,
         verbose: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, 'readSync error');
         done();
@@ -828,7 +825,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -841,7 +838,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
+        assert.strictEqual(loggerSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {
@@ -854,7 +851,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -865,7 +862,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(loggerSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -908,7 +905,7 @@ describe(commands.FILE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -918,7 +915,7 @@ describe(commands.FILE_ADD, () => {
         Folder: 'Folder',
         publish: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -933,7 +930,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -942,7 +939,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(loggerSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -955,7 +952,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses();
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -964,7 +961,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(loggerSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -987,7 +984,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, fileAddResp, null, null, null, rollbackCheckoutResp);
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -1021,7 +1018,7 @@ describe(commands.FILE_ADD, () => {
     stubPostResponses(null, fileAddResp, null, null, null, rollbackCheckoutResp);
     stubGetResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         folder: 'Shared%20Documents/t1',
@@ -1040,13 +1037,13 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('fails validation if the webUrl option not valid url', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'abc' } });
+    const actual = command.validate({ options: { webUrl: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the wrong path option specified', () => {
     sinon.stub(fs, 'existsSync').returns(false);
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         folder: 'abc',
@@ -1058,7 +1055,7 @@ describe(commands.FILE_ADD, () => {
 
   it('fails validation if --approveComment specified, but not --approve', () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         folder: 'abc',
@@ -1071,7 +1068,7 @@ describe(commands.FILE_ADD, () => {
 
   it('fails validation if --publishComment specified, but not --publish', () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         folder: 'abc',
@@ -1084,7 +1081,7 @@ describe(commands.FILE_ADD, () => {
 
   it('passed validation if options correct', () => {
     sinon.stub(fs, 'existsSync').returns(true);
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         folder: 'abc',
@@ -1095,7 +1092,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1106,7 +1103,7 @@ describe(commands.FILE_ADD, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {

@@ -1,12 +1,12 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
 import * as sinon from 'sinon';
-import { Finding } from '../Finding';
-import { Project } from '../../model';
-import { FN018002_TEAMS_manifest } from './FN018002_TEAMS_manifest';
 import Utils from '../../../../../../Utils';
+import { Project } from '../../model';
+import { Finding } from '../Finding';
+import { FN018002_TEAMS_manifest } from './FN018002_TEAMS_manifest';
 
 describe('FN018002_TEAMS_manifest', () => {
   let findings: Finding[];

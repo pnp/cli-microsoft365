@@ -1,19 +1,19 @@
 import * as request from 'request-promise-native';
 import { RequestError } from 'request-promise-native/errors';
 import auth, { Auth } from './Auth';
-import { CommandInstance } from './cli';
+import { Logger } from './cli';
 const packageJSON = require('../package.json');
 
 class Request {
   private req: any;
-  private _cmd?: CommandInstance;
+  private _logger?: Logger;
 
   public set debug(debug: boolean) {
     (request as any).debug = debug;
   }
 
-  public set cmd(cmd: CommandInstance) {
-    this._cmd = cmd;
+  public set logger(logger: Logger) {
+    this._logger = logger;
   }
 
   constructor() {
@@ -56,8 +56,8 @@ class Request {
   }
 
   private execute<TResponse>(options: request.OptionsWithUrl, resolve?: (res: TResponse) => void, reject?: (error: any) => void): Promise<TResponse> {
-    if (!this._cmd) {
-      return Promise.reject('Command reference not set on the request object');
+    if (!this._logger) {
+      return Promise.reject('Logger not set on the request object');
     }
 
     return new Promise<TResponse>((_resolve: (res: TResponse) => void, _reject: (error: any) => void): void => {
@@ -68,7 +68,7 @@ class Request {
           return Promise.resolve('');
         }
         else {
-          return auth.ensureAccessToken(resource, this._cmd as CommandInstance, request.debug)
+          return auth.ensureAccessToken(resource, this._logger as Logger, request.debug)
         }
       })()
         .then((accessToken: string): Promise<TResponse> => {
@@ -84,8 +84,8 @@ class Request {
         })
         .then((res: TResponse): void => {
           if (request.debug && res) {
-            (this._cmd as CommandInstance).log('REQUEST response body');
-            (this._cmd as CommandInstance).log(JSON.stringify(res));
+            (this._logger as Logger).log('REQUEST response body');
+            (this._logger as Logger).log(JSON.stringify(res));
           }
           if (resolve) {
             resolve(res);
@@ -102,7 +102,7 @@ class Request {
               retryAfter = 10;
             }
             if (request.debug) {
-              (this._cmd as CommandInstance).log(`Request throttled. Waiting ${retryAfter}sec before retrying...`);
+              (this._logger as Logger).log(`Request throttled. Waiting ${retryAfter}sec before retrying...`);
             }
             setTimeout(() => {
               this.execute(options, resolve || _resolve, reject || _reject);

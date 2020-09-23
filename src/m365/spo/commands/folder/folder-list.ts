@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { FolderProperties } from './FolderProperties';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -28,9 +27,9 @@ class SpoFolderListCommand extends SpoCommand {
     return 'Returns all folders under the specified parent folder';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl}...`);
+      logger.log(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl}...`);
     }
 
     const serverRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
@@ -47,10 +46,10 @@ class SpoFolderListCommand extends SpoCommand {
       .get<{ value: FolderProperties[] }>(requestOptions)
       .then((resp: { value: FolderProperties[] }): void => {
         if (args.options.output === 'json') {
-          cmd.log(resp.value);
+          logger.log(resp.value);
         }
         else {
-          cmd.log(resp.value.map(f => {
+          logger.log(resp.value.map(f => {
             return {
               Name: f.Name,
               ServerRelativeUrl: f.ServerRelativeUrl
@@ -59,7 +58,7 @@ class SpoFolderListCommand extends SpoCommand {
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -78,10 +77,8 @@ class SpoFolderListCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

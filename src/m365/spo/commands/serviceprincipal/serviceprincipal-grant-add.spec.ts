@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./serviceprincipal-grant-add');
-import * as assert from 'assert';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./serviceprincipal-grant-add');
 
 describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -83,9 +80,9 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, resource: 'Microsoft Graph', scope: 'Mail.Read' } }, () => {
+    command.action(logger, { options: { debug: true, resource: 'Microsoft Graph', scope: 'Mail.Read' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "ClientId": "868668f8-583a-4c66-b3ce-d4e14bc9ceb3", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "-GiGhjpYZkyzztThS8nOs8VG6EHn4S1OjgiedYOfUrQ", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "41e846c5-e1e7-4e2d-8e08-9e75839f52b4", "Scope": "Mail.Read"
         }));
         done();
@@ -119,9 +116,9 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } }, () => {
+    command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "ClientId": "868668f8-583a-4c66-b3ce-d4e14bc9ceb3", "ConsentType": "AllPrincipals", "IsDomainIsolated": false, "ObjectId": "-GiGhjpYZkyzztThS8nOs8VG6EHn4S1OjgiedYOfUrQ", "PackageName": null, "Resource": "Microsoft Graph", "ResourceId": "41e846c5-e1e7-4e2d-8e08-9e75839f52b4", "Scope": "Mail.Read"
         }));
         done();
@@ -142,7 +139,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]));
     });
-    cmdInstance.action({ options: { debug: false, resource: 'Microsoft Graph1', scope: 'Mail.Read' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, resource: 'Microsoft Graph1', scope: 'Mail.Read' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('A service principal with the name Microsoft Graph1 could not be found.\r\nParameter name: resourceName')));
         done();
@@ -163,7 +160,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]));
     });
-    cmdInstance.action({ options: { debug: false, resource: 'Microsoft Graph', scope: 'Calendar.Read' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Calendar.Read' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An OAuth permission with the scope Calendar.Read could not be found.\r\nParameter name: permissionRequest')));
         done();
@@ -184,7 +181,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
         }
       ]));
     });
-    cmdInstance.action({ options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An OAuth permission with the resource Microsoft Graph and scope Mail.Read already exists.\r\nParameter name: permissionRequest')));
         done();
@@ -197,7 +194,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
 
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
-    cmdInstance.action({ options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -214,7 +211,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

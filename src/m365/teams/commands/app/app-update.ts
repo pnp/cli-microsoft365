@@ -1,13 +1,13 @@
-import request from '../../../../request';
+import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
-import Utils from '../../../../Utils';
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { CommandOption, CommandValidate } from '../../../../Command';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -27,12 +27,12 @@ class TeamsAppUpdateCommand extends GraphCommand {
     return 'Updates Teams app in the organization\'s app catalog';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const { id: appId, filePath } = args.options;
 
     const fullPath: string = path.resolve(filePath);
     if (this.verbose) {
-      cmd.log(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
+      logger.log(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
     }
 
     const requestOptions: any = {
@@ -47,11 +47,11 @@ class TeamsAppUpdateCommand extends GraphCommand {
       .put(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (res: any): void => this.handleRejectedODataJsonPromise(res, cmd, cb));
+      }, (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -70,24 +70,22 @@ class TeamsAppUpdateCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
 
-      const fullPath: string = path.resolve(args.options.filePath);
+    const fullPath: string = path.resolve(args.options.filePath);
 
-      if (!fs.existsSync(fullPath)) {
-        return `File '${fullPath}' not found`;
-      }
+    if (!fs.existsSync(fullPath)) {
+      return `File '${fullPath}' not found`;
+    }
 
-      if (fs.lstatSync(fullPath).isDirectory()) {
-        return `Path '${fullPath}' points to a directory`;
-      }
+    if (fs.lstatSync(fullPath).isDirectory()) {
+      return `Path '${fullPath}' points to a directory`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,7 +1,7 @@
 import * as fs from "fs";
+import * as path from "path";
 import { Finding } from "../";
 import { Project } from "../../model";
-import * as path from "path";
 import { Rule } from "./Rule";
 
 export class FN014005_CODE_settingsfile extends Rule {

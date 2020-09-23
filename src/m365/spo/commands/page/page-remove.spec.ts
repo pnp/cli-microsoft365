@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./page-remove');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError, CommandOption } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./page-remove');
 
 describe(commands.PAGE_REMOVE, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   const fakeRestCalls: (pageName?: string) => sinon.SinonStub = (pageName: string = 'page.aspx') => {
@@ -36,24 +37,23 @@ describe(commands.PAGE_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
-    Utils.restore([request.post]);
+    Utils.restore([
+      request.post,
+      Cli.prompt
+    ]);
   });
 
   after(() => {
@@ -75,7 +75,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('removes a modern page without confirm prompt', (done) => {
     fakeRestCalls();
-    cmdInstance.action(
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -86,7 +86,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(cmdInstanceLogSpy.notCalled);
+          assert(loggerSpy.notCalled);
           done();
         } catch (e) {
           done(e);
@@ -97,7 +97,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('removes a modern page (debug) without confirm prompt', (done) => {
     fakeRestCalls();
-    cmdInstance.action(
+    command.action(logger,
       {
         options: {
           debug: true,
@@ -108,7 +108,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+          assert(loggerSpy.calledWith(chalk.green('DONE')));
           done();
         } catch (e) {
           done(e);
@@ -126,7 +126,7 @@ describe(commands.PAGE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger,
       {
         options: {
           debug: true,
@@ -137,7 +137,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+          assert(loggerSpy.calledWith(chalk.green('DONE')));
           done();
         } catch (e) {
           done(e);
@@ -148,11 +148,12 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('removes a modern page with confirm prompt', (done) => {
     fakeRestCalls();
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: true });
-    };
-    cmdInstance.action(
+    });
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -162,7 +163,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(cmdInstanceLogSpy.notCalled);
+          assert(loggerSpy.notCalled);
           done();
         } catch (e) {
           done(e);
@@ -173,11 +174,12 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('removes a modern page (debug) with confirm prompt', (done) => {
     fakeRestCalls();
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: true });
-    };
-    cmdInstance.action(
+    });
+    command.action(logger,
       {
         options: {
           debug: true,
@@ -187,7 +189,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+          assert(loggerSpy.calledWith(chalk.green('DONE')));
           done();
         } catch (e) {
           done(e);
@@ -198,7 +200,7 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('should prompt before removing page when confirmation argument not passed', (done) => {
     fakeRestCalls();
-    cmdInstance.action(
+    command.action(logger,
       {
         options: {
           debug: true,
@@ -225,10 +227,11 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('should abort page removal when prompt not confirmed', (done) => {
     let postCallSpy = fakeRestCalls();
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action(
+    });
+    command.action(logger,
       {
         options: {
           debug: true,
@@ -249,10 +252,11 @@ describe(commands.PAGE_REMOVE, () => {
 
   it('automatically appends the .aspx extension', (done) => {
     fakeRestCalls();
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action(
+    });
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -263,7 +267,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(cmdInstanceLogSpy.notCalled);
+          assert(loggerSpy.notCalled);
           done();
         } catch (e) {
           done(e);
@@ -277,10 +281,11 @@ describe(commands.PAGE_REMOVE, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action(
+    });
+    command.action(logger,
       {
         options: {
           debug: false,
@@ -345,26 +350,26 @@ describe(commands.PAGE_REMOVE, () => {
   });
 
   it('fails validation if webUrl is not an absolute URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'page.aspx', webUrl: 'foo' } });
+    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { name: 'page.aspx', webUrl: 'http://foo' }
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' }
     });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when name has no extension', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { name: 'page', webUrl: 'https://contoso.sharepoint.com' }
     });
     assert.strictEqual(actual, true);

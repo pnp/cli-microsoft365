@@ -1,7 +1,7 @@
-import { ResultTable } from "./ResultTable";
 import { RefinementResult } from "./RefinementResult";
-import { SpecialTermResult } from "./SpecialTermResult";
 import { RelevantResults } from "./RelevantResults";
+import { ResultTable } from "./ResultTable";
+import { SpecialTermResult } from "./SpecialTermResult";
 
 export interface QueryResult {
   CustomResults: ResultTable[];

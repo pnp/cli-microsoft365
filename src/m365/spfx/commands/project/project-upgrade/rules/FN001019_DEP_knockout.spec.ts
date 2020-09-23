@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Finding } from '../Finding';
 import { Project } from '../../model';
+import { Finding } from '../Finding';
 import { FN001019_DEP_knockout } from './FN001019_DEP_knockout';
 
 describe('FN001019_DEP_knockout', () => {

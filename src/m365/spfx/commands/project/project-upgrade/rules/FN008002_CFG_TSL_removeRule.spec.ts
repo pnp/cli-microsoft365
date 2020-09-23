@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Finding } from '../Finding';
 import { Project } from '../../model';
+import { Finding } from '../Finding';
 import { FN008002_CFG_TSL_removeRule } from './FN008002_CFG_TSL_removeRule';
 
 describe('FN008002_CFG_TSL_removeRule', () => {

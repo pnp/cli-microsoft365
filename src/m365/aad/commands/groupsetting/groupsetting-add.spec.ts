@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./groupsetting-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./groupsetting-add');
 
 describe(commands.GROUPSETTING_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.GROUPSETTING_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -137,10 +134,9 @@ describe(commands.GROUPSETTING_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } }, () => {
+    command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           displayName: null,
           id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
@@ -234,10 +230,9 @@ describe(commands.GROUPSETTING_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } }, () => {
+    command.action(logger, { options: { debug: true, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           displayName: null,
           id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
@@ -331,10 +326,9 @@ describe(commands.GROUPSETTING_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } }, () => {
+    command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           displayName: null,
           id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
@@ -428,8 +422,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, verbose: true, output: "text", templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } }, () => {
+    command.action(logger, { options: { debug: true, verbose: true, output: "text", templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } }, () => {
       try {
         assert.deepEqual(postStub.firstCall.args[0].body, {
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
@@ -476,8 +469,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       });
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: '62375ab9-6b52-47ed-826b-58e47e0e304c' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '62375ab9-6b52-47ed-826b-58e47e0e304c' does not exist or one of its queried reference-property objects are not present.`)));
         done();
@@ -513,8 +505,7 @@ describe(commands.GROUPSETTING_ADD, () => {
       });
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`A conflicting object with one or more of the specified property values is present in the directory.`)));
         done();
@@ -526,12 +517,12 @@ describe(commands.GROUPSETTING_ADD, () => {
   });
 
   it('fails validation if the templateId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { templateId: 'invalid' } });
+    const actual = command.validate({ options: { templateId: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the templateId is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { templateId: '68be84bf-a585-4776-80b3-30aa5207aa22' } });
+    const actual = command.validate({ options: { templateId: '68be84bf-a585-4776-80b3-30aa5207aa22' } });
     assert.strictEqual(actual, true);
   });
 
@@ -541,7 +532,7 @@ describe(commands.GROUPSETTING_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

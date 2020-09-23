@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./guestsettings-set');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./guestsettings-set');
 
 describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,16 +23,12 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -58,7 +55,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   });
 
   it('validates for a correct input.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture',
@@ -83,10 +80,9 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'true' }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -111,12 +107,11 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: { debug: true, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'false' }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -140,10 +135,9 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowCreateUpdateChannels: 'true', allowDeleteChannels: 'true' }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -159,10 +153,9 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: { debug: false, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'true' }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -174,17 +167,17 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   });
 
   it('fails validation if the teamId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { teamId: 'invalid' } });
+    const actual = command.validate({ options: { teamId: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the teamId is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55' } });
+    const actual = command.validate({ options: { teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if allowDeleteChannels is not a valid boolean', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
         allowDeleteChannels: 'invalid'
@@ -194,7 +187,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   });
 
   it('fails validation if allowCreateUpdateChannels is not a valid boolean', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
         allowCreateUpdateChannels: 'invalid'
@@ -204,7 +197,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   });
 
   it('passes validation if allowDeleteChannels is false', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
         allowDeleteChannels: 'false'
@@ -214,7 +207,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   });
 
   it('passes validation if allowDeleteChannels is true', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
         allowDeleteChannels: 'true'
@@ -224,7 +217,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   });
 
   it('passes validation if allowCreateUpdateChannels is false', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
         allowCreateUpdateChannels: 'false'
@@ -234,7 +227,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   });
 
   it('passes validation if allowCreateUpdateChannels is true', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55',
         allowCreateUpdateChannels: 'true'
@@ -244,7 +237,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

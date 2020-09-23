@@ -1,6 +1,6 @@
-import * as ts from 'typescript';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as ts from 'typescript';
 
 export class TsFile {
   private _sourceFile: ts.SourceFile | undefined;

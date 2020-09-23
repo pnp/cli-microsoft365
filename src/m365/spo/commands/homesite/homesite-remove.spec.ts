@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption } from '../../../../Command';
-import * as sinon from 'sinon';
-import auth from '../../../../Auth';
-const command: Command = require('./homesite-remove');
 import * as assert from 'assert';
+import * as chalk from 'chalk';
+import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
+import auth from '../../../../Auth';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import appInsights from '../../../../appInsights';
-import config from '../../../../config';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./homesite-remove');
 
 describe(commands.HOMESITE_REMOVE, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -30,26 +31,23 @@ describe(commands.HOMESITE_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
     promptOptions = undefined;
   });
 
   afterEach(() => {
     Utils.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -73,7 +71,7 @@ describe(commands.HOMESITE_REMOVE, () => {
   });
 
   it('prompts before removing the Home Site when confirm option is not passed', (done) => {
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
 
       try {
         let promptIssued = false;
@@ -94,11 +92,12 @@ describe(commands.HOMESITE_REMOVE, () => {
   it('aborts removing Home Site when confirm option is not passed and prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'post');
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
+    });
 
-    cmdInstance.action({ options: {} }, () => {
+    command.action(logger, { options: {} }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -131,10 +130,11 @@ describe(commands.HOMESITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     })
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: {} }, () => {
+    });
+    command.action(logger, { options: {} }, () => {
       try {
         assert(homeSiteRemoveCallIssued);
         done();
@@ -167,12 +167,13 @@ describe(commands.HOMESITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: true } }, () => {
+    });
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(homeSiteRemoveCallIssued && cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(homeSiteRemoveCallIssued && loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -198,7 +199,7 @@ describe(commands.HOMESITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, confirm: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, confirm: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The requested operation is part of an experimental feature that is not supported in the current environment.`)));
         done();
@@ -212,11 +213,11 @@ describe(commands.HOMESITE_REMOVE, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         confirm: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
         done();
@@ -228,7 +229,7 @@ describe(commands.HOMESITE_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

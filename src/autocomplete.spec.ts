@@ -1,13 +1,13 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as os from 'os';
-import Utils from './Utils';
-import { SinonSandbox } from 'sinon';
 import { fail } from 'assert';
-import { Cli, CommandInstance } from './cli';
+import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
+import * as sinon from 'sinon';
+import { SinonSandbox } from 'sinon';
+import { Cli, Logger } from './cli';
 import Command, { CommandOption } from './Command';
+import Utils from './Utils';
 
 class SimpleCommand extends Command {
   public get name(): string {
@@ -16,7 +16,7 @@ class SimpleCommand extends Command {
   public get description(): string {
     return 'Mock command'
   }
-  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
+  public commandAction(logger: Logger, args: any, cb: () => void): void {
     cb();
   }
 }
@@ -39,7 +39,7 @@ class CommandWithOptions extends Command {
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
   }
-  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
+  public commandAction(logger: Logger, args: any, cb: () => void): void {
     cb();
   }
 }
@@ -54,7 +54,7 @@ class CommandWithAlias extends Command {
   public alias(): string[] | undefined {
     return ['cli alias'];
   }
-  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
+  public commandAction(logger: Logger, args: any, cb: () => void): void {
     cb();
   }
 }

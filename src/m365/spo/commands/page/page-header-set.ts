@@ -1,13 +1,13 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import GlobalOptions from '../../../../GlobalOptions';
-import { PageHeader, CustomPageHeader, CustomPageHeaderServerProcessedContent, CustomPageHeaderProperties } from './PageHeader';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { CustomPageHeader, CustomPageHeaderProperties, CustomPageHeaderServerProcessedContent, PageHeader } from './PageHeader';
 
 interface CommandArgs {
   options: Options;
@@ -54,7 +54,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const noPageHeader: PageHeader = {
       "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
       "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -147,7 +147,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     let title: string;
 
     if (this.verbose) {
-      cmd.log(`Retrieving information about the page...`);
+      logger.log(`Retrieving information about the page...`);
     }
 
     const requestOptions: any = {
@@ -232,9 +232,9 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           }
 
           return Promise.all([
-            this.getSiteId(args.options.webUrl, this.verbose, cmd),
-            this.getWebId(args.options.webUrl, this.verbose, cmd),
-            this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, this.verbose, cmd),
+            this.getSiteId(args.options.webUrl, this.verbose, logger),
+            this.getWebId(args.options.webUrl, this.verbose, logger),
+            this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, this.verbose, logger),
           ]);
         }
         else {
@@ -275,16 +275,16 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getSiteId(siteUrl: string, verbose: boolean, cmd: CommandInstance): Promise<any> {
+  private getSiteId(siteUrl: string, verbose: boolean, logger: Logger): Promise<any> {
     if (verbose) {
-      cmd.log(`Retrieving information about the site collection...`);
+      logger.log(`Retrieving information about the site collection...`);
     }
 
     const requestOptions: any = {
@@ -298,9 +298,9 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     return request.get(requestOptions);
   }
 
-  private getWebId(siteUrl: string, verbose: boolean, cmd: CommandInstance): Promise<any> {
+  private getWebId(siteUrl: string, verbose: boolean, logger: Logger): Promise<any> {
     if (verbose) {
-      cmd.log(`Retrieving information about the site...`);
+      logger.log(`Retrieving information about the site...`);
     }
 
     const requestOptions: any = {
@@ -314,9 +314,9 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     return request.get(requestOptions);
   }
 
-  private getImageInfo(siteUrl: string, imageUrl: string, verbose: boolean, cmd: CommandInstance): Promise<any> {
+  private getImageInfo(siteUrl: string, imageUrl: string, verbose: boolean, logger: Logger): Promise<any> {
     if (verbose) {
-      cmd.log(`Retrieving information about the header image...`);
+      logger.log(`Retrieving information about the header image...`);
     }
 
     const requestOptions: any = {
@@ -393,37 +393,35 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.type &&
-        args.options.type !== 'None' &&
-        args.options.type !== 'Default' &&
-        args.options.type !== 'Custom') {
-        return `${args.options.type} is not a valid type value. Allowed values None|Default|Custom`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.type &&
+      args.options.type !== 'None' &&
+      args.options.type !== 'Default' &&
+      args.options.type !== 'Custom') {
+      return `${args.options.type} is not a valid type value. Allowed values None|Default|Custom`;
+    }
 
-      if (args.options.translateX && isNaN(args.options.translateX)) {
-        return `${args.options.translateX} is not a valid number`;
-      }
+    if (args.options.translateX && isNaN(args.options.translateX)) {
+      return `${args.options.translateX} is not a valid number`;
+    }
 
-      if (args.options.translateY && isNaN(args.options.translateY)) {
-        return `${args.options.translateY} is not a valid number`;
-      }
+    if (args.options.translateY && isNaN(args.options.translateY)) {
+      return `${args.options.translateY} is not a valid number`;
+    }
 
-      if (args.options.layout &&
-        args.options.layout !== 'FullWidthImage' &&
-        args.options.layout !== 'NoImage') {
-        return `${args.options.layout} is not a valid layout value. Allowed values FullWidthImage|NoImage`;
-      }
+    if (args.options.layout &&
+      args.options.layout !== 'FullWidthImage' &&
+      args.options.layout !== 'NoImage') {
+      return `${args.options.layout} is not a valid layout value. Allowed values FullWidthImage|NoImage`;
+    }
 
-      if (args.options.textAlignment &&
-        args.options.textAlignment !== 'Left' &&
-        args.options.textAlignment !== 'Center') {
-        return `${args.options.textAlignment} is not a valid textAlignment value. Allowed values Left|Center`;
-      }
+    if (args.options.textAlignment &&
+      args.options.textAlignment !== 'Left' &&
+      args.options.textAlignment !== 'Center') {
+      return `${args.options.textAlignment} is not a valid textAlignment value. Allowed values Left|Center`;
+    }
 
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

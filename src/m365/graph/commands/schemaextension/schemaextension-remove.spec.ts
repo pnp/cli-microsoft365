@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./schemaextension-remove');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./schemaextension-remove');
 
 describe(commands.SCHEMAEXTENSION_REMOVE, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -23,26 +24,23 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
     promptOptions = undefined;
   });
 
   afterEach(() => {
     Utils.restore([
-      request.delete
+      request.delete,
+      Cli.prompt
     ]);
   });
 
@@ -71,9 +69,9 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false,id:'exttyee4dv5_MySchemaExtension', confirm: true } }, () => {
+    command.action(logger, { options: { debug: false,id:'exttyee4dv5_MySchemaExtension', confirm: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -91,9 +89,9 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id:'exttyee4dv5_MySchemaExtension', confirm: true } }, () => {
+    command.action(logger, { options: { debug: true, id:'exttyee4dv5_MySchemaExtension', confirm: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -103,7 +101,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
   });
 
   it('prompts before removing schema extension when confirmation argument not passed', (done) => {
-    cmdInstance.action({ options: { debug: false, id: 'exttyee4dv5_MySchemaExtension' } }, () => {
+    command.action(logger, { options: { debug: false, id: 'exttyee4dv5_MySchemaExtension' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -124,10 +122,11 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       return Promise.reject('Invalid request');
     });
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action({ options: { debug: false, id:'exttyee4dv5_MySchemaExtension' } }, () => {
+    });
+    command.action(logger, { options: { debug: false, id:'exttyee4dv5_MySchemaExtension' } }, () => {
       try {
         done();
       }
@@ -146,12 +145,13 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: false, id:'exttyee4dv5_MySchemaExtension' } }, () => {
+    });
+    command.action(logger, { options: { debug: false, id:'exttyee4dv5_MySchemaExtension' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -166,7 +166,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject({ error: 'An error has occurred' });
     });
 
-    cmdInstance.action({ options: { debug: false, id:'exttyee4dv5_MySchemaExtension', confirm: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id:'exttyee4dv5_MySchemaExtension', confirm: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -182,7 +182,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({ options: { debug: false, id: 'exttyee4dv5_MySchemaExtension', confirm: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: 'exttyee4dv5_MySchemaExtension', confirm: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -194,7 +194,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -205,7 +205,7 @@ describe(commands.SCHEMAEXTENSION_REMOVE, () => {
   });
 
   it('supports specifying id', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {

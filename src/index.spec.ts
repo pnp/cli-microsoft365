@@ -1,10 +1,9 @@
 import * as assert from 'assert';
-import * as path from 'path';
 import * as fs from 'fs';
-
-import * as globalCommands from './m365/commands/commands';
+import * as path from 'path';
 import * as aadCommands from './m365/aad/commands';
 import * as cliCommands from './m365/cli/commands';
+import * as globalCommands from './m365/commands/commands';
 import * as flowCommands from './m365/flow/commands';
 import * as graphCommands from './m365/graph/commands';
 import * as oneDriveCommands from './m365/onedrive/commands';
@@ -17,6 +16,7 @@ import * as teamsCommands from './m365/teams/commands';
 import * as tenantCommands from './m365/tenant/commands';
 import * as utilCommands from './m365/util/commands';
 import * as yammerCommands from './m365/yammer/commands';
+
 
 describe('Lazy loading commands', () => {
   it('has all commands stored in correct paths that allow lazy loading', () => {

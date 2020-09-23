@@ -1,14 +1,13 @@
-import commands from '../commands';
-import GlobalOptions from '../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../Command';
-import request from '../../../request';
-import AzmgmtCommand from '../../base/AzmgmtCommand';
-import Utils from '../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../cli';
+import { Cli, Logger } from '../../../cli';
+import {
+  CommandOption
+} from '../../../Command';
+import GlobalOptions from '../../../GlobalOptions';
+import request from '../../../request';
+import Utils from '../../../Utils';
+import AzmgmtCommand from '../../base/AzmgmtCommand';
+import commands from '../commands';
 
 interface CommandArgs {
   options: Options;
@@ -37,9 +36,9 @@ class FlowRemoveCommand extends AzmgmtCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Removing Microsoft Flow ${args.options.name}...`);
+      logger.log(`Removing Microsoft Flow ${args.options.name}...`);
     }
 
     const removeFlow: () => void = (): void => {
@@ -58,22 +57,22 @@ class FlowRemoveCommand extends AzmgmtCommand {
           // handle 204 and throw error message to cmd when invalid flow id is passed
           // https://github.com/pnp/cli-microsoft365/issues/1063#issuecomment-537218957
           if (rawRes.statusCode === 204) {
-            cmd.log(chalk.red(`Error: Resource '${args.options.name}' does not exist in environment '${args.options.environment}'`));
+            logger.log(chalk.red(`Error: Resource '${args.options.name}' does not exist in environment '${args.options.environment}'`));
             cb();
           }
           else {
             if (this.verbose) {
-              cmd.log(chalk.green('DONE'));
+              logger.log(chalk.green('DONE'));
             }
             cb();
           }
-        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
     if (args.options.confirm) {
       removeFlow();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -113,14 +112,12 @@ class FlowRemoveCommand extends AzmgmtCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.name)) {
-        return `${args.options.name} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.name)) {
+      return `${args.options.name} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

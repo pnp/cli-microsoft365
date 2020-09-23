@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import { CommandInstance } from '../../../../cli';
-import * as chalk from 'chalk';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -41,9 +40,9 @@ class SpoListWebhookSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Updating webhook ${args.options.id} belonging to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
+      logger.log(`Updating webhook ${args.options.id} belonging to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -79,7 +78,7 @@ class SpoListWebhookSetCommand extends SpoCommand {
         // REST patch call doesn't return anything
         cb();
       }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, cmd, cb)
+        this.handleRejectedODataJsonPromise(err, logger, cb)
       });
   }
 
@@ -115,51 +114,49 @@ class SpoListWebhookSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
 
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.listId) {
-        if (!Utils.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
+    if (args.options.listId) {
+      if (!Utils.isValidGuid(args.options.listId)) {
+        return `${args.options.listId} is not a valid GUID`;
       }
+    }
 
-      if (args.options.listId && args.options.listTitle) {
-        return 'Specify listId or listTitle, but not both';
+    if (args.options.listId && args.options.listTitle) {
+      return 'Specify listId or listTitle, but not both';
+    }
+
+    if (!args.options.listId && !args.options.listTitle) {
+      return 'Specify listId or listTitle, one is required';
+    }
+
+    if (!args.options.notificationUrl && !args.options.expirationDateTime) {
+      return 'Specify notificationUrl, expirationDateTime or both, at least one is required';
+    }
+
+    const parsedDateTime = Date.parse(args.options.expirationDateTime as string)
+    if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
+      if (args.options.output === 'json') {
+        return `${args.options.expirationDateTime} is not a valid date format. Provide the date in one of the following formats: YYYY-MM-DD, YYYY-MM-DDThh:mm, YYYY-MM-DDThh:mmZ, YYYY-MM-DDThh:mm±hh:mm`;
       }
-
-      if (!args.options.listId && !args.options.listTitle) {
-        return 'Specify listId or listTitle, one is required';
-      }
-
-      if (!args.options.notificationUrl && !args.options.expirationDateTime) {
-        return 'Specify notificationUrl, expirationDateTime or both, at least one is required';
-      }
-
-      const parsedDateTime = Date.parse(args.options.expirationDateTime as string)
-      if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
-        if (args.options.output === 'json') {
-          return `${args.options.expirationDateTime} is not a valid date format. Provide the date in one of the following formats: YYYY-MM-DD, YYYY-MM-DDThh:mm, YYYY-MM-DDThh:mmZ, YYYY-MM-DDThh:mm±hh:mm`;
-        }
-        else {
-          return `${args.options.expirationDateTime} is not a valid date format. Provide the date in one of the following formats:
+      else {
+        return `${args.options.expirationDateTime} is not a valid date format. Provide the date in one of the following formats:
   ${chalk.grey('YYYY-MM-DD')}
   ${chalk.grey('YYYY-MM-DDThh:mm')}
   ${chalk.grey('YYYY-MM-DDThh:mmZ')}
   ${chalk.grey('YYYY-MM-DDThh:mm±hh:mm')}`;
-        }
       }
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,23 +1,24 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./listitem-isrecord');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./listitem-isrecord');
 
 describe(commands.LISTITEM_ISRECORD, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   let postFakes = (opts: any) => {
     // requestObjectIdentity mock
     if (opts.body.indexOf('Name="Current"') > -1) {
       if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
-        cmdInstance.log("Returns error from requestObjectIdentity")
+        logger.log("Returns error from requestObjectIdentity")
         return Promise.reject(JSON.stringify(
           [{ "ErrorInfo": "error occurred" }]
         ))
@@ -70,7 +71,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
     // Get list mock
     if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
       (opts.url as string).indexOf('$select=Id') > -1) {
-      cmdInstance.log('faked!');
+      logger.log('faked!');
       return Promise.resolve({
         Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
       });
@@ -92,16 +93,12 @@ describe(commands.LISTITEM_ISRECORD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -140,7 +137,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
       verbose: true
     };
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Item does not exist. It may have been deleted by another user.')));
         done();
@@ -163,9 +160,9 @@ describe(commands.LISTITEM_ISRECORD, () => {
       verbose: true
     };
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("Getting list id..."));
+        assert(loggerSpy.calledWith("Getting list id..."));
         done();
       }
       catch (e) {
@@ -186,9 +183,9 @@ describe(commands.LISTITEM_ISRECORD, () => {
       verbose: true
     };
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("List Id passed in as an argument."));
+        assert(loggerSpy.calledWith("List Id passed in as an argument."));
         done();
       }
       catch (e) {
@@ -209,9 +206,9 @@ describe(commands.LISTITEM_ISRECORD, () => {
       webUrl: `https://returnerror.sharepoint.com/sites/project-y/`
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("Returns error from requestObjectIdentity"));
+        assert(loggerSpy.calledWith("Returns error from requestObjectIdentity"));
         done();
       }
       catch (e) {
@@ -221,7 +218,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -232,7 +229,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -243,42 +240,42 @@ describe(commands.LISTITEM_ISRECORD, () => {
   });
 
   it('fails validation if listTitle and listId option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if listTitle and listId are specified together', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '1', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', listTitle: 'Test List', id: '1' } });
+    const actual = command.validate({ options: { webUrl: 'foo', listTitle: 'Test List', id: '1' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the item ID is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: 'foo' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the item ID is not a positive number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '-1' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '-1' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL and numerical ID specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '1' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '1' } });
     assert(actual);
   });
 
   it('fails validation if the listId option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: '1' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: '1' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listId option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', debug: true } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', debug: true } });
     assert(actual);
   });
 });

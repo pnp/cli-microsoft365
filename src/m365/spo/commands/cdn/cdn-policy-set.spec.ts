@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./cdn-policy-set');
-import * as assert from 'assert';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./cdn-policy-set');
 
 describe(commands.CDN_POLICY_SET, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let requests: any[];
 
   before(() => {
@@ -42,11 +43,7 @@ describe(commands.CDN_POLICY_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -78,7 +75,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('sets IncludeFileExtensions CDN policy on the public CDN when Public type specified', (done) => {
-    cmdInstance.action({ options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Public' } }, () => {
+    command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Public' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -99,7 +96,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('sets IncludeFileExtensions CDN policy on the private CDN when Private type specified', (done) => {
-    cmdInstance.action({ options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Private' } }, () => {
+    command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF', type: 'Private' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -120,7 +117,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('sets IncludeFileExtensions CDN policy on the public CDN when no type specified', (done) => {
-    cmdInstance.action({ options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF' } }, () => {
+    command.action(logger, { options: { debug: true, policy: 'IncludeFileExtensions', value: 'WOFF' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -141,7 +138,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('sets ExcludeRestrictedSiteClassifications CDN policy on the public CDN when no type specified', (done) => {
-    cmdInstance.action({ options: { debug: false, policy: 'ExcludeRestrictedSiteClassifications', value: 'foo' } }, () => {
+    command.action(logger, { options: { debug: false, policy: 'ExcludeRestrictedSiteClassifications', value: 'foo' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -187,7 +184,7 @@ describe(commands.CDN_POLICY_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, policy: 'IncludeFileExtensions', value: '<WOFF' } }, () => {
+    command.action(logger, { options: { debug: false, policy: 'IncludeFileExtensions', value: '<WOFF' } }, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -228,7 +225,7 @@ describe(commands.CDN_POLICY_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, policy: 'IncludeFileExtensions', value: '<WOFF' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, policy: 'IncludeFileExtensions', value: '<WOFF' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -243,7 +240,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -254,7 +251,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('requires CDN policy name', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let requiresCdnPolicyName = false;
     options.forEach(o => {
       if (o.option.indexOf('<policy>') > -1) {
@@ -265,7 +262,7 @@ describe(commands.CDN_POLICY_SET, () => {
   });
 
   it('requires CDN policy value', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let requiresCdnPolicyValue = false;
     options.forEach(o => {
       if (o.option.indexOf('<value>') > -1) {
@@ -277,45 +274,45 @@ describe(commands.CDN_POLICY_SET, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('accepts Public SharePoint Online CDN type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'Public', policy: 'IncludeFileExtensions' } });
+    const actual = command.validate({ options: { type: 'Public', policy: 'IncludeFileExtensions' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'Private', policy: 'IncludeFileExtensions' } });
+    const actual = command.validate({ options: { type: 'Private', policy: 'IncludeFileExtensions' } });
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', () => {
     const type = 'foo';
-    const actual = (command.validate() as CommandValidate)({ options: { type: type, policy: 'IncludeFileExtensions' } });
+    const actual = command.validate({ options: { type: type, policy: 'IncludeFileExtensions' } });
     assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { policy: 'IncludeFileExtensions' } });
+    const actual = command.validate({ options: { policy: 'IncludeFileExtensions' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts IncludeFileExtensions SharePoint Online CDN policy', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { policy: 'IncludeFileExtensions' } });
+    const actual = command.validate({ options: { policy: 'IncludeFileExtensions' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts ExcludeRestrictedSiteClassifications SharePoint Online CDN policy', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { policy: 'ExcludeRestrictedSiteClassifications' } });
+    const actual = command.validate({ options: { policy: 'ExcludeRestrictedSiteClassifications' } });
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN policy', () => {
     const policy = 'foo';
-    const actual = (command.validate() as CommandValidate)({ options: { policy: policy } });
+    const actual = command.validate({ options: { policy: policy } });
     assert.strictEqual(actual, `${policy} is not a valid CDN policy. Allowed values are IncludeFileExtensions|ExcludeRestrictedSiteClassifications`);
   });
 });
