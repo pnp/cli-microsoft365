@@ -1,15 +1,14 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Cli, Logger } from '../../../../cli';
+import {
+    CommandError, CommandOption
+} from '../../../../Command';
 import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
-import {
-  CommandOption,
-  CommandError
-} from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import { CommandInstance } from '../../../../cli';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -34,19 +33,19 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     const removeKnowledgehub = (): void => {
       this
-        .getSpoAdminUrl(cmd, this.debug)
+        .getSpoAdminUrl(logger, this.debug)
         .then((_spoAdminUrl: string): Promise<ContextInfo> => {
           spoAdminUrl = _spoAdminUrl;
           return this.getRequestDigest(spoAdminUrl);
         })
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
-            cmd.log(`Removing Knowledge Hub Site settings from your tenant`);
+            logger.log(`Removing Knowledge Hub Site settings from your tenant`);
           }
 
           const requestOptions: any = {
@@ -66,24 +65,24 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
             cb(new CommandError(response.ErrorInfo.ErrorMessage));
           }
           else {
-            cmd.log(json[json.length - 1]);
+            logger.log(json[json.length - 1]);
 
             if (this.verbose) {
-              cmd.log(chalk.green('DONE'));
+              logger.log(chalk.green('DONE'));
             }
             cb();
           }
-        }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
       if (this.debug) {
-        cmd.log('Confirmation bypassed by entering confirm option. Removing Knowledge Hub Site setting...');
+        logger.log('Confirmation bypassed by entering confirm option. Removing Knowledge Hub Site setting...');
       }
       removeKnowledgehub();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,

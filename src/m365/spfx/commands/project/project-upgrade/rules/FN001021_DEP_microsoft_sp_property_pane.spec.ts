@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Finding } from '../Finding';
 import { Project } from '../../model';
+import { Finding } from '../Finding';
 import { FN001021_DEP_microsoft_sp_property_pane } from './FN001021_DEP_microsoft_sp_property_pane';
 
 describe('FN001021_DEP_microsoft_sp_property_pane', () => {

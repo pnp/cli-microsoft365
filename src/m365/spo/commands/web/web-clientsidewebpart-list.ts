@@ -1,13 +1,12 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { GetClientSideWebPartsRsp } from './GetClientSideWebPartsRsp';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -26,7 +25,7 @@ class SpoWebClientSideWebPartListCommand extends SpoCommand {
     return 'Lists available client-side web parts';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${args.options.webUrl}/_api/web/GetClientSideWebParts`,
       headers: {
@@ -50,15 +49,15 @@ class SpoWebClientSideWebPartListCommand extends SpoCommand {
         });
 
         if (clientSideWebParts.length === 0 && this.verbose) {
-          cmd.log("No client-side web parts available for this site");
+          logger.log("No client-side web parts available for this site");
         }
 
         if (clientSideWebParts.length > 0) {
-          cmd.log(clientSideWebParts);
+          logger.log(clientSideWebParts);
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -73,10 +72,8 @@ class SpoWebClientSideWebPartListCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

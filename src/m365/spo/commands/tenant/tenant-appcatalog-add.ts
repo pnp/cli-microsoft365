@@ -1,13 +1,13 @@
-import commands from '../../commands';
-import SpoCommand from '../../../base/SpoCommand';
+import * as chalk from 'chalk';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import * as spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import * as spoSiteClassicAddCommand from '../site/site-classic-add';
 import * as spoSiteGetCommand from '../site/site-get';
 import * as spoSiteRemoveCommand from '../site/site-remove';
-import * as spoSiteClassicAddCommand from '../site/site-classic-add';
-import Command, { CommandError, CommandOption, CommandValidate } from '../../../../Command';
-import * as chalk from 'chalk';
-import { CommandInstance, Cli } from '../../../../cli';
+import * as spoTenantAppCatalogUrlGetCommand from './tenant-appcatalogurl-get';
 
 export interface CommandArgs {
   options: Options;
@@ -30,42 +30,42 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
     return 'Creates new tenant app catalog site';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      cmd.log('Checking for existing app catalog URL...');
+      logger.log('Checking for existing app catalog URL...');
     }
 
     Cli
-      .executeCommandWithOutput((spoTenantAppCatalogUrlGetCommand as Command).name, spoTenantAppCatalogUrlGetCommand as Command, { options: { _: [] } })
+      .executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { _: [] } })
       .then((appCatalogUrl: string): Promise<void> => {
         if (!appCatalogUrl) {
           if (this.verbose) {
-            cmd.log('No app catalog URL found');
+            logger.log('No app catalog URL found');
           }
 
           return Promise.resolve();
         }
 
         if (this.verbose) {
-          cmd.log(`Found app catalog URL ${appCatalogUrl}`);
+          logger.log(`Found app catalog URL ${appCatalogUrl}`);
         }
 
-        return this.ensureNoExistingSite(appCatalogUrl, args.options.force, cmd);
+        return this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger);
       })
-      .then(_ => this.ensureNoExistingSite(args.options.url, args.options.force, cmd))
-      .then(_ => this.createAppCatalog(args.options, cmd))
-      .then(_ => {
+      .then(() => this.ensureNoExistingSite(args.options.url, args.options.force, logger))
+      .then(() => this.createAppCatalog(args.options, logger))
+      .then(() => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
       }, (err: CommandError): void => cb(err));
   }
 
-  private ensureNoExistingSite(url: string, force: boolean, cmd: CommandInstance): Promise<void> {
+  private ensureNoExistingSite(url: string, force: boolean, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (err: CommandError) => void): void => {
       if (this.verbose) {
-        cmd.log(`Checking if site ${url} exists...`);
+        logger.log(`Checking if site ${url} exists...`);
       }
 
       const siteGetOptions = {
@@ -77,10 +77,10 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
         }
       };
       Cli
-        .executeCommandWithOutput((spoSiteGetCommand as Command).name, spoSiteGetCommand as Command, siteGetOptions)
-        .then(_ => {
+        .executeCommandWithOutput(spoSiteGetCommand as Command, siteGetOptions)
+        .then(() => {
           if (this.verbose) {
-            cmd.log(`Found site ${url}`);
+            logger.log(`Found site ${url}`);
           }
 
           if (!force) {
@@ -88,7 +88,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           }
 
           if (this.verbose) {
-            cmd.log(`Deleting site ${url}...`);
+            logger.log(`Deleting site ${url}...`);
           }
           const siteRemoveOptions = {
             url: url,
@@ -99,8 +99,8 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
             debug: this.debug
           }
           Cli
-            .executeCommand((spoSiteRemoveCommand as Command).name, spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } })
-            .then(_ => resolve(), (err: CommandError) => reject(err));
+            .executeCommand(spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } })
+            .then(() => resolve(), (err: CommandError) => reject(err));
         }, (err: CommandError) => {
           if (err.message !== 'File Not Found.' && err.message !== '404 FILE NOT FOUND') {
             // some other error occurred
@@ -108,7 +108,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           }
 
           if (this.verbose) {
-            cmd.log(`No site found at ${url}`);
+            logger.log(`No site found at ${url}`);
           }
 
           // site not found. continue
@@ -117,9 +117,9 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
     });
   }
 
-  private createAppCatalog(options: Options, cmd: CommandInstance): Promise<void> {
+  private createAppCatalog(options: Options, logger: Logger): Promise<void> {
     if (this.verbose) {
-      cmd.log(`Creating app catalog at ${options.url}...`);
+      logger.log(`Creating app catalog at ${options.url}...`);
     }
 
     const siteClassicAddOptions = {
@@ -132,7 +132,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       verbose: this.verbose,
       debug: this.debug
     };
-    return Cli.executeCommand((spoSiteClassicAddCommand as Command).name, spoSiteClassicAddCommand as Command, { options: { ...siteClassicAddOptions, _: [] } });
+    return Cli.executeCommand(spoSiteClassicAddCommand as Command, { options: { ...siteClassicAddOptions, _: [] } });
   }
 
   public options(): CommandOption[] {
@@ -163,19 +163,17 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (typeof args.options.timeZone !== 'number') {
-        return `${args.options.timeZone} is not a number`;
-      }
+    if (typeof args.options.timeZone !== 'number') {
+      return `${args.options.timeZone} is not a number`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

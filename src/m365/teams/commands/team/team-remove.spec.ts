@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./team-remove');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./team-remove');
 
 describe(commands.TEAMS_TEAM_REMOVE, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let promptOptions: any;
 
   before(() => {
@@ -21,26 +22,23 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
     promptOptions = undefined;
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     Utils.restore([
       request.get,
-      request.delete
+      request.delete,
+      Cli.prompt
     ]);
   });
 
@@ -61,7 +59,7 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '61703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
@@ -71,7 +69,7 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
   });
 
   it('passes validation when valid teamId is specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
       }
@@ -81,7 +79,7 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
   });
 
   it('prompts before removing the specified team when confirm option not passed', (done) => {
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000"} }, () => {
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000"} }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -99,7 +97,7 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
   });
 
   it('prompts before removing the specified team when confirm option not passed (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
+    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -118,10 +116,7 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
 
   it('aborts removing the specified team when confirm option not passed and prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    };
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -134,10 +129,7 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
 
   it('aborts removing the specified team when confirm option not passed and prompt not confirmed (debug)', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    };
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
+    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -160,10 +152,11 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
+    });
+    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
         assert(teamsDeleteCallIssued);
         done();
@@ -183,9 +176,9 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", confirm: true } }, () => {
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", confirm: true } }, () => {
       done();
-    }, (err: any) => done(err));
+    });
   });
 
   it('should handle Microsoft graph error response', (done) => {
@@ -206,13 +199,13 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({
+    });
+    command.action(logger, {
       options: { teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, 'No team found with Group Id 8231f9f2-701f-4c6e-93ce-ecb563e3c1ee');
         done();
@@ -224,7 +217,7 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

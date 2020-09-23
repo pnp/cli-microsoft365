@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError} from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./schemaextension-get');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./schemaextension-get');
 
 describe(commands.SCHEMAEXTENSION_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -83,15 +80,14 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: 'adatumisv_exo2',
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
           "id": "adatumisv_exo2",
           "description": "sample description",
@@ -148,15 +144,14 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         id: 'adatumisv_exo2',
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
           "id": "adatumisv_exo2",
           "description": "sample description",
@@ -191,13 +186,12 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         id: 'adatumisv_exo2',
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -209,7 +203,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandError, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./list-contenttype-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./list-contenttype-list');
 
 describe(commands.LIST_CONTENTTYPE_LIST, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -123,7 +120,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         listTitle: 'Documents',
@@ -131,7 +128,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
             "Name": "Document",
@@ -223,7 +220,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         listTitle: 'Documents',
@@ -231,7 +228,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
             "Name": "Document",
@@ -323,7 +320,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
@@ -331,7 +328,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
             "Name": "Document",
@@ -423,7 +420,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
@@ -431,7 +428,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "StringId": "0x010100260C61709CD8E548948F9BF605F8F54F",
             "Name": "Document",
@@ -523,7 +520,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
@@ -532,7 +529,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "Description": "Create a new document.",
             "DisplayFormTemplateName": "DocumentLibraryForm",
@@ -606,7 +603,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
     const actionTitle: string = 'Documents';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         listTitle: actionTitle,
@@ -636,7 +633,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
     const actionTitle: string = 'Documents';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         listTitle: actionTitle,
@@ -666,7 +663,7 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         listId: actionId,
@@ -685,37 +682,37 @@ describe(commands.LIST_CONTENTTYPE_LIST, () => {
   });
 
   it('fails validation if both listId and listTitle options are not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+    const actual = command.validate({ options: { webUrl: 'foo', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
     assert(actual);
   });
 
   it('fails validation if the listId option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listId option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
     assert(actual);
   });
 
   it('fails validation if both listId and listTitle options are passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

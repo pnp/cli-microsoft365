@@ -1,13 +1,12 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import { CommandInstance } from '../../../../cli';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 const expirationDateTimeMaxDays = 180;
 const maxExpirationDateTime: Date = new Date();
@@ -45,9 +44,9 @@ class SpoListWebhookAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Adding webhook to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
+      logger.log(`Adding webhook to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -84,11 +83,11 @@ class SpoListWebhookAddCommand extends SpoCommand {
     request
       .post(requestOptions)
       .then((res: any): void => {
-        cmd.log(res);
+        logger.log(res);
 
         cb();
       }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, cmd, cb)
+        this.handleRejectedODataJsonPromise(err, logger, cb)
       });
   }
 
@@ -124,42 +123,40 @@ class SpoListWebhookAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.listId) {
-        if (!Utils.isValidGuid(args.options.listId)) {
-          return `${args.options.listId} is not a valid GUID`;
-        }
+    if (args.options.listId) {
+      if (!Utils.isValidGuid(args.options.listId)) {
+        return `${args.options.listId} is not a valid GUID`;
       }
+    }
 
-      if (args.options.listId && args.options.listTitle) {
-        return 'Specify listId or listTitle, but not both';
-      }
+    if (args.options.listId && args.options.listTitle) {
+      return 'Specify listId or listTitle, but not both';
+    }
 
-      if (!args.options.listId && !args.options.listTitle) {
-        return 'Specify listId or listTitle, one is required';
-      }
+    if (!args.options.listId && !args.options.listTitle) {
+      return 'Specify listId or listTitle, one is required';
+    }
 
-      const parsedDateTime = Date.parse(args.options.expirationDateTime as string)
-      if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
-        return `Provide the date in one of the following formats:
+    const parsedDateTime = Date.parse(args.options.expirationDateTime as string)
+    if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
+      return `Provide the date in one of the following formats:
       'YYYY-MM-DD'
       'YYYY-MM-DDThh:mm'
       'YYYY-MM-DDThh:mmZ'
       'YYYY-MM-DDThh:mm±hh:mm'`;
-      }
+    }
 
-      if (parsedDateTime < Date.now() || new Date(parsedDateTime) >= maxExpirationDateTime) {
-        return `Provide an expiration date which is a date time in the future and within 6 months from now`;
-      }
+    if (parsedDateTime < Date.now() || new Date(parsedDateTime) >= maxExpirationDateTime) {
+      return `Provide an expiration date which is a date time in the future and within 6 months from now`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

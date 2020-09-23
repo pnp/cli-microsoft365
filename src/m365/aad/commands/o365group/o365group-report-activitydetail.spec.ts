@@ -1,16 +1,17 @@
-import commands from '../../commands';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./o365group-report-activitydetail');
-import * as assert from 'assert';
-import Utils from '../../../../Utils';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
 import Command from '../../../../Command';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./o365group-report-activitydetail');
 
 describe(commands.O365GROUP_REPORT_ACTIVITYDETAIL, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -20,11 +21,7 @@ describe(commands.O365GROUP_REPORT_ACTIVITYDETAIL, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -67,7 +64,7 @@ describe(commands.O365GROUP_REPORT_ACTIVITYDETAIL, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, period: 'D7' } }, () => {
+    command.action(logger, { options: { debug: false, period: 'D7' } }, () => {
       try {
         assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365GroupsActivityDetail(period='D7')");
         assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');

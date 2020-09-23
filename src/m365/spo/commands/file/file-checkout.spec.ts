@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./file-checkout');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./file-checkout');
 
 describe(commands.FILE_CHECKOUT, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let stubPostResponses: any = (getFileByServerRelativeUrlResp: any = null, getFileByIdResp: any = null) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
       if (getFileByServerRelativeUrlResp) {
@@ -42,16 +43,12 @@ describe(commands.FILE_CHECKOUT, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -86,7 +83,7 @@ describe(commands.FILE_CHECKOUT, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -112,7 +109,7 @@ describe(commands.FILE_CHECKOUT, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         id: actionId,
@@ -138,7 +135,7 @@ describe(commands.FILE_CHECKOUT, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         id: actionId,
@@ -160,7 +157,7 @@ describe(commands.FILE_CHECKOUT, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         id: actionId,
@@ -182,7 +179,7 @@ describe(commands.FILE_CHECKOUT, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         id: actionId,
@@ -190,7 +187,7 @@ describe(commands.FILE_CHECKOUT, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0], 'DONE');
+        assert.strictEqual(loggerSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {
@@ -202,7 +199,7 @@ describe(commands.FILE_CHECKOUT, () => {
   it('should call the correct API url when URL option is passed', (done) => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         fileUrl: '/sites/project-x/Documents/Test1.docx',
@@ -222,7 +219,7 @@ describe(commands.FILE_CHECKOUT, () => {
   it('should call the correct API url when tenant root URL option is passed', (done) => {
     const postStub: sinon.SinonStub = stubPostResponses();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         fileUrl: '/Documents/Test1.docx',
@@ -240,7 +237,7 @@ describe(commands.FILE_CHECKOUT, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -251,7 +248,7 @@ describe(commands.FILE_CHECKOUT, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -262,32 +259,32 @@ describe(commands.FILE_CHECKOUT, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } });
+    const actual = command.validate({ options: { webUrl: 'foo', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if the id option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '12345' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '12345' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the id option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b' } });
     assert(actual);
   });
 
   it('fails validation if the id or url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both id and fileUrl options are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b', fileUrl: '/sites/project-x/documents' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'f09c4efe-b8c0-4e89-a166-03418661b89b', fileUrl: '/sites/project-x/documents' } });
     assert.notStrictEqual(actual, true);
   });
 });

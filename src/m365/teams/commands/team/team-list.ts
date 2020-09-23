@@ -1,13 +1,13 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption
-} from '../../../../Command';
-import { Team } from '../../Team';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
-import request from '../../../../request';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+    CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import commands from '../../commands';
+import { Team } from '../../Team';
 
 interface CommandArgs {
   options: Options;
@@ -32,18 +32,18 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let endpoint: string = `${this.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team')&$select=id,displayName,description`;
     if (args.options.joined) {
       endpoint = `${this.resource}/beta/me/joinedTeams`;
     }
     this
-      .getAllItems(endpoint, cmd, true)
+      .getAllItems(endpoint, logger, true)
       .then((): Promise<any> => {
         if (args.options.joined) {
           return Promise.resolve();
         } else {
-          return Promise.all(this.items.map(g => this.getTeamFromGroup(g, cmd)));
+          return Promise.all(this.items.map(g => this.getTeamFromGroup(g, logger)));
         }
       })
       .then((res?: Team[]): void => {
@@ -51,17 +51,17 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
           this.items = res;
         }
 
-        cmd.log(this.items);
+        logger.log(this.items);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getTeamFromGroup(group: { id: string, displayName: string, description: string }, cmd: CommandInstance): Promise<Team> {
+  private getTeamFromGroup(group: { id: string, displayName: string, description: string }, logger: Logger): Promise<Team> {
     return new Promise<Team>((resolve: (team: Team) => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
         url: `${this.resource}/beta/teams/${group.id}`,

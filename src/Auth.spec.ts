@@ -1,13 +1,13 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
-import Utils from './Utils';
-import { Auth, Service, AuthType } from './Auth';
+import * as fs from 'fs';
 import * as os from 'os';
+import * as sinon from 'sinon';
+import { Auth, AuthType, Service } from './Auth';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import { CommandError } from './Command';
-import * as fs from 'fs';
 import request from './request';
+import Utils from './Utils';
 
 class MockTokenStorage implements TokenStorage {
   public get(): Promise<string> {

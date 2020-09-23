@@ -1,12 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
+import { Cli, Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
 import GlobalOptions from '../../../../GlobalOptions';
-import { CommandInstance } from '../../../../cli';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -44,7 +44,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let messageEnd: string;
     if (args.options.listId || args.options.listTitle) {
       messageEnd = `in list ${args.options.listId || args.options.listTitle}`;
@@ -55,7 +55,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
 
     const removeField = (listRestUrl: string, fieldId: string | undefined, fieldTitle: string | undefined): Promise<void> => {
       if (this.verbose) {
-        cmd.log(`Removing field ${fieldId || fieldTitle} ${messageEnd}...`);
+        logger.log(`Removing field ${fieldId || fieldTitle} ${messageEnd}...`);
       }
 
       let fieldRestUrl: string = '';
@@ -96,7 +96,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
 
       if (args.options.group) {
         if (this.verbose) {
-          cmd.log(`Retrieving fields assigned to group ${args.options.group}...`);
+          logger.log(`Retrieving fields assigned to group ${args.options.group}...`);
         }
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/${listRestUrl}fields`,
@@ -111,7 +111,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
           .then((res: any): void => {
             const filteredResults = res.value.filter((field: { Id: string | undefined, Group: string | undefined; }) => field.Group === args.options.group);
             if (this.verbose) {
-              cmd.log(`${filteredResults.length} matches found...`);
+              logger.log(`${filteredResults.length} matches found...`);
             }
 
             var promises = [];
@@ -123,16 +123,16 @@ class SpoFieldRemoveCommand extends SpoCommand {
               cb();
             })
               .catch((err) => {
-                this.handleRejectedODataJsonPromise(err, cmd, cb);
+                this.handleRejectedODataJsonPromise(err, logger, cb);
               });
-          }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+          }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
       }
       else {
         removeField(listRestUrl, args.options.id, args.options.fieldTitle)
           .then((): void => {
             // REST post call doesn't return anything
             cb();
-          }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+          }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
       }
     };
 
@@ -142,7 +142,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
     else {
       const confirmMessage: string = `Are you sure you want to remove the ${args.options.group ? 'fields' : 'field'} ${args.options.id || args.options.fieldTitle || 'from group ' + args.options.group} ${messageEnd}?`;
 
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -198,27 +198,25 @@ class SpoFieldRemoveCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (!args.options.id && !args.options.fieldTitle && !args.options.group) {
-        return 'Specify id, fieldTitle, or group. One is required';
-      }
+    if (!args.options.id && !args.options.fieldTitle && !args.options.group) {
+      return 'Specify id, fieldTitle, or group. One is required';
+    }
 
-      if (args.options.id && !Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
+    if (args.options.id && !Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
 
-      if (args.options.listId && !Utils.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} is not a valid GUID`;
-      }
+    if (args.options.listId && !Utils.isValidGuid(args.options.listId)) {
+      return `${args.options.listId} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

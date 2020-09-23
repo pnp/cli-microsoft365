@@ -1,11 +1,11 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption
-} from '../../../../Command';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+    CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -34,7 +34,7 @@ class AadUserListCommand extends GraphItemsListCommand<any> {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const properties: string[] = args.options.properties ?
       args.options.properties.split(',').map(p => p.trim()) :
       ['userPrincipalName', 'displayName'];
@@ -42,16 +42,16 @@ class AadUserListCommand extends GraphItemsListCommand<any> {
     const url: string = `${this.resource}/v1.0/users?$select=${properties.join(',')}${(filter.length > 0 ? '&' + filter : '')}&$top=100`;
 
     this
-      .getAllItems(url, cmd, true)
+      .getAllItems(url, logger, true)
       .then((): void => {
-        cmd.log(this.items);
+        logger.log(this.items);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getFilter(options: any): string {

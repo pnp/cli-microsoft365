@@ -1,16 +1,14 @@
+import { Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
 import config from '../../../../config';
-import commands from '../../commands';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import Utils from '../../../../Utils';
-import { CommandInstance } from '../../../../cli';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -42,12 +40,12 @@ class SpoThemeApplyCommand extends SpoCommand {
     return 'Applies theme to the specified site';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const isSharePointTheme: boolean = args.options.sharePointTheme ? true : false;
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
 
@@ -59,7 +57,7 @@ class SpoThemeApplyCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Applying theme ${args.options.name} to the ${args.options.webUrl} site...`);
+          logger.log(`Applying theme ${args.options.name} to the ${args.options.webUrl} site...`);
         }
 
         let requestOptions: any = {};
@@ -97,7 +95,7 @@ class SpoThemeApplyCommand extends SpoCommand {
             return;
           }
           else {
-            cmd.log(json.value);
+            logger.log(json.value);
           }
         }
         else {
@@ -110,11 +108,11 @@ class SpoThemeApplyCommand extends SpoCommand {
           }
           else {
             const result: boolean = json[json.length - 1];
-            cmd.log(result);
+            logger.log(result);
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -135,19 +133,17 @@ class SpoThemeApplyCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.sharePointTheme && !(args.options.name in SharePointThemes)) {
-        return 'Please check if the theme name is entered correctly.'
-      }
+    if (args.options.sharePointTheme && !(args.options.name in SharePointThemes)) {
+      return 'Please check if the theme name is entered correctly.'
+    }
 
-      return true;
-    };
+    return true;
   }
 
   private getSharePointTheme(themeName: string): any {

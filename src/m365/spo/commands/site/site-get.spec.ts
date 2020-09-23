@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./site-get');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./site-get');
 
 describe(commands.SITE_GET, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.SITE_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -110,9 +107,9 @@ describe(commands.SITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(siteProperties));
+        assert(loggerSpy.calledWith(siteProperties));
         done();
       }
       catch (e) {
@@ -176,9 +173,9 @@ describe(commands.SITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(siteProperties));
+        assert(loggerSpy.calledWith(siteProperties));
         done();
       }
       catch (e) {
@@ -196,7 +193,7 @@ describe(commands.SITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('404 - "404 FILE NOT FOUND"')));
         done();
@@ -208,7 +205,7 @@ describe(commands.SITE_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -219,7 +216,7 @@ describe(commands.SITE_GET, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<url>') > -1) {
@@ -230,12 +227,12 @@ describe(commands.SITE_GET, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'foo' } });
+    const actual = command.validate({ options: { url: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
 });

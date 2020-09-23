@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./tenant-settings-list');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./tenant-settings-list');
 
 describe(commands.TENANT_SETTINGS_LIST, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
 
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -61,7 +58,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -80,11 +77,11 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
 
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -110,11 +107,11 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
 
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -148,30 +145,30 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true
       }
     }, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].AllowDownloadingNonWebViewableFiles, true);
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].BccExternalSharingInvitationsList, null);
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].HideDefaultThemes, true);
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].UserVoiceForFeedbackEnabled, false);
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["_ObjectType_"], undefined);
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["_ObjectIdentity_"], undefined);
+        assert.strictEqual(loggerSpy.lastCall.args[0].AllowDownloadingNonWebViewableFiles, true);
+        assert.strictEqual(loggerSpy.lastCall.args[0].BccExternalSharingInvitationsList, null);
+        assert.strictEqual(loggerSpy.lastCall.args[0].HideDefaultThemes, true);
+        assert.strictEqual(loggerSpy.lastCall.args[0].UserVoiceForFeedbackEnabled, false);
+        assert.strictEqual(loggerSpy.lastCall.args[0]["_ObjectType_"], undefined);
+        assert.strictEqual(loggerSpy.lastCall.args[0]["_ObjectIdentity_"], undefined);
 
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["SharingCapability"], 'ExternalUserSharingOnly');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["SharingDomainRestrictionMode"], 'AllowList');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["ODBMembersCanShare"], 'Unspecified');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["ODBAccessRequests"], 'Unspecified');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["DefaultSharingLinkType"], 'Direct');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["FileAnonymousLinkType"], 'Edit');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["FolderAnonymousLinkType"], 'Edit');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["DefaultLinkPermission"], 'View');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["ConditionalAccessPolicy"], 'AllowFullAccess');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["SpecialCharactersStateInFileFolderNames"], 'Allowed');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0]["LimitedAccessFileType"], 'WebPreviewableFiles');
+        assert.strictEqual(loggerSpy.lastCall.args[0]["SharingCapability"], 'ExternalUserSharingOnly');
+        assert.strictEqual(loggerSpy.lastCall.args[0]["SharingDomainRestrictionMode"], 'AllowList');
+        assert.strictEqual(loggerSpy.lastCall.args[0]["ODBMembersCanShare"], 'Unspecified');
+        assert.strictEqual(loggerSpy.lastCall.args[0]["ODBAccessRequests"], 'Unspecified');
+        assert.strictEqual(loggerSpy.lastCall.args[0]["DefaultSharingLinkType"], 'Direct');
+        assert.strictEqual(loggerSpy.lastCall.args[0]["FileAnonymousLinkType"], 'Edit');
+        assert.strictEqual(loggerSpy.lastCall.args[0]["FolderAnonymousLinkType"], 'Edit');
+        assert.strictEqual(loggerSpy.lastCall.args[0]["DefaultLinkPermission"], 'View');
+        assert.strictEqual(loggerSpy.lastCall.args[0]["ConditionalAccessPolicy"], 'AllowFullAccess');
+        assert.strictEqual(loggerSpy.lastCall.args[0]["SpecialCharactersStateInFileFolderNames"], 'Allowed');
+        assert.strictEqual(loggerSpy.lastCall.args[0]["LimitedAccessFileType"], 'WebPreviewableFiles');
         done();
       }
       catch (e) {
@@ -197,11 +194,11 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
 
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Timed out')));
         done();

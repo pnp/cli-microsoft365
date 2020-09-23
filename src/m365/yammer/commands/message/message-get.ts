@@ -1,9 +1,9 @@
-import { CommandOption, CommandValidate } from '../../../../Command';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -22,7 +22,7 @@ class YammerMessageGetCommand extends YammerCommand {
     return 'Returns a Yammer message';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/v1/messages/${args.options.id}.json`,
       headers: {
@@ -36,17 +36,17 @@ class YammerMessageGetCommand extends YammerCommand {
       .get(requestOptions)
       .then((res: any): void => {
         if (args.options.output === 'json') {
-          cmd.log(res);
+          logger.log(res);
         }
         else {
-          cmd.log({
-            id: res.id, 
-            sender_id: res.sender_id, 
-            replied_to_id: res.replied_to_id, 
-            thread_id: res.thread_id, 
+          logger.log({
+            id: res.id,
+            sender_id: res.sender_id,
+            replied_to_id: res.replied_to_id,
+            thread_id: res.thread_id,
             group_id: res.group_id,
             created_at: res.created_at,
-            direct_message: res.direct_message,   
+            direct_message: res.direct_message,
             system_message: res.system_message,
             privacy: res.privacy,
             message_type: res.message_type,
@@ -54,7 +54,7 @@ class YammerMessageGetCommand extends YammerCommand {
           });
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -69,14 +69,12 @@ class YammerMessageGetCommand extends YammerCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (typeof args.options.id !== 'number') {
-        return `${args.options.id} is not a number`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (typeof args.options.id !== 'number') {
+      return `${args.options.id} is not a number`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

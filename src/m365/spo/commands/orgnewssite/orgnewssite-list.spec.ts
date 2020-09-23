@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./orgnewssite-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./orgnewssite-list');
 
 describe(commands.ORGNEWSSITE_LIST, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,16 +26,12 @@ describe(commands.ORGNEWSSITE_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -72,10 +69,10 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, verbose: true } }, () => {
+    command.action(logger, { options: { debug: false, verbose: true } }, () => {
       try {
         assert.strictEqual(svcListRequest.callCount, 1);
-        assert(cmdInstanceLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1']));
+        assert(loggerSpy.calledWith(['http://contoso.sharepoint.com/sites/site1']));
         done();
       }
       catch (e) {
@@ -95,10 +92,10 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, verbose: false } }, () => {
+    command.action(logger, { options: { debug: false, verbose: false } }, () => {
       try {
         assert.strictEqual(svcListRequest.callCount, 1);
-        assert(cmdInstanceLogSpy.calledWith(['http://contoso.sharepoint.com/sites/site1', 'http://contoso.sharepoint.com/sites/site2']));
+        assert(loggerSpy.calledWith(['http://contoso.sharepoint.com/sites/site1', 'http://contoso.sharepoint.com/sites/site2']));
         done();
       }
       catch (e) {
@@ -125,11 +122,11 @@ describe(commands.ORGNEWSSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert(svcListRequest.called);
         assert.strictEqual(err.message, 'An error has occurred');
@@ -144,7 +141,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -156,7 +153,7 @@ describe(commands.ORGNEWSSITE_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,8 +1,8 @@
-import AzmgmtCommand from "./AzmgmtCommand";
-import request from '../../request';
-import { AzmgmtResponse } from './AzmgmtResponse';
 import * as url from 'url';
-import { CommandInstance } from "../../cli";
+import { Logger } from "../../cli";
+import request from '../../request';
+import AzmgmtCommand from "./AzmgmtCommand";
+import { AzmgmtResponse } from './AzmgmtResponse';
 
 export abstract class AzmgmtItemsListCommand<T> extends AzmgmtCommand {
   protected items: T[];
@@ -12,7 +12,7 @@ export abstract class AzmgmtItemsListCommand<T> extends AzmgmtCommand {
     this.items = [];
   }
 
-  protected getAllItems(_url: string, cmd: CommandInstance, firstRun: boolean): Promise<void> {
+  protected getAllItems(_url: string, logger: Logger, firstRun: boolean): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
         url: _url,
@@ -45,7 +45,7 @@ export abstract class AzmgmtItemsListCommand<T> extends AzmgmtCommand {
             const nextLink: string = nextLinkUrl.href;
 
             this
-              .getAllItems(nextLink, cmd, false)
+              .getAllItems(nextLink, logger, false)
               .then((): void => {
                 resolve();
               }, (err: any): void => {

@@ -1,12 +1,10 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate, CommandTypes, CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import GlobalOptions from '../../../../GlobalOptions';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -42,7 +40,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let contentTypeId: string = '';
 
     const contentTypeIdentifierLabel: string = args.options.id ?
@@ -52,7 +50,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
     const removeContentType = (): void => {
       ((): Promise<any> => {
         if (this.debug) {
-          cmd.log(`Retrieving information about the content type ${contentTypeIdentifierLabel}...`);
+          logger.log(`Retrieving information about the content type ${contentTypeIdentifierLabel}...`);
         }
 
         if (args.options.id) {
@@ -60,7 +58,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Looking up the ID of content type ${contentTypeIdentifierLabel}...`);
+          logger.log(`Looking up the ID of content type ${contentTypeIdentifierLabel}...`);
         }
 
         const requestOptions: any = {
@@ -103,13 +101,13 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
           }
           else {
             if (this.verbose) {
-              cmd.log(chalk.green('DONE'));
+              logger.log(chalk.green('DONE'));
             }
           }
 
           cb();
         }, (err: any): void => {
-          this.handleRejectedODataJsonPromise(err, cmd, cb);
+          this.handleRejectedODataJsonPromise(err, logger, cb);
         });
     }
 
@@ -117,7 +115,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
       removeContentType();
     }
     else {
-      cmd.prompt({ type: 'confirm', name: 'continue', default: false, message: `Are you sure you want to remove the content type ${args.options.id || args.options.name}?` }, (result: { continue: boolean }): void => {
+      Cli.prompt({ type: 'confirm', name: 'continue', default: false, message: `Are you sure you want to remove the content type ${args.options.id || args.options.name}?` }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
         }
@@ -152,23 +150,21 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (!args.options.id && !args.options.name) {
-        return 'Specify either the id or the name';
-      }
+    if (!args.options.id && !args.options.name) {
+      return 'Specify either the id or the name';
+    }
 
-      if (args.options.id && args.options.name) {
-        return 'Specify either the id or the name but not both';
-      }
+    if (args.options.id && args.options.name) {
+      return 'Specify either the id or the name but not both';
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

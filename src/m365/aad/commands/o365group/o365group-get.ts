@@ -1,14 +1,14 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 import { Group } from './Group';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -28,7 +28,7 @@ class AadO365GroupGetCommand extends GraphCommand {
     return 'Gets information about the specified Microsoft 365 Group';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let group: Group;
 
     const requestOptions: any = {
@@ -64,14 +64,14 @@ class AadO365GroupGetCommand extends GraphCommand {
           group.siteUrl = res.webUrl ? res.webUrl.substr(0, res.webUrl.lastIndexOf('/')) : '';
         }
 
-        cmd.log(group);
+        logger.log(group);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -90,14 +90,12 @@ class AadO365GroupGetCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

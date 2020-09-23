@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { FolderProperties } from './FolderProperties';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -29,9 +28,9 @@ class SpoFolderAddCommand extends SpoCommand {
     return 'Creates a folder within a parent folder';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Adding folder to site ${args.options.webUrl}...`);
+      logger.log(`Adding folder to site ${args.options.webUrl}...`);
     }
 
     const parentFolderServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
@@ -51,9 +50,9 @@ class SpoFolderAddCommand extends SpoCommand {
     request
       .post<FolderProperties>(requestOptions)
       .then((folder: FolderProperties): void => {
-        cmd.log(folder);
+        logger.log(folder);
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -76,10 +75,8 @@ class SpoFolderAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

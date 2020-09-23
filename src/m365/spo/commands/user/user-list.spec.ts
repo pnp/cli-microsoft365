@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./user-list');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./user-list');
 
 describe(commands.USER_LIST, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.USER_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -94,7 +91,7 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: true,
@@ -102,7 +99,7 @@ describe(commands.USER_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           value: [{
             Id: 6,
             IsHiddenInUI: false,
@@ -163,14 +160,14 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(
+        assert(loggerSpy.calledWith(
           [{
             Id: 6,
             Title: "John Doe",
@@ -191,7 +188,7 @@ describe(commands.USER_LIST, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -203,12 +200,12 @@ describe(commands.USER_LIST, () => {
 
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo' } });
+    const actual = command.validate({ options: { webUrl: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url is valid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
 }); 

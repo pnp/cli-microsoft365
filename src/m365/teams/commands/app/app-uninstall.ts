@@ -1,11 +1,11 @@
+import * as chalk from 'chalk';
+import { Cli, Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import { CommandOption, CommandValidate } from '../../../../Command';
 import GraphCommand from '../../../base/GraphCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -26,7 +26,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
     return 'Uninstalls an app from a Microsoft Team team';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const uninstallApp: () => void = (): void => {
       const requestOptions: any = {
         url: `${this.resource}/v1.0/teams/${args.options.teamId}/installedApps/${args.options.appId}`,
@@ -39,18 +39,18 @@ class TeamsAppUninstallCommand extends GraphCommand {
         .delete(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
 
           cb();
-        }, (res: Error): void => this.handleRejectedODataJsonPromise(res, cmd, cb));
+        }, (res: Error): void => this.handleRejectedODataJsonPromise(res, logger, cb));
     };
 
     if (args.options.confirm) {
       uninstallApp();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -86,14 +86,12 @@ class TeamsAppUninstallCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.teamId)) {
-        return `${args.options.teamId} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.teamId)) {
+      return `${args.options.teamId} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

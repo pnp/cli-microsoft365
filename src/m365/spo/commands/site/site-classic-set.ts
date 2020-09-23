@@ -1,14 +1,14 @@
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
-import commands from '../../commands';
-import request from '../../../../request';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
-import { CommandOption, CommandValidate } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import { SpoOperation } from './SpoOperation';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -60,25 +60,25 @@ class SpoSiteClassicSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.dots = '';
 
     this
-      .getTenantId(cmd, this.debug)
+      .getTenantId(logger, this.debug)
       .then((_tenantId: string): Promise<string> => {
         this.tenantId = _tenantId;
 
-        return this.getSpoAdminUrl(cmd, this.debug)
+        return this.getSpoAdminUrl(logger, this.debug)
       })
       .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
         this.spoAdminUrl = _spoAdminUrl;
 
-        return this.ensureFormDigest(this.spoAdminUrl, cmd, this.context, this.debug);
+        return this.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<string> => {
         this.context = res;
         if (this.verbose) {
-          cmd.log(`Setting basic properties ${args.options.url}...`);
+          logger.log(`Setting basic properties ${args.options.url}...`);
         }
 
         const basicProperties: string[] = [
@@ -167,13 +167,13 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             }
 
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
       })
       .then((): Promise<FormDigestInfo> => {
-        return this.ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug);
+        return this.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<void> => {
         this.context = res;
@@ -184,7 +184,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           }
 
           Promise.all(args.options.owners.split(',').map(o => {
-            return this.setAdmin(cmd, args.options.url, o.trim());
+            return this.setAdmin(logger, args.options.url, o.trim());
           }))
             .then((): void => {
               resolve();
@@ -229,24 +229,24 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             }
 
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
-  private setAdmin(cmd: CommandInstance, siteUrl: string, principal: string): Promise<void> {
+  private setAdmin(logger: Logger, siteUrl: string, principal: string): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
           const requestOptions: any = {
@@ -332,69 +332,67 @@ class SpoSiteClassicSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.sharing &&
-        ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly'].indexOf(args.options.sharing) === -1) {
-        return `${args.options.sharing} is not a valid value for the sharing option. Allowed values Disabled|ExternalUserSharingOnly|ExternalUserAndGuestSharing|ExistingExternalUserSharingOnly`;
-      }
+    if (args.options.sharing &&
+      ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly'].indexOf(args.options.sharing) === -1) {
+      return `${args.options.sharing} is not a valid value for the sharing option. Allowed values Disabled|ExternalUserSharingOnly|ExternalUserAndGuestSharing|ExistingExternalUserSharingOnly`;
+    }
 
-      if (args.options.resourceQuota &&
-        typeof args.options.resourceQuota !== 'number') {
-        return `${args.options.resourceQuota} is not a number`;
-      }
+    if (args.options.resourceQuota &&
+      typeof args.options.resourceQuota !== 'number') {
+      return `${args.options.resourceQuota} is not a number`;
+    }
 
-      if (args.options.resourceQuotaWarningLevel &&
-        typeof args.options.resourceQuotaWarningLevel !== 'number') {
-        return `${args.options.resourceQuotaWarningLevel} is not a number`;
-      }
+    if (args.options.resourceQuotaWarningLevel &&
+      typeof args.options.resourceQuotaWarningLevel !== 'number') {
+      return `${args.options.resourceQuotaWarningLevel} is not a number`;
+    }
 
-      if (args.options.resourceQuota &&
-        args.options.resourceQuotaWarningLevel &&
-        args.options.resourceQuotaWarningLevel > args.options.resourceQuota) {
-        return `resourceQuotaWarningLevel must not exceed the resourceQuota`;
-      }
+    if (args.options.resourceQuota &&
+      args.options.resourceQuotaWarningLevel &&
+      args.options.resourceQuotaWarningLevel > args.options.resourceQuota) {
+      return `resourceQuotaWarningLevel must not exceed the resourceQuota`;
+    }
 
-      if (args.options.storageQuota &&
-        typeof args.options.storageQuota !== 'number') {
-        return `${args.options.storageQuota} is not a number`;
-      }
+    if (args.options.storageQuota &&
+      typeof args.options.storageQuota !== 'number') {
+      return `${args.options.storageQuota} is not a number`;
+    }
 
-      if (args.options.storageQuotaWarningLevel &&
-        typeof args.options.storageQuotaWarningLevel !== 'number') {
-        return `${args.options.storageQuotaWarningLevel} is not a number`;
-      }
+    if (args.options.storageQuotaWarningLevel &&
+      typeof args.options.storageQuotaWarningLevel !== 'number') {
+      return `${args.options.storageQuotaWarningLevel} is not a number`;
+    }
 
-      if (args.options.storageQuota &&
-        args.options.storageQuotaWarningLevel &&
-        args.options.storageQuotaWarningLevel > args.options.storageQuota) {
-        return `storageQuotaWarningLevel must not exceed the storageQuota`;
-      }
+    if (args.options.storageQuota &&
+      args.options.storageQuotaWarningLevel &&
+      args.options.storageQuotaWarningLevel > args.options.storageQuota) {
+      return `storageQuotaWarningLevel must not exceed the storageQuota`;
+    }
 
-      if (args.options.allowSelfServiceUpgrade &&
-        args.options.allowSelfServiceUpgrade !== 'true' &&
-        args.options.allowSelfServiceUpgrade !== 'false') {
-        return `${args.options.allowSelfServiceUpgrade} is not a valid boolean value`;
-      }
+    if (args.options.allowSelfServiceUpgrade &&
+      args.options.allowSelfServiceUpgrade !== 'true' &&
+      args.options.allowSelfServiceUpgrade !== 'false') {
+      return `${args.options.allowSelfServiceUpgrade} is not a valid boolean value`;
+    }
 
-      if (args.options.lockState &&
-        ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess'].indexOf(args.options.lockState) === -1) {
-        return `${args.options.lockState} is not a valid value for the lockState option. Allowed values Unlock|NoAdditions|ReadOnly|NoAccess`;
-      }
+    if (args.options.lockState &&
+      ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess'].indexOf(args.options.lockState) === -1) {
+      return `${args.options.lockState} is not a valid value for the lockState option. Allowed values Unlock|NoAdditions|ReadOnly|NoAccess`;
+    }
 
-      if (args.options.noScriptSite &&
-        args.options.noScriptSite !== 'true' &&
-        args.options.noScriptSite !== 'false') {
-        return `${args.options.noScriptSite} is not a valid boolean value`;
-      }
+    if (args.options.noScriptSite &&
+      args.options.noScriptSite !== 'true' &&
+      args.options.noScriptSite !== 'false') {
+      return `${args.options.noScriptSite} is not a valid boolean value`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

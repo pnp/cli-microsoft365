@@ -1,21 +1,22 @@
 import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
 import Command, {
-  CommandError, CommandOption, CommandValidate
+    CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
-import * as chalk from 'chalk';
 
 const command: Command = require('./site-add');
 describe(commands.SITE_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -30,16 +31,12 @@ describe(commands.SITE_ADD, () => {
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
 
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -77,11 +74,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       assert(true);
       done();
-    }, () => {
-      assert(false);
     });
   });
 
@@ -94,11 +89,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       assert(true);
       done();
-    }, () => {
-      assert(false);
     });
   });
 
@@ -114,7 +107,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite', title: expected } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite', title: expected } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -137,7 +130,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite', alias: expected } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite', alias: expected } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -160,7 +153,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite', isPublic: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite', isPublic: true } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -183,7 +176,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -206,7 +199,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite', description: expected } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite', description: expected } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -229,7 +222,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -252,7 +245,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite', classification: expected } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite', classification: expected } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -275,7 +268,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -298,7 +291,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite', lcid: 1033 } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite', lcid: 1033 } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -321,7 +314,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -344,7 +337,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com,steve@contoso.com' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com,steve@contoso.com' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -367,7 +360,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com, steve@contoso.com' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite', owners: 'admin@contoso.com, steve@contoso.com' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -387,7 +380,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The group alias already exists.')));
         done();
@@ -403,7 +396,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'TeamSite' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, type: 'TeamSite' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -423,11 +416,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite' } }, () => {
       assert(true);
       done();
-    }, () => {
-      assert(false);
     });
   });
 
@@ -443,7 +434,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', title: expected } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', title: expected } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -463,11 +454,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite' } }, () => {
       assert(true);
       done();
-    }, () => {
-      assert(false);
     });
   });
 
@@ -483,7 +472,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', title: expected, owners: 'abc@email.com' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', title: expected, owners: 'abc@email.com' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -506,7 +495,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', url: expected } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', url: expected } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -529,7 +518,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', allowFileSharingForGuestUsers: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', allowFileSharingForGuestUsers: true } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -552,7 +541,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', shareByEmailEnabled: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', shareByEmailEnabled: true } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -568,7 +557,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.resolve({});
     });
 
-    cmdInstance.action({ options: { verbose: true, type: 'CommunicationSite', allowFileSharingForGuestUsers: true } }, () => {
+    command.action(logger, { options: { verbose: true, type: 'CommunicationSite', allowFileSharingForGuestUsers: true } }, () => {
       try {
         assert(log.find(l => l.indexOf(`Option 'allowFileSharingForGuestUsers' is deprecated`) > -1));
         done();
@@ -591,7 +580,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -614,7 +603,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', description: expected } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', description: expected } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -637,7 +626,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -660,7 +649,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', classification: expected } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', classification: expected } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -683,7 +672,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -706,7 +695,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesign: 'Topic' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', siteDesign: 'Topic' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -729,7 +718,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesign: 'Showcase' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', siteDesign: 'Showcase' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -752,7 +741,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesign: 'Blank' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', siteDesign: 'Blank' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -775,7 +764,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite' } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -798,7 +787,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', siteDesignId: expected } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', siteDesignId: expected } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -821,7 +810,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'CommunicationSite', lcid: expected } }, () => {
+    command.action(logger, { options: { debug: false, type: 'CommunicationSite', lcid: expected } }, () => {
       try {
         assert.strictEqual(actual, expected);
         done();
@@ -833,7 +822,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -844,7 +833,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site type', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--type') > -1) {
         assert(true);
@@ -855,7 +844,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('offers autocomplete for site type options', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--type') > -1) {
         assert(options[i].autocomplete);
@@ -866,7 +855,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site title', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--title') > -1) {
         assert(true);
@@ -877,7 +866,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site alias', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--alias') > -1) {
         assert(true);
@@ -888,7 +877,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site url', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--url') > -1) {
         assert(true);
@@ -899,7 +888,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site description', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--description') > -1) {
         assert(true);
@@ -910,7 +899,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site classification', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--classification') > -1) {
         assert(true);
@@ -921,7 +910,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying if the team site contains a public group', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--isPublic') > -1) {
         assert(true);
@@ -932,7 +921,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying if the communication site allows sharing files with guest users (deprecated)', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--allowFileSharingForGuestUsers') > -1) {
         assert(true);
@@ -943,7 +932,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying if the communication site allows sharing files with guest users', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--shareByEmailEnabled') > -1) {
         assert(true);
@@ -954,7 +943,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site design', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--siteDesign') > -1) {
         assert(true);
@@ -965,7 +954,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site design ID', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--siteDesignId') > -1) {
         assert(true);
@@ -976,7 +965,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports specifying site language', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     for (let i = 0; i < options.length; i++) {
       if (options[i].option.indexOf('--lcid') > -1) {
         assert(true);
@@ -987,7 +976,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation if the type option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         title: 'Team 1',
         alias: 'team1'
@@ -997,7 +986,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when the TeamSite type option specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'TeamSite',
         title: 'Team 1',
@@ -1008,7 +997,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when single owner is specified for a TeamSite', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'TeamSite',
         title: 'Team 1',
@@ -1020,7 +1009,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when \'owners\' is specified for a CommunicationSite', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com',
         type: 'CommunicationSite',
@@ -1032,7 +1021,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when multiple owners are specified for a TeamSite', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'TeamSite',
         title: 'Team 1',
@@ -1044,7 +1033,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when multiple owners with a space in between are specified for a TeamSite', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'TeamSite',
         title: 'Team 1',
@@ -1056,7 +1045,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when the CommunicationSite type option specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1067,7 +1056,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when lcid is valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         lcid: 1033,
@@ -1079,7 +1068,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if an invalid type option specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'Invalid',
         title: 'Team 1',
@@ -1090,7 +1079,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if an parameter option specified for TeamSites', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'TeamSite',
         title: 'Team 1',
@@ -1102,7 +1091,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when the type is TeamSite and alias option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         title: 'Team 1'
       }
@@ -1111,7 +1100,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when the type is CommunicationSite and url option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Team 1'
@@ -1121,7 +1110,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when the type is CommunicationSite and uses a wrong parameter', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Team 1',
@@ -1133,7 +1122,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when the type is CommunicationSite and the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1144,7 +1133,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when the type is CommunicationSite and multiple owners specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1156,7 +1145,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when the type is CommunicationSite and the url option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1167,7 +1156,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when the type is CommunicationSite and siteDesign is Topic', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1179,7 +1168,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when the type is CommunicationSite and siteDesign is Showcase', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1191,7 +1180,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when the type is CommunicationSite and siteDesign is Blank', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1203,7 +1192,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when the type is CommunicationSite and siteDesign is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1215,7 +1204,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when the type is CommunicationSite and uses alias', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1228,7 +1217,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation when the type is CommunicationSite and siteDesignId is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1240,7 +1229,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when the type is CommunicationSite and siteDesignId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1252,7 +1241,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when the type is CommunicationSite and both siteDesign and siteDesignId are specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1265,7 +1254,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when lcid is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1277,7 +1266,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when lcid is less than 0', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1289,7 +1278,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation when lcid is not valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: 'CommunicationSite',
         title: 'Marketing',
@@ -1332,9 +1321,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -1375,9 +1364,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } }, () => {
+    command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -1418,9 +1407,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', lcid: 1033, webTemplate: 'PUBLISHING#0', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
+    command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', lcid: 1033, webTemplate: 'PUBLISHING#0', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -1481,9 +1470,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -1548,9 +1537,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -1617,9 +1606,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -1645,7 +1634,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -1683,7 +1672,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -1760,9 +1749,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -1837,9 +1826,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -1914,9 +1903,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -1964,7 +1953,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -2033,9 +2022,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -2102,9 +2091,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -2145,9 +2134,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -2222,9 +2211,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -2280,9 +2269,9 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -2383,9 +2372,9 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -2486,9 +2475,9 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -2589,9 +2578,9 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, verbose: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: false, verbose: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -2656,7 +2645,7 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -2770,9 +2759,9 @@ describe(commands.SITE_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -2813,9 +2802,9 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team>', title: 'Team>', timeZone: 4, owners: 'admin@contoso.com>', lcid: 1033, webTemplate: 'PUBLISHING#0>', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
+    command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team>', title: 'Team>', timeZone: 4, owners: 'admin@contoso.com>', lcid: 1033, webTemplate: 'PUBLISHING#0>', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -2844,7 +2833,7 @@ describe(commands.SITE_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("A site already exists at url https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fteam.")));
         done();
@@ -2856,7 +2845,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -2867,7 +2856,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the url is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
@@ -2876,7 +2865,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the url is not a valid url', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'abc', title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
@@ -2885,7 +2874,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the url is not a valid SharePoint url', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'http://contoso', title: 'Team', timeZone: 4, owners: 'admin@contoso.com'
       }
@@ -2894,7 +2883,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the owner is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4
       }
@@ -2903,7 +2892,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the timeZone is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', owners: 'admin@contoso.com'
       }
@@ -2912,7 +2901,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the timeZone is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 'a'
@@ -2922,7 +2911,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the lcid is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, lcid: 'a'
@@ -2932,7 +2921,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the resourceQuota is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, resourceQuota: 'abc'
@@ -2942,7 +2931,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the resourceQuotaWarningLevel is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 'abc'
@@ -2952,7 +2941,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the resourceQuotaWarningLevel is specified without resourceQuota', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10
@@ -2962,7 +2951,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, resourceQuotaWarningLevel: 10, resourceQuota: 5
@@ -2972,7 +2961,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the storageQuota is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, storageQuota: 'abc'
@@ -2982,7 +2971,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the storageQuotaWarningLevel is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 'abc'
@@ -2992,7 +2981,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the storageQuotaWarningLevel is specified without storageQuota', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10
@@ -3002,7 +2991,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if is using a wrong parameter (alias)', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', alias: 'team',
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10
@@ -3012,7 +3001,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, storageQuotaWarningLevel: 10, storageQuota: 5
@@ -3022,7 +3011,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the required options are correct but a wrong parameter passed', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4, alias: 'team'
@@ -3032,7 +3021,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation if the required options are correct', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4
@@ -3042,7 +3031,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('fails validation if the owner property passes two owners', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com, admin2@contoso.com', timeZone: 4
@@ -3052,7 +3041,7 @@ describe(commands.SITE_ADD, () => {
   });
 
   it('passes validation if all options are correct', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         type: "ClassicSite", url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owners: 'admin@contoso.com', timeZone: 4,

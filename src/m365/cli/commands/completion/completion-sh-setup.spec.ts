@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./completion-sh-setup');
-import * as assert from 'assert';
-import Utils from '../../../../Utils';
 import { autocomplete } from '../../../../autocomplete';
-import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import Command from '../../../../Command';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./completion-sh-setup');
 
 describe(commands.COMPLETION_SH_SETUP, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let generateShCompletionStub: sinon.SinonStub;
   let setupShCompletionStub: sinon.SinonStub;
 
@@ -23,16 +24,12 @@ describe(commands.COMPLETION_SH_SETUP, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -57,7 +54,7 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   });
 
   it('generates file with commands info', (done) => {
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(generateShCompletionStub.called);
         done();
@@ -69,7 +66,7 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   });
 
   it('sets up command completion in the shell', (done) => {
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(setupShCompletionStub.called);
         done();
@@ -81,9 +78,9 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   });
 
   it('writes output in verbose mode', (done) => {
-    cmdInstance.action({ options: { verbose: true } }, () => {
+    command.action(logger, { options: { verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -93,9 +90,9 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   });
 
   it('writes additional info in debug mode', (done) => {
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('Generating command completion...'));
+        assert(loggerSpy.calledWith('Generating command completion...'));
         done();
       }
       catch (e) {

@@ -1,7 +1,7 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
-import Utils from './Utils';
 import * as fs from 'fs';
+import * as sinon from 'sinon';
+import Utils from './Utils';
 
 describe('appInsights', () => {
   afterEach(() => {

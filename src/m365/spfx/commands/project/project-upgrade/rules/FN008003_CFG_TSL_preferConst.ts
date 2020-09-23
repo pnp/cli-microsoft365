@@ -1,5 +1,5 @@
-import { Finding } from "../Finding";
 import { Project } from "../../model";
+import { Finding } from "../Finding";
 import { Rule } from "./Rule";
 
 export class FN008003_CFG_TSL_preferConst extends Rule {

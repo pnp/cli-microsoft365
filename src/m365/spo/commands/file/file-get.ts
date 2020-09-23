@@ -1,16 +1,15 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { FileProperties } from './FileProperties';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -46,9 +45,9 @@ class SpoFileGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving file from site ${args.options.webUrl}...`);
+      logger.log(`Retrieving file from site ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -92,27 +91,27 @@ class SpoFileGetCommand extends SpoCommand {
       .get<string>(requestOptions)
       .then((file: string): void => {
         if (args.options.asString) {
-          cmd.log(file.toString());
+          logger.log(file.toString());
         }
         else if (args.options.asListItem) {
           const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
-          cmd.log(fileProperties.ListItemAllFields)
+          logger.log(fileProperties.ListItemAllFields)
         }
         else if (args.options.asFile) {
           if (args.options.path) {
             fs.writeFileSync(args.options.path, file);
             if (this.verbose) {
-              cmd.log(`File saved to path ${args.options.path}`);
+              logger.log(`File saved to path ${args.options.path}`);
             }
           }
         }
         else {
           const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
-          cmd.log(fileProperties);
+          logger.log(fileProperties);
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -151,49 +150,47 @@ class SpoFileGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.id) {
-        if (!Utils.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
+    if (args.options.id) {
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
       }
+    }
 
-      if (args.options.id && args.options.url) {
-        return 'Specify id or url, but not both';
+    if (args.options.id && args.options.url) {
+      return 'Specify id or url, but not both';
+    }
+
+    if (!args.options.id && !args.options.url) {
+      return 'Specify id or url, one is required';
+    }
+
+    if (args.options.asFile && !args.options.path) {
+      return 'The path should be specified when the --asFile option is used';
+    }
+
+    if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
+      return 'Specified path where to save the file does not exits';
+    }
+
+    if (args.options.asFile) {
+      if (args.options.asListItem || args.options.asString) {
+        return 'Specify to retrieve the file either as file, list item or string but not multiple';
       }
+    }
 
-      if (!args.options.id && !args.options.url) {
-        return 'Specify id or url, one is required';
+    if (args.options.asListItem) {
+      if (args.options.asFile || args.options.asString) {
+        return 'Specify to retrieve the file either as file, list item or string but not multiple';
       }
+    }
 
-      if (args.options.asFile && !args.options.path) {
-        return 'The path should be specified when the --asFile option is used';
-      }
-
-      if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
-        return 'Specified path where to save the file does not exits';
-      }
-
-      if (args.options.asFile) {
-        if (args.options.asListItem || args.options.asString) {
-          return 'Specify to retrieve the file either as file, list item or string but not multiple';
-        }
-      }
-
-      if (args.options.asListItem) {
-        if (args.options.asFile || args.options.asString) {
-          return 'Specify to retrieve the file either as file, list item or string but not multiple';
-        }
-      }
-
-      return true;
-    };
+    return true;
   }
 }
 

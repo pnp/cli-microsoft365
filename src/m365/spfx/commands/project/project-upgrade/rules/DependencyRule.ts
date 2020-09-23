@@ -1,7 +1,7 @@
+import { lt, valid, validRange } from "semver";
 import { Finding, Hash } from "../";
 import { Project } from "../../model";
 import { Rule } from "./Rule";
-import { lt, valid, validRange } from "semver";
 
 export abstract class DependencyRule extends Rule {
   constructor(protected packageName: string, protected packageVersion: string, protected isDevDep: boolean = false, protected isOptional: boolean = false, protected add: boolean = true) {

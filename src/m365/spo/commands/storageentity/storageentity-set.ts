@@ -1,17 +1,15 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -41,18 +39,18 @@ class SpoStorageEntitySetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
         return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Setting tenant property ${args.options.key} in ${args.options.appCatalogUrl}...`);
+          logger.log(`Setting tenant property ${args.options.key} in ${args.options.appCatalogUrl}...`);
         }
 
         const requestOptions: any = {
@@ -70,9 +68,9 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
           if (this.verbose && response.ErrorInfo.ErrorMessage.indexOf('Access denied.') > -1) {
-            cmd.log('');
-            cmd.log(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the ${commands.STORAGEENTITY_SET} command is a valid app catalog URL and try again.`);
-            cmd.log('');
+            logger.log('');
+            logger.log(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the ${commands.STORAGEENTITY_SET} command is a valid app catalog URL and try again.`);
+            logger.log('');
           }
 
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
@@ -80,11 +78,11 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -115,16 +113,14 @@ class SpoStorageEntitySetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const result: boolean | string = SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
-      if (result === false) {
-        return 'Missing required option appCatalogUrl';
-      }
-      else {
-        return result;
-      }
-    };
+  public validate(args: CommandArgs): boolean | string {
+    const result: boolean | string = SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+    if (result === false) {
+      return 'Missing required option appCatalogUrl';
+    }
+    else {
+      return result;
+    }
   }
 }
 

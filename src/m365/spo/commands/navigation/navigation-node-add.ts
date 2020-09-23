@@ -1,13 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -38,9 +37,9 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Adding navigation node...`);
+      logger.log(`Adding navigation node...`);
     }
 
     const nodesCollection: string = args.options.parentNodeId ?
@@ -64,14 +63,14 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     request
       .post(requestOptions)
       .then((res: any): void => {
-        cmd.log(res);
+        logger.log(res);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -107,27 +106,25 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.parentNodeId) {
-        if (isNaN(args.options.parentNodeId)) {
-          return `${args.options.parentNodeId} is not a number`;
-        }
+    if (args.options.parentNodeId) {
+      if (isNaN(args.options.parentNodeId)) {
+        return `${args.options.parentNodeId} is not a number`;
       }
-      else {
-        if (args.options.location !== 'QuickLaunch' &&
-          args.options.location !== 'TopNavigationBar') {
-          return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
-        }
+    }
+    else {
+      if (args.options.location !== 'QuickLaunch' &&
+        args.options.location !== 'TopNavigationBar') {
+        return `${args.options.location} is not a valid value for the location option. Allowed values are QuickLaunch|TopNavigationBar`;
       }
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,12 +1,12 @@
-import request from '../../../../request';
+import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import { CommandOption, CommandValidate } from '../../../../Command';
+import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -25,10 +25,10 @@ class TeamsAppPublishCommand extends GraphCommand {
     return 'Publishes Teams app to the organization\'s app catalog';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const fullPath: string = path.resolve(args.options.filePath);
     if (this.verbose) {
-      cmd.log(`Adding app '${fullPath}' to app catalog...`);
+      logger.log(`Adding app '${fullPath}' to app catalog...`);
     }
 
     const requestOptions: any = {
@@ -44,15 +44,15 @@ class TeamsAppPublishCommand extends GraphCommand {
       .post<{ id: string; }>(requestOptions)
       .then((res: { id: string; }): void => {
         if (res && res.id) {
-          cmd.log(res.id);
+          logger.log(res.id);
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (res: any): void => this.handleRejectedODataJsonPromise(res, cmd, cb));
+      }, (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -67,20 +67,18 @@ class TeamsAppPublishCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const fullPath: string = path.resolve(args.options.filePath);
+  public validate(args: CommandArgs): boolean | string {
+    const fullPath: string = path.resolve(args.options.filePath);
 
-      if (!fs.existsSync(fullPath)) {
-        return `File '${fullPath}' not found`;
-      }
+    if (!fs.existsSync(fullPath)) {
+      return `File '${fullPath}' not found`;
+    }
 
-      if (fs.lstatSync(fullPath).isDirectory()) {
-        return `Path '${fullPath}' points to a directory`;
-      }
+    if (fs.lstatSync(fullPath).isDirectory()) {
+      return `Path '${fullPath}' points to a directory`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./list-webhook-set');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError, CommandOption } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./list-webhook-set');
 
 describe(commands.LIST_WEBHOOK_SET, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -20,14 +21,10 @@ describe(commands.LIST_WEBHOOK_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
+      }
     };
   });
 
@@ -62,7 +59,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
@@ -91,7 +88,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
@@ -126,7 +123,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: true,
@@ -162,7 +159,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         verbose: true,
@@ -198,7 +195,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
@@ -233,7 +230,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
@@ -267,7 +264,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
@@ -292,7 +289,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         debug: false,
@@ -301,7 +298,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
         expirationDateTime: '2019-03-02'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -313,7 +310,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('fails validation if both list id and title options are not passed', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -326,7 +323,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('fails validation if webhook id option is not passed', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -339,7 +336,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'foo',
@@ -353,7 +350,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -367,7 +364,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('fails validation if the id option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -381,7 +378,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('fails validation if the listid option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -395,7 +392,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('passes validation if the id option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -409,7 +406,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('passes validation if the listid option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -423,7 +420,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('fails validation if both id and title options are passed', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -438,7 +435,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('fails validation if both notificationUrl and expirationDateTime options are not passed', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -450,7 +447,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('passes validation if the notificationUrl option is passed, but expirationDateTime is not', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -463,7 +460,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('passes validation if the expirationDateTime option is passed, but notificationUrl is not', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -476,7 +473,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('fails validation if the expirationDateTime option is not a valid date string', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
@@ -489,7 +486,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('fails validation if the expirationDateTime option is not a valid date string (json output)', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',

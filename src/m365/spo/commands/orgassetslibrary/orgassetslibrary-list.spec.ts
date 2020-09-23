@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./orgassetslibrary-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./orgassetslibrary-list');
 
 describe(commands.ORGASSETSLIBRARY_LIST, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,16 +26,12 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -100,9 +97,9 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, verbose: true } }, () => {
+    command.action(logger, { options: { debug: true, verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Url: '/sites/sitedesigns',
           Libraries:
             [{ DisplayName: 'Site Assets', LibraryUrl: 'sites/sitedesigns/SiteAssets', ListId: '/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: 'SiteAssets/__siteIcon__.jpg' }]
@@ -166,9 +163,9 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, verbose: true } }, () => {
+    command.action(logger, { options: { debug: true, verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Url: '/sites/sitedesigns', Libraries:
             [{ DisplayName: 'Site Assets', LibraryUrl: 'sites/sitedesigns/SiteAssets', ListId: '/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: 'SiteAssets/__siteIcon__.jpg' }, { DisplayName: 'Site Assets 2', LibraryUrl: 'sites/sitedesigns/SiteAssets2', ListId: '/Guid(86c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: null }]
         }));
@@ -216,9 +213,9 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, verbose: true } }, () => {
+    command.action(logger, { options: { debug: true, verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           Url: '/sites/sitedesigns',
           Libraries:
             [{ DisplayName: 'Site Assets', LibraryUrl: 'sites/sitedesigns/SiteAssets', ListId: '/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: null }]
@@ -270,9 +267,9 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, verbose: true, output: 'json' } }, () => {
+    command.action(logger, { options: { debug: true, verbose: true, output: 'json' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(JSON.stringify({
+        assert(loggerSpy.calledWith(JSON.stringify({
           Url: '/sites/sitedesigns',
           Libraries:
             [{ DisplayName: 'Site Assets', LibraryUrl: 'sites/sitedesigns/SiteAssets', ListId: '/Guid(96c2e234-c996-4877-b3a6-8aebd8ab45b6)/', ThumbnailUrl: 'SiteAssets/__siteIcon__.jpg' }]
@@ -421,13 +418,13 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('No libraries in Organization Assets'));
+        assert(loggerSpy.calledWith('No libraries in Organization Assets'));
         done();
       }
       catch (e) {
@@ -451,11 +448,11 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert(svcListRequest.called);
         assert.strictEqual(err.message, 'An error has occurred');
@@ -470,7 +467,7 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -482,7 +479,7 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

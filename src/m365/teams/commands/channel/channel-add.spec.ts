@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./channel-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./channel-add');
 
 describe(commands.TEAMS_CHANNEL_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,16 +23,12 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -59,7 +56,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '61703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
@@ -69,7 +66,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
   });
 
   it('validates for a correct input.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture',
@@ -92,8 +89,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
@@ -102,12 +98,12 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
           "description": "Architecture"
         }));
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -128,8 +124,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
@@ -137,7 +132,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
           "description": null
@@ -155,14 +150,13 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         name: 'Architecture Discussion'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -174,7 +168,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

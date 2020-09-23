@@ -1,15 +1,14 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { ContextInfo } from '../../spo';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -45,7 +44,7 @@ class SpoListViewSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const baseRestUrl: string = `${args.options.webUrl}/_api/web/lists`;
     const listRestUrl: string = args.options.listId ?
       `(guid'${encodeURIComponent(args.options.listId)}')`
@@ -72,11 +71,11 @@ class SpoListViewSetCommand extends SpoCommand {
         // request doesn't return any content
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   private getPayload(options: any): any {
@@ -129,41 +128,39 @@ class SpoListViewSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (!args.options.listId && !args.options.listTitle) {
-        return `Specify listId or listTitle`;
-      }
+    if (!args.options.listId && !args.options.listTitle) {
+      return `Specify listId or listTitle`;
+    }
 
-      if (args.options.listId && args.options.listTitle) {
-        return `Specify listId or listTitle but not both`;
-      }
+    if (args.options.listId && args.options.listTitle) {
+      return `Specify listId or listTitle but not both`;
+    }
 
-      if (args.options.listId &&
-        !Utils.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} in option listId is not a valid GUID`;
-      }
+    if (args.options.listId &&
+      !Utils.isValidGuid(args.options.listId)) {
+      return `${args.options.listId} in option listId is not a valid GUID`;
+    }
 
-      if (!args.options.viewId && !args.options.viewTitle) {
-        return `Specify viewId or viewTitle`;
-      }
+    if (!args.options.viewId && !args.options.viewTitle) {
+      return `Specify viewId or viewTitle`;
+    }
 
-      if (args.options.viewId && args.options.viewTitle) {
-        return `Specify viewId or viewTitle but not both`;
-      }
+    if (args.options.viewId && args.options.viewTitle) {
+      return `Specify viewId or viewTitle but not both`;
+    }
 
-      if (args.options.viewId &&
-        !Utils.isValidGuid(args.options.viewId)) {
-        return `${args.options.viewId} in option viewId is not a valid GUID`;
-      }
+    if (args.options.viewId &&
+      !Utils.isValidGuid(args.options.viewId)) {
+      return `${args.options.viewId} in option viewId is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

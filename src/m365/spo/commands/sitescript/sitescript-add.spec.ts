@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./sitescript-add');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./sitescript-add');
 
 describe(commands.SITESCRIPT_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -23,16 +24,12 @@ describe(commands.SITESCRIPT_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -78,9 +75,9 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } }, () => {
+    command.action(logger, { options: { debug: false, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Content": null,
           "Description": "My contoso script",
           "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -113,9 +110,9 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } }, () => {
+    command.action(logger, { options: { debug: true, title: 'Contoso', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Content": null,
           "Description": "My contoso script",
           "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -148,9 +145,9 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, title: 'Contoso', description: '', content: JSON.stringify({ "abc": "def" }) } }, () => {
+    command.action(logger, { options: { debug: false, title: 'Contoso', description: '', content: JSON.stringify({ "abc": "def" }) } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Content": null,
           "Description": "",
           "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -183,9 +180,9 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, title: 'Contoso script', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } }, () => {
+    command.action(logger, { options: { debug: true, title: 'Contoso script', description: 'My contoso script', content: JSON.stringify({ "abc": "def" }) } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Content": null,
           "Description": "My contoso script",
           "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -205,7 +202,7 @@ describe(commands.SITESCRIPT_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    cmdInstance.action({ options: { debug: false, title: 'Contoso', content: JSON.stringify({}) } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, title: 'Contoso', content: JSON.stringify({}) } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -217,7 +214,7 @@ describe(commands.SITESCRIPT_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -228,7 +225,7 @@ describe(commands.SITESCRIPT_ADD, () => {
   });
 
   it('supports specifying title', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--title') > -1) {
@@ -239,7 +236,7 @@ describe(commands.SITESCRIPT_ADD, () => {
   });
 
   it('supports specifying description', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--description') > -1) {
@@ -250,7 +247,7 @@ describe(commands.SITESCRIPT_ADD, () => {
   });
 
   it('supports specifying script content', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--content') > -1) {
@@ -261,12 +258,12 @@ describe(commands.SITESCRIPT_ADD, () => {
   });
 
   it('fails validation if script content is not a valid JSON string', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { title: 'Contoso', content: 'abc' } });
+    const actual = command.validate({ options: { title: 'Contoso', content: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when title specified and  script content is valid JSON', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { title: 'Contoso', content: JSON.stringify({}) } });
+    const actual = command.validate({ options: { title: 'Contoso', content: JSON.stringify({}) } });
     assert.strictEqual(actual, true);
   });
 });

@@ -1,18 +1,17 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
 import {
   CommandOption,
-  CommandValidate,
   CommandTypes
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { ListInstance } from "./ListInstance";
-import { ListTemplateType } from './ListTemplateType';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { DraftVisibilityType } from './DraftVisibilityType';
 import { ListExperience } from './ListExperience';
-import { CommandInstance } from '../../../../cli';
+import { ListInstance } from "./ListInstance";
+import { ListTemplateType } from './ListTemplateType';
 
 interface CommandArgs {
   options: Options;
@@ -234,9 +233,9 @@ class SpoListAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Creating list in site at ${args.options.webUrl}...`);
+      logger.log(`Creating list in site at ${args.options.webUrl}...`);
     }
 
     const requestBody: any = this.mapRequestBody(args.options);
@@ -254,10 +253,10 @@ class SpoListAddCommand extends SpoCommand {
     request
       .post<ListInstance>(requestOptions)
       .then((listInstance: ListInstance): void => {
-        cmd.log(listInstance);
+        logger.log(listInstance);
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -581,86 +580,84 @@ class SpoListAddCommand extends SpoCommand {
     };
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
+
+    const template: ListTemplateType = ListTemplateType[(args.options.baseTemplate.trim() as keyof typeof ListTemplateType)];
+    if (!template) {
+      return `${args.options.baseTemplate} is not a valid baseTemplate value`;
+    }
+
+    for (let i = 0; i < SpoListAddCommand.booleanOptions.length; i++) {
+      const option: string = SpoListAddCommand.booleanOptions[i];
+      const value: string | undefined = (args.options as any)[option];
+      if (value && !Utils.isValidBoolean(value)) {
+        return `${value} in option ${option} is not a valid boolean value`
       }
+    }
 
-      const template: ListTemplateType = ListTemplateType[(args.options.baseTemplate.trim() as keyof typeof ListTemplateType)];
-      if (!template) {
-        return `${args.options.baseTemplate} is not a valid baseTemplate value`;
+    if (args.options.templateFeatureId &&
+      !Utils.isValidGuid(args.options.templateFeatureId)) {
+      return `${args.options.templateFeatureId} in option templateFeatureId is not a valid GUID`;
+    }
+
+    if (args.options.defaultContentApprovalWorkflowId &&
+      !Utils.isValidGuid(args.options.defaultContentApprovalWorkflowId)) {
+      return `${args.options.defaultContentApprovalWorkflowId} in option defaultContentApprovalWorkflowId is not a valid GUID`;
+    }
+
+    if (args.options.direction &&
+      ['NONE', 'LTR', 'RTL'].indexOf(args.options.direction) === -1) {
+      return `${args.options.direction} is not a valid direction value. Allowed values are NONE|LTR|RTL`;
+    }
+
+    if (args.options.draftVersionVisibility) {
+      const draftType: DraftVisibilityType = DraftVisibilityType[(args.options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
+
+      if (!draftType) {
+        return `${args.options.draftVersionVisibility} is not a valid draftVisibilityType value`;
       }
+    }
 
-      for (let i = 0; i < SpoListAddCommand.booleanOptions.length; i++) {
-        const option: string = SpoListAddCommand.booleanOptions[i];
-        const value: string | undefined = (args.options as any)[option];
-        if (value && !Utils.isValidBoolean(value)) {
-          return `${value} in option ${option} is not a valid boolean value`
-        }
+    if (args.options.emailAlias && args.options.enableAssignToEmail !== 'true') {
+      return `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`;
+    }
+
+    if (args.options.listExperienceOptions) {
+      const experience: ListExperience = ListExperience[(args.options.listExperienceOptions.trim() as keyof typeof ListExperience)];
+
+      if (!experience) {
+        return `${args.options.listExperienceOptions} is not a valid listExperienceOptions value`;
       }
+    }
 
-      if (args.options.templateFeatureId &&
-        !Utils.isValidGuid(args.options.templateFeatureId)) {
-        return `${args.options.templateFeatureId} in option templateFeatureId is not a valid GUID`;
-      }
+    if (args.options.majorVersionLimit && args.options.enableVersioning !== 'true') {
+      return `majorVersionLimit option is only valid in combination with enableVersioning.`;
+    }
 
-      if (args.options.defaultContentApprovalWorkflowId &&
-        !Utils.isValidGuid(args.options.defaultContentApprovalWorkflowId)) {
-        return `${args.options.defaultContentApprovalWorkflowId} in option defaultContentApprovalWorkflowId is not a valid GUID`;
-      }
+    if (args.options.majorWithMinorVersionsLimit &&
+      args.options.enableMinorVersions !== 'true' &&
+      args.options.enableModeration !== 'true') {
+      return `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`;
+    }
 
-      if (args.options.direction &&
-        ['NONE', 'LTR', 'RTL'].indexOf(args.options.direction) === -1) {
-        return `${args.options.direction} is not a valid direction value. Allowed values are NONE|LTR|RTL`;
-      }
+    if (args.options.readSecurity &&
+      args.options.readSecurity !== 1 &&
+      args.options.readSecurity !== 2) {
+      return `${args.options.readSecurity} is not a valid readSecurity value. Allowed values are 1|2`;
+    }
 
-      if (args.options.draftVersionVisibility) {
-        const draftType: DraftVisibilityType = DraftVisibilityType[(args.options.draftVersionVisibility.trim() as keyof typeof DraftVisibilityType)];
+    if (args.options.writeSecurity &&
+      args.options.writeSecurity !== 1 &&
+      args.options.writeSecurity !== 2 &&
+      args.options.writeSecurity !== 4) {
+      return `${args.options.writeSecurity} is not a valid writeSecurity value. Allowed values are 1|2|4`;
+    }
 
-        if (!draftType) {
-          return `${args.options.draftVersionVisibility} is not a valid draftVisibilityType value`;
-        }
-      }
-
-      if (args.options.emailAlias && args.options.enableAssignToEmail !== 'true') {
-        return `emailAlias could not be set if enableAssignToEmail is not set to true. Please set enableAssignToEmail.`;
-      }
-
-      if (args.options.listExperienceOptions) {
-        const experience: ListExperience = ListExperience[(args.options.listExperienceOptions.trim() as keyof typeof ListExperience)];
-
-        if (!experience) {
-          return `${args.options.listExperienceOptions} is not a valid listExperienceOptions value`;
-        }
-      }
-
-      if (args.options.majorVersionLimit && args.options.enableVersioning !== 'true') {
-        return `majorVersionLimit option is only valid in combination with enableVersioning.`;
-      }
-
-      if (args.options.majorWithMinorVersionsLimit &&
-        args.options.enableMinorVersions !== 'true' &&
-        args.options.enableModeration !== 'true') {
-        return `majorWithMinorVersionsLimit option is only valid in combination with enableMinorVersions or enableModeration.`;
-      }
-
-      if (args.options.readSecurity &&
-        args.options.readSecurity !== 1 &&
-        args.options.readSecurity !== 2) {
-        return `${args.options.readSecurity} is not a valid readSecurity value. Allowed values are 1|2`;
-      }
-
-      if (args.options.writeSecurity &&
-        args.options.writeSecurity !== 1 &&
-        args.options.writeSecurity !== 2 &&
-        args.options.writeSecurity !== 4) {
-        return `${args.options.writeSecurity} is not a valid writeSecurity value. Allowed values are 1|2|4`;
-      }
-
-      return true;
-    };
+    return true;
   }
 
   private mapRequestBody(options: Options): any {

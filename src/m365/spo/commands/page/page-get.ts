@@ -1,14 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate, CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import GlobalOptions from '../../../../GlobalOptions';
-import { ClientSidePage } from './clientsidepages';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import { CommandError, CommandOption } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSidePage } from './clientsidepages';
 
 interface CommandArgs {
   options: Options;
@@ -28,9 +26,9 @@ class SpoPageGetCommand extends SpoCommand {
     return 'Gets information about the specific modern page';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving information about the page...`);
+      logger.log(`Retrieving information about the page...`);
     }
 
     let pageName: string = args.options.name;
@@ -77,15 +75,15 @@ class SpoPageGetCommand extends SpoCommand {
         if (args.options.output === 'json') {
           page = Object.assign(res, page);
         }
-          
-        cmd.log(page);
+
+        logger.log(page);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -104,10 +102,8 @@ class SpoPageGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

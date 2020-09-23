@@ -1,13 +1,13 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
-import GraphCommand from "../../../base/GraphCommand";
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import GraphCommand from "../../../base/GraphCommand";
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -28,7 +28,7 @@ class TeamsMessageGetCommand extends GraphCommand {
     return 'Retrieves a message from a channel in a Microsoft Teams team';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/beta/teams/${args.options.teamId}/channels/${args.options.channelId}/messages/${args.options.messageId}`,
       headers: {
@@ -40,14 +40,14 @@ class TeamsMessageGetCommand extends GraphCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        cmd.log(res);
+        logger.log(res);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -70,18 +70,16 @@ class TeamsMessageGetCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.teamId)) {
-        return `${args.options.teamId} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.teamId)) {
+      return `${args.options.teamId} is not a valid GUID`;
+    }
 
-      if (!Utils.isValidTeamsChannelId(args.options.channelId as string)) {
-        return `${args.options.channelId} is not a valid Teams ChannelId`;
-      }
+    if (!Utils.isValidTeamsChannelId(args.options.channelId as string)) {
+      return `${args.options.channelId} is not a valid Teams ChannelId`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

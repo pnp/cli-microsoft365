@@ -1,16 +1,15 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
+import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 import { Group } from './Group';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -37,11 +36,11 @@ class AadO365GroupAddCommand extends GraphCommand {
     return 'Creates Microsoft 365 Group';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let group: Group;
 
     if (this.verbose) {
-      cmd.log(`Creating Microsoft 365 Group...`);
+      logger.log(`Creating Microsoft 365 Group...`);
     }
 
     const requestOptions: any = {
@@ -70,7 +69,7 @@ class AadO365GroupAddCommand extends GraphCommand {
 
         if (!args.options.logoPath) {
           if (this.debug) {
-            cmd.log('logoPath not set. Skipping');
+            logger.log('logoPath not set. Skipping');
           }
 
           return Promise.resolve();
@@ -78,7 +77,7 @@ class AadO365GroupAddCommand extends GraphCommand {
 
         const fullPath: string = path.resolve(args.options.logoPath);
         if (this.verbose) {
-          cmd.log(`Setting group logo ${fullPath}...`);
+          logger.log(`Setting group logo ${fullPath}...`);
         }
 
         const requestOptions: any = {
@@ -90,13 +89,13 @@ class AadO365GroupAddCommand extends GraphCommand {
         };
 
         return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
-          this.setGroupLogo(requestOptions, AadO365GroupAddCommand.numRepeat, resolve, reject, cmd);
+          this.setGroupLogo(requestOptions, AadO365GroupAddCommand.numRepeat, resolve, reject, logger);
         });
       })
       .then((): Promise<{ value: { id: string; }[] }> => {
         if (!args.options.owners) {
           if (this.debug) {
-            cmd.log('Owners not set. Skipping');
+            logger.log('Owners not set. Skipping');
           }
 
           return Promise.resolve(undefined as any);
@@ -105,7 +104,7 @@ class AadO365GroupAddCommand extends GraphCommand {
         const owners: string[] = args.options.owners.split(',').map(o => o.trim());
 
         if (this.verbose) {
-          cmd.log('Retrieving user information to set group owners...');
+          logger.log('Retrieving user information to set group owners...');
         }
 
         const requestOptions: any = {
@@ -137,7 +136,7 @@ class AadO365GroupAddCommand extends GraphCommand {
       .then((): Promise<{ value: { id: string; }[] }> => {
         if (!args.options.members) {
           if (this.debug) {
-            cmd.log('Members not set. Skipping');
+            logger.log('Members not set. Skipping');
           }
 
           return Promise.resolve(undefined as any);
@@ -146,7 +145,7 @@ class AadO365GroupAddCommand extends GraphCommand {
         const members: string[] = args.options.members.split(',').map(o => o.trim());
 
         if (this.verbose) {
-          cmd.log('Retrieving user information to set group members...');
+          logger.log('Retrieving user information to set group members...');
         }
 
         const requestOptions: any = {
@@ -176,17 +175,17 @@ class AadO365GroupAddCommand extends GraphCommand {
         })));
       })
       .then((): void => {
-        cmd.log(group);
+        logger.log(group);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
-  private setGroupLogo(requestOptions: any, retryLeft: number, resolve: () => void, reject: (err: any) => void, cmd: CommandInstance): void {
+  private setGroupLogo(requestOptions: any, retryLeft: number, resolve: () => void, reject: (err: any) => void, logger: Logger): void {
     request
       .put(requestOptions)
       .then((res: any): void => {
@@ -194,7 +193,7 @@ class AadO365GroupAddCommand extends GraphCommand {
       }, (err: any): void => {
         if (--retryLeft > 0) {
           setTimeout(() => {
-            this.setGroupLogo(requestOptions, retryLeft, resolve, reject, cmd);
+            this.setGroupLogo(requestOptions, retryLeft, resolve, reject, logger);
           }, 500 * (AadO365GroupAddCommand.numRepeat - retryLeft));
         }
         else {
@@ -252,46 +251,44 @@ class AadO365GroupAddCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.owners) {
-        let owners: string[] = args.options.owners.split(',').map(o => o.trim());
-        for (let i = 0; i < owners.length; i++) {
-          if (owners[i].indexOf('@') < 0) {
-            return `${owners[i]} is not a valid userPrincipalName`;
-          }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.owners) {
+      let owners: string[] = args.options.owners.split(',').map(o => o.trim());
+      for (let i = 0; i < owners.length; i++) {
+        if (owners[i].indexOf('@') < 0) {
+          return `${owners[i]} is not a valid userPrincipalName`;
         }
       }
+    }
 
-      if (args.options.members) {
-        let members: string[] = args.options.members.split(',').map(m => m.trim());
-        for (let i = 0; i < members.length; i++) {
-          if (members[i].indexOf('@') < 0) {
-            return `${members[i]} is not a valid userPrincipalName`;
-          }
+    if (args.options.members) {
+      let members: string[] = args.options.members.split(',').map(m => m.trim());
+      for (let i = 0; i < members.length; i++) {
+        if (members[i].indexOf('@') < 0) {
+          return `${members[i]} is not a valid userPrincipalName`;
         }
       }
+    }
 
-      if (typeof args.options.isPrivate !== 'undefined' &&
-        args.options.isPrivate !== 'true' &&
-        args.options.isPrivate !== 'false') {
-        return `${args.options.isPrivate} is not a valid boolean value`;
+    if (typeof args.options.isPrivate !== 'undefined' &&
+      args.options.isPrivate !== 'true' &&
+      args.options.isPrivate !== 'false') {
+      return `${args.options.isPrivate} is not a valid boolean value`;
+    }
+
+    if (args.options.logoPath) {
+      const fullPath: string = path.resolve(args.options.logoPath);
+
+      if (!fs.existsSync(fullPath)) {
+        return `File '${fullPath}' not found`;
       }
 
-      if (args.options.logoPath) {
-        const fullPath: string = path.resolve(args.options.logoPath);
-
-        if (!fs.existsSync(fullPath)) {
-          return `File '${fullPath}' not found`;
-        }
-
-        if (fs.lstatSync(fullPath).isDirectory()) {
-          return `Path '${fullPath}' points to a directory`;
-        }
+      if (fs.lstatSync(fullPath).isDirectory()) {
+        return `Path '${fullPath}' points to a directory`;
       }
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

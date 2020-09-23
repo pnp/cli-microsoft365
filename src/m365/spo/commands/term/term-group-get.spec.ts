@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./term-group-get');
-import * as assert from 'assert';
-import request from '../../../../request';
-import config from '../../../../config';
-import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./term-group-get');
 
 describe(commands.TERM_GROUP_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.TERM_GROUP_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -118,9 +115,9 @@ describe(commands.TERM_GROUP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } }, () => {
+    command.action(logger, { options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "CreatedDate": "2018-06-20T07:23:21.033Z",
           "Id": "36a62501-17ea-455a-bed4-eff862242def",
           "LastModifiedDate": "2018-06-20T07:23:21.033Z",
@@ -195,9 +192,9 @@ describe(commands.TERM_GROUP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, name: 'People' } }, () => {
+    command.action(logger, { options: { debug: true, name: 'People' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "CreatedDate": "2018-06-20T07:23:21.033Z",
           "Id": "36a62501-17ea-455a-bed4-eff862242def",
           "LastModifiedDate": "2018-06-20T07:23:21.033Z",
@@ -231,7 +228,7 @@ describe(commands.TERM_GROUP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } }, (err: any) => {
+    command.action(logger, { options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } } as any, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
@@ -259,7 +256,7 @@ describe(commands.TERM_GROUP_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, name: 'People' } }, (err: any) => {
+    command.action(logger, { options: { debug: false, name: 'People' } } as any, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Specified argument was out of the range of valid values.\r\nParameter name: index')));
         done();
@@ -280,7 +277,7 @@ describe(commands.TERM_GROUP_GET, () => {
         }
       ]));
     });
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
         done();
@@ -292,32 +289,32 @@ describe(commands.TERM_GROUP_GET, () => {
   });
 
   it('fails validation if neither id nor name specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both id and name specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', name: 'People' } });
+    const actual = command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26', name: 'People' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'invalid' } });
+    const actual = command.validate({ options: { id: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when id specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26' } });
+    const actual = command.validate({ options: { id: '9e54299e-208a-4000-8546-cc4139091b26' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when name specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'People' } });
+    const actual = command.validate({ options: { name: 'People' } });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -331,9 +328,9 @@ describe(commands.TERM_GROUP_GET, () => {
     Utils.restore((command as any).getRequestDigest);
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
     
-    cmdInstance.action({
+    command.action(logger, {
       options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getRequestDigest error')));
         done();

@@ -1,9 +1,9 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
+import * as fs from 'fs';
+import * as sinon from 'sinon';
+import { AuthType, Service } from '../Auth';
 import Utils from '../Utils';
 import { FileTokenStorage } from './FileTokenStorage';
-import * as fs from 'fs';
-import { Service, AuthType } from '../Auth';
 
 describe('FileTokenStorage', () => {
   const fileStorage = new FileTokenStorage();

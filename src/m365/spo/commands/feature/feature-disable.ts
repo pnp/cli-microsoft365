@@ -1,14 +1,12 @@
-import SpoCommand from "../../../base/SpoCommand";
-import GlobalOptions from "../../../../GlobalOptions";
-import commands from "../../commands";
-import {
-  CommandTypes,
-  CommandValidate,
-  CommandOption
-} from "../../../../Command";
-import request from "../../../../request";
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from "../../../../cli";
+import {
+  CommandOption, CommandTypes
+} from "../../../../Command";
+import GlobalOptions from "../../../../GlobalOptions";
+import request from "../../../../request";
+import SpoCommand from "../../../base/SpoCommand";
+import commands from "../../commands";
 
 interface CommandArgs {
   options: Options;
@@ -37,7 +35,7 @@ class SpoFeatureDisableCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let scope: string | undefined = args.options.scope;
     let force: boolean = args.options.force;
 
@@ -49,7 +47,7 @@ class SpoFeatureDisableCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      cmd.log(`Disabling feature '${args.options.featureId}' on scope '${scope}' for url '${args.options.url}' (force='${force}')...`);
+      logger.log(`Disabling feature '${args.options.featureId}' on scope '${scope}' for url '${args.options.url}' (force='${force}')...`);
     }
 
     const url: string = `${args.options.url}/_api/${scope}/features/remove(featureId=guid'${args.options.featureId}',force=${force})`;
@@ -65,10 +63,10 @@ class SpoFeatureDisableCommand extends SpoCommand {
       .post(requestOptions)
       .then((res: any): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
 
   }
 
@@ -103,16 +101,14 @@ class SpoFeatureDisableCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.scope) {
-        if (['site', 'web'].indexOf(args.options.scope.toLowerCase()) < 0) {
-          return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.scope) {
+      if (['site', 'web'].indexOf(args.options.scope.toLowerCase()) < 0) {
+        return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
       }
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

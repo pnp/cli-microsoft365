@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import * as url from 'url';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { ContextInfo } from '../../spo';
-import * as url from 'url';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -40,7 +39,7 @@ class SpoFileCopyCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const webUrl = args.options.webUrl;
     const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
     const tenantUrl: string = `${parsedUrl.protocol}//${parsedUrl.hostname}`;
@@ -58,7 +57,7 @@ class SpoFileCopyCommand extends SpoCommand {
         if (args.options.deleteIfAlreadyExists) {
           // try delete target file, if deleteIfAlreadyExists flag is set
           const filename = args.options.sourceUrl.replace(/^.*[\\\/]/, '');
-          return this.recycleFile(tenantUrl, args.options.targetUrl, filename, cmd);
+          return this.recycleFile(tenantUrl, args.options.targetUrl, filename, logger);
         }
 
         return Promise.resolve();
@@ -94,16 +93,16 @@ class SpoFileCopyCommand extends SpoCommand {
           const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
           setTimeout(() => {
-            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, cmd, this.dots)
+            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, logger, this.dots)
           }, progressPollInterval);
         });
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log('DONE');
+          logger.log('DONE');
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   /**
@@ -129,7 +128,7 @@ class SpoFileCopyCommand extends SpoCommand {
   /**
    * Moves file in the site recycle bin
    */
-  private recycleFile(tenantUrl: string, targetUrl: string, filename: string, cmd: CommandInstance): Promise<void> {
+  private recycleFile(tenantUrl: string, targetUrl: string, filename: string, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       const targetFolderAbsoluteUrl: string = this.urlCombine(tenantUrl, targetUrl);
 
@@ -140,7 +139,7 @@ class SpoFileCopyCommand extends SpoCommand {
         .getRequestDigest(targetFolderAbsoluteUrl)
         .then((contextResponse: ContextInfo): void => {
           if (this.debug) {
-            cmd.log(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
+            logger.log(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
           }
 
           if (targetUrl.charAt(0) !== '/') {
@@ -173,8 +172,8 @@ class SpoFileCopyCommand extends SpoCommand {
               }
 
               if (this.debug) {
-                cmd.log(`recycleFile error...`);
-                cmd.log(err);
+                logger.log(`recycleFile error...`);
+                logger.log(err);
               }
 
               reject(err);
@@ -211,10 +210,8 @@ class SpoFileCopyCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

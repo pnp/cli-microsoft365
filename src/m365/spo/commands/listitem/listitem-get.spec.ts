@@ -1,17 +1,17 @@
-import commands from '../../commands';
-import Command from '../../../../Command';
-import { CommandValidate, CommandOption, CommandError, CommandTypes } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./listitem-get');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError, CommandTypes } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./listitem-get');
 
 describe(commands.LISTITEM_GET, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   const expectedTitle = `List Item 1`;
 
@@ -46,11 +46,7 @@ describe(commands.LISTITEM_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -80,7 +76,7 @@ describe(commands.LISTITEM_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -91,7 +87,7 @@ describe(commands.LISTITEM_GET, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -107,37 +103,37 @@ describe(commands.LISTITEM_GET, () => {
   });
 
   it('fails validation if listTitle and listId option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: expectedId } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: expectedId } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if listTitle and listId are specified together', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: expectedId } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: expectedId } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', listTitle: 'Demo List', id: expectedId } });
+    const actual = command.validate({ options: { webUrl: 'foo', listTitle: 'Demo List', id: expectedId } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: expectedId } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: expectedId } });
     assert(actual);
   });
 
   it('fails validation if the listId option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: expectedId } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: expectedId } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listId option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: expectedId } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: expectedId } });
     assert(actual);
   });
 
   it('fails validation if the specified id is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: 'a' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Demo List', id: 'a' } });
     assert.notStrictEqual(actual, true);
   });
 
@@ -153,7 +149,7 @@ describe(commands.LISTITEM_GET, () => {
       id: expectedId
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(actualId, expectedId);
         done();
@@ -178,7 +174,7 @@ describe(commands.LISTITEM_GET, () => {
       fields: "ID,Modified"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(actualId, expectedId);
         done();
@@ -202,7 +198,7 @@ describe(commands.LISTITEM_GET, () => {
       output: "text"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(actualId, expectedId);
         done();
@@ -226,7 +222,7 @@ describe(commands.LISTITEM_GET, () => {
       output: "json"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(actualId, expectedId);
         done();
@@ -248,7 +244,7 @@ describe(commands.LISTITEM_GET, () => {
       output: "json"
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

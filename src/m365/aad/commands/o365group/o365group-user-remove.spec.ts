@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import teamsCommands from '../../../teams/commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./o365group-user-remove');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import teamsCommands from '../../../teams/commands';
+import commands from '../../commands';
+const command: Command = require('./o365group-user-remove');
 
 describe(commands.O365GROUP_USER_REMOVE, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let promptOptions: any;
 
   before(() => {
@@ -22,19 +23,15 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
     promptOptions = undefined;
   });
 
@@ -42,7 +39,8 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     Utils.restore([
       request.get,
       request.delete,
-      global.setTimeout
+      global.setTimeout,
+      Cli.prompt
     ]);
   });
 
@@ -73,7 +71,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('fails validation if the groupId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
@@ -83,7 +81,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
@@ -93,7 +91,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('fails validation if neither the groupId nor the teamID are provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         userName: 'anne.matthews@contoso.onmicrosoft.com'
       }
@@ -103,7 +101,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('fails validation when both groupId and teamId are specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
@@ -114,7 +112,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('passes validation when valid groupId and userName are specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com'
@@ -125,7 +123,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('prompts before removing the specified user from the specified Microsoft 365 Group when confirm option not passed', (done) => {
-    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -143,7 +141,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('prompts before removing the specified user from the specified Team when confirm option not passed (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -162,10 +160,11 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
   it('aborts removing the specified user from the specified Microsoft 365 Group when confirm option not passed and prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    });
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -178,10 +177,11 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
   it('aborts removing the specified user from the specified Microsoft 365 Group when confirm option not passed and prompt not confirmed (debug)', (done) => {
     const postSpy = sinon.spy(request, 'delete');
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action({ options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    });
+    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -225,7 +225,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
 
     });
 
-    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } }, () => {
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", confirm: true } }, () => {
       try {
         assert(memberDeleteCallIssued);
         done();
@@ -267,10 +267,11 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "karl.matteson@contoso.onmicrosoft.com" } }, () => {
+    });
+    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "karl.matteson@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(memberDeleteCallIssued);
         done();
@@ -306,11 +307,11 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, (err?: any) => {
+    });
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid object identifier'))); done();
       }
@@ -339,12 +340,12 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       return Promise.resolve();
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
+    });
 
-    cmdInstance.action({ options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(memberDeleteCallIssued === false);
         done();
@@ -357,7 +358,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

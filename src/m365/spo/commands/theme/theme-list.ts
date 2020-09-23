@@ -1,8 +1,8 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -17,12 +17,12 @@ class SpoThemeListCommand extends SpoCommand {
     return 'Retrieves the list of custom themes';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((spoAdminUrl: string): Promise<any> => {
         if (this.verbose) {
-          cmd.log(`Retrieving themes from tenant store...`);
+          logger.log(`Retrieving themes from tenant store...`);
         }
 
         const requestOptions: any = {
@@ -39,21 +39,21 @@ class SpoThemeListCommand extends SpoCommand {
         const themePreviews: any[] = rawRes.themePreviews;
         if (themePreviews && themePreviews.length > 0) {
           if (args.options.output === 'json') {
-            cmd.log(themePreviews);
+            logger.log(themePreviews);
           }
           else {
-            cmd.log(themePreviews.map(a => {
+            logger.log(themePreviews.map(a => {
               return { Name: a.name };
             }));
           }
         }
         else {
           if (this.verbose) {
-            cmd.log('No themes found');
+            logger.log('No themes found');
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

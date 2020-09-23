@@ -1,15 +1,14 @@
-import commands from '../commands';
+import * as fs from 'fs';
+import * as path from 'path';
+import { Logger } from '../../../cli';
+import {
+  CommandOption
+} from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../Command';
-import AzmgmtCommand from '../../base/AzmgmtCommand';
 import Utils from '../../../Utils';
-import * as path from 'path';
-import * as fs from 'fs';
-import { CommandInstance } from '../../../cli';
+import AzmgmtCommand from '../../base/AzmgmtCommand';
+import commands from '../commands';
 
 interface CommandArgs {
   options: Options;
@@ -46,18 +45,18 @@ class FlowExportCommand extends AzmgmtCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let filenameFromApi = '';
     const formatArgument = args.options.format ? args.options.format.toLowerCase() : '';
 
     if (this.verbose) {
-      cmd.log(`Retrieving package resources for Microsoft Flow ${args.options.id}...`);
+      logger.log(`Retrieving package resources for Microsoft Flow ${args.options.id}...`);
     }
 
     ((): Promise<any> => {
       if (formatArgument === 'json') {
         if (this.debug) {
-          cmd.log('format = json, skipping listing package resources step');
+          logger.log('format = json, skipping listing package resources step');
         }
 
         return Promise.resolve();
@@ -80,7 +79,7 @@ class FlowExportCommand extends AzmgmtCommand {
     })()
       .then((res: any): Promise<{}> => {
         if (this.verbose) {
-          cmd.log(`Initiating package export for Microsoft Flow ${args.options.id}...`);
+          logger.log(`Initiating package export for Microsoft Flow ${args.options.id}...`);
         }
 
         const requestOptions: any = {
@@ -112,7 +111,7 @@ class FlowExportCommand extends AzmgmtCommand {
       })
       .then((res: any): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Getting file for Microsoft Flow ${args.options.id}...`);
+          logger.log(`Getting file for Microsoft Flow ${args.options.id}...`);
         }
 
         if (res.errors && res.errors.length && res.errors.length > 0) {
@@ -124,8 +123,8 @@ class FlowExportCommand extends AzmgmtCommand {
         filenameFromApi = formatArgument === 'json' ? `${res.properties.displayName}.json` : (filenameRegEx.exec(downloadFileUrl) || ['output.zip'])[0];
 
         if (this.debug) {
-          cmd.log(`Filename from PowerApps API: ${filenameFromApi}`);
-          cmd.log('');
+          logger.log(`Filename from PowerApps API: ${filenameFromApi}`);
+          logger.log('');
         }
 
         const requestOptions: any = {
@@ -136,8 +135,8 @@ class FlowExportCommand extends AzmgmtCommand {
           headers: formatArgument === 'json' ? {
             accept: 'application/json'
           } : {
-            'x-anonymous': true
-          }
+              'x-anonymous': true
+            }
         };
 
         return formatArgument === 'json' ?
@@ -150,15 +149,15 @@ class FlowExportCommand extends AzmgmtCommand {
         fs.writeFileSync(path, file, 'binary');
         if (!args.options.path || this.verbose) {
           if (this.verbose) {
-            cmd.log(`File saved to path '${path}'`);
+            logger.log(`File saved to path '${path}'`);
           }
           else {
-            cmd.log(path);
+            logger.log(path);
           }
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -202,42 +201,40 @@ class FlowExportCommand extends AzmgmtCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const lowerCaseFormat = args.options.format ? args.options.format.toLowerCase() : '';
+  public validate(args: CommandArgs): boolean | string {
+    const lowerCaseFormat = args.options.format ? args.options.format.toLowerCase() : '';
 
-      if (!Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
+    if (!Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
+
+    if (args.options.format && (lowerCaseFormat !== 'json' && lowerCaseFormat !== 'zip')) {
+      return 'Option format must be json or zip. Default is zip';
+    }
+
+    if (lowerCaseFormat === 'json') {
+      if (args.options.packageCreatedBy) {
+        return 'packageCreatedBy cannot be specified with output of json';
       }
 
-      if (args.options.format && (lowerCaseFormat !== 'json' && lowerCaseFormat !== 'zip')) {
-        return 'Option format must be json or zip. Default is zip';
+      if (args.options.packageDescription) {
+        return 'packageDescription cannot be specified with output of json';
       }
 
-      if (lowerCaseFormat === 'json') {
-        if (args.options.packageCreatedBy) {
-          return 'packageCreatedBy cannot be specified with output of json';
-        }
-
-        if (args.options.packageDescription) {
-          return 'packageDescription cannot be specified with output of json';
-        }
-
-        if (args.options.packageDisplayName) {
-          return 'packageDisplayName cannot be specified with output of json';
-        }
-
-        if (args.options.packageSourceEnvironment) {
-          return 'packageSourceEnvironment cannot be specified with output of json';
-        }
+      if (args.options.packageDisplayName) {
+        return 'packageDisplayName cannot be specified with output of json';
       }
 
-      if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
-        return 'Specified path where to save the file does not exist';
+      if (args.options.packageSourceEnvironment) {
+        return 'packageSourceEnvironment cannot be specified with output of json';
       }
+    }
 
-      return true;
-    };
+    if (args.options.path && !fs.existsSync(path.dirname(args.options.path))) {
+      return 'Specified path where to save the file does not exist';
+    }
+
+    return true;
   }
 }
 

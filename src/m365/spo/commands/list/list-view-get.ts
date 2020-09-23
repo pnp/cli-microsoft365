@@ -1,13 +1,12 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import { CommandInstance } from '../../../../cli';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -41,7 +40,7 @@ class SpoListViewGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const baseRestUrl: string = `${args.options.webUrl}/_api/web`;
     let listRestUrl: string = '';
 
@@ -70,9 +69,9 @@ class SpoListViewGetCommand extends SpoCommand {
     request
       .get(requestOptions)
       .then((result: any): void => {
-        cmd.log(result);
+        logger.log(result);
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -107,37 +106,35 @@ class SpoListViewGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (!args.options.listId && !args.options.listTitle && !args.options.listUrl) {
-        return `Specify listId, listTitle or listUrl`;
-      }
+    if (!args.options.listId && !args.options.listTitle && !args.options.listUrl) {
+      return `Specify listId, listTitle or listUrl`;
+    }
 
-      if (args.options.listId &&
-        !Utils.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} in option listId is not a valid GUID`;
-      }
+    if (args.options.listId &&
+      !Utils.isValidGuid(args.options.listId)) {
+      return `${args.options.listId} in option listId is not a valid GUID`;
+    }
 
-      if (!args.options.viewId && !args.options.viewTitle) {
-        return `Specify viewId or viewTitle`;
-      }
+    if (!args.options.viewId && !args.options.viewTitle) {
+      return `Specify viewId or viewTitle`;
+    }
 
-      if (args.options.viewId && args.options.viewTitle) {
-        return `Specify viewId or viewTitle but not both`;
-      }
+    if (args.options.viewId && args.options.viewTitle) {
+      return `Specify viewId or viewTitle but not both`;
+    }
 
-      if (args.options.viewId &&
-        !Utils.isValidGuid(args.options.viewId)) {
-        return `${args.options.viewId} in option viewId is not a valid GUID`;
-      }
+    if (args.options.viewId &&
+      !Utils.isValidGuid(args.options.viewId)) {
+      return `${args.options.viewId} in option viewId is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./page-header-set');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./page-header-set');
 
 describe(commands.PAGE_HEADER_SET, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let body: string;
 
   before(() => {
@@ -21,11 +22,7 @@ describe(commands.PAGE_HEADER_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -101,7 +98,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         pageName: 'home',
@@ -145,7 +142,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         pageName: 'home.aspx',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter'
@@ -162,7 +159,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to default when no type specified', (done) => {
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(body), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
@@ -197,7 +194,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to default when default type specified', (done) => {
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default' } }, () => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(body), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
@@ -232,7 +229,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to none when none specified', (done) => {
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } }, () => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(body), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
@@ -298,7 +295,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
       try {
         assert.strictEqual(JSON.stringify(body), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
@@ -382,7 +379,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
+    command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
       try {
         assert.strictEqual(JSON.stringify(body), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
@@ -435,7 +432,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets image to empty when header set to custom and no image specified', (done) => {
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom' } }, () => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(body), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
@@ -519,7 +516,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg' } }, () => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(body), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
@@ -572,7 +569,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('centers text when textAlignment set to Center', (done) => {
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', textAlignment: 'Center' } }, () => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', textAlignment: 'Center' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(body), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
@@ -607,7 +604,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('shows kicker with the specified kicker text', (done) => {
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showKicker: true, kicker: 'Team Awesome' } }, () => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showKicker: true, kicker: 'Team Awesome' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(body), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
@@ -642,7 +639,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('shows publish date', (done) => {
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showPublishDate: true } }, () => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showPublishDate: true } }, () => {
       try {
         assert.strictEqual(JSON.stringify(body), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
@@ -677,7 +674,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('shows page authors', (done) => {
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', authors: 'Joe Doe, Jane Doe' } }, () => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', authors: 'Joe Doe, Jane Doe' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(body), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
@@ -730,7 +727,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('automatically appends the .aspx extension', (done) => {
-    cmdInstance.action({ options: { debug: false, pageName: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, pageName: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
         done();
@@ -747,7 +744,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -787,7 +784,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -799,7 +796,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -810,82 +807,82 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('fails validation if webUrl is not an absolute URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'foo' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'http://foo' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'http://foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when name and webURL specified and webUrl is a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when pageName has no extension', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page', webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { pageName: 'page', webUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if type is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'invalid' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if type is None', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'None' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'None' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if type is Default', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'Default' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'Default' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if type is Custom', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'Custom' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', type: 'Custom' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if translateX is not a valid number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', translateX: 'abc' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', translateX: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if translateY is not a valid number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', translateY: 'abc' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', translateY: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if layout is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'invalid' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if layout is FullWidthImage', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'FullWidthImage' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'FullWidthImage' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if layout is NoImage', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'NoImage' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'NoImage' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if textAlignment is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'invalid' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if textAlignment is Left', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'Left' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'Left' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if textAlignment is Center', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'Center' } });
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', textAlignment: 'Center' } });
     assert.strictEqual(actual, true);
   });
 });

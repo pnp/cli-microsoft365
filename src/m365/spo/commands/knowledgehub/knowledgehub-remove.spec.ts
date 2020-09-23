@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./knowledgehub-remove');
-import * as assert from 'assert';
-import request from '../../../../request';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./knowledgehub-remove');
 
 describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let requests: any[];
   let promptOptions: any;
 
@@ -43,21 +44,21 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
     requests = [];
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
     promptOptions = undefined;
+  });
+
+  afterEach(() => {
+    Utils.restore(Cli.prompt);
   });
 
   after(() => {
@@ -81,7 +82,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('removes Knowledge Hub settings from tenant without prompting with confirmation argument', (done) => {
-    cmdInstance.action({ options: { debug: false, confirm: true } }, () => {
+    command.action(logger, { options: { debug: false, confirm: true } }, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -102,7 +103,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('removes Knowledge Hub settings from tenant without prompting with confirmation argument (debug)', (done) => {
-    cmdInstance.action({ options: { debug: true, confirm: true } }, () => {
+    command.action(logger, { options: { debug: true, confirm: true } }, () => {
       let deleteRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -123,7 +124,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('removes Knowledge Hub settings from tenant when confirmation argument not passed', (done) => {
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -141,10 +142,11 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('aborts removing Knowledge Hub settings from tenant when prompt not confirmed', (done) => {
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action({ options: { debug: true } }, () => {
+    });
+    command.action(logger, { options: { debug: true } }, () => {
       try {
         assert(requests.length === 0);
         done();
@@ -156,10 +158,11 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('removes removing Knowledge Hub settings from tenant when prompt confirmed', (done) => {
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: true } }, () => {
+    });
+    command.action(logger, { options: { debug: true } }, () => {
       let doneResponse = false;
       log.forEach(l => {
         if (l &&
@@ -209,7 +212,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, confirm: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, confirm: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, 'An error has occurred');
         done();
@@ -229,7 +232,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({ options: { debug: false, confirm: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, confirm: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -244,7 +247,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -255,7 +258,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
   });
 
   it('supports suppressing confirmation prompt', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsConfirmOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {
@@ -267,7 +270,7 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });

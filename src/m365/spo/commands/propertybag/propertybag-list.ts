@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import { ContextInfo } from '../../spo';
-import { SpoPropertyBagBaseCommand, Property } from './propertybag-base';
 import GlobalOptions from '../../../../GlobalOptions';
+import SpoCommand from '../../../base/SpoCommand';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
+import { ContextInfo } from '../../spo';
+import { Property, SpoPropertyBagBaseCommand } from './propertybag-base';
 
 export interface CommandArgs {
   options: Options;
@@ -35,8 +34,8 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    const clientSvcCommons: ClientSvc = new ClientSvc(logger, this.debug);
 
     this
       .getRequestDigest(args.options.webUrl)
@@ -48,16 +47,16 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
       .then((identityResp: IdentityResponse): Promise<any> => {
         const opts: Options = args.options;
         if (opts.folder) {
-          return this.getFolderPropertyBag(identityResp, opts.webUrl, opts.folder, cmd);
+          return this.getFolderPropertyBag(identityResp, opts.webUrl, opts.folder, logger);
         }
 
-        return this.getWebPropertyBag(identityResp, opts.webUrl, cmd);
+        return this.getWebPropertyBag(identityResp, opts.webUrl, logger);
       })
       .then((propertyBagData: any): void => {
-        cmd.log(this.formatOutput(propertyBagData));
+        logger.log(this.formatOutput(propertyBagData));
 
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -76,14 +75,8 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (SpoCommand.isValidSharePointUrl(args.options.webUrl) !== true) {
-        return 'Missing required option url';
-      }
-
-      return true;
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 
   /**

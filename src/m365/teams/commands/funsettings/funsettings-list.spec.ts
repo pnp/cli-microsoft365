@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./funsettings-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./funsettings-list');
 
 describe(commands.TEAMS_FUNSETTINGS_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.TEAMS_FUNSETTINGS_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -72,15 +69,14 @@ describe(commands.TEAMS_FUNSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(
+        assert(loggerSpy.calledWith(
           {
             "allowGiphy": true,
             "giphyContentRating": "moderate",
@@ -112,15 +108,14 @@ describe(commands.TEAMS_FUNSETTINGS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(
+        assert(loggerSpy.calledWith(
           {
             "allowGiphy": true,
             "giphyContentRating": "moderate",
@@ -141,13 +136,12 @@ describe(commands.TEAMS_FUNSETTINGS_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315"
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -159,21 +153,21 @@ describe(commands.TEAMS_FUNSETTINGS_LIST, () => {
   });
 
   it('fails validation if teamId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { teamId: 'invalid' }
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when teamId is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { teamId: 'b1cf424e-f4f6-40b2-974e-6041524f4d66' }
     });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

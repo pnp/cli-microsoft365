@@ -1,5 +1,5 @@
-import { SearchResultProperty } from "./SearchResultProperty";
 import { ResultTable } from "./ResultTable";
+import { SearchResultProperty } from "./SearchResultProperty";
 
 export interface RelevantResults {
   GroupTemplateId: string | null;

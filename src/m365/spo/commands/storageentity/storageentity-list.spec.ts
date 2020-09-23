@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./storageentity-list');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./storageentity-list');
 
 describe(commands.STORAGEENTITY_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -78,9 +75,9 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Key: 'Property1',
             Description: undefined,
@@ -114,7 +111,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -137,7 +134,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let correctResponse: boolean = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -170,7 +167,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    command.action(logger, { options: { debug: false, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -193,7 +190,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let correctResponse: boolean = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -226,7 +223,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unexpected token a in JSON at position 0')));
         done();
@@ -238,7 +235,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -249,7 +246,7 @@ describe(commands.STORAGEENTITY_LIST, () => {
   });
 
   it('requires app catalog URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let requiresAppCatalogUrl = false;
     options.forEach(o => {
       if (o.option.indexOf('<appCatalogUrl>') > -1) {
@@ -261,38 +258,38 @@ describe(commands.STORAGEENTITY_LIST, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('accepts valid SharePoint Online app catalog URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    const actual = command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts valid SharePoint Online site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online URL', () => {
     const url = 'http://contoso';
-    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: url } });
+    const actual = command.validate({ options: { appCatalogUrl: url } });
     assert.strictEqual(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
   it('fails validation when no SharePoint Online app catalog URL specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, 'Missing required option appCatalogUrl');
   });
 
   it('handles promise rejection', (done) => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('error'));
 
-    cmdInstance.action({
+    command.action(logger, {
       options: { debug: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error')));
         done();

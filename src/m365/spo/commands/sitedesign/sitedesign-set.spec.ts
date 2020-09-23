@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./sitedesign-set');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./sitedesign-set');
 
 describe(commands.SITEDESIGN_SET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,16 +23,12 @@ describe(commands.SITEDESIGN_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -82,9 +79,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'New title' } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'New title' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -128,9 +125,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'TeamSite' } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'TeamSite' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -174,9 +171,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'CommunicationSite' } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'CommunicationSite' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -220,9 +217,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -266,9 +263,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25' } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -312,9 +309,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', description: 'New description' } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', description: 'New description' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": "New description",
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -358,9 +355,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageUrl: 'https://contoso.com/image.png' } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageUrl: 'https://contoso.com/image.png' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -404,9 +401,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageAltText: 'Logo image' } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageAltText: 'Logo image' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -450,9 +447,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', version: 2 } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', version: 2 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -496,9 +493,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'true' } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'true' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": true,
@@ -542,9 +539,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'false' } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'false' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -587,9 +584,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c' } }, () => {
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -642,9 +639,9 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', previewImageAltText: 'Contoso team site preview', version: 2, isDefault: 'true' } }, () => {
+    command.action(logger, { options: { debug: true, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', previewImageAltText: 'Contoso team site preview', version: 2, isDefault: 'true' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "Description": 'Contoso team site',
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": true,
@@ -668,7 +665,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    cmdInstance.action({ options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', webTemplate: 'TeamSite', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', webTemplate: 'TeamSite', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -680,7 +677,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -691,7 +688,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying id', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -702,7 +699,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying title', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--title') > -1) {
@@ -713,7 +710,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying webTemplate', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--webTemplate') > -1) {
@@ -724,7 +721,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying siteScripts', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--siteScripts') > -1) {
@@ -735,7 +732,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying description', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--description') > -1) {
@@ -746,7 +743,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying previewImageUrl', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--previewImageUrl') > -1) {
@@ -757,7 +754,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying previewImageAltText', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--previewImageAltText') > -1) {
@@ -768,7 +765,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying version', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--version') > -1) {
@@ -779,7 +776,7 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('supports specifying isDefault', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--isDefault') > -1) {
@@ -790,77 +787,77 @@ describe(commands.SITEDESIGN_SET, () => {
   });
 
   it('fails validation if id specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'abc' } });
+    const actual = command.validate({ options: { id: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passed validation if id is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99' } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if specified webTemplate is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'Invalid' } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'Invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if specified webTemplate is CommunicationSite', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'CommunicationSite' } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'CommunicationSite' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if specified webTemplate is TeamSite', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite' } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if specified siteScripts is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: 'abc' } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the second specified siteScriptId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24,abc" } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24,abc" } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if specified siteScriptId is valid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if all required parameters are valid (multiple siteScripts)', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24,449c0c6d-5380-4df2-b84b-622e0ac8ec25" } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24,449c0c6d-5380-4df2-b84b-622e0ac8ec25" } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if specified version is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', version: 'a' } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', version: 'a' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if specified version is a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', version: 2 } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', version: 2 } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if specified isDefault value is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'invalid' } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if specified isDefault value is true', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'true' } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'true' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if specified isDefault value is false', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'false' } });
+    const actual = command.validate({ options: { id: '9b142c22-037f-4a7f-9017-e9d8c0e34b99', isDefault: 'false' } });
     assert.strictEqual(actual, true);
   });
 });

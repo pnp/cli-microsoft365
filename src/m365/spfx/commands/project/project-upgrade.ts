@@ -1,21 +1,19 @@
-import commands from '../../commands';
-import Command, {
-  CommandOption, CommandError, CommandAction, CommandValidate
-} from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import * as path from 'path';
 import * as fs from 'fs';
-import { Finding, Hash, Dictionary } from './project-upgrade/';
-import { Rule } from './project-upgrade/rules/Rule';
 import * as os from 'os';
-import { Project } from './model';
-import { FindingToReport } from './project-upgrade/FindingToReport';
-import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
-import { ReportData, ReportDataModification } from './ReportData';
+import * as path from 'path';
+import { Logger } from '../../../../cli';
+import { CommandError, CommandOption } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import commands from '../../commands';
 import { BaseProjectCommand } from './base-project-command';
+import { Project } from './model';
+import { Dictionary, Finding, Hash } from './project-upgrade/';
+import { FindingToReport } from './project-upgrade/FindingToReport';
 import { FindingTour } from './project-upgrade/FindingTour';
 import { FindingTourStep } from './project-upgrade/FindingTourStep';
-import { CommandInstance } from '../../../../cli';
+import { FN017001_MISC_npm_dedupe } from './project-upgrade/rules/FN017001_MISC_npm_dedupe';
+import { Rule } from './project-upgrade/rules/Rule';
+import { ReportData, ReportDataModification } from './ReportData';
 
 interface CommandArgs {
   options: Options;
@@ -168,15 +166,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     return telemetryProps;
   }
 
-  public action(): CommandAction {
-    const cmd: Command = this;
-    return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
-      (cmd as any).initAction(args, this);
-      cmd.commandAction(this, args, cb);
-    }
-  }
-
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this.projectRootPath = this.getProjectRoot(process.cwd());
     if (this.projectRootPath === null) {
       cb(new CommandError(`Couldn't find project root folder`, SpfxProjectUpgradeCommand.ERROR_NO_PROJECT_ROOT_FOLDER));
@@ -211,19 +201,19 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     }
 
     if (pos === posTo) {
-      cmd.log(`Project doesn't need to be upgraded`);
+      logger.log(`Project doesn't need to be upgraded`);
       cb();
       return;
     }
 
     if (this.verbose) {
-      cmd.log('Collecting project...');
+      logger.log('Collecting project...');
     }
     const project: Project = this.getProject(this.projectRootPath);
 
     if (this.debug) {
-      cmd.log('Collected project');
-      cmd.log(project);
+      logger.log('Collected project');
+      logger.log(project);
     }
 
     // reverse the list of versions to upgrade to, so that most recent findings
@@ -359,22 +349,22 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
 
     switch (args.options.output) {
       case 'json':
-        cmd.log(findingsToReport);
+        logger.log(findingsToReport);
         break;
       case 'tour':
-        this.writeReportTourFolder(this.getTourReport(findingsToReport, project), cmd, args.options);
+        this.writeReportTourFolder(this.getTourReport(findingsToReport, project), logger, args.options);
         break;
       case 'md':
-        cmd.log(this.getMdReport(findingsToReport));       
+        logger.log(this.getMdReport(findingsToReport));
         break;
       default:
-        cmd.log(this.getTextReport(findingsToReport));
+        logger.log(this.getTextReport(findingsToReport));
     }
 
     cb();
   }
 
-  private writeReportTourFolder(findingsToReport: any, cmd: CommandInstance, options: Options): void {
+  private writeReportTourFolder(findingsToReport: any, logger: Logger, options: Options): void {
     const toursFolder: string = path.join(this.projectRootPath as string, '.tours');
 
     if (!fs.existsSync(toursFolder)) {
@@ -722,22 +712,20 @@ ${f.resolution}
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.packageManager) {
-        if (['npm', 'pnpm', 'yarn'].indexOf(args.options.packageManager) < 0) {
-          return `${args.options.packageManager} is not a supported package manager. Supported package managers are npm, pnpm and yarn`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.packageManager) {
+      if (['npm', 'pnpm', 'yarn'].indexOf(args.options.packageManager) < 0) {
+        return `${args.options.packageManager} is not a supported package manager. Supported package managers are npm, pnpm and yarn`;
       }
+    }
 
-      if (args.options.shell) {
-        if (['bash', 'powershell', 'cmd'].indexOf(args.options.shell) < 0) {
-          return `${args.options.shell} is not a supported shell. Supported shells are bash, powershell and cmd`;
-        }
+    if (args.options.shell) {
+      if (['bash', 'powershell', 'logger'].indexOf(args.options.shell) < 0) {
+        return `${args.options.shell} is not a supported shell. Supported shells are bash, powershell and cmd`;
       }
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,11 +1,11 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import SpoCommand from '../../../base/SpoCommand';
-import { ContextInfo } from '../../spo';
-import GlobalOptions from '../../../../GlobalOptions';
-import { SiteDesign } from './SiteDesign';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ContextInfo } from '../../spo';
+import { SiteDesign } from './SiteDesign';
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -20,11 +20,11 @@ class SpoSiteDesignListCommand extends SpoCommand {
     return 'Lists available site designs for creating modern sites';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let spoUrl: string = '';
 
     this
-      .getSpoUrl(cmd, this.debug)
+      .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<ContextInfo> => {
         spoUrl = _spoUrl;
         return this.getRequestDigest(spoUrl);
@@ -43,10 +43,10 @@ class SpoSiteDesignListCommand extends SpoCommand {
       })
       .then((res: { value: SiteDesign[] }): void => {
         if (args.options.output === 'json') {
-          cmd.log(res.value);
+          logger.log(res.value);
         }
         else {
-          cmd.log(res.value.map(d => {
+          logger.log(res.value.map(d => {
             return {
               Id: d.Id,
               IsDefault: d.IsDefault,
@@ -58,11 +58,11 @@ class SpoSiteDesignListCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

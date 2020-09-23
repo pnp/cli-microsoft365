@@ -1,14 +1,14 @@
-import commands from '../../commands';
-import * as os from 'os';
 import * as chalk from 'chalk';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as os from 'os';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
-import { Outlook } from '../../Outlook';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
+import { Outlook } from '../../Outlook';
 
 interface CommandArgs {
   options: Options;
@@ -40,7 +40,7 @@ class OutlookMessageMoveCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let sourceFolder: string;
     let targetFolder: string;
 
@@ -71,11 +71,11 @@ class OutlookMessageMoveCommand extends GraphCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getFolderId(folderId: string | undefined, folderName: string | undefined): Promise<string> {
@@ -146,30 +146,28 @@ class OutlookMessageMoveCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.sourceFolderId &&
-        !args.options.sourceFolderName) {
-        return 'Specify sourceFolderId or sourceFolderName';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.sourceFolderId &&
+      !args.options.sourceFolderName) {
+      return 'Specify sourceFolderId or sourceFolderName';
+    }
 
-      if (args.options.sourceFolderId &&
-        args.options.sourceFolderName) {
-        return 'Specify either sourceFolderId or sourceFolderName but not both';
-      }
+    if (args.options.sourceFolderId &&
+      args.options.sourceFolderName) {
+      return 'Specify either sourceFolderId or sourceFolderName but not both';
+    }
 
-      if (!args.options.targetFolderId &&
-        !args.options.targetFolderName) {
-        return 'Specify targetFolderId or targetFolderName';
-      }
+    if (!args.options.targetFolderId &&
+      !args.options.targetFolderName) {
+      return 'Specify targetFolderId or targetFolderName';
+    }
 
-      if (args.options.targetFolderId &&
-        args.options.targetFolderName) {
-        return 'Specify either targetFolderId or targetFolderName but not both';
-      }
+    if (args.options.targetFolderId &&
+      args.options.targetFolderName) {
+      return 'Specify either targetFolderId or targetFolderName but not both';
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

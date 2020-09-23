@@ -1,16 +1,15 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
+import * as chalk from 'chalk';
+import * as sinon from 'sinon';
+import appInsights from './appInsights';
 import auth from './Auth';
+import { Cli } from './cli';
+import { Logger } from './cli/Logger';
 import Command, {
-  CommandValidate,
-  CommandOption,
-  CommandTypes,
-  CommandError
+  CommandError, CommandOption,
+  CommandTypes
 } from './Command';
 import Utils from './Utils';
-import appInsights from './appInsights';
-import { CommandInstance } from './cli/CommandInstance';
-import * as chalk from 'chalk';
 
 class MockCommand1 extends Command {
   public get name(): string {
@@ -41,19 +40,14 @@ class MockCommand1 extends Command {
     return true;
   }
 
-  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
-    this.showDeprecationWarning(cmd, 'mc1', this.name);
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+    this.showDeprecationWarning(logger, 'mc1', this.name);
 
     cb();
   }
 
-  public commandHelp(args: any, log: (message: string) => void): void {
-  }
-
-  public validate(): CommandValidate | undefined {
-    return () => {
-      return true;
-    };
+  public validate(): boolean | string {
+    return true;
   }
 
   public types(): CommandTypes | undefined {
@@ -104,8 +98,8 @@ class MockCommand2 extends Command {
     log('MockCommand2 help');
   }
 
-  public handlePromiseError(response: any, cmd: CommandInstance, callback: (err?: any) => void): void {
-    this.handleRejectedODataJsonPromise(response, cmd, callback);
+  public handlePromiseError(response: any, logger: Logger, callback: (err?: any) => void): void {
+    this.handleRejectedODataJsonPromise(response, logger, callback);
   }
 }
 
@@ -140,17 +134,26 @@ class MockCommand3 extends Command {
 
 describe('Command', () => {
   let telemetry: any;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
+  let cli: Cli;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake((t) => {
       telemetry = t;
     });
+    logger = {
+      log: (msg: string) => { }
+    };
+    loggerSpy = sinon.spy(logger, 'log');
+    cli = Cli.getInstance();
   });
 
   beforeEach(() => {
     telemetry = null;
     auth.service.connected = true;
+    cli.currentCommandName = undefined;
   });
 
   afterEach(() => {
@@ -172,9 +175,9 @@ describe('Command', () => {
     assert.strictEqual(typeof cmd.autocomplete(), 'undefined');
   });
 
-  it('has no validation logic by default', () => {
+  it('returns true by default', () => {
     const cmd = new MockCommand2();
-    assert.strictEqual(typeof cmd.validate(), 'undefined');
+    assert.strictEqual(cmd.validate({}), true);
   });
 
   it('does not define option types by default', () => {
@@ -188,13 +191,6 @@ describe('Command', () => {
   });
 
   it('displays error message when it\'s serialized in the error property', () => {
-    const cmd = {
-      commandWrapper: {
-        command: 'command'
-      },
-      log: (msg?: string) => { },
-      prompt: () => { }
-    };
     const mock = new MockCommand2();
     mock.handlePromiseError({
       error: JSON.stringify({
@@ -202,19 +198,12 @@ describe('Command', () => {
           message: 'An error has occurred'
         }
       })
-    }, cmd, (err?: any) => {
+    }, logger, (err?: any) => {
       assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
     });
   });
 
   it('displays the raw error message when the serialized value from the error property is not an error object', () => {
-    const cmd = {
-      commandWrapper: {
-        command: 'command'
-      },
-      log: (msg?: string) => { },
-      prompt: () => { }
-    };
     const mock = new MockCommand2();
     mock.handlePromiseError({
       error: JSON.stringify({
@@ -222,7 +211,7 @@ describe('Command', () => {
           id: '123'
         }
       })
-    }, cmd, (err?: any) => {
+    }, logger, (err?: any) => {
       assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(JSON.stringify({
         error: {
           id: '123'
@@ -232,63 +221,34 @@ describe('Command', () => {
   });
 
   it('displays the raw error message when the serialized value from the error property is not a JSON object', () => {
-    const cmd = {
-      commandWrapper: {
-        command: 'command'
-      },
-      log: (msg?: string) => { },
-      prompt: () => { }
-    };
     const mock = new MockCommand2();
     mock.handlePromiseError({
       error: 'abc'
-    }, cmd, (err?: any) => {
+    }, logger, (err?: any) => {
       assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
     });
   });
 
   it('displays error message coming from ADALJS', () => {
-    const cmd = {
-      commandWrapper: {
-        command: 'command'
-      },
-      log: (msg?: string) => { },
-      prompt: () => { }
-    };
     const mock = new MockCommand2();
     mock.handlePromiseError({
       error: { error_description: 'abc' }
-    }, cmd, (err?: any) => {
+    }, logger, (err?: any) => {
       assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
     });
   });
 
   it('shows deprecation warning when command executed using the deprecated name', () => {
-    const cmd = {
-      commandWrapper: {
-        command: 'mc1'
-      },
-      log: (msg?: string) => { },
-      prompt: () => { }
-    };
-    const cmdLogSpy: sinon.SinonSpy = sinon.spy(cmd, 'log');
+    cli.currentCommandName = 'mc1';
     const mock = new MockCommand1();
-    mock.commandAction(cmd, {}, (err?: any): void => {
-      assert(cmdLogSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)))
+    mock.commandAction(logger, {}, (err?: any): void => {
+      assert(loggerSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)))
     });
   });
 
   it('logs command name in the telemetry when command name used', (done) => {
     const mock = new MockCommand1();
-    const cmd = {
-      action: mock.action(),
-      commandWrapper: {
-        command: 'mock-command'
-      },
-      log: (msg?: string) => { },
-      prompt: () => { }
-    };
-    cmd.action({ options: {} }, () => {
+    mock.action(logger, { options: {} }, () => {
       try {
         assert.strictEqual(telemetry.name, 'mock-command');
         done();
@@ -300,16 +260,9 @@ describe('Command', () => {
   });
 
   it('logs command alias in the telemetry when command alias used', (done) => {
+    cli.currentCommandName = 'mc1';
     const mock = new MockCommand1();
-    const cmd = {
-      action: mock.action(),
-      commandWrapper: {
-        command: 'mc1'
-      },
-      log: (msg?: string) => { },
-      prompt: () => { }
-    };
-    cmd.action({ options: {} }, () => {
+    mock.action(logger, { options: {} }, () => {
       try {
         assert.strictEqual(telemetry.name, 'mc1');
         done();
@@ -321,16 +274,9 @@ describe('Command', () => {
   });
 
   it('logs empty command name in telemetry when command called using something else than name or alias', (done) => {
+    cli.currentCommandName = 'foo';
     const mock = new MockCommand1();
-    const cmd = {
-      action: mock.action(),
-      commandWrapper: {
-        command: 'foo'
-      },
-      log: (msg?: string) => { },
-      prompt: () => { }
-    };
-    cmd.action({ options: {} }, () => {
+    mock.action(logger, { options: {} }, () => {
       try {
         assert.strictEqual(telemetry.name, '');
         done();

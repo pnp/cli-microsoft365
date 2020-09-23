@@ -1,14 +1,14 @@
+import * as chalk from 'chalk';
+import { Cli, Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
-import commands from '../../commands';
-import request from '../../../../request';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
-import { CommandOption, CommandValidate } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import { SpoOperation } from './SpoOperation';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -45,41 +45,41 @@ class SpoSiteRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeSite = (): void => {
       this.dots = '';
 
       this
-        .getSpoAdminUrl(cmd, this.debug)
+        .getSpoAdminUrl(logger, this.debug)
         .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
           this.spoAdminUrl = _spoAdminUrl;
 
-          return this.ensureFormDigest(this.spoAdminUrl, cmd, this.context, this.debug);
+          return this.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
         })
         .then((res: FormDigestInfo): Promise<void> => {
           this.context = res;
 
           if (args.options.fromRecycleBin) {
             if (this.verbose) {
-              cmd.log(`Deleting site collection from recycle bin ${args.options.url}...`);
+              logger.log(`Deleting site collection from recycle bin ${args.options.url}...`);
             }
 
-            return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, cmd);
+            return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
           }
           else {
             if (this.verbose) {
-              cmd.log(`Deleting site collection ${args.options.url}...`);
+              logger.log(`Deleting site collection ${args.options.url}...`);
             }
 
-            return this.deleteSite(args.options.url, args.options.wait, cmd);
+            return this.deleteSite(args.options.url, args.options.wait, logger);
           }
         })
         .then((): Promise<void> => {
           if (args.options.skipRecycleBin) {
             if (this.verbose) {
-              cmd.log(`Also deleting site collection from recycle bin ${args.options.url}...`)
+              logger.log(`Also deleting site collection from recycle bin ${args.options.url}...`)
             }
-            return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, cmd);
+            return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
           }
           else {
             return Promise.resolve();
@@ -87,18 +87,18 @@ class SpoSiteRemoveCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
 
           cb();
-        }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
       removeSite();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -114,15 +114,15 @@ class SpoSiteRemoveCommand extends SpoCommand {
     }
   }
 
-  private deleteSite(url: string, wait: boolean, cmd: CommandInstance): Promise<void> {
+  private deleteSite(url: string, wait: boolean, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
 
           if (this.verbose) {
-            cmd.log(`Deleting site ${url} ...`);
+            logger.log(`Deleting site ${url} ...`);
           }
 
           const requestOptions: any = {
@@ -150,21 +150,21 @@ class SpoSiteRemoveCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
     });
   }
 
-  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, cmd: CommandInstance): Promise<void> {
+  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
           if (this.verbose) {
-            cmd.log(`Deleting site ${url} from the recycle bin...`);
+            logger.log(`Deleting site ${url} from the recycle bin...`);
           }
 
           const requestOptions: any = {
@@ -192,7 +192,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
@@ -227,10 +227,8 @@ class SpoSiteRemoveCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.url);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.url);
   }
 }
 

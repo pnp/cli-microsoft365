@@ -1,7 +1,7 @@
-import { TokenStorage } from './TokenStorage';
+import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import * as fs from 'fs';
+import { TokenStorage } from './TokenStorage';
 
 export class FileTokenStorage implements TokenStorage {
   private filePath: string = path.join(os.homedir(), '.cli-m365-tokens.json');

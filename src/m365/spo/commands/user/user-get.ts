@@ -1,12 +1,11 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -36,9 +35,9 @@ class SpoUserGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving information for list in site at ${args.options.webUrl}...`);
+      logger.log(`Retrieving information for list in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -65,10 +64,10 @@ class SpoUserGetCommand extends SpoCommand {
     request
       .get(requestOptions)
       .then((userInstance): void => {
-        cmd.log(userInstance);
+        logger.log(userInstance);
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -95,25 +94,23 @@ class SpoUserGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.id && !args.options.email && !args.options.loginName) {
-        return 'Specify id, email or loginName, one is required';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.id && !args.options.email && !args.options.loginName) {
+      return 'Specify id, email or loginName, one is required';
+    }
 
-      if ((args.options.id && args.options.email) ||
-        (args.options.id && args.options.loginName) ||
-        (args.options.loginName && args.options.email)) {
-        return 'Use either email, id or loginName, but not all';
-      }
+    if ((args.options.id && args.options.email) ||
+      (args.options.id && args.options.loginName) ||
+      (args.options.loginName && args.options.email)) {
+      return 'Use either email, id or loginName, but not all';
+    }
 
-      if (args.options.id &&
-        typeof args.options.id !== 'number') {
-        return `Specified id ${args.options.id} is not a number`;
-      }
+    if (args.options.id &&
+      typeof args.options.id !== 'number') {
+      return `Specified id ${args.options.id} is not a number`;
+    }
 
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

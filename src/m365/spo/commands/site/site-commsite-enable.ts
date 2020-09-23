@@ -1,17 +1,15 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -37,17 +35,17 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const designPackageId: string = args.options.designPackageId || '{d604dac3-50d3-405e-9ab9-d4713cda74ef}';
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
 
         if (this.debug) {
-          cmd.log(`Retrieving request digest...`);
+          logger.log(`Retrieving request digest...`);
         }
 
         return this.getRequestDigest(spoAdminUrl);
@@ -72,11 +70,11 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -95,15 +93,13 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.designPackageId &&
-        !Utils.isValidGuid(args.options.designPackageId)) {
-        return `${args.options.designPackageId} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.designPackageId &&
+      !Utils.isValidGuid(args.options.designPackageId)) {
+      return `${args.options.designPackageId} is not a valid GUID`;
+    }
 
-      return SpoCommand.isValidSharePointUrl(args.options.url);
-    };
+    return SpoCommand.isValidSharePointUrl(args.options.url);
   }
 }
 

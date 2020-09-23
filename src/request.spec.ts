@@ -1,15 +1,15 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
-import _request from './request';
-import * as requestPromise from 'request-promise-native';
-import Utils from './Utils';
-import * as https from 'https';
-import request = require('request');
-import auth from './Auth';
 import { ClientRequest } from 'http';
+import * as https from 'https';
+import * as requestPromise from 'request-promise-native';
+import * as sinon from 'sinon';
+import auth from './Auth';
+import _request from './request';
+import Utils from './Utils';
+import request = require('request');
 
 describe('Request', () => {
-  const cmdInstance = {
+  const logger = {
     commandWrapper: {
       command: 'command'
     },
@@ -21,7 +21,7 @@ describe('Request', () => {
   let _options: requestPromise.OptionsWithUrl;
 
   beforeEach(() => {
-    _request.cmd = cmdInstance;
+    _request.logger = logger;
     _request.debug = false;
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
   });
@@ -32,13 +32,13 @@ describe('Request', () => {
       global.setTimeout,
       https.request,
       (_request as any).req,
-      cmdInstance.log,
+      logger.log,
       auth.ensureAccessToken
     ]);
   });
 
   it('fails when no command instance set', (done) => {
-    _request.cmd = undefined as any;
+    _request.logger = undefined as any;
     _request
       .get({
         url: 'https://contoso.sharepoint.com/'
@@ -47,7 +47,7 @@ describe('Request', () => {
         done('Error expected');
       }, (err: any) => {
         try {
-          assert.strictEqual(err, 'Command reference not set on the request object');
+          assert.strictEqual(err, 'Logger not set on the request object');
           done();
         }
         catch (err) {
@@ -598,7 +598,7 @@ describe('Request', () => {
   it('logs additional info for throttled requests in debug mode', (done) => {
     let i: number = 0;
     _request.debug = true;
-    const logSpy: sinon.SinonSpy = sinon.spy(cmdInstance, 'log');
+    const logSpy: sinon.SinonSpy = sinon.spy(logger, 'log');
 
     sinon.stub(_request as any, 'req').callsFake(() => {
       if (i++ === 0) {
@@ -639,7 +639,7 @@ describe('Request', () => {
 
   it('logs response body in debug mode', (done) => {
     _request.debug = true;
-    const logSpy: sinon.SinonSpy = sinon.spy(cmdInstance, 'log');
+    const logSpy: sinon.SinonSpy = sinon.spy(logger, 'log');
 
     sinon.stub(_request as any, 'req').callsFake(() => {
       return Promise.resolve({

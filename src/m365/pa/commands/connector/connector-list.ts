@@ -1,11 +1,11 @@
-import commands from '../../commands';
-import flowCommands from '../../../flow/commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption
+    CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
 import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
-import { CommandInstance } from '../../../../cli';
+import flowCommands from '../../../flow/commands';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -28,18 +28,18 @@ class PaConnectorListCommand extends AzmgmtItemsListCommand<{ name: string, prop
     return [flowCommands.CONNECTOR_LIST];
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const url: string = `${this.resource}providers/Microsoft.PowerApps/apis?api-version=2016-11-01&$filter=environment%20eq%20%27${encodeURIComponent(args.options.environment)}%27%20and%20IsCustomApi%20eq%20%27True%27`;
 
     this
-      .getAllItems(url, cmd, true)
+      .getAllItems(url, logger, true)
       .then((): void => {
         if (this.items.length > 0) {
           if (args.options.output === 'json') {
-            cmd.log(this.items);
+            logger.log(this.items);
           }
           else {
-            cmd.log(this.items.map(f => {
+            logger.log(this.items.map(f => {
               return {
                 name: f.name,
                 displayName: f.properties.displayName
@@ -49,12 +49,12 @@ class PaConnectorListCommand extends AzmgmtItemsListCommand<{ name: string, prop
         }
         else {
           if (this.verbose) {
-            cmd.log('No custom connectors found');
+            logger.log('No custom connectors found');
           }
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {

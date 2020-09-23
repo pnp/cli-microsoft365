@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./message-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./message-list');
 
 describe(commands.YAMMER_MESSAGE_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   let firstMessageBatch: any = {
     messages: [{ "sender_id": 1496550646, "replied_to_id": 1496550647, "id": 10123190123123, "thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1", "body": { "plain": "message1 message is longer than 25 chars. Just for testing shortening" } },
@@ -39,16 +40,12 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -83,7 +80,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -95,57 +92,57 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
   });
 
   it('passes validation without parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation with parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { limit: 10 } });
+    const actual = command.validate({ options: { limit: 10 } });
     assert.strictEqual(actual, true);
   });
 
   it('limit must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { limit: 'abc' } });
+    const actual = command.validate({ options: { limit: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('olderThanId must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { olderThanId: 'abc' } });
+    const actual = command.validate({ options: { olderThanId: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('groupId must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { groupId: 'abc' } });
+    const actual = command.validate({ options: { groupId: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('threadId must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { threadId: 'abc' } });
+    const actual = command.validate({ options: { threadId: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('you are not allowed to use groupId and threadId at the same time', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { groupId: 123, threadId: 123 } });
+    const actual = command.validate({ options: { groupId: 123, threadId: 123 } });
     assert.notStrictEqual(actual, true);
   });
 
   it('you cannot specify the feedType with groupId or threadId at the same time', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { feedType: 'All', threadId: 123 } });
+    const actual = command.validate({ options: { feedType: 'All', threadId: 123 } });
     assert.notStrictEqual(actual, true);
   });
 
   it('Fails in case FeedType is not correct', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { feedType: 'WrongValue' } });
+    const actual = command.validate({ options: { feedType: 'WrongValue' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('you are not allowed to use groupId and threadId and feedType at the same time', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { feedType: 'Private', groupId: 123, threadId: 123 } });
+    const actual = command.validate({ options: { feedType: 'Private', groupId: 123, threadId: 123 } });
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -162,9 +159,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -180,9 +177,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { feedType: 'Top' } }, (err?: any) => {
+    command.action(logger, { options: { feedType: 'Top' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -198,9 +195,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { feedType: 'My' } }, (err?: any) => {
+    command.action(logger, { options: { feedType: 'My' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -216,9 +213,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { feedType: 'Following' } }, (err?: any) => {
+    command.action(logger, { options: { feedType: 'Following' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -234,9 +231,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { feedType: 'Sent' } }, (err?: any) => {
+    command.action(logger, { options: { feedType: 'Sent' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -252,9 +249,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { feedType: 'Private' } }, (err?: any) => {
+    command.action(logger, { options: { feedType: 'Private' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -270,9 +267,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { feedType: 'Received' } }, (err?: any) => {
+    command.action(logger, { options: { feedType: 'Received' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -288,9 +285,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { feedType: 'All' } }, (err?: any) => {
+    command.action(logger, { options: { feedType: 'All' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -306,9 +303,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { groupId: 123123 } }, (err?: any) => {
+    command.action(logger, { options: { groupId: 123123 } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -324,9 +321,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { threadId: 123123 } }, (err?: any) => {
+    command.action(logger, { options: { threadId: 123123 } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -346,9 +343,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
         return Promise.resolve(secondMessageBatch);
       }
     });
-    cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].length, 7);
+        assert.strictEqual(loggerSpy.lastCall.args[0].length, 7);
         done();
       }
       catch (e) {
@@ -368,9 +365,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
         return Promise.resolve(secondMessageBatch);
       }
     });
-    cmdInstance.action({ options: { limit: 6, output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { limit: 6, output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].length, 6);
+        assert.strictEqual(loggerSpy.lastCall.args[0].length, 6);
         done();
       }
       catch (e) {
@@ -394,7 +391,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
         });
       }
     });
-    cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -412,9 +409,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { olderThanId: 10123190123128, output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { olderThanId: 10123190123128, output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -430,9 +427,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { olderThanId: 10123190123128, threaded: true, output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { olderThanId: 10123190123128, threaded: true, output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -448,9 +445,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { threaded: true, output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { threaded: true, output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {

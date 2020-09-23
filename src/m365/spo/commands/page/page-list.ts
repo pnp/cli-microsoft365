@@ -1,13 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import SpoCommand from '../../../base/SpoCommand';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -26,9 +25,9 @@ class SpoPageListCommand extends SpoCommand {
     return 'Lists all modern pages in the given site';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving client-side pages...`);
+      logger.log(`Retrieving client-side pages...`);
     }
 
     const requestOptions: any = {
@@ -45,10 +44,10 @@ class SpoPageListCommand extends SpoCommand {
         if (res.value && res.value.length > 0) {
           const clientSidePages: any[] = res.value.filter(p => p.ListItemAllFields.ClientSideApplicationId === 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec');
           if (args.options.output === 'json') {
-            cmd.log(clientSidePages);
+            logger.log(clientSidePages);
           }
           else {
-            cmd.log(clientSidePages.map(p => {
+            logger.log(clientSidePages.map(p => {
               return {
                 Name: p.Name,
                 Title: p.Title
@@ -58,11 +57,11 @@ class SpoPageListCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -77,10 +76,8 @@ class SpoPageListCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

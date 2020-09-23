@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption } from '../../../../Command';
-import * as sinon from 'sinon';
-import auth from '../../../../Auth';
-const command: Command = require('./homesite-get');
 import * as assert from 'assert';
+import * as chalk from 'chalk';
+import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import appInsights from '../../../../appInsights';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./homesite-get');
 
 describe(commands.HOMESITE_GET, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -23,16 +24,12 @@ describe(commands.HOMESITE_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -73,9 +70,9 @@ describe(commands.HOMESITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "SiteId": "53ad95dc-5d2c-42a3-a63c-716f7b8014f5",
           "WebId": "288ce497-483c-4cd5-b8a2-27b726d002e2",
           "LogoUrl": "https://contoso.sharepoint.com/sites/Work/siteassets/work.png",
@@ -105,9 +102,9 @@ describe(commands.HOMESITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -127,9 +124,9 @@ describe(commands.HOMESITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -141,7 +138,7 @@ describe(commands.HOMESITE_GET, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
         done();
@@ -153,7 +150,7 @@ describe(commands.HOMESITE_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

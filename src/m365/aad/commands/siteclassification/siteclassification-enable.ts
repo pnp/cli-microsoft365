@@ -1,14 +1,14 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption
+    CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 import { DirectorySetting, UpdateDirectorySetting } from './DirectorySetting';
 import { DirectorySettingValue } from './DirectorySettingValue';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -37,7 +37,7 @@ class AadSiteClassificationEnableCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const requestOptions: any = {
       url: `${this.resource}/beta/directorySettingTemplates`,
       headers: {
@@ -126,11 +126,11 @@ class AadSiteClassificationEnableCommand extends GraphCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

@@ -1,14 +1,14 @@
-import commands from '../../commands';
-import * as path from 'path';
-import * as fs from 'fs';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import * as fs from 'fs';
+import * as path from 'path';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -45,7 +45,7 @@ class OutlookSendmailCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let bodyContents: string = args.options.bodyContents as string;
     if (args.options.bodyContentsFilePath) {
       bodyContents = fs.readFileSync(path.resolve(args.options.bodyContentsFilePath), 'utf-8');
@@ -81,11 +81,11 @@ class OutlookSendmailCommand extends GraphCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -121,42 +121,40 @@ class OutlookSendmailCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.bodyContents && !args.options.bodyContentsFilePath) {
-        return 'Specify either bodyContents or bodyContentsFilePath';
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.bodyContents && !args.options.bodyContentsFilePath) {
+      return 'Specify either bodyContents or bodyContentsFilePath';
+    }
+
+    if (args.options.bodyContents && args.options.bodyContentsFilePath) {
+      return 'Specify either bodyContents or bodyContentsFilePath but not both';
+    }
+
+    if (args.options.bodyContentsFilePath) {
+      const fullPath: string = path.resolve(args.options.bodyContentsFilePath);
+
+      if (!fs.existsSync(fullPath)) {
+        return `File '${fullPath}' not found`;
       }
 
-      if (args.options.bodyContents && args.options.bodyContentsFilePath) {
-        return 'Specify either bodyContents or bodyContentsFilePath but not both';
+      if (fs.lstatSync(fullPath).isDirectory()) {
+        return `Path '${fullPath}' points to a directory`;
       }
+    }
 
-      if (args.options.bodyContentsFilePath) {
-        const fullPath: string = path.resolve(args.options.bodyContentsFilePath);
+    if (args.options.bodyContentType &&
+      args.options.bodyContentType !== 'Text' &&
+      args.options.bodyContentType !== 'HTML') {
+      return `${args.options.bodyContents} is not a valid value for the bodyContents option. Allowed values are Text|HTML`;
+    }
 
-        if (!fs.existsSync(fullPath)) {
-          return `File '${fullPath}' not found`;
-        }
+    if (args.options.saveToSentItems &&
+      args.options.saveToSentItems !== 'true' &&
+      args.options.saveToSentItems !== 'false') {
+      return `${args.options.saveToSentItems} is not a valid value for the saveToSentItems option. Allowed values are true|false`;
+    }
 
-        if (fs.lstatSync(fullPath).isDirectory()) {
-          return `Path '${fullPath}' points to a directory`;
-        }
-      }
-
-      if (args.options.bodyContentType &&
-        args.options.bodyContentType !== 'Text' &&
-        args.options.bodyContentType !== 'HTML') {
-        return `${args.options.bodyContents} is not a valid value for the bodyContents option. Allowed values are Text|HTML`;
-      }
-
-      if (args.options.saveToSentItems &&
-        args.options.saveToSentItems !== 'true' &&
-        args.options.saveToSentItems !== 'false') {
-        return `${args.options.saveToSentItems} is not a valid value for the saveToSentItems option. Allowed values are true|false`;
-      }
-
-      return true;
-    };
+    return true;
   }
 }
 

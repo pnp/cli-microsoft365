@@ -1,9 +1,9 @@
-import { CommandOption, CommandValidate } from '../../../../Command';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -28,7 +28,7 @@ class YammerNetworkListCommand extends YammerCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/v1/networks/current.json`,
       headers: {
@@ -45,13 +45,13 @@ class YammerNetworkListCommand extends YammerCommand {
       .get(requestOptions)
       .then((res: any): void => {
         if (args.options.output === 'json') {
-          cmd.log(res);
+          logger.log(res);
         }
         else {
-          cmd.log((res as any[]).map(n => ({ id: n.id, name: n.name, email: n.email, community: n.community, permalink: n.permalink, web_url: n.web_url })));
+          logger.log((res as any[]).map(n => ({ id: n.id, name: n.name, email: n.email, community: n.community, permalink: n.permalink, web_url: n.web_url })));
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -64,12 +64,6 @@ class YammerNetworkListCommand extends YammerCommand {
 
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
-  }
-
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return true;
-    };
   }
 }
 

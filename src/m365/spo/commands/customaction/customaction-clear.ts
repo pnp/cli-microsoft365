@@ -1,13 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -35,7 +34,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const clearCustomActions = (): void => {
       ((): Promise<void> => {
         if (args.options.scope && args.options.scope.toLowerCase() !== "all") {
@@ -46,17 +45,17 @@ class SpoCustomActionClearCommand extends SpoCommand {
       })()
         .then((): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
           cb();
-        }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
       clearCustomActions();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -127,26 +126,24 @@ class SpoCustomActionClearCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.url) {
-        return 'Missing required option url';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.url) {
+      return 'Missing required option url';
+    }
 
-      const isValidUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-      if (typeof isValidUrl === 'string') {
-        return isValidUrl;
-      }
+    const isValidUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+    if (typeof isValidUrl === 'string') {
+      return isValidUrl;
+    }
 
-      if (args.options.scope &&
-        args.options.scope !== 'Site' &&
-        args.options.scope !== 'Web' &&
-        args.options.scope !== 'All') {
-        return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
-      }
+    if (args.options.scope &&
+      args.options.scope !== 'Site' &&
+      args.options.scope !== 'Web' &&
+      args.options.scope !== 'All') {
+      return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./hubsite-disconnect');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./hubsite-disconnect');
 
 describe(commands.HUBSITE_DISCONNECT, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -24,26 +25,23 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
     promptOptions = undefined;
   });
 
   afterEach(() => {
     Utils.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -75,9 +73,9 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -97,9 +95,9 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } }, () => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/Sales', confirm: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -109,7 +107,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   });
 
   it('prompts before disconnecting the specified site from its hub site when confirm option not passed', (done) => {
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -128,10 +126,11 @@ describe(commands.HUBSITE_DISCONNECT, () => {
 
   it('aborts disconnecting site from its hub site when prompt not confirmed', (done) => {
     const postSpy = sinon.spy(request, 'post');
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+    });
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
         assert(postSpy.notCalled);
         done();
@@ -146,10 +145,11 @@ describe(commands.HUBSITE_DISCONNECT, () => {
     const postStub = sinon.stub(request, 'post').callsFake(() => Promise.resolve({
       "odata.null": true
     }));
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+    });
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
         assert(postStub.called);
         done();
@@ -175,7 +175,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', confirm: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Exception of type \'Microsoft.SharePoint.Client.ResourceNotFoundException\' was thrown.')));
         done();
@@ -187,7 +187,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -198,7 +198,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   });
 
   it('supports specifying site URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--url') > -1) {
@@ -209,12 +209,12 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   });
 
   it('fails validation if url is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'abc' } });
+    const actual = command.validate({ options: { url: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when url is a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com/sites/Sales' } });
+    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/Sales' } });
     assert.strictEqual(actual, true);
   });
 });

@@ -1,16 +1,12 @@
-import auth from '../../Auth';
-import commands from './commands';
-import GlobalOptions from '../../GlobalOptions';
-import Command, {
-  CommandOption,
-  CommandValidate,
-  CommandError,
-  CommandAction
-} from '../../Command';
-import { AuthType } from '../../Auth';
-import * as fs from 'fs';
-import { CommandInstance } from '../../cli';
 import * as chalk from 'chalk';
+import * as fs from 'fs';
+import auth, { AuthType } from '../../Auth';
+import { Logger } from '../../cli';
+import Command, {
+  CommandError, CommandOption
+} from '../../Command';
+import GlobalOptions from '../../GlobalOptions';
+import commands from './commands';
 
 interface CommandArgs {
   options: Options;
@@ -39,22 +35,22 @@ class LoginCommand extends Command {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     // disconnect before re-connecting
     if (this.debug) {
-      cmd.log(`Logging out from Microsoft 365...`);
+      logger.log(`Logging out from Microsoft 365...`);
     }
 
     const logout: () => void = (): void => {
       auth.service.logout();
       if (this.verbose) {
-        cmd.log(chalk.green('DONE'));
+        logger.log(chalk.green('DONE'));
       }
     }
 
     const login: () => void = (): void => {
       if (this.verbose) {
-        cmd.log(`Signing in to Microsoft 365...`);
+        logger.log(`Signing in to Microsoft 365...`);
       }
 
       switch (args.options.authType) {
@@ -76,19 +72,19 @@ class LoginCommand extends Command {
       }
 
       auth
-        .ensureAccessToken(auth.defaultResource, cmd, this.debug)
+        .ensureAccessToken(auth.defaultResource, logger, this.debug)
         .then((): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
 
           auth.service.connected = true;
           cb();
         }, (rej: string): void => {
           if (this.debug) {
-            cmd.log('Error:');
-            cmd.log(rej);
-            cmd.log('');
+            logger.log('Error:');
+            logger.log(rej);
+            logger.log('');
           }
 
           if (rej !== 'Polling_Request_Cancelled') {
@@ -106,7 +102,7 @@ class LoginCommand extends Command {
         login();
       }, (error: any): void => {
         if (this.debug) {
-          cmd.log(new CommandError(error));
+          logger.log(new CommandError(error));
         }
 
         logout();
@@ -114,18 +110,15 @@ class LoginCommand extends Command {
       });
   }
 
-  public action(): CommandAction {
-    const cmd: Command = this;
-    return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
-      auth
-        .restoreAuth()
-        .then((): void => {
-          (cmd as any).initAction(args, this);
-          cmd.commandAction(this, args, cb);
-        }, (error: any): void => {
-          cb(new CommandError(error));
-        });
-    }
+  public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    auth
+      .restoreAuth()
+      .then((): void => {
+        this.initAction(args, logger);
+        this.commandAction(logger, args, cb);
+      }, (error: any): void => {
+        cb(new CommandError(error));
+      });
   }
 
   public options(): CommandOption[] {
@@ -157,34 +150,32 @@ class LoginCommand extends Command {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.authType === 'password') {
-        if (!args.options.userName) {
-          return 'Required option userName missing';
-        }
-
-        if (!args.options.password) {
-          return 'Required option password missing';
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.authType === 'password') {
+      if (!args.options.userName) {
+        return 'Required option userName missing';
       }
 
-      if (args.options.authType === 'certificate') {
-        if (!args.options.certificateFile) {
-          return 'Required option certificateFile missing';
-        }
+      if (!args.options.password) {
+        return 'Required option password missing';
+      }
+    }
 
-        if (!fs.existsSync(args.options.certificateFile)) {
-          return `File '${args.options.certificateFile}' does not exist`;
-        }
-
-        if (!args.options.thumbprint) {
-          return 'Required option thumbprint missing';
-        }
+    if (args.options.authType === 'certificate') {
+      if (!args.options.certificateFile) {
+        return 'Required option certificateFile missing';
       }
 
-      return true;
-    };
+      if (!fs.existsSync(args.options.certificateFile)) {
+        return `File '${args.options.certificateFile}' does not exist`;
+      }
+
+      if (!args.options.thumbprint) {
+        return 'Required option thumbprint missing';
+      }
+    }
+
+    return true;
   }
 }
 

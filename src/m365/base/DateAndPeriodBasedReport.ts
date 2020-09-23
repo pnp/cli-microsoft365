@@ -1,9 +1,9 @@
+import { Logger } from '../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../Command';
-import PeriodBasedReport from './PeriodBasedReport';
 import GlobalOptions from '../../GlobalOptions';
-import { CommandInstance } from '../../cli';
+import PeriodBasedReport from './PeriodBasedReport';
 
 interface CommandArgs {
   options: DateAndPeriodBasedOptions;
@@ -15,11 +15,11 @@ interface DateAndPeriodBasedOptions extends GlobalOptions {
 }
 
 export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport {
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const periodParameter: string = args.options.period ? `${this.usageEndpoint}(period='${encodeURIComponent(args.options.period)}')` : '';
     const dateParameter: string = args.options.date ? `${this.usageEndpoint}(date=${encodeURIComponent(args.options.date)})` : '';
     const endpoint: string = `${this.resource}/v1.0/reports/${(args.options.period ? periodParameter : dateParameter)}`;
-    this.executeReport(endpoint, cmd, args.options.output, cb);
+    this.executeReport(endpoint, logger, args.options.output, cb);
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -45,21 +45,19 @@ export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.period && !args.options.date) {
-        return 'Specify period or date, one is required.';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.period && !args.options.date) {
+      return 'Specify period or date, one is required.';
+    }
 
-      if (args.options.period && args.options.date) {
-        return 'Specify period or date but not both.';
-      }
+    if (args.options.period && args.options.date) {
+      return 'Specify period or date but not both.';
+    }
 
-      if (args.options.date && !((args.options.date as string).match(/^\d{4}-\d{2}-\d{2}$/))) {
-        return `${args.options.date} is not a valid date. The supported date format is YYYY-MM-DD`;
-      }
+    if (args.options.date && !((args.options.date as string).match(/^\d{4}-\d{2}-\d{2}$/))) {
+      return `${args.options.date} is not a valid date. The supported date format is YYYY-MM-DD`;
+    }
 
-      return this.validatePeriod(args.options.period);
-    };
+    return this.validatePeriod(args.options.period);
   }
 }

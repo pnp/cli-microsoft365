@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import Utils from '../../../../Utils';
 import AadCommand from '../../../base/AadCommand';
+import commands from '../../commands';
 import { OAuth2PermissionGrant } from './OAuth2PermissionGrant';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -27,9 +26,9 @@ class AadOAuth2GrantListCommand extends AadCommand {
     return 'Lists OAuth2 permission grants for the specified service principal';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving list of OAuth grants for the service principal...`);
+      logger.log(`Retrieving list of OAuth grants for the service principal...`);
     }
 
     const requestOptions: any = {
@@ -45,10 +44,10 @@ class AadOAuth2GrantListCommand extends AadCommand {
       .then((res: { value: OAuth2PermissionGrant[] }): void => {
         if (res.value && res.value.length > 0) {
           if (args.options.output === 'json') {
-            cmd.log(res.value);
+            logger.log(res.value);
           }
           else {
-            cmd.log(res.value.map(g => {
+            logger.log(res.value.map(g => {
               return {
                 objectId: g.objectId,
                 resourceId: g.resourceId,
@@ -59,7 +58,7 @@ class AadOAuth2GrantListCommand extends AadCommand {
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -74,14 +73,12 @@ class AadOAuth2GrantListCommand extends AadCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.clientId)) {
-        return `${args.options.clientId} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.clientId)) {
+      return `${args.options.clientId} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

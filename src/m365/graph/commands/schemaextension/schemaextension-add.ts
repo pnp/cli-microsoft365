@@ -1,13 +1,13 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -30,9 +30,9 @@ class GraphSchemaExtensionAdd extends GraphCommand {
     return 'Creates a Microsoft Graph schema extension';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Adding schema extension with id '${args.options.id}'...`);
+      logger.log(`Adding schema extension with id '${args.options.id}'...`);
     }
 
     const targetTypes: string[] = args.options.targetTypes.split(',').map(t => t.trim());
@@ -57,14 +57,14 @@ class GraphSchemaExtensionAdd extends GraphCommand {
     request
       .post(requestOptions)
       .then((res: any): void => {
-        cmd.log(res);
+        logger.log(res);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -95,14 +95,12 @@ class GraphSchemaExtensionAdd extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.owner && !Utils.isValidGuid(args.options.owner)) {
-        return `The specified owner '${args.options.owner}' is not a valid App Id`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.owner && !Utils.isValidGuid(args.options.owner)) {
+      return `The specified owner '${args.options.owner}' is not a valid App Id`;
+    }
 
-      return this.validateProperties(args.options.properties);
-    };
+    return this.validateProperties(args.options.properties);
   }
 
   private validateProperties(propertiesString: string): boolean | string {
@@ -113,26 +111,21 @@ class GraphSchemaExtensionAdd extends GraphCommand {
 
       // If the properties object is not an array
       if (properties.length === undefined) {
-        
         result = 'The specified JSON string is not an array';
-
-      } else {
-
+      }
+      else {
         for (let i: number = 0; i < properties.length; i++) {
           const property: any = properties[i];
           if (!property.name) {
-            
             result = `Property ${JSON.stringify(property)} misses name`;
-
           }
-          if (!this.isValidPropertyType(property.type)) {
-            
-            result = `${property.type} is not a valid property type. Valid types are: Binary, Boolean, DateTime, Integer and String`;
 
+          if (!this.isValidPropertyType(property.type)) {
+            result = `${property.type} is not a valid property type. Valid types are: Binary, Boolean, DateTime, Integer and String`;
           }
         }
 
-        if(typeof result !== "string") {
+        if (typeof result !== "string") {
           result = true;
         };
       }

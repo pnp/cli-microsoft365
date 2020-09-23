@@ -1,12 +1,10 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate, CommandTypes, CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import GlobalOptions from '../../../../GlobalOptions';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -33,7 +31,7 @@ class SpoContentTypeGetCommand extends SpoCommand {
     };
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const requestOptions: any = {
       url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes('${encodeURIComponent(args.options.id)}')`,
       headers: {
@@ -50,14 +48,14 @@ class SpoContentTypeGetCommand extends SpoCommand {
           return;
         }
 
-        cmd.log(res);
+        logger.log(res);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -80,10 +78,8 @@ class SpoContentTypeGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

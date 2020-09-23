@@ -1,13 +1,13 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import { ContextInfo } from '../../spo';
-import GlobalOptions from '../../../../GlobalOptions';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -26,7 +26,7 @@ class SpoHubSiteRegisterCommand extends SpoCommand {
     return 'Registers the specified site collection as a hub site';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getRequestDigest(args.options.url)
       .then((res: ContextInfo): Promise<any> => {
@@ -42,14 +42,14 @@ class SpoHubSiteRegisterCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        cmd.log(res);
+        logger.log(res);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -64,10 +64,8 @@ class SpoHubSiteRegisterCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.url);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.url);
   }
 }
 

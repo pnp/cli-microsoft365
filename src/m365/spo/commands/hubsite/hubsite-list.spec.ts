@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./hubsite-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./hubsite-list');
 
 describe(commands.HUBSITE_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,16 +23,12 @@ describe(commands.HUBSITE_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -90,9 +87,9 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
             "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
@@ -144,9 +141,9 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
             "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
@@ -198,9 +195,9 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, output: 'json' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "Description": null,
             "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
@@ -369,9 +366,9 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, includeAssociatedSites: true } }, () => {
+    command.action(logger, { options: { debug: false, includeAssociatedSites: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
             "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
@@ -530,9 +527,9 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, includeAssociatedSites: true, output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "Description": null,
             "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
@@ -668,7 +665,7 @@ describe(commands.HUBSITE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, includeAssociatedSites: true, output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } }, () => {
       try {
         assert.strictEqual((firstPagedRequest && secondPagedRequest && thirdPagedRequest), true);
         done();
@@ -761,7 +758,7 @@ describe(commands.HUBSITE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, includeAssociatedSites: true, output: 'json' } }, () => {
+    command.action(logger, { options: { debug: true, includeAssociatedSites: true, output: 'json' } }, () => {
       try {
         assert.strictEqual((firstPagedRequest && secondPagedRequest && thirdPagedRequest), true);
         done();
@@ -822,7 +819,7 @@ describe(commands.HUBSITE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, includeAssociatedSites: true, output: 'json' } }, () => {
+    command.action(logger, { options: { debug: true, includeAssociatedSites: true, output: 'json' } }, () => {
       try {
         assert.strictEqual(firstPagedRequest, true);
         done();
@@ -838,7 +835,7 @@ describe(commands.HUBSITE_LIST, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -881,7 +878,7 @@ describe(commands.HUBSITE_LIST, () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
-    cmdInstance.action({ options: { debug: false, includeAssociatedSites: true, output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -945,7 +942,7 @@ describe(commands.HUBSITE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, includeAssociatedSites: true, output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, includeAssociatedSites: true, output: 'json' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -957,7 +954,7 @@ describe(commands.HUBSITE_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

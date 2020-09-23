@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import config from '../../../../config';
 import auth from '../../../../Auth';
-const command: Command = require('./site-classic-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./site-classic-list');
 
 describe(commands.SITE_CLASSIC_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.SITE_CLASSIC_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -90,9 +87,9 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Team site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/ctest_101'
@@ -140,9 +137,9 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Classic team site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/ctest_101'
@@ -190,9 +187,9 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, output: 'json', webTemplate: 'STS#0' } }, () => {
+    command.action(logger, { options: { debug: false, output: 'json', webTemplate: 'STS#0' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties", "_ObjectIdentity_": "487c379e-80f8-4000-80be-1d37a4995717|908bed80-a04a-4433-b4a0-883d9847d110:67753f63-bc14-4012-869e-f808a43fe023\nSiteProperties\nhttps%3a%2f%2fm365x324230.sharepoint.com%2fsites%2fmtest_101", "AllowDownloadingNonWebViewableFiles": false, "AllowEditing": false, "AllowSelfServiceUpgrade": true, "AverageResourceUsage": 0, "CommentsOnSitePagesDisabled": false, "CompatibilityLevel": 15, "ConditionalAccessPolicy": 0, "CurrentResourceUsage": 0, "DenyAddAndCustomizePages": 2, "DisableAppViews": 0, "DisableCompanyWideSharingLinks": 0, "DisableFlows": 0, "HasHolds": false, "LastContentModifiedDate": "\/Date(2017,11,17,4,12,28,997)\/", "Lcid": 1033, "LockIssue": null, "LockState": "Unlock", "NewUrl": "", "Owner": "", "OwnerEmail": null, "PWAEnabled": 0, "RestrictedToRegion": 3, "SandboxedCodeActivationCapability": 0, "SharingAllowedDomainList": null, "SharingBlockedDomainList": null, "SharingCapability": 1, "SharingDomainRestrictionMode": 0, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SiteDefinedSharingCapability": 0, "Status": "Active", "StorageMaximumLevel": 26214400, "StorageQuotaType": null, "StorageUsage": 1, "StorageWarningLevel": 25574400, "Template": "GROUP#0", "TimeZoneId": 13, "Title": "Modern site 101", "Url": "https:\u002f\u002fm365x324230.sharepoint.com\u002fsites\u002fmtest_101", "UserCodeMaximumLevel": 300, "UserCodeWarningLevel": 200, "WebsCount": 0
           }, {
@@ -237,9 +234,9 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, webTemplate: 'STS#0' } }, () => {
+    command.action(logger, { options: { debug: true, webTemplate: 'STS#0' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Team site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/ctest_101'
@@ -287,9 +284,9 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, filter: "Url -like 'ctest'" } }, () => {
+    command.action(logger, { options: { debug: true, filter: "Url -like 'ctest'" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Team site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/ctest_101'
@@ -337,9 +334,9 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, includeOneDriveSites: '1' } }, () => {
+    command.action(logger, { options: { debug: true, includeOneDriveSites: '1' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Foo Bar',
             Url: 'https://m365x324230-my.sharepoint.com/personal/foo_bar_com'
@@ -387,9 +384,9 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, webTemplate: 'STS#0', filter: "Url -like 'ctest'" } }, () => {
+    command.action(logger, { options: { debug: true, webTemplate: 'STS#0', filter: "Url -like 'ctest'" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Classic site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/ctest_101'
@@ -437,9 +434,9 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, filter: "Url -like '<ctest>'" } }, () => {
+    command.action(logger, { options: { debug: true, filter: "Url -like '<ctest>'" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Team site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/ctest_101'
@@ -477,7 +474,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, filter: "Url like 'ctest'" } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, filter: "Url like 'ctest'" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Syntax error in the filter expression 'Url like 'test''.")));
         done();
@@ -523,9 +520,9 @@ describe(commands.SITE_CLASSIC_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, filter: "Url -like 'ctest'" } }, () => {
+    command.action(logger, { options: { debug: true, filter: "Url -like 'ctest'" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             Title: 'Team site 101',
             Url: 'https://m365x324230.sharepoint.com/sites/ctest_101'
@@ -550,7 +547,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({ options: { debug: true, filter: "Url like 'ctest'" } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, filter: "Url like 'ctest'" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred")));
         done();
@@ -562,7 +559,7 @@ describe(commands.SITE_CLASSIC_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

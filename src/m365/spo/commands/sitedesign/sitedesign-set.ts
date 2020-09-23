@@ -1,13 +1,13 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
-import GlobalOptions from '../../../../GlobalOptions';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -47,9 +47,9 @@ class SpoSiteDesignSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
-      .getSpoUrl(cmd, this.debug)
+      .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<any> => {
         const updateInfo: any = {
           Id: args.options.id
@@ -94,14 +94,14 @@ class SpoSiteDesignSetCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: any): void => {
-        cmd.log(res);
+        logger.log(res);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -149,41 +149,39 @@ class SpoSiteDesignSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
 
-      if (args.options.webTemplate &&
-        args.options.webTemplate !== 'TeamSite' &&
-        args.options.webTemplate !== 'CommunicationSite') {
-        return `${args.options.webTemplate} is not a valid web template type. Allowed values TeamSite|CommunicationSite`;
-      }
+    if (args.options.webTemplate &&
+      args.options.webTemplate !== 'TeamSite' &&
+      args.options.webTemplate !== 'CommunicationSite') {
+      return `${args.options.webTemplate} is not a valid web template type. Allowed values TeamSite|CommunicationSite`;
+    }
 
-      if (args.options.siteScripts) {
-        const siteScripts = args.options.siteScripts.split(',');
-        for (let i: number = 0; i < siteScripts.length; i++) {
-          const trimmedId: string = siteScripts[i].trim();
-          if (!Utils.isValidGuid(trimmedId)) {
-            return `${trimmedId} is not a valid GUID`;
-          }
+    if (args.options.siteScripts) {
+      const siteScripts = args.options.siteScripts.split(',');
+      for (let i: number = 0; i < siteScripts.length; i++) {
+        const trimmedId: string = siteScripts[i].trim();
+        if (!Utils.isValidGuid(trimmedId)) {
+          return `${trimmedId} is not a valid GUID`;
         }
       }
+    }
 
-      if (args.options.version &&
-        typeof args.options.version !== 'number') {
-        return `${args.options.version} is not a number`;
-      }
+    if (args.options.version &&
+      typeof args.options.version !== 'number') {
+      return `${args.options.version} is not a number`;
+    }
 
-      if (typeof args.options.isDefault !== 'undefined' &&
-        args.options.isDefault !== 'true' &&
-        args.options.isDefault !== 'false') {
-        return `${args.options.isDefault} is not a valid boolean value`
-      }
+    if (typeof args.options.isDefault !== 'undefined' &&
+      args.options.isDefault !== 'true' &&
+      args.options.isDefault !== 'false') {
+      return `${args.options.isDefault} is not a valid boolean value`
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

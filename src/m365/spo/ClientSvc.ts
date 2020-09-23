@@ -1,9 +1,9 @@
+import { Logger } from '../../cli';
+import config from '../../config';
 import request from '../../request';
 import Utils from '../../Utils';
-import config from '../../config';
-import { ClientSvcResponse, ClientSvcResponseContents } from './spo';
 import { BasePermissions } from './base-permissions';
-import { CommandInstance } from '../../cli';
+import { ClientSvcResponse, ClientSvcResponseContents } from './spo';
 
 export interface IdentityResponse {
   objectIdentity: string;
@@ -14,8 +14,7 @@ export interface IdentityResponse {
  * Commonly used Client Svc calls.
  */
 export class ClientSvc {
-  constructor(private cmd: CommandInstance, private debug: boolean) {
-    this.cmd = cmd;
+  constructor(private logger: Logger, private debug: boolean) {
     this.debug = debug;
   }
 
@@ -81,7 +80,7 @@ export class ClientSvc {
     return new Promise<BasePermissions>((resolve: (permissions: BasePermissions) => void, reject: (error: any) => void): void => {
       request.post<string>(requestOptions).then((res: string): void => {
         if (this.debug) {
-          this.cmd.log('Attempt to get the web EffectiveBasePermissions');
+          this.logger.log('Attempt to get the web EffectiveBasePermissions');
         }
 
         const json: ClientSvcResponse = JSON.parse(res);

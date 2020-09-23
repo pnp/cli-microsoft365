@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./user-remove');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./user-remove');
 
 describe(commands.USER_REMOVE, () => {
   let log: any[];
   let requests: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -23,27 +24,24 @@ describe(commands.USER_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
     requests = [];
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     promptOptions = undefined;
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     Utils.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -64,7 +62,7 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -75,7 +73,7 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('fails validation if id or loginName options are not passed', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com'
       }
@@ -84,7 +82,7 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('fails valiation if id or loginname oprions are passed', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         id: 10,
@@ -95,7 +93,7 @@ describe(commands.USER_REMOVE, () => {
   })
 
   it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         webUrl: 'foo',
@@ -106,7 +104,7 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('should prompt before removing user using id from web when confirmation argument not passed ', (done) => {
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         webUrl: 'https://contoso.sharepoint.com/subsite',
@@ -130,7 +128,7 @@ describe(commands.USER_REMOVE, () => {
   });
 
   it('should prompt before removing user using login name from web when confirmation argument not passed ', (done) => {
-    cmdInstance.action({
+    command.action(logger, {
       options:
       {
         webUrl: 'https://contoso.sharepoint.com/subsite',
@@ -162,7 +160,7 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         id: 10,
@@ -195,7 +193,7 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         loginName: "i:0#.f|membership|parker@tenant.onmicrosoft.com",
@@ -228,10 +226,11 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({
+    });
+    command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         id: 10
@@ -263,10 +262,11 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({
+    });
+    command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
@@ -298,7 +298,7 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
@@ -315,7 +315,7 @@ describe(commands.USER_REMOVE, () => {
       });
       try {
         assert(correctRequestIssued);
-        assert(cmdInstanceLogSpy.calledWith(sinon.match('DONE')));
+        assert(loggerSpy.calledWith(sinon.match('DONE')));
         done();
       }
       catch (e) {
@@ -333,7 +333,7 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         webUrl: "https://contoso.sharepoint.com/subsite",
@@ -367,13 +367,13 @@ describe(commands.USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: "https://contoso.sharepoint.com/subsite",
         id: 10,
         confirm: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

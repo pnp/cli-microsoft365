@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./folder-move');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./folder-move');
 
 describe(commands.FOLDER_MOVE, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   let stubAllPostRequests: any = (
     recycleFolder: any = null,
@@ -74,16 +75,12 @@ describe(commands.FOLDER_MOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -114,7 +111,7 @@ describe(commands.FOLDER_MOVE, () => {
     stubAllPostRequests();
     stubAllGetRequests();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -123,7 +120,7 @@ describe(commands.FOLDER_MOVE, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.args[0] === 'DONE');
+        assert(loggerSpy.lastCall.args[0] === 'DONE');
         done();
       }
       catch (e) {
@@ -136,7 +133,7 @@ describe(commands.FOLDER_MOVE, () => {
     stubAllPostRequests();
     stubAllGetRequests();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
@@ -144,7 +141,7 @@ describe(commands.FOLDER_MOVE, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.callCount === 0);
+        assert(loggerSpy.callCount === 0);
         done();
       }
       catch (e) {
@@ -180,7 +177,7 @@ describe(commands.FOLDER_MOVE, () => {
 
     stubAllGetRequests();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -189,7 +186,7 @@ describe(commands.FOLDER_MOVE, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.lastCall.args[0] === 'DONE');
+        assert(loggerSpy.lastCall.args[0] === 'DONE');
         done();
       }
       catch (e) {
@@ -206,14 +203,14 @@ describe(commands.FOLDER_MOVE, () => {
     stubAllPostRequests(null, null, getCopyJobProgress);
     stubAllGetRequests();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
         done();
@@ -232,14 +229,14 @@ describe(commands.FOLDER_MOVE, () => {
     stubAllPostRequests(null, null, getCopyJobProgress);
     stubAllGetRequests();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error2')));
         done();
@@ -278,7 +275,7 @@ describe(commands.FOLDER_MOVE, () => {
 
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
         sourceUrl: 'library/folder1',
@@ -323,7 +320,7 @@ describe(commands.FOLDER_MOVE, () => {
 
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
         sourceUrl: 'library/folder1/',
@@ -368,7 +365,7 @@ describe(commands.FOLDER_MOVE, () => {
 
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team-a/',
         sourceUrl: '/library/folder1/',
@@ -386,7 +383,7 @@ describe(commands.FOLDER_MOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -397,7 +394,7 @@ describe(commands.FOLDER_MOVE, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -408,12 +405,12 @@ describe(commands.FOLDER_MOVE, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', sourceUrl: 'abc', targetUrl: 'abc' } });
+    const actual = command.validate({ options: { webUrl: 'foo', sourceUrl: 'abc', targetUrl: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', sourceUrl: 'abc', targetUrl: 'abc' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', sourceUrl: 'abc', targetUrl: 'abc' } });
     assert.strictEqual(actual, true);
   });
 });

@@ -1,13 +1,12 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import { CommandInstance } from '../../../../cli';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -45,7 +44,7 @@ class SpoFileCheckinCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let type: CheckinType = CheckinType.Major;
     if (args.options.type) {
       switch (args.options.type.toLowerCase()) {
@@ -83,11 +82,11 @@ class SpoFileCheckinCommand extends SpoCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log('DONE');
+          logger.log('DONE');
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -119,41 +118,39 @@ class SpoFileCheckinCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.id) {
-        if (!Utils.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
+    if (args.options.id) {
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
       }
+    }
 
-      if (args.options.id && args.options.fileUrl) {
-        return 'Specify either fileUrl or id but not both';
+    if (args.options.id && args.options.fileUrl) {
+      return 'Specify either fileUrl or id but not both';
+    }
+
+    if (!args.options.id && !args.options.fileUrl) {
+      return 'Specify fileUrl or id, one is required';
+    }
+
+    if (args.options.comment && args.options.comment.length > 1023) {
+      return 'The length of the comment must be less than 1024 letters';
+    }
+
+    if (args.options.type) {
+      const allowedValues: string[] = ['minor', 'major', 'overwrite'];
+      const type: string = args.options.type.toLowerCase();
+      if (allowedValues.indexOf(type) === -1) {
+        return 'Wrong type specified. Available values are Minor|Major|Overwrite';
       }
+    }
 
-      if (!args.options.id && !args.options.fileUrl) {
-        return 'Specify fileUrl or id, one is required';
-      }
-
-      if (args.options.comment && args.options.comment.length > 1023) {
-        return 'The length of the comment must be less than 1024 letters';
-      }
-
-      if (args.options.type) {
-        const allowedValues: string[] = ['minor', 'major', 'overwrite'];
-        const type: string = args.options.type.toLowerCase();
-        if (allowedValues.indexOf(type) === -1) {
-          return 'Wrong type specified. Available values are Minor|Major|Overwrite';
-        }
-      }
-
-      return true;
-    };
+    return true;
   }
 }
 

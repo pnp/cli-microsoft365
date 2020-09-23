@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./hubsite-rights-grant');
-import * as assert from 'assert';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./hubsite-rights-grant');
 
 describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,16 +26,12 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -77,9 +74,9 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -104,9 +101,9 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } }, () => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -131,9 +128,9 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin,user', rights: 'Join' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin,user', rights: 'Join' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -158,9 +155,9 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', rights: 'Join' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com', rights: 'Join' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -185,9 +182,9 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin, user', rights: 'Join' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin, user', rights: 'Join' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -212,9 +209,9 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales>', principals: 'admin>', rights: 'Join' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales>', principals: 'admin>', rights: 'Join' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -238,7 +235,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
         done();
@@ -254,7 +251,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/sales', principals: 'admin', rights: 'Join' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -266,7 +263,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -277,7 +274,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   });
 
   it('supports specifying hub site url', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--url') > -1) {
@@ -288,7 +285,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   });
 
   it('supports specifying principals', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--principals') > -1) {
@@ -299,7 +296,7 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   });
 
   it('supports specifying rights', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--rights') > -1) {
@@ -310,22 +307,22 @@ describe(commands.HUBSITE_RIGHTS_GRANT, () => {
   });
 
   it('fails validation if url is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'abc', principals: 'admin', rights: 'Join' } });
+    const actual = command.validate({ options: { url: 'abc', principals: 'admin', rights: 'Join' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if specified rights value is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Invalid' } });
+    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if all required parameters are valid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Join' } });
+    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF', rights: 'Join' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if all required parameters are valid (multiple principals)', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF,AdeleV', rights: 'Join' } });
+    const actual = command.validate({ options: { url: 'https://contoso.sharepoint.com/sites/sales', principals: 'PattiF,AdeleV', rights: 'Join' } });
     assert.strictEqual(actual, true);
   });
 });

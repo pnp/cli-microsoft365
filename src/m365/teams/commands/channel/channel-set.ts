@@ -1,14 +1,14 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
-import Utils from '../../../../Utils';
-import request from '../../../../request';
-import { Channel } from '../../Channel';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import GraphCommand from '../../../base/GraphCommand';
+import { Channel } from '../../Channel';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -36,7 +36,7 @@ class TeamsChannelSetCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName)}'`,
       headers: {
@@ -69,11 +69,11 @@ class TeamsChannelSetCommand extends GraphCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -100,18 +100,16 @@ class TeamsChannelSetCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.teamId)) {
-        return `${args.options.teamId} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.teamId)) {
+      return `${args.options.teamId} is not a valid GUID`;
+    }
 
-      if (args.options.channelName.toLowerCase() === "general") {
-        return 'General channel cannot be updated';
-      }
+    if (args.options.channelName.toLowerCase() === "general") {
+      return 'General channel cannot be updated';
+    }
 
-      return true;
-    };
+    return true;
   }
 
   private mapRequestBody(options: Options): any {

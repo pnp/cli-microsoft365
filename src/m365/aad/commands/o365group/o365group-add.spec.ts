@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
+import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./o365group-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as fs from 'fs';
+import commands from '../../commands';
+const command: Command = require('./o365group-add');
 
 describe(commands.O365GROUP_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -23,16 +24,12 @@ describe(commands.O365GROUP_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -102,9 +99,9 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -174,9 +171,9 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } }, () => {
+    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -246,9 +243,9 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -327,9 +324,9 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -408,9 +405,9 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.jpg' } }, () => {
+    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.jpg' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -489,9 +486,9 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.gif' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.gif' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -572,7 +569,7 @@ describe(commands.O365GROUP_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -635,7 +632,7 @@ describe(commands.O365GROUP_ADD, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -705,9 +702,9 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -812,7 +809,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, () => {
+    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, () => {
       try {
         assert(groupCreated);
         done();
@@ -882,9 +879,9 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -989,7 +986,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, () => {
+    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, () => {
       try {
         assert(groupCreated);
         done();
@@ -1014,7 +1011,7 @@ describe(commands.O365GROUP_ADD, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6320', scope: 'user_impersonation' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -1026,68 +1023,68 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('passes validation when the displayName, description and mailNickname are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if one of the owners is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the owner is valid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation with multiple owners, comma-separated', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation with multiple owners, comma-separated with an additional space', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if one of the members is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the member is valid', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation with multiple members, comma-separated', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation with multiple members, comma-separated with an additional space', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com, user2@contoso.onmicrosoft.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if isPrivate is invalid boolean', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'invalid' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'invalid' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if isPrivate is true', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if isPrivate is false', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'false' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'false' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if logoPath points to a non-existent file', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'invalid' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'invalid' } });
     Utils.restore(fs.existsSync);
     assert.notStrictEqual(actual, true);
   });
@@ -1097,7 +1094,7 @@ describe(commands.O365GROUP_ADD, () => {
     sinon.stub(stats, 'isDirectory').callsFake(() => true);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } });
     Utils.restore([
       fs.existsSync,
       fs.lstatSync
@@ -1110,7 +1107,7 @@ describe(commands.O365GROUP_ADD, () => {
     sinon.stub(stats, 'isDirectory').callsFake(() => false);
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'lstatSync').callsFake(() => stats);
-    const actual = (command.validate() as CommandValidate)({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } });
+    const actual = command.validate({ options: { displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'folder' } });
     Utils.restore([
       fs.existsSync,
       fs.lstatSync
@@ -1119,7 +1116,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1130,7 +1127,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying displayName', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--displayName') > -1) {
@@ -1141,7 +1138,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying description', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--description') > -1) {
@@ -1152,7 +1149,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying mailNickname', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--mailNickname') > -1) {
@@ -1163,7 +1160,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying owners', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--owners') > -1) {
@@ -1174,7 +1171,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying members', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--members') > -1) {
@@ -1185,7 +1182,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying group type', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--isPrivate') > -1) {
@@ -1196,7 +1193,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('supports specifying logo file path', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--logoPath') > -1) {

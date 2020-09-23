@@ -1,15 +1,15 @@
-import commands from '../../commands';
-import * as os from 'os';
 import * as chalk from 'chalk';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as os from 'os';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import commands from '../../commands';
 import { Message } from '../../Message';
 import { Outlook } from '../../Outlook';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -36,20 +36,20 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getFolderId(args)
       .then((folderId: string): Promise<void> => {
         const url: string = folderId ? `me/mailFolders/${folderId}/messages` : 'me/messages';
 
-        return this.getAllItems(`${this.resource}/v1.0/${url}?$top=50`, cmd, true);
+        return this.getAllItems(`${this.resource}/v1.0/${url}?$top=50`, logger, true);
       })
       .then((): void => {
         if (args.options.output === 'json') {
-          cmd.log(this.items);
+          logger.log(this.items);
         }
         else {
-          cmd.log(this.items.map(i => {
+          logger.log(this.items.map(i => {
             return {
               subject: i.subject,
               receivedDateTime: i.receivedDateTime
@@ -58,11 +58,11 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getFolderId(args: CommandArgs): Promise<string> {
@@ -123,20 +123,18 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.folderId &&
-        !args.options.folderName) {
-        return 'Specify folderId or folderName';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.folderId &&
+      !args.options.folderName) {
+      return 'Specify folderId or folderName';
+    }
 
-      if (args.options.folderId &&
-        args.options.folderName) {
-        return 'Specify either folderId or folderName but not both';
-      }
+    if (args.options.folderId &&
+      args.options.folderName) {
+      return 'Specify either folderId or folderName but not both';
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

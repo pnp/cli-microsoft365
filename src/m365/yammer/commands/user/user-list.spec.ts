@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./user-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./user-list');
 
 describe(commands.YAMMER_USER_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.YAMMER_USER_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -66,9 +63,9 @@ describe(commands.YAMMER_USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -87,9 +84,9 @@ describe(commands.YAMMER_USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -108,9 +105,9 @@ describe(commands.YAMMER_USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { sortBy: "messages" } }, (err?: any) => {
+    command.action(logger, { options: { sortBy: "messages" } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 1496550647)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 1496550647)
         done();
       }
       catch (e) {
@@ -138,9 +135,9 @@ describe(commands.YAMMER_USER_LIST, () => {
         });
       }
     });
-    cmdInstance.action({ options: { output: 'json' } }, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].length, 4);
+        assert.strictEqual(loggerSpy.lastCall.args[0].length, 4);
         done();
       }
       catch (e) {
@@ -212,9 +209,9 @@ describe(commands.YAMMER_USER_LIST, () => {
         { "type": "user", "id": 12310090123, "network_id": 801445, "state": "active", "full_name": "Carlo Lamber" }]);
       }
     });
-    cmdInstance.action({ options: { output: 'debug' } }, (err?: any) => {
+    command.action(logger, { options: { output: 'debug' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].length, 52);
+        assert.strictEqual(loggerSpy.lastCall.args[0].length, 52);
         done();
       }
       catch (e) {
@@ -243,7 +240,7 @@ describe(commands.YAMMER_USER_LIST, () => {
       }
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -264,9 +261,9 @@ describe(commands.YAMMER_USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { sortBy: "messages" } }, (err?: any) => {
+    command.action(logger, { options: { sortBy: "messages" } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 1496550647)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 1496550647)
         done();
       }
       catch (e) {
@@ -286,9 +283,9 @@ describe(commands.YAMMER_USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { reverse: true } }, (err?: any) => {
+    command.action(logger, { options: { reverse: true } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 1496550647)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 1496550647)
         done();
       }
       catch (e) {
@@ -309,10 +306,10 @@ describe(commands.YAMMER_USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { groupId: 5785177, reverse: true, limit: 2 } }, (err?: any) => {
+    command.action(logger, { options: { groupId: 5785177, reverse: true, limit: 2 } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 1496550647)
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].length, 2)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 1496550647)
+        assert.strictEqual(loggerSpy.lastCall.args[0].length, 2)
         done();
       }
       catch (e) {
@@ -331,9 +328,9 @@ describe(commands.YAMMER_USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { groupId: 5785177 } }, (err?: any) => {
+    command.action(logger, { options: { groupId: 5785177 } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -352,9 +349,9 @@ describe(commands.YAMMER_USER_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { letter: "P" } }, (err?: any) => {
+    command.action(logger, { options: { letter: "P" } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -372,7 +369,7 @@ describe(commands.YAMMER_USER_LIST, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -384,47 +381,47 @@ describe(commands.YAMMER_USER_LIST, () => {
   });
 
   it('passes validation without parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation with parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { letter: "A" } });
+    const actual = command.validate({ options: { letter: "A" } });
     assert.strictEqual(actual, true);
   });
 
   it('letter does not allow numbers', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { letter: "1" } });
+    const actual = command.validate({ options: { letter: "1" } });
     assert.notStrictEqual(actual, true);
   });
 
   it('groupId must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { groupId: "aasdf" } });
+    const actual = command.validate({ options: { groupId: "aasdf" } });
     assert.notStrictEqual(actual, true);
   });
 
   it('limit must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { limit: "aasdf" } });
+    const actual = command.validate({ options: { limit: "aasdf" } });
     assert.notStrictEqual(actual, true);
   });
 
   it('sortBy validation check', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { sortBy: "aasdf" } });
+    const actual = command.validate({ options: { sortBy: "aasdf" } });
     assert.notStrictEqual(actual, true);
   });
 
   it('letter allows just once char', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { letter: "a" } });
+    const actual = command.validate({ options: { letter: "a" } });
     assert.strictEqual(actual, true);
   });
 
   it('letter allows just once char', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { letter: "ab" } });
+    const actual = command.validate({ options: { letter: "ab" } });
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -6,8 +6,9 @@ export * from './Manifest';
 export * from './PackageJson';
 export * from './PackageSolutionJson';
 export * from './Project';
+export * from './ScssFile';
 export * from './ServeJson';
-export * from './TsConfigJson'
+export * from './TsConfigJson';
 export * from './TsFile';
 export * from './TsLintJson';
 export * from './VsCode';
@@ -16,4 +17,4 @@ export * from './VsCodeLaunchJson';
 export * from './VsCodeSettingsJson';
 export * from './WriteManifestsJson';
 export * from './YoRcJson';
-export * from './ScssFile';
+

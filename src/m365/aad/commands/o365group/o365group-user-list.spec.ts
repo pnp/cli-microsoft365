@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import teamsCommands from '../../../teams/commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./o365group-user-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import teamsCommands from '../../../teams/commands';
+import commands from '../../commands';
+const command: Command = require('./o365group-user-list');
 
 describe(commands.O365GROUP_USER_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,16 +23,12 @@ describe(commands.O365GROUP_USER_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -68,7 +65,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
@@ -78,7 +75,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('fails validation if the groupId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
@@ -88,7 +85,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('fails validation if the groupId is not provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {}
     });
     assert.notStrictEqual(actual, true);
@@ -96,7 +93,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('fails validation when both groupId and teamId are specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
@@ -107,7 +104,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('fails validation when invalid role specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Invalid',
@@ -118,7 +115,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('passes validation when valid groupId and no role specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
@@ -128,7 +125,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('passes validation when valid groupId and Owner role specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Owner'
@@ -139,7 +136,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('passes validation when valid groupId and Member role specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Member'
@@ -150,7 +147,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('passes validation when valid groupId and Guest role specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Guest'
@@ -176,9 +173,9 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "00000000-0000-0000-0000-000000000000",
             "displayName": "Anne Matthews",
@@ -210,9 +207,9 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Owner" } }, () => {
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Owner" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "00000000-0000-0000-0000-000000000000",
             "displayName": "Anne Matthews",
@@ -244,9 +241,9 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Member" } }, () => {
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Member" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "00000000-0000-0000-0000-000000000001",
             "displayName": "Karl Matteson",
@@ -278,9 +275,9 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
+    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "00000000-0000-0000-0000-000000000000",
             "displayName": "Anne Matthews",
@@ -307,7 +304,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -319,7 +316,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

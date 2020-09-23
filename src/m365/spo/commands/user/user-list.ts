@@ -1,12 +1,11 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -25,9 +24,9 @@ class SpoUserListCommand extends SpoCommand {
     return 'Lists all the users within specific web';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving users from web ${args.options.webUrl}...`);
+      logger.log(`Retrieving users from web ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -47,19 +46,19 @@ class SpoUserListCommand extends SpoCommand {
       .get(requestOptions)
       .then((users: any): void => {
         if (args.options.output === 'json') {
-          cmd.log(users);
+          logger.log(users);
         }
         else {
-          cmd.log(users.value.map((user: any) => {
+          logger.log(users.value.map((user: any) => {
             return {
               Id: user.Id,
-              Title:user.Title,
+              Title: user.Title,
               LoginName: user.LoginName
             };
           }));
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -74,10 +73,8 @@ class SpoUserListCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

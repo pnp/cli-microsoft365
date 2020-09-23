@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./user-get');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./user-get');
 
 describe(commands.USER_GET, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.USER_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -80,7 +77,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: true,
@@ -89,7 +86,7 @@ describe(commands.USER_GET, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           value: [{
             Id: 6,
             IsHiddenInUI: false,
@@ -139,7 +136,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: true,
@@ -148,7 +145,7 @@ describe(commands.USER_GET, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           value: [{
             Id: 6,
             IsHiddenInUI: false,
@@ -197,7 +194,7 @@ describe(commands.USER_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: true,
@@ -206,7 +203,7 @@ describe(commands.USER_GET, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           value: [{
             Id: 6,
             IsHiddenInUI: false,
@@ -231,7 +228,7 @@ describe(commands.USER_GET, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -242,52 +239,52 @@ describe(commands.USER_GET, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', id: 1 } });
+    const actual = command.validate({ options: { webUrl: 'foo', id: 1 } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id or email or loginName options are not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id, email and loginName options are passed (multiple options)', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com", loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com", loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id and email both are passed (multiple options)', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com" } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, email: "jonh.deo@mytenant.com" } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if id and loginName options are passed (multiple options)', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1, loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if email and loginName options are passed (multiple options)', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', email: "jonh.deo@mytenant.com", loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', email: "jonh.deo@mytenant.com", loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if specified id is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'a' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'a' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation url is valid and id is passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 1 } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if the url is valid and email is passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', email: "jonh.deo@mytenant.com" } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', email: "jonh.deo@mytenant.com" } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation if the url is valid and loginName is passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', loginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com" } });
     assert.strictEqual(actual, true);
   });
 }); 

@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./page-control-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { ClientSidePage, CanvasSection, CanvasColumn, ClientSideText } from './clientsidepages';
+import commands from '../../commands';
+import { CanvasColumn, CanvasSection, ClientSidePage, ClientSideText } from './clientsidepages';
+const command: Command = require('./page-control-list');
 
 describe(commands.PAGE_CONTROL_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,16 +23,12 @@ describe(commands.PAGE_CONTROL_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -123,9 +120,9 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6',
             type: 'Client-side web part',
@@ -236,9 +233,9 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, () => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6',
             type: 'Client-side web part',
@@ -349,9 +346,9 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6',
             type: 'Client-side web part',
@@ -462,7 +459,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(log[0]), JSON.stringify([{"controlType":3,"dataVersion":"1.0","order":1,"id":"ede2ee65-157d-4523-b4ed-87b9b64374a6","controlData":{"controlType":3,"displayMode":2,"id":"ede2ee65-157d-4523-b4ed-87b9b64374a6","position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":0.5,"sectionFactor":8},"webPartId":"34b617b3-5f5d-4682-98ed-fc6908dc0f4c","addedFromPersistedData":true},"title":"Minified HelloWorld","description":"HelloWorld description","propertieJson":{"description":"HelloWorld"},"webPartId":"34b617b3-5f5d-4682-98ed-fc6908dc0f4c","htmlProperties":"","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"canvasDataVersion":"1.0"},{"controlType":3,"dataVersion":"1.0","order":2,"id":"3ede60d3-dc2c-438b-b5bf-cc40bb2351e5","controlData":{"controlType":3,"webPartId":"8c88f208-6c77-4bdb-86a0-0c47b4316588","position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":1,"sectionFactor":8},"displayMode":2,"addedFromPersistedData":true,"id":"3ede60d3-dc2c-438b-b5bf-cc40bb2351e5"},"title":"News","description":"Display recent news.","propertieJson":{"layoutId":"FeaturedNews","dataProviderId":"viewCounts","emptyStateHelpItemsCount":1,"newsDataSourceProp":2,"newsSiteList":[],"webId":"4f118c69-66e0-497c-96ff-d7855ce0713d","siteId":"016bd1f4-ea50-46a4-809b-e97efb96399c"},"webPartId":"8c88f208-6c77-4bdb-86a0-0c47b4316588","htmlProperties":"<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{"title":"News"},"imageSources":{},"links":{"baseUrl":"https://contoso.sharepoint.com/sites/team-a"}},"canvasDataVersion":"1.0"},{"controlType":3,"dataVersion":"1.0","order":1,"id":"63da0d97-9db4-4847-a4bf-3ae019d4c6f2","controlData":{"controlType":3,"webPartId":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","position":{"zoneIndex":1,"sectionIndex":2,"controlIndex":1,"sectionFactor":4},"displayMode":2,"addedFromPersistedData":true,"id":"63da0d97-9db4-4847-a4bf-3ae019d4c6f2"},"title":"Quick links","description":"Add links to important documents and pages.","propertieJson":{"items":[{"siteId":"00000000-0000-0000-0000-000000000000","webId":"00000000-0000-0000-0000-000000000000","uniqueId":"00000000-0000-0000-0000-000000000000","itemType":2,"fileExtension":"com/fwlink/p/?linkid=827918","progId":"","flags":0,"hasInvalidUrl":false,"renderInfo":{"imageUrl":"","compactImageInfo":{"iconName":"Globe","color":"","imageUrl":"","forceIconSize":true},"backupImageUrl":"","iconUrl":"","accentColor":"","imageFit":0,"forceStandardImageSize":false,"isFetching":false},"id":1},{"siteId":"00000000-0000-0000-0000-000000000000","webId":"00000000-0000-0000-0000-000000000000","uniqueId":"00000000-0000-0000-0000-000000000000","itemType":2,"fileExtension":"com/fwlink/p/?linkid=827919","progId":"","flags":0,"hasInvalidUrl":false,"renderInfo":{"imageUrl":"","compactImageInfo":{"iconName":"Globe","color":"","imageUrl":"","forceIconSize":true},"backupImageUrl":"","iconUrl":"","accentColor":"","imageFit":0,"forceStandardImageSize":false,"isFetching":false},"id":2}],"isMigrated":true,"layoutId":"CompactCard","shouldShowThumbnail":true,"hideWebPartWhenEmpty":true,"dataProviderId":"QuickLinks","webId":"4f118c69-66e0-497c-96ff-d7855ce0713d","siteId":"016bd1f4-ea50-46a4-809b-e97efb96399c"},"webPartId":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","htmlProperties":"<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">Quick links</div><div data-sp-prop-name=\"items[0].title\" data-sp-searchableplaintext=\"true\">Learn about a team site</div><div data-sp-prop-name=\"items[1].title\" data-sp-searchableplaintext=\"true\">Learn how to add a page</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a><a data-sp-prop-name=\"items[0].url\" href=\"https&#58;//go.microsoft.com/fwlink/p/?linkid=827918\"></a><a data-sp-prop-name=\"items[1].url\" href=\"https&#58;//go.microsoft.com/fwlink/p/?linkid=827919\"></a><a data-sp-prop-name=\"items[0].renderInfo.linkUrl\" href=\"https&#58;//go.microsoft.com/fwlink/p/?linkid=827918\"></a><a data-sp-prop-name=\"items[1].renderInfo.linkUrl\" href=\"https&#58;//go.microsoft.com/fwlink/p/?linkid=827919\"></a>","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{"title":"Quick links","items[0].title":"Learn about a team site","items[1].title":"Learn how to add a page"},"imageSources":{},"links":{"baseUrl":"https://contoso.sharepoint.com/sites/team-a","items[0].url":"https://go.microsoft.com/fwlink/p/?linkid=827918","items[1].url":"https://go.microsoft.com/fwlink/p/?linkid=827919","items[0].renderInfo.linkUrl":"https://go.microsoft.com/fwlink/p/?linkid=827918","items[1].renderInfo.linkUrl":"https://go.microsoft.com/fwlink/p/?linkid=827919"}},"canvasDataVersion":"1.0"},{"controlType":3,"dataVersion":"1.0","order":1,"id":"4366ceff-b92b-4a12-905e-1dd2535f976d","controlData":{"controlType":3,"webPartId":"eb95c819-ab8f-4689-bd03-0c2d65d47b1f","position":{"zoneIndex":2,"sectionIndex":1,"controlIndex":1,"sectionFactor":8},"displayMode":2,"addedFromPersistedData":true,"id":"4366ceff-b92b-4a12-905e-1dd2535f976d"},"title":"Site activity","description":"Show recent activities from your site.","propertieJson":{"maxItems":9},"webPartId":"eb95c819-ab8f-4689-bd03-0c2d65d47b1f","htmlProperties":"","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"canvasDataVersion":"1.0"},{"controlType":3,"dataVersion":"1.0","order":1,"id":"456dfbc7-57be-4489-92ce-666224c4fcf1","controlData":{"controlType":3,"webPartId":"f92bf067-bc19-489e-a556-7fe95f508720","position":{"zoneIndex":2,"sectionIndex":2,"controlIndex":1,"sectionFactor":4},"addedFromPersistedData":true,"displayMode":2,"id":"456dfbc7-57be-4489-92ce-666224c4fcf1"},"title":"Document library","description":"Add a document library.","propertieJson":{"isDocumentLibrary":true,"showDefaultDocumentLibrary":true,"webpartHeightKey":4,"selectedListUrl":"","listTitle":"Documents"},"webPartId":"f92bf067-bc19-489e-a556-7fe95f508720","htmlProperties":"","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"canvasDataVersion":"1.0"},{"controlType":4,"dataVersion":"1.0","order":1,"id":"d933a0dd-9536-48a6-bd85-888b85ede7d0","controlData":{"controlType":4,"displayMode":2,"id":"d933a0dd-9536-48a6-bd85-888b85ede7d0","position":{"zoneIndex":3,"sectionIndex":1,"controlIndex":1},"innerHTML":"&lt;p&gt;Lorem ipsum&lt;/p&gt;\n\n&lt;p&gt;Dolor samet&lt;/p&gt;\n","editorType":"CKEditor","addedFromPersistedData":true},"_text":"<p>Lorem ipsum</p><p>Dolor samet</p>"},{"controlType":4,"dataVersion":"1.0","order":1,"id":"135f1d1a-2eb9-4655-a913-b9f23114b01f","controlData":{"controlType":4,"displayMode":2,"id":"135f1d1a-2eb9-4655-a913-b9f23114b01f","position":{"zoneIndex":4,"sectionIndex":1,"controlIndex":1},"innerHTML":"&lt;p&gt;Lorem ipsum&lt;/p&gt;\n","editorType":"CKEditor","addedFromPersistedData":true},"_text":"<p>Lorem ipsum</p>"}]));
         done();
@@ -539,7 +536,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', output: 'json' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(log[0]), JSON.stringify([{"controlType":3,"dataVersion":"1.0","order":1,"id":"ede2ee65-157d-4523-b4ed-87b9b64374a6","controlData":{"controlType":3,"displayMode":2,"id":"ede2ee65-157d-4523-b4ed-87b9b64374a6","position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":0.5,"sectionFactor":8},"webPartId":"34b617b3-5f5d-4682-98ed-fc6908dc0f4c","addedFromPersistedData":true},"title":"Minified HelloWorld","description":"HelloWorld description","propertieJson":{"description":"HelloWorld"},"webPartId":"34b617b3-5f5d-4682-98ed-fc6908dc0f4c","htmlProperties":"","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"canvasDataVersion":"1.0"},{"controlType":3,"dataVersion":"1.0","order":2,"id":"3ede60d3-dc2c-438b-b5bf-cc40bb2351e5","controlData":{"controlType":3,"webPartId":"8c88f208-6c77-4bdb-86a0-0c47b4316588","position":{"zoneIndex":1,"sectionIndex":1,"controlIndex":1,"sectionFactor":8},"displayMode":2,"addedFromPersistedData":true,"id":"3ede60d3-dc2c-438b-b5bf-cc40bb2351e5"}, "dynamicDataPaths": { "dynamicProperty0": "WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText" }, "dynamicDataValues": { "dynamicProperty1": "" },"title":"News","description":"Display recent news.","propertieJson":{"layoutId":"FeaturedNews","dataProviderId":"viewCounts","emptyStateHelpItemsCount":1,"newsDataSourceProp":2,"newsSiteList":[],"webId":"4f118c69-66e0-497c-96ff-d7855ce0713d","siteId":"016bd1f4-ea50-46a4-809b-e97efb96399c"},"webPartId":"8c88f208-6c77-4bdb-86a0-0c47b4316588","htmlProperties":"<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{"title":"News"},"imageSources":{},"links":{"baseUrl":"https://contoso.sharepoint.com/sites/team-a"}},"canvasDataVersion":"1.0"},{"controlType":3,"dataVersion":"1.0","order":1,"id":"63da0d97-9db4-4847-a4bf-3ae019d4c6f2","controlData":{"controlType":3,"webPartId":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","position":{"zoneIndex":1,"sectionIndex":2,"controlIndex":1,"sectionFactor":4},"displayMode":2,"addedFromPersistedData":true,"id":"63da0d97-9db4-4847-a4bf-3ae019d4c6f2"},"title":"Quick links","description":"Add links to important documents and pages.","propertieJson":{"items":[{"siteId":"00000000-0000-0000-0000-000000000000","webId":"00000000-0000-0000-0000-000000000000","uniqueId":"00000000-0000-0000-0000-000000000000","itemType":2,"fileExtension":"com/fwlink/p/?linkid=827918","progId":"","flags":0,"hasInvalidUrl":false,"renderInfo":{"imageUrl":"","compactImageInfo":{"iconName":"Globe","color":"","imageUrl":"","forceIconSize":true},"backupImageUrl":"","iconUrl":"","accentColor":"","imageFit":0,"forceStandardImageSize":false,"isFetching":false},"id":1},{"siteId":"00000000-0000-0000-0000-000000000000","webId":"00000000-0000-0000-0000-000000000000","uniqueId":"00000000-0000-0000-0000-000000000000","itemType":2,"fileExtension":"com/fwlink/p/?linkid=827919","progId":"","flags":0,"hasInvalidUrl":false,"renderInfo":{"imageUrl":"","compactImageInfo":{"iconName":"Globe","color":"","imageUrl":"","forceIconSize":true},"backupImageUrl":"","iconUrl":"","accentColor":"","imageFit":0,"forceStandardImageSize":false,"isFetching":false},"id":2}],"isMigrated":true,"layoutId":"CompactCard","shouldShowThumbnail":true,"hideWebPartWhenEmpty":true,"dataProviderId":"QuickLinks","webId":"4f118c69-66e0-497c-96ff-d7855ce0713d","siteId":"016bd1f4-ea50-46a4-809b-e97efb96399c"},"webPartId":"c70391ea-0b10-4ee9-b2b4-006d3fcad0cd","htmlProperties":"<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">Quick links</div><div data-sp-prop-name=\"items[0].title\" data-sp-searchableplaintext=\"true\">Learn about a team site</div><div data-sp-prop-name=\"items[1].title\" data-sp-searchableplaintext=\"true\">Learn how to add a page</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a><a data-sp-prop-name=\"items[0].url\" href=\"https&#58;//go.microsoft.com/fwlink/p/?linkid=827918\"></a><a data-sp-prop-name=\"items[1].url\" href=\"https&#58;//go.microsoft.com/fwlink/p/?linkid=827919\"></a><a data-sp-prop-name=\"items[0].renderInfo.linkUrl\" href=\"https&#58;//go.microsoft.com/fwlink/p/?linkid=827918\"></a><a data-sp-prop-name=\"items[1].renderInfo.linkUrl\" href=\"https&#58;//go.microsoft.com/fwlink/p/?linkid=827919\"></a>","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{"title":"Quick links","items[0].title":"Learn about a team site","items[1].title":"Learn how to add a page"},"imageSources":{},"links":{"baseUrl":"https://contoso.sharepoint.com/sites/team-a","items[0].url":"https://go.microsoft.com/fwlink/p/?linkid=827918","items[1].url":"https://go.microsoft.com/fwlink/p/?linkid=827919","items[0].renderInfo.linkUrl":"https://go.microsoft.com/fwlink/p/?linkid=827918","items[1].renderInfo.linkUrl":"https://go.microsoft.com/fwlink/p/?linkid=827919"}},"canvasDataVersion":"1.0"},{"controlType":3,"dataVersion":"1.0","order":1,"id":"4366ceff-b92b-4a12-905e-1dd2535f976d","controlData":{"controlType":3,"webPartId":"eb95c819-ab8f-4689-bd03-0c2d65d47b1f","position":{"zoneIndex":2,"sectionIndex":1,"controlIndex":1,"sectionFactor":8},"displayMode":2,"addedFromPersistedData":true,"id":"4366ceff-b92b-4a12-905e-1dd2535f976d"},"title":"Site activity","description":"Show recent activities from your site.","propertieJson":{"maxItems":9},"webPartId":"eb95c819-ab8f-4689-bd03-0c2d65d47b1f","htmlProperties":"","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"canvasDataVersion":"1.0"},{"controlType":3,"dataVersion":"1.0","order":1,"id":"456dfbc7-57be-4489-92ce-666224c4fcf1","controlData":{"controlType":3,"webPartId":"f92bf067-bc19-489e-a556-7fe95f508720","position":{"zoneIndex":2,"sectionIndex":2,"controlIndex":1,"sectionFactor":4},"addedFromPersistedData":true,"displayMode":2,"id":"456dfbc7-57be-4489-92ce-666224c4fcf1"},"title":"Document library","description":"Add a document library.","propertieJson":{"isDocumentLibrary":true,"showDefaultDocumentLibrary":true,"webpartHeightKey":4,"selectedListUrl":"","listTitle":"Documents"},"webPartId":"f92bf067-bc19-489e-a556-7fe95f508720","htmlProperties":"","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{},"links":{}},"canvasDataVersion":"1.0"},{"controlType":4,"dataVersion":"1.0","order":1,"id":"d933a0dd-9536-48a6-bd85-888b85ede7d0","controlData":{"controlType":4,"displayMode":2,"id":"d933a0dd-9536-48a6-bd85-888b85ede7d0","position":{"zoneIndex":3,"sectionIndex":1,"controlIndex":1},"innerHTML":"&lt;p&gt;Lorem ipsum&lt;/p&gt;\n\n&lt;p&gt;Dolor samet&lt;/p&gt;\n","editorType":"CKEditor","addedFromPersistedData":true},"_text":"<p>Lorem ipsum</p><p>Dolor samet</p>"},{"controlType":4,"dataVersion":"1.0","order":1,"id":"135f1d1a-2eb9-4655-a913-b9f23114b01f","controlData":{"controlType":4,"displayMode":2,"id":"135f1d1a-2eb9-4655-a913-b9f23114b01f","position":{"zoneIndex":4,"sectionIndex":1,"controlIndex":1},"innerHTML":"&lt;p&gt;Lorem ipsum&lt;/p&gt;\n","editorType":"CKEditor","addedFromPersistedData":true},"_text":"<p>Lorem ipsum</p>"}]));
         done();
@@ -629,9 +626,9 @@ describe(commands.PAGE_CONTROL_LIST, () => {
     page.sections.push(section);
     sinon.stub(ClientSidePage, 'fromHtml').callsFake(() => page);
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: '88f7b5b2-83a8-45d1-bc61-c11425f233e3',
             type: 'Empty column',
@@ -714,7 +711,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Page home.aspx is not a modern page.')));
         done();
@@ -738,7 +735,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       } });
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/SitePages/home1.aspx does not exist.')));
         done();
@@ -754,7 +751,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    cmdInstance.action({ options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -766,7 +763,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -777,12 +774,12 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', name: 'home.aspx' } });
+    const actual = command.validate({ options: { webUrl: 'foo', name: 'home.aspx' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the webUrl is a valid SharePoint URL and name is specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', name: 'home.aspx' } });
     assert.strictEqual(actual, true);
   });
 });

@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Finding } from '../Finding';
 import { Project } from '../../model';
+import { Finding } from '../Finding';
 import { FN011008_MAN_requiresCustomScript } from './FN011008_MAN_requiresCustomScript';
 
 describe('FN011008_MAN_requiresCustomScript', () => {

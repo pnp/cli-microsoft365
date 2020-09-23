@@ -1,17 +1,18 @@
+import * as assert from 'assert';
 import * as sinon from 'sinon';
+import { Logger } from '../../../../cli';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { Page } from './Page';
 import { ClientSidePage } from './clientsidepages';
-import * as assert from 'assert';
+import { Page } from './Page';
 
 describe('Page', () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -35,7 +36,7 @@ describe('Page', () => {
     });
 
     Page
-      .getPage('page.aspx', 'https://contoso.sharepoint.com', cmdInstance, false, false)
+      .getPage('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
       .then((page: ClientSidePage): void => {
         done(new Error('Parsing page didn\'t fail while expected'));
       }, (error: any): void => {
@@ -113,7 +114,7 @@ describe('Page', () => {
     });
 
     Page
-      .getPage('page.aspx', 'https://contoso.sharepoint.com', cmdInstance, false, false)
+      .getPage('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
       .then((page: ClientSidePage): void => {
         done();
       }, (error: any): void => {
@@ -194,7 +195,7 @@ describe('Page', () => {
     });
 
     Page
-      .getPage('page.aspx', 'https://contoso.sharepoint.com/sites/team-a', cmdInstance, false, false)
+      .getPage('page.aspx', 'https://contoso.sharepoint.com/sites/team-a', logger, false, false)
       .then((page: ClientSidePage): void => {
         done();
       }, (error: any): void => {

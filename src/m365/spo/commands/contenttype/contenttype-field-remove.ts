@@ -1,12 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import { CommandOption, CommandTypes, CommandValidate, CommandError } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -44,14 +44,14 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let webId: string = '';
     let siteId: string = '';
     let listId: string = '';
 
     const removeFieldLink = (): void => {
       if (this.debug) {
-        cmd.log(`Get SiteId required by ProcessQuery endpoint.`);
+        logger.log(`Get SiteId required by ProcessQuery endpoint.`);
       }
 
       // GET SiteId
@@ -69,8 +69,8 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           siteId = res.Id;
 
           if (this.debug) {
-            cmd.log(`SiteId: ${siteId}`);
-            cmd.log(`Get WebId required by ProcessQuery endpoint.`);
+            logger.log(`SiteId: ${siteId}`);
+            logger.log(`Get WebId required by ProcessQuery endpoint.`);
           }
 
           // GET WebId
@@ -88,7 +88,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           webId = res.Id;
 
           if (this.debug) {
-            cmd.log(`WebId: ${webId}`);
+            logger.log(`WebId: ${webId}`);
           }
 
           // If ListTitle is provided
@@ -111,7 +111,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             listId = res.Id;
 
             if (this.debug) {
-              cmd.log(`ListId: ${listId}`);
+              logger.log(`ListId: ${listId}`);
             }
           }
 
@@ -124,9 +124,9 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
           if (this.debug) {
             const additionalLog = args.options.listTitle ? `; ListTitle='${args.options.listTitle}'` : ` ; UpdateChildContentTypes='${updateChildContentTypes}`;
-            cmd.log(`Remove FieldLink from ContentType. FieldLinkId='${args.options.fieldLinkId}' ; ContentTypeId='${args.options.contentTypeId}' ${additionalLog}`);
-            cmd.log(`Execute ProcessQuery.`);
-            cmd.log('');
+            logger.log(`Remove FieldLink from ContentType. FieldLinkId='${args.options.fieldLinkId}' ; ContentTypeId='${args.options.contentTypeId}' ${additionalLog}`);
+            logger.log(`Execute ProcessQuery.`);
+            logger.log('');
           }
 
           let requestBody: string = '';
@@ -155,11 +155,11 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             return;
           }
           if (this.debug) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
           cb();
         }, (error: any): void => {
-          this.handleRejectedODataJsonPromise(error, cmd, cb);
+          this.handleRejectedODataJsonPromise(error, logger, cb);
         });
     }
 
@@ -167,7 +167,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
       removeFieldLink();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -215,14 +215,12 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.fieldLinkId)) {
-        return `${args.options.fieldLinkId} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.fieldLinkId)) {
+      return `${args.options.fieldLinkId} is not a valid GUID`;
+    }
 
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

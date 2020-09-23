@@ -1,19 +1,17 @@
+import * as chalk from 'chalk';
 import * as fs from "fs";
 import * as path from 'path';
 import { v4 } from 'uuid';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import Command, {
-  CommandOption,
-  CommandValidate,
-  CommandAction,
-  CommandError
+import { Logger } from "../../../../cli";
+import {
+  CommandError, CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
+import AnonymousCommand from "../../../base/AnonymousCommand";
+import commands from '../../commands';
 import TemplateInstantiator from "../../template-instantiator";
 import { PcfInitVariables } from "./pcf-init/pcf-init-variables";
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -30,7 +28,7 @@ interface Options extends GlobalOptions {
  * Version: 1.0.6
  * Class: bolt.module.pcf.PcfInitVerb
  */
-class PaPcfInitCommand extends Command {
+class PaPcfInitCommand extends AnonymousCommand {
   public get name(): string {
     return commands.PCF_INIT;
   }
@@ -45,15 +43,7 @@ class PaPcfInitCommand extends Command {
     return telemetryProps;
   }
 
-  public action(): CommandAction {
-    const cmd: Command = this;
-    return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
-      (cmd as any).initAction(args, this);
-      cmd.commandAction(this, args, cb);
-    }
-  }
-
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     try {
       const pcfTemplatePath: string = path.join(__dirname, 'pcf-init', 'assets');
       const pcfComponentTemplatePath: string = path.join(pcfTemplatePath, 'control', `${args.options.template.toLowerCase()}-template`);
@@ -69,25 +59,25 @@ class PaPcfInitCommand extends Command {
       };
 
       if (this.verbose) {
-        cmd.log(`name: ${args.options.name}`);
-        cmd.log(`namespace: ${args.options.namespace}`);
-        cmd.log(`template: ${args.options.template}`);
-        cmd.log(`pcfTemplatePath: ${pcfTemplatePath}`);
-        cmd.log(`pcfComponentTemplatePath: ${pcfComponentTemplatePath}`);
-        cmd.log(`workingDirectory: ${workingDirectory}`);
-        cmd.log(`workingDirectoryName: ${workingDirectoryName}`);
-        cmd.log(`componentDirectory: ${componentDirectory}`);
+        logger.log(`name: ${args.options.name}`);
+        logger.log(`namespace: ${args.options.namespace}`);
+        logger.log(`template: ${args.options.template}`);
+        logger.log(`pcfTemplatePath: ${pcfTemplatePath}`);
+        logger.log(`pcfComponentTemplatePath: ${pcfComponentTemplatePath}`);
+        logger.log(`workingDirectory: ${workingDirectory}`);
+        logger.log(`workingDirectoryName: ${workingDirectoryName}`);
+        logger.log(`componentDirectory: ${componentDirectory}`);
       }
 
-      TemplateInstantiator.instantiate(cmd, pcfTemplatePath, workingDirectory, false, variables, this.verbose);
-      TemplateInstantiator.instantiate(cmd, pcfComponentTemplatePath, componentDirectory, true, variables, this.verbose);
+      TemplateInstantiator.instantiate(logger, pcfTemplatePath, workingDirectory, false, variables, this.verbose);
+      TemplateInstantiator.instantiate(logger, pcfComponentTemplatePath, componentDirectory, true, variables, this.verbose);
 
       if (this.verbose) {
-        cmd.log(` `);
+        logger.log(` `);
       }
 
-      cmd.log(chalk.green(`The PowerApps component framework project was successfully created in '${workingDirectory}'.`));
-      cmd.log(`Be sure to run '${chalk.grey('npm install')}' in this directory to install project dependencies.`);
+      logger.log(chalk.green(`The PowerApps component framework project was successfully created in '${workingDirectory}'.`));
+      logger.log(`Be sure to run '${chalk.grey('npm install')}' in this directory to install project dependencies.`);
 
       cb();
     }
@@ -117,61 +107,57 @@ class PaPcfInitCommand extends Command {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
+  public validate(args: CommandArgs): boolean | string {
+    if (fs.readdirSync(process.cwd()).some(fn => path.extname(fn).toLowerCase().endsWith('proj'))) {
+      return 'PowerApps component framework project creation failed. The current directory already contains a project. Please create a new directory and retry the operation.';
+    }
 
-      if (fs.readdirSync(process.cwd()).some(fn => path.extname(fn).toLowerCase().endsWith('proj'))) {
-        return 'PowerApps component framework project creation failed. The current directory already contains a project. Please create a new directory and retry the operation.';
+    const workingDirectoryName: string = path.basename(process.cwd());
+    if (!Utils.isValidFileName(workingDirectoryName)) {
+      return `Empty or invalid project name '${workingDirectoryName}'`;
+    }
+
+    if (args.options.name) {
+      if (!/^(?!\d)[a-zA-Z0-9]+$/i.test(args.options.name)) {
+        return `Value of 'name' is invalid. Only characters within the ranges [A - Z], [a - z] or [0 - 9] are allowed. The first character may not be a number.`;
       }
 
-      const workingDirectoryName: string = path.basename(process.cwd());
-      if (!Utils.isValidFileName(workingDirectoryName))
-      {
-          return `Empty or invalid project name '${workingDirectoryName}'`;
+      if (Utils.isJavascriptReservedWord(args.options.name)) {
+        return `The value '${args.options.name}' passed for 'name' is a reserved word.`;
+      }
+    }
+    else {
+      return 'Missing required option name.';
+    }
+
+    if (args.options.namespace) {
+      if (!/^(?!\.|\d)(?!.*\.$)(?!.*?\.\d)(?!.*?\.\.)[a-zA-Z0-9.]+$/i.test(args.options.namespace)) {
+        return `Value of 'namespace' is invalid. Only characters within the ranges [A - Z], [a - z], [0 - 9], or '.' are allowed. The first and last character may not be the '.' character. Consecutive '.' characters are not allowed. Numbers are not allowed as the first character or immediately after a period.`;
       }
 
-      if (args.options.name) {
-        if (!/^(?!\d)[a-zA-Z0-9]+$/i.test(args.options.name)) {
-          return `Value of 'name' is invalid. Only characters within the ranges [A - Z], [a - z] or [0 - 9] are allowed. The first character may not be a number.`;
-        }
+      if (Utils.isJavascriptReservedWord(args.options.namespace)) {
+        return `The value '${args.options.namespace}' passed for 'namespace' is or includes a reserved word.`;
+      }
+    }
+    else {
+      return 'Missing required option namespace.';
+    }
 
-        if (Utils.isJavascriptReservedWord(args.options.name)) {
-          return `The value '${args.options.name}' passed for 'name' is a reserved word.`;
-        }
-      }
-      else {
-        return 'Missing required option name.';
-      }
+    if (args.options.namespace && args.options.name && (args.options.namespace + args.options.name).length > 75) {
+      return `The total length of values for 'name' and 'namespace' cannot exceed 75. Length of 'name' is ${args.options.name.length}, length of 'namespace' is ${args.options.namespace.length}.`;
+    }
 
-      if (args.options.namespace) {
-        if (!/^(?!\.|\d)(?!.*\.$)(?!.*?\.\d)(?!.*?\.\.)[a-zA-Z0-9.]+$/i.test(args.options.namespace)) {
-          return `Value of 'namespace' is invalid. Only characters within the ranges [A - Z], [a - z], [0 - 9], or '.' are allowed. The first and last character may not be the '.' character. Consecutive '.' characters are not allowed. Numbers are not allowed as the first character or immediately after a period.`;
-        }
+    if (args.options.template) {
+      const testTemplate: string = args.options.template.toLowerCase();
+      if (!(testTemplate === 'field' || testTemplate === 'dataset')) {
+        return `Template must be either 'Field' or 'Dataset', but '${args.options.template}' was provided.`;
+      }
+    }
+    else {
+      return 'Missing required option template.';
+    }
 
-        if (Utils.isJavascriptReservedWord(args.options.namespace)) {
-          return `The value '${args.options.namespace}' passed for 'namespace' is or includes a reserved word.`;
-        }
-      }
-      else {
-        return 'Missing required option namespace.';
-      }
-
-      if (args.options.namespace && args.options.name && (args.options.namespace + args.options.name).length > 75) {
-        return `The total length of values for 'name' and 'namespace' cannot exceed 75. Length of 'name' is ${args.options.name.length}, length of 'namespace' is ${args.options.namespace.length}.`;
-      }
-
-      if (args.options.template) {
-        const testTemplate: string = args.options.template.toLowerCase();
-        if (!(testTemplate === 'field' || testTemplate === 'dataset')) {
-          return `Template must be either 'Field' or 'Dataset', but '${args.options.template}' was provided.`;
-        }
-      }
-      else {
-        return 'Missing required option template.';
-      }
-
-      return true;
-    };
+    return true;
   }
 }
 

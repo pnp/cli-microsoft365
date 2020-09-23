@@ -1,12 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import GlobalOptions from '../../../../GlobalOptions';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -32,9 +32,9 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log('Retrieving hub site data...');
+      logger.log('Retrieving hub site data...');
     }
 
     const forceRefresh: boolean = args.options.forceRefresh === true;
@@ -51,20 +51,20 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
       .get(requestOptions)
       .then((res: any): void => {
         if (res['odata.null'] !== true) {
-          cmd.log(JSON.parse(res.value));
+          logger.log(JSON.parse(res.value));
         }
         else {
           if (this.verbose) {
-            cmd.log(`${args.options.webUrl} is not connected to a hub site and is not a hub site itself`);
+            logger.log(`${args.options.webUrl} is not connected to a hub site and is not a hub site itself`);
           }
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -83,10 +83,8 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

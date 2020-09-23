@@ -1,13 +1,12 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -26,7 +25,7 @@ class SpoSiteGetCommand extends SpoCommand {
     return 'Gets information about the specific site collection';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${args.options.url}/_api/site`,
       headers: {
@@ -38,14 +37,14 @@ class SpoSiteGetCommand extends SpoCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        cmd.log(res);
+        logger.log(res);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -58,15 +57,8 @@ class SpoSiteGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-
-      return true;
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.url);
   }
 }
 

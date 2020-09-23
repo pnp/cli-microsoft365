@@ -1,13 +1,12 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -53,7 +52,7 @@ class SpoWebSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const payload: any = {};
 
     this.addUnknownOptionsToPayload(payload, args.options);
@@ -98,18 +97,18 @@ class SpoWebSetCommand extends SpoCommand {
     };
 
     if (this.verbose) {
-      cmd.log(`Updating properties of subsite ${args.options.webUrl}...`);
+      logger.log(`Updating properties of subsite ${args.options.webUrl}...`);
     }
 
     request
       .patch(requestOptions)
       .then((): void => {
         if (this.debug) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public allowUnknownOptions(): boolean | undefined {
@@ -169,58 +168,56 @@ class SpoWebSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-      
-      if (typeof args.options.quickLaunchEnabled !== 'undefined') {
-        if (args.options.quickLaunchEnabled !== 'true' &&
-          args.options.quickLaunchEnabled !== 'false') {
-          return `${args.options.quickLaunchEnabled} is not a valid boolean value`;
-        }
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (typeof args.options.headerEmphasis !== 'undefined') {
-        if (isNaN(args.options.headerEmphasis)) {
-          return `${args.options.headerEmphasis} is not a number`;
-        }
+    if (typeof args.options.quickLaunchEnabled !== 'undefined') {
+      if (args.options.quickLaunchEnabled !== 'true' &&
+        args.options.quickLaunchEnabled !== 'false') {
+        return `${args.options.quickLaunchEnabled} is not a valid boolean value`;
+      }
+    }
 
-        if ([0, 1, 2, 3].indexOf(args.options.headerEmphasis) < 0) {
-          return `${args.options.headerEmphasis} is not a valid value for headerEmphasis. Allowed values are 0|1|2|3`;
-        }
+    if (typeof args.options.headerEmphasis !== 'undefined') {
+      if (isNaN(args.options.headerEmphasis)) {
+        return `${args.options.headerEmphasis} is not a number`;
       }
 
-      if (typeof args.options.headerLayout !== 'undefined') {
-        if (['standard', 'compact'].indexOf(args.options.headerLayout) < 0) {
-          return `${args.options.headerLayout} is not a valid value for headerLayout. Allowed values are standard|compact`;
-        }
+      if ([0, 1, 2, 3].indexOf(args.options.headerEmphasis) < 0) {
+        return `${args.options.headerEmphasis} is not a valid value for headerEmphasis. Allowed values are 0|1|2|3`;
       }
+    }
 
-      if (typeof args.options.megaMenuEnabled !== 'undefined') {
-        if (['true', 'false'].indexOf(args.options.megaMenuEnabled) < 0) {
-          return `${args.options.megaMenuEnabled} is not a valid boolean value`;
-        }
+    if (typeof args.options.headerLayout !== 'undefined') {
+      if (['standard', 'compact'].indexOf(args.options.headerLayout) < 0) {
+        return `${args.options.headerLayout} is not a valid value for headerLayout. Allowed values are standard|compact`;
       }
+    }
 
-      if (typeof args.options.footerEnabled !== 'undefined') {
-        if (args.options.footerEnabled !== 'true' &&
-          args.options.footerEnabled !== 'false') {
-          return `${args.options.footerEnabled} is not a valid boolean value`;
-        }
+    if (typeof args.options.megaMenuEnabled !== 'undefined') {
+      if (['true', 'false'].indexOf(args.options.megaMenuEnabled) < 0) {
+        return `${args.options.megaMenuEnabled} is not a valid boolean value`;
       }
+    }
 
-      if (typeof args.options.searchScope !== 'undefined') {
-        const searchScope = args.options.searchScope.toString().toLowerCase();
-        if (SpoWebSetCommand.searchScopeOptions.indexOf(searchScope) < 0) {
-          return `${args.options.searchScope} is not a valid value for searchScope. Allowed values are DefaultScope|Tenant|Hub|Site`;
-        }
+    if (typeof args.options.footerEnabled !== 'undefined') {
+      if (args.options.footerEnabled !== 'true' &&
+        args.options.footerEnabled !== 'false') {
+        return `${args.options.footerEnabled} is not a valid boolean value`;
       }
+    }
 
-      return this.validateUnknownOptions(args.options, 'web', 'set');
-    };
+    if (typeof args.options.searchScope !== 'undefined') {
+      const searchScope = args.options.searchScope.toString().toLowerCase();
+      if (SpoWebSetCommand.searchScopeOptions.indexOf(searchScope) < 0) {
+        return `${args.options.searchScope} is not a valid value for searchScope. Allowed values are DefaultScope|Tenant|Hub|Site`;
+      }
+    }
+
+    return this.validateUnknownOptions(args.options, 'web', 'set');
   }
 }
 

@@ -1,14 +1,14 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Cli, Logger } from '../../../../cli';
 import {
-  CommandOption, CommandValidate
+  CommandOption
 } from '../../../../Command';
-import Utils from '../../../../Utils';
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -38,7 +38,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
 
     const removeChannel: () => void = (): void => {
       if (args.options.channelName) {
@@ -73,11 +73,11 @@ class TeamsChannelRemoveCommand extends GraphCommand {
           })
           .then((): void => {
             if (this.verbose) {
-              cmd.log(chalk.green('DONE'));
+              logger.log(chalk.green('DONE'));
             }
 
             cb();
-          }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+          }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
       }
 
       if (args.options.channelId) {
@@ -93,11 +93,11 @@ class TeamsChannelRemoveCommand extends GraphCommand {
           .delete(requestOptions)
           .then((): void => {
             if (this.verbose) {
-              cmd.log(chalk.green('DONE'));
+              logger.log(chalk.green('DONE'));
             }
 
             cb();
-          }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+          }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
       }
     };
 
@@ -106,7 +106,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
     }
     else {
       const channelName = args.options.channelName ? args.options.channelName : args.options.channelId;
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -146,26 +146,24 @@ class TeamsChannelRemoveCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.channelId && args.options.channelName) {
-        return 'Specify channelId or channelName but not both';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.channelId && args.options.channelName) {
+      return 'Specify channelId or channelName but not both';
+    }
 
-      if (!args.options.channelId && !args.options.channelName) {
-        return 'Specify channelId or channelName';
-      }
+    if (!args.options.channelId && !args.options.channelName) {
+      return 'Specify channelId or channelName';
+    }
 
-      if (args.options.channelId && !Utils.isValidTeamsChannelId(args.options.channelId)) {
-        return `${args.options.channelId} is not a valid Teams Channel Id`;
-      }
+    if (args.options.channelId && !Utils.isValidTeamsChannelId(args.options.channelId)) {
+      return `${args.options.channelId} is not a valid Teams Channel Id`;
+    }
 
-      if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
-        return `${args.options.teamId} is not a valid GUID`;
-      }
+    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
+      return `${args.options.teamId} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

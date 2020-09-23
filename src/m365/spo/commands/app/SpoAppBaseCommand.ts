@@ -1,7 +1,7 @@
-import SpoCommand from '../../../base/SpoCommand';
+import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { CommandInstance } from '../../../../cli';
+import SpoCommand from '../../../base/SpoCommand';
 
 interface CommandArgs {
   options: Options;
@@ -13,7 +13,7 @@ interface Options extends GlobalOptions {
 }
 
 export abstract class SpoAppBaseCommand extends SpoCommand {
-  public getAppCatalogSiteUrl(cmd: CommandInstance, authSiteUrl: string, args: CommandArgs): Promise<string> {
+  public getAppCatalogSiteUrl(logger: Logger, authSiteUrl: string, args: CommandArgs): Promise<string> {
     return new Promise<string>((resolve: (appCatalogSiteUrl: string) => void, reject: (error: any) => void): void => {
       if (args.options.scope === 'sitecollection') {
         return resolve((args.options.appCatalogUrl as string).toLowerCase().replace('/appcatalog', ''));

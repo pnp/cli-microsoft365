@@ -1,16 +1,17 @@
-import commands from '../../commands';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: DateAndPeriodBasedReport = require('./report-useractivityuserdetail');
-import * as assert from 'assert';
-import Utils from '../../../../Utils';
+import { Logger } from '../../../../cli';
 import request from '../../../../request';
+import Utils from '../../../../Utils';
 import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport';
+import commands from '../../commands';
+const command: DateAndPeriodBasedReport = require('./report-useractivityuserdetail');
 
 describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -20,11 +21,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -67,7 +64,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, date: '2019-07-13' } }, () => {
+    command.action(logger, { options: { debug: false, date: '2019-07-13' } }, () => {
       try {
         assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getTeamsUserActivityUserDetail(date=2019-07-13)");
         assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');

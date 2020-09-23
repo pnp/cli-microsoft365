@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./file-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./file-list');
 
 describe(commands.FILE_LIST, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.FILE_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -87,14 +84,14 @@ describe(commands.FILE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: {
+    command.action(logger, { options: {
       output: 'json',
       debug: true,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       folder: 'Shared Documents'
     } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([{ 
+        assert(loggerSpy.calledWith([{ 
           CheckInComment: "",
           CheckOutType: 2,
           ContentTag: "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
@@ -141,14 +138,14 @@ describe(commands.FILE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: {
+    command.action(logger, { options: {
       output: 'text',
       debug: false,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       folder: 'Shared Documents'
     } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(
+        assert(loggerSpy.calledWith(
           [{
             UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
             Name: 'Test.docx',
@@ -173,7 +170,7 @@ describe(commands.FILE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
@@ -198,7 +195,7 @@ describe(commands.FILE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: false,
@@ -218,7 +215,7 @@ describe(commands.FILE_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -229,7 +226,7 @@ describe(commands.FILE_LIST, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -240,12 +237,12 @@ describe(commands.FILE_LIST, () => {
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', folder: '/' } });
+    const actual = command.validate({ options: { webUrl: 'foo', folder: '/' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', folder: '/' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', folder: '/' } });
     assert.strictEqual(actual, true);
   });
 });

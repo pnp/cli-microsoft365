@@ -1,6 +1,6 @@
 import * as assert from 'assert';
-import { Finding } from '../Finding';
 import { Project } from '../../model';
+import { Finding } from '../Finding';
 import { FN011001_MAN_webpart_schema } from './FN011001_MAN_webpart_schema';
 
 describe('FN011001_MAN_webpart_schema', () => {

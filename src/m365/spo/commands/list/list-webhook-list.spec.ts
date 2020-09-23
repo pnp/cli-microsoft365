@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandError, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./list-webhook-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./list-webhook-list');
 
 describe(commands.LIST_WEBHOOK_LIST, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -86,7 +83,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         title: 'Documents',
@@ -94,7 +91,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'cfda40f2-6ca2-4424-9be0-33e9785b0e67',
             clientState: 'pnp-js-core-subscription',
@@ -147,7 +144,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         listTitle: 'Documents',
@@ -155,7 +152,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'cfda40f2-6ca2-4424-9be0-33e9785b0e67',
             clientState: 'pnp-js-core-subscription',
@@ -208,7 +205,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         title: 'Documents',
@@ -216,7 +213,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'cfda40f2-6ca2-4424-9be0-33e9785b0e67',
             clientState: 'pnp-js-core-subscription',
@@ -269,7 +266,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         listTitle: 'Documents',
@@ -277,7 +274,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'cfda40f2-6ca2-4424-9be0-33e9785b0e67',
             clientState: 'pnp-js-core-subscription',
@@ -330,7 +327,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         id: 'dfddade1-4729-428d-881e-7fedf3cae50d',
@@ -338,7 +335,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'cfda40f2-6ca2-4424-9be0-33e9785b0e67',
             clientState: 'pnp-js-core-subscription',
@@ -391,7 +388,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
@@ -399,7 +396,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'cfda40f2-6ca2-4424-9be0-33e9785b0e67',
             clientState: 'pnp-js-core-subscription',
@@ -452,7 +449,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: 'dfddade1-4729-428d-881e-7fedf3cae50d',
@@ -460,7 +457,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'cfda40f2-6ca2-4424-9be0-33e9785b0e67',
             clientState: 'pnp-js-core-subscription',
@@ -513,7 +510,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
@@ -521,7 +518,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'cfda40f2-6ca2-4424-9be0-33e9785b0e67',
             clientState: 'pnp-js-core-subscription',
@@ -574,7 +571,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: 'dfddade1-4729-428d-881e-7fedf3cae50d',
@@ -582,7 +579,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             id: 'cfda40f2-6ca2-4424-9be0-33e9785b0e67',
             clientState: '',
@@ -619,7 +616,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         id: 'dfddade1-4729-428d-881e-7fedf3cae50d',
@@ -627,7 +624,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('No webhooks found'));
+        assert(loggerSpy.calledWith('No webhooks found'));
         done();
       }
       catch (e) {
@@ -667,7 +664,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: 'dfddade1-4729-428d-881e-7fedf3cae50d',
@@ -676,7 +673,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(
+        assert(loggerSpy.calledWith(
           [
             {
               "clientState": "pnp-js-core-subscription",
@@ -725,7 +722,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
     const actionTitle: string = 'Documents';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         title: actionTitle,
@@ -753,7 +750,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
 
     const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: actionId,
@@ -771,52 +768,52 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   });
 
   it('fails validation if both id and title options are not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo' } });
+    const actual = command.validate({ options: { webUrl: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
     assert(actual);
   });
 
   it('fails validation if the id option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '12345' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '12345' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the listId option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '12345' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the id option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
     assert(actual);
   });
 
   it('passes validation if the listId option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
     assert(actual);
   });
 
   it('fails validation if both id and title options are passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', title: 'Documents' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', title: 'Documents' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if both listId and listTitle options are passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', listTitle: 'Documents' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

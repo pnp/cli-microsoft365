@@ -1,11 +1,11 @@
-import auth from '../../../../Auth';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import Command, { CommandOption } from '../../../../Command';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandOption } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -30,9 +30,9 @@ class TenantStatusListCommand extends Command {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      cmd.log(`Getting the health status of the different services in Microsoft 365.`);
+      logger.log(`Getting the health status of the different services in Microsoft 365.`);
     }
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
@@ -51,10 +51,10 @@ class TenantStatusListCommand extends Command {
       .get(requestOptions)
       .then((res: any): void => {
         if (args.options.output === 'json') {
-          cmd.log(res);
+          logger.log(res);
         }
         else {
-          cmd.log(res.value.map((r: any) => {
+          logger.log(res.value.map((r: any) => {
             return {
               Name: r.WorkloadDisplayName,
               Status: r.StatusDisplayName
@@ -63,10 +63,10 @@ class TenantStatusListCommand extends Command {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

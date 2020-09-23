@@ -1,16 +1,14 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import request from '../../../../request';
-import config from '../../../../config';
-import commands from '../../commands';
-import Utils from '../../../../Utils';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandError,
-  CommandValidate
+  CommandError, CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
-import { CommandInstance } from '../../../../cli';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 export interface CommandArgs {
   options: Options;
@@ -211,16 +209,16 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
   private getSpecialCharactersState(): string[] { return ['NoPreference', 'Allowed', 'Disallowed']; }
   private getSPOLimitedAccessFileType(): string[] { return ['OfficeOnlineFilesOnly', 'WebPreviewableFiles', 'OtherFiles']; }
 
-  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     let formDigestValue = '';
     let spoAdminUrl: string = '';
     let tenantId: string = '';
 
     this
-      .getTenantId(cmd, this.debug)
+      .getTenantId(logger, this.debug)
       .then((_tenantId: string): Promise<string> => {
         tenantId = _tenantId;
-        return this.getSpoAdminUrl(cmd, this.debug);
+        return this.getSpoAdminUrl(logger, this.debug);
       })
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
@@ -283,11 +281,11 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log('DONE');
+          logger.log('DONE');
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -685,35 +683,33 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const opts: any = args.options;
-      let hasAtLeastOneOption: boolean = false;
+  public validate(args: CommandArgs): boolean | string {
+    const opts: any = args.options;
+    let hasAtLeastOneOption: boolean = false;
 
-      for (let propertyKey of Object.keys(opts)) {
-        if (this.isExcludedOption(propertyKey)) {
-          continue;
-        }
-
-        hasAtLeastOneOption = true;
-        const propertyValue = opts[propertyKey];
-        const commandOptions: CommandOption[] = this.options();
-
-        for (let item of commandOptions) {
-          if (item.option.indexOf(propertyKey) > -1 &&
-            item.autocomplete &&
-            item.autocomplete.indexOf(propertyValue.toString()) === -1) {
-            return `${propertyKey} option has invalid value of ${propertyValue}. Allowed values are ${JSON.stringify(item.autocomplete)}`;
-          }
-        }
+    for (let propertyKey of Object.keys(opts)) {
+      if (this.isExcludedOption(propertyKey)) {
+        continue;
       }
 
-      if (!hasAtLeastOneOption) {
-        return `You must specify at least one option`;
-      }
+      hasAtLeastOneOption = true;
+      const propertyValue = opts[propertyKey];
+      const commandOptions: CommandOption[] = this.options();
 
-      return true;
-    };
+      for (let item of commandOptions) {
+        if (item.option.indexOf(propertyKey) > -1 &&
+          item.autocomplete &&
+          item.autocomplete.indexOf(propertyValue.toString()) === -1) {
+          return `${propertyKey} option has invalid value of ${propertyValue}. Allowed values are ${JSON.stringify(item.autocomplete)}`;
+        }
+      }
+    }
+
+    if (!hasAtLeastOneOption) {
+      return `You must specify at least one option`;
+    }
+
+    return true;
   }
 
   public isExcludedOption(optionKey: string): boolean {

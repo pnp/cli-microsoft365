@@ -1,15 +1,14 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Cli, Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import Utils from '../../../../Utils';
-import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 import SpoCommand from '../../../base/SpoCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
+import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 
 interface CommandArgs {
   options: Options;
@@ -39,18 +38,18 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
 
     const retractApp: () => void = (): void => {
       this
-        .getSpoUrl(cmd, this.debug)
+        .getSpoUrl(logger, this.debug)
         .then((spoUrl: string): Promise<string> => {
-          return this.getAppCatalogSiteUrl(cmd, spoUrl, args);
+          return this.getAppCatalogSiteUrl(logger, spoUrl, args);
         })
         .then((appCatalogSiteUrl: string): Promise<string> => {
           if (this.verbose) {
-            cmd.log(`Retracting app...`);
+            logger.log(`Retracting app...`);
           }
 
           const requestOptions: any = {
@@ -64,18 +63,18 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
 
           cb();
-        }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
+        }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
     }
 
     if (args.options.confirm) {
       retractApp();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -116,29 +115,27 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.scope) {
-        const testScope: string = args.options.scope.toLowerCase();
-        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-          return `Scope must be either 'tenant' or 'sitecollection' if specified`
-        }
-
-        if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-          return `You must specify appCatalogUrl when the scope is sitecollection`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.scope) {
+      const testScope: string = args.options.scope.toLowerCase();
+      if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+        return `Scope must be either 'tenant' or 'sitecollection' if specified`
       }
 
-      if (!Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
+      if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+        return `You must specify appCatalogUrl when the scope is sitecollection`;
       }
+    }
 
-      if (args.options.appCatalogUrl) {
-        return SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
-      }
+    if (!Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    if (args.options.appCatalogUrl) {
+      return SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+    }
+
+    return true;
   }
 }
 

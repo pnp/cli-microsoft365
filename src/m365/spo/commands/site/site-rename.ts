@@ -1,11 +1,11 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
-import { CommandOption, CommandValidate } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
+import commands from '../../commands';
 import { FormDigestInfo } from '../../spo';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -47,12 +47,12 @@ class SpoSiteRenameCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = "";
     let options = args.options;
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
         spoAdminUrl = _spoAdminUrl;
 
@@ -61,7 +61,7 @@ class SpoSiteRenameCommand extends SpoCommand {
       .then((res: FormDigestInfo): Promise<SiteRenameJob> => {
         this.context = res;
         if (this.verbose) {
-          cmd.log(`Scheduling rename job...`);
+          logger.log(`Scheduling rename job...`);
         }
 
         let optionsBitmask = 0;
@@ -97,7 +97,7 @@ class SpoSiteRenameCommand extends SpoCommand {
       })
       .then((res: SiteRenameJob): Promise<void> => {
         if (options.verbose) {
-          cmd.log(res);
+          logger.log(res);
         }
 
         this.operationData = res;
@@ -124,15 +124,15 @@ class SpoSiteRenameCommand extends SpoCommand {
         });
       }).then((): void => {
         if (args.options.output === 'json') {
-          cmd.log(this.operationData);
+          logger.log(this.operationData);
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb()
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   protected waitForRenameCompletion(command: SpoSiteRenameCommand, isVerbose: boolean, spoAdminUrl: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, iteration: number): void {
@@ -202,18 +202,16 @@ class SpoSiteRenameCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.newSiteUrl) {
-        return 'A new url must be provided.';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.newSiteUrl) {
+      return 'A new url must be provided.';
+    }
 
-      if (args.options.siteUrl.toLowerCase() === args.options.newSiteUrl.toLowerCase()) {
-        return 'The new URL cannot be the same as the target URL.';
-      }
+    if (args.options.siteUrl.toLowerCase() === args.options.newSiteUrl.toLowerCase()) {
+      return 'The new URL cannot be the same as the target URL.';
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

@@ -1,17 +1,15 @@
-import config from '../../../../config';
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import { PermissionKind, BasePermissions } from '../../base-permissions';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import { BasePermissions, PermissionKind } from '../../base-permissions';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -49,7 +47,7 @@ class SpoWebAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let siteInfo: any = null;
     let subsiteFullUrl: string = '';
 
@@ -77,7 +75,7 @@ class SpoWebAddCommand extends SpoCommand {
         };
 
         if (this.verbose) {
-          cmd.log(`Creating subsite ${args.options.parentWebUrl}/${args.options.webUrl}...`);
+          logger.log(`Creating subsite ${args.options.parentWebUrl}/${args.options.webUrl}...`);
         }
 
         return request.post(requestOptions)
@@ -90,7 +88,7 @@ class SpoWebAddCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log("Setting inheriting navigation from the parent site...");
+          logger.log("Setting inheriting navigation from the parent site...");
         }
 
         subsiteFullUrl = `${args.options.parentWebUrl}/${encodeURIComponent(args.options.webUrl)}`;
@@ -117,7 +115,7 @@ class SpoWebAddCommand extends SpoCommand {
         /// for the effects of NoScript
         if (!permissions.has(PermissionKind.AddAndCustomizePages)) {
           if (this.verbose) {
-            cmd.log("No script is enabled. Skipping the InheritParentNavigation settings.");
+            logger.log("No script is enabled. Skipping the InheritParentNavigation settings.");
           }
 
           return Promise.reject(SpoWebAddCommand.DONE);
@@ -144,19 +142,19 @@ class SpoWebAddCommand extends SpoCommand {
           return;
         }
         else {
-          cmd.log(siteInfo);
+          logger.log(siteInfo);
 
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
         }
         cb();
       }, (err: any): void => {
         if (err === SpoWebAddCommand.DONE) {
-          cmd.log(siteInfo);
+          logger.log(siteInfo);
 
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
 
           cb();
@@ -169,7 +167,7 @@ class SpoWebAddCommand extends SpoCommand {
           cb(new CommandError(err.error['odata.error'].message.value));
         }
         else {
-          this.handleRejectedPromise(err, cmd, cb);
+          this.handleRejectedPromise(err, logger, cb);
         }
       });
   }
@@ -214,22 +212,20 @@ class SpoWebAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.parentWebUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
-      
-      if (args.options.locale) {
-        const locale: number = parseInt(args.options.locale);
-        if (isNaN(locale)) {
-          return `${args.options.locale} is not a valid locale number`;
-        }
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.parentWebUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      return true;
-    };
+    if (args.options.locale) {
+      const locale: number = parseInt(args.options.locale);
+      if (isNaN(locale)) {
+        return `${args.options.locale} is not a valid locale number`;
+      }
+    }
+
+    return true;
   }
 }
 

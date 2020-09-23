@@ -1,7 +1,7 @@
+import * as path from 'path';
 import { Finding, Occurrence } from "../";
 import { Project } from "../../model";
 import { Rule } from "./Rule";
-import * as path from 'path';
 
 export class FN014006_CODE_launch_sourceMapPathOverrides extends Rule {
   constructor(private overrideKey: string, private overrideValue: string) {

@@ -1,12 +1,12 @@
 
-import Utils from '../../../../Utils';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import { CommandOption, CommandValidate } from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
-import request from '../../../../request';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -38,7 +38,7 @@ class TeamsCloneCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const body: any = {
       displayName: args.options.displayName,
       mailNickname: this.generateMailNickname(args.options.displayName),
@@ -68,11 +68,11 @@ class TeamsCloneCommand extends GraphCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -109,35 +109,33 @@ class TeamsCloneCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.teamId)) {
-        return `${args.options.teamId} is not a valid GUID`;
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.teamId)) {
+      return `${args.options.teamId} is not a valid GUID`;
+    }
+
+    const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');
+    for (let partToClone of partsToClone) {
+      const part: string = partToClone.toLowerCase();
+      if (part !== 'apps' &&
+        part !== 'channels' &&
+        part !== 'members' &&
+        part !== 'settings' &&
+        part !== 'tabs') {
+        return `${part} is not a valid partsToClone. Allowed values are apps|channels|members|settings|tabs`;
       }
+    }
 
-      const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');
-      for (let partToClone of partsToClone) {
-        const part: string = partToClone.toLowerCase();
-        if (part !== 'apps' &&
-          part !== 'channels' &&
-          part !== 'members' &&
-          part !== 'settings' &&
-          part !== 'tabs') {
-          return `${part} is not a valid partsToClone. Allowed values are apps|channels|members|settings|tabs`;
-        }
+    if (args.options.visibility) {
+      const visibility: string = args.options.visibility.toLowerCase();
+
+      if (visibility !== 'private' &&
+        visibility !== 'public') {
+        return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
       }
+    }
 
-      if (args.options.visibility) {
-        const visibility: string = args.options.visibility.toLowerCase();
-
-        if (visibility !== 'private' &&
-          visibility !== 'public') {
-          return `${args.options.visibility} is not a valid visibility type. Allowed values are Private|Public`;
-        }
-      }
-
-      return true;
-    };
+    return true;
   }
 
   /**

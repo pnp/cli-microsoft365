@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./theme-get');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
-import config from '../../../../config';
+import commands from '../../commands';
+const command: Command = require('./theme-get');
 
 describe(commands.THEME_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -24,16 +25,12 @@ describe(commands.THEME_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -70,7 +67,7 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         name: 'Contoso'
@@ -80,9 +77,9 @@ describe(commands.THEME_GET, () => {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
         assert.strictEqual(postStub.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><ObjectPath Id="14" ObjectPathId="13" /><Query Id="15" ObjectPathId="13"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="13" ParentId="11" Name="GetTenantTheme"><Parameters><Parameter Type="String">Contoso</Parameter></Parameters></Method></ObjectPaths></Request>`);
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].IsInverted, true);
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].Name, 'Custom22');
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].Palette.themeLight, '#affefe');
+        assert.strictEqual(loggerSpy.lastCall.args[0].IsInverted, true);
+        assert.strictEqual(loggerSpy.lastCall.args[0].Name, 'Custom22');
+        assert.strictEqual(loggerSpy.lastCall.args[0].Palette.themeLight, '#affefe');
         done();
       }
       catch (e) {
@@ -101,7 +98,7 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         name: 'Contoso'
@@ -111,7 +108,7 @@ describe(commands.THEME_GET, () => {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
         assert.strictEqual(postStub.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><ObjectPath Id="14" ObjectPathId="13" /><Query Id="15" ObjectPathId="13"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="13" ParentId="11" Name="GetTenantTheme"><Parameters><Parameter Type="String">Contoso</Parameter></Parameters></Method></ObjectPaths></Request>`);
-        assert.strictEqual(cmdInstanceLogSpy.called, true);
+        assert.strictEqual(loggerSpy.called, true);
         done();
       }
       catch (e) {
@@ -129,12 +126,12 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         name: 'Contoso'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -154,12 +151,12 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         name: 'Contoso'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
@@ -178,12 +175,12 @@ describe(commands.THEME_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         name: 'Contoso'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -195,7 +192,7 @@ describe(commands.THEME_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

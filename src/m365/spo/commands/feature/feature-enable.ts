@@ -1,14 +1,13 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
   CommandOption,
-  CommandValidate,
-  CommandTypes,
+  CommandTypes
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -37,7 +36,7 @@ class SpoFeatureEnableCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let scope: string | undefined = args.options.scope;
     let force: boolean = args.options.force;
 
@@ -49,7 +48,7 @@ class SpoFeatureEnableCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      cmd.log(`Enabling feature '${args.options.featureId}' on scope '${scope}' for url '${args.options.url}' (force='${force}')...`);
+      logger.log(`Enabling feature '${args.options.featureId}' on scope '${scope}' for url '${args.options.url}' (force='${force}')...`);
     }
 
     const url: string = `${args.options.url}/_api/${scope}/features/add(featureId=guid'${args.options.featureId}',force=${force})`;
@@ -64,10 +63,10 @@ class SpoFeatureEnableCommand extends SpoCommand {
       .post(requestOptions)
       .then((res: any): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public types(): CommandTypes {
@@ -101,16 +100,14 @@ class SpoFeatureEnableCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.scope) {
-        if (['site', 'web'].indexOf(args.options.scope.toLowerCase()) < 0){
-          return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.scope) {
+      if (['site', 'web'].indexOf(args.options.scope.toLowerCase()) < 0) {
+        return `${args.options.scope} is not a valid Feature scope. Allowed values are Site|Web`;
       }
+    }
 
-      return SpoCommand.isValidSharePointUrl(args.options.url);
-    };
+    return SpoCommand.isValidSharePointUrl(args.options.url);
   }
 }
 

@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./message-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./message-add');
 
 describe(commands.YAMMER_MESSAGE_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let firstMessage: any = { messages: [{ "id": 470839661887488, "sender_id": 1496550646, "replied_to_id": null, "created_at": "2019/12/22 17:20:30 +0000", "network_id": 801445, "message_type": "update", "sender_type": "user", "url": "https://www.yammer.com/api/v1/messages/470839661887488", "web_url": "https://www.yammer.com/nubo.eu/messages/470839661887488", "group_id": 13114941440, "body": { "parsed": "send a letter to me", "plain": "send a letter to me", "rich": "send a letter to me" }, "thread_id": 470839661887488, "client_type": "O365 Api Auth", "client_url": "https://api.yammer.com", "system_message": false, "direct_message": false, "chat_client_sequence": null, "language": null, "notified_user_ids": [], "privacy": "public", "attachments": [], "liked_by": { "count": 0, "names": [] }, "content_excerpt": "send a letter to me", "group_created_id": 13114941440 }] };
 
   before(() => {
@@ -22,16 +23,12 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -57,22 +54,22 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
   });
 
   it('repliedToId must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { body: "test", repliedToId: 'nonumber' } });
+    const actual = command.validate({ options: { body: "test", repliedToId: 'nonumber' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('groupId must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { body: "test", groupId: 'nonumber' } });
+    const actual = command.validate({ options: { body: "test", groupId: 'nonumber' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('networkId must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { body: "test", networkId: 'nonumber' } });
+    const actual = command.validate({ options: { body: "test", networkId: 'nonumber' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('has all fields', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { body: "test" } });
+    const actual = command.validate({ options: { body: "test" } });
     assert.strictEqual(actual, true);
   });
 
@@ -83,9 +80,9 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { body: "send a letter to me", debug: true } }, (err?: any) => {
+    command.action(logger, { options: { body: "send a letter to me", debug: true } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].id, 470839661887488)
+        assert.strictEqual(loggerSpy.lastCall.args[0].id, 470839661887488)
         done();
       }
       catch (e) {
@@ -101,9 +98,9 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { body: "send a letter to me", debug: true, output: "json" } }, (err?: any) => {
+    command.action(logger, { options: { body: "send a letter to me", debug: true, output: "json" } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].id, 470839661887488)
+        assert.strictEqual(loggerSpy.lastCall.args[0].id, 470839661887488)
         done();
       }
       catch (e) {
@@ -121,7 +118,7 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -133,7 +130,7 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

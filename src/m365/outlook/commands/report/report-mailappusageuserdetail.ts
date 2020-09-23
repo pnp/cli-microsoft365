@@ -1,5 +1,5 @@
-import commands from '../../commands';
 import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport';
+import commands from '../../commands';
 
 class OutlookReportMailAppUsageUserDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {

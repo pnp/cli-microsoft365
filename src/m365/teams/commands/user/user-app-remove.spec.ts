@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./user-app-remove');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./user-app-remove');
 
 describe(commands.TEAMS_USER_APP_REMOVE, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -23,26 +24,23 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     Utils.restore([
-      request.delete
+      request.delete,
+      Cli.prompt
     ]);
   });
 
@@ -63,7 +61,7 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
   });
 
   it('fails validation if the userId is not a valid guid.', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         userId: 'invalid',
         appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
@@ -73,7 +71,7 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
   });
 
   it('passes validation when the input is correct', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
         userId: '15d7a78e-fd77-4599-97a5-dbb6372846c5'
@@ -83,12 +81,12 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
   });
 
   it('prompts before removing the app when confirmation argument is not passed', (done) => {
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
       }
-    }, () => {
+    } as any, () => {
       let promptIssued = false;
       if (promptOptions && promptOptions.type === 'confirm') {
         promptIssued = true;
@@ -107,12 +105,12 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
   it('aborts removing the app when confirmation prompt is not continued', (done) => {
     const requestDeleteSpy = sinon.stub(request, 'delete');
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY='
       }
-    }, () => {
+    } as any, () => {
       try {
         assert(requestDeleteSpy.notCalled);
         done();
@@ -131,16 +129,16 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
         debug: true,
         confirm: true
       }
-    }, () => {
+    } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -157,18 +155,19 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({
+    });
+    command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
         debug: true
       }
-    }, () => {
+    } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -186,13 +185,13 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
         appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
         confirm: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(error)));
         done();
@@ -204,7 +203,7 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

@@ -1,20 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./site-remove');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./site-remove');
 
 describe(commands.SITE_REMOVE, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdClassicInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let requests: any[];
 
   before(() => {
@@ -29,26 +29,16 @@ describe(commands.SITE_REMOVE, () => {
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); }); 
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdClassicInstance = {
-      commandWrapper: {
-        command: commands.SITE_REMOVE
-      },
-      action: command.action(),
-      log: (msg: string) => {
-        log.push(msg);
-      }
-    };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     requests = [];
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
@@ -56,7 +46,8 @@ describe(commands.SITE_REMOVE, () => {
     Utils.restore([
       request.post,
       global.setTimeout,
-      (command as any).ensureFormDigest
+      (command as any).ensureFormDigest,
+      Cli.prompt
     ]);
   });
 
@@ -78,25 +69,7 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('aborts removing site when prompt not confirmed', (done) => {
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    };
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } }, () => {
-      try {
-        assert(requests.length === 0);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('runs with alias and aborts when prompt not confirmed', (done) => {
-    cmdClassicInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    };
-    cmdClassicInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } }, () => {
       try {
         assert(requests.length === 0);
         done();
@@ -139,12 +112,13 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } }, () => {
+    });
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', debug: true, verbose: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -157,7 +131,7 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('fails validation if the url is not a valid url', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'abc'
       }
@@ -166,7 +140,7 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('fails validation if the url is not a valid SharePoint url', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'http://contoso'
       }
@@ -175,7 +149,7 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('passes validation if the required options are correct', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/demosite'
       }
@@ -214,9 +188,9 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -256,9 +230,9 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -320,9 +294,9 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, skipRecycleBin: true } }, (error: any) => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, skipRecycleBin: true } } as any, (error: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -384,9 +358,9 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, skipRecycleBin: true } }, (error: any) => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, skipRecycleBin: true } } as any, (error: any) => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -426,9 +400,9 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -468,9 +442,9 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -523,9 +497,9 @@ describe(commands.SITE_REMOVE, () => {
       fn();
       return {} as any;
     });
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true, wait: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true, wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -553,7 +527,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true, wait: true } }, (err?: any) => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', fromRecycleBin: true, confirm: true, debug: true, wait: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -609,9 +583,9 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, wait: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -665,9 +639,9 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, verbose: true, wait: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, verbose: true, wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -722,9 +696,9 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: false, wait: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: false, wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -779,7 +753,7 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: false, wait: true } }, (err?: any) => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: false, wait: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -809,7 +783,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true } }, (err?: any) => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -821,7 +795,7 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

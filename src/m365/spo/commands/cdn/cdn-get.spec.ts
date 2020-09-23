@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
-import config from '../../../../config';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./cdn-get');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./cdn-get');
 
 describe(commands.CDN_GET, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -23,11 +24,7 @@ describe(commands.CDN_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -80,7 +77,7 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'Public' } }, () => {
+    command.action(logger, { options: { debug: true, type: 'Public' } }, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -123,7 +120,7 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, type: 'Private' } }, () => {
+    command.action(logger, { options: { debug: false, type: 'Private' } }, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (l === false) {
@@ -162,7 +159,7 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, type: 'Private' } }, () => {
+    command.action(logger, { options: { debug: true, type: 'Private' } }, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -205,7 +202,7 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -256,7 +253,7 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, 'An error has occurred');
         done();
@@ -273,7 +270,7 @@ describe(commands.CDN_GET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -285,7 +282,7 @@ describe(commands.CDN_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -296,7 +293,7 @@ describe(commands.CDN_GET, () => {
   });
 
   it('supports specifying CDN type', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[type]') > -1) {
@@ -308,29 +305,29 @@ describe(commands.CDN_GET, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('accepts Public SharePoint Online CDN type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'Public' } });
+    const actual = command.validate({ options: { type: 'Public' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'Private' } });
+    const actual = command.validate({ options: { type: 'Private' } });
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', () => {
     const type = 'foo';
-    const actual = (command.validate() as CommandValidate)({ options: { type: type } });
+    const actual = command.validate({ options: { type: type } });
     assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, true);
   });
 });

@@ -1,7 +1,7 @@
+import { Logger } from '../../../../cli';
 import request from '../../../../request';
-import commands from '../../commands';
 import SpoCommand from '../../../base/SpoCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
   public get name(): string {
@@ -12,9 +12,9 @@ class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
     return 'Gets the URL of the tenant app catalog';
   }
 
-  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     this
-      .getSpoUrl(cmd, this.debug)
+      .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<string> => {
         const requestOptions: any = {
           url: `${spoUrl}/_api/SP_TenantSettings_Current`,
@@ -29,15 +29,15 @@ class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
         const json = JSON.parse(res);
 
         if (json.CorporateCatalogUrl) {
-          cmd.log(json.CorporateCatalogUrl);
+          logger.log(json.CorporateCatalogUrl);
         }
         else {
           if (this.verbose) {
-            cmd.log("Tenant app catalog is not configured.");
+            logger.log("Tenant app catalog is not configured.");
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 }
 

@@ -1,5 +1,5 @@
 import { Finding } from "../";
-import { Project, Manifest } from "../../model";
+import { Manifest, Project } from "../../model";
 import { Rule } from "./Rule";
 
 export class FN010004_YORC_componentType extends Rule {

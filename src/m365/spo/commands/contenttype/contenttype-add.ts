@@ -1,15 +1,13 @@
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate, CommandTypes, CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import GlobalOptions from '../../../../GlobalOptions';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -39,16 +37,16 @@ class SpoContentTypeAddCommand extends SpoCommand {
     };
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let parentInfo: string = '';
 
     this
-      .getParentInfo(args.options.listTitle, args.options.webUrl, cmd)
+      .getParentInfo(args.options.listTitle, args.options.webUrl, logger)
       .then((parent: string): Promise<ContextInfo> => {
         parentInfo = parent;
 
         if (this.verbose) {
-          cmd.log(`Retrieving request digest...`);
+          logger.log(`Retrieving request digest...`);
         }
 
         return this.getRequestDigest(args.options.webUrl);
@@ -80,14 +78,14 @@ class SpoContentTypeAddCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
-  private getParentInfo(listTitle: string | undefined, webUrl: string, cmd: CommandInstance): Promise<string> {
+  private getParentInfo(listTitle: string | undefined, webUrl: string, logger: Logger): Promise<string> {
     return new Promise<string>((resolve: (parentInfo: string) => void, reject: (error: any) => void): void => {
       if (!listTitle) {
         resolve('<Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" />');
@@ -99,7 +97,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
       ((): Promise<{ Id: string; }> => {
         if (this.verbose) {
-          cmd.log(`Retrieving site collection id...`);
+          logger.log(`Retrieving site collection id...`);
         }
 
         const requestOptions: any = {
@@ -116,7 +114,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
           siteId = res.Id;
 
           if (this.verbose) {
-            cmd.log(`Retrieving site id...`);
+            logger.log(`Retrieving site id...`);
           }
 
           const requestOptions: any = {
@@ -133,7 +131,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
           webId = res.Id;
 
           if (this.verbose) {
-            cmd.log(`Retrieving list id...`);
+            logger.log(`Retrieving list id...`);
           }
 
           const requestOptions: any = {
@@ -186,10 +184,8 @@ class SpoContentTypeAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

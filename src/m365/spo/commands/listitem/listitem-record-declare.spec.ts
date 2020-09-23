@@ -1,17 +1,17 @@
-import commands from '../../commands';
-import Command from '../../../../Command';
-import { CommandValidate, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./listitem-record-declare');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./listitem-record-declare');
 
 describe(commands.LISTITEM_RECORD_DECLARE, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
   let declareItemAsRecordFakeCalled = false;
 
   let postFakes = (opts: any) => {
@@ -80,7 +80,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   let getFakes = (opts: any) => {
     if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
       (opts.url as string).indexOf('$select=Id') > -1) {
-      cmdInstance.log('faked!');
+      logger.log('faked!');
       return Promise.resolve({
         Id: '81f0ecee-75a8-46f0-b384-c8f4f9f31d99'
       });
@@ -102,11 +102,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -149,7 +145,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert(declareItemAsRecordFakeCalled);
         done();
@@ -172,7 +168,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert(declareItemAsRecordFakeCalled);
         done();
@@ -196,7 +192,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert(declareItemAsRecordFakeCalled);
         done();
@@ -219,7 +215,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     };
 
     declareItemAsRecordFakeCalled = false;
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert(declareItemAsRecordFakeCalled);
         done();
@@ -242,7 +238,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       webUrl: `https://alreadydeclared.sharepoint.com/sites/project-y/`,
     };
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, 'This item has already been declared a record.');
         done();
@@ -266,7 +262,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     }
 
     declareItemAsRecordFakeCalled = false;
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.notStrictEqual(declareItemAsRecordFakeCalled, true);
         done();
@@ -290,7 +286,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     }
 
     declareItemAsRecordFakeCalled = false;
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.notStrictEqual(declareItemAsRecordFakeCalled, true);
         done();
@@ -302,7 +298,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -313,7 +309,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -324,52 +320,52 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   });
 
   it('fails validation if listTitle and listId option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if listTitle and listId are specified together', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', listTitle: 'Test List', id: '1' } });
+    const actual = command.validate({ options: { webUrl: 'foo', listTitle: 'Test List', id: '1' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the item ID is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: 'foo' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the item ID is not a positive number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '-1' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '-1' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL and numerical ID specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '1' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listTitle: 'Test List', id: '1' } });
     assert(actual);
   });
 
   it('fails validation if the listId option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: '1' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: 'foo', id: '1' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listId option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', debug: true } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', debug: true } });
     assert(actual);
   });
 
   it('fails validation if the date passed in is not in ISO format', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', date: 'foo', debug: true } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', date: 'foo', debug: true } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the date passed in is in ISO format', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', date: 'foo', debug: true } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', id: '1', date: 'foo', debug: true } });
     assert(actual);
   });
 });

@@ -1,13 +1,13 @@
-import { ContextInfo } from '../../spo';
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import GlobalOptions from '../../../../GlobalOptions';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -33,13 +33,13 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const disconnectHubSite: () => void = (): void => {
       this
         .getRequestDigest(args.options.url)
         .then((res: ContextInfo): Promise<void> => {
           if (this.verbose) {
-            cmd.log(`Disconnecting site collection ${args.options.url} from its hubsite...`);
+            logger.log(`Disconnecting site collection ${args.options.url} from its hubsite...`);
           }
 
           const requestOptions: any = {
@@ -55,18 +55,18 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
 
           cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
       disconnectHubSite();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -98,10 +98,8 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.url);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.url);
   }
 }
 

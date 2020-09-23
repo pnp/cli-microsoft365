@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import { Cli, Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
 import Utils from '../../../../Utils';
-import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 import SpoCommand from '../../../base/SpoCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
+import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 
 interface CommandArgs {
   options: Options;
@@ -38,18 +37,18 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
 
     const removeApp: () => void = (): void => {
       this
-        .getSpoUrl(cmd, this.debug)
+        .getSpoUrl(logger, this.debug)
         .then((spoUrl: string): Promise<string> => {
-          return this.getAppCatalogSiteUrl(cmd, spoUrl, args)
+          return this.getAppCatalogSiteUrl(logger, spoUrl, args)
         })
         .then((appCatalogUrl: string): Promise<void> => {
           if (this.debug) {
-            cmd.log(`Retrieved app catalog URL ${appCatalogUrl}. Removing app from the app catalog...`);
+            logger.log(`Retrieved app catalog URL ${appCatalogUrl}. Removing app from the app catalog...`);
           }
 
           const requestOptions: any = {
@@ -63,14 +62,14 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
         })
         .then((): void => {
           cb();
-        }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
+        }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
     };
 
     if (args.options.confirm) {
       removeApp();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -111,30 +110,28 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      // verify either 'tenant' or 'sitecollection' specified if scope provided
-      if (args.options.scope) {
-        const testScope: string = args.options.scope.toLowerCase();
-        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-          return `Scope must be either 'tenant' or 'sitecollection' if specified`
-        }
-
-        if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-          return `You must specify appCatalogUrl when the scope is sitecollection`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    // verify either 'tenant' or 'sitecollection' specified if scope provided
+    if (args.options.scope) {
+      const testScope: string = args.options.scope.toLowerCase();
+      if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+        return `Scope must be either 'tenant' or 'sitecollection' if specified`
       }
 
-      if (!Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
+      if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+        return `You must specify appCatalogUrl when the scope is sitecollection`;
       }
+    }
 
-      if (args.options.appCatalogUrl) {
-        return SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
-      }
+    if (!Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    if (args.options.appCatalogUrl) {
+      return SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+    }
+
+    return true;
   }
 }
 

@@ -1,5 +1,5 @@
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
 import {
   CommandError
 } from '../../../../Command';
@@ -23,18 +23,18 @@ class SpoKnowledgehubGetCommand extends SpoCommand {
     return 'Gets the Knowledge Hub Site URL for your tenant';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
         return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Getting the Knowledge Hub Site settings for your tenant`);
+          logger.log(`Getting the Knowledge Hub Site settings for your tenant`);
         }
 
         const requestOptions: any = {
@@ -55,14 +55,14 @@ class SpoKnowledgehubGetCommand extends SpoCommand {
         }
         else {
           const result: string = !json[json.length - 1] ? '' : json[json.length - 1];
-          cmd.log(result);
+          logger.log(result);
 
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
           cb();
         }
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 }
 

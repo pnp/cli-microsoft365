@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./feature-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./feature-list');
 
 describe(commands.FEATURE_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.FEATURE_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -75,7 +72,7 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         verbose: false,
@@ -84,7 +81,7 @@ describe(commands.FEATURE_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
             DisplayName: "TenantSitesList"
@@ -122,7 +119,7 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         verbose: false,
@@ -131,7 +128,7 @@ describe(commands.FEATURE_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
             DisplayName: "TenantSitesList"
@@ -173,7 +170,7 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         verbose: false,
@@ -181,7 +178,7 @@ describe(commands.FEATURE_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
             DisplayName: "TenantSitesList"
@@ -232,9 +229,9 @@ describe(commands.FEATURE_LIST, () => {
       output: 'json'
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(
+        assert(loggerSpy.calledWith(
           [
             {
               "odata.type": "SP.Feature",
@@ -274,7 +271,7 @@ describe(commands.FEATURE_LIST, () => {
       scope: 'Site',
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -300,7 +297,7 @@ describe(commands.FEATURE_LIST, () => {
       scope: 'Web',
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(log.length, 0);
         done();
@@ -326,7 +323,7 @@ describe(commands.FEATURE_LIST, () => {
       url: 'https://contoso.sharepoint.com',
       scope: 'Site',
     }
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -362,7 +359,7 @@ describe(commands.FEATURE_LIST, () => {
       url: 'https://contoso.sharepoint.com',
       scope: 'Web',
     }
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       let correctLogStatement = false;
       log.forEach(l => {
         if (!l || typeof l !== 'string') {
@@ -393,7 +390,7 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         url: 'https://contoso.sharepoint.com',
@@ -420,7 +417,7 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         verbose: true,
@@ -439,7 +436,7 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsVerboseOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -450,7 +447,7 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('supports specifying scope', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsScopeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[scope]') > -1) {
@@ -462,7 +459,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
@@ -482,9 +479,9 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Web' } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Web' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             DefinitionId: '00bfea71-5932-4f9c-ad71-1557e5751100',
             DisplayName: 'WebPageLibrary'
@@ -514,9 +511,9 @@ describe(commands.FEATURE_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Site' } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Site' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             DefinitionId: '3019c9b4-e371-438d-98f6-0a08c34d06eb',
             DisplayName: 'TenantSitesList'
@@ -531,7 +528,7 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         url: 'foo'
@@ -541,7 +538,7 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('passes validation when the url options specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         url: "https://contoso.sharepoint.com"
@@ -551,7 +548,7 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('passes validation when the url and scope options specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         url: "https://contoso.sharepoint.com",
@@ -562,7 +559,7 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('accepts scope to be Site', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         url: "https://contoso.sharepoint.com",
@@ -573,7 +570,7 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('accepts scope to be Web', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
       {
         url: "https://contoso.sharepoint.com",
@@ -585,7 +582,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('rejects invalid string scope', () => {
     const scope = 'foo';
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: "https://contoso.sharepoint.com",
         scope: scope
@@ -596,7 +593,7 @@ describe(commands.FEATURE_LIST, () => {
 
   it('rejects invalid scope value specified as number', () => {
     const scope = 123;
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: "https://contoso.sharepoint.com",
         scope: scope
@@ -606,7 +603,7 @@ describe(commands.FEATURE_LIST, () => {
   });
 
   it('doesn\'t fail validation if the optional scope option not specified', () => {
-    const actual = (command.validate() as CommandValidate)(
+    const actual = command.validate(
       {
         options:
         {

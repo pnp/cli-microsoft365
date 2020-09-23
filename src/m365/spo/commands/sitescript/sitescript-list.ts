@@ -1,9 +1,9 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import SpoCommand from '../../../base/SpoCommand';
-import { ContextInfo } from '../../spo';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ContextInfo } from '../../spo';
 
 class SpoSiteScriptListCommand extends SpoCommand {
   public get name(): string {
@@ -14,11 +14,11 @@ class SpoSiteScriptListCommand extends SpoCommand {
     return 'Lists site script available for use with site designs';
   }
 
-  public commandAction(cmd: CommandInstance, args: {}, cb: () => void): void {
+  public commandAction(logger: Logger, args: {}, cb: () => void): void {
     let spoUrl: string = '';
 
     this
-      .getSpoUrl(cmd, this.debug)
+      .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<ContextInfo> => {
         spoUrl = _spoUrl;
         return this.getRequestDigest(spoUrl);
@@ -37,15 +37,15 @@ class SpoSiteScriptListCommand extends SpoCommand {
       })
       .then((res: { value: any[] }): void => {
         if (res.value && res.value.length > 0) {
-          cmd.log(res.value);
+          logger.log(res.value);
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

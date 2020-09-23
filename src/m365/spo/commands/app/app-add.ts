@@ -1,15 +1,14 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
+import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import commands from '../../commands';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -39,19 +38,19 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     const overwrite: boolean = args.options.overwrite || false;
 
     this
-      .getSpoUrl(cmd, this.debug)
+      .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<string> => {
-        return this.getAppCatalogSiteUrl(cmd, spoUrl, args);
+        return this.getAppCatalogSiteUrl(logger, spoUrl, args);
       })
       .then((appCatalogUrl: string): Promise<string> => {
         const fullPath: string = path.resolve(args.options.filePath);
         if (this.verbose) {
-          cmd.log(`Adding app '${fullPath}' to app catalog...`);
+          logger.log(`Adding app '${fullPath}' to app catalog...`);
         }
 
         const fileName: string = path.basename(fullPath);
@@ -69,18 +68,18 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
       .then((res: string): void => {
         const json: any = JSON.parse(res);
         if (args.options.output === 'json') {
-          cmd.log(json);
+          logger.log(json);
         }
         else {
-          cmd.log(json.UniqueId);
+          logger.log(json.UniqueId);
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -108,36 +107,34 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      // verify either 'tenant' or 'sitecollection' specified if scope provided
-      if (args.options.scope) {
-        const testScope: string = args.options.scope.toLowerCase();
-        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-          return `Scope must be either 'tenant' or 'sitecollection'`;
-        }
-
-        if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-          return `You must specify appCatalogUrl when the scope is sitecollection`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    // verify either 'tenant' or 'sitecollection' specified if scope provided
+    if (args.options.scope) {
+      const testScope: string = args.options.scope.toLowerCase();
+      if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+        return `Scope must be either 'tenant' or 'sitecollection'`;
       }
 
-      const fullPath: string = path.resolve(args.options.filePath);
-
-      if (!fs.existsSync(fullPath)) {
-        return `File '${fullPath}' not found`;
+      if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+        return `You must specify appCatalogUrl when the scope is sitecollection`;
       }
+    }
 
-      if (fs.lstatSync(fullPath).isDirectory()) {
-        return `Path '${fullPath}' points to a directory`;
-      }
+    const fullPath: string = path.resolve(args.options.filePath);
 
-      if (args.options.appCatalogUrl) {
-        return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
-      }
+    if (!fs.existsSync(fullPath)) {
+      return `File '${fullPath}' not found`;
+    }
 
-      return true;
-    };
+    if (fs.lstatSync(fullPath).isDirectory()) {
+      return `Path '${fullPath}' points to a directory`;
+    }
+
+    if (args.options.appCatalogUrl) {
+      return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+    }
+
+    return true;
   }
 }
 

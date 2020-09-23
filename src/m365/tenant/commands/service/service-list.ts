@@ -1,6 +1,6 @@
 import * as chalk from 'chalk';
 import auth from '../../../../Auth';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
@@ -15,9 +15,9 @@ class TenantServiceListCommand extends Command {
     return 'Gets services available in Microsoft 365';
   }
 
-  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     if (this.verbose) {
-      cmd.log(`Getting the health status of the different services in Microsoft 365.`);
+      logger.log(`Getting the health status of the different services in Microsoft 365.`);
     }
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
@@ -37,10 +37,10 @@ class TenantServiceListCommand extends Command {
       .get(requestOptions)
       .then((res: any): void => {
         if (args.options.output === 'json') {
-          cmd.log(res);
+          logger.log(res);
         }
         else {
-          cmd.log(res.value.map((r: any) => {
+          logger.log(res.value.map((r: any) => {
             return {
               Id: r.Id,
               DisplayName: r.DisplayName
@@ -48,10 +48,10 @@ class TenantServiceListCommand extends Command {
           }));
         }
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

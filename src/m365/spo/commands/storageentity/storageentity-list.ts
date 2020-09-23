@@ -1,13 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { TenantProperty } from './TenantProperty';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -26,9 +25,9 @@ class SpoStorageEntityListCommand extends SpoCommand {
     return 'Lists tenant properties stored on the specified SharePoint Online app catalog';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
+      logger.log(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
     }
 
     const requestOptions: any = {
@@ -46,7 +45,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
           if (!web.storageentitiesindex ||
             web.storageentitiesindex.trim().length === 0) {
             if (this.verbose) {
-              cmd.log('No tenant properties found');
+              logger.log('No tenant properties found');
             }
             cb();
             return;
@@ -56,11 +55,11 @@ class SpoStorageEntityListCommand extends SpoCommand {
           const keys: string[] = Object.keys(properties);
           if (keys.length === 0) {
             if (this.verbose) {
-              cmd.log('No tenant properties found');
+              logger.log('No tenant properties found');
             }
           }
           else {
-            cmd.log(keys.map((key: string): any => {
+            logger.log(keys.map((key: string): any => {
               const property: TenantProperty = properties[key];
               return {
                 Key: key,
@@ -73,9 +72,9 @@ class SpoStorageEntityListCommand extends SpoCommand {
           cb();
         }
         catch (e) {
-          this.handleError(e, cmd, cb);
+          this.handleError(e, logger, cb);
         }
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -88,16 +87,14 @@ class SpoStorageEntityListCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const result: boolean | string = SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
-      if (result === false) {
-        return 'Missing required option appCatalogUrl';
-      }
-      else {
-        return result;
-      }
-    };
+  public validate(args: CommandArgs): boolean | string {
+    const result: boolean | string = SpoCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+    if (result === false) {
+      return 'Missing required option appCatalogUrl';
+    }
+    else {
+      return result;
+    }
   }
 }
 

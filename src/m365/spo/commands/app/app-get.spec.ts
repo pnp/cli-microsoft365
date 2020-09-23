@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./app-get');
-import * as assert from 'assert';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./app-get');
 
 describe(commands.APP_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,21 +23,18 @@ describe(commands.APP_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
     Utils.restore([
-      request.get
+      request.get,
+      Cli.prompt
     ]);
   });
 
@@ -78,9 +76,9 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+    command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -118,9 +116,9 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
+    command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -158,9 +156,9 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
+    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -198,9 +196,9 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
+    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -244,9 +242,9 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -291,9 +289,9 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, name: 'solution.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com/sites/site1' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'solution.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com/sites/site1' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -337,9 +335,9 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, name: 'solution.sppkg' } }, () => {
+    command.action(logger, { options: { debug: true, name: 'solution.sppkg' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -374,10 +372,10 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { appCatalogUrl: string, }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { appCatalogUrl: string, }) => void) => {
       cb({ appCatalogUrl: '' });
-    };
-    cmdInstance.action({ options: { debug: false, name: 'solution.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } }, (err?: any) => {
+    });
+    command.action(logger, { options: { debug: false, name: 'solution.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -416,12 +414,12 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { appCatalogUrl: string }) => void) => {
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { appCatalogUrl: string }) => void) => {
       cb({ appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' });
-    };
-    cmdInstance.action({ options: { debug: false, name: 'solution.sppkg' } }, () => {
+    });
+    command.action(logger, { options: { debug: false, name: 'solution.sppkg' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -462,7 +460,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown.")));
         done();
@@ -502,7 +500,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Exception of type 'Microsoft.SharePoint.Client.ResourceNotFoundException' was thrown.")));
         done();
@@ -532,7 +530,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -572,7 +570,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -587,92 +585,92 @@ describe(commands.APP_GET, () => {
   });
 
   it('fails validation if neither the id nor the name options are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when invalid scope is specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '123', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'foo' } });
+    const actual = command.validate({ options: { id: '123', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the id option specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'f8b52a45-61d5-4264-81c9-c3bbd203e7d0' } });
+    const actual = command.validate({ options: { id: 'f8b52a45-61d5-4264-81c9-c3bbd203e7d0' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if the specified id is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '123' } });
+    const actual = command.validate({ options: { id: '123' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when both the id and the name options specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'f8b52a45-61d5-4264-81c9-c3bbd203e7d0', name: 'solution.sppkg' } });
+    const actual = command.validate({ options: { id: 'f8b52a45-61d5-4264-81c9-c3bbd203e7d0', name: 'solution.sppkg' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the specified appCatalogUrl is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'solution.sppkg', appCatalogUrl: 'url' } });
+    const actual = command.validate({ options: { name: 'solution.sppkg', appCatalogUrl: 'url' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when invalid scope is specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'foo' } });
+    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('should fail when \'sitecollection\' scope, but no appCatalogUrl specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', filePath: 'abc', scope: 'sitecollection' } });
+    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', filePath: 'abc', scope: 'sitecollection' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('should pass when scope \'tenant\' and appCatalogUrl specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', filePath: 'abc', scope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', filePath: 'abc', scope: 'tenant', appCatalogUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('should fail when \'sitecollection\' scope, but  bad appCatalogUrl format specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', filePath: 'abc', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', filePath: 'abc', scope: 'sitecollection', appCatalogUrl: 'contoso.sharepoint.com' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the id option specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'f8b52a45-61d5-4264-81c9-c3bbd203e7d0' } });
+    const actual = command.validate({ options: { id: 'f8b52a45-61d5-4264-81c9-c3bbd203e7d0' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when the name option specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'solution.sppkg' } });
+    const actual = command.validate({ options: { name: 'solution.sppkg' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when the name and appCatalogUrl options specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps', scope: 'tenant' } });
+    const actual = command.validate({ options: { name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps', scope: 'tenant' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when no scope is specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4' } });
+    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when the scope is specified with \'tenant\'', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'tenant' } });
+    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', scope: 'tenant' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when the scope is specified with \'sitecollection\'', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'sitecollection' } });
+    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4', appCatalogUrl: 'https://contoso.sharepoint.com', scope: 'sitecollection' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when no scope is specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4' } });
+    const actual = command.validate({ options: { id: 'dd20afdf-d7fd-4662-a443-b69e65a72bd4' } });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

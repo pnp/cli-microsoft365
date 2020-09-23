@@ -1,13 +1,12 @@
-import commands from '../../commands';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
-import { AppMetadata } from './AppMetadata';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import commands from '../../commands';
+import { AppMetadata } from './AppMetadata';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -34,22 +33,22 @@ class SpoAppListCommand extends SpoAppBaseCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     let appCatalogSiteUrl: string = '';
     let spoUrl: string = '';
 
     this
-      .getSpoUrl(cmd, this.debug)
+      .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<string> => {
         spoUrl = _spoUrl;
-        return this.getAppCatalogSiteUrl(cmd, spoUrl, args)
+        return this.getAppCatalogSiteUrl(logger, spoUrl, args)
       })
       .then((appCatalogUrl: string): Promise<{ value: AppMetadata[] }> => {
         appCatalogSiteUrl = appCatalogUrl;
 
         if (this.verbose) {
-          cmd.log(`Retrieving apps...`);
+          logger.log(`Retrieving apps...`);
         }
 
         const requestOptions: any = {
@@ -65,10 +64,10 @@ class SpoAppListCommand extends SpoAppBaseCommand {
       .then((apps: { value: AppMetadata[] }): void => {
         if (apps.value && apps.value.length > 0) {
           if (args.options.output === 'json') {
-            cmd.log(apps.value);
+            logger.log(apps.value);
           }
           else {
-            cmd.log(apps.value.map(a => {
+            logger.log(apps.value.map(a => {
               return {
                 Title: a.Title,
                 ID: a.ID,
@@ -80,11 +79,11 @@ class SpoAppListCommand extends SpoAppBaseCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log('No apps found');
+            logger.log('No apps found');
           }
         }
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -104,27 +103,25 @@ class SpoAppListCommand extends SpoAppBaseCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {      
-      // verify either 'tenant' or 'sitecollection' specified if scope provided
-      if (args.options.scope) {
-        const testScope: string = args.options.scope.toLowerCase();
+  public validate(args: CommandArgs): boolean | string {
+    // verify either 'tenant' or 'sitecollection' specified if scope provided
+    if (args.options.scope) {
+      const testScope: string = args.options.scope.toLowerCase();
 
-        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-          return `Scope must be either 'tenant' or 'sitecollection'`;
-        }
-
-        if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-          return `You must specify appCatalogUrl when the scope is sitecollection`;
-        }
-
-        if (args.options.appCatalogUrl) {
-          return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
-        }
+      if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+        return `Scope must be either 'tenant' or 'sitecollection'`;
       }
 
-      return true;
-    };
+      if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+        return `You must specify appCatalogUrl when the scope is sitecollection`;
+      }
+
+      if (args.options.appCatalogUrl) {
+        return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+      }
+    }
+
+    return true;
   }
 }
 

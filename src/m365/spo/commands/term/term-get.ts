@@ -1,17 +1,16 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
   CommandError,
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { Term } from './Term';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -46,18 +45,18 @@ class SpoTermGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
         return this.getRequestDigest(spoAdminUrl);
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Retrieving taxonomy term...`);
+          logger.log(`Retrieving taxonomy term...`);
         }
 
         let body: string = '';
@@ -100,9 +99,9 @@ class SpoTermGetCommand extends SpoCommand {
         term.CreatedDate = new Date(Number(term.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
         term.Id = term.Id.replace('/Guid(', '').replace(')/', '');
         term.LastModifiedDate = new Date(Number(term.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-        cmd.log(term);
+        logger.log(term);
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -137,54 +136,52 @@ class SpoTermGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!args.options.id && !args.options.name) {
-        return 'Specify either id or name';
+  public validate(args: CommandArgs): boolean | string {
+    if (!args.options.id && !args.options.name) {
+      return 'Specify either id or name';
+    }
+
+    if (args.options.id && args.options.name) {
+      return 'Specify either id or name but not both';
+    }
+
+    if (args.options.id) {
+      if (!Utils.isValidGuid(args.options.id)) {
+        return `${args.options.id} is not a valid GUID`;
+      }
+    }
+
+    if (args.options.name) {
+      if (!args.options.termGroupId && !args.options.termGroupName) {
+        return 'Specify termGroupId or termGroupName';
       }
 
-      if (args.options.id && args.options.name) {
-        return 'Specify either id or name but not both';
+      if (!args.options.termSetId && !args.options.termSetName) {
+        return 'Specify termSetId or termSetName';
       }
+    }
 
-      if (args.options.id) {
-        if (!Utils.isValidGuid(args.options.id)) {
-          return `${args.options.id} is not a valid GUID`;
-        }
+    if (args.options.termGroupId && args.options.termGroupName) {
+      return 'Specify termGroupId or termGroupName but not both';
+    }
+
+    if (args.options.termGroupId) {
+      if (!Utils.isValidGuid(args.options.termGroupId)) {
+        return `${args.options.termGroupId} is not a valid GUID`;
       }
+    }
 
-      if (args.options.name) {
-        if (!args.options.termGroupId && !args.options.termGroupName) {
-          return 'Specify termGroupId or termGroupName';
-        }
+    if (args.options.termSetId && args.options.termSetName) {
+      return 'Specify termSetId or termSetName but not both';
+    }
 
-        if (!args.options.termSetId && !args.options.termSetName) {
-          return 'Specify termSetId or termSetName';
-        }
+    if (args.options.termSetId) {
+      if (!Utils.isValidGuid(args.options.termSetId)) {
+        return `${args.options.termSetId} is not a valid GUID`;
       }
+    }
 
-      if (args.options.termGroupId && args.options.termGroupName) {
-        return 'Specify termGroupId or termGroupName but not both';
-      }
-
-      if (args.options.termGroupId) {
-        if (!Utils.isValidGuid(args.options.termGroupId)) {
-          return `${args.options.termGroupId} is not a valid GUID`;
-        }
-      }
-
-      if (args.options.termSetId && args.options.termSetName) {
-        return 'Specify termSetId or termSetName but not both';
-      }
-
-      if (args.options.termSetId) {
-        if (!Utils.isValidGuid(args.options.termSetId)) {
-          return `${args.options.termSetId} is not a valid GUID`;
-        }
-      }
-
-      return true;
-    };
+    return true;
   }
 }
 

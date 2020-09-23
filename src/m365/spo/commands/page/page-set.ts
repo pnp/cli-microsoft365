@@ -1,15 +1,15 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import { ContextInfo } from '../../spo';
-import GlobalOptions from '../../../../GlobalOptions';
-import { Auth } from '../../../../Auth';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Auth } from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -44,7 +44,7 @@ class SpoPageSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let requestDigest: string = '';
     let pageName: string = args.options.name;
@@ -250,11 +250,11 @@ class SpoPageSetCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -296,42 +296,40 @@ class SpoPageSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.layoutType &&
-        args.options.layoutType !== 'Article' &&
-        args.options.layoutType !== 'Home') {
-        return `${args.options.layoutType} is not a valid option for layoutType. Allowed values Article|Home`;
-      }
+    if (args.options.layoutType &&
+      args.options.layoutType !== 'Article' &&
+      args.options.layoutType !== 'Home') {
+      return `${args.options.layoutType} is not a valid option for layoutType. Allowed values Article|Home`;
+    }
 
-      if (args.options.promoteAs &&
-        args.options.promoteAs !== 'HomePage' &&
-        args.options.promoteAs !== 'NewsPage' &&
-        args.options.promoteAs !== 'Template') {
-        return `${args.options.promoteAs} is not a valid option for promoteAs. Allowed values HomePage|NewsPage|Template`;
-      }
+    if (args.options.promoteAs &&
+      args.options.promoteAs !== 'HomePage' &&
+      args.options.promoteAs !== 'NewsPage' &&
+      args.options.promoteAs !== 'Template') {
+      return `${args.options.promoteAs} is not a valid option for promoteAs. Allowed values HomePage|NewsPage|Template`;
+    }
 
-      if (args.options.promoteAs === 'HomePage' && args.options.layoutType !== 'Home') {
-        return 'You can only promote home pages as site home page';
-      }
+    if (args.options.promoteAs === 'HomePage' && args.options.layoutType !== 'Home') {
+      return 'You can only promote home pages as site home page';
+    }
 
-      if (args.options.promoteAs === 'NewsPage' && args.options.layoutType === 'Home') {
-        return 'You can only promote article pages as news article';
-      }
+    if (args.options.promoteAs === 'NewsPage' && args.options.layoutType === 'Home') {
+      return 'You can only promote article pages as news article';
+    }
 
-      if (typeof args.options.commentsEnabled !== 'undefined' &&
-        args.options.commentsEnabled !== 'true' &&
-        args.options.commentsEnabled !== 'false') {
-        return `${args.options.commentsEnabled} is not a valid value for commentsEnabled. Allowed values true|false`;
-      }
+    if (typeof args.options.commentsEnabled !== 'undefined' &&
+      args.options.commentsEnabled !== 'true' &&
+      args.options.commentsEnabled !== 'false') {
+      return `${args.options.commentsEnabled} is not a valid value for commentsEnabled. Allowed values true|false`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

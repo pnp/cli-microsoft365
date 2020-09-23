@@ -1,16 +1,17 @@
-import commands from '../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../appInsights';
-const command: Command = require('./spo-get');
-import * as assert from 'assert';
-import Utils from '../../../Utils';
 import auth from '../../../Auth';
+import { Logger } from '../../../cli';
+import Command, { CommandError } from '../../../Command';
+import Utils from '../../../Utils';
+import commands from '../commands';
+const command: Command = require('./spo-get');
 
 describe(commands.GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -57,14 +54,14 @@ describe(commands.GET, () => {
   it('gets SPO URL when no URL was get previously', (done) => {
     auth.service.spoUrl = undefined;
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: true
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           SpoUrl: ''
         }));
         done();
@@ -78,14 +75,14 @@ describe(commands.GET, () => {
   it('gets SPO URL when other URL was get previously', (done) => {
     auth.service.spoUrl = 'https://northwind.sharepoint.com';
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         output: 'json',
         debug: true
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           SpoUrl: 'https://northwind.sharepoint.com'
         }));
         done();
@@ -99,7 +96,7 @@ describe(commands.GET, () => {
   it('throws error when trying to get SPO URL when not logged in to O365', (done) => {
     auth.service.connected = false;
 
-    cmdInstance.action({ options: {} }, (err?: any) => {
+    command.action(logger, { options: {} } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Log in to Microsoft 365 first")));
         assert.strictEqual(auth.service.spoUrl, undefined);
@@ -112,7 +109,7 @@ describe(commands.GET, () => {
   });
 
   it('Contains the correct options', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOutputOption = false;
     let containsVerboseOption = false;
     let containsDebugOption = false;
@@ -138,7 +135,7 @@ describe(commands.GET, () => {
   });
 
   it('passes validation without any extra options', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, true);
   });
 });

@@ -1,13 +1,13 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import request from '../../../../request';
-import config from '../../../../config';
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
 import {
-  CommandError
+    CommandError
 } from '../../../../Command';
+import config from '../../../../config';
+import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { DeletedSitePropertiesEnumerable } from './DeletedSitePropertiesEnumerable';
-import { CommandInstance } from '../../../../cli';
 
 class SpoTenantRecycleBinItemListCommand extends SpoCommand {
   public get name(): string {
@@ -18,11 +18,11 @@ class SpoTenantRecycleBinItemListCommand extends SpoCommand {
     return 'Returns all modern and classic site collections in the tenant scoped recycle bin';
   }
 
-  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
         return this.getRequestDigest(spoAdminUrl);
@@ -48,10 +48,10 @@ class SpoTenantRecycleBinItemListCommand extends SpoCommand {
 
         const results: DeletedSitePropertiesEnumerable = json[json.length - 1];
         if (args.options.output === 'json') {
-          cmd.log(results._Child_Items_);
+          logger.log(results._Child_Items_);
         }
         else {
-          cmd.log(results._Child_Items_.map((r: any) => {
+          logger.log(results._Child_Items_.map((r: any) => {
             return {
               DaysRemaining: Number(r.DaysRemaining),
               DeletionTime: this.dateParser(r.DeletionTime as string),
@@ -70,7 +70,7 @@ class SpoTenantRecycleBinItemListCommand extends SpoCommand {
           }));
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
   private dateParser(dateString: string): Date {
     const d: number[] = dateString.replace('/Date(', '').replace(')/', '').split(',').map(Number);

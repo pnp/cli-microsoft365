@@ -1,17 +1,17 @@
-import commands from '../../commands';
-import Command from '../../../../Command';
-import { CommandValidate, CommandOption, CommandError, CommandTypes } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./listitem-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError, CommandTypes } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./listitem-list');
 
 describe(commands.LISTITEM_LIST, () => {
   let log: any[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   const expectedArrayLength = 2;
   let returnArrayLength = 0;
@@ -93,11 +93,7 @@ describe(commands.LISTITEM_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -128,7 +124,7 @@ describe(commands.LISTITEM_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -139,7 +135,7 @@ describe(commands.LISTITEM_LIST, () => {
   });
 
   it('supports specifying URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
@@ -155,62 +151,62 @@ describe(commands.LISTITEM_LIST, () => {
   });
 
   it('fails validation if title and id option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if title and id are specified together', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the webUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', title: 'Demo List' } });
+    const actual = command.validate({ options: { webUrl: 'foo', title: 'Demo List' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the webUrl option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List' } });
     assert(actual);
   });
 
   it('fails validation if the id option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'foo' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the id option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f' } });
     assert(actual);
   });
 
   it('fails validation if query and fields are specified together', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><ViewFields><FieldRef Name="Title" /><FieldRef Name="Id" /></ViewFields></Query>', fields: 'Title,Id' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><ViewFields><FieldRef Name="Title" /><FieldRef Name="Id" /></ViewFields></Query>', fields: 'Title,Id' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if query and pageSize are specified together', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><RowLimit>2</RowLimit></Query>', pageSize: 3 } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><RowLimit>2</RowLimit></Query>', pageSize: 3 } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if query and pageNumber are specified together', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><RowLimit>2</RowLimit></Query>', pageNumber: 3 } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><RowLimit>2</RowLimit></Query>', pageNumber: 3 } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if pageNumber is specified and pageSize is not', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageNumber: 3 } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageNumber: 3 } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the specific pageSize is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageSize: 'abc' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageSize: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if the specific pageNumber is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageSize: 3, pageNumber: 'abc' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', pageSize: 3, pageNumber: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
@@ -224,7 +220,7 @@ describe(commands.LISTITEM_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(returnArrayLength, expectedArrayLength);
         done();
@@ -250,7 +246,7 @@ describe(commands.LISTITEM_LIST, () => {
       fields: "Title,ID"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(returnArrayLength, expectedArrayLength);
         done();
@@ -277,7 +273,7 @@ describe(commands.LISTITEM_LIST, () => {
       fields: "Title,ID"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(returnArrayLength, expectedArrayLength);
         done();
@@ -303,7 +299,7 @@ describe(commands.LISTITEM_LIST, () => {
       fields: "Title,ID"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(returnArrayLength, expectedArrayLength);
         done();
@@ -326,7 +322,7 @@ describe(commands.LISTITEM_LIST, () => {
       fields: "Title,ID"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(returnArrayLength, expectedArrayLength);
         done();
@@ -349,7 +345,7 @@ describe(commands.LISTITEM_LIST, () => {
       output: "text"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(returnArrayLength, expectedArrayLength);
         done();
@@ -372,7 +368,7 @@ describe(commands.LISTITEM_LIST, () => {
       fields: "Title,ID",
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(returnArrayLength, expectedArrayLength);
         done();
@@ -396,7 +392,7 @@ describe(commands.LISTITEM_LIST, () => {
       output: "json"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(returnArrayLength, expectedArrayLength);
         done();
@@ -418,7 +414,7 @@ describe(commands.LISTITEM_LIST, () => {
       query: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert.strictEqual(returnArrayLength, expectedArrayLength);
         done();
@@ -440,7 +436,7 @@ describe(commands.LISTITEM_LIST, () => {
       query: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

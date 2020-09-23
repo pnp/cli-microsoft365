@@ -1,17 +1,15 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -39,17 +37,17 @@ class SpoCdnPolicySetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const cdnTypeString: string = args.options.type || 'Public';
     const cdnType: number = cdnTypeString === 'Private' ? 1 : 0;
     let spoAdminUrl: string = '';
     let tenantId: string = '';
 
     this
-      .getTenantId(cmd, this.debug)
+      .getTenantId(logger, this.debug)
       .then((_tenantId: string): Promise<string> => {
         tenantId = _tenantId;
-        return this.getSpoAdminUrl(cmd, this.debug);
+        return this.getSpoAdminUrl(logger, this.debug);
       })
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
@@ -57,7 +55,7 @@ class SpoCdnPolicySetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Configuring policy on the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
+          logger.log(`Configuring policy on the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
         }
 
         let policyId: number = -1;
@@ -89,11 +87,11 @@ class SpoCdnPolicySetCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -118,23 +116,21 @@ class SpoCdnPolicySetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.type) {
-        if (args.options.type !== 'Public' &&
-          args.options.type !== 'Private') {
-          return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.type) {
+      if (args.options.type !== 'Public' &&
+        args.options.type !== 'Private') {
+        return `${args.options.type} is not a valid CDN type. Allowed values are Public|Private`;
       }
+    }
 
-      if (!args.options.policy ||
-        (args.options.policy !== 'IncludeFileExtensions' &&
-          args.options.policy !== 'ExcludeRestrictedSiteClassifications')) {
-        return `${args.options.policy} is not a valid CDN policy. Allowed values are IncludeFileExtensions|ExcludeRestrictedSiteClassifications`;
-      }
+    if (!args.options.policy ||
+      (args.options.policy !== 'IncludeFileExtensions' &&
+        args.options.policy !== 'ExcludeRestrictedSiteClassifications')) {
+      return `${args.options.policy} is not a valid CDN policy. Allowed values are IncludeFileExtensions|ExcludeRestrictedSiteClassifications`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

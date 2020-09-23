@@ -1,23 +1,16 @@
-import appInsights from './appInsights';
-import GlobalOptions from './GlobalOptions';
-import request from './request';
-import auth from './Auth';
-import { GraphResponseError } from './m365/base/GraphResponseError';
-import { CommandInstance } from './cli/CommandInstance';
 import * as chalk from 'chalk';
+import appInsights from './appInsights';
+import auth from './Auth';
+import { Cli } from './cli';
+import { Logger } from './cli/Logger';
+import GlobalOptions from './GlobalOptions';
+import { GraphResponseError } from './m365/base/GraphResponseError';
+import request from './request';
 
 export interface CommandOption {
   option: string;
   description: string;
   autocomplete?: string[]
-}
-
-export interface CommandAction {
-  (this: CommandInstance, args: any, cb: (err?: any) => void): void
-}
-
-export interface CommandValidate {
-  (args: any): boolean | string
 }
 
 export interface CommandHelp {
@@ -63,22 +56,26 @@ export default abstract class Command {
   public abstract get name(): string;
   public abstract get description(): string;
 
-  public abstract commandAction(cmd: CommandInstance, args: any, cb: () => void): void;
+  public abstract commandAction(logger: Logger, args: any, cb: () => void): void;
 
-  protected showDeprecationWarning(cmd: CommandInstance, deprecated: string, recommended: string): void {
-    if (cmd.commandWrapper.command.indexOf(deprecated) === 0) {
-      cmd.log(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
+  protected showDeprecationWarning(logger: Logger, deprecated: string, recommended: string): void {
+    const cli: Cli = Cli.getInstance();
+    if (cli.currentCommandName &&
+      cli.currentCommandName.indexOf(deprecated) === 0) {
+      logger.log(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
     }
   }
 
-  protected getUsedCommandName(cmd: CommandInstance): string {
+  protected getUsedCommandName(): string {
+    const cli: Cli = Cli.getInstance();
     const commandName: string = this.getCommandName();
-    if (cmd.commandWrapper.command.indexOf(commandName) === 0) {
+    if (!cli.currentCommandName) {
       return commandName;
     }
 
-    if (!this.alias()) {
-      return '';
+    if (cli.currentCommandName &&
+      cli.currentCommandName.indexOf(commandName) === 0) {
+      return commandName;
     }
 
     // since the command was called by something else than its name
@@ -86,7 +83,7 @@ export default abstract class Command {
     const aliases: string[] = this.alias() as string[];
 
     for (let i: number = 0; i < aliases.length; i++) {
-      if (cmd.commandWrapper.command.indexOf(aliases[i]) === 0) {
+      if (cli.currentCommandName.indexOf(aliases[i]) === 0) {
         return aliases[i];
       }
     }
@@ -95,24 +92,21 @@ export default abstract class Command {
     return '';
   }
 
-  public action(): CommandAction {
-    const cmd: Command = this;
-    return function (this: CommandInstance, args: CommandArgs, cb: (err?: any) => void) {
-      auth
-        .restoreAuth()
-        .then((): void => {
-          cmd.initAction(args, this);
+  public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    auth
+      .restoreAuth()
+      .then((): void => {
+        this.initAction(args, logger);
 
-          if (!auth.service.connected) {
-            cb(new CommandError('Log in to Microsoft 365 first'));
-            return;
-          }
+        if (!auth.service.connected) {
+          cb(new CommandError('Log in to Microsoft 365 first'));
+          return;
+        }
 
-          cmd.commandAction(this, args, cb);
-        }, (error: any): void => {
-          cb(new CommandError(error));
-        });
-    }
+        this.commandAction(logger, args, cb);
+      }, (error: any): void => {
+        cb(new CommandError(error));
+      });
   }
 
   public getTelemetryProperties(args: any): any {
@@ -156,8 +150,8 @@ export default abstract class Command {
     ];
   }
 
-  public validate(): CommandValidate | undefined {
-    return;
+  public validate(args: any): boolean | string {
+    return true;
   }
 
   public types(): CommandTypes | undefined {
@@ -179,7 +173,7 @@ export default abstract class Command {
     return commandName;
   }
 
-  protected handleRejectedODataPromise(rawResponse: any, cmd: CommandInstance, callback: (err?: any) => void): void {
+  protected handleRejectedODataPromise(rawResponse: any, logger: Logger, callback: (err?: any) => void): void {
     const res: any = JSON.parse(JSON.stringify(rawResponse));
     if (res.error) {
       try {
@@ -210,7 +204,7 @@ export default abstract class Command {
     }
   }
 
-  protected handleRejectedODataJsonPromise(response: any, cmd: CommandInstance, callback: (err?: any) => void): void {
+  protected handleRejectedODataJsonPromise(response: any, logger: Logger, callback: (err?: any) => void): void {
     if (response.error &&
       response.error['odata.error'] &&
       response.error['odata.error'].message) {
@@ -260,7 +254,7 @@ export default abstract class Command {
     }
   }
 
-  protected handleError(rawResponse: any, cmd: CommandInstance, callback: (err?: any) => void): void {
+  protected handleError(rawResponse: any, logger: Logger, callback: (err?: any) => void): void {
     if (rawResponse instanceof Error) {
       callback(new CommandError(rawResponse.message));
     }
@@ -269,18 +263,18 @@ export default abstract class Command {
     }
   }
 
-  protected handleRejectedPromise(rawResponse: any, cmd: CommandInstance, callback: (err?: any) => void): void {
-    this.handleError(rawResponse, cmd, callback);
+  protected handleRejectedPromise(rawResponse: any, logger: Logger, callback: (err?: any) => void): void {
+    this.handleError(rawResponse, logger, callback);
   }
 
-  protected initAction(args: CommandArgs, cmd: CommandInstance): void {
-    this._debug = args.options.debug || process.env.OFFICE365CLI_DEBUG === '1';
-    this._verbose = this._debug || args.options.verbose || process.env.OFFICE365CLI_VERBOSE === '1';
+  protected initAction(args: CommandArgs, logger: Logger): void {
+    this._debug = args.options.debug || process.env.CLIMICROSOFT365_DEBUG === '1';
+    this._verbose = this._debug || args.options.verbose || process.env.CLIMICROSOFT365_VERBOSE === '1';
     request.debug = this._debug;
-    request.cmd = cmd;
+    request.logger = logger;
 
     appInsights.trackEvent({
-      name: this.getUsedCommandName(cmd),
+      name: this.getUsedCommandName(),
       properties: this.getTelemetryProperties(args)
     });
     appInsights.flush();

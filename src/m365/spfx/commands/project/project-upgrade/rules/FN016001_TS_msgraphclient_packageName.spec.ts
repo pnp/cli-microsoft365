@@ -1,10 +1,10 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { Finding } from '../Finding';
-import { Project, TsFile } from '../../model';
-import { FN016001_TS_msgraphclient_packageName } from './FN016001_TS_msgraphclient_packageName';
 import Utils from '../../../../../../Utils';
+import { Project, TsFile } from '../../model';
+import { Finding } from '../Finding';
+import { FN016001_TS_msgraphclient_packageName } from './FN016001_TS_msgraphclient_packageName';
 import { TsRule } from './TsRule';
 
 describe('FN016001_TS_msgraphclient_packageName', () => {

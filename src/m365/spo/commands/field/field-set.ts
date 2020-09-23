@@ -1,17 +1,15 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -49,7 +47,7 @@ class SpoFieldSetCommand extends SpoCommand {
     return true;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let requestDigest: string = '';
 
     this
@@ -134,10 +132,10 @@ class SpoFieldSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   private getPayload(options: any): string {
@@ -193,37 +191,35 @@ class SpoFieldSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (args.options.listId && args.options.listTitle) {
-        return `Specify listId or listTitle but not both`;
-      }
+    if (args.options.listId && args.options.listTitle) {
+      return `Specify listId or listTitle but not both`;
+    }
 
-      if (args.options.listId &&
-        !Utils.isValidGuid(args.options.listId)) {
-        return `${args.options.listId} in option listId is not a valid GUID`;
-      }
+    if (args.options.listId &&
+      !Utils.isValidGuid(args.options.listId)) {
+      return `${args.options.listId} in option listId is not a valid GUID`;
+    }
 
-      if (!args.options.id && !args.options.name) {
-        return `Specify id or name`;
-      }
+    if (!args.options.id && !args.options.name) {
+      return `Specify id or name`;
+    }
 
-      if (args.options.id && args.options.name) {
-        return `Specify viewId or viewTitle but not both`;
-      }
+    if (args.options.id && args.options.name) {
+      return `Specify viewId or viewTitle but not both`;
+    }
 
-      if (args.options.id &&
-        !Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} in option id is not a valid GUID`;
-      }
+    if (args.options.id &&
+      !Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} in option id is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

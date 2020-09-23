@@ -1,8 +1,8 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
-import Utils from './Utils';
+import * as sinon from 'sinon';
 import appInsights from './appInsights';
 import auth from './Auth';
+import Utils from './Utils';
 
 describe('Utils', () => {
   before(() => {

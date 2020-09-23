@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./subscription-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./subscription-add');
 
 describe(commands.SUBSCRIPTION_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let mockNowNumber = Date.parse("2019-01-01T00:00:00.000Z");
 
   before(() => {
@@ -22,16 +23,12 @@ describe(commands.SUBSCRIPTION_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -77,8 +74,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -128,8 +124,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         resource: "groups",
@@ -139,7 +134,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("Matching resource in default values 'groups' => 'groups'"));
+        assert(loggerSpy.calledWith("Matching resource in default values 'groups' => 'groups'"));
         done();
       }
       catch (e) {
@@ -168,8 +163,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         verbose: true,
@@ -180,7 +174,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("An expiration maximum delay is resolved for the resource 'groups' : 4230 minutes."));
+        assert(loggerSpy.calledWith("An expiration maximum delay is resolved for the resource 'groups' : 4230 minutes."));
         done();
       }
       catch (e) {
@@ -208,8 +202,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         resource: "groups",
@@ -220,7 +213,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("Expiration date time is specified (2019-01-03T00:00:00Z)."));
+        assert(loggerSpy.calledWith("Expiration date time is specified (2019-01-03T00:00:00Z)."));
         done();
       }
       catch (e) {
@@ -250,8 +243,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         resource: "groups",
@@ -291,8 +283,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         // NOTE Teams is not a supported resource and has no default maximum expiration delay
@@ -303,7 +294,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("An expiration maximum delay couldn't be resolved for the resource 'teams'. Will use generic default value: 4230 minutes."));
+        assert(loggerSpy.calledWith("An expiration maximum delay couldn't be resolved for the resource 'teams'. Will use generic default value: 4230 minutes."));
         done();
       }
       catch (e) {
@@ -331,8 +322,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         // NOTE Teams is not a supported resource and has no default maximum expiration delay
@@ -345,7 +335,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       try {
         // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
         // assert.strictEqual(log[4], expectedLog);
-        assert(cmdInstanceLogSpy.calledWith("Actual expiration date time: 2019-01-03T22:29:00.000Z"));
+        assert(loggerSpy.calledWith("Actual expiration date time: 2019-01-03T22:29:00.000Z"));
         done();
       }
       catch (e) {
@@ -359,8 +349,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -369,7 +358,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
         expirationDateTime: '2016-11-20T18:23:45.935Z'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -381,7 +370,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   });
 
   it('fails validation if expirationDateTime is not valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -395,7 +384,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   });
 
   it('fails validation if notificationUrl is not valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -409,7 +398,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   });
 
   it('fails validation if changeType is not valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -423,7 +412,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   });
 
   it('fails validation if the clientState exceeds maximum allowed length', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -437,7 +426,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   });
 
   it('passes validation if the expirationDateTime is not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         resource: "me/mailFolders('Inbox')/messages",
@@ -451,7 +440,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

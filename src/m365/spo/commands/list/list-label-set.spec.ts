@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandError, CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./list-label-set');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./list-label-set');
 
 describe(commands.LIST_LABEL_SET, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.LIST_LABEL_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -83,12 +80,12 @@ describe(commands.LIST_LABEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Can not find compliance tag with value: abc. SiteSubscriptionId: ea1787c6-7ce2-4e71-be47-5e0deb30f9e4")));
         done();
@@ -108,14 +105,14 @@ describe(commands.LIST_LABEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listTitle: 'MyLibrary',
         label: 'abc'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('404 - "404 FILE NOT FOUND"')));
         done();
@@ -144,7 +141,7 @@ describe(commands.LIST_LABEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
@@ -185,7 +182,7 @@ describe(commands.LIST_LABEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: '4d535433-2a7b-40b0-9dad-8f0f8f3b3841',
@@ -216,7 +213,7 @@ describe(commands.LIST_LABEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
@@ -231,7 +228,7 @@ describe(commands.LIST_LABEL_SET, () => {
         assert.strictEqual(lastCall.body.blockDelete, false);
         assert.strictEqual(lastCall.body.blockEdit, false);
         assert.strictEqual(lastCall.body.syncToItems, false);
-        assert.notStrictEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE'), -1);
+        assert.notStrictEqual(loggerSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
       catch (e) {
@@ -249,7 +246,7 @@ describe(commands.LIST_LABEL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listUrl: 'MyLibrary',
@@ -275,32 +272,32 @@ describe(commands.LIST_LABEL_SET, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'foo', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } });
+    const actual = command.validate({ options: { webUrl: 'foo', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the url option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc', listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF' } });
     assert(actual);
   });
 
   it('fails validation if the listid option is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc', listId: 'XXXXX' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc', listId: 'XXXXX' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the listid option is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc', listId: 'cc27a922-8224-4296-90a5-ebbc54da2e85' } });
     assert(actual);
   });
 
   it('fails validation if listId, listUrl and listTitle options are not passed', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc' } });
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', label: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

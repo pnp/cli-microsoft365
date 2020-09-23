@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./storageentity-remove');
-import * as assert from 'assert';
-import request from '../../../../request';
-import config from '../../../../config';
-import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./storageentity-remove');
 
 describe(commands.STORAGEENTITY_REMOVE, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let promptOptions: any;
 
   before(() => {
@@ -24,24 +25,21 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
   });
 
   afterEach(() => {
     Utils.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -71,7 +69,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, key: 'existingproperty', confirm: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    command.action(logger, { options: { debug: false, key: 'existingproperty', confirm: true, appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
@@ -86,7 +84,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
 
   it('prompts before removing tenant property when confirmation argument not passed', (done) => {
 
-    cmdInstance.action({ options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -108,10 +106,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: false });
-    };
-    cmdInstance.action({ options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert(postStub.notCalled);
         done();
@@ -130,10 +125,11 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
+    });
+    command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
@@ -161,10 +157,11 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, (err?: any) => {
+    });
+    command.action(logger, { options: { debug: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } } as any, (err?: any) => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
@@ -179,7 +176,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -190,7 +187,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('requires app catalog URL', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let requiresAppCatalogUrl = false;
     options.forEach(o => {
       if (o.option.indexOf('<appCatalogUrl>') > -1) {
@@ -201,7 +198,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('supports suppressing confirmation prompt', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsConfirmOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--confirm') > -1) {
@@ -212,7 +209,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('requires tenant property name', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let requiresTenantPropertyName = false;
     options.forEach(o => {
       if (o.option.indexOf('<key>') > -1) {
@@ -224,29 +221,29 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('accepts valid SharePoint Online app catalog URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
+    const actual = command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts valid SharePoint Online site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { appCatalogUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online URL', () => {
     const url = 'http://contoso';
-    const actual = (command.validate() as CommandValidate)({ options: { appCatalogUrl: url } });
+    const actual = command.validate({ options: { appCatalogUrl: url } });
     assert.strictEqual(actual, `${url} is not a valid SharePoint Online site URL`);
   });
 
   it('fails validation when no SharePoint Online app catalog URL specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, 'Missing required option appCatalogUrl');
   });
 
@@ -255,13 +252,14 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
     Utils.restore((command as any).getRequestDigest);
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.reject('getRequestDigest error'));
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
+    });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: { debug: true, key: 'nonexistentproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getRequestDigest error')));
         done();

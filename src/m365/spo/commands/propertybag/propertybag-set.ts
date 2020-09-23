@@ -1,14 +1,13 @@
-import commands from '../../commands';
-import SpoCommand from '../../../base/SpoCommand';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import SpoCommand from '../../../base/SpoCommand';
+import { ClientSvc, IdentityResponse } from '../../ClientSvc';
+import commands from '../../commands';
 import { ContextInfo } from '../../spo';
 import { SpoPropertyBagBaseCommand } from './propertybag-base';
-import GlobalOptions from '../../../../GlobalOptions';
-import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-import { CommandInstance } from '../../../../cli';
 
 export interface CommandArgs {
   options: Options;
@@ -36,8 +35,8 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    const clientSvcCommons: ClientSvc = new ClientSvc(logger, this.debug);
 
     let webIdentityResp: IdentityResponse;
 
@@ -69,19 +68,19 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
         return new Promise<IdentityResponse>(resolve => { return resolve(webIdentityResp); });
       })
       .then((identityResp: IdentityResponse): Promise<any> => {
-        return this.setProperty(identityResp, args.options, cmd);
+        return this.setProperty(identityResp, args.options, logger);
       })
       .then((res: any): void => {
         if (this.verbose) {
-          cmd.log('DONE');
+          logger.log('DONE');
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
-  private setProperty(identityResp: IdentityResponse, options: Options, cmd: CommandInstance): Promise<any> {
-    return SpoPropertyBagBaseCommand.setProperty(options.key, options.value, options.webUrl, this.formDigestValue, identityResp, cmd, this.debug, options.folder);
+  private setProperty(identityResp: IdentityResponse, options: Options, logger: Logger): Promise<any> {
+    return SpoPropertyBagBaseCommand.setProperty(options.key, options.value, options.webUrl, this.formDigestValue, identityResp, logger, this.debug, options.folder);
   }
 
   private isNoScriptSite(webIdentityResp: IdentityResponse, options: Options, clientSvcCommons: ClientSvc): Promise<boolean> {
@@ -112,22 +111,20 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (SpoCommand.isValidSharePointUrl(args.options.webUrl) !== true) {
-        return 'Missing required option url';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (SpoCommand.isValidSharePointUrl(args.options.webUrl) !== true) {
+      return 'Missing required option url';
+    }
 
-      if (!args.options.key) {
-        return 'Missing required option key';
-      }
+    if (!args.options.key) {
+      return 'Missing required option key';
+    }
 
-      if (!args.options.value) {
-        return 'Missing required option value';
-      }
+    if (!args.options.value) {
+      return 'Missing required option value';
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

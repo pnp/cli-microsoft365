@@ -1,12 +1,12 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption
-} from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import {
+    CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -31,10 +31,10 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeSchemaExtension: () => void = (): void => {
         if (this.verbose) {
-          cmd.log(`Removes specified Microsoft Graph schema extension with id '${args.options.id}'...`);
+          logger.log(`Removes specified Microsoft Graph schema extension with id '${args.options.id}'...`);
         }
 
         const requestOptions: any = {
@@ -49,17 +49,17 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
       request.delete(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   };
   if (args.options.confirm) {
     removeSchemaExtension();
   }
   else {
-    cmd.prompt({
+    Cli.prompt({
       type: 'confirm',
       name: 'continue',
       default: false,

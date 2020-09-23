@@ -1,14 +1,14 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
-import GlobalOptions from '../../../../GlobalOptions';
-import { SiteScriptActionStatus } from './SiteScriptActionStatus';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { SiteScriptActionStatus } from './SiteScriptActionStatus';
 
 interface CommandArgs {
   options: Options;
@@ -28,7 +28,7 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
     return 'Gets information about the site scripts executed for the specified site design';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const body: any = {
       runId: args.options.runId
     };
@@ -46,10 +46,10 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
     request.post<{ value: SiteScriptActionStatus[] }>(requestOptions)
       .then((res: { value: SiteScriptActionStatus[] }): void => {
         if (args.options.output === 'json') {
-          cmd.log(res.value);
+          logger.log(res.value);
         }
         else {
-          cmd.log(res.value.map(s => {
+          logger.log(res.value.map(s => {
             return {
               ActionTitle: s.ActionTitle,
               SiteScriptTitle: s.SiteScriptTitle,
@@ -59,11 +59,11 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -82,19 +82,17 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (!Utils.isValidGuid(args.options.runId)) {
-        return `${args.options.runId} is not a valid GUID`;
-      }
+    if (!Utils.isValidGuid(args.options.runId)) {
+      return `${args.options.runId} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

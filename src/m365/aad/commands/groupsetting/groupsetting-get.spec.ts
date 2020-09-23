@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./groupsetting-get');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./groupsetting-get');
 
 describe(commands.GROUPSETTING_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.GROUPSETTING_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -74,9 +71,9 @@ describe(commands.GROUPSETTING_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, () => {
+    command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "displayName": "Group Setting",
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "templateId": "bb4f86e1-a598-4101-affc-97c6b136a753",
@@ -114,9 +111,9 @@ describe(commands.GROUPSETTING_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, () => {
+    command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           "displayName": "Group Setting",
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "templateId": "bb4f86e1-a598-4101-affc-97c6b136a753",
@@ -155,7 +152,7 @@ describe(commands.GROUPSETTING_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c843' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c843' does not exist or one of its queried reference-property objects are not present.`)));
         done();
@@ -167,17 +164,17 @@ describe(commands.GROUPSETTING_GET, () => {
   });
 
   it('fails validation if the id is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '123' } });
+    const actual = command.validate({ options: { id: '123' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the id is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
+    const actual = command.validate({ options: { id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -188,7 +185,7 @@ describe(commands.GROUPSETTING_GET, () => {
   });
 
   it('supports specifying id', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {

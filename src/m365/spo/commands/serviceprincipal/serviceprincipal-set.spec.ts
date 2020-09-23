@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./serviceprincipal-set');
-import * as assert from 'assert';
-import request from '../../../../request';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./serviceprincipal-set');
 
 describe(commands.SERVICEPRINCIPAL_SET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -25,26 +26,23 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
-      },
-      prompt: (options: any, cb: (result: { continue: boolean }) => void) => {
-        promptOptions = options;
-        cb({ continue: false });
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      promptOptions = options;
+      cb({ continue: false });
+    });
     promptOptions = undefined;
   });
 
   afterEach(() => {
     Utils.restore([
-      request.post
+      request.post,
+      Cli.prompt
     ]);
   });
 
@@ -87,9 +85,9 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, enabled: 'true', confirm: true } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'true', confirm: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           AccountEnabled: true,
           AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
           ReplyUrls: [
@@ -125,9 +123,9 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: false, enabled: 'true', confirm: true } }, () => {
+    command.action(logger, { options: { debug: false, enabled: 'true', confirm: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           AccountEnabled: true,
           AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
           ReplyUrls: [
@@ -163,9 +161,9 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, enabled: 'false', confirm: true } }, () => {
+    command.action(logger, { options: { debug: true, enabled: 'false', confirm: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           AccountEnabled: false,
           AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
           ReplyUrls: [
@@ -190,7 +188,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
         }
       ]));
     });
-    cmdInstance.action({ options: { debug: false, confirm: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, confirm: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -202,7 +200,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   });
 
   it('prompts before enabling service principal when confirmation argument not passed', (done) => {
-    cmdInstance.action({ options: { debug: false, enabled: 'true' } }, () => {
+    command.action(logger, { options: { debug: false, enabled: 'true' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -220,7 +218,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   });
 
   it('prompts before disabling service principal when confirmation argument not passed', (done) => {
-    cmdInstance.action({ options: { debug: false, enabled: 'false' } }, () => {
+    command.action(logger, { options: { debug: false, enabled: 'false' } }, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -239,10 +237,11 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
   it('aborts enabling service principal when prompt not confirmed', (done) => {
     const requestPostSpy = sinon.spy(request, 'post');
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
-    };
-    cmdInstance.action({ options: { debug: false, enabled: 'true' } }, () => {
+    });
+    command.action(logger, { options: { debug: false, enabled: 'true' } }, () => {
       try {
         assert(requestPostSpy.notCalled);
         done();
@@ -266,12 +265,13 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
       }
     ])));
 
-    cmdInstance.prompt = (options: any, cb: (result: { continue: boolean }) => void) => {
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
-    };
-    cmdInstance.action({ options: { debug: false, enabled: 'true' } }, () => {
+    });
+    command.action(logger, { options: { debug: false, enabled: 'true' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           AccountEnabled: true,
           AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
           ReplyUrls: [
@@ -288,7 +288,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
 
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
-    cmdInstance.action({ options: { debug: false, enabled: 'true', confirm: 'true' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, enabled: 'true', confirm: 'true' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -305,7 +305,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -316,7 +316,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   });
 
   it('allows specifying the enabled option', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--enabled') > -1) {
@@ -327,17 +327,17 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   });
 
   it('fails validation if the enabled option is not a valid boolean value', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { enabled: '123' } });
+    const actual = command.validate({ options: { enabled: '123' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the enabled option is true', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { enabled: 'true' } });
+    const actual = command.validate({ options: { enabled: 'true' } });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when the enabled option is false', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { enabled: 'false' } });
+    const actual = command.validate({ options: { enabled: 'false' } });
     assert.strictEqual(actual, true);
   });
 });

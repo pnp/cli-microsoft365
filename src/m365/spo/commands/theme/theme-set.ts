@@ -1,18 +1,17 @@
-import config from '../../../../config';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
+import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -39,11 +38,11 @@ class SpoThemeSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
         return this.getRequestDigest(spoAdminUrl);
@@ -52,15 +51,15 @@ class SpoThemeSetCommand extends SpoCommand {
         const fullPath: string = path.resolve(args.options.filePath);
 
         if (this.verbose) {
-          cmd.log(`Adding theme from ${fullPath} to tenant...`);
+          logger.log(`Adding theme from ${fullPath} to tenant...`);
         }
 
         const palette: any = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
 
         if (this.debug) {
-          cmd.log('');
-          cmd.log('Palette');
-          cmd.log(JSON.stringify(palette));
+          logger.log('');
+          logger.log('Palette');
+          logger.log(JSON.stringify(palette));
         }
 
         const isInverted: boolean = args.options.isInverted ? true : false;
@@ -86,11 +85,11 @@ class SpoThemeSetCommand extends SpoCommand {
 
       }).then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -111,24 +110,22 @@ class SpoThemeSetCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const fullPath: string = path.resolve(args.options.filePath);
+  public validate(args: CommandArgs): boolean | string {
+    const fullPath: string = path.resolve(args.options.filePath);
 
-      if (!fs.existsSync(fullPath)) {
-        return `File '${fullPath}' not found`;
-      }
+    if (!fs.existsSync(fullPath)) {
+      return `File '${fullPath}' not found`;
+    }
 
-      if (fs.lstatSync(fullPath).isDirectory()) {
-        return `Path '${fullPath}' points to a directory`;
-      }
+    if (fs.lstatSync(fullPath).isDirectory()) {
+      return `Path '${fullPath}' points to a directory`;
+    }
 
-      if (!Utils.isValidTheme(fs.readFileSync(fullPath, 'utf-8'))) {
-        return 'File contents is not a valid theme';
-      }
+    if (!Utils.isValidTheme(fs.readFileSync(fullPath, 'utf-8'))) {
+      return 'File contents is not a valid theme';
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

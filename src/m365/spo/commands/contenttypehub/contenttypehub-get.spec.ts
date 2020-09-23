@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
+import commands from '../../commands';
 
 const command: Command = require('./contenttypehub-get');
 
 describe(commands.CONTENTTYPEHUB_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let stubAllPostRequests: any;
 
   before(() => {
@@ -55,16 +56,12 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   beforeEach(() => {
     auth.service.connected = true;
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -97,7 +94,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
       verbose: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         const bodyPayload = `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}">
   <Actions>
@@ -119,7 +116,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   </ObjectPaths>
 </Request>`;
         assert.strictEqual(requestStub.lastCall.args[0].body, bodyPayload);
-        assert(cmdInstanceLogSpy.calledWith({ "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub" }));
+        assert(loggerSpy.calledWith({ "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub" }));
         done();
       }
       catch (e) {
@@ -133,7 +130,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     const options: Object = {
       verbose: true
     }
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('request error')));
         done();
@@ -150,7 +147,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     const options: Object = {
       verbose: true
     }
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc error')));
         done();
@@ -162,7 +159,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   });
 
   it('Contains the correct options', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOutputOption = false;
     let containsVerboseOption = false;
     let containsDebugOption = false;

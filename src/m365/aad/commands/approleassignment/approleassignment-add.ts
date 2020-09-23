@@ -1,16 +1,15 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import * as os from 'os';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import AadCommand from '../../../base/AadCommand';
 import Utils from '../../../../Utils';
+import AadCommand from '../../../base/AadCommand';
+import commands from '../../commands';
 import { ServicePrincipal } from './ServicePrincipal';
-import * as os from 'os';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface AppRole {
   objectId: string;
@@ -47,7 +46,7 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let objectId: string = '';
     let queryFilter: string = '';
     if (args.options.appId) {
@@ -159,10 +158,10 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
       })
       .then((rolesAddedResponse: any) => {
         if (args.options.output && args.options.output.toLowerCase() === 'json') {
-          cmd.log(rolesAddedResponse);
+          logger.log(rolesAddedResponse);
         }
         else {
-          cmd.log(rolesAddedResponse.map((result: any) => ({
+          logger.log(rolesAddedResponse.map((result: any) => ({
             objectId: result.objectId,
             principalDisplayName: result.principalDisplayName,
             resourceDisplayName: result.resourceDisplayName
@@ -170,11 +169,11 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   private addRoleToServicePrincipal(objectId: string, appRole: AppRole): Promise<any> {
@@ -224,26 +223,24 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      let optionsSpecified: number = 0;
-      optionsSpecified += args.options.appId ? 1 : 0;
-      optionsSpecified += args.options.displayName ? 1 : 0;
-      optionsSpecified += args.options.objectId ? 1 : 0;
-      if (optionsSpecified !== 1) {
-        return 'Specify either appId, objectId or displayName';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    let optionsSpecified: number = 0;
+    optionsSpecified += args.options.appId ? 1 : 0;
+    optionsSpecified += args.options.displayName ? 1 : 0;
+    optionsSpecified += args.options.objectId ? 1 : 0;
+    if (optionsSpecified !== 1) {
+      return 'Specify either appId, objectId or displayName';
+    }
 
-      if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
-        return `${args.options.appId} is not a valid GUID`;
-      }
+    if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {
+      return `${args.options.appId} is not a valid GUID`;
+    }
 
-      if (args.options.objectId && !Utils.isValidGuid(args.options.objectId)) {
-        return `${args.options.objectId} is not a valid GUID`;
-      }
+    if (args.options.objectId && !Utils.isValidGuid(args.options.objectId)) {
+      return `${args.options.objectId} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

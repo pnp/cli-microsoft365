@@ -1,7 +1,7 @@
-import { BasicDependencyRule } from "./BasicDependencyRule";
-import { Project } from "../../model";
 import { ExternalizeEntry, FileEdit } from "../";
+import { Project } from "../../model";
 import { VisitationResult } from '../VisitationResult';
+import { BasicDependencyRule } from "./BasicDependencyRule";
 
 export class PnPJsRule extends BasicDependencyRule {
   private pnpModules = [

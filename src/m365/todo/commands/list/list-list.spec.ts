@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandOption } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./list-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./list-list');
 
 describe(commands.LIST_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -20,11 +21,7 @@ describe(commands.LIST_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -91,8 +88,7 @@ describe(commands.LIST_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false
       }
@@ -159,8 +155,7 @@ describe(commands.LIST_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         output: 'json'
@@ -240,8 +235,7 @@ describe(commands.LIST_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         verbose: true
@@ -258,7 +252,7 @@ describe(commands.LIST_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

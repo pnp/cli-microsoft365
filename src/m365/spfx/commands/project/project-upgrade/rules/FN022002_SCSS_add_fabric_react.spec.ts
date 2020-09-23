@@ -1,10 +1,10 @@
 import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { Finding } from '../Finding';
-import { Project, ScssFile } from '../../model';
-import { FN022002_SCSS_add_fabric_react } from './FN022002_SCSS_add_fabric_react';
 import * as fs from 'fs';
-import { Utils }  from '../';
+import * as sinon from 'sinon';
+import { Utils } from '../';
+import { Project, ScssFile } from '../../model';
+import { Finding } from '../Finding';
+import { FN022002_SCSS_add_fabric_react } from './FN022002_SCSS_add_fabric_react';
 
 describe('FN022002_SCSS_add_fabric_react', () => {
   let findings: Finding[];

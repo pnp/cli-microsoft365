@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./channel-get');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./channel-get');
 
 describe(commands.TEAMS_CHANNEL_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -57,7 +54,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
   });
 
   it('fails validation if the teamId is not a valid guid.', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: 'invalid',
         channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
@@ -67,7 +64,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
   });
 
   it('correctly validates the when all options are valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
@@ -93,14 +90,13 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
         channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Failed to execute Skype backend request GetThreadS2SRequest.`)));
         done();
@@ -125,15 +121,14 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
         channelId: '19:493665404ebd4a18adb8a980a31b4986@thread.skype'
       }
     }, () => {
       try {
-        const call: sinon.SinonSpyCall = cmdInstanceLogSpy.lastCall;
+        const call: sinon.SinonSpyCall = loggerSpy.lastCall;
         assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
         assert.strictEqual(call.args[0].displayName, 'channel1');
         assert.strictEqual(call.args[0].description, null);
@@ -161,8 +156,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         teamId: '39958f28-eefb-4006-8f83-13b6ac2a4a7f',
@@ -170,7 +164,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
       }
     }, () => {
       try {
-        const call: sinon.SinonSpyCall = cmdInstanceLogSpy.getCall(cmdInstanceLogSpy.callCount - 2);
+        const call: sinon.SinonSpyCall = loggerSpy.getCall(loggerSpy.callCount - 2);
         assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
         done();
       }
@@ -181,7 +175,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

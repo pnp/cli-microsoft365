@@ -1,15 +1,16 @@
-import Utils from '../../Utils';
 import * as assert from 'assert';
 import * as fs from "fs";
-import * as sinon from 'sinon';
 import * as path from 'path';
+import * as sinon from 'sinon';
 import { v4 } from 'uuid';
-import TemplateInstantiator from './template-instantiator';
+import { Logger } from '../../cli';
+import Utils from '../../Utils';
 import { PcfInitVariables } from './commands/pcf/pcf-init/pcf-init-variables';
+import TemplateInstantiator from './template-instantiator';
 
 describe('TemplateInstantiator', () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let fsMkdirSync: sinon.SinonStub;
   let fsCopyFileSync: sinon.SinonStub;
   let fsWriteFileSync: sinon.SinonStub;
@@ -27,7 +28,7 @@ describe('TemplateInstantiator', () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -50,7 +51,7 @@ describe('TemplateInstantiator', () => {
   it('doesn\'t try to create destinationPath if it already exists', () => {
     const fsExistsSync = sinon.stub(fs, 'existsSync').callsFake(() => true);
     
-    TemplateInstantiator.mkdirSyncIfNotExists(cmdInstance, componentDirectory, false);
+    TemplateInstantiator.mkdirSyncIfNotExists(logger, componentDirectory, false);
 
     assert(fsExistsSync.withArgs(componentDirectory).calledOnce);
     assert(fsMkdirSync.withArgs(componentDirectory).notCalled);
@@ -59,7 +60,7 @@ describe('TemplateInstantiator', () => {
   it('doesn\'t try to create destinationPath if it already exists (verbose)', () => {
     const fsExistsSync = sinon.stub(fs, 'existsSync').callsFake(() => true);
 
-    TemplateInstantiator.mkdirSyncIfNotExists(cmdInstance, componentDirectory, true);
+    TemplateInstantiator.mkdirSyncIfNotExists(logger, componentDirectory, true);
 
     assert(fsExistsSync.withArgs(componentDirectory).calledOnce);
     assert(fsMkdirSync.withArgs(componentDirectory).notCalled);
@@ -68,7 +69,7 @@ describe('TemplateInstantiator', () => {
   it('creates destinationPath when it doesn\'t exist yet', () => {
     const fsExistsSync = sinon.stub(fs, 'existsSync').callsFake(() => false);
 
-    TemplateInstantiator.mkdirSyncIfNotExists(cmdInstance, componentDirectory, false);
+    TemplateInstantiator.mkdirSyncIfNotExists(logger, componentDirectory, false);
 
     assert(fsExistsSync.withArgs(componentDirectory).calledOnce);
     assert(fsMkdirSync.withArgs(componentDirectory).calledOnce);
@@ -77,7 +78,7 @@ describe('TemplateInstantiator', () => {
   it('creates destinationPath when it doesn\'t exist yet (verbose)', () => {
     const fsExistsSync = sinon.stub(fs, 'existsSync').callsFake(() => false);
 
-    TemplateInstantiator.mkdirSyncIfNotExists(cmdInstance, componentDirectory, true);
+    TemplateInstantiator.mkdirSyncIfNotExists(logger, componentDirectory, true);
 
     assert(fsExistsSync.withArgs(componentDirectory).calledOnce);
     assert(fsMkdirSync.withArgs(componentDirectory).calledOnce);
@@ -86,7 +87,7 @@ describe('TemplateInstantiator', () => {
   it('creates structure for shared files', () => {
     const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
 
-    TemplateInstantiator.instantiate(cmdInstance, assetsRoot, projectDirectory, false, variables, false);
+    TemplateInstantiator.instantiate(logger, assetsRoot, projectDirectory, false, variables, false);
 
     assert.strictEqual(mkdirSyncIfNotExists.callCount, 6);
     assert.strictEqual(fsCopyFileSync.callCount, 3);
@@ -96,7 +97,7 @@ describe('TemplateInstantiator', () => {
   it('creates structure for shared files (verbose)', () => {
     const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
 
-    TemplateInstantiator.instantiate(cmdInstance, assetsRoot, projectDirectory, false, variables, true);
+    TemplateInstantiator.instantiate(logger, assetsRoot, projectDirectory, false, variables, true);
 
     assert.strictEqual(mkdirSyncIfNotExists.callCount, 6);
     assert.strictEqual(fsCopyFileSync.callCount, 3);
@@ -106,7 +107,7 @@ describe('TemplateInstantiator', () => {
   it('creates structure for field component', () => {
     const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
 
-    TemplateInstantiator.instantiate(cmdInstance, componentAssetsRoot, componentDirectory, true, variables, false);
+    TemplateInstantiator.instantiate(logger, componentAssetsRoot, componentDirectory, true, variables, false);
 
     assert.strictEqual(mkdirSyncIfNotExists.callCount, 4);
     assert.strictEqual(fsCopyFileSync.callCount, 1);
@@ -116,7 +117,7 @@ describe('TemplateInstantiator', () => {
   it('creates structure for field component (verbose)', () => {
     const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
 
-    TemplateInstantiator.instantiate(cmdInstance, componentAssetsRoot, componentDirectory, true, variables, true);
+    TemplateInstantiator.instantiate(logger, componentAssetsRoot, componentDirectory, true, variables, true);
 
     assert.strictEqual(mkdirSyncIfNotExists.callCount, 4);
     assert.strictEqual(fsCopyFileSync.callCount, 1);
@@ -126,7 +127,7 @@ describe('TemplateInstantiator', () => {
   it('creates structure for dataset component', () => {
     const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
 
-    TemplateInstantiator.instantiate(cmdInstance, componentAssetsRoot, componentDirectory, true, variables, false);
+    TemplateInstantiator.instantiate(logger, componentAssetsRoot, componentDirectory, true, variables, false);
 
     assert.strictEqual(mkdirSyncIfNotExists.callCount, 4);
     assert.strictEqual(fsCopyFileSync.callCount, 1);
@@ -136,7 +137,7 @@ describe('TemplateInstantiator', () => {
   it('creates structure for dataset component (verbose)', () => {
     const mkdirSyncIfNotExists = sinon.stub(TemplateInstantiator, 'mkdirSyncIfNotExists').callsFake(() => {});
 
-    TemplateInstantiator.instantiate(cmdInstance, componentAssetsRoot, componentDirectory, true, variables, true);
+    TemplateInstantiator.instantiate(logger, componentAssetsRoot, componentDirectory, true, variables, true);
 
     assert.strictEqual(mkdirSyncIfNotExists.callCount, 4);
     assert.strictEqual(fsCopyFileSync.callCount, 1);

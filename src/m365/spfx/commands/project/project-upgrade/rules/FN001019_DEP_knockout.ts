@@ -1,6 +1,6 @@
-import { DependencyRule } from "./DependencyRule";
-import { Project } from "../../model";
 import { Utils } from "../";
+import { Project } from "../../model";
+import { DependencyRule } from "./DependencyRule";
 
 export class FN001019_DEP_knockout extends DependencyRule {
   constructor(packageVersion: string) {

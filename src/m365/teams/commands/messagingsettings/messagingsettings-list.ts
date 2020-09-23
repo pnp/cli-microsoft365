@@ -1,15 +1,14 @@
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
-import GraphCommand from "../../../base/GraphCommand";
-import { Team } from '../../Team';
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import GraphCommand from "../../../base/GraphCommand";
+import commands from '../../commands';
+import { Team } from '../../Team';
 
 interface CommandArgs {
   options: Options;
@@ -28,7 +27,7 @@ class TeamsMessagingSettingsListCommand extends GraphCommand {
     return 'Lists messaging settings for a Microsoft Teams team';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}?$select=messagingSettings`,
       headers: {
@@ -40,13 +39,13 @@ class TeamsMessagingSettingsListCommand extends GraphCommand {
     request
       .get<Team>(requestOptions)
       .then((res: Team): void => {
-        cmd.log(res.messagingSettings);
+        logger.log(res.messagingSettings);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -61,14 +60,12 @@ class TeamsMessagingSettingsListCommand extends GraphCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (!Utils.isValidGuid(args.options.teamId)) {
-        return `${args.options.teamId} is not a valid GUID`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (!Utils.isValidGuid(args.options.teamId)) {
+      return `${args.options.teamId} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

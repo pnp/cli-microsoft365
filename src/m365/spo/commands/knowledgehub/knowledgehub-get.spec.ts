@@ -2,6 +2,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -11,7 +12,7 @@ const command: Command = require('./knowledgehub-get');
 
 describe(commands.KNOWLEDGEHUB_GET, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let requests: any[];
 
   before(() => {
@@ -26,11 +27,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -81,7 +78,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -117,7 +114,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true } }, () => {
+    command.action(logger, { options: { debug: true } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -155,7 +152,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false } }, () => {
+    command.action(logger, { options: { debug: false } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -205,7 +202,7 @@ describe(commands.KNOWLEDGEHUB_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();

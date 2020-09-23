@@ -1,5 +1,5 @@
-import { Finding, Occurrence, Hash } from "../";
-import { Project, ConfigJson } from "../../model";
+import { Finding, Hash, Occurrence } from "../";
+import { ConfigJson, Project } from "../../model";
 import { Rule } from "./Rule";
 
 export class FN003005_CFG_localizedResource_pathLib extends Rule {

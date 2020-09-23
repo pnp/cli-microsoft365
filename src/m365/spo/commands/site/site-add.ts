@@ -1,20 +1,18 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import { DeletedSiteProperties } from './DeletedSiteProperties';
 import { SiteProperties } from './SiteProperties';
 import { SpoOperation } from './SpoOperation';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -102,32 +100,32 @@ class SpoSiteAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const isClassicSite: boolean = args.options.type === 'ClassicSite';
 
     if (isClassicSite) {
-      this.createClassicSite(cmd, args, cb);
+      this.createClassicSite(logger, args, cb);
     }
     else {
-      this.createModernSite(cmd, args, cb);
+      this.createModernSite(logger, args, cb);
     }
   }
 
-  private createModernSite(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  private createModernSite(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const isTeamSite: boolean = args.options.type !== 'CommunicationSite';
     let spoUrl: string = '';
 
     this
-      .getSpoUrl(cmd, this.debug)
+      .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<CreateGroupExResponse> => {
         spoUrl = _spoUrl;
 
         if (args.options.allowFileSharingForGuestUsers && this.verbose) {
-          cmd.log(chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
+          logger.log(chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
         }
 
         if (this.verbose) {
-          cmd.log(`Creating new site...`);
+          logger.log(`Creating new site...`);
         }
 
         let requestOptions: any = {}
@@ -226,12 +224,12 @@ class SpoSiteAddCommand extends SpoCommand {
             return;
           }
           else {
-            cmd.log(res.SiteUrl);
+            logger.log(res.SiteUrl);
           }
         }
         else {
           if (res.SiteStatus === 2) {
-            cmd.log(res.SiteUrl);
+            logger.log(res.SiteUrl);
           }
           else {
             cb(new CommandError('An error has occurred while creating the site'));
@@ -239,24 +237,24 @@ class SpoSiteAddCommand extends SpoCommand {
           }
         }
         cb();
-      }, (res: any): void => this.handleRejectedODataJsonPromise(res, cmd, cb));
+      }, (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
   }
 
-  public createClassicSite(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public createClassicSite(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.dots = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
         this.spoAdminUrl = _spoAdminUrl;
 
-        return this.ensureFormDigest(this.spoAdminUrl, cmd, this.context, this.debug);
+        return this.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<boolean> => {
         this.context = res;
 
         if (args.options.removeDeletedSite) {
-          return this.siteExistsInTheRecycleBin(args.options.url as string, cmd);
+          return this.siteExistsInTheRecycleBin(args.options.url as string, logger);
         }
         else {
           // assume site doesn't exist
@@ -266,27 +264,27 @@ class SpoSiteAddCommand extends SpoCommand {
       .then((exists: boolean): Promise<void> => {
         if (exists) {
           if (this.verbose) {
-            cmd.log('Site exists in the recycle bin');
+            logger.log('Site exists in the recycle bin');
           }
 
-          return this.deleteSiteFromTheRecycleBin(args.options.url as string, args.options.wait, cmd);
+          return this.deleteSiteFromTheRecycleBin(args.options.url as string, args.options.wait, logger);
         }
         else {
           if (this.verbose) {
-            cmd.log('Site not found');
+            logger.log('Site not found');
           }
 
           return Promise.resolve();
         }
       })
       .then((): Promise<FormDigestInfo> => {
-        return this.ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug);
+        return this.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<string> => {
         this.context = res;
 
         if (this.verbose) {
-          cmd.log(`Creating site collection ${args.options.url}...`);
+          logger.log(`Creating site collection ${args.options.url}...`);
         }
 
         const lcid: number = typeof args.options.lcid === 'number' ? args.options.lcid : 1033;
@@ -322,29 +320,29 @@ class SpoSiteAddCommand extends SpoCommand {
             }
 
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
-  private siteExistsInTheRecycleBin(url: string, cmd: CommandInstance): Promise<boolean> {
+  private siteExistsInTheRecycleBin(url: string, logger: Logger): Promise<boolean> {
     return new Promise<boolean>((resolve: (exists: boolean) => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
 
           if (this.verbose) {
-            cmd.log(`Checking if the site ${url} exists...`);
+            logger.log(`Checking if the site ${url} exists...`);
           }
 
           const requestOptions: any = {
@@ -380,7 +378,7 @@ class SpoSiteAddCommand extends SpoCommand {
         })
         .then((exists: boolean): Promise<string> => {
           if (this.verbose) {
-            cmd.log(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
+            logger.log(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
           }
 
           const requestOptions: any = {
@@ -424,15 +422,15 @@ class SpoSiteAddCommand extends SpoCommand {
     });
   }
 
-  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, cmd: CommandInstance): Promise<void> {
+  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
 
           if (this.verbose) {
-            cmd.log(`Deleting site ${url} from the recycle bin...`);
+            logger.log(`Deleting site ${url} from the recycle bin...`);
           }
 
           const requestOptions: any = {
@@ -460,7 +458,7 @@ class SpoSiteAddCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
@@ -561,150 +559,148 @@ class SpoSiteAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isClassicSite: boolean = args.options.type === 'ClassicSite';
-      const isCommunicationSite: boolean = args.options.type === 'CommunicationSite';
-      const isTeamSite: boolean = isCommunicationSite === false && isClassicSite === false;
+  public validate(args: CommandArgs): boolean | string {
+    const isClassicSite: boolean = args.options.type === 'ClassicSite';
+    const isCommunicationSite: boolean = args.options.type === 'CommunicationSite';
+    const isTeamSite: boolean = isCommunicationSite === false && isClassicSite === false;
 
-      if (args.options.type) {
-        if (args.options.type !== 'TeamSite' &&
-          args.options.type !== 'CommunicationSite' &&
-          args.options.type !== 'ClassicSite') {
-          return `${args.options.type} is not a valid site type. Allowed types are TeamSite, CommunicationSite, and ClassicSite`;
+    if (args.options.type) {
+      if (args.options.type !== 'TeamSite' &&
+        args.options.type !== 'CommunicationSite' &&
+        args.options.type !== 'ClassicSite') {
+        return `${args.options.type} is not a valid site type. Allowed types are TeamSite, CommunicationSite, and ClassicSite`;
+      }
+    }
+
+    if (isTeamSite) {
+      if (!args.options.alias) {
+        return 'Required option alias missing';
+      }
+
+      if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
+        return "Type TeamSites supports only the parameters title, lcid, alias, owners, classification, isPublic, and description";
+      }
+    }
+    else if (isCommunicationSite) {
+      if (!args.options.url) {
+        return 'Required option url missing';
+      }
+
+      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+      if (isValidSharePointUrl !== true) {
+        return isValidSharePointUrl;
+      }
+
+      if (args.options.siteDesign) {
+        if (args.options.siteDesign !== 'Topic' &&
+          args.options.siteDesign !== 'Showcase' &&
+          args.options.siteDesign !== 'Blank') {
+          return `${args.options.siteDesign} is not a valid communication site type. Allowed types are Topic, Showcase and Blank`;
         }
       }
 
-      if (isTeamSite) {
-        if (!args.options.alias) {
-          return 'Required option alias missing';
-        }
-
-        if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
-          return "Type TeamSites supports only the parameters title, lcid, alias, owners, classification, isPublic, and description";
-        }
+      if (args.options.owners && args.options.owners.indexOf(",") > -1) {
+        return 'The CommunicationSite supports only one owner in the owners option';
       }
-      else if (isCommunicationSite) {
-        if (!args.options.url) {
-          return 'Required option url missing';
-        }
 
-        const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (args.options.siteDesign) {
-          if (args.options.siteDesign !== 'Topic' &&
-            args.options.siteDesign !== 'Showcase' &&
-            args.options.siteDesign !== 'Blank') {
-            return `${args.options.siteDesign} is not a valid communication site type. Allowed types are Topic, Showcase and Blank`;
-          }
-        }
-
-        if (args.options.owners && args.options.owners.indexOf(",") > -1) {
-          return 'The CommunicationSite supports only one owner in the owners option';
-        }
-
-        if (args.options.siteDesignId) {
-          if (!Utils.isValidGuid(args.options.siteDesignId)) {
-            return `${args.options.siteDesignId} is not a valid GUID`;
-          }
-        }
-
-        if (args.options.siteDesign && args.options.siteDesignId) {
-          return 'Specify siteDesign or siteDesignId but not both';
-        }
-
-        if (args.options.timeZone || args.options.isPublic || args.options.removeDeletedSite || args.options.wait || args.options.alias || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
-          return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, allowFileSharingForGuestUsers, siteDesignId, owners, and description";
-        }
-      }
-      else {
-        if (!args.options.url) {
-          return 'Required option url missing';
-        }
-
-        const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-        if (isValidSharePointUrl !== true) {
-          return isValidSharePointUrl;
-        }
-
-        if (!args.options.owners) {
-          return 'Required option owner missing';
-        }
-
-        if (args.options.owners.indexOf(",") > -1) {
-          return 'The ClassicSite supports only one owner in the owners options';
-        }
-
-        if (!args.options.timeZone) {
-          return 'Required option timeZone missing';
-        }
-        
-        if (typeof args.options.timeZone !== 'number') {
-          return `${args.options.timeZone} is not a number`;
-        }
-
-        if (args.options.resourceQuota &&
-          typeof args.options.resourceQuota !== 'number') {
-          return `${args.options.resourceQuota} is not a number`;
-        }
-
-        if (args.options.resourceQuotaWarningLevel &&
-          typeof args.options.resourceQuotaWarningLevel !== 'number') {
-          return `${args.options.resourceQuotaWarningLevel} is not a number`;
-        }
-
-        if (args.options.resourceQuotaWarningLevel &&
-          !args.options.resourceQuota) {
-          return `You cannot specify resourceQuotaWarningLevel without specifying resourceQuota`;
-        }
-
-        if ((<number>args.options.resourceQuotaWarningLevel) > (<number>args.options.resourceQuota)) {
-          return `resourceQuotaWarningLevel cannot exceed resourceQuota`;
-        }
-
-        if (args.options.storageQuota &&
-          typeof args.options.storageQuota !== 'number') {
-          return `${args.options.storageQuota} is not a number`;
-        }
-
-        if (args.options.storageQuotaWarningLevel &&
-          typeof args.options.storageQuotaWarningLevel !== 'number') {
-          return `${args.options.storageQuotaWarningLevel} is not a number`;
-        }
-
-        if (args.options.storageQuotaWarningLevel &&
-          !args.options.storageQuota) {
-          return `You cannot specify storageQuotaWarningLevel without specifying storageQuota`;
-        }
-
-        if ((<number>args.options.storageQuotaWarningLevel) > (<number>args.options.storageQuota)) {
-          return `storageQuotaWarningLevel cannot exceed storageQuota`;
-        }
-
-        if (args.options.classification || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.siteDesignId || args.options.alias || args.options.isPublic) {
-          return "Type ClassicSite supports only the parameters url, title, lcid, storageQuota, storageQuotaWarningLevel, resourceQuota, resourceQuotaWarningLevel, webTemplate, owners, and description";
+      if (args.options.siteDesignId) {
+        if (!Utils.isValidGuid(args.options.siteDesignId)) {
+          return `${args.options.siteDesignId} is not a valid GUID`;
         }
       }
 
-      if (args.options.lcid) {
-        if (isNaN(args.options.lcid)) {
-          return `${args.options.lcid} is not a number`;
-        }
-
-        if (args.options.lcid < 0) {
-          return `LCID must be greater than 0 (${args.options.lcid})`;
-        }
-
-        if (this.supportedLcids.indexOf(args.options.lcid) < 0) {
-          return `LCID ${args.options.lcid} is not valid. See https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff for the languages supported by SharePoint.`;
-        }   
+      if (args.options.siteDesign && args.options.siteDesignId) {
+        return 'Specify siteDesign or siteDesignId but not both';
       }
 
-      return true;
-    };
+      if (args.options.timeZone || args.options.isPublic || args.options.removeDeletedSite || args.options.wait || args.options.alias || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
+        return "Type CommunicationSite supports only the parameters url, title, lcid, classification, siteDesign, shareByEmailEnabled, allowFileSharingForGuestUsers, siteDesignId, owners, and description";
+      }
+    }
+    else {
+      if (!args.options.url) {
+        return 'Required option url missing';
+      }
+
+      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+      if (isValidSharePointUrl !== true) {
+        return isValidSharePointUrl;
+      }
+
+      if (!args.options.owners) {
+        return 'Required option owner missing';
+      }
+
+      if (args.options.owners.indexOf(",") > -1) {
+        return 'The ClassicSite supports only one owner in the owners options';
+      }
+
+      if (!args.options.timeZone) {
+        return 'Required option timeZone missing';
+      }
+
+      if (typeof args.options.timeZone !== 'number') {
+        return `${args.options.timeZone} is not a number`;
+      }
+
+      if (args.options.resourceQuota &&
+        typeof args.options.resourceQuota !== 'number') {
+        return `${args.options.resourceQuota} is not a number`;
+      }
+
+      if (args.options.resourceQuotaWarningLevel &&
+        typeof args.options.resourceQuotaWarningLevel !== 'number') {
+        return `${args.options.resourceQuotaWarningLevel} is not a number`;
+      }
+
+      if (args.options.resourceQuotaWarningLevel &&
+        !args.options.resourceQuota) {
+        return `You cannot specify resourceQuotaWarningLevel without specifying resourceQuota`;
+      }
+
+      if ((<number>args.options.resourceQuotaWarningLevel) > (<number>args.options.resourceQuota)) {
+        return `resourceQuotaWarningLevel cannot exceed resourceQuota`;
+      }
+
+      if (args.options.storageQuota &&
+        typeof args.options.storageQuota !== 'number') {
+        return `${args.options.storageQuota} is not a number`;
+      }
+
+      if (args.options.storageQuotaWarningLevel &&
+        typeof args.options.storageQuotaWarningLevel !== 'number') {
+        return `${args.options.storageQuotaWarningLevel} is not a number`;
+      }
+
+      if (args.options.storageQuotaWarningLevel &&
+        !args.options.storageQuota) {
+        return `You cannot specify storageQuotaWarningLevel without specifying storageQuota`;
+      }
+
+      if ((<number>args.options.storageQuotaWarningLevel) > (<number>args.options.storageQuota)) {
+        return `storageQuotaWarningLevel cannot exceed storageQuota`;
+      }
+
+      if (args.options.classification || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.siteDesignId || args.options.alias || args.options.isPublic) {
+        return "Type ClassicSite supports only the parameters url, title, lcid, storageQuota, storageQuotaWarningLevel, resourceQuota, resourceQuotaWarningLevel, webTemplate, owners, and description";
+      }
+    }
+
+    if (args.options.lcid) {
+      if (isNaN(args.options.lcid)) {
+        return `${args.options.lcid} is not a number`;
+      }
+
+      if (args.options.lcid < 0) {
+        return `LCID must be greater than 0 (${args.options.lcid})`;
+      }
+
+      if (this.supportedLcids.indexOf(args.options.lcid) < 0) {
+        return `LCID ${args.options.lcid} is not valid. See https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff for the languages supported by SharePoint.`;
+      }
+    }
+
+    return true;
   }
 }
 

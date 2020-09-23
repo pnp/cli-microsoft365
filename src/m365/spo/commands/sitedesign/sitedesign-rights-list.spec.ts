@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./sitedesign-rights-list');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./sitedesign-rights-list');
 
 describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -23,16 +24,12 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: any) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -85,9 +82,9 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "DisplayName": "MOD Administrator",
             "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
@@ -133,9 +130,9 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "DisplayName": "MOD Administrator",
             "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
@@ -181,9 +178,9 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
+    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "DisplayName": "MOD Administrator",
             "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
@@ -208,7 +205,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 
-    cmdInstance.action({ options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('File Not Found.')));
         done();
@@ -220,7 +217,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -231,7 +228,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
   });
 
   it('supports specifying id', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--id') > -1) {
@@ -242,12 +239,12 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
   });
 
   it('fails validation if the id is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'abc' } });
+    const actual = command.validate({ options: { id: 'abc' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the id is a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } });
+    const actual = command.validate({ options: { id: '2c1ba4c4-cd9b-4417-832f-92a34bc34b2a' } });
     assert.strictEqual(actual, true);
   });
 });

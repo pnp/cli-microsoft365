@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./run-get');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./run-get');
 
 describe(commands.FLOW_RUN_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.FLOW_RUN_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -109,9 +106,9 @@ describe(commands.FLOW_RUN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, flow: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } }, () => {
+    command.action(logger, { options: { debug: true, flow: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           name: '08586653536760200319026785874CU62',
           startTime: '2018-09-06T17:00:09.9484194Z',
           endTime: '2018-09-06T17:00:10.3406851Z',
@@ -180,9 +177,9 @@ describe(commands.FLOW_RUN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, flow: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } }, () => {
+    command.action(logger, { options: { debug: false, flow: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           name: '08586653536760200319026785874CU62',
           startTime: '2018-09-06T17:00:09.9484194Z',
           endTime: '2018-09-06T17:00:10.3406851Z',
@@ -253,9 +250,9 @@ describe(commands.FLOW_RUN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, flow: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62', output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, flow: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62', output: 'json' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(runInfo));
+        assert(loggerSpy.calledWith(runInfo));
         done();
       }
       catch (e) {
@@ -313,9 +310,9 @@ describe(commands.FLOW_RUN_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, flow: 'edf73e7e-9928-4cb9-8eb2-fc263f375ada', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586652586741142222645090602CU35' } }, () => {
+    command.action(logger, { options: { debug: false, flow: 'edf73e7e-9928-4cb9-8eb2-fc263f375ada', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586652586741142222645090602CU35' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith({
+        assert(loggerSpy.calledWith({
           name: '08586652586741142222645090602CU35',
           startTime: '2018-09-07T19:23:31.3640166Z',
           endTime: '',
@@ -340,7 +337,7 @@ describe(commands.FLOW_RUN_GET, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false, flow: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbbx', name: '08586653536760200319026785874CU62' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, flow: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbbx', name: '08586653536760200319026785874CU62' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-48595cc3-adce-4267-8e99-0c838923dbbx' is denied.`)));
         done();
@@ -361,7 +358,7 @@ describe(commands.FLOW_RUN_GET, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false, flow: '1c6ee23a-a835-44bc-a4f5-462b658efc12', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, flow: '1c6ee23a-a835-44bc-a4f5-462b658efc12', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: '08586653536760200319026785874CU62' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '1c6ee23a-a835-44bc-a4f5-462b658efc12' under Api 'shared_logicflows'.`)));
         done();
@@ -382,7 +379,7 @@ describe(commands.FLOW_RUN_GET, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false, flow: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: 'ABC' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, flow: '396d5ec9-ae2d-4a84-967d-cd7f56cd8f30', environment: 'Default-48595cc3-adce-4267-8e99-0c838923dbb9', name: 'ABC' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The provided workflow run name is not valid.`)));
         done();
@@ -407,7 +404,7 @@ describe(commands.FLOW_RUN_GET, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -419,7 +416,7 @@ describe(commands.FLOW_RUN_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -430,7 +427,7 @@ describe(commands.FLOW_RUN_GET, () => {
   });
 
   it('supports specifying environment', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--environment') > -1) {
@@ -441,7 +438,7 @@ describe(commands.FLOW_RUN_GET, () => {
   });
 
   it('supports specifying flow', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--flow') > -1) {
@@ -452,7 +449,7 @@ describe(commands.FLOW_RUN_GET, () => {
   });
 
   it('supports specifying name', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--name') > -1) {

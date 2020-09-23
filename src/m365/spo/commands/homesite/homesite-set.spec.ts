@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandError, CommandOption } from '../../../../Command';
-import * as sinon from 'sinon';
-import auth from '../../../../Auth';
-const command: Command = require('./homesite-set');
 import * as assert from 'assert';
+import * as chalk from 'chalk';
+import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import appInsights from '../../../../appInsights';
-import config from '../../../../config';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./homesite-set');
 
 describe(commands.HOMESITE_SET, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -29,16 +30,12 @@ describe(commands.HOMESITE_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -82,13 +79,13 @@ describe(commands.HOMESITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/Work"
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('The Home site has been set to https://contoso.sharepoint.com/sites/Work.'));
+        assert(loggerSpy.calledWith('The Home site has been set to https://contoso.sharepoint.com/sites/Work.'));
         done();
       }
       catch (e) {
@@ -114,14 +111,14 @@ describe(commands.HOMESITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         siteUrl: "https://contoso.sharepoint.com/sites/Work"
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -147,11 +144,11 @@ describe(commands.HOMESITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/Work"
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The provided site url can't be set as a Home site. Check aka.ms\u002fhomesites for cmdlet requirements.`)));
         done();
@@ -165,11 +162,11 @@ describe(commands.HOMESITE_SET, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         siteUrl: "https://contoso.sharepoint.com/sites/Work"
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`An error has occurred`)));
         done();
@@ -181,17 +178,17 @@ describe(commands.HOMESITE_SET, () => {
   });
 
   it('fails validation if the siteUrl option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'foo' } });
+    const actual = command.validate({ options: { siteUrl: 'foo' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation if the siteUrl option is a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { siteUrl: 'https://contoso.sharepoint.com' } });
+    const actual = command.validate({ options: { siteUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

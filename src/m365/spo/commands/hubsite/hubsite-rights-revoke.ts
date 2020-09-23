@@ -1,17 +1,15 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption,
-  CommandValidate,
-  CommandError
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import {
+  CommandError, CommandOption
+} from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -38,16 +36,16 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const revokeRights = (): void => {
       let spoAdminUrl: string = '';
 
       if (this.verbose) {
-        cmd.log(`Revoking rights for ${args.options.principals} from ${args.options.url}...`);
+        logger.log(`Revoking rights for ${args.options.principals} from ${args.options.url}...`);
       }
 
       this
-        .getSpoAdminUrl(cmd, this.debug)
+        .getSpoAdminUrl(logger, this.debug)
         .then((_spoAdminUrl: string): Promise<ContextInfo> => {
           spoAdminUrl = _spoAdminUrl;
 
@@ -78,18 +76,18 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
           }
           else {
             if (this.verbose) {
-              cmd.log(chalk.green('DONE'));
+              logger.log(chalk.green('DONE'));
             }
           }
           cb();
-        }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
       revokeRights();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -125,10 +123,8 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.url);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.url);
   }
 }
 

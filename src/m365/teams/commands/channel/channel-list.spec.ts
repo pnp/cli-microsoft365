@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./channel-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./channel-list');
 
 describe(commands.TEAMS_CHANNEL_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -52,7 +49,7 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000'
       }
@@ -66,7 +63,7 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
   });
 
   it('validates for a correct input.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
       }
@@ -110,15 +107,14 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000'
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(
+        assert(loggerSpy.calledWith(
           [
             {
               "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
@@ -154,10 +150,9 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
+    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
             "displayName": "General"
@@ -214,8 +209,7 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         output: 'json',
@@ -223,7 +217,7 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(
+        assert(loggerSpy.calledWith(
           [
             {
               "id": "19:17de660d16844149ab3f0240405f9316@thread.skype",
@@ -268,13 +262,12 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -286,7 +279,7 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

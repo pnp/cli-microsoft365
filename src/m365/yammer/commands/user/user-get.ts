@@ -1,9 +1,9 @@
-import { CommandOption, CommandValidate } from '../../../../Command';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import YammerCommand from '../../../base/YammerCommand';
 import commands from '../../commands';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -30,7 +30,7 @@ class YammerUserGetCommand extends YammerCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let endPoint = `${this.resource}/v1/users/current.json`;
 
     if (args.options.userId) {
@@ -52,11 +52,11 @@ class YammerUserGetCommand extends YammerCommand {
       .get(requestOptions)
       .then((res: any): void => {
         if (args.options.output === 'json') {
-          cmd.log(res);
+          logger.log(res);
         }
         else {
           if (res instanceof Array) {
-            cmd.log((res as any[]).map((n: any) => {
+            logger.log((res as any[]).map((n: any) => {
               const item: any = {
                 id: n.id,
                 full_name: n.full_name,
@@ -68,11 +68,11 @@ class YammerUserGetCommand extends YammerCommand {
               return item;
             }));
           } else {
-            cmd.log({ id: res.id, full_name: res.full_name, email: res.email, job_title: res.job_title, state: res.state, url: res.url });
+            logger.log({ id: res.id, full_name: res.full_name, email: res.email, job_title: res.job_title, state: res.state, url: res.url });
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -91,14 +91,12 @@ class YammerUserGetCommand extends YammerCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.userId !== undefined && args.options.email !== undefined) {
-        return `You are only allowed to search by ID or e-mail but not both`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.userId !== undefined && args.options.email !== undefined) {
+      return `You are only allowed to search by ID or e-mail but not both`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

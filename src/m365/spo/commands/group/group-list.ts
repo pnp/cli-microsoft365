@@ -1,14 +1,13 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
-import { GroupPropertiesCollection } from "./GroupPropertiesCollection";
+import commands from '../../commands';
 import { GroupProperties } from "./GroupProperties";
-import { CommandInstance } from '../../../../cli';
+import { GroupPropertiesCollection } from "./GroupPropertiesCollection";
 
 interface CommandArgs {
   options: Options;
@@ -27,9 +26,9 @@ class SpoGroupListCommand extends SpoCommand {
     return 'Lists all the groups within specific web';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      cmd.log(`Retrieving list of groups for specified web at ${args.options.webUrl}...`);
+      logger.log(`Retrieving list of groups for specified web at ${args.options.webUrl}...`);
     }
 
     let requestUrl = `${args.options.webUrl}/_api/web/sitegroups`;
@@ -46,10 +45,10 @@ class SpoGroupListCommand extends SpoCommand {
       .get<GroupPropertiesCollection>(requestOptions)
       .then((groupProperties: GroupPropertiesCollection): void => {
         if (args.options.output === 'json') {
-          cmd.log(groupProperties);
+          logger.log(groupProperties);
         }
         else {
-          cmd.log(groupProperties.value.map((g: GroupProperties) => {
+          logger.log(groupProperties.value.map((g: GroupProperties) => {
             return {
               Id: g.Id,
               Title: g.Title,
@@ -60,7 +59,7 @@ class SpoGroupListCommand extends SpoCommand {
           }))
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -75,10 +74,8 @@ class SpoGroupListCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

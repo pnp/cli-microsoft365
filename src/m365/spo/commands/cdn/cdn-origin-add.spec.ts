@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./cdn-origin-add');
-import * as assert from 'assert';
-import request from '../../../../request';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import config from '../../../../config';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./cdn-origin-add');
 
 describe(commands.CDN_ORIGIN_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let requests: any[];
 
   before(() => {
@@ -48,11 +49,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -84,7 +81,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('sets CDN origin on the public CDN when Public type specified', (done) => {
-    cmdInstance.action({ options: { debug: true, origin: '*/cdn', type: 'Public' } }, () => {
+    command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -105,7 +102,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('sets CDN origin on the private CDN when Private type specified', (done) => {
-    cmdInstance.action({ options: { debug: true, origin: '*/cdn', type: 'Private' } }, () => {
+    command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Private' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -126,7 +123,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('sets CDN origin on the public CDN when no type specified', (done) => {
-    cmdInstance.action({ options: { debug: false, origin: '*/cdn' } }, () => {
+    command.action(logger, { options: { debug: false, origin: '*/cdn' } }, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf('/_vti_bin/client.svc/ProcessQuery') > -1 &&
@@ -177,7 +174,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, origin: '*/cdn', type: 'Public' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, 'The library is already registered as a CDN origin.');
         done();
@@ -193,7 +190,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       return Promise.reject('An error has occurred');
     });
-    cmdInstance.action({ options: { debug: true, origin: '*/cdn', type: 'Public' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -236,7 +233,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, origin: '<*/CDN>' } }, () => {
+    command.action(logger, { options: { debug: true, origin: '<*/CDN>' } }, () => {
       let isDone = false;
       log.forEach(l => {
         if (l && typeof l === 'string' && l.indexOf('DONE')) {
@@ -255,7 +252,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsdebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -266,7 +263,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
   });
 
   it('requires CDN origin name', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let requiresCdnOriginName = false;
     options.forEach(o => {
       if (o.option.indexOf('<origin>') > -1) {
@@ -278,29 +275,29 @@ describe(commands.CDN_ORIGIN_ADD, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
 
   it('accepts Public SharePoint Online CDN type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'Public' } });
+    const actual = command.validate({ options: { type: 'Public' } });
     assert.strictEqual(actual, true);
   });
 
   it('accepts Private SharePoint Online CDN type', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { type: 'Private' } });
+    const actual = command.validate({ options: { type: 'Private' } });
     assert.strictEqual(actual, true);
   });
 
   it('rejects invalid SharePoint Online CDN type', () => {
     const type = 'foo';
-    const actual = (command.validate() as CommandValidate)({ options: { type: type } });
+    const actual = command.validate({ options: { type: type } });
     assert.strictEqual(actual, `${type} is not a valid CDN type. Allowed values are Public|Private`);
   });
 
   it('doesn\'t fail validation if the optional type option not specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: {} });
+    const actual = command.validate({ options: {} });
     assert.strictEqual(actual, true);
   });
 });

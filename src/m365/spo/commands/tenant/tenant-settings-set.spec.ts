@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandError, CommandOption, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./tenant-settings-set');
-import * as assert from 'assert';
+import auth from '../../../../Auth';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
-import auth from '../../../../Auth';
+import commands from '../../commands';
+const command: Command = require('./tenant-settings-set');
 
 describe(commands.TENANT_SETTINGS_SET, () => {
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   let defaultRequestsSuccessStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
@@ -39,16 +40,12 @@ describe(commands.TENANT_SETTINGS_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -77,7 +74,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -95,11 +92,11 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
 
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -113,14 +110,14 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sets the tenant settings (debug) successfully', (done) => {
     defaultRequestsSuccessStub();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         NotificationsInSharePointEnabled: true
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith('DONE'));
+        assert(loggerSpy.calledWith('DONE'));
         done();
       }
       catch (e) {
@@ -132,13 +129,13 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sets the tenant settings successfully', (done) => {
     defaultRequestsSuccessStub();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         NotificationsInSharePointEnabled: true
       }
     }, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(loggerSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -150,7 +147,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sends xml as array of strings for option excludedFileExtensionsForSyncClient', (done) => {
     let request = defaultRequestsSuccessStub();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         ExcludedFileExtensionsForSyncClient: 'xml,xslt,xsd'
       }
@@ -168,7 +165,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sends xml as array of guids for option allowedDomainListForSyncClient', (done) => {
     let request = defaultRequestsSuccessStub();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         AllowedDomainListForSyncClient: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77'
       }
@@ -186,7 +183,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sends xml as array of guids for option disabledWebPartIds', (done) => {
     let request = defaultRequestsSuccessStub();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         DisabledWebPartIds: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77'
       }
@@ -204,7 +201,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('sends xml for multiple options specified', (done) => {
     let request = defaultRequestsSuccessStub();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         DisabledWebPartIds: '6648899e-a042-6000-ee90-5bfa05d08b79,6648899e-a042-6000-ee90-5bfa05d08b77',
         ExcludedFileExtensionsForSyncClient: 'xsl,doc,ttf',
@@ -239,11 +236,11 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Timed out')));
         done();
@@ -290,10 +287,10 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Timed out')));
         done();
@@ -307,7 +304,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('should turn enums to int in the request successfully', (done) => {
     const stubRequest: sinon.SinonStub = defaultRequestsSuccessStub();
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         verbose: true,
@@ -338,7 +335,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     const options: any = {
       SharingCapability: 'abc'
     }
-    const actual = (command.validate() as CommandValidate)({ options: options });
+    const actual = command.validate({ options: options });
     assert.strictEqual(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
   });
 
@@ -357,7 +354,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       LimitedAccessFileType: 'WebPreviewableFiles',
       SpecialCharactersStateInFileFolderNames: 'Allowed',
     }
-    const actual = (command.validate() as CommandValidate)({ options: options });
+    const actual = command.validate({ options: options });
     assert.strictEqual(actual, true);
   });
 
@@ -365,7 +362,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     const options: any = {
       SharingCapability: 'abc'
     }
-    const actual = (command.validate() as CommandValidate)({ options: options });
+    const actual = command.validate({ options: options });
     assert.strictEqual(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
   });
 
@@ -379,7 +376,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     const options: any = {
       OrgNewsSiteUrl: 'abc'
     }
-    const actual = (command.validate() as CommandValidate)({ options: options });
+    const actual = command.validate({ options: options });
     assert.strictEqual(actual, true);
   });
 
@@ -387,7 +384,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     const options: any = {
       ShowAllUsersClaim: 'abc'
     }
-    const actual = (command.validate() as CommandValidate)({ options: options });
+    const actual = command.validate({ options: options });
     assert.strictEqual(actual, 'ShowAllUsersClaim option has invalid value of abc. Allowed values are ["true","false"]');
   });
 
@@ -396,7 +393,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       debug: true,
       verbose: true
     }
-    const actual = (command.validate() as CommandValidate)({ options: options });
+    const actual = command.validate({ options: options });
     assert.strictEqual(actual, `You must specify at least one option`);
   });
 
@@ -404,7 +401,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     const options: any = {
       ShowAllUsersClaim: true
     }
-    const actual = (command.validate() as CommandValidate)({ options: options });
+    const actual = command.validate({ options: options });
     assert.strictEqual(actual, true);
   });
 });

@@ -1,18 +1,19 @@
-import commands from "../../commands";
-import Command, { CommandOption, CommandValidate, CommandError } from "../../../../Command";
+import * as assert from "assert";
+import * as chalk from 'chalk';
 import * as sinon from "sinon";
 import appInsights from "../../../../appInsights";
 import auth from "../../../../Auth";
-const command: Command = require("./apppage-set");
-import * as assert from "assert";
+import { Logger } from "../../../../cli";
+import Command, { CommandError, CommandOption } from "../../../../Command";
 import request from "../../../../request";
 import Utils from "../../../../Utils";
-import * as chalk from 'chalk';
+import commands from "../../commands";
+const command: Command = require("./apppage-set");
 
 describe(commands.APPPAGE_SET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, "restoreAuth").callsFake(() => Promise.resolve());
@@ -22,14 +23,12 @@ describe(commands.APPPAGE_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: { command: command.name },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -59,7 +58,7 @@ describe(commands.APPPAGE_SET, () => {
       }
       return Promise.reject("Invalid request");
     });
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: true,
@@ -74,7 +73,7 @@ describe(commands.APPPAGE_SET, () => {
           return;
         }
         try {
-          assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+          assert(loggerSpy.calledWith(chalk.green('DONE')));
           done();
         }
         catch (e) {
@@ -93,7 +92,7 @@ describe(commands.APPPAGE_SET, () => {
       }
       return Promise.reject("Invalid request");
     });
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -163,7 +162,7 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("fails validation if pageName not specified", () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         webPartData: JSON.stringify({ abc: "def" }),
         webUrl: "https://contoso.sharepoint.com"
@@ -173,7 +172,7 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("fails validation if webPartData not specified", () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: "Contoso.aspx",
         webUrl: "https://contoso.sharepoint.com"
@@ -183,7 +182,7 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("fails validation if webUrl not specified", () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         webPartData: JSON.stringify({ abc: "def" }),
         pageName: "page.aspx"
@@ -193,7 +192,7 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("fails validation if webPartData is not a valid JSON string", () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: "Contoso.aspx",
         webUrl: "https://contoso",
@@ -204,7 +203,7 @@ describe(commands.APPPAGE_SET, () => {
   });
 
   it("validation passes on all required options", () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: "Contoso.aspx",
         webPartData: "{}",

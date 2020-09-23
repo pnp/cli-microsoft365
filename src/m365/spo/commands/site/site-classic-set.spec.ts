@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-import config from '../../../../config';
 import auth from '../../../../Auth';
-const command: Command = require('./site-classic-set');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./site-classic-set');
 
 describe(commands.SITE_CLASSIC_SET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -29,16 +30,12 @@ describe(commands.SITE_CLASSIC_SET, () => {
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
 
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -92,9 +89,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -127,9 +124,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, () => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -162,9 +159,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Disabled' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Disabled' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -197,9 +194,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 100 } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 100 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -232,9 +229,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 100 } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 100 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -267,9 +264,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuota: 100 } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuota: 100 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -302,9 +299,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuotaWarningLevel: 100 } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', storageQuotaWarningLevel: 100 } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -337,9 +334,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'true' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'true' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -372,9 +369,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'true' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'true' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -407,9 +404,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'false' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'false' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -438,7 +435,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -473,9 +470,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -504,9 +501,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -535,9 +532,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, () => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -566,7 +563,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -591,7 +588,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', owners: 'admin@contoso.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -626,9 +623,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -661,9 +658,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, () => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -692,7 +689,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Unknown Error')));
         done();
@@ -727,9 +724,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -783,9 +780,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com', lockState: 'NoAccess', wait: true } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com', lockState: 'NoAccess', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -833,9 +830,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -883,9 +880,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -933,9 +930,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, verbose: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
+    command.action(logger, { options: { debug: false, verbose: true, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -980,9 +977,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -1026,7 +1023,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred.')));
         done();
@@ -1084,9 +1081,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return {} as any;
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -1140,9 +1137,9 @@ describe(commands.SITE_CLASSIC_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title>', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com>', lockState: 'NoAccess', wait: true } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/team', title: 'New title>', sharing: 'Disabled', resourceQuota: 100, resourceQuotaWarningLevel: 100, storageQuota: 100, storageQuotaWarningLevel: 100, allowSelfServiceUpgrade: 'true', noScriptSite: 'true', owners: 'admin@contoso.com>', lockState: 'NoAccess', wait: true } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -1152,7 +1149,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsDebugOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -1163,7 +1160,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if the url is not a valid url', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'abc', title: 'Team'
       }
@@ -1172,7 +1169,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if the url is not a valid SharePoint url', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'http://contoso', title: 'Team'
       }
@@ -1181,7 +1178,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if the resourceQuota is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', resourceQuota: 'abc'
       }
@@ -1190,7 +1187,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if the resourceQuotaWarningLevel is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', resourceQuotaWarningLevel: 'abc'
       }
@@ -1199,7 +1196,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if the resourceQuotaWarningLevel is greater than resourceQuota', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         owner: 'admin@contoso.com', resourceQuotaWarningLevel: 10, resourceQuota: 5
@@ -1209,7 +1206,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if the storageQuota is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         storageQuota: 'abc'
@@ -1219,7 +1216,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if the storageQuotaWarningLevel is not a number', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         storageQuotaWarningLevel: 'abc'
@@ -1229,7 +1226,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if the storageQuotaWarningLevel is greater than storageQuota', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         storageQuotaWarningLevel: 10, storageQuota: 5
@@ -1239,7 +1236,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if sharing is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Invalid'
       }
@@ -1248,7 +1245,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if sharing is set to Disabled', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', sharing: 'Disabled'
       }
@@ -1257,7 +1254,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if sharing is set to ExternalUserSharingOnly', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', sharing: 'ExternalUserSharingOnly'
       }
@@ -1266,7 +1263,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if sharing is set to ExternalUserAndGuestSharing', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', sharing: 'ExternalUserAndGuestSharing'
       }
@@ -1275,7 +1272,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if sharing is set to ExistingExternalUserSharingOnly', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', sharing: 'ExistingExternalUserSharingOnly'
       }
@@ -1284,7 +1281,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if allowSelfServiceUpgrade is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'Invalid'
       }
@@ -1293,7 +1290,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if allowSelfServiceUpgrade is set to true', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'true'
       }
@@ -1302,7 +1299,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if allowSelfServiceUpgrade is set to false', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', allowSelfServiceUpgrade: 'false'
       }
@@ -1311,7 +1308,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if lockState is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Invalid'
       }
@@ -1320,7 +1317,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if lockState is set to Unlock', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'Unlock'
       }
@@ -1329,7 +1326,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if lockState is set to NoAdditions', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAdditions'
       }
@@ -1338,7 +1335,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if lockState is set to ReadOnly', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'ReadOnly'
       }
@@ -1347,7 +1344,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if lockState is set to NoAccess', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', lockState: 'NoAccess'
       }
@@ -1356,7 +1353,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if the required options are correct', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team'
       }
@@ -1365,7 +1362,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('fails validation if noScriptSite is invalid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'Invalid'
       }
@@ -1374,7 +1371,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if noScriptSite is set to true', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'true'
       }
@@ -1383,7 +1380,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if noScriptSite is set to false', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', noScriptSite: 'false'
       }
@@ -1392,7 +1389,7 @@ describe(commands.SITE_CLASSIC_SET, () => {
   });
 
   it('passes validation if all options are correct', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: 'https://contoso.sharepoint.com/sites/team', title: 'Team',
         resourceQuota: 100, resourceQuotaWarningLevel: 90,

@@ -1,9 +1,9 @@
-import commands from '../../commands';
+import * as chalk from 'chalk';
+import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import commands from '../../commands';
 import { Task } from '../../Task';
-import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -18,15 +18,15 @@ class GraphPlannerTaskListCommand extends GraphItemsListCommand<Task> {
     return 'Lists Planner tasks for the currently logged in user';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
-      .getAllItems(`${this.resource}/v1.0/me/planner/tasks`, cmd, true)
+      .getAllItems(`${this.resource}/v1.0/me/planner/tasks`, logger, true)
       .then((): void => {
         if (args.options.output === 'json') {
-          cmd.log(this.items);
+          logger.log(this.items);
         }
         else {
-          cmd.log(this.items.map(t => {
+          logger.log(this.items.map(t => {
             const task: any = {
               id: t.id,
               title: t.title,
@@ -39,10 +39,10 @@ class GraphPlannerTaskListCommand extends GraphItemsListCommand<Task> {
         }
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 }
 

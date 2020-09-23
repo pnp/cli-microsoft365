@@ -1,16 +1,16 @@
-import config from '../../../../config';
-import commands from '../../commands';
-import request from '../../../../request';
-import SpoCommand from '../../../base/SpoCommand';
-import Utils from '../../../../Utils';
-import { CommandOption, CommandValidate } from '../../../../Command';
-import GlobalOptions from '../../../../GlobalOptions';
-import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
-import { SiteProperties } from './SiteProperties';
-import { DeletedSiteProperties } from './DeletedSiteProperties';
-import { SpoOperation } from './SpoOperation';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
+import { DeletedSiteProperties } from './DeletedSiteProperties';
+import { SiteProperties } from './SiteProperties';
+import { SpoOperation } from './SpoOperation';
 
 interface CommandArgs {
   options: Options;
@@ -58,22 +58,22 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.dots = '';
-    this.showDeprecationWarning(cmd, commands.SITE_CLASSIC_ADD, commands.SITE_ADD); 
+    this.showDeprecationWarning(logger, commands.SITE_CLASSIC_ADD, commands.SITE_ADD);
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
         this.spoAdminUrl = _spoAdminUrl;
 
-        return this.ensureFormDigest(this.spoAdminUrl, cmd, this.context, this.debug);
+        return this.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<boolean> => {
         this.context = res;
 
         if (args.options.removeDeletedSite) {
-          return this.siteExistsInTheRecycleBin(args.options.url, cmd);
+          return this.siteExistsInTheRecycleBin(args.options.url, logger);
         }
         else {
           // assume site doesn't exist
@@ -83,27 +83,27 @@ class SpoSiteClassicAddCommand extends SpoCommand {
       .then((exists: boolean): Promise<void> => {
         if (exists) {
           if (this.verbose) {
-            cmd.log('Site exists in the recycle bin');
+            logger.log('Site exists in the recycle bin');
           }
 
-          return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, cmd);
+          return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
         }
         else {
           if (this.verbose) {
-            cmd.log('Site not found');
+            logger.log('Site not found');
           }
 
           return Promise.resolve();
         }
       })
       .then((): Promise<FormDigestInfo> => {
-        return this.ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug);
+        return this.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
       })
       .then((res: FormDigestInfo): Promise<string> => {
         this.context = res;
 
         if (this.verbose) {
-          cmd.log(`Creating site collection ${args.options.url}...`);
+          logger.log(`Creating site collection ${args.options.url}...`);
         }
 
         const lcid: number = typeof args.options.lcid === 'number' ? args.options.lcid : 1033;
@@ -139,29 +139,29 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             }
 
             this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
       })
       .then((): void => {
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
-  private siteExistsInTheRecycleBin(url: string, cmd: CommandInstance): Promise<boolean> {
+  private siteExistsInTheRecycleBin(url: string, logger: Logger): Promise<boolean> {
     return new Promise<boolean>((resolve: (exists: boolean) => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
 
           if (this.verbose) {
-            cmd.log(`Checking if the site ${url} exists...`);
+            logger.log(`Checking if the site ${url} exists...`);
           }
 
           const requestOptions: any = {
@@ -197,7 +197,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
         })
         .then((exists: boolean): Promise<string> => {
           if (this.verbose) {
-            cmd.log(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
+            logger.log(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
           }
 
           const requestOptions: any = {
@@ -241,15 +241,15 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     });
   }
 
-  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, cmd: CommandInstance): Promise<void> {
+  private deleteSiteFromTheRecycleBin(url: string, wait: boolean, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       this
-        .ensureFormDigest(this.spoAdminUrl as string, cmd, this.context, this.debug)
+        .ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug)
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
 
           if (this.verbose) {
-            cmd.log(`Deleting site ${url} from the recycle bin...`);
+            logger.log(`Deleting site ${url} from the recycle bin...`);
           }
 
           const requestOptions: any = {
@@ -277,7 +277,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
             }, operation.PollingInterval);
           }
         });
@@ -340,62 +340,60 @@ class SpoSiteClassicAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
-      if (isValidSharePointUrl !== true) {
-        return isValidSharePointUrl;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.url);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
 
-      if (typeof args.options.timeZone !== 'number') {
-        return `${args.options.timeZone} is not a number`;
-      }
+    if (typeof args.options.timeZone !== 'number') {
+      return `${args.options.timeZone} is not a number`;
+    }
 
-      if (args.options.lcid &&
-        typeof args.options.lcid !== 'number') {
-        return `${args.options.lcid} is not a number`;
-      }
+    if (args.options.lcid &&
+      typeof args.options.lcid !== 'number') {
+      return `${args.options.lcid} is not a number`;
+    }
 
-      if (args.options.resourceQuota &&
-        typeof args.options.resourceQuota !== 'number') {
-        return `${args.options.resourceQuota} is not a number`;
-      }
+    if (args.options.resourceQuota &&
+      typeof args.options.resourceQuota !== 'number') {
+      return `${args.options.resourceQuota} is not a number`;
+    }
 
-      if (args.options.resourceQuotaWarningLevel &&
-        typeof args.options.resourceQuotaWarningLevel !== 'number') {
-        return `${args.options.resourceQuotaWarningLevel} is not a number`;
-      }
+    if (args.options.resourceQuotaWarningLevel &&
+      typeof args.options.resourceQuotaWarningLevel !== 'number') {
+      return `${args.options.resourceQuotaWarningLevel} is not a number`;
+    }
 
-      if (args.options.resourceQuotaWarningLevel &&
-        !args.options.resourceQuota) {
-        return `You cannot specify resourceQuotaWarningLevel without specifying resourceQuota`;
-      }
+    if (args.options.resourceQuotaWarningLevel &&
+      !args.options.resourceQuota) {
+      return `You cannot specify resourceQuotaWarningLevel without specifying resourceQuota`;
+    }
 
-      if ((<number>args.options.resourceQuotaWarningLevel) > (<number>args.options.resourceQuota)) {
-        return `resourceQuotaWarningLevel cannot exceed resourceQuota`;
-      }
+    if ((<number>args.options.resourceQuotaWarningLevel) > (<number>args.options.resourceQuota)) {
+      return `resourceQuotaWarningLevel cannot exceed resourceQuota`;
+    }
 
-      if (args.options.storageQuota &&
-        typeof args.options.storageQuota !== 'number') {
-        return `${args.options.storageQuota} is not a number`;
-      }
+    if (args.options.storageQuota &&
+      typeof args.options.storageQuota !== 'number') {
+      return `${args.options.storageQuota} is not a number`;
+    }
 
-      if (args.options.storageQuotaWarningLevel &&
-        typeof args.options.storageQuotaWarningLevel !== 'number') {
-        return `${args.options.storageQuotaWarningLevel} is not a number`;
-      }
+    if (args.options.storageQuotaWarningLevel &&
+      typeof args.options.storageQuotaWarningLevel !== 'number') {
+      return `${args.options.storageQuotaWarningLevel} is not a number`;
+    }
 
-      if (args.options.storageQuotaWarningLevel &&
-        !args.options.storageQuota) {
-        return `You cannot specify storageQuotaWarningLevel without specifying storageQuota`;
-      }
+    if (args.options.storageQuotaWarningLevel &&
+      !args.options.storageQuota) {
+      return `You cannot specify storageQuotaWarningLevel without specifying storageQuota`;
+    }
 
-      if ((<number>args.options.storageQuotaWarningLevel) > (<number>args.options.storageQuota)) {
-        return `storageQuotaWarningLevel cannot exceed storageQuota`;
-      }
+    if ((<number>args.options.storageQuotaWarningLevel) > (<number>args.options.storageQuota)) {
+      return `storageQuotaWarningLevel cannot exceed storageQuota`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

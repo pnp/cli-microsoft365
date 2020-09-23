@@ -1,5 +1,5 @@
-import { TeamsTabConfiguration } from "./TeamsTabConfiguration";
 import { TeamsApp } from "./TeamsApp";
+import { TeamsTabConfiguration } from "./TeamsTabConfiguration";
 
 export interface Tab {
   id: string;

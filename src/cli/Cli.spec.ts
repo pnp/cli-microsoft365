@@ -1,17 +1,18 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as fs from 'fs';
+import * as inquirer from 'inquirer';
+import * as markshell from 'markshell';
 import * as os from 'os';
 import * as path from 'path';
-import * as chalk from 'chalk';
-import * as markshell from 'markshell';
-import * as inquirer from 'inquirer';
-import Table = require('easy-table');
+import * as sinon from 'sinon';
 import { Cli } from '.';
-import Utils from '../Utils';
-import Command, { CommandOption, CommandValidate, CommandTypes, CommandError } from '../Command';
-import { CommandInstance } from './CommandInstance';
+import appInsights from '../appInsights';
+import Command, { CommandArgs, CommandError, CommandOption, CommandTypes } from '../Command';
 import AnonymousCommand from '../m365/base/AnonymousCommand';
+import Utils from '../Utils';
+import { Logger } from './Logger';
+import Table = require('easy-table');
 const packageJSON = require('../../package.json');
 
 class MockCommand extends AnonymousCommand {
@@ -41,7 +42,7 @@ class MockCommand extends AnonymousCommand {
       boolean: ['y']
     };
   }
-  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     cb();
   }
 }
@@ -56,7 +57,7 @@ class MockCommandWithAlias extends AnonymousCommand {
   public alias(): string[] {
     return ['cli mock alt'];
   }
-  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
+  public commandAction(logger: Logger, args: any, cb: () => void): void {
     cb();
   }
 }
@@ -82,12 +83,7 @@ class MockCommandWithValidation extends AnonymousCommand {
     const parentOptions: CommandOption[] = super.options();
     return options.concat(parentOptions);
   }
-  public validate(): CommandValidate {
-    return (args: any): boolean | string => {
-      return true;
-    }
-  }
-  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
+  public commandAction(logger: Logger, args: any, cb: () => void): void {
     cb();
   }
 }
@@ -99,8 +95,8 @@ class MockCommandWithPrompt extends AnonymousCommand {
   public get description(): string {
     return 'Mock command with prompt'
   }
-  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
-    cmd.prompt({
+  public commandAction(logger: Logger, args: any, cb: () => void): void {
+    Cli.prompt({
       type: 'confirm',
       name: 'continue',
       default: false,
@@ -118,8 +114,8 @@ class MockCommandWithOutput extends AnonymousCommand {
   public get description(): string {
     return 'Mock command with output'
   }
-  public commandAction(cmd: CommandInstance, args: any, cb: () => void): void {
-    cmd.log('Command output');
+  public commandAction(logger: Logger, args: any, cb: () => void): void {
+    logger.log('Command output');
     cb();
   }
 }
@@ -131,12 +127,14 @@ describe('Cli', () => {
   let cliErrorStub: sinon.SinonStub;
   let processExitStub: sinon.SinonStub;
   let markshellStub: sinon.SinonStub;
-  let mockCommandActionStub: sinon.SinonStub;
+  let mockCommandActionSpy: sinon.SinonSpy;
   let mockCommand: Command;
   let mockCommandWithAlias: Command;
   let mockCommandWithValidation: Command;
 
   before(() => {
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
+    
     cliLogStub = sinon.stub((Cli as any), 'log');
     cliErrorStub = sinon.stub((Cli as any), 'error');
     processExitStub = sinon.stub(process, 'exit');
@@ -145,7 +143,7 @@ describe('Cli', () => {
     mockCommand = new MockCommand();
     mockCommandWithAlias = new MockCommandWithAlias();
     mockCommandWithValidation = new MockCommandWithValidation();
-    mockCommandActionStub = sinon.stub(mockCommand, 'action');
+    mockCommandActionSpy = sinon.spy(mockCommand, 'action');
 
     return new Promise((resolve) => {
       fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string): void => {
@@ -168,7 +166,7 @@ describe('Cli', () => {
     cliErrorStub.reset();
     processExitStub.reset();
     markshellStub.reset();
-    mockCommandActionStub.reset();
+    mockCommandActionSpy.resetHistory();
     Utils.restore([
       Cli.executeCommand,
       fs.existsSync,
@@ -176,7 +174,8 @@ describe('Cli', () => {
       mockCommandWithValidation.action,
       inquirer.prompt,
       console.log,
-      console.error
+      console.error,
+      mockCommand.commandAction
     ]);
   });
 
@@ -185,7 +184,8 @@ describe('Cli', () => {
       (Cli as any).log,
       (Cli as any).error,
       process.exit,
-      markshell.toRawContent
+      markshell.toRawContent,
+      appInsights.trackEvent
     ]);
   });
 
@@ -339,7 +339,7 @@ describe('Cli', () => {
       .execute(rootFolder, ['cli', 'mock', '-x', '123', '-y', '456'])
       .then(_ => {
         try {
-          assert(mockCommandActionStub.called);
+          assert(mockCommandActionSpy.called);
           done();
         }
         catch (e) {
@@ -367,7 +367,7 @@ describe('Cli', () => {
       .execute(rootFolder, ['cli', 'mock', '-x', '123', '-z'])
       .then(_ => {
         try {
-          assert(mockCommandActionStub.notCalled);
+          assert(mockCommandActionSpy.notCalled);
           done();
         }
         catch (e) {
@@ -420,7 +420,7 @@ describe('Cli', () => {
   });
 
   it(`passes validation when the command's validate method returns true`, (done) => {
-    sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => () => true);
+    sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => true);
     const mockCommandWithValidationActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'action');
 
     cli
@@ -437,7 +437,7 @@ describe('Cli', () => {
   });
 
   it(`fails validation when the command's validate method returns a string`, (done) => {
-    sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => () => 'Error');
+    sinon.stub(mockCommandWithValidation, 'validate').callsFake(() => 'Error');
     const mockCommandWithValidationActionSpy: sinon.SinonSpy = sinon.spy(mockCommandWithValidation, 'action');
 
     cli
@@ -458,7 +458,7 @@ describe('Cli', () => {
       .execute(rootFolder, ['cli', 'mock', '-x', '123'])
       .then(_ => {
         try {
-          assert(mockCommandActionStub.called);
+          assert(mockCommandActionSpy.called);
           done();
         }
         catch (e) {
@@ -468,12 +468,11 @@ describe('Cli', () => {
   });
 
   it('executes the specified command', (done) => {
-    mockCommandActionStub.callsFake(() => ({ }, cb: (err?: any) => {}) => { cb(); });
     Cli
-      .executeCommand(mockCommand.name, mockCommand, { options: { _: [] } })
+      .executeCommand(mockCommand, { options: { _: [] } })
       .then(_ => {
         try {
-          assert(mockCommandActionStub.called);
+          assert(mockCommandActionSpy.called);
           done();
         }
         catch (e) {
@@ -483,9 +482,8 @@ describe('Cli', () => {
   });
 
   it('logs command name when executing command in debug mode', (done) => {
-    mockCommandActionStub.callsFake(() => ({ }, cb: (err?: any) => {}) => { cb(); });
     Cli
-      .executeCommand(mockCommand.name, mockCommand, { options: { debug: true, _: [] } })
+      .executeCommand(mockCommand, { options: { debug: true, _: [] } })
       .then(_ => {
         try {
           assert(cliLogStub.calledWith('Executing command cli mock with options {"options":{"debug":true,"_":[]}}'));
@@ -502,7 +500,7 @@ describe('Cli', () => {
     const mockCommandWithPrompt = new MockCommandWithPrompt();
 
     Cli
-      .executeCommand(mockCommandWithPrompt.name, mockCommandWithPrompt, { options: { _: [] } })
+      .executeCommand(mockCommandWithPrompt, { options: { _: [] } })
       .then(_ => {
         try {
           assert(promptStub.called);
@@ -517,7 +515,7 @@ describe('Cli', () => {
   it('returns command output when executing command with output', (done) => {
     const commandWithOutput: MockCommandWithOutput = new MockCommandWithOutput();
     Cli
-      .executeCommandWithOutput(commandWithOutput.name, commandWithOutput, { options: { _: [] } })
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [] } })
       .then((output: string) => {
         try {
           assert.strictEqual(output, 'Command output');
@@ -534,7 +532,7 @@ describe('Cli', () => {
     const mockCommandWithPrompt = new MockCommandWithPrompt();
 
     Cli
-      .executeCommandWithOutput(mockCommandWithPrompt.name, mockCommandWithPrompt, { options: { _: [] } })
+      .executeCommandWithOutput(mockCommandWithPrompt, { options: { _: [] } })
       .then(_ => {
         try {
           assert(promptStub.called);
@@ -547,9 +545,8 @@ describe('Cli', () => {
   });
 
   it('logs command name when executing command with output in debug mode', (done) => {
-    mockCommandActionStub.callsFake(() => ({ }, cb: (err?: any) => {}) => { cb(); });
     Cli
-      .executeCommandWithOutput(mockCommand.name, mockCommand, { options: { debug: true, _: [] } })
+      .executeCommandWithOutput(mockCommand, { options: { debug: true, _: [] } })
       .then(_ => {
         try {
           assert(cliLogStub.calledWith('Executing command cli mock with options {"options":{"debug":true,"_":[]}}'));
@@ -562,9 +559,9 @@ describe('Cli', () => {
   });
 
   it('correctly handles error when executing command', (done) => {
-    mockCommandActionStub.callsFake(() => ({ }, cb: (err?: any) => {}) => { cb('Error'); });
+    sinon.stub(mockCommand, 'commandAction').callsFake((logger: Logger, args: CommandArgs, cb: (err?: any) => void) => { cb('Error'); });
     Cli
-      .executeCommand(mockCommand.name, mockCommand, { options: { _: [] } })
+      .executeCommand(mockCommand, { options: { _: [] } })
       .then(_ => {
         done('Command succeeded while expected fail');
       }, e => {
@@ -579,9 +576,9 @@ describe('Cli', () => {
   });
 
   it('correctly handles error when executing command with output', (done) => {
-    mockCommandActionStub.callsFake(() => ({ }, cb: (err?: any) => {}) => { cb('Error'); });
+    sinon.stub(mockCommand, 'commandAction').callsFake((logger: Logger, args: CommandArgs, cb: (err?: any) => void) => { cb('Error'); });
     Cli
-      .executeCommandWithOutput(mockCommand.name, mockCommand, { options: { _: [] } })
+      .executeCommandWithOutput(mockCommand, { options: { _: [] } })
       .then(_ => {
         done('Command succeeded while expected fail');
       }, e => {

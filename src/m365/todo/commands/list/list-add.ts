@@ -1,12 +1,12 @@
-import commands from '../../commands';
-import request from '../../../../request';
-import GlobalOptions from '../../../../GlobalOptions';
-import {
-  CommandOption
-} from '../../../../Command';
-import GraphCommand from '../../../base/GraphCommand';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+    CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import GraphCommand from '../../../base/GraphCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -25,7 +25,7 @@ class TodoListAddCommand extends GraphCommand {
     return 'Adds a new Microsoft To Do task list';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const body: any = {
       displayName: args.options.name
     };
@@ -43,14 +43,14 @@ class TodoListAddCommand extends GraphCommand {
     request
       .post(requestOptions)
       .then((res: any): void => {
-        cmd.log(res);
+        logger.log(res);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

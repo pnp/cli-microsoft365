@@ -1,17 +1,15 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import config from '../../../../config';
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate,
-  CommandError
+  CommandError, CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
+import config from '../../../../config';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 import { GetExternalUsersResults } from './GetExternalUsersResults';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -44,11 +42,11 @@ class SpoExternalUserListCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
 
@@ -56,7 +54,7 @@ class SpoExternalUserListCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          cmd.log(`Retrieving information about external users...`);
+          logger.log(`Retrieving information about external users...`);
         }
 
         const position: number = parseInt(args.options.position || '0');
@@ -93,7 +91,7 @@ class SpoExternalUserListCommand extends SpoCommand {
           const results: GetExternalUsersResults = json.pop();
 
           if (results.TotalUserCount > 0) {
-            cmd.log(results.ExternalUserCollection._Child_Items_.map(e => {
+            logger.log(results.ExternalUserCollection._Child_Items_.map(e => {
               delete e._ObjectType_;
               const dateChunks: number[] = (e.WhenCreated as string)
                 .replace('/Date(', '')
@@ -108,7 +106,7 @@ class SpoExternalUserListCommand extends SpoCommand {
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -140,42 +138,40 @@ class SpoExternalUserListCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (args.options.pageSize) {
-        const pageSize: number = parseInt(args.options.pageSize);
-        if (isNaN(pageSize)) {
-          return `${args.options.pageSize} is not a valid number`;
-        }
-
-        if (pageSize < 1 || pageSize > 50) {
-          return 'pageSize must be between 1 and 50';
-        }
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.pageSize) {
+      const pageSize: number = parseInt(args.options.pageSize);
+      if (isNaN(pageSize)) {
+        return `${args.options.pageSize} is not a valid number`;
       }
 
-      if (args.options.position) {
-        const position: number = parseInt(args.options.position);
-        if (isNaN(position)) {
-          return `${args.options.position} is not a valid number`;
-        }
+      if (pageSize < 1 || pageSize > 50) {
+        return 'pageSize must be between 1 and 50';
+      }
+    }
 
-        if (position < 0) {
-          return 'position must be greater than or 0';
-        }
+    if (args.options.position) {
+      const position: number = parseInt(args.options.position);
+      if (isNaN(position)) {
+        return `${args.options.position} is not a valid number`;
       }
 
-      if (args.options.sortOrder &&
-        args.options.sortOrder !== 'asc' &&
-        args.options.sortOrder !== 'desc') {
-        return `${args.options.sortOrder} is not a valid sortOrder value. Allowed values asc|desc`;
+      if (position < 0) {
+        return 'position must be greater than or 0';
       }
+    }
 
-      if (args.options.siteUrl) {
-        return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
-      }
+    if (args.options.sortOrder &&
+      args.options.sortOrder !== 'asc' &&
+      args.options.sortOrder !== 'desc') {
+      return `${args.options.sortOrder} is not a valid sortOrder value. Allowed values asc|desc`;
+    }
 
-      return true;
-    };
+    if (args.options.siteUrl) {
+      return SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+    }
+
+    return true;
   }
 }
 

@@ -1,12 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import { CommandOption, CommandValidate } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import { ContextInfo } from '../../spo';
-import GlobalOptions from '../../../../GlobalOptions';
-import Utils from '../../../../Utils';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Cli, Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
+import { ContextInfo } from '../../spo';
 
 interface CommandArgs {
   options: Options;
@@ -27,7 +27,7 @@ class SpoPageRemoveCommand extends SpoCommand {
     return 'Removes a modern page';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let requestDigest: string = '';
     let pageName: string = args.options.name;
 
@@ -42,7 +42,7 @@ class SpoPageRemoveCommand extends SpoCommand {
           }
 
           if (this.verbose) {
-            cmd.log(`Removing page ${pageName}...`);
+            logger.log(`Removing page ${pageName}...`);
           }
 
           const requestOptions: any = {
@@ -61,11 +61,11 @@ class SpoPageRemoveCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            cmd.log(chalk.green('DONE'));
+            logger.log(chalk.green('DONE'));
           }
           cb();
         },
-          (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb)
+          (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb)
         );
     };
 
@@ -73,7 +73,7 @@ class SpoPageRemoveCommand extends SpoCommand {
       removePage();
     }
     else {
-      cmd.prompt(
+      Cli.prompt(
         {
           type: 'confirm',
           name: 'continue',
@@ -112,10 +112,8 @@ class SpoPageRemoveCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      return SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    };
+  public validate(args: CommandArgs): boolean | string {
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

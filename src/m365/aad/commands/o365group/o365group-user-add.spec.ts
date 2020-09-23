@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import teamsCommands from '../../../teams/commands';
-import Command, { CommandOption, CommandError, CommandValidate } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./o365group-user-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import teamsCommands from '../../../teams/commands';
+import commands from '../../commands';
+const command: Command = require('./o365group-user-add');
 
 describe(commands.O365GROUP_USER_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,11 +22,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -67,7 +64,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
   });
 
   it('fails validation if the groupId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
@@ -77,7 +74,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
@@ -87,7 +84,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
   });
 
   it('fails validation if neither the groupId nor teamId are provided.', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         role: 'Member'
       }
@@ -97,7 +94,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
   });
 
   it('fails validation when both groupId and teamId are specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
@@ -108,7 +105,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
   });
 
   it('fails validation when invalid role specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com',
@@ -120,7 +117,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
   });
 
   it('passes validation when valid groupId, userName and no role specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com'
@@ -131,7 +128,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
   });
 
   it('passes validation when valid groupId, userName and Owner role specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com',
@@ -143,7 +140,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
   });
 
   it('passes validation when valid groupId, userName and Member role specified', (done) => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com',
@@ -176,8 +173,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.resolve();
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(addMemberRequestIssued);
         done();
@@ -211,8 +207,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.resolve();
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
+    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(addMemberRequestIssued);
         done();
@@ -246,8 +241,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.resolve();
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } }, () => {
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } }, () => {
       try {
         assert(addMemberRequestIssued);
         done();
@@ -281,8 +275,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.resolve();
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } }, () => {
+    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com", role: "Owner" } }, () => {
       try {
         assert(addMemberRequestIssued);
         done();
@@ -315,8 +308,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.resolve();
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews.not.found@contoso.onmicrosoft.com" } }, () => {
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews.not.found@contoso.onmicrosoft.com" } }, () => {
       try {
         assert(addMemberRequestIssued === false);
         done();
@@ -337,8 +329,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "doesnotexist.matthews@contoso.onmicrosoft.com" } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "doesnotexist.matthews@contoso.onmicrosoft.com" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Resource \'doesnotexist.matthews@contoso.onmicrosoft.com\' does not exist or one of its queried reference-property objects are not present.')));
         done();
@@ -370,8 +361,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid object identifier'))); done();
       }
@@ -383,7 +373,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

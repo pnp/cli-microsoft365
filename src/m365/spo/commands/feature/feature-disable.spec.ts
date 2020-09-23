@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import sinon = require('sinon');
+import * as assert from 'assert';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-import Utils from '../../../../Utils';
+import { Logger } from '../../../../cli';
+import Command, { CommandError, CommandTypes } from '../../../../Command';
 import request from '../../../../request';
-import * as assert from 'assert';
-import Command, { CommandValidate, CommandOption, CommandTypes, CommandError } from '../../../../Command';
+import Utils from '../../../../Utils';
+import commands from '../../commands';
+import sinon = require('sinon');
 const command: Command = require('./feature-disable');
 
 describe(commands.FEATURE_DISABLE, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let requests: any[];
 
   before(() => {
@@ -22,11 +23,7 @@ describe(commands.FEATURE_DISABLE, () => {
   beforeEach(() => {
     log = [];
     requests = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -69,7 +66,7 @@ describe(commands.FEATURE_DISABLE, () => {
 
   it('fails validation if scope is not site|web', () => {
     const scope = 'list';
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: "https://contoso.sharepoint.com",
         featureId: "780ac353-eaf8-4ac2-8c47-536d93c03fd6",
@@ -80,7 +77,7 @@ describe(commands.FEATURE_DISABLE, () => {
   });
 
   it('passes validation if url and featureId is correct', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         url: "https://contoso.sharepoint.com",
         featureId: "780ac353-eaf8-4ac2-8c47-536d93c03fd6"
@@ -92,7 +89,7 @@ describe(commands.FEATURE_DISABLE, () => {
   });
 
   it('supports specifying scope', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsScopeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[scope]') > -1) {
@@ -118,7 +115,7 @@ describe(commands.FEATURE_DISABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com' } }, () => {
+    command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -154,7 +151,7 @@ describe(commands.FEATURE_DISABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com', force: true } }, () => {
+    command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com', force: true } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -190,7 +187,7 @@ describe(commands.FEATURE_DISABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com', scope: 'site' } }, () => {
+    command.action(logger, { options: { debug: true, featureId: '780ac353-eaf8-4ac2-8c47-536d93c03fd6', url: 'https://contoso.sharepoint.com', scope: 'site' } }, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(requestUrl) > -1 && r.headers.accept && r.headers.accept.indexOf('application/json') === 0) {
@@ -222,7 +219,7 @@ describe(commands.FEATURE_DISABLE, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         url: 'https://contoso.sharepoint.com',

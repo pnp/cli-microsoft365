@@ -1,8 +1,8 @@
-import commands from '../../commands';
+import { autocomplete } from '../../../../autocomplete';
+import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import AnonymousCommand from '../../../base/AnonymousCommand';
-import { autocomplete } from '../../../../autocomplete';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: GlobalOptions;
@@ -17,8 +17,8 @@ class CliCompletionClinkUpdateCommand extends AnonymousCommand {
     return 'Updates command completion for Clink (cmder)';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    cmd.log(autocomplete.getClinkCompletion());
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    logger.log(autocomplete.getClinkCompletion());
     cb();
   }
 }

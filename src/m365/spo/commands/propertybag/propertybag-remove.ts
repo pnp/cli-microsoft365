@@ -1,17 +1,16 @@
-import config from '../../../../config';
-import commands from '../../commands';
-import request from '../../../../request';
+import { Cli, Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import { SpoPropertyBagBaseCommand } from './propertybag-base';
+import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
+import SpoCommand from '../../../base/SpoCommand';
 import { ClientSvc, IdentityResponse } from '../../ClientSvc';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
+import { SpoPropertyBagBaseCommand } from './propertybag-base';
 
 export interface CommandArgs {
   options: Options;
@@ -40,9 +39,9 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeProperty = (): void => {
-      const clientSvcCommons: ClientSvc = new ClientSvc(cmd, this.debug);
+      const clientSvcCommons: ClientSvc = new ClientSvc(logger, this.debug);
 
       this
         .getRequestDigest(args.options.webUrl)
@@ -64,18 +63,18 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
         })
         .then((res: any): void => {
           if (this.verbose) {
-            cmd.log('DONE');
+            logger.log('DONE');
           }
 
           cb();
-        }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
       removeProperty();
     }
     else {
-      cmd.prompt({
+      Cli.prompt({
         type: 'confirm',
         name: 'continue',
         default: false,
@@ -143,18 +142,16 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      if (SpoCommand.isValidSharePointUrl(args.options.webUrl) !== true) {
-        return 'Missing required option url';
-      }
+  public validate(args: CommandArgs): boolean | string {
+    if (SpoCommand.isValidSharePointUrl(args.options.webUrl) !== true) {
+      return 'Missing required option url';
+    }
 
-      if (!args.options.key) {
-        return 'Missing required option key';
-      }
+    if (!args.options.key) {
+      return 'Missing required option key';
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 

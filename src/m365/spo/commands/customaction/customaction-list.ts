@@ -1,13 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import GlobalOptions from '../../../../GlobalOptions';
+import { Logger } from '../../../../cli';
 import {
-  CommandOption,
-  CommandValidate
+  CommandOption
 } from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 import { CustomAction } from './customaction';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -33,13 +32,13 @@ class SpoCustomActionListCommand extends SpoCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const scope: string = args.options.scope ? args.options.scope : 'All';
 
     ((): Promise<CustomAction[]> => {
       if (this.debug) {
-        cmd.log(`Attempt to get custom actions list with scope: ${scope}`);
-        cmd.log('');
+        logger.log(`Attempt to get custom actions list with scope: ${scope}`);
+        logger.log('');
       }
 
       if (scope && scope.toLowerCase() !== "all") {
@@ -51,15 +50,15 @@ class SpoCustomActionListCommand extends SpoCommand {
       .then((customActions: CustomAction[]): void => {
         if (customActions.length === 0) {
           if (this.verbose) {
-            cmd.log(`Custom actions not found`);
+            logger.log(`Custom actions not found`);
           }
         }
         else {
           if (args.options.output === 'json') {
-            cmd.log(customActions);
+            logger.log(customActions);
           }
           else {
-            cmd.log(customActions.map(a => {
+            logger.log(customActions.map(a => {
               return {
                 Name: a.Name,
                 Location: a.Location,
@@ -70,7 +69,7 @@ class SpoCustomActionListCommand extends SpoCommand {
           }
         }
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   private getCustomActions(options: Options): Promise<CustomAction[]> {
@@ -148,23 +147,20 @@ class SpoCustomActionListCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
+  public validate(args: CommandArgs): boolean | string {
+    if (SpoCommand.isValidSharePointUrl(args.options.url) !== true) {
+      return 'Missing required option url';
+    }
 
-      if (SpoCommand.isValidSharePointUrl(args.options.url) !== true) {
-        return 'Missing required option url';
+    if (args.options.scope) {
+      if (args.options.scope !== 'Site' &&
+        args.options.scope !== 'Web' &&
+        args.options.scope !== 'All') {
+        return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
       }
+    }
 
-      if (args.options.scope) {
-        if (args.options.scope !== 'Site' &&
-          args.options.scope !== 'Web' &&
-          args.options.scope !== 'All') {
-          return `${args.options.scope} is not a valid custom action scope. Allowed values are Site|Web|All`;
-        }
-      }
-
-      return true;
-    };
+    return true;
   }
 }
 

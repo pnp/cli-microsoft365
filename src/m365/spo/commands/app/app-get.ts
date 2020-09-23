@@ -1,14 +1,13 @@
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import {
-  CommandOption,
-  CommandValidate
-} from '../../../../Command';
-import { AppMetadata } from './AppMetadata';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+import { AppMetadata } from './AppMetadata';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
-import { CommandInstance } from '../../../../cli';
 
 interface CommandArgs {
   options: Options;
@@ -39,14 +38,14 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
     return telemetryProps;
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     let appCatalogSiteUrl: string = '';
 
     this
-      .getSpoUrl(cmd, this.debug)
+      .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<string> => {
-        return this.getAppCatalogSiteUrl(cmd, spoUrl, args);
+        return this.getAppCatalogSiteUrl(logger, spoUrl, args);
       })
       .then((appCatalogUrl: string): Promise<{ UniqueId: string }> => {
         appCatalogSiteUrl = appCatalogUrl;
@@ -56,7 +55,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
         }
 
         if (this.verbose) {
-          cmd.log(`Looking up app id for app named ${args.options.name}...`);
+          logger.log(`Looking up app id for app named ${args.options.name}...`);
         }
 
         const requestOptions: any = {
@@ -71,7 +70,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
       })
       .then((res: { UniqueId: string }): Promise<AppMetadata> => {
         if (this.verbose) {
-          cmd.log(`Retrieving information for app ${res}...`);
+          logger.log(`Retrieving information for app ${res}...`);
         }
 
         const requestOptions: any = {
@@ -85,10 +84,10 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
         return request.get(requestOptions);
       })
       .then((res: AppMetadata): void => {
-        cmd.log(res);
+        logger.log(res);
 
         cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, cmd, cb));
+      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -116,38 +115,36 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      // verify either 'tenant' or 'sitecollection' specified if scope provided
-      if (args.options.scope) {
-        const testScope: string = args.options.scope.toLowerCase();
-        if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-          return `Scope must be either 'tenant' or 'sitecollection'`
-        }
-
-        if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
-          return `You must specify appCatalogUrl when the scope is sitecollection`;
-        }
+  public validate(args: CommandArgs): boolean | string {
+    // verify either 'tenant' or 'sitecollection' specified if scope provided
+    if (args.options.scope) {
+      const testScope: string = args.options.scope.toLowerCase();
+      if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
+        return `Scope must be either 'tenant' or 'sitecollection'`
       }
 
-      if (!args.options.id && !args.options.name) {
-        return 'Specify either the id or the name';
+      if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {
+        return `You must specify appCatalogUrl when the scope is sitecollection`;
       }
+    }
 
-      if (args.options.id && args.options.name) {
-        return 'Specify either the id or the name but not both';
-      }
+    if (!args.options.id && !args.options.name) {
+      return 'Specify either the id or the name';
+    }
 
-      if (args.options.id && !Utils.isValidGuid(args.options.id)) {
-        return `${args.options.id} is not a valid GUID`;
-      }
+    if (args.options.id && args.options.name) {
+      return 'Specify either the id or the name but not both';
+    }
 
-      if (args.options.appCatalogUrl) {
-        return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
-      }
+    if (args.options.id && !Utils.isValidGuid(args.options.id)) {
+      return `${args.options.id} is not a valid GUID`;
+    }
 
-      return true;
-    };
+    if (args.options.appCatalogUrl) {
+      return SpoAppBaseCommand.isValidSharePointUrl(args.options.appCatalogUrl);
+    }
+
+    return true;
   }
 }
 

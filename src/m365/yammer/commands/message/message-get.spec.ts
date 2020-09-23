@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./message-get');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./message-get');
 
 describe(commands.YAMMER_MESSAGE_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let firstMessage: any = {"sender_id":1496550646, "replied_to_id":1496550647,"id":10123190123123,"thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1"};
   let secondMessage: any = {"sender_id":1496550640, "replied_to_id":"","id":10123190123124,"thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2"};
 
@@ -23,16 +24,12 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -59,12 +56,12 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
   });
 
   it('id must be a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 'nonumber' } });
+    const actual = command.validate({ options: { id: 'nonumber' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('id is required', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { } });
+    const actual = command.validate({ options: { } });
     assert.notStrictEqual(actual, true);
   });
 
@@ -75,9 +72,9 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { id:10123190123123, debug: true } }, (err?: any) => {
+    command.action(logger, { options: { id:10123190123123, debug: true } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].id, 10123190123123)
+        assert.strictEqual(loggerSpy.lastCall.args[0].id, 10123190123123)
         done();
       }
       catch (e) {
@@ -95,7 +92,7 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false } }, (err?: any) => {
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
@@ -113,9 +110,9 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    cmdInstance.action({ options: { debug: true, id:10123190123124, output: "json" } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, id:10123190123124, output: "json" } } as any, (err?: any) => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0].id, 10123190123124);
+        assert.strictEqual(loggerSpy.lastCall.args[0].id, 10123190123124);
         done();
       }
       catch (e) {
@@ -125,12 +122,12 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
   });
 
   it('passes validation with parameters', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { id: 10123123 }});
+    const actual = command.validate({ options: { id: 10123123 }});
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

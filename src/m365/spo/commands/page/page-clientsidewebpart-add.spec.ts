@@ -1,16 +1,17 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./page-clientsidewebpart-add');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError, CommandOption } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./page-clientsidewebpart-add');
 
 describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   const clientSideWebParts = {
     value: [
       {
@@ -47,11 +48,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -111,7 +108,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         pageName: 'home',
@@ -159,7 +156,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         pageName: 'home',
@@ -207,7 +204,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         pageName: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
@@ -250,7 +247,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -344,7 +341,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -439,7 +436,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -534,7 +531,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -669,7 +666,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -805,7 +802,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -941,7 +938,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: true,
@@ -1116,7 +1113,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -1292,7 +1289,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -1468,7 +1465,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -1644,7 +1641,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -1779,7 +1776,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -1863,7 +1860,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: true,
@@ -1983,7 +1980,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -2019,7 +2016,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -2059,7 +2056,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -2105,7 +2102,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -2239,7 +2236,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -2278,7 +2275,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -2315,7 +2312,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -2352,7 +2349,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -2400,7 +2397,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -2531,7 +2528,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: true,
@@ -2662,7 +2659,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: true,
@@ -2800,7 +2797,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     });
 
     
-    cmdInstance.action(
+    command.action(logger, 
       {
         options: {
           debug: false,
@@ -2999,14 +2996,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('fails validation if webUrl is not an absolute URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { pageName: 'page.aspx', webUrl: 'foo', webPartId: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e1' }
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webUrl is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'http://foo',
@@ -3017,14 +3014,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('fails validation if either webPartId or standardWebPart parameters are not specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com' }
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if webPartId and standardWebPart parameters are both specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3036,7 +3033,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('fails validation if webPartId value is not valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3047,7 +3044,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('fails validation if webPartProperties and webPartData are specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3060,7 +3057,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('fails validation if webPartProperties value is not valid JSON', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3072,7 +3069,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('passes validation when webPartProperties value is valid JSON', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3084,7 +3081,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('fails validation if webPartData value is not valid JSON', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3096,7 +3093,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('passes validation when webPartData value is valid JSON', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3108,14 +3105,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('fails validation if standardWebPart is not valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'Foo' }
     });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and webPartId is specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3126,14 +3123,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('passes validation when name and webURL specified, webUrl is a valid SharePoint URL and standardWebPart is specified instead of webPartId', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'BingMap' }
     });
     assert.strictEqual(actual, true);
   });
 
   it('passes validation when name has no extension', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3144,14 +3141,14 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('passes validation if standardWebPart is valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', standardWebPart: 'BingMap' }
     });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation if section has invalid (negative) value', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3163,7 +3160,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('fails validation if section has invalid (non number) value', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3175,7 +3172,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('fails validation if column has invalid (negative) value', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',
@@ -3187,7 +3184,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   });
 
   it('fails validation if column has invalid (non number) value', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         pageName: 'page.aspx',
         webUrl: 'https://contoso.sharepoint.com',

@@ -1,14 +1,15 @@
 import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { Logger } from '../../cli';
 import request from '../../request';
 import Utils from '../../Utils';
-import * as sinon from 'sinon';
-import { FolderExtensions } from './FolderExtensions'
+import { FolderExtensions } from './FolderExtensions';
 
 describe('FolderExtensions', () => {
   let folderExtensions: FolderExtensions;
   let log: any[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   let stubPostResponses: any = (
     folderAddResp: any = null
@@ -43,24 +44,24 @@ describe('FolderExtensions', () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
     Utils.restore([
       request.post,
       request.get,
-      cmdInstance.log
+      logger.log
     ]);
   });
 
   it('should reject if wrong url param', (done) => {
-    folderExtensions = new FolderExtensions(cmdInstance, true);
+    folderExtensions = new FolderExtensions(logger, true);
 
     folderExtensions.ensureFolder("abc", "abc")
       .then(res => {
@@ -76,7 +77,7 @@ describe('FolderExtensions', () => {
 
   it('should reject if empty folder param', (done) => {
 
-    folderExtensions = new FolderExtensions(cmdInstance, true);
+    folderExtensions = new FolderExtensions(logger, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "")
       .then(res => {
@@ -105,7 +106,7 @@ describe('FolderExtensions', () => {
     stubGetResponses(folderDoesNotExistErrorResp);
     stubPostResponses(folderCreationErrorResp);
 
-    folderExtensions = new FolderExtensions(cmdInstance, false);
+    folderExtensions = new FolderExtensions(logger, false);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
@@ -132,7 +133,7 @@ describe('FolderExtensions', () => {
     stubGetResponses(folderDoesNotExistErrorResp);
     stubPostResponses(folderCreationErrorResp);
 
-    folderExtensions = new FolderExtensions(cmdInstance, true);
+    folderExtensions = new FolderExtensions(logger, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
@@ -151,12 +152,12 @@ describe('FolderExtensions', () => {
     stubGetResponses(folderDoesNotExistErrorResp);
     stubPostResponses();
 
-    folderExtensions = new FolderExtensions(cmdInstance, true);
+    folderExtensions = new FolderExtensions(logger, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0], 'All sub-folders exist');
+        assert.strictEqual(loggerSpy.lastCall.args[0], 'All sub-folders exist');
         done();
 
       }, (err: any) => {
@@ -171,12 +172,12 @@ describe('FolderExtensions', () => {
     stubGetResponses(folderDoesNotExistErrorResp);
     stubPostResponses();
 
-    folderExtensions = new FolderExtensions(cmdInstance, false);
+    folderExtensions = new FolderExtensions(logger, false);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(loggerSpy.notCalled, true);
         done();
 
       }, (err: any) => {
@@ -188,12 +189,12 @@ describe('FolderExtensions', () => {
     stubPostResponses();
     stubGetResponses();
 
-    folderExtensions = new FolderExtensions(cmdInstance, true);
+    folderExtensions = new FolderExtensions(logger, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.strictEqual(cmdInstanceLogSpy.called, true);
+        assert.strictEqual(loggerSpy.called, true);
         done();
 
       }, (err: any) => {
@@ -205,12 +206,12 @@ describe('FolderExtensions', () => {
     stubPostResponses();
     stubGetResponses();
 
-    folderExtensions = new FolderExtensions(cmdInstance, false);
+    folderExtensions = new FolderExtensions(logger, false);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.strictEqual(cmdInstanceLogSpy.called, false);
+        assert.strictEqual(loggerSpy.called, false);
         done();
 
       }, (err: any) => {
@@ -225,7 +226,7 @@ describe('FolderExtensions', () => {
     });
     stubGetResponses(folderDoesNotExistErrorResp);
 
-    folderExtensions = new FolderExtensions(cmdInstance, true);
+    folderExtensions = new FolderExtensions(logger, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "/folder2/folder3")
       .then(res => {
@@ -245,7 +246,7 @@ describe('FolderExtensions', () => {
     });
     stubGetResponses(folderDoesNotExistErrorResp);
 
-    folderExtensions = new FolderExtensions(cmdInstance, true);
+    folderExtensions = new FolderExtensions(logger, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3")
       .then(res => {
@@ -264,7 +265,7 @@ describe('FolderExtensions', () => {
     });
     stubGetResponses(folderDoesNotExistErrorResp);
 
-    folderExtensions = new FolderExtensions(cmdInstance, true);
+    folderExtensions = new FolderExtensions(logger, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3")
       .then(res => {
@@ -284,7 +285,7 @@ describe('FolderExtensions', () => {
     });
     stubGetResponses(folderDoesNotExistErrorResp);
 
-    folderExtensions = new FolderExtensions(cmdInstance, true);
+    folderExtensions = new FolderExtensions(logger, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1/", "/folder2/folder3/")
       .then(res => {
@@ -304,7 +305,7 @@ describe('FolderExtensions', () => {
     });
     stubGetResponses(folderDoesNotExistErrorResp);
 
-    folderExtensions = new FolderExtensions(cmdInstance, true);
+    folderExtensions = new FolderExtensions(logger, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/site1/", "PnP1/Folder2/")
       .then(res => {
@@ -322,7 +323,7 @@ describe('FolderExtensions', () => {
     stubPostResponses();
     const getStubs: sinon.SinonStub = stubGetResponses();
 
-    folderExtensions = new FolderExtensions(cmdInstance, true);
+    folderExtensions = new FolderExtensions(logger, true);
 
     folderExtensions.ensureFolder("https://contoso.sharepoint.com/sites/Site1", "/folder2/folder3")
       .then(res => {

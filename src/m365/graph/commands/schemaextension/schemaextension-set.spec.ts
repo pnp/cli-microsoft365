@@ -1,18 +1,19 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
+import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./schemaextension-set');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as chalk from 'chalk';
+import commands from '../../commands';
+const command: Command = require('./schemaextension-set');
 
 describe(commands.SCHEMAEXTENSION_SET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -22,16 +23,12 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -84,8 +81,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: 'ext6kguklm2_TestSchemaExtension',
@@ -115,8 +111,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: true,
         id: 'ext6kguklm2_TestSchemaExtension',
@@ -128,7 +123,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith("Schema extension successfully updated."));
+        assert(loggerSpy.calledWith("Schema extension successfully updated."));
         done();
       }
       catch (e) {
@@ -146,8 +141,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         verbose: true,
         debug: false,
@@ -158,7 +152,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       }
     }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -172,8 +166,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       return Promise.reject('An error has occurred');
     });
 
-    cmdInstance.action = command.action();
-    cmdInstance.action({
+    command.action(logger, {
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -182,7 +175,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         targetTypes: 'Group',
         properties: '[{"name":"MyInt","type":"Integer"},{"name":"MyString","type":"String"}]'
       }
-    }, (err?: any) => {
+    } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
@@ -194,7 +187,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('fails validation if the owner is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -208,7 +201,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('fails validation if no update information is specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -219,7 +212,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('fails validation if properties is not valid JSON string', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -233,7 +226,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('fails validation if properties have no valid type', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -247,7 +240,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('fails validation if a specified property has missing type', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -261,7 +254,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('fails validation if a specified property has missing name', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -275,7 +268,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('fails validation if properties JSON string is not an array', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -289,7 +282,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('fails validation if status is not valid', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -302,7 +295,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('passes validation if required parameters are set and at least one property to update (description) is specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -314,7 +307,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('passes validation if the property type is Binary', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -328,7 +321,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('passes validation if the property type is Boolean', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -342,7 +335,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('passes validation if the property type is DateTime', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -356,7 +349,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('passes validation if the property type is Integer', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -370,7 +363,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('passes validation if the property type is String', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options: {
         debug: false,
         id: 'TestSchemaExtension',
@@ -384,7 +377,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {

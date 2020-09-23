@@ -1,12 +1,12 @@
-import { ContextInfo, ClientSvcResponse, ClientSvcResponseContents } from '../../spo';
-import request from '../../../../request';
-import config from '../../../../config';
-import commands from '../../commands';
+import { Logger } from '../../../../cli';
 import {
-  CommandError
+    CommandError
 } from '../../../../Command';
+import config from '../../../../config';
+import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
-import { CommandInstance } from '../../../../cli';
+import commands from '../../commands';
+import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 class SpoTenantSettingsListCommand extends SpoCommand {
   public get name(): string {
@@ -17,11 +17,11 @@ class SpoTenantSettingsListCommand extends SpoCommand {
     return 'Lists the global tenant settings';
   }
 
-  public commandAction(cmd: CommandInstance, args: any, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this
-      .getSpoAdminUrl(cmd, this.debug)
+      .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
         spoAdminUrl = _spoAdminUrl;
         return this.getRequestDigest(spoAdminUrl);
@@ -72,10 +72,10 @@ class SpoTenantSettingsListCommand extends SpoCommand {
         result['SpecialCharactersStateInFileFolderNames'] = specialCharactersState[result['SpecialCharactersStateInFileFolderNames']];
         result['LimitedAccessFileType'] = sPOLimitedAccessFileType[result['LimitedAccessFileType']];
 
-        cmd.log(result);
+        logger.log(result);
 
         cb();
-      }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 }
 

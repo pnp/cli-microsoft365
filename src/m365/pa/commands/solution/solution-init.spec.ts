@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate } from '../../../../Command';
-import * as sinon from 'sinon';
-import appInsights from '../../../../appInsights';
-const command: Command = require('./solution-init');
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as sinon from 'sinon';
+import appInsights from '../../../../appInsights';
+import { Logger } from '../../../../cli';
+import Command, { CommandOption } from '../../../../Command';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
 import TemplateInstantiator from '../../template-instantiator';
+const command: Command = require('./solution-init');
 
 describe(commands.SOLUTION_INIT, () => {
   let log: string[];
-  let cmdInstance: any;
+  let logger: Logger;
   let trackEvent: any;
   let telemetry: any;
 
@@ -23,11 +24,7 @@ describe(commands.SOLUTION_INIT, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
@@ -59,21 +56,19 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('calls telemetry', () => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
+    command.action(logger, { options: {} }, () => {
       assert(trackEvent.called);
     });
   });
 
   it('logs correct telemetry event', () => {
-    cmdInstance.action = command.action();
-    cmdInstance.action({ options: {} }, () => {
+    command.action(logger, { options: {} }, () => {
       assert.strictEqual(telemetry.name, commands.SOLUTION_INIT);
     });
   });
 
   it('supports specifying publisher name', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--publisherName') > -1) {
@@ -84,7 +79,7 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('supports specifying publisher prefix', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--publisherPrefix') > -1) {
@@ -95,90 +90,90 @@ describe(commands.SOLUTION_INIT, () => {
   });
 
   it('passes validation when valid publisherName and publisherPrefix are specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = command.validate({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation when the project directory contains relative paths', () => {
     sinon.stub(path, 'basename').callsFake(() => 'rootPath1\\.\\..\\rootPath2');
 
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the project directory equals invalid text sequences (like COM1 or LPT6)', () => {
     sinon.stub(path, 'basename').callsFake(() => 'COM1');
 
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails when the project directory name is emtpy', () => {
     sinon.stub(path, 'basename').callsFake(() => '');
 
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'prefix' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the publisherName option isn\'t specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { publisherPrefix: 'prefix' } });
+    const actual = command.validate({ options: { publisherPrefix: 'prefix' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the publisherPrefix option isn\'t specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher' } });
+    const actual = command.validate({ options: { publisherName: 'ExamplePublisher' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix is less than 2', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'p' } });
+    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'p' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix is more than 8', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'verylongprefix' } });
+    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'verylongprefix' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix starts with a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: '1prefix' } });
+    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: '1prefix' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix starts with an underscore', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: '_prefix' } });
+    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: '_prefix' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix starts with \'mscrm\'', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'mscrmpr' } });
+    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'mscrmpr' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherPrefix contains a special character', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'préfix' } });
+    const actual = command.validate({ options: { publisherName: 'ExamplePublisher', publisherPrefix: 'préfix' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherName starts with a number', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: '1ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = command.validate({ options: { publisherName: '1ExamplePublisher', publisherPrefix: 'prefix' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation when the length of publisherName contains a special character', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: 'ExamplePùblisher', publisherPrefix: 'prefix' } });
+    const actual = command.validate({ options: { publisherName: 'ExamplePùblisher', publisherPrefix: 'prefix' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the current directory doesn\'t contain any files with extension proj', () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.xml', 'file3.json'] as any);
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = command.validate({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation when the current directory contains files with extension proj', () => {
     sinon.stub(fs, 'readdirSync').callsFake(() => ['file1.exe', 'file2.cdsproj', 'file3.json'] as any);
-    const actual = (command.validate() as CommandValidate)({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
+    const actual = command.validate({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } });
     assert.notStrictEqual(actual, true);
   });
 
@@ -186,9 +181,9 @@ describe(commands.SOLUTION_INIT, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    cmdInstance.action({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, () => {
+    command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, () => {
       assert(templateInstantiate.calledTwice);
-      assert(templateInstantiate.withArgs(cmdInstance, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
+      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
     });
   });
 
@@ -196,9 +191,9 @@ describe(commands.SOLUTION_INIT, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    cmdInstance.action({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix', verbose: true } }, () => {
+    command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix', verbose: true } }, () => {
       assert(templateInstantiate.calledTwice);
-      assert(templateInstantiate.withArgs(cmdInstance, sinon.match.string, sinon.match.string, false, sinon.match.object, true).calledTwice);
+      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, true).calledTwice);
     });
   });
 
@@ -206,9 +201,9 @@ describe(commands.SOLUTION_INIT, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    cmdInstance.action({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'new' } }, () => {
+    command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'new' } }, () => {
       assert(templateInstantiate.calledTwice);
-      assert(templateInstantiate.withArgs(cmdInstance, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
+      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
     });
   });
 
@@ -227,9 +222,9 @@ describe(commands.SOLUTION_INIT, () => {
     });
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    cmdInstance.action({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, () => {
+    command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, () => {
       assert(templateInstantiate.calledTwice);
-      assert(templateInstantiate.withArgs(cmdInstance, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
+      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledTwice);
     });
   });
 
@@ -248,9 +243,9 @@ describe(commands.SOLUTION_INIT, () => {
     });
     const templateInstantiate = sinon.stub(TemplateInstantiator, 'instantiate').callsFake(() => { });
 
-    cmdInstance.action({ options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, () => {
+    command.action(logger, { options: { publisherName: '_ExamplePublisher', publisherPrefix: 'prefix' } }, () => {
       assert(templateInstantiate.calledOnce);
-      assert(templateInstantiate.withArgs(cmdInstance, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledOnce);
+      assert(templateInstantiate.withArgs(logger, sinon.match.string, sinon.match.string, false, sinon.match.object, false).calledOnce);
     });
   });
 

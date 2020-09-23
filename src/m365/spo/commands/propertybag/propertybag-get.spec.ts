@@ -1,19 +1,20 @@
-import commands from '../../commands';
-import Command, { CommandValidate, CommandOption, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./propertybag-get');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
+import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import config from '../../../../config';
-import { IdentityResponse, ClientSvc } from '../../ClientSvc';
+import { ClientSvc, IdentityResponse } from '../../ClientSvc';
+import commands from '../../commands';
+const command: Command = require('./propertybag-get');
 
 describe(commands.PROPERTYBAG_GET, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
   let stubAllPostRequests: any = (
     requestObjectIdentityResp: any = null,
     getFolderPropertyBagResp: any = null,
@@ -91,16 +92,12 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -141,10 +138,10 @@ describe(commands.PROPERTYBAG_GET, () => {
       serverRelativeUrl: "\u002f"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
-        assert(getWebPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', cmdInstance));
+        assert(getWebPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', logger));
         assert(getWebPropertyBagSpy.calledOnce === true);
         done();
       }
@@ -176,10 +173,10 @@ describe(commands.PROPERTYBAG_GET, () => {
       serverRelativeUrl: "\u002fsites\u002ftest"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
-        assert(getWebPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com/sites/test', cmdInstance));
+        assert(getWebPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com/sites/test', logger));
         assert(getWebPropertyBagSpy.calledOnce === true);
         done();
       }
@@ -202,10 +199,10 @@ describe(commands.PROPERTYBAG_GET, () => {
       serverRelativeUrl: "\u002f"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
-        assert(getFolderPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', '/', cmdInstance));
+        assert(getFolderPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com', '/', logger));
         assert(getFolderPropertyBagSpy.calledOnce === true);
         done();
       }
@@ -238,10 +235,10 @@ describe(commands.PROPERTYBAG_GET, () => {
       serverRelativeUrl: "\u002fsites\u002ftest"
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
-        assert(getFolderPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com/sites/test', '/', cmdInstance));
+        assert(getFolderPropertyBagSpy.calledWith(objIdentity, 'https://contoso.sharepoint.com/sites/test', '/', logger));
         assert(getFolderPropertyBagSpy.calledOnce === true);
         done();
       }
@@ -259,7 +256,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       folder: '/'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(getFolderPropertyBagSpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc')));
@@ -279,7 +276,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       debug: false
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(getWebPropertyBagSpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('abc1')));
@@ -301,7 +298,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       verbose: true
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(getFolderPropertyBagSpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getFolderPropertyBag error')));
@@ -321,7 +318,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       webUrl: 'https://contoso.sharepoint.com'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(getWebPropertyBagSpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('getWebPropertyBag error')));
@@ -342,7 +339,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       webUrl: 'https://contoso.sharepoint.com'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(requestObjectIdentitySpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('requestObjectIdentity error')));
@@ -363,7 +360,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       webUrl: 'https://contoso.sharepoint.com'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert(requestObjectIdentitySpy.calledOnce === true);
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
@@ -385,7 +382,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       folder: '/'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
@@ -400,13 +397,12 @@ describe(commands.PROPERTYBAG_GET, () => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
 
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error) }));
-    cmdInstance.action = command.action();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc unknown error')));
         done();
@@ -426,12 +422,12 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
         assert(filterByKeySpy.calledOnce === true);
 
-        const out = cmdInstanceLogSpy.lastCall.args[0];
+        const out = loggerSpy.lastCall.args[0];
         assert.strictEqual(out, '{1C5271C8-DB93-459E-9C18-68FC33EFD856}');
         done();
       }
@@ -450,12 +446,12 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_timelastmodified' //\/Date(2017,10,7,11,29,31,0)\/
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
         assert(filterByKeySpy.calledOnce === true);
 
-        const out = cmdInstanceLogSpy.lastCall.args[0];
+        const out = loggerSpy.lastCall.args[0];
         const expectedDate = new Date(2017, 10, 7, 11, 29, 31, 0);
         assert.strictEqual(out.getUTCMonth(), expectedDate.getUTCMonth(), 'getUTCMonth');
         assert.strictEqual(out.getUTCFullYear(), expectedDate.getUTCFullYear(), 'getUTCFullYear');
@@ -481,12 +477,12 @@ describe(commands.PROPERTYBAG_GET, () => {
       output: 'json'
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
         assert(filterByKeySpy.calledOnce === true);
 
-        const out = cmdInstanceLogSpy.lastCall.args[0];
+        const out = loggerSpy.lastCall.args[0];
         assert.strictEqual(Object.prototype.toString.call(out), '[object Date]');
         const expectedDate = new Date(2017, 10, 7, 11, 29, 31, 0);
         assert.strictEqual(out.getUTCMonth(), expectedDate.getUTCMonth(), 'getUTCMonth');
@@ -512,12 +508,12 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_level'
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
         assert(filterByKeySpy.calledOnce === true);
 
-        const out = cmdInstanceLogSpy.lastCall.args[0];
+        const out = loggerSpy.lastCall.args[0];
         assert.strictEqual(out, 1);
         done();
       }
@@ -535,9 +531,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_folderitemcount'
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.lastCall.args[0], 0);
+        assert.strictEqual(loggerSpy.lastCall.args[0], 0);
         done();
       }
       catch (e) {
@@ -555,11 +551,11 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_candeleteversion'
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         assert(filterByKeySpy.calledOnce === true);
         
-        const out = cmdInstanceLogSpy.lastCall.args[0];
+        const out = loggerSpy.lastCall.args[0];
         assert.strictEqual(out, true);
         done();
       }
@@ -578,10 +574,10 @@ describe(commands.PROPERTYBAG_GET, () => {
       verbose: true
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
-        const out = cmdInstanceLogSpy.lastCall.args[0];
+        const out = loggerSpy.lastCall.args[0];
         assert.strictEqual(out, 'Property not found.');
         done();
       }
@@ -600,9 +596,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       verbose: false
     }
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(cmdInstanceLogSpy.notCalled, true);
+        assert.strictEqual(loggerSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -619,7 +615,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. _ObjectIdentity_ not found')));
         done();
@@ -638,7 +634,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. Properties not found')));
         done();
@@ -656,7 +652,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Cannot proceed. AllProperties not found')));
         done();
@@ -674,7 +670,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     }
 
-    cmdInstance.action({ options: options }, (err?: any) => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('error1')));
         done();
@@ -693,7 +689,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     };
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         const secondCall = postRequestSpy.getCalls()[0];
         assert(secondCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })), 'url');
@@ -715,7 +711,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       key: 'vti_parentid'
     };
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
@@ -738,7 +734,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       folder: '/'
     };
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
         const lastCall = postRequestSpy.lastCall;
@@ -772,7 +768,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       folder: '/'
     };
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
         const lastCall = postRequestSpy.lastCall;
@@ -796,7 +792,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       folder: '/'
     };
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
 
       try {
         const lastCall = postRequestSpy.lastCall;
@@ -830,7 +826,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       folder: '/'
     };
 
-    cmdInstance.action({ options: options }, () => {
+    command.action(logger, { options: options } as any, () => {
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/sites/test/_vti_bin/client.svc/ProcessQuery' })));
@@ -846,7 +842,7 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsVerboseOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -857,7 +853,7 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('supports specifying folder', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsScopeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('[folder]') > -1) {
@@ -869,7 +865,7 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   it('doesn\'t fail if the parent doesn\'t define options', () => {
     sinon.stub(Command.prototype, 'options').callsFake(() => { return []; });
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     Utils.restore(Command.prototype.options);
     assert(options.length > 0);
   });
@@ -894,7 +890,7 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           webUrl: 'foo',
@@ -905,7 +901,7 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('passes validation when the url and key options specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           webUrl: "https://contoso.sharepoint.com",
@@ -916,7 +912,7 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('passes validation when the url, key and folder options specified', () => {
-    const actual = (command.validate() as CommandValidate)({
+    const actual = command.validate({
       options:
         {
           webUrl: "https://contoso.sharepoint.com",
@@ -928,7 +924,7 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('doesn\'t fail validation if the optional folder option not specified', () => {
-    const actual = (command.validate() as CommandValidate)(
+    const actual = command.validate(
       {
         options:
           {

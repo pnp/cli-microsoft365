@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 const omelette: (template: string) => Omelette = require('omelette');
-import * as os from 'os';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
 import { Cli } from './cli/Cli';
 import { CommandInfo } from './cli/CommandInfo';

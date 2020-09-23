@@ -1,17 +1,18 @@
-import commands from '../../commands';
-import Command, { CommandOption, CommandValidate, CommandError } from '../../../../Command';
+import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
-const command: Command = require('./oauth2grant-list');
-import * as assert from 'assert';
+import { Logger } from '../../../../cli';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import commands from '../../commands';
+const command: Command = require('./oauth2grant-list');
 
 describe(commands.OAUTH2GRANT_LIST, () => {
   let log: string[];
-  let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
+  let logger: Logger;
+  let loggerSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,16 +22,12 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   beforeEach(() => {
     log = [];
-    cmdInstance = {
-      commandWrapper: {
-        command: command.name
-      },
-      action: command.action(),
+    logger = {
       log: (msg: string) => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
+    loggerSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -89,9 +86,9 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: true, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
+    command.action(logger, { options: { debug: true, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             objectId: '50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw',
             resourceId: '1c444f1a-bba3-42f2-999f-4106c5b1c20c',
@@ -145,9 +142,9 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
+    command.action(logger, { options: { debug: false, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([
+        assert(loggerSpy.calledWith([
           {
             objectId: '50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw',
             resourceId: '1c444f1a-bba3-42f2-999f-4106c5b1c20c',
@@ -201,9 +198,9 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.calledWith([{
+        assert(loggerSpy.calledWith([{
           "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
           "consentType": "AllPrincipals",
           "expiryTime": "9999-12-31T23:59:59.9999999",
@@ -248,9 +245,9 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    cmdInstance.action({ options: { debug: false, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
+    command.action(logger, { options: { debug: false, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
       try {
-        assert(cmdInstanceLogSpy.notCalled);
+        assert(loggerSpy.notCalled);
         done();
       }
       catch (e) {
@@ -273,7 +270,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       });
     });
 
-    cmdInstance.action({ options: { debug: false, clientId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, (err?: any) => {
+    command.action(logger, { options: { debug: false, clientId: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
         done();
@@ -285,17 +282,17 @@ describe(commands.OAUTH2GRANT_LIST, () => {
   });
 
   it('fails validation if the clientId is not a valid GUID', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { clientId: '123' } });
+    const actual = command.validate({ options: { clientId: '123' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes validation when the clientId option specified', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320' } });
+    const actual = command.validate({ options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320' } });
     assert.strictEqual(actual, true);
   });
 
   it('supports debug mode', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
@@ -306,7 +303,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
   });
 
   it('supports specifying clientId', () => {
-    const options = (command.options() as CommandOption[]);
+    const options = command.options();
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--clientId') > -1) {

@@ -1,12 +1,12 @@
-import request from '../../../../request';
-import commands from '../../commands';
-import {
-  CommandOption, CommandValidate
-} from '../../../../Command';
-import SpoCommand from '../../../base/SpoCommand';
-import GlobalOptions from '../../../../GlobalOptions';
 import * as chalk from 'chalk';
-import { CommandInstance } from '../../../../cli';
+import { Logger } from '../../../../cli';
+import {
+  CommandOption
+} from '../../../../Command';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import SpoCommand from '../../../base/SpoCommand';
+import commands from '../../commands';
 
 interface CommandArgs {
   options: Options;
@@ -34,7 +34,7 @@ class SpoAppPageAddCommand extends SpoCommand {
     return 'Creates a single-part app page';
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${args.options.webUrl}/_api/sitepages/Pages/CreateFullPageApp`,
       headers: {
@@ -52,14 +52,14 @@ class SpoAppPageAddCommand extends SpoCommand {
     request
       .post(requestOptions)
       .then((res: any): void => {
-        cmd.log(res);
+        logger.log(res);
 
         if (this.verbose) {
-          cmd.log(chalk.green('DONE'));
+          logger.log(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, cmd, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -86,17 +86,15 @@ class SpoAppPageAddCommand extends SpoCommand {
     return options.concat(parentOptions);
   }
 
-  public validate(): CommandValidate {
-    return (args: CommandArgs): boolean | string => {
-      try {
-        JSON.parse(args.options.webPartData);
-      }
-      catch (e) {
-        return `Specified webPartData is not a valid JSON string. Error: ${e}`;
-      }
+  public validate(args: CommandArgs): boolean | string {
+    try {
+      JSON.parse(args.options.webPartData);
+    }
+    catch (e) {
+      return `Specified webPartData is not a valid JSON string. Error: ${e}`;
+    }
 
-      return true;
-    };
+    return true;
   }
 }
 
