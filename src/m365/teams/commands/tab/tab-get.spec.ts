@@ -236,8 +236,7 @@ describe(commands.TEAMS_TAB_GET, () => {
           }
         });
       }
-      done();
-      return Promise.reject('Invalid request');
+      return Promise.reject('Channel id is not in a valid format: 29:00000000000000000000000000000000@thread.skype');
     });
 
     cmdInstance.action = command.action();
@@ -333,6 +332,7 @@ describe(commands.TEAMS_TAB_GET, () => {
   it('fails when multiple teams with same name exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+        done();
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 2,
@@ -436,7 +436,7 @@ describe(commands.TEAMS_TAB_GET, () => {
         return Promise.resolve({ value: [] });
       }
       done();
-      return Promise.reject('Invalid request');
+      return Promise.reject('The specified tab does not exist in the Microsoft Teams team channel');
     });
 
     cmdInstance.action = command.action();

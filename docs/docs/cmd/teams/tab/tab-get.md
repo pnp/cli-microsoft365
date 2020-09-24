@@ -13,9 +13,9 @@ teams tab get [options]
 Option|Description
 ------|-----------
 `--help`| output usage information
-`-i, --teamId <teamId>`|The ID of the Microsoft Teams team where the tab is located. Specify either teamId or teamName but not both
+`-i, --teamId [teamId]`|The ID of the Microsoft Teams team where the tab is located. Specify either teamId or teamName but not both
 `--teamName [teamName]`|The display name of the Microsoft Teams team where the tab is located. Specify either teamId or teamName but not both
-`-c, --channelId <channelId>`|The ID of the Microsoft Teams channel where the tab is located. Specify either channelId or channelName but not both
+`-c, --channelId [channelId]`|The ID of the Microsoft Teams channel where the tab is located. Specify either channelId or channelName but not both
 `--channelName [channelName]`|The display name of the Microsoft Teams channel where the tab is located. Specify either channelId or channelName but not both
 `-t, --tabId [tabId]`|The ID of the Microsoft Teams tab. Specify either tabId or tabName but not both
 `--tabName [tabName]`|The display name of the Microsoft Teams tab. Specify either tabId or tabName but not both

@@ -36,23 +36,23 @@ class TeamsTabGetCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.teamId = args.options.teamId;
-    telemetryProps.teamName = args.options.teamName;
-    telemetryProps.channelId = args.options.channelId;
-    telemetryProps.channelName = args.options.channelName;
-    telemetryProps.tabId = args.options.tabId;
-    telemetryProps.tabName = args.options.tabName;
+    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
+    telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
+    telemetryProps.channelId = typeof args.options.channelId !== 'undefined';
+    telemetryProps.channelName = typeof args.options.channelName !== 'undefined';
+    telemetryProps.tabId = typeof args.options.tabId !== 'undefined';
+    telemetryProps.tabName = typeof args.options.tabName !== 'undefined';
     return telemetryProps;
   }
 
-  public getTeamId(teamName: string): Promise<string> {
-    if (Utils.isValidGuid(teamName as string)) {
-      return Promise.resolve(teamName);
+  private getTeamId(args: CommandArgs): Promise<string> {
+    if (args.options.teamId) {
+      return Promise.resolve(args.options.teamId);
     }
 
     return new Promise<string>((resolve: (result: string) => void, reject: (error: any) => void): void => {
       const teamRequestOptions: any = {
-        url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(teamName)}'`,
+        url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(args.options.teamName)}'`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
@@ -65,11 +65,11 @@ class TeamsTabGetCommand extends GraphCommand {
           const teamItem: Team | undefined = res.value[0];
 
           if (res.value.length > 1) {
-            Promise.reject(`Multiple Microsoft Teams team found with ids ${res.value.map(x => x.id)}`);
+            return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.tabName} found: ${res.value.map(x => x.id)}`);
           }
 
           if (!teamItem) {
-            Promise.reject(`The specified team does not exist in the Microsoft Teams`);
+            return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
           }
 
           const teamId: string = res.value[0].id;
@@ -84,14 +84,14 @@ class TeamsTabGetCommand extends GraphCommand {
     });
   }
 
-  public getChannelId(teamId: string, channelName: string): Promise<string> {
-    if (Utils.isValidTeamsChannelId(channelName as string)) {
-      return Promise.resolve(channelName);
+  private getChannelId(args: CommandArgs): Promise<string> {
+    if (args.options.channelId) {
+      return Promise.resolve(args.options.channelId);
     }
 
     return new Promise((resolve: (result: string) => void, reject: (error: any) => void): void => {
       const channelRequestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(channelName)}'`,
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName)}'`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
@@ -119,14 +119,14 @@ class TeamsTabGetCommand extends GraphCommand {
     });
   }
 
-  public getTabId(teamId: string, channelId: string, tabName: string): Promise<string> {
-    if (Utils.isValidGuid(tabName as string)) {
-      return Promise.resolve(tabName);
+  private getTabId(args: CommandArgs): Promise<string> {
+    if (args.options.tabId) {
+      return Promise.resolve(args.options.tabId);
     }
 
     return new Promise((resolve: (result: string) => void, reject: (error: any) => void): void => {
       const channelRequestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}/tabs?$filter=displayName eq '${encodeURIComponent(tabName)}'`,
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}/tabs?$filter=displayName eq '${encodeURIComponent(args.options.tabName)}'`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
@@ -154,25 +154,20 @@ class TeamsTabGetCommand extends GraphCommand {
     });
   }
 
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {    
-    let teamInput: string = args.options.teamName ? args.options.teamName : args.options.teamId;
-    let channelInput: string = args.options.channelName ? args.options.channelName : args.options.channelId;
-    let tabInput: string = args.options.tabName ? args.options.tabName : args.options.tabId;
-    let teamId: string;
-    let channelId: string;
-
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
     this
-      .getTeamId(teamInput)
+      .getTeamId(args)
       .then((_teamId: string) => {
-        teamId = _teamId;
-        return this.getChannelId(teamId, channelInput);
+        args.options.teamId = _teamId;  
+        return this.getChannelId(args);
       })
       .then((_channelId: string) => {
-        channelId = _channelId;
-        return this.getTabId(teamId, channelId, tabInput);
+        args.options.channelId = _channelId;
+        return this.getTabId(args);
       })
       .then((tabId: string) => {
-        const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}/tabs/${encodeURIComponent(tabId)}`;
+        
+        const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}/tabs/${encodeURIComponent(tabId)}`;
 
         const requestOptions: any = {
           url: endpoint,
@@ -199,27 +194,27 @@ class TeamsTabGetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
+        option: '-i, --teamId [teamId]',
         description: 'The ID of the Microsoft Teams team where the tab is located. Specify either teamId or teamName but not both'
       },
       {
-        option: '--teamName <teamName>',
+        option: '--teamName [teamName]',
         description: 'The display name of the Microsoft Teams team where the tab is located. Specify either teamId or teamName but not both'
       },
       {
-        option: '-c, --channelId <channelId>',
+        option: '-c, --channelId [channelId]',
         description: 'The ID of the Microsoft Teams channel where the tab is located. Specify either channelId or channelName but not both'
       },
       {
-        option: '--channelName <channelName>',
+        option: '--channelName [channelName]',
         description: 'The display name of the Microsoft Teams channel where the tab is located. Specify either channelId or channelName but not both'
       },
       {
-        option: '-t, --tabId <tabId>',
+        option: '-t, --tabId [tabId]',
         description: 'The ID of the Microsoft Teams tab. Specify either tabId or tabName but not both'
       },
       {
-        option: '--tabName <tabName>',
+        option: '--tabName [tabName]',
         description: 'The display name of the Microsoft Teams tab. Specify either tabId or tabName but not both'
       }
     ];
