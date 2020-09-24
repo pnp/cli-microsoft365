@@ -6,6 +6,7 @@
 
 **Microsoft 365:**
 
+- [tenant service list](../cmd/tenant/service/service-list.md) - gets services available in Microsoft 365 [#1740](https://github.com/pnp/cli-microsoft365/issues/1740)
 - [tenant service message list](../cmd/tenant/service/service-message-list.md) - gets service messages Microsoft 365 [#1741](https://github.com/pnp/cli-microsoft365/issues/1741)
 - [tenant service report historicalservicestatus](../cmd/tenant/service/service-report-historicalservicestatus.md) - gets the historical service status of Microsoft 365 Services of the last 7 days [#1742](https://github.com/pnp/cli-microsoft365/issues/1742)
 
