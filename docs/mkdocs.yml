@@ -239,6 +239,7 @@ nav:
         - hubsite theme sync: 'cmd/spo/hubsite/hubsite-theme-sync.md'
         - hubsite unregister: 'cmd/spo/hubsite/hubsite-unregister.md'
       - knowledgehub:
+        - knowledgehub get: 'cmd/spo/knowledgehub/knowledgehub-get.md'
         - knowledgehub remove: 'cmd/spo/knowledgehub/knowledgehub-remove.md'
         - knowledgehub set: 'cmd/spo/knowledgehub/knowledgehub-set.md'
       - list:
