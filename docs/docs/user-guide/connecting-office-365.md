@@ -130,7 +130,7 @@ CLI for Microsoft 365 uses the _PnP Microsoft 365 Management Shell_ Azure AD app
 To re-consent the _PnP Microsoft 365 Management Shell_ application in your Azure AD, in the command line execute:
 
 ```sh
-m365 o365 cli reconsent
+m365 cli reconsent
 ```
 
 CLI for Microsoft 365 will provide you with a URL that you should open in the web browser and sign in with your organizational account. After authenticating, Azure AD will prompt you to approve the new set of permissions. Once you approved the permissions, you will be redirected to an empty page. You can now use all commands in the CLI for Microsoft 365.
