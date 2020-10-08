@@ -17,15 +17,19 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  teamId: string;
-  teamName: string;
-  channelId: string;
-  channelName: string;
-  tabId: string;
-  tabName: string;
+  teamId?: string;
+  teamName?: string;
+  channelId?: string;
+  channelName?: string;
+  tabId?: string;
+  tabName?: string;
 }
 
 class TeamsTabGetCommand extends GraphCommand {
+  private teamId: string = "";
+  private channelId: string = "";
+  private tabId: string = "";
+  
   public get name(): string {
     return `${commands.TEAMS_TAB_GET}`;
   }
@@ -52,7 +56,7 @@ class TeamsTabGetCommand extends GraphCommand {
 
     return new Promise<string>((resolve: (result: string) => void, reject: (error: any) => void): void => {
       const teamRequestOptions: any = {
-        url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(args.options.teamName)}'`,
+        url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(String(args.options.teamName))}'`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
@@ -91,7 +95,7 @@ class TeamsTabGetCommand extends GraphCommand {
 
     return new Promise((resolve: (result: string) => void, reject: (error: any) => void): void => {
       const channelRequestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName)}'`,
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(String(this.teamId))}/channels?$filter=displayName eq '${encodeURIComponent(String(args.options.channelName))}'`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
@@ -126,7 +130,7 @@ class TeamsTabGetCommand extends GraphCommand {
 
     return new Promise((resolve: (result: string) => void, reject: (error: any) => void): void => {
       const channelRequestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}/tabs?$filter=displayName eq '${encodeURIComponent(args.options.tabName)}'`,
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(String(this.teamId))}/channels/${encodeURIComponent(String(this.channelId))}/tabs?$filter=displayName eq '${encodeURIComponent(String(args.options.tabName))}'`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
@@ -158,16 +162,15 @@ class TeamsTabGetCommand extends GraphCommand {
     this
       .getTeamId(args)
       .then((_teamId: string) => {
-        args.options.teamId = _teamId;  
+        this.teamId = _teamId;  
         return this.getChannelId(args);
       })
       .then((_channelId: string) => {
-        args.options.channelId = _channelId;
+        this.channelId = _channelId;
         return this.getTabId(args);
       })
-      .then((tabId: string) => {
-        
-        const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${encodeURIComponent(args.options.channelId)}/tabs/${encodeURIComponent(tabId)}`;
+      .then((tabId: string) => {        
+        const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(String(this.teamId))}/channels/${encodeURIComponent(String(this.channelId))}/tabs/${encodeURIComponent(tabId)}`;
 
         const requestOptions: any = {
           url: endpoint,
@@ -226,7 +229,7 @@ class TeamsTabGetCommand extends GraphCommand {
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
       if (args.options.teamId && args.options.teamName) {
-        return 'Specify either "teamId" or "teamName", but not both.';
+        return 'Specify either teamId or teamName, but not both.';
       }
 
       if (!args.options.teamId && !args.options.teamName) {
@@ -238,7 +241,7 @@ class TeamsTabGetCommand extends GraphCommand {
       }
 
       if (args.options.channelId && args.options.channelName) {
-        return 'Specify either "channelId" or "channelName", but not both.';
+        return 'Specify either channelId or channelName, but not both.';
       }
 
       if (!args.options.channelId && !args.options.channelName) {
@@ -250,7 +253,7 @@ class TeamsTabGetCommand extends GraphCommand {
       }
 
       if (args.options.tabId && args.options.tabName) {
-        return 'Specify either "tabId" or "tabName", but not both.';
+        return 'Specify either tabId or tabName, but not both.';
       }
 
       if (!args.options.tabId && !args.options.tabName) {
