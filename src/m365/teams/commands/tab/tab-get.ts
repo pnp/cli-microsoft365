@@ -28,7 +28,6 @@ interface Options extends GlobalOptions {
 class TeamsTabGetCommand extends GraphCommand {
   private teamId: string = "";
   private channelId: string = "";
-  private tabId: string = "";
   
   public get name(): string {
     return `${commands.TEAMS_TAB_GET}`;

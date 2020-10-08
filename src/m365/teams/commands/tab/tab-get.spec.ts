@@ -275,7 +275,6 @@ describe(commands.TEAMS_TAB_GET, () => {
           }
         });
       }
-      done();
       return Promise.reject('Invalid request');
     });
 
@@ -292,7 +291,6 @@ describe(commands.TEAMS_TAB_GET, () => {
         assert(cmdInstanceLogSpy.calledWith(
           "https://teams.microsoft.com/l/entity/00000000-0000-0000-0000-000000000000/_djb2_msteams_prefix_00000000-0000-0000-0000-000000000000?label=TeamsTab&context=%7b%0d%0a++%22canvasUrl%22%3a+%22https%3a%2f%2fcontoso.sharepoint.com%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fTeamsLogon.aspx%3fSPFX%3dtrue%26dest%3d%2fsites%2fPrototypeTeam%2f_layouts%2f15%2fteamshostedapp.aspx%253Flist%3d7d7f911a-bf19-46a0-86d9-187c3f32cce2%2526id%3d2%2526webPartInstanceId%3d1c8e5fda-7fd7-416f-9930-b3e90f009ea5%22%2c%0d%0a++%22channelId%22%3a+%2219%3000000000000000000000000000000008%40thread.skype%22%2c%0d%0a++%22subEntityId%22%3a+null%0d%0a%7d&groupId=00000000-0000-0000-0000-000000000000&tenantId=de348bc7-1aeb-4406-8cb3-97db021cadb4"
         ));
-        done();
       }
       catch (e) {
         done(e);
@@ -303,10 +301,8 @@ describe(commands.TEAMS_TAB_GET, () => {
   it('fails to get team when team does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
-        done();
         return Promise.resolve({ value: [] });
       }
-      done();
       return Promise.reject('Invalid request');
     });
 
@@ -332,7 +328,6 @@ describe(commands.TEAMS_TAB_GET, () => {
   it('fails when multiple teams with same name exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
-        done();
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 2,
@@ -377,7 +372,6 @@ describe(commands.TEAMS_TAB_GET, () => {
         }
         );
       }
-      done();
       return Promise.reject('Invalid request');
     });
 
@@ -403,10 +397,8 @@ describe(commands.TEAMS_TAB_GET, () => {
   it('fails to get channel when channel does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/channels?$filter=displayName eq '`) > -1) {
-        done();
         return Promise.resolve({ value: [] });
       }
-      done();
       return Promise.reject('Invalid request');
     });
 
@@ -432,10 +424,8 @@ describe(commands.TEAMS_TAB_GET, () => {
   it('fails to get tab when tab does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/tabs?$filter=displayName eq '`) > -1) {
-        done();
         return Promise.resolve({ value: [] });
       }
-      done();
       return Promise.reject('The specified tab does not exist in the Microsoft Teams team channel');
     });
 
@@ -592,7 +582,6 @@ describe(commands.TEAMS_TAB_GET, () => {
       }
 
       if ((opts.url as string).indexOf(`/tabs?$filter=displayName eq '`) > -1) {
-        done();
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('a3e044e8-7532-44a2-90d4-fe4ac19bc9a6')/channels('19%3A7b6aabe5c04d4a12b813f9272b0774f8%40thread.skype')/tabs(teamsApp())/$entity",
           "id": "1432c9da-8b9c-4602-9248-e0800f3e3f07",
@@ -607,8 +596,6 @@ describe(commands.TEAMS_TAB_GET, () => {
           }
         });
       }
-
-      done();
       return Promise.reject('Invalid request');
     });
 
