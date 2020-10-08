@@ -1,19 +1,19 @@
-import config from "../../../../config";
-import commands from "../../commands";
-import GlobalOptions from "../../../../GlobalOptions";
-import request from "../../../../request";
-import { CommandOption, CommandValidate } from "../../../../Command";
-import SpoCommand from "../../../base/SpoCommand";
+import config from '../../../../config';
+import commands from '../../commands';
+import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
+import { CommandOption, CommandValidate } from '../../../../Command';
+import SpoCommand from '../../../base/SpoCommand';
 import {
   ContextInfo,
   ClientSvcResponse,
   ClientSvcResponseContents,
-} from "../../spo";
-import * as fs from "fs";
-import * as path from "path";
-import Utils from "../../../../Utils";
+} from '../../spo';
+import * as fs from 'fs';
+import * as path from 'path';
+import Utils from '../../../../Utils';
 
-const vorpal: Vorpal = require("../../../../vorpal-init");
+const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
   options: Options;
@@ -31,7 +31,7 @@ class SpoThemeSetCommand extends SpoCommand {
   }
 
   public get description(): string {
-    return "Add or update a theme";
+    return 'Add or update a theme';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -45,7 +45,7 @@ class SpoThemeSetCommand extends SpoCommand {
     args: CommandArgs,
     cb: () => void
   ): void {
-    let spoAdminUrl: string = "";
+    let spoAdminUrl: string = '';
 
     this.getSpoAdminUrl(cmd, this.debug)
       .then(
@@ -62,11 +62,11 @@ class SpoThemeSetCommand extends SpoCommand {
             cmd.log(`Adding theme from ${fullPath} to tenant...`);
           }
 
-          const palette: any = JSON.parse(fs.readFileSync(fullPath, "utf8"));
+          const palette: any = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
 
           if (this.debug) {
-            cmd.log("");
-            cmd.log("Palette");
+            cmd.log('');
+            cmd.log('Palette');
             cmd.log(JSON.stringify(palette));
           }
 
@@ -75,17 +75,16 @@ class SpoThemeSetCommand extends SpoCommand {
           const requestOptions: any = {
             url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
             headers: {
-              "X-RequestDigest": res.FormDigestValue,
+              'X-RequestDigest': res.FormDigestValue,
             },
-            body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${
-              config.applicationName
-            }" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">${Utils.escapeXml(
-              args.options.name
-            )}</Parameter><Parameter Type="String">{"isInverted":${isInverted},"name":"${Utils.escapeXml(
-              args.options.name
-            )}","palette":${JSON.stringify(
-              palette
-            )}}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`,
+            body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName
+              }" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="UpdateTenantTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">${Utils.escapeXml(
+                args.options.name
+              )}</Parameter><Parameter Type="String">{"isInverted":${isInverted},"name":"${Utils.escapeXml(
+                args.options.name
+              )}","palette":${JSON.stringify(
+                palette
+              )}}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/></ObjectPaths></Request>`,
           };
 
           return request.post(requestOptions);
@@ -95,12 +94,12 @@ class SpoThemeSetCommand extends SpoCommand {
         (res: string): Promise<void> => {
           const json: ClientSvcResponse = JSON.parse(res);
           const contents: ClientSvcResponseContents = json.find((x) => {
-            return x["ErrorInfo"];
+            return x['ErrorInfo'];
           });
 
           if (contents && contents.ErrorInfo) {
             return Promise.reject(
-              contents.ErrorInfo.ErrorMessage || "ClientSvc unknown error"
+              contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error'
             );
           }
           return Promise.resolve();
@@ -109,7 +108,7 @@ class SpoThemeSetCommand extends SpoCommand {
       .then(
         (): void => {
           if (this.verbose) {
-            cmd.log(vorpal.chalk.green("DONE"));
+            cmd.log(vorpal.chalk.green('DONE'));
           }
 
           cb();
@@ -121,16 +120,16 @@ class SpoThemeSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "-n, --name <name>",
-        description: "Name of the theme to add or update",
+        option: '-n, --name <name>',
+        description: 'Name of the theme to add or update',
       },
       {
-        option: "-p, --filePath <filePath>",
-        description: "Absolute or relative path to the theme json file",
+        option: '-p, --filePath <filePath>',
+        description: 'Absolute or relative path to the theme json file',
       },
       {
-        option: "--isInverted",
-        description: "Set to specify that the theme is inverted",
+        option: '--isInverted',
+        description: 'Set to specify that the theme is inverted',
       },
     ];
 
@@ -141,11 +140,11 @@ class SpoThemeSetCommand extends SpoCommand {
   public validate(): CommandValidate {
     return (args: CommandArgs): boolean | string => {
       if (!args.options.name) {
-        return "Required parameter name missing";
+        return 'Required parameter name missing';
       }
 
       if (!args.options.filePath) {
-        return "Required parameter filePath missing";
+        return 'Required parameter filePath missing';
       }
 
       const fullPath: string = path.resolve(args.options.filePath);
@@ -159,7 +158,7 @@ class SpoThemeSetCommand extends SpoCommand {
       }
 
       if (!Utils.isValidTheme(fs.readFileSync(fullPath, "utf-8"))) {
-        return "File contents is not a valid theme";
+        return 'File contents is not a valid theme';
       }
 
       return true;
@@ -171,20 +170,18 @@ class SpoThemeSetCommand extends SpoCommand {
     log(vorpal.find(this.name).helpInformation());
     log(
       `  ${chalk.yellow(
-        "Important:"
+        'Important:'
       )} to use this command you have to have permissions to access
     the tenant admin site.
     
   Examples:
   
     Add or update a theme from a theme JSON file
-      ${
-        commands.THEME_SET
+      ${commands.THEME_SET
       } --name Contoso-Blue --filePath /Users/rjesh/themes/contoso-blue.json
 
     Add or update an inverted theme from a theme JSON file
-      ${
-        commands.THEME_SET
+      ${commands.THEME_SET
       } --name Contoso-Blue --filePath /Users/rjesh/themes/contoso-blue.json --isInverted
 
     A valid theme object is as follows:
