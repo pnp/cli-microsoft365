@@ -1,5 +1,18 @@
 # Release notes
 
+## [v3.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.2.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo knowledgehub get](../cmd/spo/knowledgehub/knowledgehub-get.md) - gets the Knowledge Hub Site URL for your tenant [#1575](https://github.com/pnp/cli-microsoft365/issues/1575)
+
+### Changes
+
+- removed Vorpal [#1737](https://github.com/pnp/cli-microsoft365/issues/1737)
+- extended 'todo list set' with name [#1806](https://github.com/pnp/cli-microsoft365/issues/1806)
+
 ## [v3.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.1.0)
 
 ### New commands
