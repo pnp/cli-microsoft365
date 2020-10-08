@@ -5,7 +5,7 @@ Removes the Knowledge Hub Site setting for your tenant
 ## Usage
 
 ```sh
-spo knowledgehub remove [options]
+m365 spo knowledgehub remove [options]
 ```
 
 ## Options
