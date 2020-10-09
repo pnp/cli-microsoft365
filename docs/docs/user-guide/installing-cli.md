@@ -15,7 +15,7 @@ CLI for Microsoft 365 is distributed as a Node.js package and published on [npmj
 To install the CLI for Microsoft 365, in the command line execute:
 
 ```sh
-m365 npm install -g @pnp/cli-microsoft365
+npm install -g @pnp/cli-microsoft365
 ```
 
 <script src="https://asciinema.org/a/158191.js" id="asciicast-158191" async></script>
@@ -23,7 +23,7 @@ m365 npm install -g @pnp/cli-microsoft365
 If you're using Yarn, you can install the CLI for Microsoft 365 by executing:
 
 ```sh
-m365 yarn global add @pnp/cli-microsoft365
+yarn global add @pnp/cli-microsoft365
 ```
 
 !!! tip
@@ -40,7 +40,7 @@ m365 version
 Alternatively, you can check the version of the Node.js package you have installed, by executing:
 
 ```sh
-m365 npm ls -g --depth=0
+npm ls -g --depth=0
 ```
 
 The version of the CLI is the same as the version of the Node.js package distributing the CLI, so by using either of the commands you can control which version of the CLI you have installed.
@@ -50,7 +50,7 @@ The version of the CLI is the same as the version of the Node.js package distrib
 We are continuously evolving the CLI for Microsoft 365 and adding more features to it. You can download new versions of the CLI from npmjs.com. To check, if a new version of the CLI for Microsoft 365 is available, execute in the command line:
 
 ```sh
-m365 npm outdated -g
+npm outdated -g
 ```
 
 For each package that you have installed globally, npm will show the version you have currently installed as well as the latest version available on npm.
@@ -76,7 +76,7 @@ $ npm view @pnp/cli-microsoft365
 To update the CLI, execute in the command line:
 
 ```sh
-m365 npm install -g @pnp/cli-microsoft365@latest
+npm install -g @pnp/cli-microsoft365@latest
 ```
 
 This will download and install the latest public version of the CLI for Microsoft 365. If you want to update to the latest beta version of the CLI, replace `@latest` with `@next`.
@@ -92,7 +92,7 @@ This will download and install the latest public version of the CLI for Microsof
 To uninstall the CLI for Microsoft 365, execute in the command line:
 
 ```sh
-m365 npm uninstall -g @pnp/cli-microsoft365
+npm uninstall -g @pnp/cli-microsoft365
 ```
 
 This command will remove all CLI for Microsoft 365 files from your computer.
