@@ -5,7 +5,7 @@ import {
   CommandValidate
 } from '../../../../Command';
 import Utils from '../../../../Utils';
-import AadCommand from '../../../base/AadCommand';
+import GraphCommand from '../../../base/GraphCommand';
 import request from '../../../../request';
 import { AppRoleAssignment } from './AppRoleAssignment';
 import { ServicePrincipal, AppRole } from './ServicePrincipal';
@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   objectId?: string;
 }
 
-class AadAppRoleAssignmentListCommand extends AadCommand {
+class AadAppRoleAssignmentListCommand extends GraphCommand {
   public get name(): string {
     return commands.APPROLEASSIGNMENT_LIST;
   }
@@ -47,7 +47,7 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
       spMatchQuery = `appId eq '${encodeURIComponent(args.options.appId)}'`;
     }
     else if (args.options.objectId) {
-      spMatchQuery = `objectId eq '${encodeURIComponent(args.options.objectId)}'`;
+      spMatchQuery = `id eq '${encodeURIComponent(args.options.objectId)}'`;
     }
     else {
       spMatchQuery = `displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
@@ -79,14 +79,14 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
         // and lookup the appRole.Id in the resources[resourceId].appRoles array...
         const results: any[] = [];
         sp.appRoleAssignments.map((appRoleAssignment: AppRoleAssignment) => {
-          const resource: ServicePrincipal | undefined = resources.find((r: any) => r.objectId === appRoleAssignment.resourceId);
+          const resource: ServicePrincipal | undefined = resources.find((r: any) => r.id === appRoleAssignment.resourceId);
 
           if (resource) {
-            const appRole: AppRole | undefined = resource.appRoles.find((r: any) => r.id === appRoleAssignment.id);
+            const appRole: AppRole | undefined = resource.appRoles.find((r: any) => r.id === appRoleAssignment.appRoleId);
 
             if (appRole) {
               results.push({
-                appRoleId: appRoleAssignment.id,
+                appRoleId: appRoleAssignment.appRoleId,
                 resourceDisplayName: appRoleAssignment.resourceDisplayName,
                 resourceId: appRoleAssignment.resourceId,
                 roleId: appRole.id,
@@ -114,7 +114,7 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
 
   private getServicePrincipalForApp(filterParam: string): Promise<{ value: ServicePrincipal[] }> {
     const spRequestOptions: any = {
-      url: `${this.resource}/myorganization/servicePrincipals?api-version=1.6&$expand=appRoleAssignments&$filter=${filterParam}`,
+      url: `${this.resource}/v1.0/servicePrincipals?$expand=appRoleAssignments&$filter=${filterParam}`,
       headers: {
         accept: 'application/json'
       },
@@ -124,9 +124,9 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
     return request.get<{ value: ServicePrincipal[] }>(spRequestOptions);
   }
 
-  private getServicePrincipal(spId: string): Promise<ServicePrincipal> {
+  private  getServicePrincipal(spId: string): Promise<ServicePrincipal> {
     const spRequestOptions: any = {
-      url: `${this.resource}/myorganization/servicePrincipals/${spId}?api-version=1.6`,
+      url: `${this.resource}/v1.0/servicePrincipals/${spId}`,
       headers: {
         accept: 'application/json'
       },

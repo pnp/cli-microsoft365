@@ -14,15 +14,12 @@ class ServicePrincipalCollections {
     {
       value: [
         {
-          "odata.type": "Microsoft.DirectoryServices.ServicePrincipal",
-          "appRoleAssignments@odata.navigationLinkUrl": "https://graph.windows.net/myorganization/directoryObjects/3aa76d8a-4145-40d1-89ca-b15bdb943bfd/Microsoft.DirectoryServices.ServicePrincipal/appRoleAssignments",
           "appRoleAssignments": [
             {
-              "objectType": "AppRoleAssignment",
-              "objectId": "im2nOkVB0UCJyrFb25Q7_eZg4Yr51ZhDlErpioz6f8k",
-              "deletionTimestamp": null,
-              "creationTimestamp": "2020-02-11T16:42:20.2272849Z",
-              "id": "df021288-bdef-4463-88db-98f22de89214",
+              "id": "im2nOkVB0UCJyrFb25Q7_eZg4Yr51ZhDlErpioz6f8k",
+              "deletedDateTime": null,
+              "createdDateTime": "2020-02-11T16:42:20.2272849Z",
+              "appRoleId": "df021288-bdef-4463-88db-98f22de89214",
               "principalDisplayName": "Product Catalog daemon",
               "principalId": "3aa76d8a-4145-40d1-89ca-b15bdb943bfd",
               "principalType": "ServicePrincipal",
@@ -30,11 +27,10 @@ class ServicePrincipalCollections {
               "resourceId": "b1ce2d04-5502-4142-ba53-819327b74b5b"
             },
             {
-              "objectType": "AppRoleAssignment",
-              "objectId": "im2nOkVB0UCJyrFb25Q7_c9ubVNI2s9PkLasaAPuNQM",
-              "deletionTimestamp": null,
-              "creationTimestamp": "2020-02-11T01:27:47.395556Z",
-              "id": "9116d0c7-0632-4203-889f-a24a08442b3d",
+              "id": "im2nOkVB0UCJyrFb25Q7_c9ubVNI2s9PkLasaAPuNQM",
+              "deletedDateTime": null,
+              "createdDateTime": "2020-02-11T01:27:47.395556Z",
+              "appRoleId": "9116d0c7-0632-4203-889f-a24a08442b3d",
               "principalDisplayName": "Product Catalog daemon",
               "principalId": "3aa76d8a-4145-40d1-89ca-b15bdb943bfd",
               "principalType": "ServicePrincipal",
@@ -42,9 +38,8 @@ class ServicePrincipalCollections {
               "resourceId": "b3598f45-9d8c-41c9-b5f0-81eb7ea8551f"
             }
           ],
-          "objectType": "ServicePrincipal",
-          "objectId": "3aa76d8a-4145-40d1-89ca-b15bdb943bfd",
-          "deletionTimestamp": null,
+          "id": "3aa76d8a-4145-40d1-89ca-b15bdb943bfd",
+          "deletedDateTime": null,
           "accountEnabled": true,
           "addIns": [],
           "alternativeNames": [],
@@ -57,7 +52,7 @@ class ServicePrincipalCollections {
           "displayName": "Product Catalog daemon",
           "errorUrl": null,
           "homepage": null,
-          "informationalUrls": {
+          "info": {
             "termsOfService": null,
             "support": null,
             "privacy": null,
@@ -66,7 +61,7 @@ class ServicePrincipalCollections {
           "keyCredentials": [],
           "logoutUrl": null,
           "notificationEmailAddresses": [],
-          "oauth2Permissions": [],
+          "oauth2PermissionScopes": [],
           "passwordCredentials": [],
           "preferredSingleSignOnMode": null,
           "preferredTokenSigningKeyEndDateTime": null,
@@ -92,12 +87,9 @@ class ServicePrincipalCollections {
     {
       value: [
         {
-          "odata.type": "Microsoft.DirectoryServices.ServicePrincipal",
-          "appRoleAssignments@odata.navigationLinkUrl": "https://graph.windows.net/myorganization/directoryObjects/43a9e7d8-0469-42f5-8c9d-17ac8c974ba6/Microsoft.DirectoryServices.ServicePrincipal/appRoleAssignments",
           "appRoleAssignments": [],
-          "objectType": "ServicePrincipal",
-          "objectId": "43a9e7d8-0469-42f5-8c9d-17ac8c974ba6",
-          "deletionTimestamp": null,
+          "id": "43a9e7d8-0469-42f5-8c9d-17ac8c974ba6",
+          "deletedDateTime": null,
           "accountEnabled": true,
           "addIns": [],
           "alternativeNames": [],
@@ -110,7 +102,7 @@ class ServicePrincipalCollections {
           "displayName": "Product Catalog WebApp",
           "errorUrl": null,
           "homepage": null,
-          "informationalUrls": {
+          "info": {
             "termsOfService": null,
             "support": null,
             "privacy": null,
@@ -119,7 +111,7 @@ class ServicePrincipalCollections {
           "keyCredentials": [],
           "logoutUrl": "https://localhost:5001/signout-oidc",
           "notificationEmailAddresses": [],
-          "oauth2Permissions": [],
+          "oauth2PermissionScopes": [],
           "passwordCredentials": [],
           "preferredSingleSignOnMode": null,
           "preferredTokenSigningKeyEndDateTime": null,
@@ -151,9 +143,8 @@ class ServicePrincipalCollections {
 
 class ServicePrincipalObject {
   static servicePrincipalCustomAppWithAppRole: any = {
-    "objectType": "ServicePrincipal",
-    "objectId": "b3598f45-9d8c-41c9-b5f0-81eb7ea8551f",
-    "deletionTimestamp": null,
+    "id": "b3598f45-9d8c-41c9-b5f0-81eb7ea8551f",
+    "deletedDateTime": null,
     "accountEnabled": true,
     "addIns": [],
     "alternativeNames": [],
@@ -177,7 +168,7 @@ class ServicePrincipalObject {
     "displayName": "Contoso Product Catalog service",
     "errorUrl": null,
     "homepage": null,
-    "informationalUrls": {
+    "info": {
       "termsOfService": null,
       "support": null,
       "privacy": null,
@@ -186,7 +177,7 @@ class ServicePrincipalObject {
     "keyCredentials": [],
     "logoutUrl": null,
     "notificationEmailAddresses": [],
-    "oauth2Permissions": [
+    "oauth2PermissionScopes": [
       {
         "adminConsentDescription": "Allows the app to write Product Categories",
         "adminConsentDisplayName": "Write Product Categories",
@@ -250,11 +241,8 @@ class ServicePrincipalObject {
 
   static servicePrincipalCustomAppWithNoAppRole: any =
     {
-      "odata.metadata": "https://graph.windows.net/myorganization/$metadata#directoryObjects/@Element",
-      "odata.type": "Microsoft.DirectoryServices.ServicePrincipal",
-      "objectType": "ServicePrincipal",
-      "objectId": "003c6308-0075-4e45-b310-d04c72bd649f",
-      "deletionTimestamp": null,
+      "id": "003c6308-0075-4e45-b310-d04c72bd649f",
+      "deletedDateTime": null,
       "accountEnabled": true,
       "addIns": [],
       "alternativeNames": [],
@@ -267,7 +255,7 @@ class ServicePrincipalObject {
       "displayName": "Contoso Product Catalog native client",
       "errorUrl": null,
       "homepage": null,
-      "informationalUrls": {
+      "info": {
         "termsOfService": null,
         "support": null,
         "privacy": null,
@@ -276,7 +264,7 @@ class ServicePrincipalObject {
       "keyCredentials": [],
       "logoutUrl": null,
       "notificationEmailAddresses": [],
-      "oauth2Permissions": [],
+      "oauth2PermissionScopes": [],
       "passwordCredentials": [],
       "preferredSingleSignOnMode": null,
       "preferredTokenSigningKeyEndDateTime": null,
@@ -300,9 +288,8 @@ class ServicePrincipalObject {
 
   static servicePrincipalMicrosoftGraphWithAppRole: any =
     {
-      "objectType": "ServicePrincipal",
-      "objectId": "b1ce2d04-5502-4142-ba53-819327b74b5b",
-      "deletionimestamp": null,
+      "id": "b1ce2d04-5502-4142-ba53-819327b74b5b",
+      "deletedDateTime": null,
       "accountEnabled": true,
       "addIns": [],
       "alternativeNames": [],
@@ -369,13 +356,13 @@ class RequestStub {
     // 3. get the app roles of the resource
 
     // query for service principal
-    if ((opts.url as string).indexOf(`/myorganization/servicePrincipals?api-version=1.6&$expand=appRoleAssignments&$filter=`) > -1) {
+    if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$expand=appRoleAssignments&$filter=`) > -1) {
       // by app id
       if ((opts.url as string).indexOf(`appId eq '${CommandActionParameters.appIdWithRoleAssignments}'`) > -1) {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppId);
       }
       // by object id
-      if ((opts.url as string).indexOf(`objectId eq '${CommandActionParameters.objectIdWithRoleAssigments}'`) > -1) {
+      if ((opts.url as string).indexOf(`id eq '${CommandActionParameters.objectIdWithRoleAssigments}'`) > -1) {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppId);
       }
       // by display name
@@ -392,11 +379,11 @@ class RequestStub {
       }
     }
 
-    if ((opts.url as string).indexOf(`/myorganization/servicePrincipals/${InternalRequestStub.customAppId}?api-version=1.6`) > -1) {
+    if ((opts.url as string).indexOf(`/v1.0/servicePrincipals/${InternalRequestStub.customAppId}`) > -1) {
       return Promise.resolve(ServicePrincipalObject.servicePrincipalCustomAppWithAppRole);
     }
 
-    if ((opts.url as string).indexOf(`/myorganization/servicePrincipals/${InternalRequestStub.microsoftGraphAppId}?api-version=1.6`) > -1) {
+    if ((opts.url as string).indexOf(`/v1.0/servicePrincipals/${InternalRequestStub.microsoftGraphAppId}`) > -1) {
       return Promise.resolve(ServicePrincipalObject.servicePrincipalMicrosoftGraphWithAppRole);
     }
 

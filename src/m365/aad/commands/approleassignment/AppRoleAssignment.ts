@@ -1,7 +1,6 @@
 export interface AppRoleAssignment {
-  objectType: string;
-  objectId: string;
   id: string;
+  appRoleId: string;
   principalDisplayName: string;
   principalId: string;
   principalType: string;
