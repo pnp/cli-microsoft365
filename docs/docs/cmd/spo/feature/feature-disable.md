@@ -10,17 +10,32 @@ m365 spo feature disable [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`-h, --help`|output usage information
-`-u, --url <url>`|The URL of the site or web for which to disable the feature
-`-f, --featureId <id>`|The ID of the feature to disable
-`-s, --scope [scope]`|Scope of the Feature to disable. Allowed values `Site,Web`. Default `Web`
-`--force`|Specifies whether to continue if an error occurs when disabling the feature
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --url <url>`
+: The URL of the site or web for which to disable the feature
+
+`-f, --featureId <id>`
+: The ID of the feature to disable
+
+`-s, --scope [scope]`
+: Scope of the Feature to disable. Allowed values `Site,Web`. Default `Web`
+
+`--force`
+: Specifies whether to continue if an error occurs when disabling the feature
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 

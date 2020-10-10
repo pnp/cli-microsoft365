@@ -10,15 +10,26 @@ m365 spo group list [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`-h, --help`|output usage information
-`-u, --webUrl <webUrl>`|Url of the web to list the group within
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--pretty`|Prettifies `json` output
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: Url of the web to list the group within
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--pretty`
+: Prettifies `json` output
 
 ## Examples
 

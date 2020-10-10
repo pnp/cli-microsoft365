@@ -10,17 +10,32 @@ m365 spo group remove [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`-h, --help`|output usage information
-`-u, --webUrl <webUrl>`|Url of the web to remove the group from
-`--id [id]`|ID of the group to remove. Use ID or name but not both
-`--name [name]`|Name of the group to remove. Use ID or name but not both
-`--confirm`|Confirm removal of the group
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`-u, --webUrl <webUrl>`
+: Url of the web to remove the group from
+
+`--id [id]`
+: ID of the group to remove. Use ID or name but not both
+
+`--name [name]`
+: Name of the group to remove. Use ID or name but not both
+
+`--confirm`
+: Confirm removal of the group
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Examples
 
