@@ -79,6 +79,10 @@ class FlowExportCommand extends AzmgmtCommand {
       return request.post(requestOptions);
     })()
       .then((res: any): Promise<{}> => {
+        if (typeof res !== 'undefined' && res.errors && res.errors.length && res.errors.length > 0) {
+          return Promise.reject(res.errors[0].message);
+        }
+
         if (this.verbose) {
           cmd.log(`Initiating package export for Microsoft Flow ${args.options.id}...`);
         }
@@ -94,6 +98,14 @@ class FlowExportCommand extends AzmgmtCommand {
         };
 
         if (formatArgument !== 'json') {
+          // adds suggestedCreationType property to all resources
+          // see https://github.com/pnp/cli-microsoft365/issues/1845
+          Object.keys(res.resources).forEach((key) => {
+            res.resources[key].type === 'Microsoft.Flow/flows'
+              ? res.resources[key].suggestedCreationType = 'Update'
+              : res.resources[key].suggestedCreationType = 'Existing';
+          });
+
           requestOptions['body'] = {
             "includedResourceIds": [
               `/providers/Microsoft.Flow/flows/${args.options.id}`
@@ -115,10 +127,6 @@ class FlowExportCommand extends AzmgmtCommand {
           cmd.log(`Getting file for Microsoft Flow ${args.options.id}...`);
         }
 
-        if (res.errors && res.errors.length && res.errors.length > 0) {
-          return Promise.reject(res.errors[0].message)
-        }
-
         const downloadFileUrl: string = formatArgument === 'json' ? '' : res.packageLink.value;
         const filenameRegEx: RegExp = /([^\/]+\.zip)/i;
         filenameFromApi = formatArgument === 'json' ? `${res.properties.displayName}.json` : (filenameRegEx.exec(downloadFileUrl) || ['output.zip'])[0];
@@ -136,8 +144,8 @@ class FlowExportCommand extends AzmgmtCommand {
           headers: formatArgument === 'json' ? {
             accept: 'application/json'
           } : {
-            'x-anonymous': true
-          }
+              'x-anonymous': true
+            }
         };
 
         return formatArgument === 'json' ?
