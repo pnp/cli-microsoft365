@@ -10,17 +10,32 @@ m365 teams user app remove [options]
 
 ## Options
 
-Option|Description
-------|-----------
-`-h, --help`|output usage information
-`--appId <appId>`|The unique id of the app instance installed for the user
-`--userId <userId>`|The ID of the user to uninstall the app for
-`--confirm`|Confirm removal of app for user
-`--query [query]`|JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-`-o, --output [output]`|Output type. `json,text`. Default `text`
-`--pretty`|Prettifies `json` output
-`--verbose`|Runs command with verbose logging
-`--debug`|Runs command with debug logging
+`-h, --help`
+: output usage information
+
+`--appId <appId>`
+: The unique id of the app instance installed for the user
+
+`--userId <userId>`
+: The ID of the user to uninstall the app for
+
+`--confirm`
+: Confirm removal of app for user
+
+`--query [query]`
+: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+
+`-o, --output [output]`
+: Output type. `json,text`. Default `text`
+
+`--pretty`
+: Prettifies `json` output
+
+`--verbose`
+: Runs command with verbose logging
+
+`--debug`
+: Runs command with debug logging
 
 ## Remarks
 
