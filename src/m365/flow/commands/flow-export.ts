@@ -78,6 +78,10 @@ class FlowExportCommand extends AzmgmtCommand {
       return request.post(requestOptions);
     })()
       .then((res: any): Promise<{}> => {
+        if (typeof res !== 'undefined' && res.errors && res.errors.length && res.errors.length > 0) {
+          return Promise.reject(res.errors[0].message);
+        }
+
         if (this.verbose) {
           logger.log(`Initiating package export for Microsoft Flow ${args.options.id}...`);
         }
@@ -93,6 +97,14 @@ class FlowExportCommand extends AzmgmtCommand {
         };
 
         if (formatArgument !== 'json') {
+          // adds suggestedCreationType property to all resources
+          // see https://github.com/pnp/cli-microsoft365/issues/1845
+          Object.keys(res.resources).forEach((key) => {
+            res.resources[key].type === 'Microsoft.Flow/flows'
+              ? res.resources[key].suggestedCreationType = 'Update'
+              : res.resources[key].suggestedCreationType = 'Existing';
+          });
+
           requestOptions['data'] = {
             "includedResourceIds": [
               `/providers/Microsoft.Flow/flows/${args.options.id}`
@@ -112,10 +124,6 @@ class FlowExportCommand extends AzmgmtCommand {
       .then((res: any): Promise<string> => {
         if (this.verbose) {
           logger.log(`Getting file for Microsoft Flow ${args.options.id}...`);
-        }
-
-        if (res.errors && res.errors.length && res.errors.length > 0) {
-          return Promise.reject(res.errors[0].message)
         }
 
         const downloadFileUrl: string = formatArgument === 'json' ? '' : res.packageLink.value;

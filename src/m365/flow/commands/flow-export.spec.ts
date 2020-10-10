@@ -117,7 +117,7 @@ describe(commands.FLOW_EXPORT, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -291,6 +291,26 @@ describe(commands.FLOW_EXPORT, () => {
     command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } }, () => {
       try {
         assert.strictEqual(getRequestsStub.lastCall.args[0].headers['x-anonymous'], true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('call is made with suggestedCreationType properties when format specified as ZIP', (done) => {
+    const resourceIds = ["L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FAZFGGHDDCAAVEX0FQUFJPVkFMUw==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkAZVVDSSAFBRTM2NVVTRVJTL0NPTk5FQ1RJT05TL1NIQVJFRC1PRkZJQ0UzNjVVU0VSLUExOUI5QjBELTFFQTUtNDhGOS1BQUM4LTgwRjkyQTFGRjE3OB==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX09GRklDRTM2NVVTRVJT", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX0FQUFJPVkFMUy9DT05ORUNUSU9OUy1AFFFVAGJXAAGHQUk9WQUxTLUQ2Njc1RUE5LUZDM0QtNDA4MS1CNTY4LUFCRDc3MzMyOTMyMZ==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NFTkRNQUlM", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NFTkRNQUlML0NPTk5FQ1RJT05TL1NIQVJFRC1TRU5ETUFJTC05NEUzODVCQi1CNUE3LTRBODgtOURFRC1FMEVFRDAzNTY1Njk=", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NIQVJFUE9JTlRPTkxJTkU=", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NIQVJFUE9JTlRPTkxJTkUvQ09OTkVDVElPTlMvU0hBUkVELVNIQVJFUE9JTlRPTkwtRjg0NTE4MDktREEwNi00RDQ3LTg3ODYtMTUxMjM4RDUwRTdB"]
+    const postRequestsStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(postFakes);
+    sinon.stub(request, 'get').callsFake(getFakes);
+    sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);
+
+    command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } }, () => {
+      try {
+        assert.strictEqual(postRequestsStub.lastCall.args[0].data.resources["L1BST1ZJREVSUy9NSUNST1NPRlQuRkxPVy9GTE9XUy9GMkVCOEIzNy1GNjI0LTRCMjItOTk1NC1CNUQwQ0JCMjhGOEI="].suggestedCreationType, 'Update');
+        resourceIds.forEach((id) => {
+          assert.strictEqual(postRequestsStub.lastCall.args[0].data.resources[id].suggestedCreationType, 'Existing');
+        });
         done();
       }
       catch (e) {
