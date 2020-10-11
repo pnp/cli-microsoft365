@@ -128,8 +128,8 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
     cmdInstance.action({ options: { debug: true, verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'false' } }, () => {
       try {
         assert.strictEqual(requestStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/team-a/_api/site/features/remove');
-        assert.strictEqual(requestStub.lastCall.args[0].body.featureId, 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9');
-        assert.strictEqual(requestStub.lastCall.args[0].body.force, true);
+        assert.strictEqual(requestStub.lastCall.args[0].data.featureId, 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9');
+        assert.strictEqual(requestStub.lastCall.args[0].data.force, true);
 
         done();
       }
@@ -152,8 +152,8 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
     cmdInstance.action({ options: { verbose: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'true' } }, () => {
       try {
         assert.strictEqual(requestStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/team-a/_api/site/features/add');
-        assert.strictEqual(requestStub.lastCall.args[0].body.featureId, 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9');
-        assert.strictEqual(requestStub.lastCall.args[0].body.force, true);
+        assert.strictEqual(requestStub.lastCall.args[0].data.featureId, 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9');
+        assert.strictEqual(requestStub.lastCall.args[0].data.force, true);
         done();
       }
       catch (e) {
@@ -175,8 +175,8 @@ describe(commands.SITE_INPLACERECORDSMANAGEMENT_SET, () => {
     cmdInstance.action({ options: { siteUrl: 'https://contoso.sharepoint.com/sites/team-a', enabled: 'true' } }, () => {
       try {
         assert.strictEqual(requestStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/team-a/_api/site/features/add');
-        assert.strictEqual(requestStub.lastCall.args[0].body.featureId, 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9');
-        assert.strictEqual(requestStub.lastCall.args[0].body.force, true);
+        assert.strictEqual(requestStub.lastCall.args[0].data.featureId, 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9');
+        assert.strictEqual(requestStub.lastCall.args[0].data.force, true);
         done();
       }
       catch (e) {

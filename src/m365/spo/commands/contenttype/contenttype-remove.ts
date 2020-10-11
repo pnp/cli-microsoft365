@@ -68,7 +68,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
           headers: {
             accept: 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.get(requestOptions);
@@ -87,7 +87,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
                 'If-Match': '*',
                 'accept': 'application/json;odata=nometadata'
               },
-              json: true
+              responseType: 'json'
             };
 
             return request.post(requestOptions);

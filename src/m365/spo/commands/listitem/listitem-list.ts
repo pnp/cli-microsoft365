@@ -87,7 +87,7 @@ class SpoListItemListCommand extends SpoCommand {
               'accept': 'application/json;odata=nometadata',
               'X-RequestDigest': formDigestValue
             },
-            json: true
+            responseType: 'json'
           };
 
           return request.get(requestOptions);
@@ -118,8 +118,8 @@ class SpoListItemListCommand extends SpoCommand {
             'accept': 'application/json;odata=nometadata',
             'X-RequestDigest': formDigestValue
           },
-          json: true,
-          body: requestBody
+          responseType: 'json',
+          data: requestBody
         };
 
         return args.options.query ? request.post(requestOptions) : request.get(requestOptions);

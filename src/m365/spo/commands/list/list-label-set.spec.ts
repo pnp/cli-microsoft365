@@ -154,11 +154,11 @@ describe(commands.LIST_LABEL_SET, () => {
     }, () => {
       try {
         const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.strictEqual(lastCall.body.complianceTagValue, 'abc');
-        assert.strictEqual(lastCall.body.blockDelete, false);
-        assert.strictEqual(lastCall.body.blockEdit, false);
-        assert.strictEqual(lastCall.body.syncToItems, false);
+        assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+        assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
+        assert.strictEqual(lastCall.data.blockDelete, false);
+        assert.strictEqual(lastCall.data.blockEdit, false);
+        assert.strictEqual(lastCall.data.syncToItems, false);
         done();
       }
       catch (e) {
@@ -194,11 +194,11 @@ describe(commands.LIST_LABEL_SET, () => {
     }, () => {
       try {
         const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.strictEqual(lastCall.body.complianceTagValue, 'abc');
-        assert.strictEqual(lastCall.body.blockDelete, false);
-        assert.strictEqual(lastCall.body.blockEdit, false);
-        assert.strictEqual(lastCall.body.syncToItems, false);
+        assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+        assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
+        assert.strictEqual(lastCall.data.blockDelete, false);
+        assert.strictEqual(lastCall.data.blockEdit, false);
+        assert.strictEqual(lastCall.data.syncToItems, false);
         done();
       }
       catch (e) {
@@ -226,11 +226,11 @@ describe(commands.LIST_LABEL_SET, () => {
     }, () => {
       try {
         const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.strictEqual(lastCall.body.complianceTagValue, 'abc');
-        assert.strictEqual(lastCall.body.blockDelete, false);
-        assert.strictEqual(lastCall.body.blockEdit, false);
-        assert.strictEqual(lastCall.body.syncToItems, false);
+        assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+        assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
+        assert.strictEqual(lastCall.data.blockDelete, false);
+        assert.strictEqual(lastCall.data.blockEdit, false);
+        assert.strictEqual(lastCall.data.syncToItems, false);
         assert.notStrictEqual(cmdInstanceLogSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
@@ -261,11 +261,11 @@ describe(commands.LIST_LABEL_SET, () => {
     }, () => {
       try {
         const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(lastCall.body.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.strictEqual(lastCall.body.complianceTagValue, 'abc');
-        assert.strictEqual(lastCall.body.blockDelete, true);
-        assert.strictEqual(lastCall.body.blockEdit, true);
-        assert.strictEqual(lastCall.body.syncToItems, true);
+        assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
+        assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
+        assert.strictEqual(lastCall.data.blockDelete, true);
+        assert.strictEqual(lastCall.data.blockEdit, true);
+        assert.strictEqual(lastCall.data.syncToItems, true);
         done();
       }
       catch (e) {

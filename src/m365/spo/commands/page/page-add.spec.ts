@@ -61,7 +61,7 @@ describe(commands.PAGE_ADD, () => {
   it('creates new modern page', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -91,7 +91,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -126,7 +126,7 @@ describe(commands.PAGE_ADD, () => {
   it('creates new modern page (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -156,7 +156,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -191,7 +191,7 @@ describe(commands.PAGE_ADD, () => {
   it('creates new modern page on root of tenant (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -221,7 +221,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -256,7 +256,7 @@ describe(commands.PAGE_ADD, () => {
   it('automatically appends the .aspx extension', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -286,7 +286,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -321,7 +321,7 @@ describe(commands.PAGE_ADD, () => {
   it('sets page title when specified', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -351,7 +351,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'My page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -386,7 +386,7 @@ describe(commands.PAGE_ADD, () => {
   it('creates new modern page using the Home layout', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -416,7 +416,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -446,7 +446,7 @@ describe(commands.PAGE_ADD, () => {
   it('creates new modern page and promotes it as NewsPage', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -476,7 +476,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -495,8 +495,8 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        opts.body.PromotedState === 2 &&
-        opts.body.FirstPublishedDate) {
+        opts.data.PromotedState === 2 &&
+        opts.data.FirstPublishedDate) {
         return Promise.resolve();
       }
 
@@ -517,7 +517,7 @@ describe(commands.PAGE_ADD, () => {
   it('creates new modern page and promotes it as Template', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -547,7 +547,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -562,7 +562,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        !opts.body) {
+        !opts.data) {
         return Promise.resolve({ Id: '1' });
       }
 
@@ -595,7 +595,7 @@ describe(commands.PAGE_ADD, () => {
   it('creates new modern page using the Home layout and promotes it as HomePage (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -625,7 +625,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -639,7 +639,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf('_api/web/rootfolder') > -1 &&
-        opts.body.WelcomePage === 'SitePages/page.aspx') {
+        opts.data.WelcomePage === 'SitePages/page.aspx') {
         return Promise.resolve();
       }
 
@@ -660,7 +660,7 @@ describe(commands.PAGE_ADD, () => {
   it('creates new modern page with comments enabled', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -690,7 +690,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -725,7 +725,7 @@ describe(commands.PAGE_ADD, () => {
   it('creates new modern page and publishes it', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -755,7 +755,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -794,7 +794,7 @@ describe(commands.PAGE_ADD, () => {
   it('creates new modern page and publishes it with a message (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -824,7 +824,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -863,7 +863,7 @@ describe(commands.PAGE_ADD, () => {
   it('escapes special characters in user input', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
           templateFileType: 3
         })) {
@@ -893,7 +893,7 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
           Title: 'page',
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',

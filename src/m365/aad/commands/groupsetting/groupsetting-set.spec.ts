@@ -69,7 +69,7 @@ describe(commands.GROUPSETTING_SET, () => {
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/c391b57d-5783-4c53-9236-cefb5c6ef323` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           displayName: null,
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
           values: [
@@ -166,7 +166,7 @@ describe(commands.GROUPSETTING_SET, () => {
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/c391b57d-5783-4c53-9236-cefb5c6ef323` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           displayName: null,
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
           values: [
@@ -256,7 +256,7 @@ describe(commands.GROUPSETTING_SET, () => {
     });
   });
 
-  it('ignores global options when creating request body', (done) => {
+  it('ignores global options when creating request data', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/c391b57d-5783-4c53-9236-cefb5c6ef323`) {
         return Promise.resolve({
@@ -268,7 +268,7 @@ describe(commands.GROUPSETTING_SET, () => {
     });
     const patchStub = sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/c391b57d-5783-4c53-9236-cefb5c6ef323` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           displayName: null,
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
           values: [
@@ -350,7 +350,7 @@ describe(commands.GROUPSETTING_SET, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(patchStub.firstCall.args[0].body, {
+        assert.deepEqual(patchStub.firstCall.args[0].data, {
           displayName: null,
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
           values: [

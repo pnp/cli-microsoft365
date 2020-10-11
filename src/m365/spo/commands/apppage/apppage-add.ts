@@ -41,8 +41,8 @@ class SpoAppPageAddCommand extends SpoCommand {
         'content-type': 'application/json;odata=nometadata',
         accept: 'application/json;odata=nometadata'
       },
-      json: true,
-      body: {
+      responseType: 'json',
+      data: {
         title: args.options.title,
         addToQuickLaunch: args.options.addToQuickLaunch ? true : false,
         webPartDataAsJson: args.options.webPartData

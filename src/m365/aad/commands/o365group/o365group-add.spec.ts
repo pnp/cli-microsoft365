@@ -64,7 +64,7 @@ describe(commands.O365GROUP_ADD, () => {
   it('creates Microsoft 365 Group using basic info', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -136,7 +136,7 @@ describe(commands.O365GROUP_ADD, () => {
   it('creates Microsoft 365 Group using basic info (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -208,7 +208,7 @@ describe(commands.O365GROUP_ADD, () => {
   it('creates private Microsoft 365 Group using basic info', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -280,7 +280,7 @@ describe(commands.O365GROUP_ADD, () => {
   it('creates Microsoft 365 Group with a png logo', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -361,7 +361,7 @@ describe(commands.O365GROUP_ADD, () => {
   it('creates Microsoft 365 Group with a jpg logo (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -442,7 +442,7 @@ describe(commands.O365GROUP_ADD, () => {
   it('creates Microsoft 365 Group with a gif logo', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -523,7 +523,7 @@ describe(commands.O365GROUP_ADD, () => {
   it('handles failure when creating Microsoft 365 Group with a logo', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -586,7 +586,7 @@ describe(commands.O365GROUP_ADD, () => {
   it('handles failure when creating Microsoft 365 Group with a logo (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -649,7 +649,7 @@ describe(commands.O365GROUP_ADD, () => {
   it('creates Microsoft 365 Group with specific owner', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -685,7 +685,7 @@ describe(commands.O365GROUP_ADD, () => {
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
         return Promise.resolve();
       }
 
@@ -740,7 +740,7 @@ describe(commands.O365GROUP_ADD, () => {
     let groupCreated: boolean = false;
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -777,12 +777,12 @@ describe(commands.O365GROUP_ADD, () => {
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
         return Promise.resolve();
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
         return Promise.resolve();
       }
 
@@ -826,7 +826,7 @@ describe(commands.O365GROUP_ADD, () => {
   it('creates Microsoft 365 Group with specific member', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -862,7 +862,7 @@ describe(commands.O365GROUP_ADD, () => {
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
         return Promise.resolve();
       }
 
@@ -917,7 +917,7 @@ describe(commands.O365GROUP_ADD, () => {
     let groupCreated: boolean = false;
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My awesome group',
           displayName: 'My group',
           groupTypes: [
@@ -954,12 +954,12 @@ describe(commands.O365GROUP_ADD, () => {
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
         return Promise.resolve();
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
         return Promise.resolve();
       }
 

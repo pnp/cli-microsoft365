@@ -193,7 +193,6 @@ describe('FolderExtensions', () => {
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.strictEqual(cmdInstanceLogSpy.called, true);
         done();
 
       }, (err: any) => {

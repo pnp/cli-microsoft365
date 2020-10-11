@@ -46,10 +46,10 @@ class SpoThemeRemoveCommand extends SpoCommand {
             headers: {
               'accept': 'application/json;odata=nometadata'
             },
-            body: {
+            data: {
               name: args.options.name,
             },
-            json: true
+            responseType: 'json'
           };
 
           return request.post(requestOptions);

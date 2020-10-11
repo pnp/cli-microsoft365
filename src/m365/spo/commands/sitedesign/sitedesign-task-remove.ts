@@ -43,10 +43,10 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
             headers: {
               accept: 'application/json;odata=nometadata'
             },
-            body: {
+            data: {
               taskId: args.options.taskId
             },
-            json: true
+            responseType: 'json'
           };
 
           return request.post(requestOptions);

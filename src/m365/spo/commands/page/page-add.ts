@@ -73,11 +73,11 @@ class SpoPageAddCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             urlOfFile: `${serverRelativeSiteUrl}/sitepages/${pageName}`,
             templateFileType: 3
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);
@@ -95,18 +95,18 @@ class SpoPageAddCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
             Title: args.options.title ? args.options.title : (args.options.name.indexOf('.aspx') > -1 ? args.options.name.substr(0, args.options.name.indexOf('.aspx')) : args.options.name),
             ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
             PageLayoutType: layoutType
           },
-          json: true
+          responseType: 'json'
         };
 
         if (layoutType === 'Article') {
-          requestOptions.body.PromotedState = 0;
-          requestOptions.body.BannerImageUrl = {
+          requestOptions.data.PromotedState = 0;
+          requestOptions.data.BannerImageUrl = {
             Description: '/_layouts/15/images/sitepagethumbnail.png',
             Url: `${resource}/_layouts/15/images/sitepagethumbnail.png`
           };
@@ -120,7 +120,7 @@ class SpoPageAddCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          json: true
+          responseType: 'json'
         };
 
         switch (args.options.promoteAs) {
@@ -133,7 +133,7 @@ class SpoPageAddCommand extends SpoCommand {
               'content-type': 'application/json;odata=nometadata',
               accept: 'application/json;odata=nometadata'
             };
-            requestOptions.body = {
+            requestOptions.data = {
               WelcomePage: `SitePages/${pageName}`
             };
             break;
@@ -146,7 +146,7 @@ class SpoPageAddCommand extends SpoCommand {
               'content-type': 'application/json;odata=nometadata',
               accept: 'application/json;odata=nometadata'
             };
-            requestOptions.body = {
+            requestOptions.data = {
               PromotedState: 2,
               FirstPublishedDate: new Date().toISOString().replace('Z', '')
             }
@@ -169,7 +169,7 @@ class SpoPageAddCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          json: true,
+          responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${res.Id})/SavePageAsTemplate`,
           headers: {
             'X-RequestDigest': requestDigest,
@@ -199,7 +199,7 @@ class SpoPageAddCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);
@@ -210,7 +210,7 @@ class SpoPageAddCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          json: true,
+          responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePage`,
           headers: {
             'X-RequestDigest': requestDigest,
@@ -219,7 +219,7 @@ class SpoPageAddCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             BannerImageUrl: bannerImageUrl,
             CanvasContent1: canvasContent1,
             LayoutWebpartsContent: layoutWebpartsContent
@@ -233,7 +233,7 @@ class SpoPageAddCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          json: true,
+          responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePageAsDraft`,
           headers: {
             'X-RequestDigest': requestDigest,
@@ -242,7 +242,7 @@ class SpoPageAddCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             Title: fileNameWithoutExtension,
             BannerImageUrl: bannerImageUrl,
             CanvasContent1: canvasContent1,
@@ -260,7 +260,7 @@ class SpoPageAddCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);
@@ -277,7 +277,7 @@ class SpoPageAddCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

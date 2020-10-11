@@ -577,4 +577,13 @@ export default class Utils {
   public static parseJsonWithBom(s: string): any {
     return JSON.parse(s.replace(/^\uFEFF/, ''));
   }
+
+  public static filterObject(obj: any, propertiesToInclude: string[]): any {
+    return Object.keys(obj)
+      .filter(key => propertiesToInclude.includes(key))
+      .reduce((filtered: any, key: string) => {
+        filtered[key] = obj[key];
+        return filtered;
+      }, {});
+  }
 }

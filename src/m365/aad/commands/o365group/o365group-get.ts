@@ -36,7 +36,7 @@ class AadO365GroupGetCommand extends GraphCommand {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      json: true
+      responseType: 'json'
     };
 
     request
@@ -50,7 +50,7 @@ class AadO365GroupGetCommand extends GraphCommand {
             headers: {
               accept: 'application/json;odata.metadata=none'
             },
-            json: true
+            responseType: 'json'
           };
 
           return request.get(requestOptions);

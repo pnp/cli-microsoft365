@@ -37,7 +37,7 @@ class TeamsAppPublishCommand extends GraphCommand {
         "content-type": "application/zip",
         accept: 'application/json;odata.metadata=none'
       },
-      body: fs.readFileSync(fullPath)
+      data: fs.readFileSync(fullPath)
     };
 
     request

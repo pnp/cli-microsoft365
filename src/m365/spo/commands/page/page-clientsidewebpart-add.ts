@@ -69,7 +69,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     request
@@ -86,7 +86,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);
@@ -228,10 +228,10 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
             'accept': 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             CanvasContent1: JSON.stringify(canvasContent)
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);
@@ -263,7 +263,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         headers: {
           accept: 'application/json;odata=nometadata'
         },
-        json: true
+        responseType: 'json'
       };
 
       request

@@ -51,7 +51,7 @@ class SpoFolderCopyCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      body: {
+      data: {
         exportObjectUris: [sourceAbsoluteUrl],
         destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
         options: {
@@ -59,7 +59,7 @@ class SpoFolderCopyCommand extends SpoCommand {
           "IgnoreVersionHistory": true
         }
       },
-      json: true
+      responseType: 'json'
     };
 
     request

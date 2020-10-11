@@ -159,7 +159,7 @@ describe(commands.SITE_RENAME, () => {
   it('creates a site rename job using new url parameter - suppressMarketplaceAppCheck flag', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
-        && opts.body.Option === 8) {
+        && opts.data.Option === 8) {
         return Promise.resolve({
           "Option": 8,
           "Reserve": null,
@@ -196,7 +196,7 @@ describe(commands.SITE_RENAME, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
-        && opts.body.Option === 16) {
+        && opts.data.Option === 16) {
         return Promise.resolve({
           "Option": 16,
           "Reserve": null,
@@ -233,7 +233,7 @@ describe(commands.SITE_RENAME, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SiteRenameJobs?api-version=1.4.7`) > -1
-        && opts.body.Option === 24) {
+        && opts.data.Option === 24) {
         return Promise.resolve({
           "Option": 24,
           "Reserve": null,

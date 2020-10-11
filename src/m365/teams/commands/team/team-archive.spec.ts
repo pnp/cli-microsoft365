@@ -116,7 +116,7 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(postStub.lastCall.args[0].body.shouldSetSpoSiteReadOnlyForMembers, true);
+        assert.strictEqual(postStub.lastCall.args[0].data.shouldSetSpoSiteReadOnlyForMembers, true);
         done();
       }
       catch (e) {
@@ -141,7 +141,7 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(postStub.lastCall.args[0].body["shouldSetSpoSiteReadOnlyForMembers"], false);
+        assert.strictEqual(postStub.lastCall.args[0].data["shouldSetSpoSiteReadOnlyForMembers"], false);
         done();
       }
       catch (e) {

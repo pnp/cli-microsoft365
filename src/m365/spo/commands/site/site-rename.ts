@@ -89,8 +89,8 @@ class SpoSiteRenameCommand extends SpoCommand {
             'X-RequestDigest': this.context.FormDigestValue,
             'Content-Type': 'application/json'
           },
-          json: true,
-          body: requestOptions
+          responseType: 'json',
+          data: requestOptions
         };
 
         return request.post(postData);
@@ -143,7 +143,7 @@ class SpoSiteRenameCommand extends SpoCommand {
       headers: {
         'X-AttemptNumber': iteration.toString()
       },
-      json: true
+      responseType: 'json'
     };
 
     request

@@ -64,7 +64,7 @@ class SpoListLabelGetCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     request
@@ -78,8 +78,8 @@ class SpoListLabelGetCommand extends SpoCommand {
             'accept': 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
           },
-          json: true,
-          body: {
+          responseType: 'json',
+          data: {
             listUrl: listAbsoluteUrl
           }
         };

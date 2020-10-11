@@ -70,7 +70,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }
@@ -100,7 +100,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }
@@ -116,7 +116,7 @@ describe(commands.APP_ADD, () => {
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
           r.headers.binaryStringRequestBody &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -146,7 +146,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }
@@ -162,7 +162,7 @@ describe(commands.APP_ADD, () => {
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
           r.headers.binaryStringRequestBody &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -192,7 +192,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }
@@ -227,7 +227,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.reject({
             error: JSON.stringify({ "odata.error": { "code": "-2130575257, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800." } } })
           });
@@ -264,7 +264,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.reject({
             error: JSON.stringify({ "odata.error": { "code": "-2130575257, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "A file with the name AppCatalog/spfx.sppkg already exists. It was last modified by i:0#.f|membership|admin@contoso.onmi on 24 Nov 2017 12:50:43 -0800." } } })
           });
@@ -301,7 +301,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.reject({ error: 'An error has occurred' });
         }
       }
@@ -336,7 +336,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.reject({ error: 'An error has occurred' });
         }
       }
@@ -371,7 +371,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.reject('An error has occurred');
         }
       }
@@ -406,7 +406,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.reject('An error has occurred');
         }
       }
@@ -559,7 +559,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }
@@ -601,7 +601,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }
@@ -643,7 +643,7 @@ describe(commands.APP_ADD, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers.binaryStringRequestBody &&
-          opts.body) {
+          opts.data) {
           return Promise.resolve('{"CheckInComment":"","CheckOutType":2,"ContentTag":"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4,3","CustomizedPageStatus":0,"ETag":"\\"{BDA5CE2F-9AC7-4A6F-A98B-7AE1C168519E},4\\"","Exists":true,"IrmEnabled":false,"Length":"3752","Level":1,"LinkingUri":null,"LinkingUrl":"","MajorVersion":3,"MinorVersion":0,"Name":"spfx-01.sppkg","ServerRelativeUrl":"/sites/apps/AppCatalog/spfx.sppkg","TimeCreated":"2018-05-25T06:59:20Z","TimeLastModified":"2018-05-25T08:23:18Z","Title":"spfx-01-client-side-solution","UIVersion":1536,"UIVersionLabel":"3.0","UniqueId":"bda5ce2f-9ac7-4a6f-a98b-7ae1c168519e"}');
         }
       }

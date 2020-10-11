@@ -41,17 +41,17 @@ class SpoUserProfileSetCommand extends SpoCommand {
       .then((res: ContextInfo): Promise<string> => {
         const propertyValue: string[] = args.options.propertyValue.split(',').map(o => o.trim());
         let propertyType: string = 'SetSingleValueProfileProperty';
-        const body: any = {
+        const data: any = {
           accountName: `i:0#.f|membership|${args.options.userName}`,
           propertyName: args.options.propertyName
         };
 
         if (propertyValue.length > 1) {
           propertyType = 'SetMultiValuedProfileProperty';
-          body.propertyValues = [...propertyValue];
+          data.propertyValues = [...propertyValue];
         }
         else {
-          body.propertyValue = propertyValue[0];
+          data.propertyValue = propertyValue[0];
         }
 
         const requestOptions: any = {
@@ -61,8 +61,8 @@ class SpoUserProfileSetCommand extends SpoCommand {
             'Content-type': 'application/json;odata=verbose',
             'X-RequestDigest': res.FormDigestValue
           },
-          body: body,
-          json: true
+          data: data,
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

@@ -68,7 +68,7 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
-        json: true
+        responseType: 'json'
       };
 
       request

@@ -41,7 +41,7 @@ class SpoWebAddCommand extends SpoCommand {
           accept: 'application/json;odata=nometadata',
           'X-HTTP-Method': 'DELETE'
         },
-        json: true
+        responseType: 'json'
       };
 
       if (this.verbose) {

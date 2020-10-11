@@ -35,8 +35,8 @@ class YammerNetworkListCommand extends YammerCommand {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata=nometadata'
       },
-      json: true,
-      body: {
+      responseType: 'json',
+      data: {
         includeSuspended: args.options.includeSuspended !== undefined && args.options.includeSuspended !== false
       }
     };

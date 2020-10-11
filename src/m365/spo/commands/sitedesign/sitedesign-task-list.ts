@@ -32,7 +32,7 @@ class SpoSiteDesignTaskListCommand extends SpoCommand {
       headers: {
         accept: 'application/json;odata=nometadata',
       },
-      json: true
+      responseType: 'json'
     };
 
     request.post<{ value: SiteDesignTask[] }>(requestOptions)

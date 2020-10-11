@@ -50,7 +50,7 @@ class AadO365GroupUserAddCommand extends GraphCommand {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      json: true
+      responseType: 'json'
     };
 
     request
@@ -63,8 +63,8 @@ class AadO365GroupUserAddCommand extends GraphCommand {
           headers: {
             'accept': 'application/json;odata.metadata=none'
           },
-          json: true,
-          body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + res.value }
+          responseType: 'json',
+          data: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + res.value }
         };
 
         return request.post(requestOptions);

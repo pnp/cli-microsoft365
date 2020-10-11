@@ -37,7 +37,7 @@ class AadOAuth2GrantListCommand extends AadCommand {
       headers: {
         accept: 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     request

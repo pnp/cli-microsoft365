@@ -61,10 +61,10 @@ class OutlookMessageMoveCommand extends GraphCommand {
           headers: {
             accept: 'application/json;odata.metadata=none'
           },
-          body: {
+          data: {
             destinationId: targetFolder
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);
@@ -93,7 +93,7 @@ class OutlookMessageMoveCommand extends GraphCommand {
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
-        json: true
+        responseType: 'json'
       };
 
       request

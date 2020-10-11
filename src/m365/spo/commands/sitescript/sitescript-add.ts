@@ -51,8 +51,8 @@ class SpoSiteScriptAddCommand extends SpoCommand {
             'content-type': 'application/json;charset=utf-8',
             accept: 'application/json;odata=nometadata'
           },
-          body: JSON.parse(args.options.content),
-          json: true
+          data: JSON.parse(args.options.content),
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

@@ -27,7 +27,7 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
       headers: {
         accept: 'application/json'
       },
-      json: true
+      responseType: 'json'
     };
 
     request

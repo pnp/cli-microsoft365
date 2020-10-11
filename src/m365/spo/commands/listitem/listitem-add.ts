@@ -73,7 +73,7 @@ class SpoListItemAddCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     request
@@ -119,7 +119,7 @@ class SpoListItemAddCommand extends SpoCommand {
             headers: {
               'accept': 'application/json;odata=nometadata'
             },
-            json: true
+            responseType: 'json'
           }
 
           return request
@@ -153,7 +153,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
         if (args.options.contentType && contentTypeName !== '') {
           if (this.debug) {
-            cmd.log(`Specifying content type name [${contentTypeName}] in request body`);
+            cmd.log(`Specifying content type name [${contentTypeName}] in request data`);
           }
 
           requestBody.formValues.push({
@@ -167,8 +167,8 @@ class SpoListItemAddCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
-          body: requestBody,
-          json: true
+          data: requestBody,
+          responseType: 'json'
         };
 
         return request.post(requestOptions);
@@ -195,7 +195,7 @@ class SpoListItemAddCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.get(requestOptions);

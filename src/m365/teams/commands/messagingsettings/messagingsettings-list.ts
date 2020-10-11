@@ -34,7 +34,7 @@ class TeamsMessagingSettingsListCommand extends GraphCommand {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      json: true
+      responseType: 'json'
     };
 
     request

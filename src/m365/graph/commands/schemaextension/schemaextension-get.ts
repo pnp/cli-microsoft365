@@ -36,7 +36,7 @@ class GraphSchemaExtensionGet extends GraphCommand {
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
           },
-          json: true
+          responseType: 'json'
         };
 
       request.get(requestOptions)

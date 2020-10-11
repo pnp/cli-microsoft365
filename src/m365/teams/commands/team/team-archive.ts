@@ -39,8 +39,8 @@ class TeamsArchiveCommand extends GraphCommand {
         'content-type': 'application/json;odata=nometadata',
         'accept': 'application/json;odata.metadata=none'
       },
-      json: true,
-      body: {
+      responseType: 'json',
+      data: {
         shouldSetSpoSiteReadOnlyForMembers: siteReadOnlyForMembers
       }
     };

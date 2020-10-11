@@ -67,7 +67,7 @@ class SpoListLabelSetCommand extends SpoCommand {
         headers: {
           'accept': 'application/json;odata=nometadata'
         },
-        json: true
+        responseType: 'json'
       };
 
       return request
@@ -84,14 +84,14 @@ class SpoListLabelSetCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             listUrl: listAbsoluteUrl,
             complianceTagValue: args.options.label,
             blockDelete: args.options.blockDelete || false,
             blockEdit: args.options.blockEdit || false,
             syncToItems: args.options.syncToItems || false
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

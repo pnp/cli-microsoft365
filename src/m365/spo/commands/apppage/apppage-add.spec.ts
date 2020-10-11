@@ -58,8 +58,8 @@ describe(commands.APPPAGE_ADD, () => {
   it('creates a single-part app page', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/sitepages/Pages/CreateFullPageApp`) > -1 &&
-        opts.body.webPartDataAsJson ===
-        "{}" && !opts.body.addToQuickLaunch) {
+        opts.data.webPartDataAsJson ===
+        "{}" && !opts.data.addToQuickLaunch) {
         return Promise.resolve("Done");
       }
       return Promise.reject('Invalid request');
@@ -79,8 +79,8 @@ describe(commands.APPPAGE_ADD, () => {
   it('creates a single-part app page showing on quicklaunch', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/sitepages/Pages/CreateFullPageApp`) > -1 &&
-        opts.body.webPartDataAsJson ===
-        "{}" && opts.body.addToQuickLaunch) {
+        opts.data.webPartDataAsJson ===
+        "{}" && opts.data.addToQuickLaunch) {
         return Promise.resolve("Done");
       }
       return Promise.reject('Invalid request');
@@ -100,7 +100,7 @@ describe(commands.APPPAGE_ADD, () => {
   it('fails to create a single-part app page if request is rejected', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/sitepages/Pages/CreateFullPageApp`) > -1 &&
-        opts.body.title === "failme") {
+        opts.data.title === "failme") {
         return Promise.reject('Failed to create a single-part app page');
       }
       return Promise.reject('Invalid request');

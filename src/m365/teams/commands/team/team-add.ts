@@ -9,6 +9,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as chalk from 'chalk';
 import { CommandInstance } from '../../../../cli';
+import { AxiosRequestConfig } from 'axios';
 
 enum TeamsAsyncOperationStatus {
   Invalid = "invalid",
@@ -98,15 +99,14 @@ class TeamsTeamAddCommand extends GraphCommand {
       }
     }
 
-    const requestOptions = {
+    const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/beta/teams`,
-      resolveWithFullResponse: true,
       headers: {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata.metadata=none'
       },
-      body: requestBody,
-      json: true
+      data: requestBody,
+      responseType: 'json'
     };
 
     request
@@ -117,7 +117,7 @@ class TeamsTeamAddCommand extends GraphCommand {
           headers: {
             accept: 'application/json;odata.metadata=minimal'
           },
-          json: true
+          responseType: 'json'
         };
 
         return new Promise((resolve, reject) => {
@@ -142,7 +142,7 @@ class TeamsTeamAddCommand extends GraphCommand {
           headers: {
             accept: 'application/json;odata.metadata=minimal'
           },
-          json: true
+          responseType: 'json'
         });
       })
       .then((output: any) => {

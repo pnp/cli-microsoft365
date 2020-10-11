@@ -52,8 +52,8 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
               'content-type': 'application/json;charset=utf-8',
               accept: 'application/json;odata=nometadata'
             },
-            body: { id: args.options.id },
-            json: true
+            data: { id: args.options.id },
+            responseType: 'json'
           };
 
           return request.post(requestOptions);

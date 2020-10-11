@@ -61,7 +61,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         if (opts.headers &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
-          JSON.stringify(opts.body) === JSON.stringify({
+          JSON.stringify(opts.data) === JSON.stringify({
             contentTypeId: '0x0120'
           })) {
           return Promise.resolve({
@@ -145,7 +145,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         if (opts.headers &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
-          JSON.stringify(opts.body) === JSON.stringify({
+          JSON.stringify(opts.data) === JSON.stringify({
             contentTypeId: '0x0120'
           })) {
           return Promise.resolve({
@@ -229,7 +229,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         if (opts.headers &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
-          JSON.stringify(opts.body) === JSON.stringify({
+          JSON.stringify(opts.data) === JSON.stringify({
             contentTypeId: '0x0120'
           })) {
           return Promise.resolve({
@@ -313,7 +313,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
         if (opts.headers &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
-          JSON.stringify(opts.body) === JSON.stringify({
+          JSON.stringify(opts.data) === JSON.stringify({
             contentTypeId: '0x0120'
           })) {
           return Promise.resolve({

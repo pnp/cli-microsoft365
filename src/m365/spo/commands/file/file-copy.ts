@@ -73,7 +73,7 @@ class SpoFileCopyCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             exportObjectUris: [sourceAbsoluteUrl],
             destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
             options: {
@@ -81,7 +81,7 @@ class SpoFileCopyCommand extends SpoCommand {
               "IgnoreVersionHistory": true
             }
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);
@@ -120,7 +120,7 @@ class SpoFileCopyCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.get(requestOptions);
@@ -159,7 +159,7 @@ class SpoFileCopyCommand extends SpoCommand {
               'If-Match': '*',
               'accept': 'application/json;odata=nometadata'
             },
-            json: true
+            responseType: 'json'
           };
 
           request.post(requestOptions)

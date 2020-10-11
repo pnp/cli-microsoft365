@@ -64,7 +64,7 @@ describe(commands.LIST_VIEW_SET, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
-          JSON.stringify(opts.body) === JSON.stringify({ Title: 'All events' })) {
+          JSON.stringify(opts.data) === JSON.stringify({ Title: 'All events' })) {
           return Promise.resolve();
         }
       }
@@ -83,14 +83,14 @@ describe(commands.LIST_VIEW_SET, () => {
     });
   });
 
-  it('ignores global options when creating request body', (done) => {
+  it('ignores global options when creating request data', (done) => {
     const patchRequest: sinon.SinonStub = sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/getByTitle('List%201')/views/getByTitle('All%20items')`) {
         if (opts.headers &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
-          JSON.stringify(opts.body) === JSON.stringify({ Title: 'All events' })) {
+          JSON.stringify(opts.data) === JSON.stringify({ Title: 'All events' })) {
           return Promise.resolve();
         }
       }
@@ -100,7 +100,7 @@ describe(commands.LIST_VIEW_SET, () => {
 
     cmdInstance.action({ options: { debug: false, verbose: false, output: "text", webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewTitle: 'All items', Title: 'All events' } }, () => {
       try {
-        assert.deepEqual(patchRequest.lastCall.args[0].body, { Title: 'All events' });
+        assert.deepEqual(patchRequest.lastCall.args[0].data, { Title: 'All events' });
         done();
       }
       catch (e) {
@@ -116,7 +116,7 @@ describe(commands.LIST_VIEW_SET, () => {
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0 &&
           opts.headers['X-RequestDigest'] &&
-          JSON.stringify(opts.body) === JSON.stringify({ Title: 'All events', CustomFormatter: 'abc' })) {
+          JSON.stringify(opts.data) === JSON.stringify({ Title: 'All events', CustomFormatter: 'abc' })) {
           return Promise.resolve();
         }
       }

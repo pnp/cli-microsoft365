@@ -257,8 +257,8 @@ class SpoCustomActionSetCommand extends SpoCommand {
         accept: 'application/json;odata=nometadata',
         'X-HTTP-Method': 'MERGE'
       },
-      body: requestBody,
-      json: true
+      data: requestBody,
+      responseType: 'json'
     };
 
     return request.post(requestOptions);

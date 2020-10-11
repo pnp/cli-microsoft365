@@ -118,7 +118,7 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
       headers: {
         accept: 'application/json'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.get<{ value: ServicePrincipal[] }>(spRequestOptions);
@@ -130,7 +130,7 @@ class AadAppRoleAssignmentListCommand extends AadCommand {
       headers: {
         accept: 'application/json'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.get<ServicePrincipal>(spRequestOptions);

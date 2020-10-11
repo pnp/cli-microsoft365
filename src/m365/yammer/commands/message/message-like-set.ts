@@ -44,8 +44,8 @@ class YammerMessageLikeSetCommand extends YammerCommand {
           accept: 'application/json;odata.metadata=none',
           'content-type': 'application/json;odata=nometadata'
         },
-        json: true,
-        body: {
+        responseType: 'json',
+        data: {
           message_id: args.options.id
         }
       };

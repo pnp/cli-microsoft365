@@ -57,11 +57,11 @@ class OutlookSendmailCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json'
       },
-      json: true,
-      body: {
+      responseType: 'json',
+      data: {
         message: {
           subject: args.options.subject,
-          body: {
+          data: {
             contentType: args.options.bodyContentType || 'Text',
             content: bodyContents
           },

@@ -42,7 +42,7 @@ class TeamsChannelSetCommand extends GraphCommand {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      json: true
+      responseType: 'json'
     }
 
     request
@@ -55,14 +55,14 @@ class TeamsChannelSetCommand extends GraphCommand {
         }
 
         const channelId: string = res.value[0].id;
-        const body: any = this.mapRequestBody(args.options);
+        const data: any = this.mapRequestBody(args.options);
         const requestOptions: any = {
           url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${channelId}`,
           headers: {
             'accept': 'application/json;odata.metadata=none'
           },
-          json: true,
-          body: body
+          responseType: 'json',
+          data: data
         };
 
         return request.patch(requestOptions);

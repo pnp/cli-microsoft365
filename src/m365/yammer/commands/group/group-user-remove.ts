@@ -43,8 +43,8 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
           accept: 'application/json;odata.metadata=none',
           'content-type': 'application/json;odata=nometadata'
         },
-        json: true,
-        body: {
+        responseType: 'json',
+        data: {
           group_id: args.options.id,
           user_id: args.options.userId
         }

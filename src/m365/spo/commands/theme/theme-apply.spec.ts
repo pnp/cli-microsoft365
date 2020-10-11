@@ -80,7 +80,7 @@ describe(commands.THEME_APPLY, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery', 'url');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC', 'request digest');
-        assert.strictEqual(postStub.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="SetWebTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">https://contoso.sharepoint.com/sites/project-x</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`, 'body');
+        assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="SetWebTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">https://contoso.sharepoint.com/sites/project-x</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`, 'data');
         assert(cmdInstanceLogSpy.calledWith(true), 'log');
         done();
       }
@@ -108,7 +108,7 @@ describe(commands.THEME_APPLY, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
-        assert.strictEqual(postStub.lastCall.args[0].body, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="SetWebTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">https://contoso.sharepoint.com/sites/project-x</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`);
+        assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><Method Name="SetWebTheme" Id="11" ObjectPathId="9"><Parameters><Parameter Type="String">Contoso</Parameter><Parameter Type="String">https://contoso.sharepoint.com/sites/project-x</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="9" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`);
         done();
       }
       catch (e) {
@@ -150,7 +150,7 @@ describe(commands.THEME_APPLY, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.body) {
+          r.data) {
           setRequestIssued = true;
         }
       });
@@ -197,7 +197,7 @@ describe(commands.THEME_APPLY, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.body) {
+          r.data) {
           setRequestIssued = true;
         }
       });
@@ -244,7 +244,7 @@ describe(commands.THEME_APPLY, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.body) {
+          r.data) {
           setRequestIssued = true;
         }
       });
@@ -291,7 +291,7 @@ describe(commands.THEME_APPLY, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.body) {
+          r.data) {
           setRequestIssued = true;
         }
       });
@@ -338,7 +338,7 @@ describe(commands.THEME_APPLY, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.body) {
+          r.data) {
           setRequestIssued = true;
         }
       });
@@ -385,7 +385,7 @@ describe(commands.THEME_APPLY, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.body) {
+          r.data) {
           setRequestIssued = true;
         }
       });
@@ -432,7 +432,7 @@ describe(commands.THEME_APPLY, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.body) {
+          r.data) {
           setRequestIssued = true;
         }
       });
@@ -479,7 +479,7 @@ describe(commands.THEME_APPLY, () => {
       let setRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.body) {
+          r.data) {
           setRequestIssued = true;
         }
       });
@@ -579,7 +579,7 @@ describe(commands.THEME_APPLY, () => {
 
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/ThemeManager/ApplyTheme`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });

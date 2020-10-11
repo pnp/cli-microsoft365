@@ -66,7 +66,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group display name', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           displayName: 'My group'
         })) {
           return Promise.resolve();
@@ -90,7 +90,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group description (debug)', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           description: 'My group'
         })) {
           return Promise.resolve();
@@ -114,7 +114,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group to public', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           visibility: 'Public'
         })) {
           return Promise.resolve();
@@ -138,7 +138,7 @@ describe(commands.O365GROUP_SET, () => {
   it('updates Microsoft 365 Group to private', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848') {
-        if (JSON.stringify(opts.body) === JSON.stringify({
+        if (JSON.stringify(opts.data) === JSON.stringify({
           visibility: 'Private'
         })) {
           return Promise.resolve();
@@ -276,7 +276,7 @@ describe(commands.O365GROUP_SET, () => {
   it('adds owner to Microsoft 365 Group', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
         return Promise.resolve();
       }
 
@@ -310,12 +310,12 @@ describe(commands.O365GROUP_SET, () => {
   it('adds owners to Microsoft 365 Group (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
         return Promise.resolve();
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/owners/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
         return Promise.resolve();
       }
 
@@ -352,7 +352,7 @@ describe(commands.O365GROUP_SET, () => {
   it('adds member to Microsoft 365 Group', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
         return Promise.resolve();
       }
 
@@ -386,12 +386,12 @@ describe(commands.O365GROUP_SET, () => {
   it('adds members to Microsoft 365 Group (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8a') {
         return Promise.resolve();
       }
 
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/f3db5c2b-068f-480d-985b-ec78b9fa0e76/members/$ref' &&
-        opts.body['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
+        opts.data['@odata.id'] === 'https://graph.microsoft.com/v1.0/users/949b16c1-a032-453e-a8ae-89a52bfc1d8b') {
         return Promise.resolve();
       }
 

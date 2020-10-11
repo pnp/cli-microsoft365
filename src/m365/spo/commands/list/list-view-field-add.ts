@@ -71,7 +71,7 @@ class SpoListViewFieldAddCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(postRequestOptions);
@@ -100,8 +100,8 @@ class SpoListViewFieldAddCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
-          body: { 'field': currentField.InternalName, 'index': args.options.fieldPosition },
-          json: true
+          data: { 'field': currentField.InternalName, 'index': args.options.fieldPosition },
+          responseType: 'json'
         };
 
         return request.post(moveRequestOptions);
@@ -122,7 +122,7 @@ class SpoListViewFieldAddCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.get(requestOptions);

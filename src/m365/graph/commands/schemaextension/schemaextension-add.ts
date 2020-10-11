@@ -44,14 +44,14 @@ class GraphSchemaExtensionAdd extends GraphCommand {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json'
       },
-      body: {
+      data: {
         id: args.options.id,
         description: args.options.description,
         owner: args.options.owner,
         targetTypes,
         properties
       },
-      json: true
+      responseType: 'json'
     };
 
     request

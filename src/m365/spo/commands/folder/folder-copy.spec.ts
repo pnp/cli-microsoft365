@@ -262,10 +262,10 @@ describe(commands.FOLDER_COPY, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.body);
+      actual = JSON.stringify(opts.data);
       if (
-        opts.body.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/folder1' &&
-        opts.body.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
+        opts.data.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/folder1' &&
+        opts.data.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
         opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
       ) {
         return Promise.resolve();
@@ -306,10 +306,10 @@ describe(commands.FOLDER_COPY, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.body);
+      actual = JSON.stringify(opts.data);
       if (
-        opts.body.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/folder1' &&
-        opts.body.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
+        opts.data.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/folder1' &&
+        opts.data.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
         opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
       ) {
         return Promise.resolve();
@@ -350,10 +350,10 @@ describe(commands.FOLDER_COPY, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.body);
+      actual = JSON.stringify(opts.data);
       if (
-        opts.body.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/folder1' &&
-        opts.body.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
+        opts.data.exportObjectUris[0] === 'https://contoso.sharepoint.com/sites/team-a/library/folder1' &&
+        opts.data.destinationUri === 'https://contoso.sharepoint.com/sites/team-b/library2' &&
         opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/site/CreateCopyJobs'
       ) {
         return Promise.resolve();

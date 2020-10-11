@@ -35,8 +35,8 @@ class SpoAppPageSetCommand extends SpoCommand {
         'content-type': 'application/json;odata=nometadata',
         accept: 'application/json;odata=nometadata'
       },
-      json: true,
-      body: {
+      responseType: 'json',
+      data: {
         serverRelativeUrl: `${Utils.getServerRelativePath(args.options.webUrl, '')}/SitePages/${args.options.pageName}`,
         webPartDataAsJson: args.options.webPartData
       }

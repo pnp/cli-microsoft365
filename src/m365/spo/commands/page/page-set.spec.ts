@@ -61,7 +61,7 @@ describe(commands.PAGE_SET, () => {
   it('updates page layout to Article', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           PageLayoutType: 'Article',
           PromotedState: 0,
           BannerImageUrl: {
@@ -89,7 +89,7 @@ describe(commands.PAGE_SET, () => {
   it('updates page layout to Article (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           PageLayoutType: 'Article',
           PromotedState: 0,
           BannerImageUrl: {
@@ -117,7 +117,7 @@ describe(commands.PAGE_SET, () => {
   it('updates page layout to Article on root of tenant(debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           PageLayoutType: 'Article',
           PromotedState: 0,
           BannerImageUrl: {
@@ -145,7 +145,7 @@ describe(commands.PAGE_SET, () => {
   it('automatically appends the .aspx extension', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           PageLayoutType: 'Article',
           PromotedState: 0,
           BannerImageUrl: {
@@ -173,7 +173,7 @@ describe(commands.PAGE_SET, () => {
   it('updates page layout to Home', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           PageLayoutType: 'Home'
         })) {
         return Promise.resolve();
@@ -196,8 +196,8 @@ describe(commands.PAGE_SET, () => {
   it('promotes the page as NewsPage', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        opts.body.PromotedState === 2 &&
-        opts.body.FirstPublishedDate) {
+        opts.data.PromotedState === 2 &&
+        opts.data.FirstPublishedDate) {
         return Promise.resolve();
       }
 
@@ -218,7 +218,7 @@ describe(commands.PAGE_SET, () => {
   it('promotes the page as Template', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        !opts.body) {
+        !opts.data) {
         return Promise.resolve({ Id: '1' });
       }
 
@@ -247,14 +247,14 @@ describe(commands.PAGE_SET, () => {
   it('updates page layout to Home and promotes it as HomePage (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           PageLayoutType: 'Home'
         })) {
         return Promise.resolve();
       }
 
       if ((opts.url as string).indexOf('_api/web/rootfolder') > -1 &&
-        opts.body.WelcomePage === 'SitePages/page.aspx') {
+        opts.data.WelcomePage === 'SitePages/page.aspx') {
         return Promise.resolve();
       }
 

@@ -64,10 +64,10 @@ class SpoSiteGroupifyCommand extends SpoCommand {
       headers: {
         'content-type': 'application/json;odata=nometadata',
         accept: 'application/json;odata=nometadata',
-        json: true
+        responseType: 'json'
       },
-      body: payload,
-      json: true
+      data: payload,
+      responseType: 'json'
     };
 
     request

@@ -10,7 +10,7 @@ import * as path from 'path';
 import Utils from '../../../../Utils';
 import { Project, ExternalConfiguration, External } from './model';
 import { ExternalizeEntry, FileEdit } from './project-externalize/';
-import * as requestNative from 'request-promise-native';
+import { AxiosRequestConfig } from 'axios';
 
 describe(commands.PROJECT_EXTERNALIZE, () => {
   let log: any[];
@@ -598,8 +598,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake((options: requestNative.OptionsWithUrl) => {
-      if ((options.body as string).indexOf('tnt') > -1) {
+    sinon.stub(request, 'post').callsFake((options: AxiosRequestConfig) => {
+      if ((options.data as string).indexOf('tnt') > -1) {
         return Promise.resolve(JSON.stringify({ scriptType: 'module' }));
       } else {
         return Promise.resolve(JSON.stringify({ scriptType: 'script' }));

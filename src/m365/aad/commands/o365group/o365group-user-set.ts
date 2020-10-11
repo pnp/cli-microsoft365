@@ -84,8 +84,8 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
               headers: {
                 'accept': 'application/json;odata.metadata=none'
               },
-              json: true,
-              body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + foundMember.id }
+              responseType: 'json',
+              data: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/" + foundMember.id }
             };
 
             return request.post(requestOptions);

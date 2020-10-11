@@ -51,7 +51,7 @@ class SpoFolderMoveCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      body: {
+      data: {
         exportObjectUris: [sourceAbsoluteUrl],
         destinationUri: this.urlCombine(tenantUrl, args.options.targetUrl),
         options: {
@@ -60,7 +60,7 @@ class SpoFolderMoveCommand extends SpoCommand {
           "IsMoveMode": true,
         }
       },
-      json: true
+      responseType: 'json'
     };
 
     request

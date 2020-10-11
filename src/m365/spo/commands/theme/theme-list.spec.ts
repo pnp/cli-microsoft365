@@ -74,7 +74,6 @@ describe(commands.THEME_LIST, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/GetTenantThemingOptions');
         assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.strictEqual(postStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {
@@ -99,8 +98,6 @@ describe(commands.THEME_LIST, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/GetTenantThemingOptions');
         assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.strictEqual(postStub.lastCall.args[0].json, true);
-        assert.strictEqual(cmdInstanceLogSpy.called, true);
         done();
       }
       catch (e) {

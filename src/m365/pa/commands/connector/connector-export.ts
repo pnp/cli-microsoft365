@@ -44,7 +44,7 @@ class PaConnectorExportCommand extends AzmgmtCommand {
       headers: {
         accept: 'application/json'
       },
-      json: true
+      responseType: 'json'
     };
 
     let connector: Connector;
@@ -139,7 +139,7 @@ class PaConnectorExportCommand extends AzmgmtCommand {
           return request
             .get({
               url: connector.properties.iconUri,
-              encoding: null,
+              responseType: 'arraybuffer',
               headers: {
                 'x-anonymous': true
               }

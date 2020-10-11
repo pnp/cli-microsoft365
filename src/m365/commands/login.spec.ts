@@ -5,7 +5,7 @@ import appInsights from '../../appInsights';
 import auth from '../../Auth';
 const command: Command = require('./login');
 import * as assert from 'assert';
-import * as request from 'request-promise-native';
+import Axios from 'axios';
 import Utils from '../../Utils';
 import { AuthType } from '../../Auth';
 import * as fs from 'fs';
@@ -52,7 +52,7 @@ describe(commands.LOGIN, () => {
       auth.restoreAuth,
       auth.clearConnectionInfo,
       auth.storeConnectionInfo,
-      request.post,
+      Axios.post,
       appInsights.trackEvent
     ]);
   });

@@ -68,7 +68,7 @@ describe(commands.USERPROFILE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    const body: any = {
+    const data: any = {
       'accountName': `i:0#.f|membership|john.doe@mytenant.onmicrosoft.com`,
       'propertyName': 'SPS-JobTitle',
       'propertyValue': 'Senior Developer'
@@ -84,7 +84,7 @@ describe(commands.USERPROFILE_SET, () => {
     }, () => {
       try {
         const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(JSON.stringify(lastCall.body), JSON.stringify(body));
+        assert.strictEqual(JSON.stringify(lastCall.data), JSON.stringify(data));
         done();
       } catch (e) {
         done(e);
@@ -129,7 +129,7 @@ describe(commands.USERPROFILE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    const body: any = {
+    const data: any = {
       'accountName': `i:0#.f|membership|john.doe@mytenant.onmicrosoft.com`,
       'propertyName': 'SPS-Skills',
       'propertyValues': ['CSS', 'HTML']
@@ -144,7 +144,7 @@ describe(commands.USERPROFILE_SET, () => {
     }, () => {
       try {
         const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(JSON.stringify(lastCall.body), JSON.stringify(body));
+        assert.strictEqual(JSON.stringify(lastCall.data), JSON.stringify(data));
         done();
       } catch (e) {
         done(e);

@@ -65,8 +65,8 @@ class AadO365GroupSetCommand extends GraphCommand {
         headers: {
           'accept': 'application/json;odata.metadata=none'
         },
-        json: true,
-        body: update
+        responseType: 'json',
+        data: update
       };
 
       return request.patch(requestOptions);
@@ -90,7 +90,7 @@ class AadO365GroupSetCommand extends GraphCommand {
           headers: {
             'content-type': this.getImageContentType(fullPath)
           },
-          body: fs.readFileSync(fullPath)
+          data: fs.readFileSync(fullPath)
         };
 
         return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
@@ -117,7 +117,7 @@ class AadO365GroupSetCommand extends GraphCommand {
           headers: {
             'content-type': 'application/json'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.get(requestOptions);
@@ -132,8 +132,8 @@ class AadO365GroupSetCommand extends GraphCommand {
           headers: {
             'content-type': 'application/json'
           },
-          json: true,
-          body: {
+          responseType: 'json',
+          data: {
             "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
           }
         })));
@@ -158,7 +158,7 @@ class AadO365GroupSetCommand extends GraphCommand {
           headers: {
             'content-type': 'application/json'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.get(requestOptions);
@@ -173,8 +173,8 @@ class AadO365GroupSetCommand extends GraphCommand {
           headers: {
             'content-type': 'application/json'
           },
-          json: true,
-          body: {
+          responseType: 'json',
+          data: {
             "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
           }
         })));

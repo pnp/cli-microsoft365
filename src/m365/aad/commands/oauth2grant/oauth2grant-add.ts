@@ -39,8 +39,8 @@ class AadOAuth2GrantAddCommand extends AadCommand {
       headers: {
         'content-type': 'application/json'
       },
-      json: true,
-      body: {
+      responseType: 'json',
+      data: {
         "odata.type": "Microsoft.DirectoryServices.OAuth2PermissionGrant",
         "clientId": args.options.clientId,
         "consentType": "AllPrincipals",

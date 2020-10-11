@@ -54,7 +54,7 @@ class SpoPageRemoveCommand extends SpoCommand {
               'content-type': 'application/json;odata=nometadata',
               accept: 'application/json;odata=nometadata'
             },
-            json: true
+            responseType: 'json'
           };
 
           return request.post(requestOptions);

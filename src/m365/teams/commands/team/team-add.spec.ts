@@ -151,7 +151,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+        assert.deepEqual(requestStub.getCall(0).args[0].data, {
           "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
           displayName: 'Architecture',
           description: 'Architecture Discussion'
@@ -207,7 +207,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+        assert.deepEqual(requestStub.getCall(0).args[0].data, {
           "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
           displayName: 'Sample Engineering Team',
           description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
@@ -264,7 +264,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+        assert.deepEqual(requestStub.getCall(0).args[0].data, {
           "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
           displayName: 'Sample Classroom Team',
           description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
@@ -321,7 +321,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+        assert.deepEqual(requestStub.getCall(0).args[0].data, {
           "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
           displayName: 'Sample Engineering Team',
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
@@ -379,7 +379,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+        assert.deepEqual(requestStub.getCall(0).args[0].data, {
           "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
           displayName: 'Sample Classroom Team',
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
@@ -481,7 +481,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+        assert.deepEqual(requestStub.getCall(0).args[0].data, {
           "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
           displayName: 'Sample Classroom Team',
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
@@ -586,7 +586,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+        assert.deepEqual(requestStub.getCall(0).args[0].data, {
           "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
           displayName: 'Sample Classroom Team',
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
@@ -668,7 +668,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.deepEqual(requestStub.getCall(0).args[0].body, {
+        assert.deepEqual(requestStub.getCall(0).args[0].data, {
           "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
           displayName: 'Sample Classroom Team',
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'

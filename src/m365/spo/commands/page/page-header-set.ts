@@ -155,7 +155,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     request
@@ -172,7 +172,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);
@@ -265,10 +265,10 @@ class SpoPageHeaderSetCommand extends SpoCommand {
             'accept': 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             LayoutWebpartsContent: JSON.stringify([header])
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);
@@ -292,7 +292,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       headers: {
         accept: 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.get(requestOptions);
@@ -308,7 +308,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       headers: {
         accept: 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.get(requestOptions);
@@ -324,7 +324,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       headers: {
         accept: 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.get(requestOptions);
