@@ -69,7 +69,7 @@ class SpoListItemSetCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.get(listRequestOptions)
@@ -93,7 +93,7 @@ class SpoListItemSetCommand extends SpoCommand {
             headers: {
               'accept': 'application/json;odata=nometadata'
             },
-            json: true
+            responseType: 'json'
           };
 
           return request.get(requestOptions);
@@ -200,14 +200,14 @@ class SpoListItemSetCommand extends SpoCommand {
             'Content-Type': 'text/xml',
             'X-RequestDigest': formDigestValue,
           },
-          body: requestBody
+          data: requestBody
         } : {
             url: `${listRestUrl}/items(${args.options.id})/ValidateUpdateListItem()`,
             headers: {
               'accept': 'application/json;odata=nometadata'
             },
-            body: requestBody,
-            json: true
+            data: requestBody,
+            responseType: 'json'
           };
 
         return request.post(requestOptions);
@@ -240,7 +240,7 @@ class SpoListItemSetCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.get(requestOptions);
@@ -369,7 +369,7 @@ class SpoListItemSetCommand extends SpoCommand {
       headers: {
         'X-RequestDigest': formDigestValue
       },
-      body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
+      data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
     };
 
     return new Promise<string>((resolve: any, reject: any): void => {

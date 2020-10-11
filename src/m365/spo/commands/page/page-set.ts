@@ -77,15 +77,15 @@ class SpoPageSetCommand extends SpoCommand {
             'IF-MATCH': '*',
             accept: 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             PageLayoutType: args.options.layoutType
           },
-          json: true
+          responseType: 'json'
         };
 
         if (args.options.layoutType === 'Article') {
-          requestOptions.body.PromotedState = 0;
-          requestOptions.body.BannerImageUrl = {
+          requestOptions.data.PromotedState = 0;
+          requestOptions.data.BannerImageUrl = {
             Description: '/_layouts/15/images/sitepagethumbnail.png',
             Url: `${resource}/_layouts/15/images/sitepagethumbnail.png`
           };
@@ -99,7 +99,7 @@ class SpoPageSetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          json: true
+          responseType: 'json'
         };
 
         switch (args.options.promoteAs) {
@@ -112,7 +112,7 @@ class SpoPageSetCommand extends SpoCommand {
               'content-type': 'application/json;odata=nometadata',
               accept: 'application/json;odata=nometadata'
             };
-            requestOptions.body = {
+            requestOptions.data = {
               WelcomePage: `SitePages/${pageName}`
             };
             break;
@@ -125,7 +125,7 @@ class SpoPageSetCommand extends SpoCommand {
               'content-type': 'application/json;odata=nometadata',
               accept: 'application/json;odata=nometadata'
             };
-            requestOptions.body = {
+            requestOptions.data = {
               PromotedState: 2,
               FirstPublishedDate: new Date().toISOString().replace('Z', '')
             }
@@ -148,7 +148,7 @@ class SpoPageSetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          json: true,
+          responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${res.Id})/SavePageAsTemplate`,
           headers: {
             'X-RequestDigest': requestDigest,
@@ -172,7 +172,7 @@ class SpoPageSetCommand extends SpoCommand {
         templateListItemId = res.Id;
 
         const requestOptions: any = {
-          json: true,
+          responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePage`,
           headers: {
             'X-RequestDigest': requestDigest,
@@ -181,7 +181,7 @@ class SpoPageSetCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             BannerImageUrl: bannerImageUrl,
             CanvasContent1: canvasContent1,
             LayoutWebpartsContent: layoutWebpartsContent
@@ -195,7 +195,7 @@ class SpoPageSetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          json: true,
+          responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePageAsDraft`,
           headers: {
             'X-RequestDigest': requestDigest,
@@ -204,7 +204,7 @@ class SpoPageSetCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             Title: fileNameWithoutExtension,
             BannerImageUrl: bannerImageUrl,
             CanvasContent1: canvasContent1,
@@ -226,7 +226,7 @@ class SpoPageSetCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);
@@ -243,7 +243,7 @@ class SpoPageSetCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

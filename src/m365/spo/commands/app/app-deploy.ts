@@ -70,7 +70,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
             headers: {
               accept: 'application/json;odata=nometadata'
             },
-            json: true
+            responseType: 'json'
           };
 
           return request.get(requestOptions);
@@ -89,8 +89,8 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
             accept: 'application/json;odata=nometadata',
             'content-type': 'application/json;odata=nometadata;charset=utf-8'
           },
-          body: { 'skipFeatureDeployment': args.options.skipFeatureDeployment || false },
-          json: true
+          data: { 'skipFeatureDeployment': args.options.skipFeatureDeployment || false },
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

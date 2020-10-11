@@ -45,15 +45,15 @@ class TeamsTabAddCommand extends GraphItemsListCommand<Tab> {
   }
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
 
-    const body: any = this.mapRequestBody(args.options);
+    const data: any = this.mapRequestBody(args.options);
     const requestOptions: any = {
       url: `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/channels/${args.options.channelId}/tabs`,
       headers: {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata=nometadata'
       },
-      body: body,
-      json: true
+      data: data,
+      responseType: 'json'
     };
     request
       .post(requestOptions)

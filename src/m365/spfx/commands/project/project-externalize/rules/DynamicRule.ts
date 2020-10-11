@@ -102,8 +102,8 @@ export class DynamicRule extends BasicDependencyRule {
       .post<ScriptCheckApiResponse>({
         url: 'https://scriptcheck-weu-fn.azurewebsites.net/api/v2/script-check',
         headers: { 'content-type': 'application/json', accept: 'application/json', 'x-anonymous': 'true' },
-        body: { url: url },
-        json: true
+        data: { url: url },
+        responseType: 'json'
       }).catch(() => {
         return { scriptType: 'non-module' as ModuleType, exports: [] };
       });

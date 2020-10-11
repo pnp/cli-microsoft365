@@ -60,7 +60,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
             accept: 'application/json;odata=nometadata',
             binaryStringRequestBody: 'true'
           },
-          body: fs.readFileSync(fullPath)
+          data: fs.readFileSync(fullPath)
         };
 
         return request.post(requestOptions);

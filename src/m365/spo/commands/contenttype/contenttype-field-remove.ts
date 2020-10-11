@@ -60,7 +60,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
         headers: {
           accept: 'application/json;odata=nometadata'
         },
-        json: true
+        responseType: 'json'
       }
 
       request
@@ -79,7 +79,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             headers: {
               accept: 'application/json;odata=nometadata'
             },
-            json: true
+            responseType: 'json'
           }
 
           return request.get(requestOptions);
@@ -101,7 +101,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             headers: {
               accept: 'application/json;odata=nometadata'
             },
-            json: true
+            responseType: 'json'
           }
 
           return request.get(requestOptions);
@@ -142,7 +142,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             headers: {
               'X-RequestDigest': requestDigest
             },
-            body: requestBody
+            data: requestBody
           };
 
           return request.post(requestOptions);

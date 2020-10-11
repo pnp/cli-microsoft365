@@ -50,7 +50,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
             headers: {
               accept: 'application/json'
             },
-            json: true
+            responseType: 'json'
           };
           return request.get(requestOptions);
         }
@@ -70,7 +70,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
             'content-length': 0,
             'accept': 'application/json'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions)

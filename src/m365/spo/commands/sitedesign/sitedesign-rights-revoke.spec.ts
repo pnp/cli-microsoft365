@@ -67,7 +67,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   it('revokes access to the specified site design from the specified principal without prompting for confirmation when confirm option specified', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b',
           principalNames: ['PattiF']
         })) {
@@ -93,7 +93,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   it('revokes access to the specified site design from the specified principal without prompting for confirmation when confirm option specified (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b',
           principalNames: ['PattiF']
         })) {
@@ -119,7 +119,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   it('revokes access to the specified site design from the specified principals', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b',
           principalNames: ['PattiF', 'AdeleV']
         })) {
@@ -145,7 +145,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   it('revokes access to the specified site design from the principals specified via email', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b',
           principalNames: ['PattiF@contoso.com', 'AdeleV@contoso.com']
         })) {
@@ -171,7 +171,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   it('revokes access to the specified site design from the specified principals separated with an extra space', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RevokeSiteDesignRights`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b',
           principalNames: ['PattiF@contoso.com', 'AdeleV@contoso.com']
         })) {

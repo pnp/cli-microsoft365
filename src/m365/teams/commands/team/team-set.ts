@@ -68,15 +68,15 @@ class TeamsSetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const body: any = this.mapRequestBody(args.options);
+    const data: any = this.mapRequestBody(args.options);
 
     const requestOptions: any = {
       url: `${this.resource}/beta/groups/${encodeURIComponent(args.options.teamId)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      body: body,
-      json: true
+      data: data,
+      responseType: 'json'
     };
 
     request

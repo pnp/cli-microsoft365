@@ -358,7 +358,7 @@ export class Auth {
           Metadata: true,
           'x-anonymous': true
         },
-        json: true
+        responseType: 'json'
       };
 
       if (process.env.IDENTITY_ENDPOINT && process.env.IDENTITY_HEADER) {

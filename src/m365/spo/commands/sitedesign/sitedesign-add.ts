@@ -80,8 +80,8 @@ class SpoSiteDesignAddCommand extends SpoCommand {
             'content-type': 'application/json;charset=utf-8',
             accept: 'application/json;odata=nometadata'
           },
-          body: { info: info },
-          json: true
+          data: { info: info },
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

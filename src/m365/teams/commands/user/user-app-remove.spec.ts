@@ -123,7 +123,7 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
 
   it('removes the app for the specified user when confirmation is specified (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url.toString().indexOf(`/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) > -1) {
+      if ((opts.url as string).indexOf(`/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) > -1) {
         return Promise.resolve();
       }
       return Promise.reject('Invalid request');
@@ -149,7 +149,7 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
 
   it('removes the app for the specified user when prompt is confirmed (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url.toString().indexOf(`/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) > -1) {
+      if ((opts.url as string).indexOf(`/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) > -1) {
         return Promise.resolve();
       }
       return Promise.reject('Invalid request');
@@ -179,7 +179,7 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
   it('correctly handles error while removing teams app', (done) => {
     const error = 'An error has occurred';
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url.toString().indexOf(`/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) > -1) {
+      if ((opts.url as string).indexOf(`/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) > -1) {
         return Promise.reject(error);
       }
       return Promise.reject('Invalid Request');

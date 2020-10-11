@@ -73,8 +73,8 @@ class SpoSiteScriptSetCommand extends SpoCommand {
             'content-type': 'application/json;charset=utf-8',
             accept: 'application/json;odata=nometadata'
           },
-          body: { updateInfo: updateInfo },
-          json: true
+          data: { updateInfo: updateInfo },
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

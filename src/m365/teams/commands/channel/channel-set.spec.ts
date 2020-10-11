@@ -136,7 +136,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (((opts.url as string).indexOf(`channels/19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype`) > -1) &&
-        JSON.stringify(opts.body) === JSON.stringify({ displayName: "New Review", description: "New Review" })
+        JSON.stringify(opts.data) === JSON.stringify({ displayName: "New Review", description: "New Review" })
       ) {
         return Promise.resolve({});
       }
@@ -179,7 +179,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (((opts.url as string).indexOf(`channels/19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype`) > -1) &&
-        JSON.stringify(opts.body) === JSON.stringify({ displayName: "New Review" })
+        JSON.stringify(opts.data) === JSON.stringify({ displayName: "New Review" })
       ) {
         return Promise.resolve({});
       }

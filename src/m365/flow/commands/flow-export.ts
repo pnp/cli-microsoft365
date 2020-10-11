@@ -67,12 +67,12 @@ class FlowExportCommand extends AzmgmtCommand {
         headers: {
           accept: 'application/json'
         },
-        body: {
+        data: {
           "baseResourceIds": [
             `/providers/Microsoft.Flow/flows/${args.options.id}`
           ]
         },
-        json: true
+        responseType: 'json'
       };
 
       return request.post(requestOptions);
@@ -89,11 +89,11 @@ class FlowExportCommand extends AzmgmtCommand {
           headers: {
             accept: 'application/json'
           },
-          json: true
+          responseType: 'json'
         };
 
         if (formatArgument !== 'json') {
-          requestOptions['body'] = {
+          requestOptions['data'] = {
             "includedResourceIds": [
               `/providers/Microsoft.Flow/flows/${args.options.id}`
             ],
@@ -131,7 +131,9 @@ class FlowExportCommand extends AzmgmtCommand {
           url: formatArgument === 'json' ?
             `${this.resource}/providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
             : downloadFileUrl,
-          encoding: null, // Set encoding to null, otherwise binary data will be encoded to utf8 and binary data is corrupt 
+          // Set responseType to arraybuffer, otherwise binary data will be encoded
+          // to utf8 and binary data is corrupt 
+          responseType: 'arraybuffer',
           headers: formatArgument === 'json' ? {
             accept: 'application/json'
           } : {

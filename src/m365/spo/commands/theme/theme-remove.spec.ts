@@ -99,8 +99,7 @@ describe(commands.THEME_REMOVE, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
         assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.strictEqual(postStub.lastCall.args[0].body.name, 'Contoso');
-        assert.strictEqual(postStub.lastCall.args[0].json, true);
+        assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
         assert.strictEqual(loggerSpy.notCalled, true);
         done();
       }
@@ -130,8 +129,7 @@ describe(commands.THEME_REMOVE, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
         assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.strictEqual(postStub.lastCall.args[0].body.name, 'Contoso');
-        assert.strictEqual(postStub.lastCall.args[0].json, true);
+        assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
         assert.notStrictEqual(loggerSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
@@ -165,8 +163,7 @@ describe(commands.THEME_REMOVE, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
         assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.strictEqual(postStub.lastCall.args[0].body.name, 'Contoso');
-        assert.strictEqual(postStub.lastCall.args[0].json, true);
+        assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
         assert.notStrictEqual(loggerSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }

@@ -109,7 +109,7 @@ class YammerMessageListCommand extends YammerCommand {
           accept: 'application/json;odata.metadata=none',
           'content-type': 'application/json;odata=nometadata'
         },
-        json: true
+        responseType: 'json'
       };
 
       request

@@ -38,7 +38,7 @@ class SpoHubSiteConnectCommand extends SpoCommand {
             'X-RequestDigest': res.FormDigestValue,
             accept: 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

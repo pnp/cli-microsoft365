@@ -26,7 +26,7 @@ class TodoListAddCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const body: any = {
+    const data: any = {
       displayName: args.options.name
     };
 
@@ -36,8 +36,8 @@ class TodoListAddCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json'
       },
-      body,
-      json: true
+      data,
+      responseType: 'json'
     };
 
     request

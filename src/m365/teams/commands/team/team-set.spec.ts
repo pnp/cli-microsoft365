@@ -67,7 +67,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
   it('sets the visibility settings correctly', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           visibility: 'Public'
         })) {
         return Promise.resolve({});
@@ -92,7 +92,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
   it('sets the mailNickName correctly', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           mailNickName: 'NewNickName'
         })) {
         return Promise.resolve({});
@@ -117,7 +117,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
   it('sets the description settings correctly', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           description: 'desc'
         })) {
         return Promise.resolve({});
@@ -140,7 +140,7 @@ describe(commands.TEAMS_TEAM_SET, () => {
   it('sets the classification settings correctly', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           classification: 'MBI'
         })) {
         return Promise.resolve({});

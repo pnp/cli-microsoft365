@@ -59,7 +59,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
         if (opts.headers &&
           opts.headers['content-type'] &&
           opts.headers['content-type'].indexOf('application/json') === 0 &&
-          opts.body.scope === 'user_impersonation') {
+          opts.data.scope === 'user_impersonation') {
           return Promise.resolve();
         }
       }
@@ -84,7 +84,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
         if (opts.headers &&
           opts.headers['content-type'] &&
           opts.headers['content-type'].indexOf('application/json') === 0 &&
-          opts.body.scope === 'user_impersonation') {
+          opts.data.scope === 'user_impersonation') {
           return Promise.resolve();
         }
       }

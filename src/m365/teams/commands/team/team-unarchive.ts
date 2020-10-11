@@ -33,7 +33,7 @@ class TeamsUnarchiveCommand extends GraphCommand {
         'content-type': 'application/json;odata=nometadata',
         'accept': 'application/json;odata.metadata=none'
       },
-      json: true
+      responseType: 'json'
     };
 
     request

@@ -47,12 +47,12 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
             'content-type': 'application/json;charset=utf-8',
             accept: 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             id: args.options.id,
             principalNames: args.options.principals.split(',').map(p => p.trim()),
             grantedRights: grantedRights
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

@@ -66,7 +66,7 @@ describe(commands.WEB_REINDEX, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.body.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
+        if (opts.data.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
@@ -115,7 +115,7 @@ describe(commands.WEB_REINDEX, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.body.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
+        if (opts.data.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
@@ -166,7 +166,7 @@ describe(commands.WEB_REINDEX, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.body.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
+        if (opts.data.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
@@ -179,7 +179,7 @@ describe(commands.WEB_REINDEX, () => {
           }]));
         }
 
-        if (opts.body.indexOf(`<ObjectPath Id="10" ObjectPathId="9" />`) > -1) {
+        if (opts.data.indexOf(`<ObjectPath Id="10" ObjectPathId="9" />`) > -1) {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
@@ -258,7 +258,7 @@ describe(commands.WEB_REINDEX, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.body.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
+        if (opts.data.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
@@ -271,7 +271,7 @@ describe(commands.WEB_REINDEX, () => {
           }]));
         }
 
-        if (opts.body.indexOf(`<ObjectPath Id="10" ObjectPathId="9" />`) > -1) {
+        if (opts.data.indexOf(`<ObjectPath Id="10" ObjectPathId="9" />`) > -1) {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
@@ -347,7 +347,7 @@ describe(commands.WEB_REINDEX, () => {
   it('correctly handles error while requiring reindexing a list', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
-        if (opts.body.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
+        if (opts.data.indexOf(`<Query Id="1" ObjectPathId="5">`) > -1) {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
@@ -360,7 +360,7 @@ describe(commands.WEB_REINDEX, () => {
           }]));
         }
 
-        if (opts.body.indexOf(`<ObjectPath Id="10" ObjectPathId="9" />`) > -1) {
+        if (opts.data.indexOf(`<ObjectPath Id="10" ObjectPathId="9" />`) > -1) {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"

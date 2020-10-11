@@ -196,7 +196,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
     });
   });
 
-  it('ignores global options when creating request body', (done) => {
+  it('ignores global options when creating request data', (done) => {
     const postStub: Sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://graph.microsoft.com/v1.0/teams/3b4797e5-bdf3-48e1-a552-839af71562ef`) > -1) {
         return Promise.resolve({
@@ -225,7 +225,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(postStub.firstCall.args[0].body, {
+        assert.deepEqual(postStub.firstCall.args[0].data, {
           'teamsApp@odata.bind': 'https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/com.microsoft.teamspace.tab.web',
           configuration: {
             contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',

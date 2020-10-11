@@ -47,7 +47,7 @@ class AadGroupSettingAddCommand extends GraphCommand {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      json: true
+      responseType: 'json'
     };
 
     request
@@ -59,11 +59,11 @@ class AadGroupSettingAddCommand extends GraphCommand {
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
           },
-          body: {
+          data: {
             templateId: args.options.templateId,
             values: this.getGroupSettingValues(args.options, groupSettingTemplate)
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

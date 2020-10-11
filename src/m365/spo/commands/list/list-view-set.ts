@@ -61,8 +61,8 @@ class SpoListViewSetCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          json: true,
-          body: this.getPayload(args.options)
+          responseType: 'json',
+          data: this.getPayload(args.options)
         };
 
         return request.patch(requestOptions);

@@ -35,7 +35,7 @@ class TodoListSetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const body: any = {
+    const data: any = {
       displayName: args.options.newName
     };
 
@@ -52,8 +52,8 @@ class TodoListSetCommand extends GraphCommand {
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
           },
-          body,
-          json: true
+          data,
+          responseType: 'json'
         };
 
         return request.patch(requestOptions);
@@ -77,7 +77,7 @@ class TodoListSetCommand extends GraphCommand {
       headers: {
         accept: "application/json;odata.metadata=none"
       },
-      json: true
+      responseType: 'json'
     };
 
     return request

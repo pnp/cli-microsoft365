@@ -21,7 +21,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
   ) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       // fake requestObjectIdentity
-      if (opts.body.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
+      if (opts.data.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
           return requestObjectIdentityResp;
         } else {
@@ -39,7 +39,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
       }
 
       // fake getFolderPropertyBag
-      if (opts.body.indexOf('GetFolderByServerRelativeUrl') > -1) {
+      if (opts.data.indexOf('GetFolderByServerRelativeUrl') > -1) {
         if (getFolderPropertyBagResp) {
           return getFolderPropertyBagResp;
         } else {
@@ -60,7 +60,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
       }
 
       // fake getWebPropertyBag
-      if (opts.body.indexOf('Property Name="AllProperties" SelectAll="true"') > -1) {
+      if (opts.data.indexOf('Property Name="AllProperties" SelectAll="true"') > -1) {
         if (getWebPropertyBagResp) {
           return getWebPropertyBagResp;
         } else {

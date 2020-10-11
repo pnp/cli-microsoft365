@@ -67,7 +67,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
             headers: {
               'accept': 'application/json;odata=nometadata'
             },
-            json: true
+            responseType: 'json'
           };
 
           return request.post(postRequestOptions);
@@ -107,7 +107,7 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.get(requestOptions);

@@ -237,10 +237,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -258,7 +258,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -331,10 +331,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -353,7 +353,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -426,10 +426,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -448,7 +448,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -521,10 +521,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -542,7 +542,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -656,10 +656,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -678,7 +678,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -792,10 +792,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -814,7 +814,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -928,10 +928,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -949,7 +949,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1103,10 +1103,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -1125,7 +1125,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1279,10 +1279,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -1301,7 +1301,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1455,10 +1455,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -1477,7 +1477,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1631,10 +1631,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -1652,7 +1652,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1766,10 +1766,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -1787,7 +1787,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -1850,10 +1850,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -1872,7 +1872,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -2092,10 +2092,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -2114,7 +2114,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -2387,10 +2387,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -2409,7 +2409,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       () => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -2518,10 +2518,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -2540,7 +2540,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       () => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -2649,10 +2649,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -2671,7 +2671,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       () => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,
@@ -2786,10 +2786,10 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    let body: string = '';
+    let data: string = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve({});
       }
 
@@ -2808,7 +2808,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       },
       (err?: any) => {
         try {
-          assert.strictEqual(replaceId(JSON.stringify(body)), JSON.stringify({
+          assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
               {
                 "controlType": 3,

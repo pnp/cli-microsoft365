@@ -83,8 +83,9 @@ class SpoFileGetCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      encoding: null, // Set encoding to null, otherwise binary data will be encoded to utf8 and binary data is corrupt 
-      json: true
+      // Set responseType to arraybuffer, otherwise binary data will be encoded
+      // to utf8 and binary data is corrupt 
+      responseType: args.options.asFile ? 'arraybuffer' : 'json'
     };
 
     request

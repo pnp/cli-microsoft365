@@ -123,8 +123,8 @@ describe(commands.FOLDER_ADD, () => {
         assert(request.calledWith({ url: 'https://contoso.sharepoint.com/_api/web/folders',
         headers:
          { accept: 'application/json;odata=nometadata' },
-        body: { ServerRelativeUrl: '/Shared Documents/abc' },
-        json: true }));
+        data: { ServerRelativeUrl: '/Shared Documents/abc' },
+        responseType: 'json' }));
         done();
       }
       catch (e) {
@@ -148,8 +148,8 @@ describe(commands.FOLDER_ADD, () => {
         assert(request.calledWith({ url: 'https://contoso.sharepoint.com/sites/test1/_api/web/folders',
         headers:
          { accept: 'application/json;odata=nometadata' },
-        body: { ServerRelativeUrl: '/sites/test1/Shared Documents/abc' },
-        json: true }));
+        data: { ServerRelativeUrl: '/sites/test1/Shared Documents/abc' },
+        responseType: 'json' }));
         done();
       }
       catch (e) {

@@ -637,7 +637,7 @@ describe(commands.FILE_ADD, () => {
     });
   });
 
-  it('ignores global options when creating request body', (done) => {
+  it('ignores global options when creating request data', (done) => {
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
 
@@ -655,7 +655,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(postRequests.secondCall.args[0].body, {
+        assert.deepEqual(postRequests.secondCall.args[0].data, {
           bNewDocumentUpdate: true,
           checkInComment: '',
           formValues: [{ FieldName: 'Title', FieldValue: 'abc' }, { FieldName: 'ContentType', FieldValue: 'Picture' }]
@@ -882,7 +882,7 @@ describe(commands.FILE_ADD, () => {
           return Promise.resolve({ "CheckInComment": "", "CheckOutType": 0, "ContentTag": "{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428,159", "CustomizedPageStatus": 0, "ETag": "\"{B0BC16BB-C8D9-4A24-BC04-FB52045F8BEF},428\"", "Exists": true, "IrmEnabled": false, "Length": "165114", "Level": 255, "LinkingUri": null, "LinkingUrl": "", "MajorVersion": 51, "MinorVersion": 15, "Name": "MS365.jpg", "ServerRelativeUrl": "/sites/VelinDev/Shared Documents/t1/MS365.jpg", "TimeCreated": "2018-10-21T21:46:08Z", "TimeLastModified": "2018-10-25T23:49:52Z", "Title": "title4", "UIVersion": 26127, "UIVersionLabel": "51.15", "UniqueId": "b0bc16bb-c8d9-4a24-bc04-fb52045f8bef" });
         }
         else if ((opts.url as string).indexOf('ValidateUpdateListItem') > -1) {
-          if (opts.body.formValues.filter((f: any) => f.FieldName === 'Folder').length > 0) {
+          if (opts.data.formValues.filter((f: any) => f.FieldName === 'Folder').length > 0) {
             return Promise.resolve({ "value": [{ "ErrorMessage": null, "FieldName": "Title", "FieldValue": "title4", "HasException": false, "ItemId": 212 }] });
           }
           else {

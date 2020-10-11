@@ -248,12 +248,12 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
     } as any, () => {
       try {
         assert.strictEqual(sinonStub.lastCall.args[0].url, 'https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone');
-        assert.strictEqual(sinonStub.lastCall.args[0].body.displayName, 'Library Assist');
-        assert.strictEqual(sinonStub.lastCall.args[0].body.partsToClone, 'apps,tabs,settings,channels,members');
-        assert.strictEqual(sinonStub.lastCall.args[0].body.description, 'abc');
-        assert.strictEqual(sinonStub.lastCall.args[0].body.visibility, 'public');
-        assert.strictEqual(sinonStub.lastCall.args[0].body.classification, 'label');
-        assert.notStrictEqual(sinonStub.lastCall.args[0].body.mailNickname.length, 0);
+        assert.strictEqual(sinonStub.lastCall.args[0].data.displayName, 'Library Assist');
+        assert.strictEqual(sinonStub.lastCall.args[0].data.partsToClone, 'apps,tabs,settings,channels,members');
+        assert.strictEqual(sinonStub.lastCall.args[0].data.description, 'abc');
+        assert.strictEqual(sinonStub.lastCall.args[0].data.visibility, 'public');
+        assert.strictEqual(sinonStub.lastCall.args[0].data.classification, 'label');
+        assert.notStrictEqual(sinonStub.lastCall.args[0].data.mailNickname.length, 0);
         done();
       }
       catch (e) {

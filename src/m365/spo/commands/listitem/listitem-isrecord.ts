@@ -78,7 +78,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
         headers: {
           accept: 'application/json;odata=nometadata'
         },
-        json: true
+        responseType: 'json'
       }
 
       return request.get(requestOptions);
@@ -108,7 +108,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
             'Content-Type': 'text/xml',
             'X-RequestDigest': formDigestValue,
           },
-          body: requestBody
+          data: requestBody
         };
 
         return request.post<string>(requestOptions);

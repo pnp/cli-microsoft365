@@ -23,7 +23,7 @@ describe(commands.LISTITEM_SET, () => {
 
   let postFakes = (opts: any) => {
     if ((opts.url as string).indexOf('ValidateUpdateListItem') > -1) {
-      const bodyString = JSON.stringify(opts.body);
+      const bodyString = JSON.stringify(opts.data);
       const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
       actualContentType = ctMatch ? ctMatch[1] : "";
       if (bodyString.indexOf("fail updating me") > -1) return Promise.resolve({ value: [{ ErrorMessage: 'failed updating' }] })
@@ -32,7 +32,7 @@ describe(commands.LISTITEM_SET, () => {
 
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
       // requestObjectIdentity mock
-      if (opts.body.indexOf('Name="Current"') > -1) {
+      if (opts.data.indexOf('Name="Current"') > -1) {
 
         if ((opts.url as string).indexOf('rejectme.com') > -1) {
 
@@ -65,9 +65,9 @@ describe(commands.LISTITEM_SET, () => {
         )
 
       }
-      if (opts.body.indexOf('SystemUpdate') > -1) {
+      if (opts.data.indexOf('SystemUpdate') > -1) {
 
-        if (opts.body.indexOf('systemUpdate error') > -1) {
+        if (opts.data.indexOf('systemUpdate error') > -1) {
           return Promise.resolve(
             'ErrorMessage": "systemUpdate error"}'
           )
@@ -440,7 +440,7 @@ describe(commands.LISTITEM_SET, () => {
     });
   });
 
-  it('should ignore global options when creating request body', (done) => {
+  it('should ignore global options when creating request data', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     const postStubs = sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -459,7 +459,7 @@ describe(commands.LISTITEM_SET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.deepEqual(postStubs.firstCall.args[0].body, { formValues: [{ FieldName: 'Title', FieldValue: 'List Item 1' }] });
+        assert.deepEqual(postStubs.firstCall.args[0].data, { formValues: [{ FieldName: 'Title', FieldValue: 'List Item 1' }] });
         done();
       }
       catch (e) {

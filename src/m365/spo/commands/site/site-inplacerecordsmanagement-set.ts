@@ -41,11 +41,11 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
       headers: {
         accept: 'application/json;odata=nometadata'
       },
-      body: {
+      data: {
         featureId: 'da2e115b-07e4-49d9-bb2c-35e93bb9fca9',
         force: true
       },
-      json: true
+      responseType: 'json'
     };
 
     if (this.verbose) {

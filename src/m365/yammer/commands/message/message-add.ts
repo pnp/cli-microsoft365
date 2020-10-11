@@ -42,7 +42,7 @@ class YammerMessageAddCommand extends YammerCommand {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata=nometadata'
       },
-      json: true,
+      responseType: 'json',
       body: {
         body: args.options.body,
         replied_to_id: args.options.repliedToId,

@@ -32,7 +32,7 @@ describe(commands.FOLDER_RENAME, () => {
     ): sinon.SinonStub => {
       return sinon.stub(request, 'post').callsFake((opts) => {
         // fake requestObjectIdentity
-        if (opts.body.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
+        if (opts.data.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
           if (requestObjectIdentityResp) {
             return requestObjectIdentityResp;
           } else {
@@ -50,7 +50,7 @@ describe(commands.FOLDER_RENAME, () => {
         }
   
         // fake requestFolderObjectIdentity
-        if (opts.body.indexOf('GetFolderByServerRelativeUrl') > -1) {
+        if (opts.data.indexOf('GetFolderByServerRelativeUrl') > -1) {
           if (folderObjectIdentityResp) {
             return folderObjectIdentityResp;
           } else {
@@ -68,7 +68,7 @@ describe(commands.FOLDER_RENAME, () => {
         }
   
         // fake folder rename/move success
-        if (opts.body.indexOf('Name="MoveTo"') > -1) {
+        if (opts.data.indexOf('Name="MoveTo"') > -1) {
           if (folderRenameResp) {
             return folderRenameResp;
           } else {
@@ -119,7 +119,7 @@ describe(commands.FOLDER_RENAME, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should send correct folder remove request body', (done) => {
+  it('should send correct folder remove request data', (done) => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
@@ -133,7 +133,7 @@ describe(commands.FOLDER_RENAME, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="MoveTo" Id="32" ObjectPathId="26"><Parameters><Parameter Type="String">/sites/abc/Shared Documents/test1</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="26" Name="${folderObjectIdentity}" /></ObjectPaths></Request>`;
-        assert.strictEqual(requestStub.lastCall.args[0].body, bodyPayload);
+        assert.strictEqual(requestStub.lastCall.args[0].data, bodyPayload);
         done();
       }
       catch (e) {

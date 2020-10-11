@@ -42,7 +42,7 @@ class SpoPageGetCommand extends SpoCommand {
         'content-type': 'application/json;charset=utf-8',
         accept: 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     request

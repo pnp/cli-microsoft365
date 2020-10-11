@@ -51,7 +51,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
               accept: 'application/json;odata=nometadata',
               'X-RequestDigest': res.FormDigestValue
             },
-            json: true
+            responseType: 'json'
           };
 
           return request.delete(requestOptions);

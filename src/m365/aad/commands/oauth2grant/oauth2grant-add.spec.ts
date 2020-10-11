@@ -59,9 +59,9 @@ describe(commands.OAUTH2GRANT_ADD, () => {
         if (opts.headers &&
           opts.headers['content-type'] &&
           opts.headers['content-type'].indexOf('application/json') === 0 &&
-          opts.body.clientId === '6a7b1395-d313-4682-8ed4-65a6265a6320' &&
-          opts.body.resourceId === '6a7b1395-d313-4682-8ed4-65a6265a6321' &&
-          opts.body.scope === 'user_impersonation') {
+          opts.data.clientId === '6a7b1395-d313-4682-8ed4-65a6265a6320' &&
+          opts.data.resourceId === '6a7b1395-d313-4682-8ed4-65a6265a6321' &&
+          opts.data.scope === 'user_impersonation') {
           return Promise.resolve();
         }
       }
@@ -88,9 +88,9 @@ describe(commands.OAUTH2GRANT_ADD, () => {
           opts.headers.authorization.indexOf('Bearer ') === 0 &&
           opts.headers['content-type'] &&
           opts.headers['content-type'].indexOf('application/json') === 0 &&
-          opts.body.clientId === '6a7b1395-d313-4682-8ed4-65a6265a6320' &&
-          opts.body.resourceId === '6a7b1395-d313-4682-8ed4-65a6265a6321' &&
-          opts.body.scope === 'user_impersonation') {
+          opts.data.clientId === '6a7b1395-d313-4682-8ed4-65a6265a6320' &&
+          opts.data.resourceId === '6a7b1395-d313-4682-8ed4-65a6265a6321' &&
+          opts.data.scope === 'user_impersonation') {
           return Promise.resolve();
         }
       }

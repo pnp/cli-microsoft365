@@ -31,7 +31,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     ): sinon.SinonStub => {
       return sinon.stub(request, 'post').callsFake((opts) => {
         // fake contenttype hub url retrieval
-        if (opts.body.indexOf('981cbc68-9edc-4f8d-872f-71146fcbb84f') > -1) {
+        if (opts.data.indexOf('981cbc68-9edc-4f8d-872f-71146fcbb84f') > -1) {
           if (contentTypeHubRetrievalResp) {
             return contentTypeHubRetrievalResp;
           } else {
@@ -115,7 +115,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     <Method Id="4" ParentId="1" Name="GetDefaultSiteCollectionTermStore" />
   </ObjectPaths>
 </Request>`;
-        assert.strictEqual(requestStub.lastCall.args[0].body, bodyPayload);
+        assert.strictEqual(requestStub.lastCall.args[0].data, bodyPayload);
         assert(loggerSpy.calledWith({ "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub" }));
         done();
       }

@@ -60,7 +60,7 @@ describe(commands.SITEDESIGN_GET, () => {
   it('gets information about the specified site design', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignMetadata`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b'
         })) {
         return Promise.resolve({
@@ -107,7 +107,7 @@ describe(commands.SITEDESIGN_GET, () => {
   it('gets information about the specified site script (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignMetadata`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b'
         })) {
         return Promise.resolve({

@@ -64,7 +64,7 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
       headers: {
         accept: 'application/json;odata=nometadata;streaming=false'
       },
-      json: true
+      responseType: 'json'
     };
 
     request
@@ -103,7 +103,7 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
           headers: {
             'accept': 'application/json;odata=nometadata;streaming=false'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.get(requestOptions);
@@ -183,8 +183,8 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
         'accept': 'application/json;odata=nometadata;streaming=false',
         'Content-Type': 'application/json'
       },
-      json: true,
-      body: {
+      responseType: 'json',
+      data: {
         id: appRole.objectId,
         principalId: objectId,
         resourceId: appRole.resourceId

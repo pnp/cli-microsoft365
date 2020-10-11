@@ -57,7 +57,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('updates site design title', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
             Title: 'New title'
@@ -103,7 +103,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('updates site design web template to TeamSite', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
             WebTemplate: '64'
@@ -149,7 +149,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('updates site design web template to CommunicationSite', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
             WebTemplate: '68'
@@ -195,7 +195,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('updates site design site scripts (one script)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
             SiteScriptIds: ['449c0c6d-5380-4df2-b84b-622e0ac8ec24']
@@ -241,7 +241,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('updates site design site scripts (multiple scripts)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
             SiteScriptIds: ['449c0c6d-5380-4df2-b84b-622e0ac8ec24', '449c0c6d-5380-4df2-b84b-622e0ac8ec25']
@@ -287,7 +287,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('updates site design description', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
             Description: 'New description'
@@ -333,7 +333,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('updates site design previewImageUrl', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
             PreviewImageUrl: 'https://contoso.com/image.png'
@@ -379,7 +379,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('updates site design previewImageAltText', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
             PreviewImageAltText: 'Logo image'
@@ -425,7 +425,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('updates site design version', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
             Version: 2
@@ -471,7 +471,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('makes site design default', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
             IsDefault: true
@@ -517,7 +517,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('makes site design not-default (explicit)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
             IsDefault: false
@@ -563,7 +563,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('makes site design not-default (implicit)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '2a9f178a-4d1d-449c-9296-df509ab4702c'
           }
@@ -608,7 +608,7 @@ describe(commands.SITEDESIGN_SET, () => {
   it('updates all site design properties (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           "updateInfo": {
             "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
             "Title": "Contoso",

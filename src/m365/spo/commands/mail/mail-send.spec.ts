@@ -66,7 +66,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -95,7 +95,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -124,7 +124,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -153,7 +153,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -182,7 +182,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -211,7 +211,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -240,7 +240,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -269,7 +269,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -298,7 +298,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -327,7 +327,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -356,7 +356,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });
@@ -385,7 +385,7 @@ describe(commands.MAIL_SEND, () => {
       let correctRequestIssued = false;
       requests.forEach(r => {
         if (r.url.indexOf(`/_api/SP.Utilities.Utility.SendEmail`) > -1 &&
-          r.body) {
+          r.data) {
           correctRequestIssued = true;
         }
       });

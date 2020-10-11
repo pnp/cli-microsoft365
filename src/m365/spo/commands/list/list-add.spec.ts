@@ -57,7 +57,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.Title;
+        actual = opts.data.Title;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -80,7 +80,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.BaseTemplate;
+        actual = opts.data.BaseTemplate;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -103,7 +103,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.Description;
+        actual = opts.data.Description;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -126,7 +126,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.TemplateFeatureId;
+        actual = opts.data.TemplateFeatureId;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -149,7 +149,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.SchemaXml;
+        actual = opts.data.SchemaXml;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -172,7 +172,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.AllowDeletion;
+        actual = opts.data.AllowDeletion;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -195,7 +195,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.AllowEveryoneViewItems;
+        actual = opts.data.AllowEveryoneViewItems;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -218,7 +218,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.AllowMultiResponses;
+        actual = opts.data.AllowMultiResponses;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -241,7 +241,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.ContentTypesEnabled;
+        actual = opts.data.ContentTypesEnabled;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -264,7 +264,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.CrawlNonDefaultViews;
+        actual = opts.data.CrawlNonDefaultViews;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -287,7 +287,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.DefaultContentApprovalWorkflowId;
+        actual = opts.data.DefaultContentApprovalWorkflowId;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -310,7 +310,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.DefaultDisplayFormUrl;
+        actual = opts.data.DefaultDisplayFormUrl;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -333,7 +333,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.DefaultEditFormUrl;
+        actual = opts.data.DefaultEditFormUrl;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -356,7 +356,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.Direction;
+        actual = opts.data.Direction;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -379,7 +379,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.DisableGridEditing;
+        actual = opts.data.DisableGridEditing;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -402,7 +402,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.DraftVersionVisibility;
+        actual = opts.data.DraftVersionVisibility;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -425,7 +425,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EmailAlias;
+        actual = opts.data.EmailAlias;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -448,7 +448,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnableAssignToEmail;
+        actual = opts.data.EnableAssignToEmail;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -471,7 +471,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnableAttachments;
+        actual = opts.data.EnableAttachments;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -494,7 +494,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnableDeployWithDependentList;
+        actual = opts.data.EnableDeployWithDependentList;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -517,7 +517,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnableFolderCreation;
+        actual = opts.data.EnableFolderCreation;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -540,7 +540,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnableMinorVersions;
+        actual = opts.data.EnableMinorVersions;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -563,7 +563,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnableModeration;
+        actual = opts.data.EnableModeration;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -586,7 +586,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnablePeopleSelector;
+        actual = opts.data.EnablePeopleSelector;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -609,7 +609,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnableResourceSelector;
+        actual = opts.data.EnableResourceSelector;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -632,7 +632,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnableSchemaCaching;
+        actual = opts.data.EnableSchemaCaching;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -655,7 +655,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnableSyndication;
+        actual = opts.data.EnableSyndication;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -678,7 +678,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnableThrottling;
+        actual = opts.data.EnableThrottling;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -701,7 +701,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnableVersioning;
+        actual = opts.data.EnableVersioning;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -724,7 +724,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.EnforceDataValidation;
+        actual = opts.data.EnforceDataValidation;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -747,7 +747,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.ExcludeFromOfflineClient;
+        actual = opts.data.ExcludeFromOfflineClient;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -770,7 +770,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.FetchPropertyBagForListView;
+        actual = opts.data.FetchPropertyBagForListView;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -793,7 +793,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.Followable;
+        actual = opts.data.Followable;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -816,7 +816,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.ForceCheckout;
+        actual = opts.data.ForceCheckout;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -839,7 +839,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.ForceDefaultContentType;
+        actual = opts.data.ForceDefaultContentType;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -862,7 +862,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.Hidden;
+        actual = opts.data.Hidden;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -885,7 +885,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.IncludedInMyFilesScope;
+        actual = opts.data.IncludedInMyFilesScope;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -908,7 +908,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.IrmEnabled;
+        actual = opts.data.IrmEnabled;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -931,7 +931,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.IrmExpire;
+        actual = opts.data.IrmExpire;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -954,7 +954,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.IrmReject;
+        actual = opts.data.IrmReject;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -977,7 +977,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.IsApplicationList;
+        actual = opts.data.IsApplicationList;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1000,7 +1000,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.ListExperienceOptions;
+        actual = opts.data.ListExperienceOptions;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1023,7 +1023,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.MajorVersionLimit;
+        actual = opts.data.MajorVersionLimit;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1046,7 +1046,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.MajorWithMinorVersionsLimit;
+        actual = opts.data.MajorWithMinorVersionsLimit;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1069,7 +1069,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.MultipleDataList;
+        actual = opts.data.MultipleDataList;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1092,7 +1092,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.NavigateForFormsPages;
+        actual = opts.data.NavigateForFormsPages;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1115,7 +1115,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.NeedUpdateSiteClientTag;
+        actual = opts.data.NeedUpdateSiteClientTag;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1138,7 +1138,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.NoCrawl;
+        actual = opts.data.NoCrawl;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1161,7 +1161,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.OnQuickLaunch;
+        actual = opts.data.OnQuickLaunch;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1184,7 +1184,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.Ordered;
+        actual = opts.data.Ordered;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1207,7 +1207,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.ParserDisabled;
+        actual = opts.data.ParserDisabled;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1230,7 +1230,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.ReadOnlyUI;
+        actual = opts.data.ReadOnlyUI;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1253,7 +1253,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.ReadSecurity;
+        actual = opts.data.ReadSecurity;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1276,7 +1276,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.RequestAccessEnabled;
+        actual = opts.data.RequestAccessEnabled;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1299,7 +1299,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.RestrictUserUpdates;
+        actual = opts.data.RestrictUserUpdates;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1322,7 +1322,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.SendToLocationName;
+        actual = opts.data.SendToLocationName;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1345,7 +1345,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.SendToLocationUrl;
+        actual = opts.data.SendToLocationUrl;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1368,7 +1368,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.ShowUser;
+        actual = opts.data.ShowUser;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1391,7 +1391,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.UseFormsForDisplay;
+        actual = opts.data.UseFormsForDisplay;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1414,7 +1414,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.ValidationFormula;
+        actual = opts.data.ValidationFormula;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1437,7 +1437,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.ValidationMessage;
+        actual = opts.data.ValidationMessage;
         return Promise.resolve({ ErrorMessage: null });
       }
 
@@ -1460,7 +1460,7 @@ describe(commands.LIST_ADD, () => {
     let actual = '';
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/lists`) > -1) {
-        actual = opts.body.WriteSecurity;
+        actual = opts.data.WriteSecurity;
         return Promise.resolve({ ErrorMessage: null });
       }
 

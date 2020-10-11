@@ -32,7 +32,7 @@ class AadOAuth2GrantRemoveCommand extends AadCommand {
 
     const requestOptions: any = {
       url: `${this.resource}/myorganization/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}?api-version=1.6`,
-      json: true
+      responseType: 'json'
     };
 
     request

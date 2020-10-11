@@ -221,7 +221,7 @@ class SpoFileAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files/Add(url='${encodeURIComponent(fileName)}', overwrite=true)`,
-          body: fileBody,
+          data: fileBody,
           headers: {
             'accept': 'application/json;odata=nometadata',
             'content-length': bodyLength
@@ -284,7 +284,7 @@ class SpoFileAddCommand extends SpoCommand {
             headers: {
               'accept': 'application/json;odata=nometadata'
             },
-            json: true
+            responseType: 'json'
           };
 
           return request.post(requestOptions);
@@ -304,7 +304,7 @@ class SpoFileAddCommand extends SpoCommand {
             headers: {
               'accept': 'application/json;odata=nometadata'
             },
-            json: true
+            responseType: 'json'
           };
 
           return request.post(requestOptions);
@@ -424,7 +424,7 @@ class SpoFileAddCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.get<any>(requestOptions).then(response => {
@@ -456,7 +456,7 @@ class SpoFileAddCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata',
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post<void>(requestOptions);
@@ -478,7 +478,7 @@ class SpoFileAddCommand extends SpoCommand {
 
       const requestOptions: any = {
         url: `${info.WebUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(info.FolderPath)}')/Files('${encodeURIComponent(info.Name)}')/${isLastChunk ? 'Finish' : 'Continue'}Upload(uploadId=guid'${info.Id}',fileOffset=${offset})`,
-        body: fileBuffer,
+        data: fileBuffer,
         headers: {
           'accept': 'application/json;odata=nometadata',
           'content-length': readCount
@@ -543,7 +543,7 @@ class SpoFileAddCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.get(requestOptions);
@@ -571,8 +571,8 @@ class SpoFileAddCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      body: requestBody,
-      json: true
+      data: requestBody,
+      responseType: 'json'
     };
 
     return request.post(requestOptions)
@@ -597,7 +597,7 @@ class SpoFileAddCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.post(requestOptions);

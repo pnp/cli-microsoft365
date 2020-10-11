@@ -65,11 +65,11 @@ describe(commands.WEB_ADD, () => {
           Created: "2018-01-24T18:24:20",
           Description: '',
           Id: "08385b9a-8d5f-4ee9-ac98-bf6984c1856b",
-          Language: opts.body.parameters.Language,
+          Language: opts.data.parameters.Language,
           LastItemModifiedDate: "2018-01-24T18:24:27Z",
           LastItemUserModifiedDate: "2018-01-24T18:24:27Z",
-          ServerRelativeUrl: `/${opts.body.parameters.Url}`,
-          Title: opts.body.parameters.Title,
+          ServerRelativeUrl: `/${opts.data.parameters.Url}`,
+          Title: opts.data.parameters.Title,
           WebTemplate: "STS",
           WebTemplateId: 0
         });
@@ -280,7 +280,7 @@ describe(commands.WEB_ADD, () => {
       }
 
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1 &&
-        opts.body.indexOf("UseShared") > -1) {
+        opts.data.indexOf("UseShared") > -1) {
         configuredNavigation = true;
 
         return Promise.resolve(JSON.stringify([
@@ -356,7 +356,7 @@ describe(commands.WEB_ADD, () => {
       }
 
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1 &&
-        opts.body.indexOf("UseShared") > -1) {
+        opts.data.indexOf("UseShared") > -1) {
         configuredNavigation = true;
 
         return Promise.resolve(JSON.stringify([

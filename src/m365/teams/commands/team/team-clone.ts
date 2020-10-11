@@ -39,19 +39,19 @@ class TeamsCloneCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const body: any = {
+    const data: any = {
       displayName: args.options.displayName,
       mailNickname: this.generateMailNickname(args.options.displayName),
       partsToClone: args.options.partsToClone,
     }
     if (args.options.description) {
-      body.description = args.options.description;
+      data.description = args.options.description;
     }
     if (args.options.classification) {
-      body.classification = args.options.classification;
+      data.classification = args.options.classification;
     }
     if (args.options.visibility) {
-      body.visibility = args.options.visibility
+      data.visibility = args.options.visibility
     }
 
     const requestOptions: any = {
@@ -60,8 +60,8 @@ class TeamsCloneCommand extends GraphCommand {
         "content-type": "application/json",
         accept: 'application/json;odata.metadata=none'
       },
-      json: true,
-      body: body
+      responseType: 'json',
+      data: data
     };
 
     request
@@ -143,7 +143,7 @@ class TeamsCloneCommand extends GraphCommand {
    * However the mailNickname is still required by the payload so to deliver better user experience
    * the CLI generates mailNickname for the user 
    * so the user does not have to specify something that will be ignored.
-   * For more see: https://docs.microsoft.com/en-us/graph/api/team-clone?view=graph-rest-1.0#request-body
+   * For more see: https://docs.microsoft.com/en-us/graph/api/team-clone?view=graph-rest-1.0#request-data
    * This method has to be removed once the graph team fixes the issue and then the actual value
    * of the mailNickname would have to be specified by the CLI user.
    * @param displayName teams display name

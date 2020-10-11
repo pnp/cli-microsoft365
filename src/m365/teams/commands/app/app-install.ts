@@ -34,8 +34,8 @@ class TeamsAppInstallCommand extends GraphCommand {
         'content-type': 'application/json;odata=nometadata',
         'accept': 'application/json;odata.metadata=none'
       },
-      json: true,
-      body: {
+      responseType: 'json',
+      data: {
         'teamsApp@odata.bind': `${endpoint}/appCatalogs/teamsApps/${args.options.appId}`
       }
     };

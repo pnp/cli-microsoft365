@@ -64,7 +64,7 @@ class SpoSiteListCommand extends SpoCommand {
           headers: {
             'X-RequestDigest': res.FormDigestValue
           },
-          body: requestBody
+          data: requestBody
         };
 
         return request.post(requestOptions);

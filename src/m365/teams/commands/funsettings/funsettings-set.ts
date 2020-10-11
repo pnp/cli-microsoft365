@@ -44,17 +44,17 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const body: any = {
+    const data: any = {
       funSettings: {}
     };
     TeamsFunSettingsSetCommand.booleanProps.forEach(p => {
       if (typeof (args.options as any)[p] !== 'undefined') {
-        body.funSettings[p] = (args.options as any)[p] === 'true';
+        data.funSettings[p] = (args.options as any)[p] === 'true';
       }
     });
 
     if (args.options.giphyContentRating) {
-      body.funSettings.giphyContentRating = args.options.giphyContentRating;
+      data.funSettings.giphyContentRating = args.options.giphyContentRating;
     }
 
     const requestOptions: any = {
@@ -62,8 +62,8 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      body: body,
-      json: true
+      data: data,
+      responseType: 'json'
     };
 
     request

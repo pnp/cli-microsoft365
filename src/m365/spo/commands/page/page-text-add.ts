@@ -128,10 +128,10 @@ class SpoPageTextAddCommand extends SpoCommand {
         'IF-MATCH': '*',
         accept: 'application/json;odata=nometadata'
       },
-      body: {
+      data: {
         CanvasContent1: updatedContent
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.post(requestOptions);

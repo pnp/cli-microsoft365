@@ -69,7 +69,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   it('sets the allowDeleteChannels setting to true', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           guestSettings: {
             allowDeleteChannels: true
           }
@@ -96,7 +96,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   it('sets the allowDeleteChannels setting to false', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           guestSettings: {
             allowDeleteChannels: false
           }
@@ -123,7 +123,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   it('sets allowCreateUpdateChannels and allowDeleteChannels to true', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           guestSettings: {
             allowCreateUpdateChannels: true,
             allowDeleteChannels: true

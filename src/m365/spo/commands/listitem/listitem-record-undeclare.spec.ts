@@ -18,7 +18,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
       // requestObjectIdentity mock
-      if (opts.body.indexOf('Name="Current"') > -1) {
+      if (opts.data.indexOf('Name="Current"') > -1) {
 
         if ((opts.url as string).indexOf('rejectme.com') > -1) {
 
@@ -51,7 +51,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
         )
 
       }
-      if (opts.body.indexOf('Name="UndeclareItemAsRecord') > -1) {
+      if (opts.data.indexOf('Name="UndeclareItemAsRecord') > -1) {
 
         actualId = expectedId;
         return Promise.resolve();

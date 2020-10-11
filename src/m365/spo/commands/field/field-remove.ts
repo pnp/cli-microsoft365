@@ -74,7 +74,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
           'If-Match': '*',
           'accept': 'application/json;odata=nometadata'
         },
-        json: true
+        responseType: 'json'
       };
 
       return request.post(requestOptions);
@@ -103,7 +103,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
           headers: {
             accept: 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         request

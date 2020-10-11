@@ -18,7 +18,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
       // requestObjectIdentity mock
-      if (opts.body.indexOf('Name="Current"') > -1) {
+      if (opts.data.indexOf('Name="Current"') > -1) {
 
         if ((opts.url as string).indexOf('rejectme.sharepoint.com') > -1) {
           return Promise.reject('Failed request')
@@ -47,8 +47,8 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
         )
       }
 
-      if (opts.body.indexOf('Name="DeclareItemAsRecord') > -1
-        || opts.body.indexOf('Name="DeclareItemAsRecordWithDeclarationDate') > -1) {
+      if (opts.data.indexOf('Name="DeclareItemAsRecord') > -1
+        || opts.data.indexOf('Name="DeclareItemAsRecordWithDeclarationDate') > -1) {
 
         if ((opts.url as string).indexOf('alreadydeclared') > -1) {
           return Promise.resolve(JSON.stringify([

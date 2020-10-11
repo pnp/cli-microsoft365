@@ -75,7 +75,7 @@ class SpoExternalUserListCommand extends SpoCommand {
           headers: {
             'X-RequestDigest': res.FormDigestValue
           },
-          body: payload
+          data: payload
         };
 
         return request.post(requestOptions);

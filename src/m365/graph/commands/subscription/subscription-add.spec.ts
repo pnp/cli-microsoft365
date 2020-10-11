@@ -226,7 +226,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     sinon.stub(Date, 'now').callsFake(() => mockNowNumber);
     let requestBodyArg: any = null;
     sinon.stub(request, 'post').callsFake((opts) => {
-      requestBodyArg = opts.body;
+      requestBodyArg = opts.data;
       if (opts.url === `https://graph.microsoft.com/v1.0/subscriptions`) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/beta/$metadata#subscriptions/$entity",

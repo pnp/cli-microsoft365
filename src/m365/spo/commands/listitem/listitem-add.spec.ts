@@ -25,7 +25,7 @@ describe(commands.LISTITEM_ADD, () => {
 
   let postFakes = (opts: any) => {
     if ((opts.url as string).indexOf('AddValidateUpdateItemUsingPath') > -1) {
-      const bodyString = JSON.stringify(opts.body);
+      const bodyString = JSON.stringify(opts.data);
       const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
       actualContentType = ctMatch ? ctMatch[1] : "";
       if (bodyString.indexOf("fail adding me") > -1) return Promise.resolve({ value: [] })
@@ -342,7 +342,7 @@ describe(commands.LISTITEM_ADD, () => {
     }, () => {
       try {
         const addValidateUpdateItemUsingPathRequest = postStubs.getCall(postStubs.callCount - 1).args[0];
-        const info = addValidateUpdateItemUsingPathRequest.body.listItemCreateInfo;
+        const info = addValidateUpdateItemUsingPathRequest.data.listItemCreateInfo;
         assert.strictEqual(info.FolderPath.DecodedUrl, '/sites/project-xxx/Lists/Demo%20List/InsideFolder2/Folder3');
         done();
       }
@@ -352,7 +352,7 @@ describe(commands.LISTITEM_ADD, () => {
     });
   });
 
-  it('ignores global options when creating request body', (done) => {
+  it('ignores global options when creating request data', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     const postStubs = sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -369,7 +369,7 @@ describe(commands.LISTITEM_ADD, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(postStubs.firstCall.args[0].body, {
+        assert.deepEqual(postStubs.firstCall.args[0].data, {
           formValues: [{ FieldName: 'Title', FieldValue: 'List Item 1' }, { FieldName: 'ContentType', FieldValue: 'Item' }],
           listItemCreateInfo: { FolderPath: { DecodedUrl: '/sites/project-xxx/Lists/Demo%20List/InsideFolder2/Folder3' } }
         });

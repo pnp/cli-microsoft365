@@ -59,7 +59,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const body: any = {
+    const data: any = {
       changeType: args.options.changeType,
       resource: args.options.resource,
       notificationUrl: args.options.notificationUrl,
@@ -67,7 +67,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
     };
 
     if (args.options.clientState) {
-      body["clientState"] = args.options.clientState;
+      data["clientState"] = args.options.clientState;
     }
 
     const requestOptions: any = {
@@ -76,8 +76,8 @@ class GraphSubscriptionAddCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json'
       },
-      body,
-      json: true
+      data,
+      responseType: 'json'
     };
 
     request

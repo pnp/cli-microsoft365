@@ -361,7 +361,7 @@ describe(commands.APP_DEPLOY, () => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
-          JSON.stringify(r.body) === JSON.stringify({ 'skipFeatureDeployment': true })) {
+          JSON.stringify(r.data) === JSON.stringify({ 'skipFeatureDeployment': true })) {
           correctRequestIssued = true;
         }
       });
@@ -403,7 +403,7 @@ describe(commands.APP_DEPLOY, () => {
         if (r.url.indexOf(`/_api/web/sitecollectionappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
-          JSON.stringify(r.body) === JSON.stringify({ 'skipFeatureDeployment': true })) {
+          JSON.stringify(r.data) === JSON.stringify({ 'skipFeatureDeployment': true })) {
           correctRequestIssued = true;
         }
       });
@@ -445,7 +445,7 @@ describe(commands.APP_DEPLOY, () => {
         if (r.url.indexOf(`/_api/web/tenantappcatalog/AvailableApps/GetById('b2307a39-e878-458b-bc90-03bc578531d6')/deploy`) > -1 &&
           r.headers.accept &&
           r.headers.accept.indexOf('application/json') === 0 &&
-          JSON.stringify(r.body) === JSON.stringify({ 'skipFeatureDeployment': false })) {
+          JSON.stringify(r.data) === JSON.stringify({ 'skipFeatureDeployment': false })) {
           correctRequestIssued = true;
         }
       });

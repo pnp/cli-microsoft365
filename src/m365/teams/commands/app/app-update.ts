@@ -40,7 +40,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
       headers: {
         "content-type": "application/zip"
       },
-      body: fs.readFileSync(fullPath)
+      data: fs.readFileSync(fullPath)
     };
 
     request

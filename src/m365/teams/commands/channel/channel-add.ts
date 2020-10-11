@@ -41,11 +41,11 @@ class TeamsChannelAddCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json;odata=nometadata'
       },
-      body: {
+      data: {
         displayName: args.options.name,
         description: args.options.description || null
       },
-      json: true
+      responseType: 'json'
     };
 
     request

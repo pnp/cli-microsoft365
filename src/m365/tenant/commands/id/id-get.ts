@@ -39,7 +39,7 @@ class TenantIdGetCommand extends Command {
         accept: 'application/json',
         'x-anonymous': true
       },
-      json: true
+      responseType: 'json'
     };
 
     request

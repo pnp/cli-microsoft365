@@ -86,7 +86,7 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
   it('adds app from the catalog for the specified user', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
-        JSON.stringify(opts.body) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/beta/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
+        JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/beta/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
         return Promise.resolve();
       }
 
@@ -112,7 +112,7 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
   it('adds app from the catalog for the specified user (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
-        JSON.stringify(opts.body) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/beta/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
+        JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/beta/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
         return Promise.resolve();
       }
 

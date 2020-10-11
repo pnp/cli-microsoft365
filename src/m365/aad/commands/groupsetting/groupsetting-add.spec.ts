@@ -66,7 +66,7 @@ describe(commands.GROUPSETTING_ADD, () => {
     });
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
           values: [
             {
@@ -162,7 +162,7 @@ describe(commands.GROUPSETTING_ADD, () => {
     });
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
           values: [
             {
@@ -258,7 +258,7 @@ describe(commands.GROUPSETTING_ADD, () => {
     });
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
           values: [
             {
@@ -342,7 +342,7 @@ describe(commands.GROUPSETTING_ADD, () => {
     });
   });
 
-  it('ignores global options when creating request body', (done) => {
+  it('ignores global options when creating request data', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettingTemplates/62375ab9-6b52-47ed-826b-58e47e0e304b`) {
         return Promise.resolve({
@@ -354,7 +354,7 @@ describe(commands.GROUPSETTING_ADD, () => {
     });
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
           values: [
             {
@@ -424,7 +424,7 @@ describe(commands.GROUPSETTING_ADD, () => {
 
     command.action(logger, { options: { debug: true, verbose: true, output: "text", templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } }, () => {
       try {
-        assert.deepEqual(postStub.firstCall.args[0].body, {
+        assert.deepEqual(postStub.firstCall.args[0].data, {
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
           values: [
             {

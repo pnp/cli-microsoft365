@@ -40,7 +40,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
-        json: true
+        responseType: 'json'
       };
 
       request
@@ -69,7 +69,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
               accept: 'application/json;odata.metadata=none',
               'content-type': 'application/json'
             },
-            json: true,
+            responseType: 'json',
           };
 
           return request.delete(requestOptions);

@@ -55,7 +55,7 @@ describe(commands.WEB_SET, () => {
 
   it('updates site title', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         Title: 'New title'
       })) {
         return Promise.resolve();
@@ -77,7 +77,7 @@ describe(commands.WEB_SET, () => {
 
   it('updates site description', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         Description: 'New description'
       })) {
         return Promise.resolve();
@@ -99,7 +99,7 @@ describe(commands.WEB_SET, () => {
 
   it('updates site logo URL', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         SiteLogoUrl: 'image.png'
       })) {
         return Promise.resolve();
@@ -121,7 +121,7 @@ describe(commands.WEB_SET, () => {
 
   it('disables quick launch', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         QuickLaunchEnabled: false
       })) {
         return Promise.resolve();
@@ -143,7 +143,7 @@ describe(commands.WEB_SET, () => {
 
   it('enables quick launch', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         QuickLaunchEnabled: true
       })) {
         return Promise.resolve();
@@ -165,7 +165,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets site header to compact', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         HeaderLayout: 2
       })) {
         return Promise.resolve();
@@ -187,7 +187,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets site header to standard', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         HeaderLayout: 1
       })) {
         return Promise.resolve();
@@ -209,7 +209,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets site header emphasis to 0', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         HeaderEmphasis: 0
       })) {
         return Promise.resolve();
@@ -231,7 +231,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets site header emphasis to 1', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         HeaderEmphasis: 1
       })) {
         return Promise.resolve();
@@ -253,7 +253,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets site header emphasis to 2', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         HeaderEmphasis: 2
       })) {
         return Promise.resolve();
@@ -275,7 +275,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets site header emphasis to 3', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         HeaderEmphasis: 3
       })) {
         return Promise.resolve();
@@ -297,7 +297,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets site menu mode to megamenu', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         MegaMenuEnabled: true
       })) {
         return Promise.resolve();
@@ -319,7 +319,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets site menu mode to cascading', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         MegaMenuEnabled: false
       })) {
         return Promise.resolve();
@@ -341,7 +341,7 @@ describe(commands.WEB_SET, () => {
 
   it('updates all properties', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         Title: 'New title',
         Description: 'New description',
         SiteLogoUrl: 'image.png',
@@ -582,7 +582,7 @@ describe(commands.WEB_SET, () => {
 
   it('enables footer', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         FooterEnabled: true
       })) {
         return Promise.resolve();
@@ -604,7 +604,7 @@ describe(commands.WEB_SET, () => {
 
   it('disables footer', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         FooterEnabled: false
       })) {
         return Promise.resolve();
@@ -661,7 +661,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets search scope to default scope', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         SearchScope: 0
       })) {
         return Promise.resolve();
@@ -683,7 +683,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets search scope to tenant', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         SearchScope: 1
       })) {
         return Promise.resolve();
@@ -705,7 +705,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets search scope to hub', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         SearchScope: 2
       })) {
         return Promise.resolve();
@@ -727,7 +727,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets search scope to site', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         SearchScope: 3
       })) {
         return Promise.resolve();
@@ -749,7 +749,7 @@ describe(commands.WEB_SET, () => {
 
   it('sets search scope even if parameter is not all lower case', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (JSON.stringify(opts.body) === JSON.stringify({
+      if (JSON.stringify(opts.data) === JSON.stringify({
         SearchScope: 3
       })) {
         return Promise.resolve();

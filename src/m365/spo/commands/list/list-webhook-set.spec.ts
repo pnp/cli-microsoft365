@@ -116,7 +116,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
-        actual = JSON.stringify(opts.body);
+        actual = JSON.stringify(opts.data);
         return Promise.resolve();
       }
 
@@ -152,7 +152,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists(guid'cc27a922-8224-4296-90a5-ebbc54da2e77')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
-        actual = JSON.stringify(opts.body);
+        actual = JSON.stringify(opts.data);
         return Promise.resolve();
       }
 
@@ -188,7 +188,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
-        actual = JSON.stringify(opts.body);
+        actual = JSON.stringify(opts.data);
         return Promise.resolve();
       }
 
@@ -223,7 +223,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
-        actual = JSON.stringify(opts.body);
+        actual = JSON.stringify(opts.data);
         return Promise.resolve();
       }
 
@@ -257,7 +257,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
     });
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/ninja/_api/web/lists/GetByTitle('Documents')/Subscriptions('cc27a922-8224-4296-90a5-ebbc54da2e81')`) > -1) {
-        actual = JSON.stringify(opts.body);
+        actual = JSON.stringify(opts.data);
         return Promise.resolve();
       }
 

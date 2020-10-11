@@ -55,7 +55,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
   it('adds new navigation node to the top navigation', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           Title: 'About',
           Url: '/sites/team-a/sitepages/about.aspx',
           IsExternal: false
@@ -134,7 +134,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
   it('adds new navigation node pointing to an external URL to the quick launch', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/quicklaunch`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           Title: 'About us',
           Url: 'https://contoso.com/about-us',
           IsExternal: true
@@ -176,7 +176,7 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
   it('adds new navigation node below an existing node', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/GetNodeById(1000)/Children`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           Title: 'About',
           Url: '/sites/team-a/sitepages/about.aspx',
           IsExternal: false

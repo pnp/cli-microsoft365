@@ -36,8 +36,8 @@ class AadOAuth2GrantSetCommand extends AadCommand {
       headers: {
         'content-type': 'application/json'
       },
-      json: true,
-      body: {
+      responseType: 'json',
+      data: {
         "scope": args.options.scope
       }
     };

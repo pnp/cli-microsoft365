@@ -77,8 +77,8 @@ describe(commands.O365GROUP_TEAMIFY, () => {
     }, () => {
       try {
         assert.strictEqual(requestStub.lastCall.args[0].url, 'https://graph.microsoft.com/beta/teams');
-        assert.strictEqual(requestStub.lastCall.args[0].body["template@odata.bind"], 'https://graph.microsoft.com/beta/teamsTemplates(\'standard\')');
-        assert.strictEqual(requestStub.lastCall.args[0].body["group@odata.bind"], `https://graph.microsoft.com/v1.0/groups('8231f9f2-701f-4c6e-93ce-ecb563e3c1ee')`);
+        assert.strictEqual(requestStub.lastCall.args[0].data["template@odata.bind"], 'https://graph.microsoft.com/beta/teamsTemplates(\'standard\')');
+        assert.strictEqual(requestStub.lastCall.args[0].data["group@odata.bind"], `https://graph.microsoft.com/v1.0/groups('8231f9f2-701f-4c6e-93ce-ecb563e3c1ee')`);
         done();
       }
       catch (e) {

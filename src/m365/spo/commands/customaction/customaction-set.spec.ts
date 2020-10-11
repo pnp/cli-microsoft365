@@ -93,7 +93,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(postRequestSpy.calledWith(sinon.match({
-          body: {
+          data: {
             Title: 'title1',
             Name: 'name1',
             Location: 'Microsoft.SharePoint.StandardMenu',
@@ -111,7 +111,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
   });
 
-  it('correct https body send when custom action with location ClientSideExtension.ApplicationCustomizer', (done) => {
+  it('correct https data send when custom action with location ClientSideExtension.ApplicationCustomizer', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -128,7 +128,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(postRequestSpy.calledWith(sinon.match({
-          body: {
+          data: {
             Title: 'title1',
             Name: 'name1',
             Location: 'ClientSideExtension.ApplicationCustomizer',
@@ -146,7 +146,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
   });
 
-  it('correct https body send when custom action with location ClientSideExtension.ListViewCommandSet', (done) => {
+  it('correct https data send when custom action with location ClientSideExtension.ListViewCommandSet', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -164,7 +164,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(postRequestSpy.calledWith(sinon.match({
-          body: {
+          data: {
             Title: 'title1',
             Name: 'name1',
             Location: 'ClientSideExtension.ListViewCommandSet',
@@ -184,7 +184,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
   });
 
-  it('correct https body send when custom action with location EditControlBlock', (done) => {
+  it('correct https data send when custom action with location EditControlBlock', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -201,7 +201,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(postRequestSpy.calledWith(sinon.match({
-          body: {
+          data: {
             Title: 'title1',
             Name: 'name1',
             Location: 'EditControlBlock',
@@ -220,7 +220,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
   });
 
-  it('correct https body send when custom action with location ScriptLink', (done) => {
+  it('correct https data send when custom action with location ScriptLink', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -236,7 +236,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(postRequestSpy.calledWith(sinon.match({
-          body: {
+          data: {
             Title: 'title1',
             Name: 'name1',
             Location: 'ScriptLink',
@@ -253,7 +253,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
   });
 
-  it('correct https body send when custom action with location ScriptLink and ScriptBlock', (done) => {
+  it('correct https data send when custom action with location ScriptLink and ScriptBlock', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -267,7 +267,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(postRequestSpy.calledWith(sinon.match({
-          body: {
+          data: {
             Title: 'title1',
             Name: 'name1',
             Location: 'ScriptLink',
@@ -283,7 +283,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
   });
 
-  it('correct https body send when custom action with location CommandUI.Ribbon', (done) => {
+  it('correct https data send when custom action with location CommandUI.Ribbon', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -300,7 +300,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(postRequestSpy.calledWith(sinon.match({
-          body: {
+          data: {
             Title: 'title1',
             Name: 'name1',
             Location: 'CommandUI.Ribbon',
@@ -318,7 +318,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
   });
 
-  it('correct https body send when custom action with delegated rights', (done) => {
+  it('correct https data send when custom action with delegated rights', (done) => {
     const postRequestSpy = initDefaultPostStubs();
     const options: any = {
       url: 'https://contoso.sharepoint.com',
@@ -335,7 +335,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(postRequestSpy.calledWith(sinon.match({
-          body: {
+          data: {
             Title: 'title1',
             Name: 'name1',
             Location: 'Microsoft.SharePoint.StandardMenu',

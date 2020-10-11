@@ -27,8 +27,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-
-    const body: any = {
+    const data: any = {
       "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
       "group@odata.bind": `https://graph.microsoft.com/v1.0/groups('${encodeURIComponent(args.options.groupId)}')`
     }
@@ -38,8 +37,8 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      body: body,
-      json: true
+      data: data,
+      responseType: 'json'
     };
 
     request

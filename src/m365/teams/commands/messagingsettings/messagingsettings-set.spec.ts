@@ -67,7 +67,7 @@ describe(commands.TEAMS_MESSAGINGSETTINGS_SET, () => {
   it('sets the allowUserEditMessages setting to true', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           messagingSettings: {
             allowUserEditMessages: true
           }
@@ -94,7 +94,7 @@ describe(commands.TEAMS_MESSAGINGSETTINGS_SET, () => {
   it('sets the allowUserDeleteMessages setting to false', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           messagingSettings: {
             allowUserDeleteMessages: false
           }
@@ -121,7 +121,7 @@ describe(commands.TEAMS_MESSAGINGSETTINGS_SET, () => {
   it('sets allowOwnerDeleteMessages, allowTeamMentions and allowChannelMentions to true', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           messagingSettings: {
             allowOwnerDeleteMessages: true,
             allowTeamMentions: true,

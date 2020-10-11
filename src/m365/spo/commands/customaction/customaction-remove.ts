@@ -86,7 +86,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
         accept: 'application/json;odata=nometadata',
         'X-HTTP-Method': 'DELETE'
       },
-      json: true
+      responseType: 'json'
     };
 
     return request.post(requestOptions);

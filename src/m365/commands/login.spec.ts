@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
-import * as request from 'request-promise-native';
 import * as sinon from 'sinon';
+import Axios from 'axios';
 import appInsights from '../../appInsights';
 import auth, { AuthType } from '../../Auth';
 import { Logger } from '../../cli';
@@ -48,7 +48,7 @@ describe(commands.LOGIN, () => {
       auth.restoreAuth,
       auth.clearConnectionInfo,
       auth.storeConnectionInfo,
-      request.post,
+      Axios.post,
       appInsights.trackEvent
     ]);
   });

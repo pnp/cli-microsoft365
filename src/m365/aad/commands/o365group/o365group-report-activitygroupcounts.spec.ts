@@ -68,7 +68,6 @@ describe(commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS, () => {
       try {
         assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365GroupsActivityGroupCounts(period='D7')");
         assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert.strictEqual(requestStub.lastCall.args[0].json, true);
         done();
       }
       catch (e) {

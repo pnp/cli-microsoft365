@@ -44,10 +44,10 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             hideDefaultThemes: args.options.hideDefaultThemes,
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

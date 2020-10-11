@@ -55,7 +55,7 @@ describe(commands.SITE_GROUPIFY, () => {
   it('connects site to an Microsoft 365 Group', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           displayName: 'Team A',
           alias: 'team-a',
           isPublic: false,
@@ -93,7 +93,7 @@ describe(commands.SITE_GROUPIFY, () => {
   it('connects site to an Microsoft 365 Group (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           displayName: 'Team A',
           alias: 'team-a',
           isPublic: false,
@@ -131,7 +131,7 @@ describe(commands.SITE_GROUPIFY, () => {
   it('connects site to a public Microsoft 365 Group', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           displayName: 'Team A',
           alias: 'team-a',
           isPublic: true,
@@ -169,7 +169,7 @@ describe(commands.SITE_GROUPIFY, () => {
   it('setts Microsoft 365 Group description', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           displayName: 'Team A',
           alias: 'team-a',
           isPublic: false,
@@ -209,7 +209,7 @@ describe(commands.SITE_GROUPIFY, () => {
   it('sets Microsoft 365 Group classification', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           displayName: 'Team A',
           alias: 'team-a',
           isPublic: false,
@@ -249,7 +249,7 @@ describe(commands.SITE_GROUPIFY, () => {
   it('keeps the old home page', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/team-a/_api/GroupSiteManager/CreateGroupForSite' &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           displayName: 'Team A',
           alias: 'team-a',
           isPublic: false,

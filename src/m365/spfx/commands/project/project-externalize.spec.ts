@@ -1,8 +1,8 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as requestNative from 'request-promise-native';
 import * as sinon from 'sinon';
+import { AxiosRequestConfig } from 'axios';
 import appInsights from '../../../../appInsights';
 import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
@@ -584,8 +584,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       }
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
-    sinon.stub(request, 'post').callsFake((options: requestNative.OptionsWithUrl) => {
-      if ((options.body as string).indexOf('tnt') > -1) {
+    sinon.stub(request, 'post').callsFake((options: AxiosRequestConfig) => {
+      if ((options.data as string).indexOf('tnt') > -1) {
         return Promise.resolve(JSON.stringify({ scriptType: 'module' }));
       } else {
         return Promise.resolve(JSON.stringify({ scriptType: 'script' }));

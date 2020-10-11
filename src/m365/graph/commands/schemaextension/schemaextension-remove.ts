@@ -43,7 +43,7 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
           },
-          json: true
+          responseType: 'json'
         };
 
       request.delete(requestOptions)

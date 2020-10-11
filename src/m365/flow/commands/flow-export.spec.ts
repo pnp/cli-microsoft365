@@ -33,7 +33,7 @@ describe(commands.FLOW_EXPORT, () => {
         }
       });
     }
-    if (JSON.stringify(opts.body || {}).indexOf(notFoundFlowId) > -1) {
+    if (JSON.stringify(opts.data || {}).indexOf(notFoundFlowId) > -1) {
       return Promise.resolve({
         errors: [{
           "code": "ConnectionAuthorizationFailed",
@@ -50,7 +50,7 @@ describe(commands.FLOW_EXPORT, () => {
         }
       );
     }
-    if ((opts.url as string).indexOf('/exportPackage?api-version=2016-11-01') > -1 && JSON.stringify(opts.body || {}).indexOf(nonZipFileFlowId) > -1) {
+    if ((opts.url as string).indexOf('/exportPackage?api-version=2016-11-01') > -1 && JSON.stringify(opts.data || {}).indexOf(nonZipFileFlowId) > -1) {
       return Promise.resolve(
         {
           "details": { "createdTime": "2018-09-16T04:24:28.365117Z", "packageTelemetryId": "448a7d93-7ce3-4e6a-88c9-57cf2479e62e" },

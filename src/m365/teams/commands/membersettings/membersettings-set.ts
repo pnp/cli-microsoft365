@@ -48,12 +48,12 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const body: any = {
+    const data: any = {
       memberSettings: {}
     };
     TeamsMemberSettingsSetCommand.props.forEach(p => {
       if (typeof (args.options as any)[p] !== 'undefined') {
-        body.memberSettings[p] = (args.options as any)[p] === 'true';
+        data.memberSettings[p] = (args.options as any)[p] === 'true';
       }
     });
 
@@ -62,8 +62,8 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      body: body,
-      json: true
+      data: data,
+      responseType: 'json'
     };
 
     request

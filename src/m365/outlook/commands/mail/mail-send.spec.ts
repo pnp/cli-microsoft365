@@ -65,7 +65,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        body: {
+        data: {
           contentType: 'Text',
           content: 'Lorem ipsum'
         },
@@ -74,7 +74,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
       saveToSentItems: undefined
     });
     sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.body);
+      actual = JSON.stringify(opts.data);
       if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
         return Promise.resolve();
       }
@@ -98,7 +98,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        body: {
+        data: {
           contentType: 'Text',
           content: 'Lorem ipsum'
         },
@@ -107,7 +107,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
       saveToSentItems: undefined
     });
     sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.body);
+      actual = JSON.stringify(opts.data);
       if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
         return Promise.resolve();
       }
@@ -131,7 +131,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        body: {
+        data: {
           contentType: 'Text',
           content: 'Lorem ipsum'
         },
@@ -141,7 +141,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => 'Lorem ipsum');
     sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.body);
+      actual = JSON.stringify(opts.data);
       if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
         return Promise.resolve();
       }
@@ -165,7 +165,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        body: {
+        data: {
           contentType: 'HTML',
           content: 'Lorem <b>ipsum</b>'
         },
@@ -175,7 +175,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => 'Lorem ipsum');
     sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.body);
+      actual = JSON.stringify(opts.data);
       if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
         return Promise.resolve();
       }
@@ -199,7 +199,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        body: {
+        data: {
           contentType: 'Text',
           content: 'Lorem ipsum'
         },
@@ -212,7 +212,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     });
     sinon.stub(fs, 'readFileSync').callsFake(() => 'Lorem ipsum');
     sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.body);
+      actual = JSON.stringify(opts.data);
       if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
         return Promise.resolve();
       }
@@ -236,7 +236,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        body: {
+        data: {
           contentType: 'Text',
           content: 'Lorem ipsum'
         },
@@ -246,7 +246,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     });
 
     sinon.stub(request, 'post').callsFake((opts) => {
-      actual = JSON.stringify(opts.body);
+      actual = JSON.stringify(opts.data);
       if (opts.url === `https://graph.microsoft.com/v1.0/me/sendMail`) {
         return Promise.resolve();
       }

@@ -45,7 +45,7 @@ class AadSiteClassificationUpdateCommand extends GraphCommand {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      json: true
+      responseType: 'json'
     };
 
     request
@@ -135,8 +135,8 @@ class AadSiteClassificationUpdateCommand extends GraphCommand {
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
           },
-          json: true,
-          body: updatedDirSettings,
+          responseType: 'json',
+          data: updatedDirSettings,
         };
 
         return request.patch(requestOptions);

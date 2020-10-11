@@ -52,12 +52,12 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         accept: 'application/json;odata=nometadata',
         'content-type': 'application/json;odata=nometadata'
       },
-      body: {
+      data: {
         Title: args.options.title,
         Url: args.options.url,
         IsExternal: args.options.isExternal === true
       },
-      json: true
+      responseType: 'json'
     };
 
     request

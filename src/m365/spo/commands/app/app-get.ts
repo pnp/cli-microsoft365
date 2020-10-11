@@ -63,7 +63,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
           headers: {
             accept: 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.get(requestOptions);
@@ -78,7 +78,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
           headers: {
             accept: 'application/json;odata=nometadata'
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.get(requestOptions);

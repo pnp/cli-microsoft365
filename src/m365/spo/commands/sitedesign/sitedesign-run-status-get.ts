@@ -29,7 +29,7 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const body: any = {
+    const data: any = {
       runId: args.options.runId
     };
 
@@ -39,8 +39,8 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
         accept: 'application/json;odata=nometadata',
         'content-type': 'application/json;odata=nometadata'
       },
-      body: body,
-      json: true
+      data: data,
+      responseType: 'json'
     };
 
     request.post<{ value: SiteScriptActionStatus[] }>(requestOptions)

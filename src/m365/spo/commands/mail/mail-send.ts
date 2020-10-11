@@ -85,8 +85,8 @@ class SpoMailSendCommand extends SpoCommand {
       headers: {
         'content-type': 'application/json;odata=verbose'
       },
-      json: true,
-      body: params
+      responseType: 'json',
+      data: params
     };
 
     request

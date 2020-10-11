@@ -16,7 +16,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
 
   let postFakes = (opts: any) => {
     // requestObjectIdentity mock
-    if (opts.body.indexOf('Name="Current"') > -1) {
+    if (opts.data.indexOf('Name="Current"') > -1) {
       if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
         logger.log("Returns error from requestObjectIdentity")
         return Promise.reject(JSON.stringify(

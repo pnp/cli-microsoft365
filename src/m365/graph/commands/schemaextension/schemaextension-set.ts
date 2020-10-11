@@ -45,8 +45,8 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       logger.log(`Updating schema extension with id '${args.options.id}'...`);
     }
 
-    // The default request body always contains owner
-    const body: {
+    // The default request data always contains owner
+    const data: {
       owner: string;
       description?: string;
       status?: string;
@@ -56,23 +56,23 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       owner: args.options.owner
     };
 
-    // Add the description to request body if any
+    // Add the description to request data if any
     if (args.options.description) {
       if (this.debug) {
         logger.log(`Will update description to '${args.options.description}'...`);
       }
-      body.description = args.options.description;
+      data.description = args.options.description;
     }
 
-    // Add the status to request body if any
+    // Add the status to request data if any
     if (args.options.status) {
       if (this.debug) {
         logger.log(`Will update status to '${args.options.status}'...`);
       }
-      body.status = args.options.status;
+      data.status = args.options.status;
     }
 
-    // Add the target types to request body if any
+    // Add the target types to request data if any
     const targetTypes: string[] = args.options.targetTypes
       ? args.options.targetTypes.split(',').map(t => t.trim())
       : [];
@@ -80,10 +80,10 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       if (this.debug) {
         logger.log(`Will update targetTypes to '${args.options.targetTypes}'...`);
       }
-      body.targetTypes = targetTypes;
+      data.targetTypes = targetTypes;
     }
 
-    // Add the properties to request body if any
+    // Add the properties to request data if any
     const properties: any = args.options.properties
       ? JSON.parse(args.options.properties)
       : null;
@@ -91,7 +91,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       if (this.debug) {
         logger.log(`Will update properties to '${args.options.properties}'...`);
       }
-      body.properties = properties;
+      data.properties = properties;
     }
 
     const requestOptions: any = {
@@ -100,8 +100,8 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json'
       },
-      body,
-      json: true
+      data,
+      responseType: 'json'
     };
 
     request

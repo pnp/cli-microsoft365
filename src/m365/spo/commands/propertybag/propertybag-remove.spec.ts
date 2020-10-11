@@ -23,7 +23,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   ): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
       // fake requestObjectIdentity
-      if (opts.body.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
+      if (opts.data.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
           return requestObjectIdentityResp;
         } else {
@@ -41,7 +41,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       }
 
       // fake requestFolderObjectIdentity
-      if (opts.body.indexOf('GetFolderByServerRelativeUrl') > -1) {
+      if (opts.data.indexOf('GetFolderByServerRelativeUrl') > -1) {
         if (folderObjectIdentityResp) {
           return folderObjectIdentityResp;
         } else {
@@ -62,7 +62,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       }
 
       // fake deleteion success for site and folder
-      if (opts.body.indexOf('SetFieldValue') > -1) {
+      if (opts.data.indexOf('SetFieldValue') > -1) {
         if (removePropertyResp) {
           return removePropertyResp;
         } else {
@@ -333,7 +333,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     });
   });
 
-  it('should send correct remove request body when folder is not specified', (done) => {
+  it('should send correct remove request data when folder is not specified', (done) => {
     const requestStub: sinon.SinonStub  = stubAllPostRequests();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -348,7 +348,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="AllProperties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`
-        assert(requestStub.calledWith(sinon.match({body:bodyPayload})));
+        assert(requestStub.calledWith(sinon.match({data:bodyPayload})));
         done();
       }
       catch (e) {
@@ -357,7 +357,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     });
   });
 
-  it('should send correct remove request body when folder is specified', (done) => {
+  it('should send correct remove request data when folder is specified', (done) => {
     const requestStub: sinon.SinonStub  = stubAllPostRequests();
     const options: Object = {
       webUrl: 'https://contoso.sharepoint.com',
@@ -373,7 +373,7 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="Properties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`
-        assert(requestStub.calledWith(sinon.match({body:bodyPayload})));
+        assert(requestStub.calledWith(sinon.match({data:bodyPayload})));
         done();
       }
       catch (e) {

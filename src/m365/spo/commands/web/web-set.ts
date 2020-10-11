@@ -92,8 +92,8 @@ class SpoWebSetCommand extends SpoCommand {
         'content-type': 'application/json;odata=nometadata',
         accept: 'application/json;odata=nometadata'
       },
-      json: true,
-      body: payload
+      responseType: 'json',
+      data: payload
     };
 
     if (this.verbose) {

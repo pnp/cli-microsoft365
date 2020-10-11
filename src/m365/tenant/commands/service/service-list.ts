@@ -30,7 +30,7 @@ class TenantServiceListCommand extends Command {
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
-      json: true
+      responseType: 'json'
     };
 
     request

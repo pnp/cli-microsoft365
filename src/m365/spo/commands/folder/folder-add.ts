@@ -41,10 +41,10 @@ class SpoFolderAddCommand extends SpoCommand {
       headers: {
         'accept': 'application/json;odata=nometadata',
       },
-      body: {
+      data: {
         'ServerRelativeUrl': serverRelativeUrl
       },
-      json: true
+      responseType: 'json'
     };
 
     request

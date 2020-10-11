@@ -127,7 +127,7 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
-        json: true
+        responseType: 'json'
       };
 
       request

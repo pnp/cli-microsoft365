@@ -58,7 +58,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   it('sets allowGiphy settings to false', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-11f09f201302` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           funSettings: {
             allowGiphy: false
           }
@@ -85,7 +85,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   it('sets allowGiphy settings to true', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-11f09f201302` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           funSettings: {
             allowGiphy: true
           }
@@ -112,7 +112,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   it('sets giphyContentRating to moderate', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-11f09f201302` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           funSettings: {
             giphyContentRating: 'moderate'
           }
@@ -139,7 +139,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   it('sets giphyContentRating to strict', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-11f09f201302` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           funSettings: {
             giphyContentRating: 'strict'
           }
@@ -166,7 +166,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   it('sets allowStickersAndMemes to true', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-11f09f201302` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           funSettings: {
             allowStickersAndMemes: true
           }
@@ -193,7 +193,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   it('sets allowStickersAndMemes to false', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-11f09f201302` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           funSettings: {
             allowStickersAndMemes: false
           }
@@ -221,7 +221,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   it('sets allowCustomMemes to true', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-11f09f201302` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           funSettings: {
             allowCustomMemes: true
           }
@@ -248,7 +248,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   it('sets allowCustomMemes to false', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-11f09f201302` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           funSettings: {
             allowCustomMemes: false
           }
@@ -275,7 +275,7 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   it('sets allowCustomMemes to false (debug)', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-11f09f201302` &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           funSettings: {
             allowCustomMemes: false
           }

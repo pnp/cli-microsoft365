@@ -39,13 +39,13 @@ class SpoFieldAddCommand extends SpoCommand {
             'X-RequestDigest': res.FormDigestValue,
             accept: 'application/json;odata=nometadata'
           },
-          body: {
+          data: {
             parameters: {
               SchemaXml: args.options.xml,
               Options: this.getOptions(args.options.options)
             }
           },
-          json: true
+          responseType: 'json'
         };
 
         return request.post(requestOptions);

@@ -59,7 +59,7 @@ describe(commands.SITESCRIPT_SET, () => {
   it('updates title of an existing site script', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             'Id': '0f27a016-d277-4bb4-b3c3-b5b040c9559b',
             'Title': 'Contoso'
@@ -97,7 +97,7 @@ describe(commands.SITESCRIPT_SET, () => {
   it('updates title of an existing site script (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             'Id': '0f27a016-d277-4bb4-b3c3-b5b040c9559b',
             'Title': 'Contoso'
@@ -135,7 +135,7 @@ describe(commands.SITESCRIPT_SET, () => {
   it('updates description of an existing site script', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             'Id': '0f27a016-d277-4bb4-b3c3-b5b040c9559b',
             'Description': 'My contoso script'
@@ -173,7 +173,7 @@ describe(commands.SITESCRIPT_SET, () => {
   it('updates version of an existing site script', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             'Id': '0f27a016-d277-4bb4-b3c3-b5b040c9559b',
             'Version': 1
@@ -211,7 +211,7 @@ describe(commands.SITESCRIPT_SET, () => {
   it('updates content of an existing site script', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             'Id': '0f27a016-d277-4bb4-b3c3-b5b040c9559b',
             'Content': JSON.stringify({})
@@ -249,7 +249,7 @@ describe(commands.SITESCRIPT_SET, () => {
   it('updates all properties of an existing site script', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteScript`) > -1 &&
-        JSON.stringify(opts.body) === JSON.stringify({
+        JSON.stringify(opts.data) === JSON.stringify({
           updateInfo: {
             Id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b',
             Title: 'Contoso',

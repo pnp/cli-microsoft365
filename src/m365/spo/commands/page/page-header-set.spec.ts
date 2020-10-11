@@ -12,7 +12,7 @@ const command: Command = require('./page-header-set');
 describe(commands.PAGE_HEADER_SET, () => {
   let log: string[];
   let logger: Logger;
-  let body: string;
+  let data: string;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -39,7 +39,7 @@ describe(commands.PAGE_HEADER_SET, () => {
     });
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
-        body = opts.body;
+        data = opts.data;
         return Promise.resolve();
       }
 
@@ -52,7 +52,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       request.get,
       request.post
     ]);
-    body = '';
+    data = '';
   });
 
   after(() => {
@@ -161,7 +161,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('sets page header to default when no type specified', (done) => {
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(body), JSON.stringify({
+        assert.strictEqual(JSON.stringify(data), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
             "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
             "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -196,7 +196,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('sets page header to default when default type specified', (done) => {
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(body), JSON.stringify({
+        assert.strictEqual(JSON.stringify(data), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
             "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
             "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -231,7 +231,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('sets page header to none when none specified', (done) => {
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(body), JSON.stringify({
+        assert.strictEqual(JSON.stringify(data), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
             "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
             "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -297,7 +297,7 @@ describe(commands.PAGE_HEADER_SET, () => {
 
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(body), JSON.stringify({
+        assert.strictEqual(JSON.stringify(data), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
             "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
             "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -381,7 +381,7 @@ describe(commands.PAGE_HEADER_SET, () => {
 
     command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(body), JSON.stringify({
+        assert.strictEqual(JSON.stringify(data), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
             "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
             "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -434,7 +434,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('sets image to empty when header set to custom and no image specified', (done) => {
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(body), JSON.stringify({
+        assert.strictEqual(JSON.stringify(data), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
             "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
             "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -518,7 +518,7 @@ describe(commands.PAGE_HEADER_SET, () => {
 
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(body), JSON.stringify({
+        assert.strictEqual(JSON.stringify(data), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
             "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
             "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -571,7 +571,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('centers text when textAlignment set to Center', (done) => {
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', textAlignment: 'Center' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(body), JSON.stringify({
+        assert.strictEqual(JSON.stringify(data), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
             "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
             "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -606,7 +606,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('shows kicker with the specified kicker text', (done) => {
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showKicker: true, kicker: 'Team Awesome' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(body), JSON.stringify({
+        assert.strictEqual(JSON.stringify(data), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
             "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
             "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -641,7 +641,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('shows publish date', (done) => {
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showPublishDate: true } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(body), JSON.stringify({
+        assert.strictEqual(JSON.stringify(data), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
             "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
             "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -676,7 +676,7 @@ describe(commands.PAGE_HEADER_SET, () => {
   it('shows page authors', (done) => {
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', authors: 'Joe Doe, Jane Doe' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(body), JSON.stringify({
+        assert.strictEqual(JSON.stringify(data), JSON.stringify({
           LayoutWebpartsContent: JSON.stringify([{
             "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
             "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
