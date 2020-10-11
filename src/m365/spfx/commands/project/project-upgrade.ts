@@ -102,9 +102,9 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
   private static createDirectoryCommands = {
     bash: {
       createDirectoryCommand: 'mkdir',
-      createDirectoryPathParam: ' ',
+      createDirectoryPathParam: ' "',
       createDirectoryNameParam: '/',
-      createDirectoryItemTypeParam: '',
+      createDirectoryItemTypeParam: '"',
     },
     powershell: {
       createDirectoryCommand: 'New-Item',
