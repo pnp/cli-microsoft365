@@ -12,6 +12,7 @@
 
 - removed Vorpal [#1737](https://github.com/pnp/cli-microsoft365/issues/1737)
 - extended 'todo list set' with name [#1806](https://github.com/pnp/cli-microsoft365/issues/1806)
+- updated 'aad approleassignment list' to v1.0 graph API [#1604](https://github.com/pnp/cli-microsoft365/issues/1604)
 
 ## [v3.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.1.0)
 
