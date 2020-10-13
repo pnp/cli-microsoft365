@@ -13,6 +13,9 @@
 - removed Vorpal [#1737](https://github.com/pnp/cli-microsoft365/issues/1737)
 - extended 'todo list set' with name [#1806](https://github.com/pnp/cli-microsoft365/issues/1806)
 - updated 'aad approleassignment list' to v1.0 graph API [#1604](https://github.com/pnp/cli-microsoft365/issues/1604)
+- removed `CommandInstance` and simplifies `validate()` [#1821](https://github.com/pnp/cli-microsoft365/issues/1821)
+- replaced request with Axios [#1363](https://github.com/pnp/cli-microsoft365/issues/1363)
+- added quotes to paths in shell commands [#1849](https://github.com/pnp/cli-microsoft365/issues/1849)
 
 ## [v3.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.1.0)
 
