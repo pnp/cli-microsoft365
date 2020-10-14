@@ -50,39 +50,24 @@ class SpoSiteRemoveCommand extends SpoCommand {
       this.dots = '';
 
       this
-        .getSpoAdminUrl(logger, this.debug)
-        .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
-          this.spoAdminUrl = _spoAdminUrl;
-
-          return this.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
-        })
-        .then((res: FormDigestInfo): Promise<void> => {
-          this.context = res;
-
-          if (args.options.fromRecycleBin) {
-            if (this.verbose) {
-              logger.log(`Deleting site collection from recycle bin ${args.options.url}...`);
+        .getSiteGroupId(args.options.url, logger)
+        .then((_groupId: string): Promise<void> => {
+          if (_groupId === '00000000-0000-0000-0000-000000000000') {
+            if (this.debug) {
+              logger.log('Site is not groupified. Going ahead with the conventional site deletion options');
             }
 
-            return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
+            return this.deleteSiteWithoutGroup(logger, args);
           }
           else {
-            if (this.verbose) {
-              logger.log(`Deleting site collection ${args.options.url}...`);
+            if (this.debug) {
+              logger.log(`Site attached to group ${_groupId}. Initiating group delete operation via Graph API`);
+            }
+            if (args.options.fromRecycleBin || args.options.skipRecycleBin || args.options.wait) {
+              logger.log(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'fromRecycleBin' or 'skipRecycleBin' or 'wait' will not be applicable.`))
             }
 
-            return this.deleteSite(args.options.url, args.options.wait, logger);
-          }
-        })
-        .then((): Promise<void> => {
-          if (args.options.skipRecycleBin) {
-            if (this.verbose) {
-              logger.log(`Also deleting site collection from recycle bin ${args.options.url}...`)
-            }
-            return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
-          }
-          else {
-            return Promise.resolve();
+            return this.deleteGroupifiedSite(_groupId, logger);
           }
         })
         .then((): void => {
@@ -112,6 +97,45 @@ class SpoSiteRemoveCommand extends SpoCommand {
         }
       });
     }
+  }
+
+  private deleteSiteWithoutGroup(logger: Logger, args: CommandArgs): Promise<void> {
+    return this
+      .getSpoAdminUrl(logger, this.debug)
+      .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
+        this.spoAdminUrl = _spoAdminUrl;
+
+        return this.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
+      })
+      .then((res: FormDigestInfo): Promise<void> => {
+        this.context = res;
+
+        if (args.options.fromRecycleBin) {
+          if (this.verbose) {
+            logger.log(`Deleting site collection from recycle bin ${args.options.url}...`);
+          }
+
+          return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
+        }
+        else {
+          if (this.verbose) {
+            logger.log(`Deleting site collection ${args.options.url}...`);
+          }
+
+          return this.deleteSite(args.options.url, args.options.wait, logger);
+        }
+      })
+      .then((): Promise<void> => {
+        if (args.options.skipRecycleBin) {
+          if (this.verbose) {
+            logger.log(`Also deleting site collection from recycle bin ${args.options.url}...`)
+          }
+          return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
+        }
+        else {
+          return Promise.resolve();
+        }
+      });
   }
 
   private deleteSite(url: string, wait: boolean, logger: Logger): Promise<void> {
@@ -197,6 +221,57 @@ class SpoSiteRemoveCommand extends SpoCommand {
           }
         });
     });
+  }
+
+  private getSiteGroupId(url: string, logger: Logger): Promise<string> {
+    return this
+      .getSpoAdminUrl(logger, this.debug)
+      .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
+        this.spoAdminUrl = _spoAdminUrl;
+        return this.ensureFormDigest(this.spoAdminUrl, logger, this.context, this.debug);
+      })
+      .then((res: FormDigestInfo): Promise<string> => {
+        this.context = res;
+        if (this.verbose) {
+          logger.log(`Retrieving the GroupId of the site  ${url}`);
+        }
+
+        const requestOptions: any = {
+          url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': this.context.FormDigestValue
+          },
+          data: `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">${Utils.escapeXml(url)}</Parameter></Parameters></Method></ObjectPaths></Request>`
+        };
+
+        return request.post(requestOptions);
+      })
+      .then((res: string): Promise<string> => {
+        const json: ClientSvcResponse = JSON.parse(res);
+        const response: ClientSvcResponseContents = json[0];
+        if (response.ErrorInfo) {
+          return Promise.reject(response.ErrorInfo.ErrorMessage);
+        }
+        else {
+          const groupId: string = json[json.length - 1].GroupId.replace('/Guid(', '').replace(')/', '');
+          return Promise.resolve(groupId);
+        }
+      });
+  }
+
+  private deleteGroupifiedSite(groupId: string, logger: Logger): Promise<void> {
+    if (this.verbose) {
+      logger.log(`Removing Microsoft 365 Group: ${groupId}...`);
+    }
+
+    const requestOptions: any = {
+      url: `https://graph.microsoft.com/v1.0/groups/${groupId}`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none'
+      },
+    };
+
+    return request.delete(requestOptions);
   }
 
   public options(): CommandOption[] {
