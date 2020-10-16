@@ -48,92 +48,98 @@ class TeamsTabGetCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  private getTeamId(args: CommandArgs): Promise<Team[]> {
+  private getTeamId(args: CommandArgs): Promise<string> {
+    if (args.options.teamId) {
+      return Promise.resolve(args.options.teamId);
+    }
+
     const teamRequestOptions: any = {
-      url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(String(args.options.teamName))}'`,
+      url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       json: true
-    }
+    };
 
-    return request.get(teamRequestOptions)
-  }
-
-  private getChannelId(args: CommandArgs): Promise<{ value: Channel[] }> {
-    const channelRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(String(this.teamId))}/channels?$filter=displayName eq '${encodeURIComponent(String(args.options.channelName))}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      json: true
-    }
-
-    return request.get<{ value: Channel[] }>(channelRequestOptions);
-  }
-
-  private getTabId(args: CommandArgs): Promise<Tab[]> {
-    const channelRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(String(this.teamId))}/channels/${encodeURIComponent(String(this.channelId))}/tabs?$filter=displayName eq '${encodeURIComponent(String(args.options.tabName))}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      json: true
-    }
-
-    return request.get(channelRequestOptions);
-  }
-
-  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-    ((): Promise<any> => {
-      if (args.options.teamId) {
-        return Promise.resolve({ "value": [{ "id": String(args.options.teamId) }] });
-      }
-
-      return this.getTeamId(args);
-    })()
-      .then((res: { value: Team[] }): Promise<any> => {
-        const teamItem: Team | undefined = res.value[0];
+    return request.get<{ value: Team[] }>(teamRequestOptions)
+      .then(response => {
+        const teamItem: Team | undefined = response.value[0];
 
         if (!teamItem) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 
-        if (res.value.length > 1) {
-          return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${res.value.map(x => x.id)}`);
+        if (response.value.length > 1) {
+          return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
         }
+        
+        return Promise.resolve(teamItem.id);
+      });
+  }
 
-        this.teamId = res.value[0].id;
+  private getChannelId(args: CommandArgs): Promise<string> {
+    if (args.options.channelId) {
+      return Promise.resolve(args.options.channelId);
+    }
 
-        if (args.options.channelId) {
-          return Promise.resolve({ "value": [{ "id": String(args.options.channelId) }] });
-        }
+    const channelRequestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    };
 
-        return this.getChannelId(args);
-      })
-      .then((res: { value: Channel[] }): Promise<any> => {
-        const channelItem: Channel | undefined = res.value[0];
+    return request.get<{ value: Channel[] }>(channelRequestOptions)
+      .then(response => {
+        const channelItem: Channel | undefined = response.value[0];
 
         if (!channelItem) {
           return Promise.reject(`The specified channel does not exist in the Microsoft Teams team`);
         }
+        
+        return Promise.resolve(channelItem.id);
+      });
+  }
 
-        this.channelId = res.value[0].id;
+  private getTabId(args: CommandArgs): Promise<string> {
+    if (args.options.tabId) {
+      return Promise.resolve(args.options.tabId);
+    }
 
-        if (args.options.tabId) {
-          return Promise.resolve({ "value": [{ "id": String(args.options.tabId) }] });
-        }
+    const tabRequestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(this.channelId)}/tabs?$filter=displayName eq '${encodeURIComponent(args.options.tabName as string)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      json: true
+    }
 
+    return request.get<{ value: Tab[] }>(tabRequestOptions)
+    .then(response => {
+      const tabItem: Tab | undefined = response.value[0];
+
+      if (!tabItem) {
+        return Promise.reject(`The specified tab does not exist in the Microsoft Teams team channel`);
+      }
+
+      return Promise.resolve(tabItem.id);
+    });
+  }
+
+  public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
+    this
+      .getTeamId(args)
+      .then((teamId: string): Promise<string> => {
+        this.teamId = teamId;
+        return this.getChannelId(args);
+      })
+      .then((channelId: string): Promise<string> => {
+        this.channelId = channelId;
         return this.getTabId(args);
       })
-      .then((res: { value: Tab[] }): Promise<any> => {
-        const tabItem: Tab | undefined = res.value[0];
-
-        if (!tabItem) {
-          return Promise.reject(`The specified tab does not exist in the Microsoft Teams team channel`);
-        }
-
-        const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(String(this.teamId))}/channels/${encodeURIComponent(String(this.channelId))}/tabs/${encodeURIComponent(tabItem.id)}`;
+      .then((tabId: string): Promise<Tab> => {
+        const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(this.channelId)}/tabs/${encodeURIComponent(tabId)}`;
 
         const requestOptions: any = {
           url: endpoint,
@@ -143,9 +149,9 @@ class TeamsTabGetCommand extends GraphCommand {
           json: true
         }
 
-        return request.get(requestOptions);
+        return request.get<Tab>(requestOptions);
       })
-      .then((res: Tab): void => {
+      .then((res: Tab): void => {        
         cmd.log(res.webUrl);
 
         if (this.verbose) {

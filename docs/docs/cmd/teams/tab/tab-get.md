@@ -33,11 +33,11 @@ You can only retrieve tabs for teams of which you are a member.
 Get url of a Microsoft Teams Tab with id 1432c9da-8b9c-4602-9248-e0800f3e3f07
 
 ```sh
-teams tab get --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --tabId 1432c9da-8b9c-4602-9248-e0800f3e3f07
+m365 teams tab get --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:00000000000000000000000000000000@thread.skype --tabId 1432c9da-8b9c-4602-9248-e0800f3e3f07
 ```
 
 Get url of a Microsoft Teams Tab with name "Tab Name"
 
 ```sh
-teams tab list --teamName "Team Name" --channelName "Channel Name" --tabName "Tab Name"
+m365 teams tab list --teamName "Team Name" --channelName "Channel Name" --tabName "Tab Name"
 ```
