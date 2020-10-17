@@ -16,6 +16,8 @@
 - removed `CommandInstance` and simplifies `validate()` [#1821](https://github.com/pnp/cli-microsoft365/issues/1821)
 - replaced request with Axios [#1363](https://github.com/pnp/cli-microsoft365/issues/1363)
 - added quotes to paths in shell commands [#1849](https://github.com/pnp/cli-microsoft365/issues/1849)
+- fixed 'flow export' command [#1845](https://github.com/pnp/cli-microsoft365/issues/1845)
+- extended 'spo site remove' with support for M365 groups [#1561](https://github.com/pnp/cli-microsoft365/issues/1561)
 
 ## [v3.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.1.0)
 
