@@ -10,6 +10,9 @@ In this scenario, administrators will want to provide their own Azure AD app reg
 
 This tutorial will walk you through how to create your own Azure AD application with permissions restricted to only read information about SharePoint Online Site Collections and how to use this custom application with the CLI for Microsoft 365.
 
+!!!info
+    We have provided scripts to automate the provisioning of custom identities at the end of this tutorial
+
 ## Register Azure AD application in your tenant
 
 We first need to register a new Azure AD application in your tenant, to do this we will need to navigate to the [Azure Portal](https://portal.azure.com).
@@ -146,6 +149,102 @@ Search for `Edit the system environment variables` in Start Menu and launch it. 
 
 Open a new PowerShell session and execute `$env:CLIMICROSOFT365_AADAPPID` and `$env:CLIMICROSOFT365_TENANT` to verify that the environment variables have been created correctly.
 
-If you are on Linux or MacOS, depending on your terminal, add the  `export` lines to `.bashrc` or `.zshrc` file in your home directory.
+If you are on Linux or MacOS, depending on your terminal, add the `export` lines to `.bashrc` or `.zshrc` file in your home directory.
 
 If you are using PowerShell Core, it is worth noting that environment variables set in `bash` or `zsh` will persist to the `pwsh` session and the same applies to Windows.
+
+## Scripted provisioning
+
+We have provided scripts for you to use to automate the provisioning of custom identities in Azure AD to use with CLI for Microsoft 365. These scripts provision a custom identity in your Azure Active Directory, configure API permissions, grant administrator consent and configure authentication settings. 
+
+!!!attention
+    These scripts assume that you have logged into your tenant with an account with permissions to create objects in Azure Active Directory
+
+!!!info
+    The API permissions that these scripts configure, mirror the permissions of the multi-tenant `PnP Microsoft 365 Management Shell` identity.
+
+```bash tab="Bash & Azure CLI"
+#!/bin/bash
+
+function createAppRegistration (){
+    local appName=$1
+    
+    appObjectId=`az ad app create --display-name "${appName}" --oauth2-allow-implicit-flow false --query "objectId" --output tsv`
+    # Undocumented: You need to create the service principal to back the app registration
+    # https://github.com/Azure/azure-cli/issues/12797#issuecomment-612138520
+    sp=`az ad sp create --id ${appObjectId}`
+    appId=`az ad app show --id ${appObjectId} --query "appId" --output tsv`
+    
+    echo "${appId}"
+}
+
+function addDelegatePermission (){
+    local appId=$1
+    local sp=$2
+    local scope=$3
+    
+    spId=`az ad sp list --display-name "${sp}" --query "[0].appId" --output tsv`
+    scopeId=`az ad sp show --id ${spId} --query "oauth2Permissions[?value=='${scope}'].id" --output tsv`
+    count=`az ad app permission list --id ${appId} --query "length([*].resourceAccess[?id=='${scopeId}'] | [])" --output tsv`
+    
+    if [ $count -eq 0 ]; then
+        echo "Adding ${scope} permission for ${sp} ..."
+        az ad app permission add --id ${appId} --api ${spId} --api-permissions "${scopeId}=Scope"
+    else
+        echo "${scope} already listed in permissions ... skipping ..."
+    fi
+}
+
+function grantAdminConsent (){
+    local appId=$1
+    
+    az ad app permission admin-consent --id ${appId}
+}
+
+function updatePlatformConfiguration () {
+    local appId=$1
+    
+    appObjectId=`az ad app show --id ${appId} --query "objectId" --output tsv`
+    az rest --method patch --uri "https://graph.microsoft.com/v1.0/applications/${appObjectId}" --headers 'Content-Type=application/json' --body "{\"isFallbackPublicClient\":true,\"publicClient\":{\"redirectUris\":[\"https://login.microsoftonline.com/common/oauth2/nativeclient\"]},\"web\":{\"implicitGrantSettings\":{\"enableIdTokenIssuance\":false}}}"
+}
+
+echo "Creating app registration ..."
+appName='CLI for Microsoft 365 Identity'
+appId=`createAppRegistration $appName`
+
+echo "Adding delegate permissions ..."
+addDelegatePermission ${appId} "Microsoft Graph" "AppCatalog.ReadWrite.All"
+addDelegatePermission ${appId} "Microsoft Graph" "Directory.AccessAsUser.All"
+addDelegatePermission ${appId} "Microsoft Graph" "Directory.ReadWrite.All"
+addDelegatePermission ${appId} "Microsoft Graph" "Group.ReadWrite.All"
+addDelegatePermission ${appId} "Microsoft Graph" "IdentityProvider.ReadWrite.All"
+addDelegatePermission ${appId} "Microsoft Graph" "Mail.Send"
+addDelegatePermission ${appId} "Microsoft Graph" "Reports.Read.All"
+addDelegatePermission ${appId} "Microsoft Graph" "TeamsAppInstallation.ReadWriteForUser"
+addDelegatePermission ${appId} "Microsoft Graph" "User.Invite.All"
+addDelegatePermission ${appId} "Office 365 SharePoint Online" "AllSites.FullControl"
+addDelegatePermission ${appId} "Office 365 SharePoint Online" "User.Read.All"
+addDelegatePermission ${appId} "Office 365 SharePoint Online" "TermStore.ReadWrite.All"
+addDelegatePermission ${appId} "Windows Azure Active Directory" "Directory.AccessAsUser.All"
+addDelegatePermission ${appId} "Windows Azure Service Management API" "user_impersonation"
+
+echo "Granting admin consent ..."
+grantAdminConsent ${appId}
+
+echo "Updating plaform configuration ..."
+updatePlatformConfiguration ${appId}
+
+tenantId=`az account show --query "homeTenantId" --output tsv`
+echo "Execute the following commands in the prompt to use the identity and login to Microsoft 365 ..."
+echo "<!--- BEGIN ---!>"
+echo "export CLIMICROSOFT365_AADAPPID=${appId}"
+echo "export CLIMICROSOFT365_TENANT=${tenantId}"
+echo "m365 login"
+echo "<!---  END  ---!>"
+echo "Done"
+```
+
+```powershell tab="PowerShell Core & Azure CLI"
+
+
+```
