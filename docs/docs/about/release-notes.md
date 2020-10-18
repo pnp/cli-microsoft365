@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Microsoft Teams:**
+
+- [teams tab get](../cmd/teams/tab/tab-get.md) - gets information about the specified Microsoft Teams tab [#1804](https://github.com/pnp/cli-microsoft365/issues/1804)
+
 **SharePoint:**
 
 - [spo knowledgehub get](../cmd/spo/knowledgehub/knowledgehub-get.md) - gets the Knowledge Hub Site URL for your tenant [#1575](https://github.com/pnp/cli-microsoft365/issues/1575)
@@ -18,6 +22,8 @@
 - added quotes to paths in shell commands [#1849](https://github.com/pnp/cli-microsoft365/issues/1849)
 - fixed 'flow export' command [#1845](https://github.com/pnp/cli-microsoft365/issues/1845)
 - extended 'spo site remove' with support for M365 groups [#1561](https://github.com/pnp/cli-microsoft365/issues/1561)
+- added the 'Deploy a Microsoft Teams personal app and add it to users' sample script [#1867](https://github.com/pnp/cli-microsoft365/pull/1867)
+- added Teams scope to the list of default permissions in the docs [#1860](https://github.com/pnp/cli-microsoft365/issues/1860)
 
 ## [v3.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.1.0)
 
