@@ -10,10 +10,11 @@ export interface AppRole {
 }
 
 export interface InformationalUrls {
-  termsOfService?: any;
-  support?: any;
-  privacy?: any;
-  marketing?: any;
+  logoUrl?: null,
+  marketingUrl?: null,
+  privacyStatementUrl?: null,
+  supportUrl?: null,
+  termsOfServiceUrl?: null
 }
 
 export interface Oauth2Permissions {
@@ -29,31 +30,30 @@ export interface Oauth2Permissions {
 
 export interface ServicePrincipal {
   appRoleAssignments: AppRoleAssignment[];
-  objectType: string;
-  objectId: string;
-  deletionTimestamp?: any;
+  id: string;
+  deletedDateTime?: any;
   accountEnabled: boolean;
   addIns: any[];
   alternativeNames: any[];
   appDisplayName: string;
   appId: string;
   applicationTemplateId?: any;
-  appOwnerTenantId: string;
+  appOwnerOrganizationId: string;
   appRoleAssignmentRequired: boolean;
   appRoles: AppRole[];
   displayName: string;
   errorUrl?: any;
   homepage?: any;
-  informationalUrls: InformationalUrls;
+  info: InformationalUrls;
   keyCredentials: any[];
   logoutUrl?: any;
   notificationEmailAddresses: any[];
-  oauth2Permissions: Oauth2Permissions[];
+  oauth2PermissionScopes: Oauth2Permissions[];
   passwordCredentials: any[];
   preferredSingleSignOnMode?: any;
   preferredTokenSigningKeyEndDateTime?: any;
   preferredTokenSigningKeyThumbprint?: any;
-  publisherName: string;
+  verifiedPublisher?: any;
   replyUrls: any[];
   samlMetadataUrl?: any;
   samlSingleSignOnSettings?: any;
