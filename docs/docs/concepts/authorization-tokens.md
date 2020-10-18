@@ -31,6 +31,7 @@ CLI for Microsoft 365 requires the following permissions to Microsoft 365 servic
   - Read and write access to user mail
   - Send mail as a user
   - Read all usage reports
+  - Manage user's installed Teams apps
   - Invite guest users to the organization
   - Create, read, update and delete user tasks and projects
 - Microsoft 365 Management APIs
