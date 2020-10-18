@@ -543,6 +543,7 @@ nav:
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
       - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
     - Microsoft Teams:
+      - 'Deploy a Microsoft Teams personal app and add it to users': 'sample-scripts/teams/install-personal-app.md'
       - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
       - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
       - 'List app usage in Microsoft Teams': 'sample-scripts/teams/list-teams-app-usage.md'
