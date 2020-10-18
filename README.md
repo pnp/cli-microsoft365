@@ -33,6 +33,8 @@ npm i -g @pnp/cli-microsoft365@next
 
 ## Getting started
 
+> All the information to get started can be found in the documentation of this repository: [documentation](https://pnp.github.io/cli-microsoft365).
+
 Start managing the settings of your Microsoft 365 tenant by logging in to it, using the `login` command, for example:
 
 ```sh
