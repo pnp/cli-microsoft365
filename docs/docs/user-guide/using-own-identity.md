@@ -149,7 +149,7 @@ Search for `Edit the system environment variables` in Start Menu and launch it. 
 
 Open a new PowerShell session and execute `$env:CLIMICROSOFT365_AADAPPID` and `$env:CLIMICROSOFT365_TENANT` to verify that the environment variables have been created correctly.
 
-If you are on Linux or MacOS, depending on your terminal, add the `export` lines to `.bashrc` or `.zshrc` file in your home directory.
+If you are on Linux or MacOS, depending on your shell, add the `export` lines to `.bashrc` or `.zshrc` file in your home directory.
 
 If you are using PowerShell Core, it is worth noting that environment variables set in `bash` or `zsh` will persist to the `pwsh` session and the same applies to Windows.
 
