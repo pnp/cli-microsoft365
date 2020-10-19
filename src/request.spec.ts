@@ -332,6 +332,24 @@ describe('Request', () => {
       });
   });
 
+  it('returns response of a successful GET request for large file (stream)', (done) => {
+    sinon.stub(_request as any, 'req').callsFake((options) => {
+      _options = options;
+      options.responseType = "stream";
+      return Promise.resolve({ data: {} });
+    });
+
+    _request
+      .get({
+        url: 'https://contoso.sharepoint.com/'
+      })
+      .then(() => {
+        done();
+      }, (err) => {
+        done(err);
+      });
+  });
+
   it('correctly handles failed GET request', (cb) => {
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options;
@@ -513,6 +531,51 @@ describe('Request', () => {
           done(err)
         }
       }, (err: any) => {
+        done(err);
+      });
+  });
+
+  it('repeats 429-throttled request after the designated retry value for large file (stream)', (done) => {
+    let i: number = 0;
+    let timeout: number = -1;
+
+    sinon.stub(_request as any, 'req').callsFake((options) => {
+      _options = options;
+      options.responseType = "stream";
+
+      if (i++ === 0) {
+        return Promise.reject({
+          response: {
+            status: 429,
+            headers: {
+              'retry-after': 60
+            }
+          }
+        })
+      }
+      else {
+        return Promise.resolve({ data: {} });
+      }
+    });
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+      timeout = to;
+      fn();
+      return {} as any;
+    });
+
+    _request
+      .get({
+        url: 'https://contoso.sharepoint.com/'
+      })
+      .then(() => {
+        try {
+          assert.strictEqual(timeout, 60000);
+          done();
+        }
+        catch (err) {
+          done(err)
+        }
+      }, (err) => {
         done(err);
       });
   });

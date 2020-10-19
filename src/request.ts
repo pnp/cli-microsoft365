@@ -73,6 +73,9 @@ class Request {
 
   public get<TResponse>(options: AxiosRequestConfig): Promise<TResponse> {
     options.method = 'GET';
+
+    console.log(options.responseType);
+
     return this.execute(options);
   }
 
@@ -123,12 +126,22 @@ class Request {
           }
           return this.req(options);
         })
-        .then((res: AxiosResponse<TResponse>): void => {
-          if (resolve) {
-            resolve(res.data);
+        .then((res: any): void => {
+          if (options.responseType === "stream") {
+            if (resolve) {
+              resolve(res);
+            }
+            else {
+              _resolve(res);
+            }
           }
           else {
-            _resolve(res.data);
+            if (resolve) {
+              resolve(res.data);
+            }
+            else {
+              _resolve(res.data);
+            }
           }
         }, (error: AxiosError): void => {
           if (error && error.response &&
