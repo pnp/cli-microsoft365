@@ -84,35 +84,49 @@ class SpoFileGetCommand extends SpoCommand {
         'accept': 'application/json;odata=nometadata'
       },
       // Set responseType to arraybuffer, otherwise binary data will be encoded
-      // to utf8 and binary data is corrupt 
-      responseType: args.options.asFile ? 'arraybuffer' : 'json'
+      // to utf8 and binary data is corrupt
+      responseType: args.options.asFile ? 'stream' : 'json'
     };
 
-    request
-      .get<string>(requestOptions)
-      .then((file: string): void => {
-        if (args.options.asString) {
-          logger.log(file.toString());
-        }
-        else if (args.options.asListItem) {
-          const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
-          logger.log(fileProperties.ListItemAllFields)
-        }
-        else if (args.options.asFile) {
-          if (args.options.path) {
-            fs.writeFileSync(args.options.path, file);
-            if (this.verbose) {
-              logger.log(`File saved to path ${args.options.path}`);
-            }
-          }
-        }
-        else {
-          const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
-          logger.log(fileProperties);
-        }
+    if (args.options.asFile && args.options.path) {
+      request
+        .get<any>(requestOptions)
+        .then((file: any): Promise<string> => {
+          return new Promise((resolve, reject) => {
+            const writer = fs.createWriteStream(args.options.path as string);
 
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+            file.data.pipe(writer);
+
+            writer.on('error', err => {
+              reject(err);
+            });
+            writer.on('close', () => {
+              resolve(args.options.path);
+            });
+          });
+        })
+        .then((file: string): void => {
+          if (this.verbose) {
+            logger.log(`File saved to path ${file}`);
+          }
+          cb();
+        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    } else {
+      request
+        .get<string>(requestOptions)
+        .then((file: string): void => {
+          if (args.options.asString) {
+            logger.log(file.toString());
+          }
+          else {
+            const fileProperties: FileProperties = JSON.parse(JSON.stringify(file));
+            logger.log(args.options.asListItem ? fileProperties.ListItemAllFields : fileProperties);
+          }
+
+          cb();
+        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    }
+
   }
 
   public options(): CommandOption[] {

@@ -1,6 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
+import { PassThrough } from 'stream';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
@@ -17,7 +18,7 @@ describe(commands.FILE_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -33,7 +34,8 @@ describe(commands.FILE_GET, () => {
 
   afterEach(() => {
     Utils.restore([
-      request.get
+      request.get,
+      fs.createWriteStream
     ]);
   });
 
@@ -356,28 +358,92 @@ describe(commands.FILE_GET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('writeFile called when option --asFile is specified', (done) => {
+  it('writeFile called when option --asFile is specified (verbose)', (done) => {
+    const mockResponse = `{"data": 123}`;
+    const responseStream = new PassThrough();
+    responseStream.write(mockResponse);
+    responseStream.end(); //Mark that we pushed all the data.
+
+    const writeStream = new PassThrough();
+    const fsStub = sinon.stub(fs, 'createWriteStream').returns(writeStream as any);
+
+    setTimeout(() => {
+      writeStream.emit('close');
+    }, 5);
+
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
-        return Promise.resolve('abc');
+        return Promise.resolve({
+          data: responseStream
+        });
       }
 
       return Promise.reject('Invalid request');
     });
 
-    const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => '');
+    const options: Object = {
+      verbose: true,
+      id: 'b2307a39-e878-458b-bc90-03bc578531d6',
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      asFile: true,
+      path: 'test1.docx',
+      fileName: 'Test1.docx'
+    }
+
+    command.action(logger, { options: options } as any, (err?: any) => {
+      try {
+        assert(fsStub.calledOnce);
+        assert.strictEqual(err, undefined);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+      finally {
+        Utils.restore([
+          fs.createWriteStream
+        ]);
+      }
+    });
+
+  });
+
+  it('fails when empty file is created file with --asFile is specified', (done) => {
+    const mockResponse = `{"data": 123}`;
+    const responseStream = new PassThrough();
+    responseStream.write(mockResponse);
+    responseStream.end(); //Mark that we pushed all the data.
+
+    const writeStream = new PassThrough();
+    const fsStub = sinon.stub(fs, 'createWriteStream').returns(writeStream as any);
+
+    setTimeout(() => {
+      writeStream.emit('error', "Writestream throws error");
+    }, 5);
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
+        return Promise.resolve({
+          data: responseStream
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
     const options: Object = {
       debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       asFile: true,
-      path: '/Users/user/documents',
+      path: 'test1.docx',
       fileName: 'Test1.docx'
     }
 
-    command.action(logger, { options: options } as any, () => {
+    command.action(logger, { options: options } as any, (err?: any) => {
       try {
-        assert(writeFileSyncStub.called)
+        assert(fsStub.calledOnce);
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Writestream throws error')));
         done();
       }
       catch (e) {
@@ -385,77 +451,7 @@ describe(commands.FILE_GET, () => {
       }
       finally {
         Utils.restore([
-          fs.writeFileSync
-        ]);
-      }
-    });
-  });
-
-  it('writeFile called when option --asFile is specified (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => '');
-    const options: Object = {
-      debug: true,
-      id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      asFile: true,
-      path: '/Users/user/documents',
-      fileName: 'Test1.docx'
-    }
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(writeFileSyncStub.called)
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          fs.writeFileSync
-        ]);
-      }
-    });
-  });
-
-  it('writeFile not called when option --asFile and path is empty is specified', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
-        return Promise.resolve('abc');
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => '');
-    const options: Object = {
-      debug: false,
-      id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      asFile: true,
-      fileName: 'Test1.docx'
-    }
-
-    command.action(logger, { options: options } as any, () => {
-
-      try {
-        assert(writeFileSyncStub.notCalled)
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-      finally {
-        Utils.restore([
-          fs.writeFileSync
+          fs.createWriteStream
         ]);
       }
     });
