@@ -45,5 +45,6 @@ export default {
   TEAMS_USER_REMOVE: `${prefix} user remove`,
   TEAMS_USER_SET: `${prefix} user set`,
   TEAMS_USER_APP_ADD: `${prefix} user app add`,
+  TEAMS_USER_APP_LIST: `${prefix} user app list`,
   TEAMS_USER_APP_REMOVE: `${prefix} user app remove`
 };
