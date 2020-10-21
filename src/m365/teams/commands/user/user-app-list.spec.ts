@@ -79,6 +79,16 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if the both userId and userName are provided.', () => {
+    const actual = command.validate({
+      options: {
+        userId: '15d7a78e-fd77-4599-97a5-dbb6372846c6',
+        userName: "admin@contoso.com"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation when the input is correct (userId)', () => {
     const actual = command.validate({
       options: {
@@ -185,7 +195,7 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
     });
   });
 
-  it('list app from the catalog for the specified user (debug)', (done) => {
+  it('list apps from the catalog for the specified user (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
         return Promise.resolve({
@@ -228,7 +238,50 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
     });
   });
 
-  it('correctly handles error while listing teams app', (done) => {
+  it('list apps from the catalog for the specified user (json)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY="
+            },
+            {
+              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE="
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        userId: '5c705288-ed7f-44fc-af0a-ac164419901c',
+        output: 'json'
+      }
+    } as any, () => {
+      try {
+        assert(loggerSpy.calledWith([
+          {
+            "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
+            "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef"
+          },
+          {
+            "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
+            "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a"
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles error while listing teams apps', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       return Promise.reject('An error has occurred');
     });
