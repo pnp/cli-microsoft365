@@ -10,9 +10,6 @@ m365 spo page control set [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --id <id>`
 : ID of the control to update properties of
 
@@ -28,17 +25,7 @@ m365 spo page control set [options]
 `--webPartProperties [webPartProperties]`
 : JSON string with web part data as retrieved from the web part maintenance mode. Specify `webPartProperties` or `webPartData` but not both
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

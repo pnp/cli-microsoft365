@@ -10,9 +10,6 @@ m365 teams guestsettings set [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --teamId <teamId>`
 : The ID of the Teams team for which to update settings
 
@@ -22,17 +19,7 @@ m365 teams guestsettings set [options]
 `--allowDeleteChannels [allowDeleteChannels]`
 : Set to `true` to allow guests to create and update channels and to `false` to disallow it
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

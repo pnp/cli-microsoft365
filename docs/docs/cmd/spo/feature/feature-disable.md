@@ -10,9 +10,6 @@ m365 spo feature disable [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --url <url>`
 : The URL of the site or web for which to disable the feature
 
@@ -25,17 +22,7 @@ m365 spo feature disable [options]
 `--force`
 : Specifies whether to continue if an error occurs when disabling the feature
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

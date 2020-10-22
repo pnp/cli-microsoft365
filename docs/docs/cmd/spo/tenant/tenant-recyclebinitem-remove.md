@@ -10,9 +10,6 @@ m365 spo tenant recyclebinitem remove [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --url`
 : URL of the site to remove
 
@@ -22,17 +19,7 @@ m365 spo tenant recyclebinitem remove [options]
 `--confirm`
 : Don't prompt for confirming removing the deleted site collection
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 !!! important
     To use this command you have to have permissions to access the tenant admin site.

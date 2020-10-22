@@ -10,9 +10,6 @@ m365 spo sitedesign rights revoke [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --id <id>`
 : The ID of the site design to revoke rights from
 
@@ -22,17 +19,7 @@ m365 spo sitedesign rights revoke [options]
 `--confirm`
 : Don't prompt for confirming removing the site design
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

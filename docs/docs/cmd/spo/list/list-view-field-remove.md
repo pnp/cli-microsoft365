@@ -10,9 +10,6 @@ m365 spo list view field remove [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --webUrl <webUrl>`
 : URL of the site where the list is located
 
@@ -34,17 +31,7 @@ m365 spo list view field remove [options]
 `--fieldTitle [fieldTitle]`
 : The **case-sensitive** internal name or display name of the field to remove. Specify `fieldId` or `fieldTitle` but not both
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

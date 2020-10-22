@@ -531,6 +531,7 @@ export class Cli {
       theme.headline = chalk.white;
       theme.inlineCode = chalk.cyan;
       theme.sourceCodeTheme = 'solarizelight';
+      theme.includePath = path.join(this.commandsFolder, '..', '..', 'docs');
       markshell.setTheme(theme);
 
       Cli.log(markshell.toRawContent(helpFilePath));

@@ -10,23 +10,10 @@ m365 aad oauth2grant remove [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --grantId <grantId>`
 : `objectId` of OAuth2 permission grant to remove
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

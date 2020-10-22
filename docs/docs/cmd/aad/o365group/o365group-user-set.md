@@ -16,9 +16,6 @@ m365 aad teams user set
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --groupId [groupId]`
 : The ID of the Microsoft 365 group for which to update user
 
@@ -31,17 +28,7 @@ m365 aad teams user set
 `-r, --role <role>`
 : Role to set for the given user in the specified Microsoft 365 Group or Microsoft Teams team. Allowed values: `Owner,Member`
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

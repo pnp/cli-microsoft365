@@ -10,9 +10,6 @@ m365 todo task set [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --id <id>`
 : The id of the task to update
 
@@ -28,17 +25,7 @@ m365 todo task set [options]
 `--listId [listId]`
 : The id of the task list in which the task exists. Specify either `listName` or `listId`, not both
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

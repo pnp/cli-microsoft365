@@ -10,9 +10,6 @@ m365 spo propertybag set [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --webUrl <webUrl>`
 : The URL of the site in which the property should be set
 
@@ -25,17 +22,7 @@ m365 spo propertybag set [options]
 `-f, --folder [folder]`
 : Site-relative URL of the folder on which the property should be set
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

@@ -10,11 +10,11 @@ m365 spfx project externalize [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-f, --outputFile [outputFile]`
 : Path to the file where the report should be stored in
+
+`-h, --help`
+: output usage information
 
 `--query [query]`
 : JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples

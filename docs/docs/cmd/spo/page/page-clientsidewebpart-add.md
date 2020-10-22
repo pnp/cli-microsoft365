@@ -10,9 +10,6 @@ m365 spo page clientsidewebpart add [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --webUrl <webUrl>`
 : URL of the site where the page to add the web part to is located
 
@@ -40,17 +37,7 @@ m365 spo page clientsidewebpart add [options]
 `--order [order]`
 : Order of the web part in the column
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

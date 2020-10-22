@@ -10,9 +10,6 @@ m365 teams conversationmember list [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --teamId [teamId]`
 : The ID of the team where the channel is located. Specify either `teamId` or `teamName`, but not both.
 
@@ -21,21 +18,11 @@ m365 teams conversationmember list [options]
 
 `-c, --channelId [channelId]`
 : The ID of the channel for which to list members. Specify either `channelId` or `channelName`, but not both.
-      
+
 `--channelName [channelName]`
 : The name of the channel for which to list members. Specify either `channelId` or `channelName`, but not both.
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

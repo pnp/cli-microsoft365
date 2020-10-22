@@ -10,9 +10,6 @@ m365 aad o365group list [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-d, --displayName [displayName]`
 : Retrieve only groups with displayName starting with the specified value
 
@@ -28,17 +25,7 @@ m365 aad o365group list [options]
 `--orphaned`
 : Set to only retrieve groups without owners
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

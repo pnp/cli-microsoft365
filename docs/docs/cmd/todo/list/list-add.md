@@ -10,23 +10,10 @@ m365 todo list add [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-n, --name <name>`
 : The name of the task list to add
 
-`--query [query]`
-: JMESPath query string. See http://jmespath.org/ for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
@@ -36,7 +23,7 @@ m365 todo list add [options]
 ## Examples
 
 Add a task list with the name _My task list_
-      
+
 ```sh
 m365 todo list add --name "My task list"
 ```

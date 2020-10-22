@@ -10,9 +10,6 @@ m365 teams tab add [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --teamId <teamId>`
 : The ID of the team to where the channel exists
 
@@ -37,17 +34,7 @@ m365 teams tab add [options]
 `--websiteUrl [websiteUrl]`
 : The URL for showing tab contents outside of Teams
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

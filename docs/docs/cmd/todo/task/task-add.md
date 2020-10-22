@@ -10,9 +10,6 @@ m365 todo task add [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-t, --title <title>`
 : The title of the task
 
@@ -22,17 +19,7 @@ m365 todo task add [options]
 `--listId [listId]`
 : The id of the list in which to create the task. Specify either `listName` or `listId` but not both
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 
