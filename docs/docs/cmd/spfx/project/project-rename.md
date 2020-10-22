@@ -10,20 +10,20 @@ m365 spfx project rename [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-n, --newName <newName>`
 : New name for the project
 
 `--generateNewId`
 : Generate a new solution ID for the project
 
+`-h, --help`
+: output usage information
+
 `--query [query]`
 : JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 
 `-o, --output [output]`
-: Output type. `json|text|md`. Default `text`
+: Output type. `json,text,md`. Default `text`
 
 `--verbose`
 : Runs command with verbose logging

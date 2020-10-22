@@ -10,9 +10,6 @@ m365 flow disable [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-n, --name <name>`
 : The name of the Microsoft Flow to disable
 
@@ -22,17 +19,7 @@ m365 flow disable [options]
 `--asAdmin`
 : Set, to disable the Flow as admin
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

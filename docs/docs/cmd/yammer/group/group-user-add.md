@@ -10,9 +10,6 @@ m365 yammer group user add [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `--id <id>`
 : The ID of the group to add the user to
 
@@ -22,14 +19,7 @@ m365 yammer group user add [options]
 `--email [email]`
 : E-mail of the user to add to the group
 
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

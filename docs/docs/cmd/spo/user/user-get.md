@@ -10,9 +10,6 @@ m365 spo user get [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --webUrl <webUrl>`
 : URL of the web to get the user within
 
@@ -25,17 +22,7 @@ m365 spo user get [options]
 `--loginName [loginName]`
 : Login name of the user to retrieve information for. Use either `email`, `id` or `loginName`, but not all.
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

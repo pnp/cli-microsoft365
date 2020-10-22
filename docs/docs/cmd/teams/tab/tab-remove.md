@@ -10,9 +10,6 @@ m365 teams tab remove [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --teamId <teamId>`
 : The ID of the team where the tab exists
 
@@ -25,17 +22,7 @@ m365 teams tab remove [options]
 `--confirm`
 : Don't prompt for confirmation
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json|text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

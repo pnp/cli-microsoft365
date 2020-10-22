@@ -10,9 +10,6 @@ m365 spo page header set [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-n, --pageName <pageName>`
 : Name of the page to set the header for
 
@@ -52,17 +49,7 @@ m365 spo page header set [options]
 `--authors [authors]`
 : Comma-separated list of page authors to show in the header
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

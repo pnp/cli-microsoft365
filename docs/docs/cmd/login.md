@@ -10,9 +10,6 @@ m365 login [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-t, --authType [authType]`
 : The type of authentication to use. Allowed values `certificate,deviceCode,password,identity`. Default `deviceCode`
 
@@ -28,17 +25,7 @@ m365 login [options]
 `--thumbprint [thumbprint]`
 : Certificate thumbprint. Required when `authType` is set to `certificate`
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

@@ -16,9 +16,6 @@ m365 flow connector export
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-e, --environment <environment>`
 : The name of the environment where the custom connector to export is located
 
@@ -28,14 +25,7 @@ m365 flow connector export
 `--outputFolder [outputFolder]`
 : Path where the folder with connector's files should be saved. If not specified, will create the connector's folder in the current folder.
 
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

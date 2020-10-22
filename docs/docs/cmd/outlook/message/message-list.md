@@ -10,26 +10,13 @@ m365 outlook message list [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `--folderName [folderName]`
 : Name of the folder from which to list messages
 
 `--folderId [folderId]`
 : ID of the folder from which to list messages
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

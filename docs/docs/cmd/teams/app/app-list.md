@@ -10,9 +10,6 @@ m365 teams app list [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-a, --all`
 : Specify, to get apps from your organization only
 
@@ -22,17 +19,7 @@ m365 teams app list [options]
 `-t, --teamName [teamName]`
 : The display name of the team for which to list installed apps. Specify either `teamId` or `teamName` but not both
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

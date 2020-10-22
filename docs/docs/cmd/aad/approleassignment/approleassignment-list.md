@@ -10,9 +10,6 @@ m365 aad approleassignment list [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --appId [appId]`
 : Application (client) Id of the App Registration for which the configured app roles should be retrieved
 
@@ -22,17 +19,7 @@ m365 aad approleassignment list [options]
 `--objectId [objectId]`
 : ObjectId of the application for which the configured app roles should be retrieved
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
