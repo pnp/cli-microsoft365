@@ -44,7 +44,7 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
     }
 
     userIdPromise.then((userId) => {
-      const endpoint: string = `${this.resource}/v1.0/users/${encodeURIComponent(userId.value)}/teamwork/installedApps`
+      const endpoint: string = `${this.resource}/beta/users/${encodeURIComponent(userId.value)}/teamwork/installedApps`
       
       this.getAllItems(endpoint, logger, true)
         .then((): void => {
