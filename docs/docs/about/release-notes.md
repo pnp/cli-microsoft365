@@ -24,6 +24,7 @@
 - extended 'spo site remove' with support for M365 groups [#1561](https://github.com/pnp/cli-microsoft365/issues/1561)
 - added the 'Deploy a Microsoft Teams personal app and add it to users' sample script [#1867](https://github.com/pnp/cli-microsoft365/pull/1867)
 - added Teams scope to the list of default permissions in the docs [#1860](https://github.com/pnp/cli-microsoft365/issues/1860)
+- updated 'aad approleassignment add' to use Microsoft Graph [#1858](https://github.com/pnp/cli-microsoft365/issues/1858)
 
 ## [v3.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.1.0)
 
