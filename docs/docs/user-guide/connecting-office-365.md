@@ -79,7 +79,7 @@ Generally, you should use the default device code flow. If you need to use a non
 Create a new self signed certificate:
 
 ```sh
-m365 openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privateKey.key -out certificate.cer
+openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout privateKey.key -out certificate.cer
 ```
 
 Create a new Personal Information Exchange (.pfx) file
@@ -93,7 +93,7 @@ At this point the `protected.pfx` file can be used to log in the CLI for Microso
 If login with the .pfx file does not work then extract the private key from a protected .pfx and unprotect it:
 
 ```sh
-m365 openssl pkcs12 -in protected.pfx -out privateKeyWithPassphrase.pem -nodes
+openssl pkcs12 -in protected.pfx -out privateKeyWithPassphrase.pem -nodes
 ```
 
 At this point the `privateKeyWithPassphrase.pem` file can be used to log in the CLI for Microsoft 365 following the instructions above for logging in using a PEM certificate.
