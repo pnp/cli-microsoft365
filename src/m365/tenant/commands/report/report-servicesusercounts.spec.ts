@@ -24,6 +24,12 @@ describe(commands.TENANT_REPORT_SERVICESUSERCOUNTS, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
     (command as any).items = [];

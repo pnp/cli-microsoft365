@@ -18,24 +18,18 @@ class AadGroupSettingTemplateListCommand extends GraphItemsListCommand<GroupSett
     return 'Lists Azure AD group settings templates';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'displayName'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getAllItems(`${this.resource}/v1.0/groupSettingTemplates`, logger, true)
       .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          logger.log(this.items.map(i => {
-            return {
-              id: i.id,
-              displayName: i.displayName
-            };
-          }));
-        }
+        logger.log(this.items);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

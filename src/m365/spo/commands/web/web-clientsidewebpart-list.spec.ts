@@ -12,7 +12,8 @@ const command: Command = require('./web-clientsidewebpart-list');
 describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +26,16 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -145,7 +153,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     }, () => {
 
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -193,7 +201,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     }, () => {
 
       try {
-        assert(loggerSpy.calledWith("No client-side web parts available for this site"));
+        assert(loggerLogToStderrSpy.calledWith("No client-side web parts available for this site"));
         done();
       }
       catch (e) {
@@ -256,7 +264,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
             }
           }
         );
-        assert(loggerSpy.calledWith(expectedClientSideWebparts));
+        assert(loggerLogSpy.calledWith(expectedClientSideWebparts));
         done();
       }
       catch (e) {
@@ -318,7 +326,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
             }
           }
         );
-        assert(loggerSpy.calledWith(expectedClientSideWebparts));
+        assert(loggerLogSpy.calledWith(expectedClientSideWebparts));
         done();
       }
       catch (e) {

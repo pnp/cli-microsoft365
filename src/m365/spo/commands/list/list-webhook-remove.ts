@@ -43,7 +43,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
 
     const removeWebhook: () => void = (): void => {
       if (this.verbose) {
-        logger.log(`Webhook ${args.options.id} is about to be removed from list ${list} located at site ${args.options.webUrl}...`);
+        logger.logToStderr(`Webhook ${args.options.id} is about to be removed from list ${list} located at site ${args.options.webUrl}...`);
       }
 
       let requestUrl: string = '';

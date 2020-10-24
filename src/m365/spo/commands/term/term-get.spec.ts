@@ -13,7 +13,7 @@ const command: Command = require('./term-get');
 describe(commands.TERM_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.TERM_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -71,7 +77,7 @@ describe(commands.TERM_GET, () => {
 
     command.action(logger, { options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:05:07.600Z", "Id": "16573ae2-0cc4-42fa-a2ff-8bf0407bd385", "LastModifiedDate": "2018-08-22T14:05:07.600Z", "Name": "Engineering", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Engineering", "TermsCount": 0 }));
+        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:05:07.600Z", "Id": "16573ae2-0cc4-42fa-a2ff-8bf0407bd385", "LastModifiedDate": "2018-08-22T14:05:07.600Z", "Name": "Engineering", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Engineering", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -94,7 +100,7 @@ describe(commands.TERM_GET, () => {
 
     command.action(logger, { options: { debug: true, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -117,7 +123,7 @@ describe(commands.TERM_GET, () => {
 
     command.action(logger, { options: { debug: false, name: 'IT', termGroupId: '5c928151-c140-4d48-aab9-54da901c7fef', termSetName: 'Department' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -140,7 +146,7 @@ describe(commands.TERM_GET, () => {
 
     command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetId: '8ed8c9ea-7052-4c1d-a4d7-b9c10bffea6f' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -163,7 +169,7 @@ describe(commands.TERM_GET, () => {
 
     command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -209,7 +215,7 @@ describe(commands.TERM_GET, () => {
 
     command.action(logger, { options: { debug: false, id: '16573ae2-0cc4-42fa-a2ff-8bf0407bd385' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -278,7 +284,7 @@ describe(commands.TERM_GET, () => {
 
     command.action(logger, { options: { debug: false, name: 'IT>', termGroupName: 'People', termSetName: 'Department' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT>", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT>", "TermsCount": 0 }));
+        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT>", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT>", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -301,7 +307,7 @@ describe(commands.TERM_GET, () => {
 
     command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People>', termSetName: 'Department' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {
@@ -324,7 +330,7 @@ describe(commands.TERM_GET, () => {
 
     command.action(logger, { options: { debug: false, name: 'IT', termGroupName: 'People', termSetName: 'Department>' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
+        assert(loggerLogSpy.calledWith({ "CreatedDate": "2018-08-22T14:00:07.973Z", "Id": "01ce3a68-bf38-4bf5-9ea8-fc13b138df8f", "LastModifiedDate": "2018-08-22T14:00:07.973Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "DProdMGD104\\_SPOFrm_187262", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }));
         done();
       }
       catch (e) {

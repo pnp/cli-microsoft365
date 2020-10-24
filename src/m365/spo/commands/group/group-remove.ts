@@ -38,7 +38,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeGroup: () => void = (): void => {
       if (this.verbose) {
-        logger.log(`Removing group in web at ${args.options.webUrl}...`);
+        logger.logToStderr(`Removing group in web at ${args.options.webUrl}...`);
       }
 
       let groupId: number | undefined;

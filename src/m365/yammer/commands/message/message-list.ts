@@ -46,6 +46,10 @@ class YammerMessageListCommand extends YammerCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'replied_to_id', 'thread_id', 'group_id', 'shortBody'];
+  }
+
   private getAllItems(logger: Logger, args: CommandArgs, messageId: number): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       let endpoint = `${this.resource}/v1`;
@@ -147,36 +151,25 @@ class YammerMessageListCommand extends YammerCommand {
     this
       .getAllItems(logger, args, -1)
       .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          logger.log(this.items.map((n: any) => {
-            let shortBody;
-            const bodyToProcess = n.body.plain;
+        this.items.forEach(m => {
+          let shortBody;
+          const bodyToProcess = m.body.plain;
 
-            if (bodyToProcess) {
-              let maxLength = 35;
-              let addedDots = "...";
-              if (bodyToProcess.length < maxLength) {
-                maxLength = bodyToProcess.length;
-                addedDots = "";
-              }
-
-              shortBody = bodyToProcess.replace(/\n/g, ' ').substring(0, maxLength) + addedDots;
+          if (bodyToProcess) {
+            let maxLength = 35;
+            let addedDots = "...";
+            if (bodyToProcess.length < maxLength) {
+              maxLength = bodyToProcess.length;
+              addedDots = "";
             }
 
-            const item: any = {
-              id: n.id,
-              replied_to_id: n.replied_to_id,
-              thread_id: n.thread_id,
-              group_id: n.group_id,
-              shortBody: shortBody
-            };
-            return item;
-          }));
-        }
+            shortBody = bodyToProcess.replace(/\n/g, ' ').substring(0, maxLength) + addedDots;
+          }
 
+          m.shortBody = shortBody;
+        });
+
+        logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   };

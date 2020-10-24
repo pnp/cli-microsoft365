@@ -54,7 +54,7 @@ class SpoExternalUserListCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Retrieving information about external users...`);
+          logger.logToStderr(`Retrieving information about external users...`);
         }
 
         const position: number = parseInt(args.options.position || '0');

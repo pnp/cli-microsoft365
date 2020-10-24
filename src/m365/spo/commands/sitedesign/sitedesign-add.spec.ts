@@ -12,7 +12,7 @@ const command: Command = require('./sitedesign-add');
 describe(commands.SITEDESIGN_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,11 +25,17 @@ describe(commands.SITEDESIGN_ADD, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: any) => {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
         log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -84,7 +90,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
     command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -131,7 +137,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
     command.action(logger, { options: { debug: true, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -178,7 +184,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
     command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25" } }, () => {
       try {
-        assert(loggerSpy.calledOnce);
+        assert(loggerLogSpy.calledOnce);
         done();
       }
       catch (e) {
@@ -215,7 +221,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
     command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'CommunicationSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24" } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -263,7 +269,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
     command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": "Contoso team site",
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -311,7 +317,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
     command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageUrl: 'https://contoso.com/assets/team-site-preview.png' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -359,7 +365,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
     command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", previewImageAltText: 'Contoso team site preview' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -407,7 +413,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
     command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", isDefault: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": true,
@@ -458,7 +464,7 @@ describe(commands.SITEDESIGN_ADD, () => {
 
     command.action(logger, { options: { debug: false, title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', previewImageAltText: 'Contoso team site preview', isDefault: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": 'Contoso team site',
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": true,

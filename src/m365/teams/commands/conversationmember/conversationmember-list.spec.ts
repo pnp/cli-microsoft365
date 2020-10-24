@@ -234,7 +234,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
 
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -247,9 +247,15 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -439,7 +445,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "MTk6NTg2YThiOWUzNmM0NDc5YmJiZDM3OGU0MzlhOTZkZjJAdGhyZWFkLnNreXBlIyM1YzcwNTI4OC1lZDdmLTQ0ZmMtYWYwYS1hYzE2NDQxOTkwMWM=",
             "displayName": "Mary Thompson",
@@ -482,7 +488,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "MTk6NTg2YThiOWUzNmM0NDc5YmJiZDM3OGU0MzlhOTZkZjJAdGhyZWFkLnNreXBlIyM1YzcwNTI4OC1lZDdmLTQ0ZmMtYWYwYS1hYzE2NDQxOTkwMWM=",
             "displayName": "Mary Thompson",
@@ -529,7 +535,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "MTk6NTg2YThiOWUzNmM0NDc5YmJiZDM3OGU0MzlhOTZkZjJAdGhyZWFkLnNreXBlIyM1YzcwNTI4OC1lZDdmLTQ0ZmMtYWYwYS1hYzE2NDQxOTkwMWM=",
             "displayName": "Mary Thompson",
@@ -576,7 +582,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "MTk6NTg2YThiOWUzNmM0NDc5YmJiZDM3OGU0MzlhOTZkZjJAdGhyZWFkLnNreXBlIyM1YzcwNTI4OC1lZDdmLTQ0ZmMtYWYwYS1hYzE2NDQxOTkwMWM=",
             "displayName": "Mary Thompson",
@@ -720,7 +726,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "MTk6NTg2YThiOWUzNmM0NDc5YmJiZDM3OGU0MzlhOTZkZjJAdGhyZWFkLnNreXBlIyM1YzcwNTI4OC1lZDdmLTQ0ZmMtYWYwYS1hYzE2NDQxOTkwMWM=",
             "displayName": "Mary Thompson",
@@ -793,7 +799,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "@odata.type": "#microsoft.graph.aadUserConversationMember",
             "id": "MTk6NTg2YThiOWUzNmM0NDc5YmJiZDM3OGU0MzlhOTZkZjJAdGhyZWFkLnNreXBlIyM1YzcwNTI4OC1lZDdmLTQ0ZmMtYWYwYS1hYzE2NDQxOTkwMWM=",

@@ -12,7 +12,7 @@ const command: Command = require('./message-get');
 describe(commands.YAMMER_MESSAGE_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   let firstMessage: any = {"sender_id":1496550646, "replied_to_id":1496550647,"id":10123190123123,"thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1"};
   let secondMessage: any = {"sender_id":1496550640, "replied_to_id":"","id":10123190123124,"thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2"};
 
@@ -27,9 +27,15 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -55,6 +61,10 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'sender_id', 'replied_to_id', 'thread_id', 'group_id', 'created_at', 'direct_message', 'system_message', 'privacy', 'message_type', 'content_excerpt']);
+  });
+
   it('id must be a number', () => {
     const actual = command.validate({ options: { id: 'nonumber' } });
     assert.notStrictEqual(actual, true);
@@ -74,7 +84,7 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
     });
     command.action(logger, { options: { id:10123190123123, debug: true } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].id, 10123190123123)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123123)
         done();
       }
       catch (e) {
@@ -112,7 +122,7 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
     });
     command.action(logger, { options: { debug: true, id:10123190123124, output: "json" } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].id, 10123190123124);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123124);
         done();
       }
       catch (e) {

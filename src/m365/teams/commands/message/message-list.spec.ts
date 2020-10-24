@@ -12,11 +12,11 @@ const command: Command = require('./message-list');
 describe(commands.TEAMS_MESSAGE_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -25,9 +25,15 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -50,6 +56,10 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'summary', 'body']);
   });
 
   it('fails validation if teamId and channelId are not specified', () => {
@@ -270,23 +280,90 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            "id": "1542290200091",
-            "summary": null,
-            "body": "<p>Welcome!</p>"
+        assert(loggerLogSpy.calledWith([{
+          "attachments": [],
+          "body": "<p>Welcome!</p>",
+          "createdDateTime": "2018-11-15T13:56:40.091Z",
+          "deleted": false,
+          "etag": "1542290200091",
+          "from": {
+            "application": {
+              "applicationIdentityType": "bot",
+              "displayName": "POITBot",
+              "id": "d22ece15-e04f-453a-adbd-d1514d2f1abe"
+            },
+            "conversation": null,
+            "device": null,
+            "user": null
           },
-          {
-            "id": "1542288043581",
-            "summary": null,
-            "body": "hello"
+          "id": "1542290200091",
+          "importance": "normal",
+          "lastModifiedDateTime": null,
+          "locale": "en-us",
+          "mentions": [],
+          "messageType": "message",
+          "policyViolation": null,
+          "reactions": [],
+          "replyToId": null,
+          "subject": null,
+          "summary": null
+        },
+        {
+          "attachments": [],
+          "body": "hello",
+          "createdDateTime": "2018-11-15T13:20:43.581Z",
+          "deleted": false,
+          "etag": "1542288043581",
+          "from": {
+            "application": null,
+            "conversation": null,
+            "device": null,
+            "user": {
+              "displayName": "Balamurugan Kailasam",
+              "id": "065868eb-f08f-4a82-9786-690bc5c38fce",
+              "userIdentityType": "aadUser"
+            }
           },
-          {
-            "id": "1511723663660",
-            "summary": null,
-            "body": "Hi...files uploaded"
-          }
-        ]));
+          "id": "1542288043581",
+          "importance": "normal",
+          "lastModifiedDateTime": null,
+          "locale": "en-us",
+          "mentions": [],
+          "messageType": "message",
+          "policyViolation": null,
+          "reactions": [],
+          "replyToId": null,
+          "subject": "",
+          "summary": null
+        },
+        {
+          "attachments": [],
+          "body": "Hi...files uploaded",
+          "createdDateTime": "2017-11-26T19:14:23.66Z",
+          "deleted": false,
+          "etag": "1511723663660",
+          "from": {
+            "application": null,
+            "conversation": null,
+            "device": null,
+            "user": {
+              "displayName": "orgid:065868eb-f08f-4a82-9786-690bc5c38fce",
+              "id": "065868eb-f08f-4a82-9786-690bc5c38fce",
+              "userIdentityType": "aadUser"
+            }
+          },
+          "id": "1511723663660",
+          "importance": "normal",
+          "lastModifiedDateTime": null,
+          "locale": "en-us",
+          "mentions": [],
+          "messageType": "message",
+          "policyViolation": null,
+          "reactions": [],
+          "replyToId": null,
+          "subject": null,
+          "summary": null
+        }]));
 
         done();
       }
@@ -378,18 +455,62 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            "id": "1542290200091",
-            "summary": null,
-            "body": "<p>Welcome!</p>"
+        assert(loggerLogSpy.calledWith([{
+          "attachments": [],
+          "body": "<p>Welcome!</p>",
+          "createdDateTime": "2018-11-15T13:56:40.091Z",
+          "deleted": false,
+          "etag": "1542290200091",
+          "from": {
+            "application": {
+              "applicationIdentityType": "bot",
+              "displayName": "POITBot",
+              "id": "d22ece15-e04f-453a-adbd-d1514d2f1abe"
+            },
+            "conversation": null,
+            "device": null,
+            "user": null
           },
-          {
-            "id": "1542288043581",
-            "summary": null,
-            "body": "hello"
-          }
-        ]));
+          "id": "1542290200091",
+          "importance": "normal",
+          "lastModifiedDateTime": null,
+          "locale": "en-us",
+          "mentions": [],
+          "messageType": "message",
+          "policyViolation": null,
+          "reactions": [],
+          "replyToId": null,
+          "subject": null,
+          "summary": null
+        },
+        {
+          "attachments": [],
+          "body": "hello",
+          "createdDateTime": "2018-11-15T13:20:43.581Z",
+          "deleted": false,
+          "etag": "1542288043581",
+          "from": {
+            "application": null,
+            "conversation": null,
+            "device": null,
+            "user": {
+              "displayName": "Balamurugan Kailasam",
+              "id": "065868eb-f08f-4a82-9786-690bc5c38fce",
+              "userIdentityType": "aadUser"
+            }
+          },
+          "id": "1542288043581",
+          "importance": "normal",
+          "lastModifiedDateTime": null,
+          "locale": "en-us",
+          "mentions": [],
+          "messageType": "message",
+          "policyViolation": null,
+          "reactions": [],
+          "replyToId": null,
+          "subject": "",
+          "summary": null
+        }]));
 
         done();
       }
@@ -479,22 +600,66 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
         debug: false,
         teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
         channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype",
-        since: dt 
+        since: dt
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            "id": "1542290200091",
-            "summary": null,
-            "body": "<p>Welcome!</p>"
+        assert(loggerLogSpy.calledWith([{
+          "attachments": [],
+          "body": "<p>Welcome!</p>",
+          "createdDateTime": "2018-11-15T13:56:40.091Z",
+          "deleted": false,
+          "etag": "1542290200091",
+          "from": {
+            "application": {
+              "applicationIdentityType": "bot",
+              "displayName": "POITBot",
+              "id": "d22ece15-e04f-453a-adbd-d1514d2f1abe"
+            },
+            "conversation": null,
+            "device": null,
+            "user": null
           },
-          {
-            "id": "1542288043581",
-            "summary": null,
-            "body": "hello"
-          }
-        ]));
+          "id": "1542290200091",
+          "importance": "normal",
+          "lastModifiedDateTime": null,
+          "locale": "en-us",
+          "mentions": [],
+          "messageType": "message",
+          "policyViolation": null,
+          "reactions": [],
+          "replyToId": null,
+          "subject": null,
+          "summary": null
+        },
+        {
+          "attachments": [],
+          "body": "hello",
+          "createdDateTime": "2018-11-15T13:20:43.581Z",
+          "deleted": false,
+          "etag": "1542288043581",
+          "from": {
+            "application": null,
+            "conversation": null,
+            "device": null,
+            "user": {
+              "displayName": "Balamurugan Kailasam",
+              "id": "065868eb-f08f-4a82-9786-690bc5c38fce",
+              "userIdentityType": "aadUser"
+            }
+          },
+          "id": "1542288043581",
+          "importance": "normal",
+          "lastModifiedDateTime": null,
+          "locale": "en-us",
+          "mentions": [],
+          "messageType": "message",
+          "policyViolation": null,
+          "reactions": [],
+          "replyToId": null,
+          "subject": "",
+          "summary": null
+        }]));
 
         done();
       }
@@ -587,7 +752,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "attachments": [],
             "body": {

@@ -12,8 +12,8 @@ const command: Command = require('./channel-get');
 describe(commands.TEAMS_CHANNEL_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
-
+  let loggerLogSpy: sinon.SinonSpy;
+  
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -25,9 +25,15 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -340,7 +346,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
       }
     }, () => {
       try {
-        const call: sinon.SinonSpyCall = loggerSpy.lastCall;
+        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
         assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
         assert.strictEqual(call.args[0].displayName, 'channel1');
         assert.strictEqual(call.args[0].description, null);
@@ -415,7 +421,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
       }
     }, () => {
       try {
-        const call: sinon.SinonSpyCall = loggerSpy.lastCall;
+        const call: sinon.SinonSpyCall = loggerLogSpy.lastCall;
         assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
         assert.strictEqual(call.args[0].displayName, 'Channel Name');
         assert.strictEqual(call.args[0].description, null);
@@ -451,7 +457,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
       }
     }, () => {
       try {
-        const call: sinon.SinonSpyCall = loggerSpy.getCall(loggerSpy.callCount - 2);
+        const call: sinon.SinonSpyCall = loggerLogSpy.getCall(loggerLogSpy.callCount - 2);
         assert.strictEqual(call.args[0].id, '19:493665404ebd4a18adb8a980a31b4986@thread.skype');
         done();
       }

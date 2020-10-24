@@ -54,7 +54,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
           this.context = res;
 
           if (this.verbose) {
-            logger.log(`Removing deleted site collection ${args.options.url}...`);
+            logger.logToStderr(`Removing deleted site collection ${args.options.url}...`);
           }
 
           const requestOptions: any = {
@@ -90,7 +90,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
         })
         .then(() => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb()

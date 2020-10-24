@@ -38,7 +38,7 @@ class SpoThemeRemoveCommand extends SpoCommand {
         .getSpoAdminUrl(logger, this.debug)
         .then((spoAdminUrl: string): Promise<void> => {
           if (this.verbose) {
-            logger.log(`Removing theme from tenant...`);
+            logger.logToStderr(`Removing theme from tenant...`);
           }
 
           const requestOptions: any = {
@@ -56,7 +56,7 @@ class SpoThemeRemoveCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

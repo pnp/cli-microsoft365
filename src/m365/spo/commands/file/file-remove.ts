@@ -41,7 +41,7 @@ class SpoFileRemoveCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeFile: () => void = (): void => {
       if (this.verbose) {
-        logger.log(`Removing file in site at ${args.options.webUrl}...`);
+        logger.logToStderr(`Removing file in site at ${args.options.webUrl}...`);
       }
 
       let requestUrl: string = '';

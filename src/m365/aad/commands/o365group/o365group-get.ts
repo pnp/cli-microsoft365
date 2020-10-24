@@ -67,7 +67,7 @@ class AadO365GroupGetCommand extends GraphCommand {
         logger.log(group);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

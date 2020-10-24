@@ -11,23 +11,35 @@ const command: Command = require('./id-get');
 
 describe(commands.TENANT_ID_GET, () => {
   let log: any[];
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   let logger: Logger;
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     auth.service.connected = true;
+    if (!auth.service.accessTokens[auth.defaultResource]) {
+      auth.service.accessTokens[auth.defaultResource] = {
+        expiresOn: '123',
+        value: 'abc'
+      };
+    }
   });
 
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: any) => {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
         log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -39,7 +51,8 @@ describe(commands.TENANT_ID_GET, () => {
   after(() => {
     Utils.restore([
       appInsights.trackEvent,
-      auth.restoreAuth
+      auth.restoreAuth,
+      Utils.getUserNameFromAccessToken
     ]);
     auth.service.connected = false;
   });
@@ -130,7 +143,7 @@ describe(commands.TENANT_ID_GET, () => {
 
     command.action(logger, { options: {} }, () => {
       try {
-        assert(loggerSpy.calledWith('31537af4-6d77-4bb9-a681-d2394888ea26'));
+        assert(loggerLogSpy.calledWith('31537af4-6d77-4bb9-a681-d2394888ea26'));
         Utils.restore(Utils.getUserNameFromAccessToken);
         done();
       }
@@ -214,7 +227,7 @@ describe(commands.TENANT_ID_GET, () => {
 
     command.action(logger, { options: { debug: false, domainName: 'contoso.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith('6babcaad-604b-40ac-a9d7-9fd97c0b779f'));
+        assert(loggerLogSpy.calledWith('6babcaad-604b-40ac-a9d7-9fd97c0b779f'));
         done();
       }
       catch (e) {

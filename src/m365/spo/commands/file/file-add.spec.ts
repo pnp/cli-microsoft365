@@ -14,7 +14,8 @@ const command: Command = require('./file-add');
 describe(commands.FILE_ADD, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let ensureFolderStub: sinon.SinonStub;
 
   let stubPostResponses: any = (
@@ -161,9 +162,16 @@ describe(commands.FILE_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(fs, 'statSync').returns({ size: 1234 } as any);
     sinon.stub(fs, 'openSync').returns(3);
     sinon.stub(fs, 'readSync').returns(10485760);
@@ -250,7 +258,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(loggerSpy.notCalled, true);
+        assert.strictEqual(loggerLogSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -388,7 +396,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.strictEqual(loggerSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
+        assert.strictEqual(loggerLogToStderrSpy.calledWith(`folder path: ${folderServerRelativePath}...`), true);
         done();
       }
       catch (e) {
@@ -414,7 +422,7 @@ describe(commands.FILE_ADD, () => {
     }, (err: any) => {
 
       try {
-        assert.strictEqual(loggerSpy.calledWith(`file name: TEST''FILE.txt...`), true);
+        assert.strictEqual(loggerLogToStderrSpy.calledWith(`file name: TEST''FILE.txt...`), true);
         done();
       }
       catch (e) {
@@ -628,7 +636,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0], 'DONE');
+        assert.strictEqual(loggerLogToStderrSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {
@@ -838,7 +846,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0], 'DONE');
+        assert.strictEqual(loggerLogToStderrSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {
@@ -862,7 +870,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(loggerSpy.notCalled, true);
+        assert.strictEqual(loggerLogSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -939,7 +947,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err: any) => {
       try {
-        assert.strictEqual(loggerSpy.notCalled, true);
+        assert.strictEqual(loggerLogSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -961,7 +969,7 @@ describe(commands.FILE_ADD, () => {
       }
     }, (err: any) => {
       try {
-        assert.strictEqual(loggerSpy.notCalled, true);
+        assert.strictEqual(loggerLogSpy.notCalled, true);
         done();
       }
       catch (e) {

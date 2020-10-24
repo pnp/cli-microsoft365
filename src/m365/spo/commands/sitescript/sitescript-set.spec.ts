@@ -12,7 +12,7 @@ const command: Command = require('./sitescript-set');
 describe(commands.SITESCRIPT_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,9 +27,15 @@ describe(commands.SITESCRIPT_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -79,7 +85,7 @@ describe(commands.SITESCRIPT_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
           "Description": "My contoso script",
           "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -117,7 +123,7 @@ describe(commands.SITESCRIPT_SET, () => {
 
     command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
           "Description": "My contoso script",
           "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -155,7 +161,7 @@ describe(commands.SITESCRIPT_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', description: 'My contoso script' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
           "Description": "My contoso script",
           "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -193,7 +199,7 @@ describe(commands.SITESCRIPT_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', version: '1' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
           "Description": "My contoso script",
           "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -231,7 +237,7 @@ describe(commands.SITESCRIPT_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', content: JSON.stringify({}) } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
           "Description": "My contoso script",
           "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",
@@ -272,7 +278,7 @@ describe(commands.SITESCRIPT_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', title: 'Contoso', description: 'My contoso script', version: '1', content: JSON.stringify({}) } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Content": JSON.stringify({}),
           "Description": "My contoso script",
           "Id": "0f27a016-d277-4bb4-b3c3-b5b040c9559b",

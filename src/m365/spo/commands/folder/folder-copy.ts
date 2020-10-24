@@ -77,7 +77,7 @@ class SpoFolderCopyCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log('DONE');
+          logger.logToStderr('DONE');
         }
 
         cb();

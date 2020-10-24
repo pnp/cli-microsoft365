@@ -12,7 +12,7 @@ const command: Command = require('./messagingsettings-list');
 describe(commands.TEAMS_MESSAGINGSETTINGS_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.TEAMS_MESSAGINGSETTINGS_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -72,7 +78,7 @@ describe(commands.TEAMS_MESSAGINGSETTINGS_LIST, () => {
 
     command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "allowUserEditMessages": true,
           "allowUserDeleteMessages": true,
           "allowOwnerDeleteMessages": true,
@@ -106,7 +112,7 @@ describe(commands.TEAMS_MESSAGINGSETTINGS_LIST, () => {
 
     command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "allowUserEditMessages": true,
           "allowUserDeleteMessages": true,
           "allowOwnerDeleteMessages": true,
@@ -176,7 +182,7 @@ describe(commands.TEAMS_MESSAGINGSETTINGS_LIST, () => {
 
     command.action(logger, { options: { teamId: "2609af39-7775-4f94-a3dc-0dd67657e900", output: 'json', debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "allowUserEditMessages": true,
           "allowUserDeleteMessages": true,
           "allowOwnerDeleteMessages": true,

@@ -67,14 +67,14 @@ class SpoSiteSetCommand extends SpoCommand {
       .then((): Promise<void> => {
         if (this.groupId === '00000000-0000-0000-0000-000000000000') {
           if (this.debug) {
-            logger.log('Site is not groupified');
+            logger.logToStderr('Site is not groupified');
           }
 
           return this.updateSite(logger, args);
         }
         else {
           if (this.debug) {
-            logger.log(`Site attached to group ${this.groupId}`);
+            logger.logToStderr(`Site attached to group ${this.groupId}`);
           }
 
           return this.updateGroupifiedSite(logger, args);
@@ -85,7 +85,7 @@ class SpoSiteSetCommand extends SpoCommand {
       .then((): Promise<void> => this.setSharingCapabilities(logger, args))
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();
@@ -188,7 +188,7 @@ class SpoSiteSetCommand extends SpoCommand {
     const owners: string[] = args.options.owners.split(',').map(o => o.trim());
 
     if (this.verbose) {
-      logger.log('Retrieving user information to set group owners...');
+      logger.logToStderr('Retrieving user information to set group owners...');
     }
 
     let spoAdminUrl: string;
@@ -235,14 +235,14 @@ class SpoSiteSetCommand extends SpoCommand {
 
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (this.verbose) {
-        logger.log(`Retrieving request digest...`);
+        logger.logToStderr(`Retrieving request digest...`);
       }
 
       this
         .getRequestDigest(args.options.url)
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
-            logger.log(`Updating site ${args.options.url} properties...`);
+            logger.logToStderr(`Updating site ${args.options.url} properties...`);
           }
 
           let propertyId: number = 27;
@@ -305,7 +305,7 @@ class SpoSiteSetCommand extends SpoCommand {
 
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (this.verbose) {
-        logger.log(`Retrieving request digest...`);
+        logger.logToStderr(`Retrieving request digest...`);
       }
 
       const sharingCapability: SharingCapabilities = SharingCapabilities[(args.options.sharingCapability as keyof typeof SharingCapabilities)];
@@ -319,7 +319,7 @@ class SpoSiteSetCommand extends SpoCommand {
         })
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
-            logger.log(`Setting sharing for site  ${args.options.url} as ${args.options.sharingCapability}`);
+            logger.logToStderr(`Setting sharing for site  ${args.options.url} as ${args.options.sharingCapability}`);
           }
 
           const requestOptions: any = {
@@ -349,7 +349,7 @@ class SpoSiteSetCommand extends SpoCommand {
 
   private loadSiteIds(siteUrl: string, logger: Logger): Promise<void> {
     if (this.debug) {
-      logger.log('Loading site IDs...');
+      logger.logToStderr('Loading site IDs...');
     }
 
     const requestOptions: any = {
@@ -367,7 +367,7 @@ class SpoSiteSetCommand extends SpoCommand {
         this.siteId = siteInfo.Id;
 
         if (this.debug) {
-          logger.log(`Retrieved site IDs. siteId: ${this.siteId}, groupId: ${this.groupId}`);
+          logger.logToStderr(`Retrieved site IDs. siteId: ${this.siteId}, groupId: ${this.groupId}`);
         }
 
         return Promise.resolve();

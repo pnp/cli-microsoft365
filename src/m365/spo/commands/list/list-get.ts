@@ -37,7 +37,7 @@ class ListGetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving information for list in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving information for list in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';

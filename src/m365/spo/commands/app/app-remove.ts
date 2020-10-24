@@ -48,7 +48,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
         })
         .then((appCatalogUrl: string): Promise<void> => {
           if (this.debug) {
-            logger.log(`Retrieved app catalog URL ${appCatalogUrl}. Removing app from the app catalog...`);
+            logger.logToStderr(`Retrieved app catalog URL ${appCatalogUrl}. Removing app from the app catalog...`);
           }
 
           const requestOptions: any = {

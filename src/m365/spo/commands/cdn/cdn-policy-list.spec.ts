@@ -13,7 +13,7 @@ const command: Command = require('./cdn-policy-list');
 describe(commands.CDN_POLICY_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.CDN_POLICY_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -80,7 +86,7 @@ describe(commands.CDN_POLICY_LIST, () => {
 
     command.action(logger, { options: { debug: true, type: 'Public' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           Policy: 'IncludeFileExtensions',
           Value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON'
         },
@@ -120,7 +126,7 @@ describe(commands.CDN_POLICY_LIST, () => {
 
     command.action(logger, { options: { debug: true, type: 'Private' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           Policy: 'IncludeFileExtensions',
           Value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON'
         },
@@ -160,7 +166,7 @@ describe(commands.CDN_POLICY_LIST, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           Policy: 'IncludeFileExtensions',
           Value: 'CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF,JSON'
         },

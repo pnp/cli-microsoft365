@@ -28,6 +28,10 @@ class YammerNetworkListCommand extends YammerCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'name', 'email', 'community', 'permalink', 'web_url'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/v1/networks/current.json`,
@@ -44,12 +48,7 @@ class YammerNetworkListCommand extends YammerCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        if (args.options.output === 'json') {
-          logger.log(res);
-        }
-        else {
-          logger.log((res as any[]).map(n => ({ id: n.id, name: n.name, email: n.email, community: n.community, permalink: n.permalink, web_url: n.web_url })));
-        }
+        logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

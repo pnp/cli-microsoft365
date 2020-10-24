@@ -13,7 +13,7 @@ const command: Command = require('./term-group-list');
 describe(commands.TERM_GROUP_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.TERM_GROUP_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -55,6 +61,10 @@ describe(commands.TERM_GROUP_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Name']);
   });
 
   it('lists taxonomy term groups (debug)', (done) => {
@@ -202,17 +212,105 @@ describe(commands.TERM_GROUP_LIST, () => {
     });
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          { "Id": "36a62501-17ea-455a-bed4-eff862242def", "Name": "People" },
-          { "Id": "0e8f395e-ff58-4d45-9ff7-e331ab728beb", "Name": "PnPTermSets" },
-          { "Id": "d87b6a37-c801-4a36-9046-6296d4779c87", "Name": "Search Dictionaries" },
-          { "Id": "b16ae5da-a017-4d6b-bb32-01dc0e73643a", "Name": "Site Collection - m365x035040.sharepoint.com-search" },
-          { "Id": "d5996106-7273-45dd-8fa3-006a52756877", "Name": "Site Collection - m365x035040.sharepoint.com-sites-Analytics" },
-          { "Id": "d5d21ae0-7d75-4fef-a716-415dcdb56987", "Name": "Site Collection - m365x035040.sharepoint.com-sites-hr" },
-          { "Id": "82c7ae54-ef9a-4b87-ae7f-1b98256e4e9d", "Name": "Site Collection - m365x035040.sharepoint.com-sites-Marketing" },
-          { "Id": "883abc10-d86e-45ae-a0bc-d62642c2cccd", "Name": "Site Collection - m365x035040.sharepoint.com-sites-portal" },
-          { "Id": "fa978985-1faf-4f98-adf3-35464e273535", "Name": "System" }
-        ]));
+        assert(loggerLogSpy.calledWith([{
+          "_ObjectType_": "SP.Taxonomy.TermGroup",
+          "_ObjectIdentity_": "40bc8e9e-c0f3-0000-2b65-64d3c82fb3d9|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUQElpjbqF1pFvtTv+GIkLe8=",
+          "CreatedDate": "2018-06-20T07:23:21.033Z",
+          "Id": "36a62501-17ea-455a-bed4-eff862242def",
+          "LastModifiedDate": "2018-06-20T07:23:21.033Z",
+          "Name": "People",
+          "Description": "",
+          "IsSiteCollectionGroup": false,
+          "IsSystemGroup": false
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.TermGroup",
+          "_ObjectIdentity_": "40bc8e9e-c0f3-0000-2b65-64d3c82fb3d9|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+s=",
+          "CreatedDate": "2018-09-13T11:52:53.117Z",
+          "Id": "0e8f395e-ff58-4d45-9ff7-e331ab728beb",
+          "LastModifiedDate": "2018-09-13T11:52:53.117Z",
+          "Name": "PnPTermSets",
+          "Description": "",
+          "IsSiteCollectionGroup": false,
+          "IsSystemGroup": false
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.TermGroup",
+          "_ObjectIdentity_": "40bc8e9e-c0f3-0000-2b65-64d3c82fb3d9|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUTdqe9gByDZKkEZiltR3nIc=",
+          "CreatedDate": "2018-06-20T07:23:21.063Z",
+          "Id": "d87b6a37-c801-4a36-9046-6296d4779c87",
+          "LastModifiedDate": "2018-06-20T07:23:21.063Z",
+          "Name": "Search Dictionaries",
+          "Description": "",
+          "IsSiteCollectionGroup": false,
+          "IsSystemGroup": false
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.TermGroup",
+          "_ObjectIdentity_": "40bc8e9e-c0f3-0000-2b65-64d3c82fb3d9|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUdrlarEXoGtNuzIB3A5zZDo=",
+          "CreatedDate": "2018-06-20T07:23:20.770Z",
+          "Id": "b16ae5da-a017-4d6b-bb32-01dc0e73643a",
+          "LastModifiedDate": "2018-06-20T07:23:20.770Z",
+          "Name": "Site Collection - m365x035040.sharepoint.com-search",
+          "Description": "",
+          "IsSiteCollectionGroup": true,
+          "IsSystemGroup": false
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.TermGroup",
+          "_ObjectIdentity_": "40bc8e9e-c0f3-0000-2b65-64d3c82fb3d9|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUQZhmdVzct1Fj6MAalJ1aHc=",
+          "CreatedDate": "2018-06-20T11:50:06.027Z",
+          "Id": "d5996106-7273-45dd-8fa3-006a52756877",
+          "LastModifiedDate": "2018-06-20T11:50:06.027Z",
+          "Name": "Site Collection - m365x035040.sharepoint.com-sites-Analytics",
+          "Description": "",
+          "IsSiteCollectionGroup": true,
+          "IsSystemGroup": false
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.TermGroup",
+          "_ObjectIdentity_": "40bc8e9e-c0f3-0000-2b65-64d3c82fb3d9|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUeAa0tV1fe9PpxZBXc21aYc=",
+          "CreatedDate": "2018-09-12T12:20:31.887Z",
+          "Id": "d5d21ae0-7d75-4fef-a716-415dcdb56987",
+          "LastModifiedDate": "2018-09-12T12:20:31.887Z",
+          "Name": "Site Collection - m365x035040.sharepoint.com-sites-hr",
+          "Description": "",
+          "IsSiteCollectionGroup": true,
+          "IsSystemGroup": false
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.TermGroup",
+          "_ObjectIdentity_": "40bc8e9e-c0f3-0000-2b65-64d3c82fb3d9|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUVSux4Ka74dLrn8bmCVuTp0=",
+          "CreatedDate": "2018-09-12T12:20:43.060Z",
+          "Id": "82c7ae54-ef9a-4b87-ae7f-1b98256e4e9d",
+          "LastModifiedDate": "2018-09-12T12:20:43.060Z",
+          "Name": "Site Collection - m365x035040.sharepoint.com-sites-Marketing",
+          "Description": "",
+          "IsSiteCollectionGroup": true,
+          "IsSystemGroup": false
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.TermGroup",
+          "_ObjectIdentity_": "40bc8e9e-c0f3-0000-2b65-64d3c82fb3d9|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpURC8Oohu2K5FoLzWJkLCzM0=",
+          "CreatedDate": "2018-09-12T12:11:44.210Z",
+          "Id": "883abc10-d86e-45ae-a0bc-d62642c2cccd",
+          "LastModifiedDate": "2018-09-12T12:11:44.210Z",
+          "Name": "Site Collection - m365x035040.sharepoint.com-sites-portal",
+          "Description": "",
+          "IsSiteCollectionGroup": true,
+          "IsSystemGroup": false
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.TermGroup",
+          "_ObjectIdentity_": "40bc8e9e-c0f3-0000-2b65-64d3c82fb3d9|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUYWJl/qvH5hPrfM1Rk4nNTU=",
+          "CreatedDate": "2018-06-20T07:19:15.453Z",
+          "Id": "fa978985-1faf-4f98-adf3-35464e273535",
+          "LastModifiedDate": "2018-06-20T07:19:15.453Z",
+          "Name": "System",
+          "Description": "These term sets are used by the system itself.",
+          "IsSiteCollectionGroup": false,
+          "IsSystemGroup": true
+        }]));
         done();
       }
       catch (e) {
@@ -366,7 +464,7 @@ describe(commands.TERM_GROUP_LIST, () => {
     });
     command.action(logger, { options: { output: 'json' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{ "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUQElpjbqF1pFvtTv+GIkLe8=", "CreatedDate": "2018-06-20T07:23:21.033Z", "Id": "36a62501-17ea-455a-bed4-eff862242def", "LastModifiedDate": "2018-06-20T07:23:21.033Z", "Name": "People", "Description": "", "IsSiteCollectionGroup": false, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+s=", "CreatedDate": "2018-09-13T11:52:53.117Z", "Id": "0e8f395e-ff58-4d45-9ff7-e331ab728beb", "LastModifiedDate": "2018-09-13T11:52:53.117Z", "Name": "PnPTermSets", "Description": "", "IsSiteCollectionGroup": false, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUTdqe9gByDZKkEZiltR3nIc=", "CreatedDate": "2018-06-20T07:23:21.063Z", "Id": "d87b6a37-c801-4a36-9046-6296d4779c87", "LastModifiedDate": "2018-06-20T07:23:21.063Z", "Name": "Search Dictionaries", "Description": "", "IsSiteCollectionGroup": false, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUdrlarEXoGtNuzIB3A5zZDo=", "CreatedDate": "2018-06-20T07:23:20.770Z", "Id": "b16ae5da-a017-4d6b-bb32-01dc0e73643a", "LastModifiedDate": "2018-06-20T07:23:20.770Z", "Name": "Site Collection - m365x035040.sharepoint.com-search", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUQZhmdVzct1Fj6MAalJ1aHc=", "CreatedDate": "2018-06-20T11:50:06.027Z", "Id": "d5996106-7273-45dd-8fa3-006a52756877", "LastModifiedDate": "2018-06-20T11:50:06.027Z", "Name": "Site Collection - m365x035040.sharepoint.com-sites-Analytics", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUeAa0tV1fe9PpxZBXc21aYc=", "CreatedDate": "2018-09-12T12:20:31.887Z", "Id": "d5d21ae0-7d75-4fef-a716-415dcdb56987", "LastModifiedDate": "2018-09-12T12:20:31.887Z", "Name": "Site Collection - m365x035040.sharepoint.com-sites-hr", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUVSux4Ka74dLrn8bmCVuTp0=", "CreatedDate": "2018-09-12T12:20:43.060Z", "Id": "82c7ae54-ef9a-4b87-ae7f-1b98256e4e9d", "LastModifiedDate": "2018-09-12T12:20:43.060Z", "Name": "Site Collection - m365x035040.sharepoint.com-sites-Marketing", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpURC8Oohu2K5FoLzWJkLCzM0=", "CreatedDate": "2018-09-12T12:11:44.210Z", "Id": "883abc10-d86e-45ae-a0bc-d62642c2cccd", "LastModifiedDate": "2018-09-12T12:11:44.210Z", "Name": "Site Collection - m365x035040.sharepoint.com-sites-portal", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUYWJl/qvH5hPrfM1Rk4nNTU=", "CreatedDate": "2018-06-20T07:19:15.453Z", "Id": "fa978985-1faf-4f98-adf3-35464e273535", "LastModifiedDate": "2018-06-20T07:19:15.453Z", "Name": "System", "Description": "These term sets are used by the system itself.", "IsSiteCollectionGroup": false, "IsSystemGroup": true }]));
+        assert(loggerLogSpy.calledWith([{ "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUQElpjbqF1pFvtTv+GIkLe8=", "CreatedDate": "2018-06-20T07:23:21.033Z", "Id": "36a62501-17ea-455a-bed4-eff862242def", "LastModifiedDate": "2018-06-20T07:23:21.033Z", "Name": "People", "Description": "", "IsSiteCollectionGroup": false, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+s=", "CreatedDate": "2018-09-13T11:52:53.117Z", "Id": "0e8f395e-ff58-4d45-9ff7-e331ab728beb", "LastModifiedDate": "2018-09-13T11:52:53.117Z", "Name": "PnPTermSets", "Description": "", "IsSiteCollectionGroup": false, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUTdqe9gByDZKkEZiltR3nIc=", "CreatedDate": "2018-06-20T07:23:21.063Z", "Id": "d87b6a37-c801-4a36-9046-6296d4779c87", "LastModifiedDate": "2018-06-20T07:23:21.063Z", "Name": "Search Dictionaries", "Description": "", "IsSiteCollectionGroup": false, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUdrlarEXoGtNuzIB3A5zZDo=", "CreatedDate": "2018-06-20T07:23:20.770Z", "Id": "b16ae5da-a017-4d6b-bb32-01dc0e73643a", "LastModifiedDate": "2018-06-20T07:23:20.770Z", "Name": "Site Collection - m365x035040.sharepoint.com-search", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUQZhmdVzct1Fj6MAalJ1aHc=", "CreatedDate": "2018-06-20T11:50:06.027Z", "Id": "d5996106-7273-45dd-8fa3-006a52756877", "LastModifiedDate": "2018-06-20T11:50:06.027Z", "Name": "Site Collection - m365x035040.sharepoint.com-sites-Analytics", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUeAa0tV1fe9PpxZBXc21aYc=", "CreatedDate": "2018-09-12T12:20:31.887Z", "Id": "d5d21ae0-7d75-4fef-a716-415dcdb56987", "LastModifiedDate": "2018-09-12T12:20:31.887Z", "Name": "Site Collection - m365x035040.sharepoint.com-sites-hr", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUVSux4Ka74dLrn8bmCVuTp0=", "CreatedDate": "2018-09-12T12:20:43.060Z", "Id": "82c7ae54-ef9a-4b87-ae7f-1b98256e4e9d", "LastModifiedDate": "2018-09-12T12:20:43.060Z", "Name": "Site Collection - m365x035040.sharepoint.com-sites-Marketing", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpURC8Oohu2K5FoLzWJkLCzM0=", "CreatedDate": "2018-09-12T12:11:44.210Z", "Id": "883abc10-d86e-45ae-a0bc-d62642c2cccd", "LastModifiedDate": "2018-09-12T12:11:44.210Z", "Name": "Site Collection - m365x035040.sharepoint.com-sites-portal", "Description": "", "IsSiteCollectionGroup": true, "IsSystemGroup": false }, { "_ObjectType_": "SP.Taxonomy.TermGroup", "_ObjectIdentity_": "dfa8909e-402d-0000-2cdb-e7b0f4389f1c|fec14c62-7c3b-481b-851b-c80d7802b224:gr:YU1+cBy9wUuh/fzgFZGpUYWJl/qvH5hPrfM1Rk4nNTU=", "CreatedDate": "2018-06-20T07:19:15.453Z", "Id": "fa978985-1faf-4f98-adf3-35464e273535", "LastModifiedDate": "2018-06-20T07:19:15.453Z", "Name": "System", "Description": "These term sets are used by the system itself.", "IsSiteCollectionGroup": false, "IsSystemGroup": true }]));
         done();
       }
       catch (e) {
@@ -420,7 +518,7 @@ describe(commands.TERM_GROUP_LIST, () => {
     });
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

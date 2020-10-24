@@ -32,6 +32,10 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['title', 'status', 'createdDateTime', 'lastModifiedDateTime'];
+  }
+
   private getTodoListId(args: CommandArgs): Promise<string> {
     if (args.options.listId) {
       return Promise.resolve(args.options.listId);
@@ -65,22 +69,10 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
         return this.getAllItems(endpoint, logger, true)
       })
       .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          logger.log(this.items.map(m => {
-            return {
-              title: m.title,
-              status: m.status,
-              createdDateTime: m.createdDateTime,
-              lastModifiedDateTime: m.lastModifiedDateTime
-            }
-          }));
-        }
+        logger.log(this.items);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -38,7 +38,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Removing Microsoft Flow ${args.options.name}...`);
+      logger.logToStderr(`Removing Microsoft Flow ${args.options.name}...`);
     }
 
     const removeFlow: () => void = (): void => {
@@ -62,7 +62,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
           }
           else {
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
             cb();
           }

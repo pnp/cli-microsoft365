@@ -27,9 +27,13 @@ class SpoFolderListCommand extends SpoCommand {
     return 'Returns all folders under the specified parent folder';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Name', 'ServerRelativeUrl'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl}...`);
+      logger.logToStderr(`Retrieving folders from site ${args.options.webUrl} parent folder ${args.options.parentFolderUrl}...`);
     }
 
     const serverRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);
@@ -45,18 +49,7 @@ class SpoFolderListCommand extends SpoCommand {
     request
       .get<{ value: FolderProperties[] }>(requestOptions)
       .then((resp: { value: FolderProperties[] }): void => {
-        if (args.options.output === 'json') {
-          logger.log(resp.value);
-        }
-        else {
-          logger.log(resp.value.map(f => {
-            return {
-              Name: f.Name,
-              ServerRelativeUrl: f.ServerRelativeUrl
-            }
-          }));
-        }
-
+        logger.log(resp.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

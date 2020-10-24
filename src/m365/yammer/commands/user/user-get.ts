@@ -30,6 +30,10 @@ class YammerUserGetCommand extends YammerCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'full_name', 'email', 'job_title', 'state', 'url'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let endPoint = `${this.resource}/v1/users/current.json`;
 
@@ -51,26 +55,7 @@ class YammerUserGetCommand extends YammerCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        if (args.options.output === 'json') {
-          logger.log(res);
-        }
-        else {
-          if (res instanceof Array) {
-            logger.log((res as any[]).map((n: any) => {
-              const item: any = {
-                id: n.id,
-                full_name: n.full_name,
-                email: n.email,
-                job_title: n.job_title,
-                state: n.state,
-                url: n.url
-              };
-              return item;
-            }));
-          } else {
-            logger.log({ id: res.id, full_name: res.full_name, email: res.email, job_title: res.job_title, state: res.state, url: res.url });
-          }
-        }
+        logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

@@ -39,7 +39,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Adding navigation node...`);
+      logger.logToStderr(`Adding navigation node...`);
     }
 
     const nodesCollection: string = args.options.parentNodeId ?
@@ -66,7 +66,7 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
         logger.log(res);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

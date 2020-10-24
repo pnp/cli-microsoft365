@@ -6,7 +6,6 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { GroupProperties } from "./GroupProperties";
 import { GroupPropertiesCollection } from "./GroupPropertiesCollection";
 
 interface CommandArgs {
@@ -26,9 +25,13 @@ class SpoGroupListCommand extends SpoCommand {
     return 'Lists all the groups within specific web';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Id', 'Title', 'LoginName', 'IsHiddenInUI', 'PrincipalType'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving list of groups for specified web at ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving list of groups for specified web at ${args.options.webUrl}...`);
     }
 
     let requestUrl = `${args.options.webUrl}/_api/web/sitegroups`;
@@ -44,20 +47,7 @@ class SpoGroupListCommand extends SpoCommand {
     request
       .get<GroupPropertiesCollection>(requestOptions)
       .then((groupProperties: GroupPropertiesCollection): void => {
-        if (args.options.output === 'json') {
-          logger.log(groupProperties);
-        }
-        else {
-          logger.log(groupProperties.value.map((g: GroupProperties) => {
-            return {
-              Id: g.Id,
-              Title: g.Title,
-              LoginName: g.LoginName,
-              IsHiddenInUI: g.IsHiddenInUI,
-              PrincipalType: g.PrincipalType
-            };
-          }))
-        }
+        logger.log(groupProperties);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

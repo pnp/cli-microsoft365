@@ -207,13 +207,13 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     }
 
     if (this.verbose) {
-      logger.log('Collecting project...');
+      logger.logToStderr('Collecting project...');
     }
     const project: Project = this.getProject(this.projectRootPath);
 
     if (this.debug) {
-      logger.log('Collected project');
-      logger.log(project);
+      logger.logToStderr('Collected project');
+      logger.logToStderr(project);
     }
 
     // reverse the list of versions to upgrade to, so that most recent findings

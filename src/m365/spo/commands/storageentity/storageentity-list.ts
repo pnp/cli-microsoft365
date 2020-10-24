@@ -27,7 +27,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
+      logger.logToStderr(`Retrieving details for all tenant properties in ${args.options.appCatalogUrl}...`);
     }
 
     const requestOptions: any = {
@@ -45,7 +45,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
           if (!web.storageentitiesindex ||
             web.storageentitiesindex.trim().length === 0) {
             if (this.verbose) {
-              logger.log('No tenant properties found');
+              logger.logToStderr('No tenant properties found');
             }
             cb();
             return;
@@ -55,7 +55,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
           const keys: string[] = Object.keys(properties);
           if (keys.length === 0) {
             if (this.verbose) {
-              logger.log('No tenant properties found');
+              logger.logToStderr('No tenant properties found');
             }
           }
           else {

@@ -12,7 +12,7 @@ const command: Command = require('./network-list');
 describe(commands.YAMMER_NETWORK_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -51,6 +57,10 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'email', 'community', 'permalink', 'web_url']);
   });
 
   it('calls the networking endpoint without parameter', function (done) {
@@ -81,7 +91,7 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
     });
     command.action(logger, { options: { debug: true } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 123)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123)
         done();
       }
       catch (e) {
@@ -138,7 +148,7 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
     });
     command.action(logger, { options: { debug: true, output: "json" } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 123);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
         done();
       }
       catch (e) {
@@ -175,7 +185,7 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
     });
     command.action(logger, { options: { debug: true, includeSuspended: true } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 123);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
         done();
       }
       catch (e) {

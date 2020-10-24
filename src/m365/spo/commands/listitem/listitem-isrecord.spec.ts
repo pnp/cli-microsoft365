@@ -12,7 +12,8 @@ const command: Command = require('./listitem-isrecord');
 describe(commands.LISTITEM_ISRECORD, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   let postFakes = (opts: any) => {
     // requestObjectIdentity mock
@@ -96,9 +97,16 @@ describe(commands.LISTITEM_ISRECORD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -162,7 +170,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerSpy.calledWith("Getting list id..."));
+        assert(loggerLogToStderrSpy.calledWith("Getting list id..."));
         done();
       }
       catch (e) {
@@ -185,7 +193,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerSpy.calledWith("List Id passed in as an argument."));
+        assert(loggerLogToStderrSpy.calledWith("List Id passed in as an argument."));
         done();
       }
       catch (e) {
@@ -208,7 +216,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerSpy.calledWith("Returns error from requestObjectIdentity"));
+        assert(loggerLogSpy.calledWith("Returns error from requestObjectIdentity"));
         done();
       }
       catch (e) {

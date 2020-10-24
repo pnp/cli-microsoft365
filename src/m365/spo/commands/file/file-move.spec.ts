@@ -12,7 +12,8 @@ const command: Command = require('./file-move');
 describe(commands.FILE_MOVE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   let stubAllPostRequests: any = (
     recycleFile: any = null,
@@ -79,9 +80,16 @@ describe(commands.FILE_MOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -121,7 +129,7 @@ describe(commands.FILE_MOVE, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.lastCall.args[0] === 'DONE');
+        assert(loggerLogToStderrSpy.lastCall.args[0] === 'DONE');
         done();
       }
       catch (e) {
@@ -142,7 +150,7 @@ describe(commands.FILE_MOVE, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.callCount === 0);
+        assert(loggerLogSpy.callCount === 0);
         done();
       }
       catch (e) {
@@ -186,7 +194,7 @@ describe(commands.FILE_MOVE, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.lastCall.args[0] === 'DONE');
+        assert(loggerLogToStderrSpy.lastCall.args[0] === 'DONE');
         done();
       }
       catch (e) {
@@ -234,7 +242,7 @@ describe(commands.FILE_MOVE, () => {
       }
     } as any, (err?: any) => {
       try {
-        assert(loggerSpy.lastCall.calledWith('DONE'));
+        assert(loggerLogToStderrSpy.lastCall.calledWith('DONE'));
         done();
       }
       catch (e) {
@@ -260,7 +268,7 @@ describe(commands.FILE_MOVE, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.lastCall.calledWith('DONE'));
+        assert(loggerLogToStderrSpy.lastCall.calledWith('DONE'));
         done();
       }
       catch (e) {

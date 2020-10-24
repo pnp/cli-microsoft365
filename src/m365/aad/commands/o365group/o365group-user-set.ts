@@ -60,9 +60,9 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
         );
 
         if (this.debug) {
-          logger.log((typeof args.options.groupId !== 'undefined') ? 'Group owners and members:' : 'Team owners and members:');
-          logger.log(this.items);
-          logger.log('');
+          logger.logToStderr((typeof args.options.groupId !== 'undefined') ? 'Group owners and members:' : 'Team owners and members:');
+          logger.logToStderr(this.items);
+          logger.logToStderr('');
         }
 
         if (this.items.filter(i => i.userPrincipalName.toLocaleLowerCase() === args.options.userName.toLocaleLowerCase()).length <= 0) {
@@ -124,7 +124,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

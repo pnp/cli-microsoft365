@@ -12,7 +12,7 @@ const command: Command = require('./group-get');
 describe(commands.GROUP_GET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.GROUP_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -86,7 +92,7 @@ describe(commands.GROUP_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           value: [{
             Id: 7,
             IsHiddenInUI: false,
@@ -144,7 +150,7 @@ describe(commands.GROUP_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           value: [{
             Id: 7,
             IsHiddenInUI: false,

@@ -60,7 +60,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.log(`Retrieving page information...`);
+      logger.logToStderr(`Retrieving page information...`);
     }
 
     const requestOptions: any = {
@@ -92,7 +92,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       })
       .then((): Promise<ClientSideWebpart> => {
         if (this.verbose) {
-          logger.log(
+          logger.logToStderr(
             `Retrieving definition for web part ${args.options.webPartId ||
             args.options.standardWebPart}...`
           );
@@ -102,7 +102,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       })
       .then((webPart: ClientSideWebpart): Promise<void> => {
         if (this.verbose) {
-          logger.log(`Setting client-side web part layout and properties...`);
+          logger.logToStderr(`Setting client-side web part layout and properties...`);
         }
 
         this.setWebPartProperties(webPart, logger, args);
@@ -237,7 +237,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       })
@@ -253,8 +253,8 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
         : args.options.webPartId;
 
       if (this.debug) {
-        logger.log(`StandardWebPart: ${standardWebPart}`);
-        logger.log(`WebPartId: ${webPartId}`);
+        logger.logToStderr(`StandardWebPart: ${standardWebPart}`);
+        logger.logToStderr(`WebPartId: ${webPartId}`);
       }
 
       const requestOptions: any = {
@@ -275,13 +275,13 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
           }
 
           if (this.debug) {
-            logger.log('WebPart definition:');
-            logger.log(webPartDefinition);
-            logger.log('');
+            logger.logToStderr('WebPart definition:');
+            logger.logToStderr(webPartDefinition);
+            logger.logToStderr('');
           }
 
           if (this.verbose) {
-            logger.log(`Creating instance from definition of WebPart ${webPartId}...`);
+            logger.logToStderr(`Creating instance from definition of WebPart ${webPartId}...`);
           }
           const component: ClientSidePageComponent = webPartDefinition[0];
           const id: string = v4();
@@ -310,9 +310,9 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
   private setWebPartProperties(webPart: ClientSideWebpart, logger: Logger, args: CommandArgs): void {
     if (args.options.webPartProperties) {
       if (this.debug) {
-        logger.log('WebPart properties: ');
-        logger.log(args.options.webPartProperties);
-        logger.log('');
+        logger.logToStderr('WebPart properties: ');
+        logger.logToStderr(args.options.webPartProperties);
+        logger.logToStderr('');
       }
 
       try {
@@ -325,9 +325,9 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
     if (args.options.webPartData) {
       if (this.debug) {
-        logger.log('WebPart data:');
-        logger.log(args.options.webPartData);
-        logger.log('');
+        logger.logToStderr('WebPart data:');
+        logger.logToStderr(args.options.webPartData);
+        logger.logToStderr('');
       }
 
       const webPartData = JSON.parse(args.options.webPartData);

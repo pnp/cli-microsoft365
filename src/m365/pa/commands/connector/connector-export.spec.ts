@@ -15,7 +15,7 @@ const command: Command = require('./connector-export');
 describe(commands.CONNECTOR_EXPORT, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let writeFileSyncStub: sinon.SinonStub;
   let mkdirSyncStub: sinon.SinonStub;
 
@@ -32,9 +32,15 @@ describe(commands.CONNECTOR_EXPORT, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -175,7 +181,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
 
     command.action(logger, { options: { debug: true, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } }, () => {
       try {
-        assert(loggerSpy.calledWithExactly('Downloaded swagger'));
+        assert(loggerLogToStderrSpy.calledWithExactly('Downloaded swagger'));
         done();
       }
       catch (e) {
@@ -421,9 +427,9 @@ describe(commands.CONNECTOR_EXPORT, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    command.action(logger, { options: { debug: true, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, () => {
       try {
-        assert(loggerSpy.calledWith('originalSwaggerUrl not set. Skipping'));
+        assert(loggerLogToStderrSpy.calledWith('originalSwaggerUrl not set. Skipping'));
         done();
       }
       catch (e) {
@@ -625,9 +631,9 @@ describe(commands.CONNECTOR_EXPORT, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    command.action(logger, { options: { debug: true, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, environment: 'Default-5be1aa17-e6cd-4d3d-8355-01af3e607d4b', connector: 'shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa' } } as any, () => {
       try {
-        assert(loggerSpy.calledWith('iconUri not set. Skipping'));
+        assert(loggerLogToStderrSpy.calledWith('iconUri not set. Skipping'));
         done();
       }
       catch (e) {
@@ -637,7 +643,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
   });
 
   it('correctly handles environment not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -658,7 +664,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
   });
 
   it('correctly handles connector not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "ApiResourceNotFound",
@@ -679,7 +685,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
   });
 
   it('correctly handles OData API error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

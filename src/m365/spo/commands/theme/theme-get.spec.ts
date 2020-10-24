@@ -13,7 +13,7 @@ const command: Command = require('./theme-get');
 describe(commands.THEME_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.THEME_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -77,9 +83,9 @@ describe(commands.THEME_GET, () => {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
         assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><ObjectPath Id="14" ObjectPathId="13" /><Query Id="15" ObjectPathId="13"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="13" ParentId="11" Name="GetTenantTheme"><Parameters><Parameter Type="String">Contoso</Parameter></Parameters></Method></ObjectPaths></Request>`);
-        assert.strictEqual(loggerSpy.lastCall.args[0].IsInverted, true);
-        assert.strictEqual(loggerSpy.lastCall.args[0].Name, 'Custom22');
-        assert.strictEqual(loggerSpy.lastCall.args[0].Palette.themeLight, '#affefe');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].IsInverted, true);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].Name, 'Custom22');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].Palette.themeLight, '#affefe');
         done();
       }
       catch (e) {
@@ -108,7 +114,7 @@ describe(commands.THEME_GET, () => {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_vti_bin/client.svc/ProcessQuery');
         assert.strictEqual(postStub.lastCall.args[0].headers['X-RequestDigest'], 'ABC');
         assert.strictEqual(postStub.lastCall.args[0].data, `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="12" ObjectPathId="11" /><ObjectPath Id="14" ObjectPathId="13" /><Query Id="15" ObjectPathId="13"><Query SelectAllProperties="true"><Properties /></Query></Query></Actions><ObjectPaths><Constructor Id="11" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="13" ParentId="11" Name="GetTenantTheme"><Parameters><Parameter Type="String">Contoso</Parameter></Parameters></Method></ObjectPaths></Request>`);
-        assert.strictEqual(loggerSpy.called, true);
+        assert.strictEqual(loggerLogSpy.called, true);
         done();
       }
       catch (e) {

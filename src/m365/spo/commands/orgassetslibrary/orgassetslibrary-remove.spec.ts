@@ -14,7 +14,7 @@ const command: Command = require('./orgassetslibrary-remove');
 describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -32,9 +32,15 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -166,7 +172,7 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
 
     command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, verbose: true, confirm: true } }, () => {
       try {
-        assert(orgAssetLibRemoveCallIssued && loggerSpy.calledWith(chalk.green('DONE')));
+        assert(orgAssetLibRemoveCallIssued && loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

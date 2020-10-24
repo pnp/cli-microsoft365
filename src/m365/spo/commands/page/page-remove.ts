@@ -42,7 +42,7 @@ class SpoPageRemoveCommand extends SpoCommand {
           }
 
           if (this.verbose) {
-            logger.log(`Removing page ${pageName}...`);
+            logger.logToStderr(`Removing page ${pageName}...`);
           }
 
           const requestOptions: any = {
@@ -61,7 +61,7 @@ class SpoPageRemoveCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
           cb();
         },

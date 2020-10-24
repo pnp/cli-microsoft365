@@ -39,18 +39,22 @@ class SpoListWebhookListCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'clientState', 'expirationDateTime', 'resource'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (args.options.title && this.verbose) {
-      logger.log(chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead`));
+      logger.logToStderr(chalk.yellow(`Option 'title' is deprecated. Please use 'listTitle' instead`));
     }
 
     if (args.options.id && this.verbose) {
-      logger.log(chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead`));
+      logger.logToStderr(chalk.yellow(`Option 'id' is deprecated. Please use 'listId' instead`));
     }
 
     if (this.verbose) {
       const list: string = args.options.id ? encodeURIComponent(args.options.id as string) : (args.options.listId ? encodeURIComponent(args.options.listId as string) : (args.options.title ? encodeURIComponent(args.options.title as string) : encodeURIComponent(args.options.listTitle as string)));
-      logger.log(`Retrieving webhook information for list ${list} in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving webhook information for list ${list} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -81,23 +85,15 @@ class SpoListWebhookListCommand extends SpoCommand {
       .get<{ value: [{ id: string, clientState: string, expirationDateTime: Date, resource: string }] }>(requestOptions)
       .then((res: { value: [{ id: string, clientState: string, expirationDateTime: Date, resource: string }] }): void => {
         if (res.value && res.value.length > 0) {
-          if (args.options.output === 'json') {
-            logger.log(res.value);
-          }
-          else {
-            logger.log(res.value.map(e => {
-              return {
-                id: e.id,
-                clientState: e.clientState || '',
-                expirationDateTime: e.expirationDateTime,
-                resource: e.resource
-              };
-            }));
-          }
+          res.value.forEach(w => {
+            w.clientState = w.clientState || '';
+          });
+
+          logger.log(res.value);
         }
         else {
           if (this.verbose) {
-            logger.log('No webhooks found');
+            logger.logToStderr('No webhooks found');
           }
         }
 

@@ -13,7 +13,7 @@ const command: Command = require('./term-set-get');
 describe(commands.TERM_SET_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.TERM_SET_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -139,7 +145,7 @@ describe(commands.TERM_SET_GET, () => {
     });
     command.action(logger, { options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",
@@ -248,7 +254,7 @@ describe(commands.TERM_SET_GET, () => {
     });
     command.action(logger, { options: { debug: true, name: 'PnP-CollabFooter-SharedLinks', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",
@@ -357,7 +363,7 @@ describe(commands.TERM_SET_GET, () => {
     });
     command.action(logger, { options: { debug: false, id: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",
@@ -466,7 +472,7 @@ describe(commands.TERM_SET_GET, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",
@@ -575,7 +581,7 @@ describe(commands.TERM_SET_GET, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnP-CollabFooter-SharedLinks', termGroupName: 'PnPTermSets>' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",
@@ -684,7 +690,7 @@ describe(commands.TERM_SET_GET, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnP-CollabFooter-SharedLinks>', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "CreatedDate": "2018-09-13T11:52:53.337Z",
           "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
           "LastModifiedDate": "2018-09-13T12:13:46.883Z",

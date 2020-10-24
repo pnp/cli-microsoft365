@@ -26,7 +26,7 @@ export default class TemplateInstantiator {
   public static mkdirSyncIfNotExists(logger: Logger, destinationPath: string, verbose: boolean) {
     if (!fs.existsSync(destinationPath)) {
       if (verbose) {
-        logger.log(`Create directory: ${destinationPath}`);
+        logger.logToStderr(`Create directory: ${destinationPath}`);
       }
       fs.mkdirSync(destinationPath);
     }

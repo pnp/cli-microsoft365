@@ -283,7 +283,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.log('DONE');
+          logger.logToStderr('DONE');
         }
 
         cb();

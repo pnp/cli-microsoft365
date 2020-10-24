@@ -45,7 +45,7 @@ class SpoListContentTypeAddCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-      logger.log(`Adding content type ${args.options.contentTypeId} to list ${list} in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Adding content type ${args.options.contentTypeId} to list ${list} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';

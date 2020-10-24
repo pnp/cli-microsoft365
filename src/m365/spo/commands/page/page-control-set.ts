@@ -42,7 +42,7 @@ class SpoPageControlSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Control with ID ${args.options.id} found on the page`);
+          logger.logToStderr(`Control with ID ${args.options.id} found on the page`);
         }
 
         // Check out the page
@@ -52,7 +52,7 @@ class SpoPageControlSetCommand extends SpoCommand {
         // Update the web part data
         const canvasContent: ClientSideControl[] = JSON.parse(page.CanvasContent1);
         if (this.debug) {
-          logger.log(canvasContent);
+          logger.logToStderr(canvasContent);
         }
 
         const canvasControl = canvasContent.find(c => c.id === args.options.id);
@@ -62,9 +62,9 @@ class SpoPageControlSetCommand extends SpoCommand {
 
         if (args.options.webPartData) {
           if (this.verbose) {
-            logger.log('web part data:');
-            logger.log(args.options.webPartData);
-            logger.log('');
+            logger.logToStderr('web part data:');
+            logger.logToStderr(args.options.webPartData);
+            logger.logToStderr('');
           }
 
           const webPartData = JSON.parse(args.options.webPartData);
@@ -76,17 +76,17 @@ class SpoPageControlSetCommand extends SpoCommand {
           };
 
           if (this.verbose) {
-            logger.log('Updated web part data:');
-            logger.log(canvasControl.webPartData);
-            logger.log('');
+            logger.logToStderr('Updated web part data:');
+            logger.logToStderr(canvasControl.webPartData);
+            logger.logToStderr('');
           }
         }
 
         if (args.options.webPartProperties) {
           if (this.verbose) {
-            logger.log('web part properties data:');
-            logger.log(args.options.webPartProperties);
-            logger.log('');
+            logger.logToStderr('web part properties data:');
+            logger.logToStderr(args.options.webPartProperties);
+            logger.logToStderr('');
           }
 
           const webPartProperties = JSON.parse(args.options.webPartProperties);
@@ -96,9 +96,9 @@ class SpoPageControlSetCommand extends SpoCommand {
           };
 
           if (this.verbose) {
-            logger.log('Updated web part properties:');
-            logger.log(canvasControl.webPartData.properties);
-            logger.log('');
+            logger.logToStderr('Updated web part properties:');
+            logger.logToStderr(canvasControl.webPartData.properties);
+            logger.logToStderr('');
           }
         }
 
@@ -106,7 +106,7 @@ class SpoPageControlSetCommand extends SpoCommand {
       })
       .then(() => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

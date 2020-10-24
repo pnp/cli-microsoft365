@@ -27,7 +27,7 @@ class SpoHubSiteThemeSyncCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log('Syncing hub site theme...');
+      logger.logToStderr('Syncing hub site theme...');
     }
 
     const requestOptions: any = {
@@ -42,7 +42,7 @@ class SpoHubSiteThemeSyncCommand extends SpoCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

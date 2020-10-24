@@ -13,7 +13,7 @@ const command: Command = require('./o365group-user-list');
 describe(commands.O365GROUP_USER_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +26,15 @@ describe(commands.O365GROUP_USER_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -175,7 +181,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
 
     command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "00000000-0000-0000-0000-000000000000",
             "displayName": "Anne Matthews",
@@ -209,7 +215,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
 
     command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Owner" } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "00000000-0000-0000-0000-000000000000",
             "displayName": "Anne Matthews",
@@ -243,7 +249,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
 
     command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Member" } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "00000000-0000-0000-0000-000000000001",
             "displayName": "Karl Matteson",
@@ -277,7 +283,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
 
     command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "00000000-0000-0000-0000-000000000000",
             "displayName": "Anne Matthews",

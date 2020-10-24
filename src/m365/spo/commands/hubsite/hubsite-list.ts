@@ -39,6 +39,10 @@ class SpoHubSiteListCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['ID', 'SiteUrl', 'Title'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let hubSites: HubSite[];
     let spoAdminUrl: string = '';
@@ -66,8 +70,8 @@ class SpoHubSiteListCommand extends SpoCommand {
         }
         else {
           if (this.debug) {
-            logger.log('Retrieving associated sites...');
-            logger.log('');
+            logger.logToStderr('Retrieving associated sites...');
+            logger.logToStderr('');
           }
         }
 
@@ -86,7 +90,7 @@ class SpoHubSiteListCommand extends SpoCommand {
         };
 
         if (this.debug) {
-          logger.log(`Will retrieve associated sites (including the hub sites) in batches of ${this.batchSize}`);
+          logger.logToStderr(`Will retrieve associated sites (including the hub sites) in batches of ${this.batchSize}`);
         }
 
         return this.getSites(requestOptions, requestOptions.url, logger);
@@ -99,32 +103,21 @@ class SpoHubSiteListCommand extends SpoCommand {
               // Hub Site ID (as this site is the actual hub site) and of which the
               // Hub Site ID matches the ID of the Hub
               return f.SiteId !== f.HubSiteId
-                && (f.HubSiteId as string).toUpperCase() == `{${h.ID.toUpperCase()}}`;
+                && (f.HubSiteId as string).toUpperCase() === `{${h.ID.toUpperCase()}}`;
             });
             h.AssociatedSites = filteredSites.map(a => {
               return {
                 Title: a.Title,
                 SiteUrl: a.SiteUrl
               }
-            })
+            });
           });
         };
 
-        if (args.options.output === 'json') {
-          logger.log(hubSites);
-        }
-        else {
-          logger.log(hubSites.map(h => {
-            return {
-              ID: h.ID,
-              SiteUrl: h.SiteUrl,
-              Title: h.Title
-            };
-          }));
-        }
+        logger.log(hubSites);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();
@@ -140,14 +133,14 @@ class SpoHubSiteListCommand extends SpoCommand {
           const retrievedSites: AssociatedSite[] = res.Row.length > 0 ? sites.concat(res.Row) : sites;
 
           if (this.debug) {
-            logger.log(res);
-            logger.log(`Retrieved ${res.Row.length} sites in batch ${batchNumber}`);
+            logger.logToStderr(res);
+            logger.logToStderr(`Retrieved ${res.Row.length} sites in batch ${batchNumber}`);
           }
 
           if (!!res.NextHref) {
             reqOptions.url = nonPagedUrl + res.NextHref;
             if (this.debug) {
-              logger.log(`Url for next batch of sites: ${reqOptions.url}`);
+              logger.logToStderr(`Url for next batch of sites: ${reqOptions.url}`);
             }
 
             this
@@ -160,7 +153,7 @@ class SpoHubSiteListCommand extends SpoCommand {
           }
           else {
             if (this.debug) {
-              logger.log(`Retrieved ${retrievedSites.length} sites in total`);
+              logger.logToStderr(`Retrieved ${retrievedSites.length} sites in total`);
             }
 
             resolve(retrievedSites);

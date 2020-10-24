@@ -24,6 +24,12 @@ describe(commands.TEAMS_REPORT_USERACTIVITYCOUNTS, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
     (command as any).items = [];

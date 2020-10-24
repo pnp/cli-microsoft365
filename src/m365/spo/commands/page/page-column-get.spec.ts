@@ -13,7 +13,7 @@ const command: Command = require('./page-column-get');
 describe(commands.PAGE_COLUMN_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   const apiResponse = {
     "ListItemAllFields": {
@@ -86,9 +86,15 @@ describe(commands.PAGE_COLUMN_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -125,7 +131,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, () => {
       try {
-        assert(loggerSpy.calledWith(
+        assert(loggerLogSpy.calledWith(
           {
             "order": 1,
             "factor": 6,
@@ -209,7 +215,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -287,7 +293,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 5 } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -307,7 +313,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', section: 1, column: 1 } }, () => {
       try {
-        assert(loggerSpy.calledWith(
+        assert(loggerLogSpy.calledWith(
           {
             "order": 1,
             "factor": 6,
@@ -332,7 +338,7 @@ describe(commands.PAGE_COLUMN_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', section: 1, column: 1 } }, () => {
       try {
-        assert(loggerSpy.calledWith(
+        assert(loggerLogSpy.calledWith(
           {
             "order": 1,
             "factor": 6,

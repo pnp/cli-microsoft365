@@ -13,7 +13,7 @@ const command: Command = require('./serviceprincipal-set');
 describe(commands.SERVICEPRINCIPAL_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -29,9 +29,15 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -87,7 +93,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     });
     command.action(logger, { options: { debug: true, enabled: 'true', confirm: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           AccountEnabled: true,
           AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
           ReplyUrls: [
@@ -125,7 +131,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     });
     command.action(logger, { options: { debug: false, enabled: 'true', confirm: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           AccountEnabled: true,
           AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
           ReplyUrls: [
@@ -163,7 +169,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     });
     command.action(logger, { options: { debug: true, enabled: 'false', confirm: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           AccountEnabled: false,
           AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
           ReplyUrls: [
@@ -271,7 +277,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
     });
     command.action(logger, { options: { debug: false, enabled: 'true' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           AccountEnabled: true,
           AppId: "57fb890c-0dab-4253-a5e0-7188c88b2bb4",
           ReplyUrls: [

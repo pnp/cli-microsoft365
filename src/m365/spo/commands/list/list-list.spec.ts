@@ -12,7 +12,7 @@ const command: Command = require('./list-list');
 describe(commands.LIST_LIST, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.LIST_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -50,6 +56,10 @@ describe(commands.LIST_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Title', 'Url', 'Id']);
   });
 
   it('retrieves all lists', (done) => {
@@ -120,96 +130,60 @@ describe(commands.LIST_LIST, () => {
       webUrl: 'https://contoso.sharepoint.com'
     } }, () => {
       try {
-        assert(loggerSpy.calledWith([{ 
-          AllowContentTypes: true,
-          BaseTemplate: 109,
-          BaseType: 1,
-          ContentTypesEnabled: false,
-          CrawlNonDefaultViews: false,
-          Created: null,
-          CurrentChangeToken: null,
-          CustomActionElements: null,
-          DefaultContentApprovalWorkflowId: '00000000-0000-0000-0000-000000000000',
-          DefaultItemOpenUseListSetting: false,
-          Description: '',
-          Direction: 'none',
-          DocumentTemplateUrl: null,
-          DraftVersionVisibility: 0,
-          EnableAttachments: false,
-          EnableFolderCreation: true,
-          EnableMinorVersions: false,
-          EnableModeration: false,
-          EnableVersioning: false,
-          EntityTypeName: 'Documents',
-          ExemptFromBlockDownloadOfNonViewableFiles: false,
-          FileSavePostProcessingEnabled: false,
-          ForceCheckout: false,
-          HasExternalDataSource: false,
-          Hidden: false,
-          Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
-          ImagePath: null,
-          ImageUrl: null,
-          IrmEnabled: false,
-          IrmExpire: false,
-          IrmReject: false,
-          IsApplicationList: false,
-          IsCatalog: false,
-          IsPrivate: false,
-          ItemCount: 69,
-          LastItemDeletedDate: null,
-          LastItemModifiedDate: null,
-          LastItemUserModifiedDate: null,
-          ListExperienceOptions: 0,
-          ListItemEntityTypeFullName: null,
-          MajorVersionLimit: 0,
-          MajorWithMinorVersionsLimit: 0,
-          MultipleDataList: false,
-          NoCrawl: false,
-          ParentWebPath: null,
-          ParentWebUrl: null,
-          ParserDisabled: false,
-          ServerTemplateCanCreateFolders: true,
-          TemplateFeatureId: null,
-          Title: 'Documents',
-          RootFolder: {ServerRelativeUrl: 'Documents'}
+        assert(loggerLogSpy.calledWith([{
+          "AllowContentTypes": true,
+          "BaseTemplate": 109,
+          "BaseType": 1,
+          "ContentTypesEnabled": false,
+          "CrawlNonDefaultViews": false,
+          "Created": null,
+          "CurrentChangeToken": null,
+          "CustomActionElements": null,
+          "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
+          "DefaultItemOpenUseListSetting": false,
+          "Description": "",
+          "Direction": "none",
+          "DocumentTemplateUrl": null,
+          "DraftVersionVisibility": 0,
+          "EnableAttachments": false,
+          "EnableFolderCreation": true,
+          "EnableMinorVersions": false,
+          "EnableModeration": false,
+          "EnableVersioning": false,
+          "EntityTypeName": "Documents",
+          "ExemptFromBlockDownloadOfNonViewableFiles": false,
+          "FileSavePostProcessingEnabled": false,
+          "ForceCheckout": false,
+          "HasExternalDataSource": false,
+          "Hidden": false,
+          "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
+          "ImagePath": null,
+          "ImageUrl": null,
+          "IrmEnabled": false,
+          "IrmExpire": false,
+          "IrmReject": false,
+          "IsApplicationList": false,
+          "IsCatalog": false,
+          "IsPrivate": false,
+          "ItemCount": 69,
+          "LastItemDeletedDate": null,
+          "LastItemModifiedDate": null,
+          "LastItemUserModifiedDate": null,
+          "ListExperienceOptions": 0,
+          "ListItemEntityTypeFullName": null,
+          "MajorVersionLimit": 0,
+          "MajorWithMinorVersionsLimit": 0,
+          "MultipleDataList": false,
+          "NoCrawl": false,
+          "ParentWebPath": null,
+          "ParentWebUrl": null,
+          "ParserDisabled": false,
+          "ServerTemplateCanCreateFolders": true,
+          "TemplateFeatureId": null,
+          "Title": "Documents",
+          "RootFolder": {"ServerRelativeUrl":"Documents"},
+          Url: "Documents"
         }]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('retrieves all lists with output option text', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/lists') > -1) {
-        return Promise.resolve(
-          {"value":[
-            {
-              "Title": "Documents",
-              "RootFolder": {"ServerRelativeUrl": "Documents"},
-              "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3"
-            }
-          ]}
-        );
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: {
-      output: 'text',
-      debug: false,
-      webUrl: 'https://contoso.sharepoint.com'
-    } }, () => {
-      try {
-        assert(loggerSpy.calledWith(
-          [{
-            Title: 'Documents',
-            Url: 'Documents',
-            Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3'
-          }]
-        ));
         done();
       }
       catch (e) {

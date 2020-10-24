@@ -14,7 +14,8 @@ const command: Command = require('./folder-rename');
 describe(commands.FOLDER_RENAME, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let stubAllPostRequests: any;
 
   before(() => {
@@ -91,9 +92,16 @@ describe(commands.FOLDER_RENAME, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -153,7 +161,7 @@ describe(commands.FOLDER_RENAME, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0], 'DONE');
+        assert.strictEqual(loggerLogToStderrSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {
@@ -172,7 +180,7 @@ describe(commands.FOLDER_RENAME, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(loggerSpy.called, false);
+        assert.strictEqual(loggerLogSpy.called, false);
         done();
       }
       catch (e) {

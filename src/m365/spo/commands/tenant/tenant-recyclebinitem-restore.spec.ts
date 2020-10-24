@@ -32,6 +32,12 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
     loggerSpy = sinon.spy(logger, 'log');

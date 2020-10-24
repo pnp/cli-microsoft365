@@ -13,7 +13,8 @@ const command: Command = require('./flow-export');
 describe(commands.FLOW_EXPORT, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   const actualFilename = `20180916t000000zba9d7134cc81499e9884bf70642afac7_20180916042428.zip`
   const actualFileUrl = `https://bapfeblobprodml.blob.core.windows.net/20180916t000000zb5faa82a53cb4cd29f2a20fde7dbb785/${actualFilename}?sv=2017-04-17&sr=c&sig=AOp0fzKc0dLpY2yovI%2BSHJnQ92GxaMvbWgxyCX5Wwno%3D&se=2018-09-16T12%3A24%3A28Z&sp=rl`;
@@ -126,9 +127,16 @@ describe(commands.FLOW_EXPORT, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -162,7 +170,7 @@ describe(commands.FLOW_EXPORT, () => {
 
     command.action(logger, { options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
       try {
-        assert(loggerSpy.calledWith(`File saved to path './${actualFilename}'`));
+        assert(loggerLogToStderrSpy.calledWith(`File saved to path './${actualFilename}'`));
         done();
       }
       catch (e) {
@@ -194,7 +202,7 @@ describe(commands.FLOW_EXPORT, () => {
 
     command.action(logger, { options: { debug: true, id: `${nonZipFileFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip', verbose: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(`File saved to path './output.zip'`));
+        assert(loggerLogToStderrSpy.calledWith(`File saved to path './output.zip'`));
         done();
       }
       catch (e) {
@@ -210,7 +218,7 @@ describe(commands.FLOW_EXPORT, () => {
 
     command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'json' } }, () => {
       try {
-        assert(loggerSpy.calledWith(`./${flowDisplayName}.json`));
+        assert(loggerLogSpy.calledWith(`./${flowDisplayName}.json`));
         done();
       }
       catch (e) {
@@ -226,7 +234,7 @@ describe(commands.FLOW_EXPORT, () => {
 
     command.action(logger, { options: { debug: true, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'json' } }, () => {
       try {
-        assert(loggerSpy.calledWith(`File saved to path './${flowDisplayName}.json'`));
+        assert(loggerLogToStderrSpy.calledWith(`File saved to path './${flowDisplayName}.json'`));
         done();
       }
       catch (e) {
@@ -242,7 +250,7 @@ describe(commands.FLOW_EXPORT, () => {
 
     command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip' } }, () => {
       try {
-        assert(loggerSpy.calledWith(`./${actualFilename}`));
+        assert(loggerLogSpy.calledWith(`./${actualFilename}`));
         done();
       }
       catch (e) {
@@ -274,7 +282,7 @@ describe(commands.FLOW_EXPORT, () => {
 
     command.action(logger, { options: { debug: false, id: `${foundFlowId}`, environment: `Default-${foundEnvironmentId}`, format: 'zip', path: './output.zip' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

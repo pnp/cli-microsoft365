@@ -13,7 +13,8 @@ const command: Command = require('./login');
 describe(commands.LOGIN, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,9 +28,16 @@ describe(commands.LOGIN, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(auth.service, 'logout').callsFake(() => { });
   });
 
@@ -238,7 +246,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
     command.action(logger, { options: {} }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -251,7 +259,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith('Polling_Request_Cancelled'));
+        assert(loggerLogToStderrSpy.calledWith('Polling_Request_Cancelled'));
         done();
       }
       catch (e) {

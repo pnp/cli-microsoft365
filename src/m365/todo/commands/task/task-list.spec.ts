@@ -13,7 +13,8 @@ const command: Command = require('./task-list');
 describe(commands.TASK_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +27,16 @@ describe(commands.TASK_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -52,6 +60,10 @@ describe(commands.TASK_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['title', 'status', 'createdDateTime', 'lastModifiedDateTime']);
   });
 
   it('fails validation if both listId and listName options are passed', () => {
@@ -162,7 +174,7 @@ describe(commands.TASK_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWithExactly(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWithExactly(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -217,7 +229,7 @@ describe(commands.TASK_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(
+        assert(loggerLogSpy.calledWith(
           [
             {
               "importance": "normal",
@@ -322,16 +334,32 @@ describe(commands.TASK_LIST, () => {
         const actual = JSON.stringify(log[log.length - 1]);
         const expected = JSON.stringify([
           {
+            "@odata.etag": "W/\"xMBBaLl1lk+dAn8KkjfXKQABF7wl/A==\"",
+            "importance": "normal",
+            "isReminderOn": false,
+            "status": "notStarted",
             "title": "Stay healthy",
-             "status": "notStarted",
             "createdDateTime": "2020-11-01T17:13:13.9582172Z",
-            "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z"
+            "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z",
+            "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
+            "body": {
+              "content": "",
+              "contentType": "text"
+            }
           },
           {
-            "title": "Eat food",
+            "@odata.etag": "W/\"xMBBaLl1lk+dAn8KkjfXKQABF7wl8w==\"",
+            "importance": "normal",
+            "isReminderOn": false,
             "status": "notStarted",
+            "title": "Eat food",
             "createdDateTime": "2020-11-01T17:13:10.7970391Z",
-            "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z"
+            "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z",
+            "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuOAAA=",
+            "body": {
+              "content": "",
+              "contentType": "text"
+            }
           }
         ]);
         assert.strictEqual(actual, expected);

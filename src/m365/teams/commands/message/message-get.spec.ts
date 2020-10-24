@@ -12,7 +12,7 @@ const command: Command = require('./message-get');
 describe(commands.TEAMS_MESSAGE_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.TEAMS_MESSAGE_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -165,7 +171,7 @@ describe(commands.TEAMS_MESSAGE_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           attachments: [],
           body: { "contentType": "text", "content": "Konnichiwa" },
           createdDateTime: "2018-10-28T15:56:25.116Z",
@@ -228,7 +234,7 @@ describe(commands.TEAMS_MESSAGE_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           attachments: [],
           body: { "contentType": "text", "content": "Konnichiwa" },
           createdDateTime: "2018-10-28T15:56:25.116Z",

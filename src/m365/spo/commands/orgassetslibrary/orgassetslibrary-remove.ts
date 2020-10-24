@@ -1,7 +1,7 @@
 import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
-    CommandError, CommandOption
+  CommandError, CommandOption
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -58,12 +58,10 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
             return;
           }
           else {
-            if (args.options.output === 'json') {
-              logger.log(json[json.length - 1]);
-            }
+            logger.log(json[json.length - 1]);
 
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
           }
           cb();

@@ -13,7 +13,7 @@ const command: Command = require('./externaluser-list');
 describe(commands.EXTERNALUSER_LIST, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,11 +26,17 @@ describe(commands.EXTERNALUSER_LIST, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: any) => {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
         log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -84,7 +90,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Dear Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -127,7 +133,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Dear Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -170,7 +176,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: true, pageSize: '50' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Dear Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -213,7 +219,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: true, position: '1', pageSize: '50' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Dear Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -256,7 +262,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: true, filter: 'Vesa' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -299,7 +305,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: true, sortOrder: 'desc' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Dear Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -342,7 +348,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Dear Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -385,7 +391,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Dear Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -428,7 +434,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: true, pageSize: '50', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Dear Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -471,7 +477,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: true, position: '1', pageSize: '50', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Dear Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -514,7 +520,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: true, filter: 'Vesa', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -557,7 +563,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: true, sortOrder: 'desc', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: 'Dear Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -600,7 +606,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: true, filter: '<Vesa', siteUrl: 'https://contoso.sharepoint.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           DisplayName: '<Vesa',
           InvitedAs: 'me@dearvesa.fi',
           UniqueId: '100300009BF10C95',
@@ -634,7 +640,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
     });
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

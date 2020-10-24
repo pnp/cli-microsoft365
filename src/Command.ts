@@ -62,7 +62,7 @@ export default abstract class Command {
     const cli: Cli = Cli.getInstance();
     if (cli.currentCommandName &&
       cli.currentCommandName.indexOf(deprecated) === 0) {
-      logger.log(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
+      logger.logToStderr(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
     }
   }
 
@@ -121,6 +121,14 @@ export default abstract class Command {
   }
 
   public autocomplete(): string[] | undefined {
+    return;
+  }
+
+  /**
+   * Returns list of properties that should be returned in the text output.
+   * Returns all properties if no default properties specified
+   */
+  public defaultProperties(): string[] | undefined {
     return;
   }
 

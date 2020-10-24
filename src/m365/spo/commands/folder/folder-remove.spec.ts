@@ -12,7 +12,8 @@ const command: Command = require('./folder-remove');
 describe(commands.FOLDER_REMOVE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let requests: any[];
   let promptOptions: any;
   let stubPostResponses: any;
@@ -42,9 +43,16 @@ describe(commands.FOLDER_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -121,7 +129,7 @@ describe(commands.FOLDER_REMOVE, () => {
         folderUrl: '/Shared Documents/Folder1' 
       } }, () => {
       try {
-        assert(loggerSpy.notCalled === true);
+        assert(loggerLogSpy.notCalled === true);
         done();
       }
       catch (e) {
@@ -143,7 +151,7 @@ describe(commands.FOLDER_REMOVE, () => {
         folderUrl: '/Shared Documents/Folder1' 
       } }, () => {
       try {
-        assert(loggerSpy.lastCall.calledWith('DONE'));
+        assert(loggerLogToStderrSpy.lastCall.calledWith('DONE'));
         done();
       }
       catch (e) {

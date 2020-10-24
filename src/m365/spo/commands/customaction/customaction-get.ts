@@ -45,7 +45,7 @@ class SpoCustomActionGetCommand extends SpoCommand {
       .then((customAction: CustomAction): void => {
         if (customAction["odata.null"] === true) {
           if (this.verbose) {
-            logger.log(`Custom action with id ${args.options.id} not found`);
+            logger.logToStderr(`Custom action with id ${args.options.id} not found`);
           }
         }
         else {

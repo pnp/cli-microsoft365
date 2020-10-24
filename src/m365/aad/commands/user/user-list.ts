@@ -47,7 +47,7 @@ class AadUserListCommand extends GraphItemsListCommand<any> {
         logger.log(this.items);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

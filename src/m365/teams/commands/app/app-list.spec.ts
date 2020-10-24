@@ -12,7 +12,7 @@ const command: Command = require('./app-list');
 describe(commands.TEAMS_APP_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.TEAMS_APP_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -51,6 +57,10 @@ describe(commands.TEAMS_APP_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'distributionMethod']);
   });
 
   it('fails validation if both teamId and teamName options are passed', (done) => {
@@ -84,9 +94,10 @@ describe(commands.TEAMS_APP_LIST, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "7131a36d-bb5f-46b8-bb40-0b199a3fad74",
+            "externalId": "4f0cd7c8-995e-4868-812d-d1d402a81eca",
             "displayName": "WsInfo",
             "distributionMethod": "organization"
           }
@@ -221,19 +232,22 @@ describe(commands.TEAMS_APP_LIST, () => {
 
     command.action(logger, { options: { all: true, debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "012be6ac-6f34-4ffa-9344-b857f7bc74e1",
+            "externalId": null,
             "displayName": "Pickit Images",
             "distributionMethod": "store"
           },
           {
             "id": "01b22ab6-c657-491c-97a0-d745bea11269",
+            "externalId": null,
             "displayName": "Hootsuite",
             "distributionMethod": "store"
           },
           {
             "id": "02d14659-a28b-4007-8544-b279c0d3628b",
+            "externalId": null,
             "displayName": "Pivotal Tracker",
             "distributionMethod": "store"
           }
@@ -261,13 +275,17 @@ describe(commands.TEAMS_APP_LIST, () => {
 
     command.action(logger, { options: { debug: false, teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=",
+        assert(loggerLogSpy.calledWith([{
+          "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=",
+          "teamsApp": {
+            "id": "b8ccf3f4-84ee-4e62-82d0-bf6bf95bdb83",
+            "externalId": "912e9d76-1794-414f-82fd-e5b60fab731b",
             "displayName": "HelloWorld",
             "distributionMethod": "organization"
-          }
-        ]));
+          },
+          "displayName": "HelloWorld",
+          "distributionMethod": "organization"
+        }]));
         done();
       }
       catch (e) {
@@ -316,13 +334,17 @@ describe(commands.TEAMS_APP_LIST, () => {
 
     command.action(logger, { options: { debug: false, teamName: 'Team Name' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=",
+        assert(loggerLogSpy.calledWith([{
+          "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=",
+          "teamsApp": {
+            "id": "b8ccf3f4-84ee-4e62-82d0-bf6bf95bdb83",
+            "externalId": "912e9d76-1794-414f-82fd-e5b60fab731b",
             "displayName": "HelloWorld",
             "distributionMethod": "organization"
-          }
-        ]));
+          },
+          "displayName": "HelloWorld",
+          "distributionMethod": "organization"
+        }]));
         done();
       }
       catch (e) {
@@ -354,23 +376,39 @@ describe(commands.TEAMS_APP_LIST, () => {
 
     command.action(logger, { options: { debug: false, teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55', all: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=",
+        assert(loggerLogSpy.calledWith([{
+          "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=",
+          "teamsApp": {
+            "id": "b8ccf3f4-84ee-4e62-82d0-bf6bf95bdb83",
+            "externalId": "912e9d76-1794-414f-82fd-e5b60fab731b",
             "displayName": "HelloWorld",
             "distributionMethod": "organization"
           },
-          {
-            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyMwZDgyMGVjZC1kZWYyLTQyOTctYWRhZC03ODA1NmNkZTdjNzg=",
+          "displayName": "HelloWorld",
+          "distributionMethod": "organization"
+        },
+        {
+          "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyMwZDgyMGVjZC1kZWYyLTQyOTctYWRhZC03ODA1NmNkZTdjNzg=",
+          "teamsApp": {
+            "id": "0d820ecd-def2-4297-adad-78056cde7c78",
+            "externalId": null,
             "displayName": "OneNote",
             "distributionMethod": "store"
           },
-          {
-            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=",
+          "displayName": "OneNote",
+          "distributionMethod": "store"
+        },
+        {
+          "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyMxNGQ2OTYyZC02ZWViLTRmNDgtODg5MC1kZTU1NDU0YmIxMzY=",
+          "teamsApp": {
+            "id": "14d6962d-6eeb-4f48-8890-de55454bb136",
+            "externalId": null,
             "displayName": "Activity",
             "distributionMethod": "store"
-          }
-        ]));
+          },
+          "displayName": "Activity",
+          "distributionMethod": "store"
+        }]));
         done();
       }
       catch (e) {
@@ -399,7 +437,7 @@ describe(commands.TEAMS_APP_LIST, () => {
 
     command.action(logger, { options: { output: 'json', debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "7131a36d-bb5f-46b8-bb40-0b199a3fad74",
             "externalId": "4f0cd7c8-995e-4868-812d-d1d402a81eca",

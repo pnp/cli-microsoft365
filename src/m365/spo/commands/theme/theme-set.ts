@@ -51,15 +51,15 @@ class SpoThemeSetCommand extends SpoCommand {
         const fullPath: string = path.resolve(args.options.filePath);
 
         if (this.verbose) {
-          logger.log(`Adding theme from ${fullPath} to tenant...`);
+          logger.logToStderr(`Adding theme from ${fullPath} to tenant...`);
         }
 
         const palette: any = JSON.parse(fs.readFileSync(fullPath, 'utf8'));
 
         if (this.debug) {
-          logger.log('');
-          logger.log('Palette');
-          logger.log(JSON.stringify(palette));
+          logger.logToStderr('');
+          logger.logToStderr('Palette');
+          logger.logToStderr(JSON.stringify(palette));
         }
 
         const isInverted: boolean = args.options.isInverted ? true : false;
@@ -85,7 +85,7 @@ class SpoThemeSetCommand extends SpoCommand {
 
       }).then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

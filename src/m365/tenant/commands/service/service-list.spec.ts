@@ -12,18 +12,7 @@ const command: Command = require('./service-list');
 describe(commands.TENANT_SERVICE_LIST, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
-
-  const textOutput = [
-    {
-      Id: "Bookings",
-      DisplayName: "Microsoft Bookings"
-    },
-    {
-      Id: "DynamicsCRM",
-      DisplayName: "Dynamics 365"
-    }
-  ];
+  let loggerLogSpy: sinon.SinonSpy;
 
   const jsonOutput = {
     "value": [
@@ -69,11 +58,15 @@ describe(commands.TENANT_SERVICE_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(Utils, 'getTenantIdFromAccessToken').callsFake(() => {
-      return '31537af4-6d77-4bb9-a681-d2394888ea26';
-    });
+    sinon.stub(Utils, 'getTenantIdFromAccessToken').callsFake(() => '31537af4-6d77-4bb9-a681-d2394888ea26');
 
     auth.service.connected = true;
+    if (!auth.service.accessTokens[auth.defaultResource]) {
+      auth.service.accessTokens[auth.defaultResource] = {
+        expiresOn: 'abc',
+        value: 'abc'
+      };
+    }
   });
 
   beforeEach(() => {
@@ -81,9 +74,15 @@ describe(commands.TENANT_SERVICE_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -106,7 +105,11 @@ describe(commands.TENANT_SERVICE_LIST, () => {
   });
 
   it('has a description', () => {
-    assert.notEqual(command.description, null);
+    assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'DisplayName']);
   });
 
   it('supports debug mode', () => {
@@ -153,12 +156,12 @@ describe(commands.TENANT_SERVICE_LIST, () => {
 
     command.action(logger, {
       options: {
-        output: 'json',
+        output: 'text',
         debug: false
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -177,60 +180,12 @@ describe(commands.TENANT_SERVICE_LIST, () => {
 
     command.action(logger, {
       options: {
-        output: 'json',
-        debug: true
-      }
-    }, () => {
-      try {
-        assert(loggerSpy.calledWith(jsonOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('gets the services available in Microsoft 365 as text', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('ServiceComms/Services') > -1) {
-        return Promise.resolve(jsonOutput);
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        output: 'text',
-        debug: false
-      }
-    }, () => {
-      try {
-        assert(loggerSpy.calledWith(textOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('gets the services available in Microsoft 365 as text (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('ServiceComms/Services') > -1) {
-        return Promise.resolve(jsonOutput);
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
         output: 'text',
         debug: true
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(textOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {

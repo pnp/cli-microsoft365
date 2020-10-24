@@ -13,7 +13,7 @@ const command: Command = require('./o365group-add');
 describe(commands.O365GROUP_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,9 +27,15 @@ describe(commands.O365GROUP_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -101,7 +107,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -173,7 +179,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -245,7 +251,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', isPrivate: 'true' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -326,7 +332,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -407,7 +413,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.jpg' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -488,7 +494,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.gif' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -704,7 +710,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user@contoso.onmicrosoft.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,
@@ -881,7 +887,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user@contoso.onmicrosoft.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
           deletedDateTime: null,
           classification: null,

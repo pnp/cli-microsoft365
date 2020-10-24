@@ -36,6 +36,10 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['subject', 'receivedDateTime'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getFolderId(args)
@@ -45,20 +49,10 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
         return this.getAllItems(`${this.resource}/v1.0/${url}?$top=50`, logger, true);
       })
       .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          logger.log(this.items.map(i => {
-            return {
-              subject: i.subject,
-              receivedDateTime: i.receivedDateTime
-            };
-          }));
-        }
+        logger.log(this.items);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

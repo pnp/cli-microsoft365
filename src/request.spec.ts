@@ -4,17 +4,15 @@ import { ClientRequest } from 'http';
 import * as https from 'https';
 import * as sinon from 'sinon';
 import auth from './Auth';
+import { Logger } from './cli';
 import _request from './request';
 import Utils from './Utils';
 
 describe('Request', () => {
-  const logger = {
-    commandWrapper: {
-      command: 'command'
-    },
+  const logger: Logger = {
     log: (msg: any) => { },
-    prompt: () => { },
-    action: () => { }
+    logRaw: (msg: any) => { },
+    logToStderr: (msg: any) => { }
   };
 
   let _options: AxiosRequestConfig;

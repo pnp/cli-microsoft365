@@ -13,7 +13,8 @@ const command: Command = require('./channel-add');
 describe(commands.TEAMS_CHANNEL_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +27,16 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -218,12 +226,12 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
           "description": "Architecture"
         }));
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -252,7 +260,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
           "description": null
@@ -315,7 +323,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "id": "19:d9c63a6d6a2644af960d74ea927bdfb0@thread.skype",
           "displayName": "Architecture Discussion",
           "description": null

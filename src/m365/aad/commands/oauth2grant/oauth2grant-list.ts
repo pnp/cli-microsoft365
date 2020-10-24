@@ -7,7 +7,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import AadCommand from '../../../base/AadCommand';
 import commands from '../../commands';
-import { OAuth2PermissionGrant } from './OAuth2PermissionGrant';
 
 interface CommandArgs {
   options: Options;
@@ -26,9 +25,13 @@ class AadOAuth2GrantListCommand extends AadCommand {
     return 'Lists OAuth2 permission grants for the specified service principal';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['objectId', 'resourceId', 'scope'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving list of OAuth grants for the service principal...`);
+      logger.logToStderr(`Retrieving list of OAuth grants for the service principal...`);
     }
 
     const requestOptions: any = {
@@ -40,21 +43,10 @@ class AadOAuth2GrantListCommand extends AadCommand {
     };
 
     request
-      .get<{ value: OAuth2PermissionGrant[] }>(requestOptions)
-      .then((res: { value: OAuth2PermissionGrant[] }): void => {
+      .get<{ value: any[] }>(requestOptions)
+      .then((res: { value: any[] }): void => {
         if (res.value && res.value.length > 0) {
-          if (args.options.output === 'json') {
-            logger.log(res.value);
-          }
-          else {
-            logger.log(res.value.map(g => {
-              return {
-                objectId: g.objectId,
-                resourceId: g.resourceId,
-                scope: g.scope
-              };
-            }));
-          }
+          logger.log(res.value);
         }
 
         cb();

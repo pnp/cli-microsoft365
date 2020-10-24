@@ -27,7 +27,7 @@ class GraphSchemaExtensionGet extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
         if (this.verbose) {
-          logger.log(`Gets the properties of the specified schema extension definition with id '${args.options.id}'...`);
+          logger.logToStderr(`Gets the properties of the specified schema extension definition with id '${args.options.id}'...`);
         }
 
         const requestOptions: any = {
@@ -45,7 +45,7 @@ class GraphSchemaExtensionGet extends GraphCommand {
         logger.log(res);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

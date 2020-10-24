@@ -16,6 +16,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
   let requests: any[];
   let logger: Logger; 
   let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -35,9 +36,16 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
     });
@@ -181,7 +189,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, debug: true } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -225,7 +233,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, verbose: true } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -389,7 +397,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true, debug: true } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -449,7 +457,7 @@ describe(commands.TENANT_RECYCLEBINITEM_REMOVE, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', confirm: true, wait: true, verbose: true } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

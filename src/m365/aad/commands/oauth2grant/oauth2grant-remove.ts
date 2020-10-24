@@ -27,7 +27,7 @@ class AadOAuth2GrantRemoveCommand extends AadCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Removing OAuth2 permissions...`);
+      logger.logToStderr(`Removing OAuth2 permissions...`);
     }
 
     const requestOptions: any = {
@@ -39,7 +39,7 @@ class AadOAuth2GrantRemoveCommand extends AadCommand {
       .delete(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

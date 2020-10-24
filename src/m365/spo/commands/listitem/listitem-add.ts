@@ -64,7 +64,7 @@ class SpoListItemAddCommand extends SpoCommand {
     const folderExtensions: FolderExtensions = new FolderExtensions(logger, this.debug);
 
     if (this.verbose) {
-      logger.log(`Getting content types for list...`);
+      logger.logToStderr(`Getting content types for list...`);
     }
 
     const requestOptions: any = {
@@ -83,15 +83,15 @@ class SpoListItemAddCommand extends SpoCommand {
             const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
 
             if (this.debug) {
-              logger.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
+              logger.logToStderr(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
             }
 
             return contentTypeMatch;
           });
 
           if (this.debug) {
-            logger.log('content type filter output...');
-            logger.log(foundContentType);
+            logger.logToStderr('content type filter output...');
+            logger.logToStderr(foundContentType);
           }
 
           if (foundContentType.length > 0) {
@@ -104,13 +104,13 @@ class SpoListItemAddCommand extends SpoCommand {
           }
 
           if (this.debug) {
-            logger.log(`using content type name: ${contentTypeName}`);
+            logger.logToStderr(`using content type name: ${contentTypeName}`);
           }
         }
 
         if (args.options.folder) {
           if (this.debug) {
-            logger.log('setting up folder lookup response ...');
+            logger.logToStderr('setting up folder lookup response ...');
           }
 
           const requestOptions: any = {
@@ -135,7 +135,7 @@ class SpoListItemAddCommand extends SpoCommand {
       })
       .then((): Promise<any> => {
         if (this.verbose) {
-          logger.log(`Creating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+          logger.logToStderr(`Creating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
         const requestBody: any = {
@@ -152,7 +152,7 @@ class SpoListItemAddCommand extends SpoCommand {
 
         if (args.options.contentType && contentTypeName !== '') {
           if (this.debug) {
-            logger.log(`Specifying content type name [${contentTypeName}] in request body`);
+            logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
           }
 
           requestBody.formValues.push({
@@ -180,9 +180,9 @@ class SpoListItemAddCommand extends SpoCommand {
         });
 
         if (this.debug) {
-          logger.log(`field values returned:`)
-          logger.log(fieldValues)
-          logger.log(`Id returned by AddValidateUpdateItemUsingPath: ${idField}`);
+          logger.logToStderr(`field values returned:`)
+          logger.logToStderr(fieldValues)
+          logger.logToStderr(`Id returned by AddValidateUpdateItemUsingPath: ${idField}`);
         }
 
         if (idField.length === 0) {

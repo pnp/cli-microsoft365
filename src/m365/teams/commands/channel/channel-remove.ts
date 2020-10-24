@@ -73,7 +73,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
           })
           .then((): void => {
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
 
             cb();
@@ -93,7 +93,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
           .delete(requestOptions)
           .then((): void => {
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
 
             cb();

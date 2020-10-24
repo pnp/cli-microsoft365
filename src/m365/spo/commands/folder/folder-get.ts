@@ -27,7 +27,7 @@ class SpoFolderGetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving folder from site ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving folder from site ${args.options.webUrl}...`);
     }
 
     const serverRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.folderUrl);

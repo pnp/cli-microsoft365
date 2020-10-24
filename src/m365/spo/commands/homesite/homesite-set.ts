@@ -60,7 +60,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
           logger.log(json[json.length - 1]);
 
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
         }
         cb();

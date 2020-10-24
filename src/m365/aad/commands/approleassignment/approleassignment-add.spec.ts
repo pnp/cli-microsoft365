@@ -13,7 +13,7 @@ const command: Command = require('./approleassignment-add');
 describe(commands.APPROLEASSIGNMENT_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   let getRequestStub = (): sinon.SinonStub => {
 
@@ -47,9 +47,15 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -81,9 +87,9 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
         done();
       }
       catch (e) {
@@ -98,12 +104,12 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     command.action(logger, { options: { objectId: '24448e9c-d0fa-43d1-a1dd-e279720969a0', resource: 'SharePoint', scope: 'Sites.Read.All,Sites.ReadWrite.All' } }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
-        assert.strictEqual(loggerSpy.lastCall.args[0][1].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
-        assert.strictEqual(loggerSpy.lastCall.args[0][1].principalDisplayName, 'myapp');
-        assert.strictEqual(loggerSpy.lastCall.args[0][1].resourceDisplayName, 'Office 365 SharePoint Online');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][1].objectId, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][1].principalDisplayName, 'myapp');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][1].resourceDisplayName, 'Office 365 SharePoint Online');
         done();
       }
       catch (e) {
@@ -118,12 +124,12 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     command.action(logger, { options: { displayName: 'myapp', resource: 'SharePoint', scope: 'Sites.Read.All', output: 'json' } }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].principalId, '24448e9c-d0fa-43d1-a1dd-e279720969a0');
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].principalType, 'ServicePrincipal');
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].resourceId, 'df3d00f0-a24d-45a9-ba8b-3b0934ec3a6c');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 'nI5EJPrQ0UOh3eJ5cglpoLL3KmM12wZPom8Zw6AEypw');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalDisplayName, 'myapp');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceDisplayName, 'Office 365 SharePoint Online');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalId, '24448e9c-d0fa-43d1-a1dd-e279720969a0');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].principalType, 'ServicePrincipal');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].resourceId, 'df3d00f0-a24d-45a9-ba8b-3b0934ec3a6c');
         done();
       }
       catch (e) {
@@ -138,7 +144,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
         done();
       }
       catch (e) {
@@ -153,7 +159,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'intune', scope: 'Sites.Read.All' } }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
         done();
       }
       catch (e) {
@@ -168,7 +174,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'exchange', scope: 'Sites.Read.All' } }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
         done();
       }
       catch (e) {
@@ -183,7 +189,7 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
 
     command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scope: 'Sites.Read.All' } }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
         done();
       }
       catch (e) {

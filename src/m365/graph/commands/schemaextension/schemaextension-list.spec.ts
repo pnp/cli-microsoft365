@@ -12,7 +12,7 @@ const command: Command = require('./schemaextension-list');
 describe(commands.SCHEMAEXTENSION_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -91,7 +97,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
                   "id": "adatumisv_exo2",
                   "description": "sample desccription",
                   "targetTypes": [
@@ -178,7 +184,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.lastCall.args[0][1].id === 'adatumisv_exo3');
+        assert(loggerLogSpy.lastCall.args[0][1].id === 'adatumisv_exo3');
         done();
       }
       catch (e) {
@@ -233,7 +239,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
               {
                   "id": "adatumisv_courses",
                   "description": "Extension description",
@@ -314,7 +320,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
               {
                   "id": "adatumisv_courses",
                   "description": "Extension description",
@@ -396,7 +402,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
               {
                   "id": "adatumisv_courses",
                   "description": "Extension description",
@@ -471,7 +477,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
               {
                   "id": "adatumisv_exo2",
                   "description": "sample desccription",

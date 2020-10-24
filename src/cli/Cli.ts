@@ -11,6 +11,7 @@ import Command, { CommandError } from '../Command';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
 import Table = require('easy-table');
+import Utils from '../Utils';
 const packageJSON = require('../../package.json');
 
 export class Cli {
@@ -143,13 +144,15 @@ export class Cli {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       const logger: Logger = {
         log: (message: any): void => {
-          const output: any = Cli.logOutput(message, args.options);
+          const output: any = Cli.formatOutput(message, args.options);
           Cli.log(output);
-        }
+        },
+        logRaw: (message: any): void => Cli.log(message),
+        logToStderr: (message: any): void => Cli.error(message)
       };
 
       if (args.options.debug) {
-        logger.log(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
+        logger.logToStderr(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
       }
 
       command
@@ -166,8 +169,14 @@ export class Cli {
   public static executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }): Promise<string> {
     return new Promise((resolve: (result: string) => void, reject: (error: any) => void): void => {
       const log: string[] = [];
-      const logger = {
+      const logger: Logger = {
         log: (message: any): void => {
+          log.push(message);
+        },
+        logRaw: (message: any): void => {
+          log.push(message);
+        },
+        logToStderr: (message: any): void => {
           log.push(message);
         }
       };
@@ -278,7 +287,8 @@ export class Cli {
       aliases: command.alias(),
       name: command.name,
       command: command,
-      options: this.getCommandOptions(command)
+      options: this.getCommandOptions(command),
+      defaultProperties: command.defaultProperties()
     });
   }
 
@@ -336,7 +346,7 @@ export class Cli {
     return minimist(args, minimistOptions);
   }
 
-  private static logOutput(logStatement: any, options: any): any {
+  private static formatOutput(logStatement: any, options: any): any {
     if (logStatement instanceof Date) {
       return logStatement.toString();
     }
@@ -346,6 +356,13 @@ export class Cli {
     if (logStatementType === 'undefined') {
       return logStatement;
     }
+
+    // we need to get the list of object's properties to see if the specified
+    // JMESPath query (if any) filters object's properties or not. We need to
+    // know this in order to decide if we should use default command's
+    // properties or custom ones from JMESPath
+    const originalObject: any = Array.isArray(logStatement) ? Cli.getFirstNonUndefinedArrayItem(logStatement) : logStatement;
+    const originalProperties: string[] = originalObject ? Object.getOwnPropertyNames(originalObject) : [];
 
     if (options.query &&
       !options.help) {
@@ -367,6 +384,11 @@ export class Cli {
     }
     else {
       for (let i: number = 0; i < logStatement.length; i++) {
+        if (Array.isArray(logStatement[i])) {
+          arrayType = 'array';
+          break;
+        }
+
         const t: string = typeof logStatement[i];
         if (t !== 'undefined') {
           arrayType = t;
@@ -379,6 +401,35 @@ export class Cli {
       return logStatement.join(os.EOL);
     }
 
+    // if output type has not been set or set to 'text', process the retrieved
+    // data so that returned objects contain only default properties specified
+    // on the current command. If there is no current command or the
+    // command doesn't specify default properties, return original data
+    if (!options.output || options.output === 'text') {
+      const cli: Cli = Cli.getInstance();
+      const currentCommand: CommandInfo | undefined = cli.commandToExecute;
+
+      if (arrayType === 'object' &&
+        currentCommand && currentCommand.defaultProperties) {
+        // the log statement contains the same properties as the original object
+        // so it can be filtered following the default properties specified on
+        // the command
+        if (JSON.stringify(originalProperties) === JSON.stringify(Object.getOwnPropertyNames(logStatement[0]))) {
+          // in some cases we return properties wrapped in `value` array
+          // returned by the API. We'll remove it in the future, but for now
+          // we'll use a workaround to drop the `value` array here
+          if (logStatement[0].value &&
+            Array.isArray(logStatement[0].value)) {
+            logStatement = logStatement[0].value;
+          }
+
+          logStatement = logStatement.map((s: any) =>
+            Utils.filterObject(s, currentCommand.defaultProperties as string[]));
+        }
+      }
+    }
+
+    // display object as a list of key-value pairs
     if (logStatement.length === 1) {
       const obj: any = logStatement[0];
       const propertyNames: string[] = [];
@@ -400,6 +451,7 @@ export class Cli {
 
       return output.join('\n') + '\n';
     }
+    // display object as a table where each property is a column
     else {
       const t: Table = new Table();
       logStatement.forEach((r: any) => {
@@ -415,6 +467,17 @@ export class Cli {
 
       return t.toString();
     }
+  }
+
+  private static getFirstNonUndefinedArrayItem(arr: any[]): any {
+    for (let i: number = 0; i < arr.length; i++) {
+      const a: any = arr[i];
+      if (typeof a !== 'undefined') {
+        return a;
+      }
+    }
+
+    return undefined;
   }
 
   private printHelp(exitCode: number = 0, std: any = Cli.log): void {

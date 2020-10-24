@@ -55,14 +55,14 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
 
         if (args.options.id) {
           if (this.verbose) {
-            logger.log(`Using the specified app id ${args.options.id}`);
+            logger.logToStderr(`Using the specified app id ${args.options.id}`);
           }
 
           return Promise.resolve({ UniqueId: args.options.id });
         }
         else {
           if (this.verbose) {
-            logger.log(`Looking up app id for app named ${args.options.name}...`);
+            logger.logToStderr(`Looking up app id for app named ${args.options.name}...`);
           }
 
           const requestOptions: any = {
@@ -80,7 +80,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
         appId = res.UniqueId;
 
         if (this.verbose) {
-          logger.log(`Deploying app...`);
+          logger.logToStderr(`Deploying app...`);
         }
 
         const requestOptions: any = {
@@ -97,7 +97,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

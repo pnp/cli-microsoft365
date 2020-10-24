@@ -26,6 +26,10 @@ class TeamsChannelListCommand extends GraphItemsListCommand<Channel>{
     return 'Lists channels in the specified Microsoft Teams team';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'displayName'];
+  }
+
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
@@ -73,20 +77,10 @@ class TeamsChannelListCommand extends GraphItemsListCommand<Channel>{
           .getAllItems(endpoint, logger, true)
       })
       .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          logger.log(this.items.map(m => {
-            return {
-              id: m.id,
-              displayName: m.displayName
-            }
-          }));
-        }
+        logger.log(this.items);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

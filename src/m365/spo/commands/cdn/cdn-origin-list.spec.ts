@@ -13,7 +13,7 @@ const command: Command = require('./cdn-origin-list');
 describe(commands.CDN_ORIGIN_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.CDN_ORIGIN_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -81,7 +87,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
     command.action(logger, { options: { debug: true, type: 'Public' } }, () => {
       try {
-        assert(loggerSpy.calledWith(['/master','*/cdn']));
+        assert(loggerLogSpy.calledWith(['/master','*/cdn']));
         done();
       }
       catch (e) {
@@ -116,7 +122,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
     command.action(logger, { options: { debug: false, type: 'Private' } }, () => {
       try {
-        assert(loggerSpy.calledWith(['/master']));
+        assert(loggerLogSpy.calledWith(['/master']));
         done();
       }
       catch (e) {
@@ -151,7 +157,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
     command.action(logger, { options: { debug: true, type: 'Private' } }, () => {
       try {
-        assert(loggerSpy.calledWith(['/master']));
+        assert(loggerLogSpy.calledWith(['/master']));
         done();
       }
       catch (e) {
@@ -186,7 +192,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(['/master', '*/cdn']));
+        assert(loggerLogSpy.calledWith(['/master', '*/cdn']));
         done();
       }
       catch (e) {

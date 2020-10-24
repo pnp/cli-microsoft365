@@ -14,7 +14,7 @@ const command: Command = require('./contenttypehub-get');
 describe(commands.CONTENTTYPEHUB_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   let stubAllPostRequests: any;
 
   before(() => {
@@ -59,9 +59,15 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -116,7 +122,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
   </ObjectPaths>
 </Request>`;
         assert.strictEqual(requestStub.lastCall.args[0].data, bodyPayload);
-        assert(loggerSpy.calledWith({ "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub" }));
+        assert(loggerLogSpy.calledWith({ "ContentTypePublishingHub": "https:\\u002f\\u002fcontoso.sharepoint.com\\u002fsites\\u002fcontentTypeHub" }));
         done();
       }
       catch (e) {

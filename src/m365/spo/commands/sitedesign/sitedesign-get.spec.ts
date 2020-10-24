@@ -12,7 +12,7 @@ const command: Command = require('./sitedesign-get');
 describe(commands.SITEDESIGN_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,11 +25,17 @@ describe(commands.SITEDESIGN_GET, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: any) => {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
         log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -83,7 +89,7 @@ describe(commands.SITEDESIGN_GET, () => {
 
     command.action(logger, { options: { debug: false, id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "IsDefault": false,
           "PreviewImageAltText": null,
@@ -130,7 +136,7 @@ describe(commands.SITEDESIGN_GET, () => {
 
     command.action(logger, { options: { debug: true, id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "IsDefault": false,
           "PreviewImageAltText": null,

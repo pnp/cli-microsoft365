@@ -32,7 +32,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      logger.log('Checking for existing app catalog URL...');
+      logger.logToStderr('Checking for existing app catalog URL...');
     }
 
     Cli
@@ -40,14 +40,14 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       .then((appCatalogUrl: string): Promise<void> => {
         if (!appCatalogUrl) {
           if (this.verbose) {
-            logger.log('No app catalog URL found');
+            logger.logToStderr('No app catalog URL found');
           }
 
           return Promise.resolve();
         }
 
         if (this.verbose) {
-          logger.log(`Found app catalog URL ${appCatalogUrl}`);
+          logger.logToStderr(`Found app catalog URL ${appCatalogUrl}`);
         }
 
         return this.ensureNoExistingSite(appCatalogUrl, args.options.force, logger);
@@ -56,7 +56,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       .then(() => this.createAppCatalog(args.options, logger))
       .then(() => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       }, (err: CommandError): void => cb(err));
@@ -65,7 +65,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
   private ensureNoExistingSite(url: string, force: boolean, logger: Logger): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (err: CommandError) => void): void => {
       if (this.verbose) {
-        logger.log(`Checking if site ${url} exists...`);
+        logger.logToStderr(`Checking if site ${url} exists...`);
       }
 
       const siteGetOptions = {
@@ -80,7 +80,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
         .executeCommandWithOutput(spoSiteGetCommand as Command, siteGetOptions)
         .then(() => {
           if (this.verbose) {
-            logger.log(`Found site ${url}`);
+            logger.logToStderr(`Found site ${url}`);
           }
 
           if (!force) {
@@ -88,7 +88,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           }
 
           if (this.verbose) {
-            logger.log(`Deleting site ${url}...`);
+            logger.logToStderr(`Deleting site ${url}...`);
           }
           const siteRemoveOptions = {
             url: url,
@@ -108,7 +108,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           }
 
           if (this.verbose) {
-            logger.log(`No site found at ${url}`);
+            logger.logToStderr(`No site found at ${url}`);
           }
 
           // site not found. continue
@@ -119,7 +119,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
 
   private createAppCatalog(options: Options, logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.log(`Creating app catalog at ${options.url}...`);
+      logger.logToStderr(`Creating app catalog at ${options.url}...`);
     }
 
     const siteClassicAddOptions = {

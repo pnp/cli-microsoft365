@@ -14,7 +14,8 @@ const command: Command = require('./web-reindex');
 describe(commands.WEB_REINDEX, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +29,16 @@ describe(commands.WEB_REINDEX, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -98,7 +106,7 @@ describe(commands.WEB_REINDEX, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert(loggerSpy.notCalled, 'Something has been logged');
+        assert(loggerLogSpy.notCalled, 'Something has been logged');
         assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
         assert.strictEqual(propertyValue, '1', 'Incorrect property value stored in the property bag');
         done();
@@ -149,7 +157,7 @@ describe(commands.WEB_REINDEX, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
         assert.strictEqual(propertyValue, '2', 'Incorrect property value stored in the property bag');
         done();
@@ -239,7 +247,7 @@ describe(commands.WEB_REINDEX, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert(loggerSpy.notCalled, 'Something has been logged');
+        assert(loggerLogSpy.notCalled, 'Something has been logged');
         assert.strictEqual(propertyName[0], 'vti_searchversion');
         assert.strictEqual(propertyName[1], 'vti_searchversion');
         assert.strictEqual(propertyValue[0], '1');
@@ -331,7 +339,7 @@ describe(commands.WEB_REINDEX, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert(loggerSpy.called, 'Nothing has been logged');
+        assert(loggerLogToStderrSpy.called, 'Nothing has been logged');
         assert.strictEqual(propertyName[0], 'vti_searchversion');
         assert.strictEqual(propertyName[1], 'vti_searchversion');
         assert.strictEqual(propertyValue[0], '1');

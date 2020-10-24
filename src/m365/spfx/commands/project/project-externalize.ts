@@ -60,7 +60,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (args.options.output !== 'json' || this.verbose) {
-      logger.log(`This command is currently in preview. Feedback welcome at https://github.com/pnp/cli-microsoft365/issues${os.EOL}`);
+      logger.logToStderr(`This command is currently in preview. Feedback welcome at https://github.com/pnp/cli-microsoft365/issues${os.EOL}`);
     }
 
     this.projectRootPath = this.getProjectRoot(process.cwd());
@@ -81,13 +81,13 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     }
 
     if (this.verbose) {
-      logger.log('Collecting project...');
+      logger.logToStderr('Collecting project...');
     }
     const project: Project = this.getProject(this.projectRootPath);
 
     if (this.debug) {
-      logger.log('Collected project');
-      logger.log(project);
+      logger.logToStderr('Collected project');
+      logger.logToStderr(project);
     }
 
     const asyncRulesResults = (rules as BasicDependencyRule[]).map(r => r.visit(project));

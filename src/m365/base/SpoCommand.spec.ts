@@ -30,7 +30,7 @@ class MockCommand extends SpoCommand {
 }
 
 describe('SpoCommand', () => {
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   let logger: Logger;
   let log: string[];
 
@@ -44,10 +44,16 @@ describe('SpoCommand', () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
 
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -73,7 +79,9 @@ describe('SpoCommand', () => {
     const command = new MockCommand();
 
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
 
     command.action(logger, { options: {} } as any, (err?: any) => {
@@ -94,7 +102,9 @@ describe('SpoCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
     command.action(logger, { options: {} }, () => {
@@ -123,7 +133,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
 
     let futureDate = new Date();
@@ -139,7 +151,7 @@ describe('SpoCommand', () => {
     command.ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, false);
 
     try {
-      assert(loggerSpy.notCalled);
+      assert(loggerLogSpy.notCalled);
       done();
     }
     catch (e) {
@@ -159,7 +171,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
 
     let futureDate = new Date();
@@ -175,7 +189,7 @@ describe('SpoCommand', () => {
     command.ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, true);
 
     try {
-      assert(loggerSpy.notCalled);
+      assert(loggerLogSpy.notCalled);
       done();
     }
     catch (e) {
@@ -195,7 +209,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
 
     command
@@ -225,7 +241,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
 
     let pastDate = new Date();
@@ -241,7 +259,7 @@ describe('SpoCommand', () => {
     command.ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, false);
 
     try {
-      assert(loggerSpy.notCalled);
+      assert(loggerLogSpy.notCalled);
       done();
     }
     catch (e) {
@@ -261,7 +279,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
 
     let pastDate = new Date();
@@ -277,7 +297,7 @@ describe('SpoCommand', () => {
     command.ensureFormDigest('https://contoso.sharepoint.com', logger, ctx, true);
 
     try {
-      assert(loggerSpy.notCalled);
+      assert(loggerLogSpy.notCalled);
       done();
     }
     catch (e) {
@@ -295,7 +315,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
 
     let pastDate = new Date();
@@ -331,7 +353,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
 
     (command as any)
@@ -359,7 +383,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
 
     (command as any)
@@ -387,7 +413,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
 
     (command as any)
@@ -414,7 +442,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
 
     (command as any)
@@ -435,7 +465,9 @@ describe('SpoCommand', () => {
   it('returns error when retrieving SPO admin URL failed', (done) => {
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     sinon.stub(command as any, 'getSpoUrl').callsFake(() => Promise.reject('An error has occurred'));
 
@@ -468,7 +500,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc' }));
@@ -500,7 +534,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc' }));
@@ -532,7 +568,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc' }));
@@ -555,7 +593,9 @@ describe('SpoCommand', () => {
 
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'abc' }));

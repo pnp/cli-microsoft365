@@ -218,7 +218,7 @@ class SpoListSetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Updating list in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Updating list in site at ${args.options.webUrl}...`);
     }
 
     const requestBody: any = this.mapRequestBody(args.options);
