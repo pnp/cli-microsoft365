@@ -12,7 +12,7 @@ const command: Command = require('./message-list');
 describe(commands.YAMMER_MESSAGE_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   let firstMessageBatch: any = {
     messages: [{ "sender_id": 1496550646, "replied_to_id": 1496550647, "id": 10123190123123, "thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1", "body": { "plain": "message1 message is longer than 25 chars. Just for testing shortening" } },
@@ -43,9 +43,15 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -69,6 +75,10 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'replied_to_id', 'thread_id', 'group_id', 'shortBody']);
   });
 
   it('correctly handles error', (done) => {
@@ -161,7 +171,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -179,7 +189,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { feedType: 'Top' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -197,7 +207,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { feedType: 'My' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -215,7 +225,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { feedType: 'Following' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -233,7 +243,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { feedType: 'Sent' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -251,7 +261,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { feedType: 'Private' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -269,7 +279,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { feedType: 'Received' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -287,7 +297,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { feedType: 'All' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -305,7 +315,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { groupId: 123123 } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -323,7 +333,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { threadId: 123123 } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -345,7 +355,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].length, 7);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 7);
         done();
       }
       catch (e) {
@@ -367,7 +377,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { limit: 6, output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].length, 6);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 6);
         done();
       }
       catch (e) {
@@ -411,7 +421,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { olderThanId: 10123190123128, output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -429,7 +439,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { olderThanId: 10123190123128, threaded: true, output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {
@@ -447,7 +457,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
     });
     command.action(logger, { options: { threaded: true, output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
         done();
       }
       catch (e) {

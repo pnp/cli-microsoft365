@@ -13,7 +13,8 @@ const command: Command = require('./sitedesign-rights-grant');
 describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,11 +27,18 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: any) => {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
         log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -75,7 +83,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
     command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -102,7 +110,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
     command.action(logger, { options: { debug: true, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -129,7 +137,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
     command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF,AdeleV', rights: 'View' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -156,7 +164,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
     command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF@contoso.com,AdeleV@contoso.com', rights: 'View' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -183,7 +191,7 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
 
     command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF, AdeleV', rights: 'View' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

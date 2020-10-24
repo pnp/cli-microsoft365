@@ -13,7 +13,7 @@ const command: Command = require('./serviceprincipal-permissionrequest-approve')
 describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -84,7 +90,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
     });
     command.action(logger, { options: { debug: true, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
           ConsentType: "AllPrincipals",
           ObjectId: "50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA",
@@ -127,7 +133,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
     });
     command.action(logger, { options: { debug: false, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           ClientId: "cd4043e7-b749-420b-bd07-aa7c3912ed22",
           ConsentType: "AllPrincipals",
           ObjectId: "50NAzUm3C0K9B6p8ORLtIsQccg4rMERGvFGRtBsk2fA",

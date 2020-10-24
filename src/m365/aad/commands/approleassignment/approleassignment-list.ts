@@ -37,6 +37,10 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['resourceDisplayName', 'roleName'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let sp: ServicePrincipal;
 
@@ -95,18 +99,7 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
           }
         });
 
-        if (args.options.output === 'json') {
-          logger.log(results);
-        }
-        else {
-          logger.log(results.map((r: any) => {
-            return {
-              resourceDisplayName: r.resourceDisplayName,
-              roleName: r.roleName
-            }
-          }));
-        }
-
+        logger.log(results);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

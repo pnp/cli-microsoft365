@@ -42,7 +42,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Updating schema extension with id '${args.options.id}'...`);
+      logger.logToStderr(`Updating schema extension with id '${args.options.id}'...`);
     }
 
     // The default request data always contains owner
@@ -59,7 +59,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     // Add the description to request data if any
     if (args.options.description) {
       if (this.debug) {
-        logger.log(`Will update description to '${args.options.description}'...`);
+        logger.logToStderr(`Will update description to '${args.options.description}'...`);
       }
       data.description = args.options.description;
     }
@@ -67,7 +67,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     // Add the status to request data if any
     if (args.options.status) {
       if (this.debug) {
-        logger.log(`Will update status to '${args.options.status}'...`);
+        logger.logToStderr(`Will update status to '${args.options.status}'...`);
       }
       data.status = args.options.status;
     }
@@ -78,7 +78,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       : [];
     if (targetTypes.length > 0) {
       if (this.debug) {
-        logger.log(`Will update targetTypes to '${args.options.targetTypes}'...`);
+        logger.logToStderr(`Will update targetTypes to '${args.options.targetTypes}'...`);
       }
       data.targetTypes = targetTypes;
     }
@@ -89,7 +89,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       : null;
     if (properties) {
       if (this.debug) {
-        logger.log(`Will update properties to '${args.options.properties}'...`);
+        logger.logToStderr(`Will update properties to '${args.options.properties}'...`);
       }
       data.properties = properties;
     }
@@ -108,11 +108,11 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
       .patch(requestOptions)
       .then((res: any): void => {
         if (this.debug) {
-          logger.log("Schema extension successfully updated.");
+          logger.logToStderr("Schema extension successfully updated.");
         }
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

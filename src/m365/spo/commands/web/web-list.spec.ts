@@ -12,7 +12,7 @@ const command: Command = require('./web-list');
 describe(commands.WEB_LIST, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.WEB_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -50,6 +56,10 @@ describe(commands.WEB_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Title', 'Url', 'Id']);
   });
 
   it('retrieves all webs', (done) => {
@@ -105,83 +115,40 @@ describe(commands.WEB_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
-          value: [{
-            AllowRssFeeds: false,
-            AlternateCssUrl: null,
-            AppInstanceId: "00000000-0000-0000-0000-000000000000",
-            Configuration: 0,
-            Created: null,
-            CurrentChangeToken: null,
-            CustomMasterUrl: null,
-            Description: null,
-            DesignPackageId: null,
-            DocumentLibraryCalloutOfficeWebAppPreviewersDisabled: false,
-            EnableMinimalDownload: false,
-            HorizontalQuickLaunch: false,
-            Id: "d8d179c7-f459-4f90-b592-14b08e84accb",
-            IsMultilingual: false,
-            Language: 1033,
-            LastItemModifiedDate: null,
-            LastItemUserModifiedDate: null,
-            MasterUrl: null,
-            NoCrawl: false,
-            OverwriteTranslationsOnChange: false,
-            ResourcePath: null,
-            QuickLaunchEnabled: false,
-            RecycleBinEnabled: false,
-            ServerRelativeUrl: null,
-            SiteLogoUrl: null,
-            SyndicationEnabled: false,
-            Title: "Subsite",
-            TreeViewEnabled: false,
-            UIVersion: 15,
-            UIVersionConfigurationEnabled: false,
-            Url: "https://Contoso.sharepoint.com/Subsite",
-            WebTemplate: "STS",
-          }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('retrieves all webs with output option text', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/webs') > -1) {
-        return Promise.resolve(
-          {
-            "value": [
-              {
-                "Title": "Subsite",
-                "Url": "https://Contoso.sharepoint.com/",
-                "Id": "d8d179c7-f459-4f90-b592-14b08e84accb"
-              }
-            ]
-          }
-        );
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        output: 'text',
-        debug: false,
-        webUrl: 'https://contoso.sharepoint.com'
-      }
-    }, () => {
-      try {
-        assert(loggerSpy.calledWith(
-          [{
-            Title: 'Subsite',
-            Url: "https://Contoso.sharepoint.com/",
-            Id: 'd8d179c7-f459-4f90-b592-14b08e84accb'
-          }]
-        ));
+        assert(loggerLogSpy.calledWith({ value :[{
+          "AllowRssFeeds": false,
+          "AlternateCssUrl": null,
+          "AppInstanceId": "00000000-0000-0000-0000-000000000000",
+          "Configuration": 0,
+          "Created": null,
+          "CurrentChangeToken": null,
+          "CustomMasterUrl": null,
+          "Description": null,
+          "DesignPackageId": null,
+          "DocumentLibraryCalloutOfficeWebAppPreviewersDisabled": false,
+          "EnableMinimalDownload": false,
+          "HorizontalQuickLaunch": false,
+          "Id": "d8d179c7-f459-4f90-b592-14b08e84accb",
+          "IsMultilingual": false,
+          "Language": 1033,
+          "LastItemModifiedDate": null,
+          "LastItemUserModifiedDate": null,
+          "MasterUrl": null,
+          "NoCrawl": false,
+          "OverwriteTranslationsOnChange": false,
+          "ResourcePath": null,
+          "QuickLaunchEnabled": false,
+          "RecycleBinEnabled": false,
+          "ServerRelativeUrl": null,
+          "SiteLogoUrl": null,
+          "SyndicationEnabled": false,
+          "Title": "Subsite",
+          "TreeViewEnabled": false,
+          "UIVersion": 15,
+          "UIVersionConfigurationEnabled": false,
+          "Url": "https://Contoso.sharepoint.com/Subsite",
+          "WebTemplate": "STS",
+        }]}));
         done();
       }
       catch (e) {

@@ -56,7 +56,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
         })
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
-            logger.log(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
+            logger.logToStderr(`Removing origin ${args.options.origin} from the ${(cdnType === 1 ? 'Private' : 'Public')} CDN. Please wait, this might take a moment...`);
           }
 
           const requestOptions: any = {
@@ -77,7 +77,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
           }
           else {
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
             cb();
           }
@@ -86,7 +86,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
 
     if (args.options.confirm) {
       if (this.debug) {
-        logger.log('Confirmation suppressed through the confirm option. Removing CDN origin...');
+        logger.logToStderr('Confirmation suppressed through the confirm option. Removing CDN origin...');
       }
       removeCdnOrigin();
     }

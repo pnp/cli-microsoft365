@@ -39,7 +39,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
     let canvasContent: Control[];
 
     if (this.verbose) {
-      logger.log(`Retrieving page information...`);
+      logger.logToStderr(`Retrieving page information...`);
     }
 
     const requestOptions: any = {
@@ -109,7 +109,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

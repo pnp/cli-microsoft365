@@ -43,6 +43,10 @@ class YammerUserListCommand extends YammerCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'full_name', 'email'];
+  }
+
   private getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (page === 1) {
@@ -119,19 +123,7 @@ class YammerUserListCommand extends YammerCommand {
     this
       .getAllItems(logger, args, 1)
       .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          logger.log(this.items.map((n: any) => {
-            const item: any = {
-              id: n.id,
-              full_name: n.full_name,
-              email: n.email
-            };
-            return item;
-          }));
-        }
+        logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   };

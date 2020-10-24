@@ -49,7 +49,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
         })
         .then((appCatalogSiteUrl: string): Promise<string> => {
           if (this.verbose) {
-            logger.log(`Retracting app...`);
+            logger.logToStderr(`Retracting app...`);
           }
 
           const requestOptions: any = {
@@ -63,7 +63,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

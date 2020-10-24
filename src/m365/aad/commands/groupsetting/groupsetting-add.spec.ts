@@ -12,7 +12,7 @@ const command: Command = require('./groupsetting-add');
 describe(commands.GROUPSETTING_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.GROUPSETTING_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -136,7 +142,7 @@ describe(commands.GROUPSETTING_ADD, () => {
 
     command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           displayName: null,
           id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
@@ -232,7 +238,7 @@ describe(commands.GROUPSETTING_ADD, () => {
 
     command.action(logger, { options: { debug: true, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           displayName: null,
           id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',
@@ -328,7 +334,7 @@ describe(commands.GROUPSETTING_ADD, () => {
 
     command.action(logger, { options: { debug: false, templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b', UsageGuidelinesUrl: 'https://contoso.sharepoint.com/sites/compliance', ClassificationList: 'HBI, MBI, LBI, GDPR', DefaultClassification: 'MBI' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           displayName: null,
           id: 'cb9ede6b-fa00-474c-b34f-dae81102d210',
           templateId: '62375ab9-6b52-47ed-826b-58e47e0e304b',

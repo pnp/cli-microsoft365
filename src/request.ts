@@ -15,8 +15,8 @@ class Request {
     if (this._debug) {
       this.req.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConfig => {
         if (this._logger) {
-          this._logger.log('Request:');
-          this._logger.log(Utils.filterObject(config, ['url', 'method', 'headers', 'data', 'responseType', 'decompress']));
+          this._logger.logToStderr('Request:');
+          this._logger.logToStderr(JSON.stringify(Utils.filterObject(config, ['url', 'method', 'headers', 'data', 'responseType', 'decompress']), null, 2));
         }
         return config;
       });
@@ -25,14 +25,14 @@ class Request {
       /* c8 ignore next 13 */
       this.req.interceptors.response.use((response: AxiosResponse): AxiosResponse => {
         if (this._logger) {
-          this._logger.log('Response:');
-          this._logger.log(Utils.filterObject(response, ['data', 'status', 'statusText', 'headers']));
+          this._logger.logToStderr('Response:');
+          this._logger.logToStderr(JSON.stringify(Utils.filterObject(response, ['data', 'status', 'statusText', 'headers']), null, 2));
         }
         return response;
       }, (error: AxiosError): void => {
         if (this._logger) {
-          this._logger.log('Request error');
-          this._logger.log(Utils.filterObject(error.response, ['data', 'status', 'statusText', 'headers']));
+          this._logger.logToStderr('Request error');
+          this._logger.logToStderr(JSON.stringify(Utils.filterObject(error.response, ['data', 'status', 'statusText', 'headers']), null, 2));
         }
         throw error;
       });

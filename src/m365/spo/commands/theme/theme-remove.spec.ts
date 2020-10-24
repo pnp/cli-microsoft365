@@ -13,7 +13,8 @@ describe(commands.THEME_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,9 +28,16 @@ describe(commands.THEME_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     promptOptions = undefined;
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
@@ -100,7 +108,7 @@ describe(commands.THEME_REMOVE, () => {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
         assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
         assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
-        assert.strictEqual(loggerSpy.notCalled, true);
+        assert.strictEqual(loggerLogSpy.notCalled, true);
         done();
       }
       catch (e) {
@@ -130,7 +138,7 @@ describe(commands.THEME_REMOVE, () => {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
         assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
         assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
-        assert.notStrictEqual(loggerSpy.lastCall.args[0].indexOf('DONE'), -1);
+        assert.notStrictEqual(loggerLogToStderrSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
       catch (e) {
@@ -164,7 +172,7 @@ describe(commands.THEME_REMOVE, () => {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/DeleteTenantTheme');
         assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
         assert.strictEqual(postStub.lastCall.args[0].data.name, 'Contoso');
-        assert.notStrictEqual(loggerSpy.lastCall.args[0].indexOf('DONE'), -1);
+        assert.notStrictEqual(loggerLogToStderrSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
       catch (e) {

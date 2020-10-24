@@ -12,7 +12,7 @@ const command: Command = require('./schemaextension-get');
 describe(commands.SCHEMAEXTENSION_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -87,7 +93,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
           "id": "adatumisv_exo2",
           "description": "sample description",
@@ -151,7 +157,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
           "id": "adatumisv_exo2",
           "description": "sample description",

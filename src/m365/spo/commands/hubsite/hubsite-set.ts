@@ -54,7 +54,7 @@ class SpoHubSiteSetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Updating hub site ${args.options.id}...`);
+          logger.logToStderr(`Updating hub site ${args.options.id}...`);
         }
 
         const title: string = typeof args.options.title === 'string' ? `<SetProperty Id="13" ObjectPathId="10" Name="Title"><Parameter Type="String">${Utils.escapeXml(args.options.title)}</Parameter></SetProperty>` : '';
@@ -88,7 +88,7 @@ class SpoHubSiteSetCommand extends SpoCommand {
           logger.log(hubSite);
 
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
         }
         cb();

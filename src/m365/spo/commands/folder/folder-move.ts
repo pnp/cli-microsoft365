@@ -78,7 +78,7 @@ class SpoFolderMoveCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log('DONE');
+          logger.logToStderr('DONE');
         }
 
         cb();

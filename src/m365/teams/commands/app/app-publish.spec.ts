@@ -14,7 +14,8 @@ const command: Command = require('./app-publish');
 describe(commands.TEAMS_APP_PUBLISH, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,9 +28,16 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -119,7 +127,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
 
     command.action(logger, { options: { debug: false, filePath: 'teamsapp.zip' } }, () => {
       try {
-        assert(loggerSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
+        assert(loggerLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
         done();
       } catch (e) {
         done(e);
@@ -146,8 +154,8 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
 
     command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip' } }, () => {
       try {
-        assert(loggerSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
 
         done();
       } catch (e) {

@@ -39,7 +39,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
         .getRequestDigest(args.options.url)
         .then((res: ContextInfo): Promise<void> => {
           if (this.verbose) {
-            logger.log(`Disconnecting site collection ${args.options.url} from its hubsite...`);
+            logger.logToStderr(`Disconnecting site collection ${args.options.url} from its hubsite...`);
           }
 
           const requestOptions: any = {
@@ -55,7 +55,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

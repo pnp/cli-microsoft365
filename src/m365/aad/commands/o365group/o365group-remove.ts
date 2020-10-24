@@ -36,7 +36,7 @@ class AadO365GroupRemoveCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeGroup: () => void = (): void => {
       if (this.verbose) {
-        logger.log(`Removing Microsoft 365 Group: ${args.options.id}...`);
+        logger.logToStderr(`Removing Microsoft 365 Group: ${args.options.id}...`);
       }
 
       const requestOptions: any = {
@@ -50,7 +50,7 @@ class AadO365GroupRemoveCommand extends GraphCommand {
         .delete(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

@@ -12,8 +12,7 @@ const command: Command = require('./tenant-settings-list');
 describe(commands.TENANT_SETTINGS_LIST, () => {
   let log: any[];
   let logger: Logger;
-
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +27,15 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -151,24 +156,24 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].AllowDownloadingNonWebViewableFiles, true);
-        assert.strictEqual(loggerSpy.lastCall.args[0].BccExternalSharingInvitationsList, null);
-        assert.strictEqual(loggerSpy.lastCall.args[0].HideDefaultThemes, true);
-        assert.strictEqual(loggerSpy.lastCall.args[0].UserVoiceForFeedbackEnabled, false);
-        assert.strictEqual(loggerSpy.lastCall.args[0]["_ObjectType_"], undefined);
-        assert.strictEqual(loggerSpy.lastCall.args[0]["_ObjectIdentity_"], undefined);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].AllowDownloadingNonWebViewableFiles, true);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].BccExternalSharingInvitationsList, null);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].HideDefaultThemes, true);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].UserVoiceForFeedbackEnabled, false);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["_ObjectType_"], undefined);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["_ObjectIdentity_"], undefined);
 
-        assert.strictEqual(loggerSpy.lastCall.args[0]["SharingCapability"], 'ExternalUserSharingOnly');
-        assert.strictEqual(loggerSpy.lastCall.args[0]["SharingDomainRestrictionMode"], 'AllowList');
-        assert.strictEqual(loggerSpy.lastCall.args[0]["ODBMembersCanShare"], 'Unspecified');
-        assert.strictEqual(loggerSpy.lastCall.args[0]["ODBAccessRequests"], 'Unspecified');
-        assert.strictEqual(loggerSpy.lastCall.args[0]["DefaultSharingLinkType"], 'Direct');
-        assert.strictEqual(loggerSpy.lastCall.args[0]["FileAnonymousLinkType"], 'Edit');
-        assert.strictEqual(loggerSpy.lastCall.args[0]["FolderAnonymousLinkType"], 'Edit');
-        assert.strictEqual(loggerSpy.lastCall.args[0]["DefaultLinkPermission"], 'View');
-        assert.strictEqual(loggerSpy.lastCall.args[0]["ConditionalAccessPolicy"], 'AllowFullAccess');
-        assert.strictEqual(loggerSpy.lastCall.args[0]["SpecialCharactersStateInFileFolderNames"], 'Allowed');
-        assert.strictEqual(loggerSpy.lastCall.args[0]["LimitedAccessFileType"], 'WebPreviewableFiles');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["SharingCapability"], 'ExternalUserSharingOnly');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["SharingDomainRestrictionMode"], 'AllowList');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["ODBMembersCanShare"], 'Unspecified');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["ODBAccessRequests"], 'Unspecified');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["DefaultSharingLinkType"], 'Direct');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["FileAnonymousLinkType"], 'Edit');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["FolderAnonymousLinkType"], 'Edit');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["DefaultLinkPermission"], 'View');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["ConditionalAccessPolicy"], 'AllowFullAccess');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["SpecialCharactersStateInFileFolderNames"], 'Allowed');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0]["LimitedAccessFileType"], 'WebPreviewableFiles');
         done();
       }
       catch (e) {

@@ -39,7 +39,7 @@ class SpoKnowledgehubSetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Adding ${args.options.url} as the Knowledge Hub Site`);
+          logger.logToStderr(`Adding ${args.options.url} as the Knowledge Hub Site`);
         }
 
         const requestOptions: any = {
@@ -62,7 +62,7 @@ class SpoKnowledgehubSetCommand extends SpoCommand {
           logger.log(json[json.length - 1]);
 
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

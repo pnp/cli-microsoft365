@@ -34,10 +34,14 @@ class SpoListViewListCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Id', 'Title', 'DefaultView', 'Hidden', 'BaseViewId'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-      logger.log(`Retrieving views information for list ${list} in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving views information for list ${list} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -60,21 +64,7 @@ class SpoListViewListCommand extends SpoCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        if (args.options.output === 'json') {
-          logger.log(res.value);
-        }
-        else {
-          logger.log(res.value.map((vw: any) => {
-            return {
-              Id: vw.Id,
-              Title: vw.Title,
-              DefaultView: vw.DefaultView,
-              Hidden: vw.Hidden,
-              BaseViewId: vw.BaseViewId
-            };
-          }));
-        }
-
+        logger.log(res.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

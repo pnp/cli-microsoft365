@@ -14,7 +14,8 @@ const command: Command = require('./propertybag-get');
 describe(commands.PROPERTYBAG_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let stubAllPostRequests: any = (
     requestObjectIdentityResp: any = null,
     getFolderPropertyBagResp: any = null,
@@ -95,9 +96,16 @@ describe(commands.PROPERTYBAG_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -427,7 +435,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         assert(filterByKeySpy.calledOnce === true);
 
-        const out = loggerSpy.lastCall.args[0];
+        const out = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(out, '{1C5271C8-DB93-459E-9C18-68FC33EFD856}');
         done();
       }
@@ -451,7 +459,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         assert(filterByKeySpy.calledOnce === true);
 
-        const out = loggerSpy.lastCall.args[0];
+        const out = loggerLogSpy.lastCall.args[0];
         const expectedDate = new Date(2017, 10, 7, 11, 29, 31, 0);
         assert.strictEqual(out.getUTCMonth(), expectedDate.getUTCMonth(), 'getUTCMonth');
         assert.strictEqual(out.getUTCFullYear(), expectedDate.getUTCFullYear(), 'getUTCFullYear');
@@ -482,7 +490,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         assert(filterByKeySpy.calledOnce === true);
 
-        const out = loggerSpy.lastCall.args[0];
+        const out = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(Object.prototype.toString.call(out), '[object Date]');
         const expectedDate = new Date(2017, 10, 7, 11, 29, 31, 0);
         assert.strictEqual(out.getUTCMonth(), expectedDate.getUTCMonth(), 'getUTCMonth');
@@ -513,7 +521,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         assert(filterByKeySpy.calledOnce === true);
 
-        const out = loggerSpy.lastCall.args[0];
+        const out = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(out, 1);
         done();
       }
@@ -533,7 +541,7 @@ describe(commands.PROPERTYBAG_GET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0], 0);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0], 0);
         done();
       }
       catch (e) {
@@ -555,7 +563,7 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         assert(filterByKeySpy.calledOnce === true);
         
-        const out = loggerSpy.lastCall.args[0];
+        const out = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(out, true);
         done();
       }
@@ -577,7 +585,7 @@ describe(commands.PROPERTYBAG_GET, () => {
     command.action(logger, { options: options } as any, () => {
 
       try {
-        const out = loggerSpy.lastCall.args[0];
+        const out = loggerLogToStderrSpy.lastCall.args[0];
         assert.strictEqual(out, 'Property not found.');
         done();
       }
@@ -598,7 +606,7 @@ describe(commands.PROPERTYBAG_GET, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(loggerSpy.notCalled, true);
+        assert.strictEqual(loggerLogSpy.notCalled, true);
         done();
       }
       catch (e) {

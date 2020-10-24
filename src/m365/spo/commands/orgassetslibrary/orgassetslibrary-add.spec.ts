@@ -14,7 +14,7 @@ const command: Command = require('./orgassetslibrary-add');
 describe(commands.ORGASSETSLIBRARY_ADD, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -31,9 +31,15 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -79,7 +85,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
     command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets' } }, () => {
       try {
-        assert(orgAssetLibAddCallIssued && loggerSpy.calledWith(chalk.green('DONE')));
+        assert(orgAssetLibAddCallIssued && loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -109,7 +115,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
     command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public' } }, () => {
       try {
-        assert(orgAssetLibAddCallIssued && loggerSpy.calledWith(chalk.green('DONE')));
+        assert(orgAssetLibAddCallIssued && loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
 
         done();
       }
@@ -139,7 +145,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
     command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } }, () => {
       try {
-        assert(orgAssetLibAddCallIssued && loggerSpy.calledWith(chalk.green('DONE')));
+        assert(orgAssetLibAddCallIssued && loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
 
         done();
       }

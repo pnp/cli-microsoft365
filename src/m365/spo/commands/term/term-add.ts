@@ -68,7 +68,7 @@ class SpoTermAddCommand extends SpoCommand {
         formDigest = res.FormDigestValue;
 
         if (this.verbose) {
-          logger.log(`Adding taxonomy term...`);
+          logger.logToStderr(`Adding taxonomy term...`);
         }
 
         const termGroupQuery: string = args.options.termGroupId ? `<Method Id="11" ParentId="9" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="11" ParentId="9" Name="GetByName"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`;
@@ -106,7 +106,7 @@ class SpoTermAddCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Setting term properties...`);
+          logger.logToStderr(`Setting term properties...`);
         }
 
         const properties: string[] = [];

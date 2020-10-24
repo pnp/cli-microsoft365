@@ -15,7 +15,8 @@ import Sinon = require('sinon');
 describe(commands.FIELD_SET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -29,9 +30,16 @@ describe(commands.FIELD_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -92,7 +100,7 @@ describe(commands.FIELD_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', name: 'MyColumn', Description: 'My column' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -137,7 +145,7 @@ describe(commands.FIELD_SET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My cool column', Title: 'My column', updateExistingLists: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -197,7 +205,7 @@ describe(commands.FIELD_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listId: '03cef05c-ba50-4dcf-a876-304f0626085c', id: '5d021339-4d62-4fe9-9d2a-c99bc56a157a', Description: 'My column' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -257,7 +265,7 @@ describe(commands.FIELD_SET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List', name: 'MyColumn', Description: 'My column' } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -317,7 +325,7 @@ describe(commands.FIELD_SET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listTitle: 'My List>', name: 'MyColumn', Description: 'My column' } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -422,7 +430,7 @@ describe(commands.FIELD_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', name: 'MyColumn>', Description: 'My column' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -467,7 +475,7 @@ describe(commands.FIELD_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', name: 'MyColumn', Description: 'My column>' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

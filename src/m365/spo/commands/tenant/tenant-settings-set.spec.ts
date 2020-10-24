@@ -13,7 +13,8 @@ const command: Command = require('./tenant-settings-set');
 describe(commands.TENANT_SETTINGS_SET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   let defaultRequestsSuccessStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
@@ -43,9 +44,16 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -117,7 +125,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith('DONE'));
+        assert(loggerLogToStderrSpy.calledWith('DONE'));
         done();
       }
       catch (e) {
@@ -135,7 +143,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     }, () => {
       try {
-        assert.strictEqual(loggerSpy.notCalled, true);
+        assert.strictEqual(loggerLogSpy.notCalled, true);
         done();
       }
       catch (e) {

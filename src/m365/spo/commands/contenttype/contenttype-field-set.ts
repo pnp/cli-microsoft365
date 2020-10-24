@@ -65,7 +65,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     let schemaXmlWithResourceTokens: string = '';
 
     if (this.verbose) {
-      logger.log(`Retrieving field link for field ${args.options.fieldId}...`);
+      logger.logToStderr(`Retrieving field link for field ${args.options.fieldId}...`);
     }
 
     const requestOptions: any = {
@@ -81,15 +81,15 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
       .then((res: FieldLink): Promise<{ SchemaXmlWithResourceTokens: string; }> => {
         if (res["odata.null"] !== true) {
           if (this.verbose) {
-            logger.log('Field link found');
+            logger.logToStderr('Field link found');
           }
           this.fieldLink = res;
           return Promise.resolve(undefined as any);
         }
 
         if (this.verbose) {
-          logger.log('Field link not found. Creating...');
-          logger.log(`Retrieving information about site column ${args.options.fieldId}...`);
+          logger.logToStderr('Field link not found. Creating...');
+          logger.logToStderr(`Retrieving information about site column ${args.options.fieldId}...`);
         }
 
         const requestOptions: any = {
@@ -116,7 +116,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Retrieving information about field link for field ${args.options.fieldId}...`);
+          logger.logToStderr(`Retrieving information about field link for field ${args.options.fieldId}...`);
         }
 
         const requestOptions: any = {
@@ -151,7 +151,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
 
         if (!updateHidden && !updateRequired) {
           if (this.verbose) {
-            logger.log('Field link already up-to-date');
+            logger.logToStderr('Field link already up-to-date');
           }
           return Promise.reject('DONE');
         }
@@ -161,7 +161,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Retrieving site collection id...`);
+          logger.logToStderr(`Retrieving site collection id...`);
         }
 
         const requestOptions: any = {
@@ -184,7 +184,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Retrieving site id...`);
+          logger.logToStderr(`Retrieving site id...`);
         }
 
         const requestOptions: any = {
@@ -203,7 +203,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Updating field link...`);
+          logger.logToStderr(`Updating field link...`);
         }
 
         const requiredProperty: string = typeof args.options.required !== 'undefined' &&
@@ -229,14 +229,14 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
           cb();
         }
       }, (error: any): void => {
         if (error === 'DONE') {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
           cb();
         }
@@ -267,7 +267,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         .updateField(xField, requiresUpdate, logger, args)
         .then((): Promise<{ Id: string; }> => {
           if (this.verbose) {
-            logger.log(`Retrieving site collection id...`);
+            logger.logToStderr(`Retrieving site collection id...`);
           }
 
           const requestOptions: any = {
@@ -284,7 +284,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           this.siteId = res.Id;
 
           if (this.verbose) {
-            logger.log(`Retrieving site id...`);
+            logger.logToStderr(`Retrieving site id...`);
           }
 
           const requestOptions: any = {
@@ -332,7 +332,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (!requiresUpdate) {
         if (this.verbose) {
-          logger.log(`Schema of field ${args.options.fieldId} is already up-to-date`);
+          logger.logToStderr(`Schema of field ${args.options.fieldId} is already up-to-date`);
         }
         resolve();
         return;
@@ -342,7 +342,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         .ensureRequestDigest(args.options.webUrl, logger)
         .then((): Promise<void> => {
           if (this.verbose) {
-            logger.log(`Updating field schema...`);
+            logger.logToStderr(`Updating field schema...`);
           }
 
           const requestOptions: any = {
@@ -373,14 +373,14 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (this.requestDigest) {
         if (this.debug) {
-          logger.log('Request digest already present');
+          logger.logToStderr('Request digest already present');
         }
         resolve();
         return;
       }
 
       if (this.debug) {
-        logger.log('Retrieving request digest...');
+        logger.logToStderr('Retrieving request digest...');
       }
 
       this

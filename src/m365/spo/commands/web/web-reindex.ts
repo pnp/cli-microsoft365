@@ -46,7 +46,7 @@ class SpoWebReindexCommand extends SpoCommand {
         requestDigest = res.FormDigestValue;
 
         if (this.debug) {
-          logger.log(`Retrieved request digest. Retrieving web identity...`);
+          logger.logToStderr(`Retrieved request digest. Retrieving web identity...`);
         }
 
         return clientSvcCommons.getCurrentWebIdentity(args.options.webUrl, requestDigest);
@@ -55,10 +55,10 @@ class SpoWebReindexCommand extends SpoCommand {
         webIdentityResp = identityResp;
 
         if (this.debug) {
-          logger.log(`Retrieved web identity.`);
+          logger.logToStderr(`Retrieved web identity.`);
         }
         if (this.verbose) {
-          logger.log(`Checking if the site is a no-script site...`);
+          logger.logToStderr(`Checking if the site is a no-script site...`);
         }
 
         return SpoPropertyBagBaseCommand.isNoScriptSite(args.options.webUrl, requestDigest, webIdentityResp, clientSvcCommons);
@@ -66,14 +66,14 @@ class SpoWebReindexCommand extends SpoCommand {
       .then((isNoScriptSite: boolean): Promise<{ vti_x005f_searchversion?: number }> => {
         if (isNoScriptSite) {
           if (this.verbose) {
-            logger.log(`Site is a no-script site. Reindexing lists instead...`);
+            logger.logToStderr(`Site is a no-script site. Reindexing lists instead...`);
           }
 
           return this.reindexLists(args.options.webUrl, requestDigest, logger, webIdentityResp, clientSvcCommons) as any;
         }
 
         if (this.verbose) {
-          logger.log(`Site is not a no-script site. Reindexing site...`);
+          logger.logToStderr(`Site is not a no-script site. Reindexing site...`);
         }
 
         const requestOptions: any = {
@@ -94,14 +94,14 @@ class SpoWebReindexCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();
       }, (err: any): void => {
         if (this.reindexedLists) {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();
@@ -116,7 +116,7 @@ class SpoWebReindexCommand extends SpoCommand {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       ((): Promise<{ value: { NoCrawl: boolean; Title: string; RootFolder: { Properties: any; ServerRelativeUrl: string; } }[] }> => {
         if (this.debug) {
-          logger.log(`Retrieving information about lists...`);
+          logger.logToStderr(`Retrieving information about lists...`);
         }
 
         const requestOptions: any = {
@@ -144,7 +144,7 @@ class SpoWebReindexCommand extends SpoCommand {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (list.NoCrawl) {
         if (this.debug) {
-          logger.log(`List ${list.Title} is excluded from crawling`);
+          logger.logToStderr(`List ${list.Title} is excluded from crawling`);
         }
         resolve();
         return;

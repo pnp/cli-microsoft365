@@ -38,7 +38,7 @@ class SpoAppUpgradeCommand extends SpoCommand {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
 
     if (this.verbose) {
-      logger.log(`Upgrading app '${args.options.id}' in site '${args.options.siteUrl}'...`);
+      logger.logToStderr(`Upgrading app '${args.options.id}' in site '${args.options.siteUrl}'...`);
     }
 
     const requestOptions: any = {
@@ -52,7 +52,7 @@ class SpoAppUpgradeCommand extends SpoCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

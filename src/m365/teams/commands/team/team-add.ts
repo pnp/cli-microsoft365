@@ -72,20 +72,20 @@ class TeamsTeamAddCommand extends GraphCommand {
       const fullPath: string = path.resolve(args.options.templatePath);
 
       if (this.verbose) {
-        logger.log(`Using template '${fullPath}'...`);
+        logger.logToStderr(`Using template '${fullPath}'...`);
       };
       requestBody = JSON.parse(fs.readFileSync(fullPath, 'utf-8'))
 
       if (args.options.name) {
         if (this.verbose) {
-          logger.log(`Using '${args.options.name}' as name...`);
+          logger.logToStderr(`Using '${args.options.name}' as name...`);
         };
         requestBody.displayName = args.options.name;
       }
 
       if (args.options.description) {
         if (this.verbose) {
-          logger.log(`Using '${args.options.description}' as description...`);
+          logger.logToStderr(`Using '${args.options.description}' as description...`);
         };
         requestBody.description = args.options.description;
       }
@@ -148,7 +148,7 @@ class TeamsTeamAddCommand extends GraphCommand {
       .then((output: any) => {
         logger.log(output);
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => {

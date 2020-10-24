@@ -35,6 +35,10 @@ class YammerMessageAddCommand extends YammerCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/v1/messages.json`,
@@ -60,14 +64,7 @@ class YammerMessageAddCommand extends YammerCommand {
           result = res.messages[0];
         }
 
-        if (args.options.output === 'json') {
-          logger.log(result);
-        }
-        else {
-          logger.log({
-            id: result.id
-          });
-        }
+        logger.log(result);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

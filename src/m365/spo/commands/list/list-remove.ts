@@ -39,7 +39,7 @@ class SpoListRemoveCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeList: () => void = (): void => {
       if (this.verbose) {
-        logger.log(`Removing list in site at ${args.options.webUrl}...`);
+        logger.logToStderr(`Removing list in site at ${args.options.webUrl}...`);
       }
 
       let requestUrl: string = '';

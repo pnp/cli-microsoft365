@@ -12,7 +12,7 @@ const command: Command = require('./customaction-add');
 describe(commands.CUSTOMACTION_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let defaultCommandOptions: any;
   let initDefaultPostStubs = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
@@ -39,9 +39,15 @@ describe(commands.CUSTOMACTION_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     defaultCommandOptions = {
       url: 'https://contoso.sharepoint.com',
       title: 'title',
@@ -396,7 +402,7 @@ describe(commands.CUSTOMACTION_ADD, () => {
 
     command.action(logger, { options: defaultCommandOptions } as any, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogToStderrSpy.calledWith({
           ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
           ClientSideComponentProperties: '{"testMessage":"Test message"}',
           CommandUIExtension: null,

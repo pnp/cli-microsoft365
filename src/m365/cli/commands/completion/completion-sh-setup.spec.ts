@@ -12,7 +12,7 @@ const command: Command = require('./completion-sh-setup');
 describe(commands.COMPLETION_SH_SETUP, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let generateShCompletionStub: sinon.SinonStub;
   let setupShCompletionStub: sinon.SinonStub;
 
@@ -27,9 +27,15 @@ describe(commands.COMPLETION_SH_SETUP, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -80,7 +86,7 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   it('writes output in verbose mode', (done) => {
     command.action(logger, { options: { verbose: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -92,7 +98,7 @@ describe(commands.COMPLETION_SH_SETUP, () => {
   it('writes additional info in debug mode', (done) => {
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith('Generating command completion...'));
+        assert(loggerLogToStderrSpy.calledWith('Generating command completion...'));
         done();
       }
       catch (e) {

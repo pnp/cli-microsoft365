@@ -48,7 +48,7 @@ class SpoFeatureEnableCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.log(`Enabling feature '${args.options.featureId}' on scope '${scope}' for url '${args.options.url}' (force='${force}')...`);
+      logger.logToStderr(`Enabling feature '${args.options.featureId}' on scope '${scope}' for url '${args.options.url}' (force='${force}')...`);
     }
 
     const url: string = `${args.options.url}/_api/${scope}/features/add(featureId=guid'${args.options.featureId}',force=${force})`;
@@ -63,7 +63,7 @@ class SpoFeatureEnableCommand extends SpoCommand {
       .post(requestOptions)
       .then((res: any): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

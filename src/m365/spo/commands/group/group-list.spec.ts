@@ -12,7 +12,7 @@ const command: Command = require('./group-list');
 describe(commands.GROUP_LIST, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -24,9 +24,15 @@ describe(commands.GROUP_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -51,52 +57,11 @@ describe(commands.GROUP_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('Lists all the groups within specific web with output option json', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/web/sitegroups') > -1) {
-        return Promise.resolve(
-          {
-            "value": [{
-              "Id": 15,
-              "Title": "Contoso Members",
-              "LoginName": "Contoso Members",
-              "Description": "SharePoint Contoso",
-              "IsHiddenInUI": false,
-              "PrincipalType": 8
-            }]
-          }
-        );
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        output: 'json',
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com'
-      }
-    }, () => {
-      try {
-        assert(loggerSpy.calledWith({
-          value: [{
-            Id: 15,
-            Title: "Contoso Members",
-            LoginName: "Contoso Members",
-            Description: "SharePoint Contoso",
-            IsHiddenInUI: false,
-            PrincipalType: 8
-          }]
-        }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Title', 'LoginName', 'IsHiddenInUI', 'PrincipalType']);
   });
-
-  it('retrieves all groups with output option text', (done) => {
+  
+  it('retrieves all groups with', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/sitegroups') > -1) {
         return Promise.resolve(
@@ -119,21 +84,21 @@ describe(commands.GROUP_LIST, () => {
 
     command.action(logger, {
       options: {
-        output: 'text',
         debug: false,
         webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(
-          [{
+        assert(loggerLogSpy.calledWith({
+          value: [{
             Id: 15,
             Title: "Contoso Members",
             LoginName: "Contoso Members",
+            "Description": "SharePoint Contoso",
             IsHiddenInUI: false,
             PrincipalType: 8
           }]
-        ));
+        }));
         done();
       }
       catch (e) {

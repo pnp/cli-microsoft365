@@ -12,7 +12,7 @@ const command: Command = require('./list-contenttype-add');
 describe(commands.LIST_CONTENTTYPE_ADD, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -102,7 +108,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": "Create a new folder.",
           "DisplayFormTemplateName": "ListForm",
           "DisplayFormUrl": "",
@@ -186,7 +192,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": "Create a new folder.",
           "DisplayFormTemplateName": "ListForm",
           "DisplayFormUrl": "",
@@ -270,7 +276,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": "Create a new folder.",
           "DisplayFormTemplateName": "ListForm",
           "DisplayFormUrl": "",
@@ -354,7 +360,7 @@ describe(commands.LIST_CONTENTTYPE_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": "Create a new folder.",
           "DisplayFormTemplateName": "ListForm",
           "DisplayFormUrl": "",

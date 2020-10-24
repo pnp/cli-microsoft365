@@ -41,7 +41,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
       let spoAdminUrl: string = '';
 
       if (this.verbose) {
-        logger.log(`Revoking rights for ${args.options.principals} from ${args.options.url}...`);
+        logger.logToStderr(`Revoking rights for ${args.options.principals} from ${args.options.url}...`);
       }
 
       this
@@ -76,7 +76,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
           }
           else {
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
           }
           cb();

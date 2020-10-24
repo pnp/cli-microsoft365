@@ -12,7 +12,7 @@ const command: Command = require('./o365group-teamify');
 describe(commands.O365GROUP_TEAMIFY, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.O365GROUP_TEAMIFY, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -100,7 +106,7 @@ describe(commands.O365GROUP_TEAMIFY, () => {
       options: { debug: true, groupId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' }
     }, () => {
       try {
-        assert.notStrictEqual(loggerSpy.lastCall.args[0].indexOf('DONE'), -1);
+        assert.notStrictEqual(loggerLogToStderrSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
       catch (e) {

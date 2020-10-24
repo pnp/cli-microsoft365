@@ -13,7 +13,7 @@ const command: Command = require('./tab-remove');
 describe(commands.TEAMS_TAB_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -27,9 +27,15 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     promptOptions = undefined;
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
@@ -227,7 +233,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.called);
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -255,7 +261,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
         confirm: true
       }
     }, () => {
-      assert(loggerSpy.calledWith(chalk.green('DONE')));
+      assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
       done();
     });
   });

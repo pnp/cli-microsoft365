@@ -20,6 +20,10 @@ class SpoSiteDesignListCommand extends SpoCommand {
     return 'Lists available site designs for creating modern sites';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Id', 'IsDefault', 'Title', 'Version', 'WebTemplate'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let spoUrl: string = '';
 
@@ -42,23 +46,10 @@ class SpoSiteDesignListCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: { value: SiteDesign[] }): void => {
-        if (args.options.output === 'json') {
-          logger.log(res.value);
-        }
-        else {
-          logger.log(res.value.map(d => {
-            return {
-              Id: d.Id,
-              IsDefault: d.IsDefault,
-              Title: d.Title,
-              Version: d.Version,
-              WebTemplate: d.WebTemplate
-            };
-          }));
-        }
+        logger.log(res.value);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

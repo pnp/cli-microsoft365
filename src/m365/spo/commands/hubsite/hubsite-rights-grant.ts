@@ -39,7 +39,7 @@ class SpoHubSiteRightsGrantCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Granting permissions to join the hub site ${args.options.url} to principals ${args.options.principals}...`);
+          logger.logToStderr(`Granting permissions to join the hub site ${args.options.url} to principals ${args.options.principals}...`);
         }
 
         const principals: string = args.options.principals
@@ -67,7 +67,7 @@ class SpoHubSiteRightsGrantCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
         }
         cb();

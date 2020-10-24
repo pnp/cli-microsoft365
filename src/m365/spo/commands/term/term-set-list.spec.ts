@@ -13,7 +13,7 @@ const command: Command = require('./term-set-list');
 describe(commands.TERM_SET_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.TERM_SET_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -55,6 +61,10 @@ describe(commands.TERM_SET_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Name']);
   });
 
   it('lists taxonomy term sets from the term group specified using id (debug)', (done) => {
@@ -110,10 +120,46 @@ describe(commands.TERM_SET_LIST, () => {
     });
     command.action(logger, { options: { debug: true, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          { "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed", "Name": "PnP-CollabFooter-SharedLinks" },
-          { "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb", "Name": "PnP-Organizations" }
-        ]));
+        assert(loggerLogSpy.calledWith([{
+          "_ObjectType_": "SP.Taxonomy.TermSet",
+          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
+          "CreatedDate": "2018-09-13T11:52:53.337Z",
+          "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
+          "LastModifiedDate": "2018-09-13T12:13:46.883Z",
+          "Name": "PnP-CollabFooter-SharedLinks",
+          "CustomProperties": {
+            "_Sys_Nav_IsNavigationTermSet": "True"
+          },
+          "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f",
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+          "Contact": "",
+          "Description": "",
+          "IsOpenForTermCreation": false,
+          "Names": {
+            "1033": "PnP-CollabFooter-SharedLinks"
+          },
+          "Stakeholders": []
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.TermSet",
+          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7",
+          "CreatedDate": "2018-09-13T11:52:55.147Z",
+          "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb",
+          "LastModifiedDate": "2018-09-13T12:13:47.383Z",
+          "Name": "PnP-Organizations",
+          "CustomProperties": {},
+          "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602",
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+          "Contact": "",
+          "Description": "",
+          "IsOpenForTermCreation": false,
+          "Names": {
+            "1033": "PnP-Organizations"
+          },
+          "Stakeholders": []
+        }]));
         done();
       }
       catch (e) {
@@ -175,10 +221,46 @@ describe(commands.TERM_SET_LIST, () => {
     });
     command.action(logger, { options: { debug: false, termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          { "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed", "Name": "PnP-CollabFooter-SharedLinks" },
-          { "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb", "Name": "PnP-Organizations" }
-        ]));
+        assert(loggerLogSpy.calledWith([{
+          "_ObjectType_": "SP.Taxonomy.TermSet",
+          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
+          "CreatedDate": "2018-09-13T11:52:53.337Z",
+          "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
+          "LastModifiedDate": "2018-09-13T12:13:46.883Z",
+          "Name": "PnP-CollabFooter-SharedLinks",
+          "CustomProperties": {
+            "_Sys_Nav_IsNavigationTermSet": "True"
+          },
+          "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f",
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+          "Contact": "",
+          "Description": "",
+          "IsOpenForTermCreation": false,
+          "Names": {
+            "1033": "PnP-CollabFooter-SharedLinks"
+          },
+          "Stakeholders": []
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.TermSet",
+          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7",
+          "CreatedDate": "2018-09-13T11:52:55.147Z",
+          "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb",
+          "LastModifiedDate": "2018-09-13T12:13:47.383Z",
+          "Name": "PnP-Organizations",
+          "CustomProperties": {},
+          "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602",
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+          "Contact": "",
+          "Description": "",
+          "IsOpenForTermCreation": false,
+          "Names": {
+            "1033": "PnP-Organizations"
+          },
+          "Stakeholders": []
+        }]));
         done();
       }
       catch (e) {
@@ -240,10 +322,46 @@ describe(commands.TERM_SET_LIST, () => {
     });
     command.action(logger, { options: { debug: false, termGroupName: 'PnPTermSets>' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          { "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed", "Name": "PnP-CollabFooter-SharedLinks" },
-          { "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb", "Name": "PnP-Organizations" }
-        ]));
+        assert(loggerLogSpy.calledWith([{
+          "_ObjectType_": "SP.Taxonomy.TermSet",
+          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt",
+          "CreatedDate": "2018-09-13T11:52:53.337Z",
+          "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed",
+          "LastModifiedDate": "2018-09-13T12:13:46.883Z",
+          "Name": "PnP-CollabFooter-SharedLinks",
+          "CustomProperties": {
+            "_Sys_Nav_IsNavigationTermSet": "True"
+          },
+          "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f",
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+          "Contact": "",
+          "Description": "",
+          "IsOpenForTermCreation": false,
+          "Names": {
+            "1033": "PnP-CollabFooter-SharedLinks"
+          },
+          "Stakeholders": []
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.TermSet",
+          "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7",
+          "CreatedDate": "2018-09-13T11:52:55.147Z",
+          "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb",
+          "LastModifiedDate": "2018-09-13T12:13:47.383Z",
+          "Name": "PnP-Organizations",
+          "CustomProperties": {},
+          "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602",
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com",
+          "Contact": "",
+          "Description": "",
+          "IsOpenForTermCreation": false,
+          "Names": {
+            "1033": "PnP-Organizations"
+          },
+          "Stakeholders": []
+        }]));
         done();
       }
       catch (e) {
@@ -305,7 +423,7 @@ describe(commands.TERM_SET_LIST, () => {
     });
     command.action(logger, { options: { output: 'json', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{ "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "2018-09-13T11:52:53.337Z", "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed", "LastModifiedDate": "2018-09-13T12:13:46.883Z", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": { "_Sys_Nav_IsNavigationTermSet": "True" }, "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": { "1033": "PnP-CollabFooter-SharedLinks" }, "Stakeholders": [] }, { "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "2018-09-13T11:52:55.147Z", "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb", "LastModifiedDate": "2018-09-13T12:13:47.383Z", "Name": "PnP-Organizations", "CustomProperties": {}, "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": { "1033": "PnP-Organizations" }, "Stakeholders": [] }]));
+        assert(loggerLogSpy.calledWith([{ "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+tHfBZ6NyvQQZTQ6WLBpPLt", "CreatedDate": "2018-09-13T11:52:53.337Z", "Id": "7a167c47-2b37-41d0-94d0-e962c1a4f2ed", "LastModifiedDate": "2018-09-13T12:13:46.883Z", "Name": "PnP-CollabFooter-SharedLinks", "CustomProperties": { "_Sys_Nav_IsNavigationTermSet": "True" }, "CustomSortOrder": "a359ee29-cf72-4235-a4ef-1ed96bf4eaea:60d165e6-8cb1-4c20-8fad-80067c4ca767:da7bfb84-008b-48ff-b61f-bfe40da2602f", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": { "1033": "PnP-CollabFooter-SharedLinks" }, "Stakeholders": [] }, { "_ObjectType_": "SP.Taxonomy.TermSet", "_ObjectIdentity_": "ec3f929e-2007-0000-2cdb-ebdf7451c224|fec14c62-7c3b-481b-851b-c80d7802b224:se:YU1+cBy9wUuh\u002ffzgFZGpUV45jw5Y\u002f0VNn\u002ffjMatyi+ts4nkUgBOoQZGDcrxallG7", "CreatedDate": "2018-09-13T11:52:55.147Z", "Id": "1479e26c-1380-41a8-9183-72bc5a9651bb", "LastModifiedDate": "2018-09-13T12:13:47.383Z", "Name": "PnP-Organizations", "CustomProperties": {}, "CustomSortOrder": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b:247543b6-45f2-4232-b9e8-66c5bf53c31e:ffc3608f-1250-4d28-b388-381fad8d4602", "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@m365x035040.onmicrosoft.com", "Contact": "", "Description": "", "IsOpenForTermCreation": false, "Names": { "1033": "PnP-Organizations" }, "Stakeholders": [] }]));
         done();
       }
       catch (e) {
@@ -359,7 +477,7 @@ describe(commands.TERM_SET_LIST, () => {
     });
     command.action(logger, { options: { debug: false, termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

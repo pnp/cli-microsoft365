@@ -38,7 +38,7 @@ class SpoAppInstallCommand extends SpoCommand {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
 
     if (this.verbose) {
-      logger.log(`Installing app '${args.options.id}' in site '${args.options.siteUrl}'...`);
+      logger.logToStderr(`Installing app '${args.options.id}' in site '${args.options.siteUrl}'...`);
     }
 
     const requestOptions: any = {
@@ -52,7 +52,7 @@ class SpoAppInstallCommand extends SpoCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -34,7 +34,7 @@ class SpoKnowledgehubGetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Getting the Knowledge Hub Site settings for your tenant`);
+          logger.logToStderr(`Getting the Knowledge Hub Site settings for your tenant`);
         }
 
         const requestOptions: any = {
@@ -58,7 +58,7 @@ class SpoKnowledgehubGetCommand extends SpoCommand {
           logger.log(result);
 
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
           cb();
         }

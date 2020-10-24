@@ -59,7 +59,7 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
           logger.log(results);
 
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
           cb();
         }

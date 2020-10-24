@@ -20,24 +20,18 @@ class TodoListListCommand extends GraphItemsListCommand<ToDoList> {
     return 'Returns a list of Microsoft To Do task lists';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['displayName', 'id'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
       .getAllItems(`${this.resource}/beta/me/todo/lists`, logger, true)
       .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          logger.log(this.items.map(i => {
-            return {
-              displayName: i.displayName,
-              id: i.id
-            };
-          }));
-        }
+        logger.log(this.items);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -12,7 +12,7 @@ const command: Command = require('./list-get');
 describe(commands.LIST_GET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.LIST_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -119,7 +125,7 @@ describe(commands.LIST_GET, () => {
       webUrl: 'https://contoso.sharepoint.com'
     } }, () => {
       try {
-        assert(loggerSpy.calledWith({ 
+        assert(loggerLogSpy.calledWith({ 
           AllowContentTypes: true,
           BaseTemplate: 109,
           BaseType: 1,

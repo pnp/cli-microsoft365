@@ -61,7 +61,7 @@ class SpoSiteRenameCommand extends SpoCommand {
       .then((res: FormDigestInfo): Promise<SiteRenameJob> => {
         this.context = res;
         if (this.verbose) {
-          logger.log(`Scheduling rename job...`);
+          logger.logToStderr(`Scheduling rename job...`);
         }
 
         let optionsBitmask = 0;
@@ -97,7 +97,7 @@ class SpoSiteRenameCommand extends SpoCommand {
       })
       .then((res: SiteRenameJob): Promise<void> => {
         if (options.verbose) {
-          logger.log(res);
+          logger.logToStderr(res);
         }
 
         this.operationData = res;
@@ -123,12 +123,10 @@ class SpoSiteRenameCommand extends SpoCommand {
           );
         });
       }).then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.operationData);
-        }
+        logger.log(this.operationData);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb()

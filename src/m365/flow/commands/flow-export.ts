@@ -50,13 +50,13 @@ class FlowExportCommand extends AzmgmtCommand {
     const formatArgument = args.options.format ? args.options.format.toLowerCase() : '';
 
     if (this.verbose) {
-      logger.log(`Retrieving package resources for Microsoft Flow ${args.options.id}...`);
+      logger.logToStderr(`Retrieving package resources for Microsoft Flow ${args.options.id}...`);
     }
 
     ((): Promise<any> => {
       if (formatArgument === 'json') {
         if (this.debug) {
-          logger.log('format = json, skipping listing package resources step');
+          logger.logToStderr('format = json, skipping listing package resources step');
         }
 
         return Promise.resolve();
@@ -83,7 +83,7 @@ class FlowExportCommand extends AzmgmtCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Initiating package export for Microsoft Flow ${args.options.id}...`);
+          logger.logToStderr(`Initiating package export for Microsoft Flow ${args.options.id}...`);
         }
 
         const requestOptions: any = {
@@ -123,7 +123,7 @@ class FlowExportCommand extends AzmgmtCommand {
       })
       .then((res: any): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Getting file for Microsoft Flow ${args.options.id}...`);
+          logger.logToStderr(`Getting file for Microsoft Flow ${args.options.id}...`);
         }
 
         const downloadFileUrl: string = formatArgument === 'json' ? '' : res.packageLink.value;
@@ -131,8 +131,8 @@ class FlowExportCommand extends AzmgmtCommand {
         filenameFromApi = formatArgument === 'json' ? `${res.properties.displayName}.json` : (filenameRegEx.exec(downloadFileUrl) || ['output.zip'])[0];
 
         if (this.debug) {
-          logger.log(`Filename from PowerApps API: ${filenameFromApi}`);
-          logger.log('');
+          logger.logToStderr(`Filename from PowerApps API: ${filenameFromApi}`);
+          logger.logToStderr('');
         }
 
         const requestOptions: any = {
@@ -159,7 +159,7 @@ class FlowExportCommand extends AzmgmtCommand {
         fs.writeFileSync(path, file, 'binary');
         if (!args.options.path || this.verbose) {
           if (this.verbose) {
-            logger.log(`File saved to path '${path}'`);
+            logger.logToStderr(`File saved to path '${path}'`);
           }
           else {
             logger.log(path);

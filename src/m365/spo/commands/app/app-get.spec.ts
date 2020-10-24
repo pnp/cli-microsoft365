@@ -12,7 +12,7 @@ const command: Command = require('./app-get');
 describe(commands.APP_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +26,15 @@ describe(commands.APP_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -78,7 +84,7 @@ describe(commands.APP_GET, () => {
 
     command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -118,7 +124,7 @@ describe(commands.APP_GET, () => {
 
     command.action(logger, { options: { debug: true, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -158,7 +164,7 @@ describe(commands.APP_GET, () => {
 
     command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -198,7 +204,7 @@ describe(commands.APP_GET, () => {
 
     command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6', scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -244,7 +250,7 @@ describe(commands.APP_GET, () => {
 
     command.action(logger, { options: { debug: false, name: 'solution.sppkg', appCatalogUrl: 'https://contoso.sharepoint.com/sites/apps' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -291,7 +297,7 @@ describe(commands.APP_GET, () => {
 
     command.action(logger, { options: { debug: false, name: 'solution.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com/sites/site1' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -337,7 +343,7 @@ describe(commands.APP_GET, () => {
 
     command.action(logger, { options: { debug: true, name: 'solution.sppkg' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,
@@ -419,7 +425,7 @@ describe(commands.APP_GET, () => {
     });
     command.action(logger, { options: { debug: false, name: 'solution.sppkg' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
           Title: 'online-client-side-solution',
           Deployed: true,

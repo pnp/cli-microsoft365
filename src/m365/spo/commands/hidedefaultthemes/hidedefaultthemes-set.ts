@@ -36,7 +36,7 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
       .getSpoAdminUrl(logger, this.debug)
       .then((spoAdminUrl: string): Promise<void> => {
         if (this.verbose) {
-          logger.log(`Setting the value of the HideDefaultThemes setting to ${args.options.hideDefaultThemes}...`);
+          logger.logToStderr(`Setting the value of the HideDefaultThemes setting to ${args.options.hideDefaultThemes}...`);
         }
 
         const requestOptions: any = {
@@ -54,7 +54,7 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -47,7 +47,7 @@ class SpoFileGetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving file from site ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving file from site ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -107,11 +107,12 @@ class SpoFileGetCommand extends SpoCommand {
         })
         .then((file: string): void => {
           if (this.verbose) {
-            logger.log(`File saved to path ${file}`);
+            logger.logToStderr(`File saved to path ${file}`);
           }
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    } else {
+    }
+    else {
       request
         .get<string>(requestOptions)
         .then((file: string): void => {

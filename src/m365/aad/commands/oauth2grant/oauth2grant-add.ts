@@ -30,7 +30,7 @@ class AadOAuth2GrantAddCommand extends AadCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Granting the service principal specified permissions...`);
+      logger.logToStderr(`Granting the service principal specified permissions...`);
     }
 
     const requestOptions: any = {
@@ -55,7 +55,7 @@ class AadOAuth2GrantAddCommand extends AadCommand {
       .post<void>(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

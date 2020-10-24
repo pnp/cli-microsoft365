@@ -13,7 +13,7 @@ const command: Command = require('./term-group-add');
 describe(commands.TERM_GROUP_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.TERM_GROUP_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -99,7 +105,7 @@ describe(commands.TERM_GROUP_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnPTermSets' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Name": "PnPTermSets",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",
           "Description": ""
@@ -154,7 +160,7 @@ describe(commands.TERM_GROUP_ADD, () => {
     });
     command.action(logger, { options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8' } } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Name": "PnPTermSets",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a8",
           "Description": ""
@@ -217,7 +223,7 @@ describe(commands.TERM_GROUP_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnPTermSets', description: 'Term sets for PnP' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Name": "PnPTermSets",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",
           "Description": "Term sets for PnP"
@@ -280,7 +286,7 @@ describe(commands.TERM_GROUP_ADD, () => {
     });
     command.action(logger, { options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8', description: 'Term sets for PnP' } } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Name": "PnPTermSets",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a8",
           "Description": "Term sets for PnP"
@@ -517,7 +523,7 @@ describe(commands.TERM_GROUP_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnPTermSets>' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Name": "PnPTermSets>",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",
           "Description": ""
@@ -580,7 +586,7 @@ describe(commands.TERM_GROUP_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnPTermSets', description: 'Term sets for PnP>' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Name": "PnPTermSets",
           "Id": "6cb612c7-2e96-47b9-b7c7-41ddc87379a7",
           "Description": "Term sets for PnP>"

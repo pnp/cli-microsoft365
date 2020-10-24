@@ -49,7 +49,7 @@ class PaConnectorExportCommand extends AzmgmtCommand {
     let connector: Connector;
 
     if (this.verbose) {
-      logger.log('Downloading connector...');
+      logger.logToStderr('Downloading connector...');
     }
     request
       .get<Connector>(requestOptions)
@@ -61,7 +61,7 @@ class PaConnectorExportCommand extends AzmgmtCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Creating output folder ${outputFolder}...`);
+          logger.logToStderr(`Creating output folder ${outputFolder}...`);
         }
         fs.mkdirSync(outputFolder);
 
@@ -75,7 +75,7 @@ class PaConnectorExportCommand extends AzmgmtCommand {
           powerAppsUrl: "https://api.powerapps.com"
         };
         if (this.verbose) {
-          logger.log('Exporting settings...');
+          logger.logToStderr('Exporting settings...');
         }
         fs.writeFileSync(path.join(outputFolder, 'settings.json'), JSON.stringify(settings, null, 2), 'utf8');
 
@@ -95,14 +95,14 @@ class PaConnectorExportCommand extends AzmgmtCommand {
           }
         });
         if (this.verbose) {
-          logger.log('Exporting API properties...');
+          logger.logToStderr('Exporting API properties...');
         }
         fs.writeFileSync(path.join(outputFolder, 'apiProperties.json'), JSON.stringify(apiProperties, null, 2), 'utf8');
 
         if (connector.properties.apiDefinitions &&
           connector.properties.apiDefinitions.originalSwaggerUrl) {
           if (this.verbose) {
-            logger.log(`Downloading swagger from ${connector.properties.apiDefinitions.originalSwaggerUrl}...`);
+            logger.logToStderr(`Downloading swagger from ${connector.properties.apiDefinitions.originalSwaggerUrl}...`);
           }
           return request
             .get({
@@ -114,7 +114,7 @@ class PaConnectorExportCommand extends AzmgmtCommand {
         }
         else {
           if (this.debug) {
-            logger.log('originalSwaggerUrl not set. Skipping');
+            logger.logToStderr('originalSwaggerUrl not set. Skipping');
           }
           return Promise.resolve('');
         }
@@ -122,18 +122,18 @@ class PaConnectorExportCommand extends AzmgmtCommand {
       .then((swagger: string): Promise<any> => {
         if (swagger && swagger.length > 0) {
           if (this.debug) {
-            logger.log('Downloaded swagger');
-            logger.log(swagger);
+            logger.logToStderr('Downloaded swagger');
+            logger.logToStderr(swagger);
           }
           if (this.verbose) {
-            logger.log('Exporting swagger...');
+            logger.logToStderr('Exporting swagger...');
           }
           fs.writeFileSync(path.join(outputFolder, 'apiDefinition.swagger.json'), swagger, 'utf8');
         }
 
         if (connector.properties.iconUri) {
           if (this.verbose) {
-            logger.log(`Downloading icon from ${connector.properties.iconUri}...`);
+            logger.logToStderr(`Downloading icon from ${connector.properties.iconUri}...`);
           }
           return request
             .get({
@@ -146,7 +146,7 @@ class PaConnectorExportCommand extends AzmgmtCommand {
         }
         else {
           if (this.debug) {
-            logger.log('iconUri not set. Skipping');
+            logger.logToStderr('iconUri not set. Skipping');
           }
           return Promise.resolve();
         }
@@ -154,18 +154,18 @@ class PaConnectorExportCommand extends AzmgmtCommand {
       .then((icon: any): void => {
         if (icon) {
           if (this.verbose) {
-            logger.log('Exporting icon...');
+            logger.logToStderr('Exporting icon...');
           }
           const iconBuffer: Buffer = Buffer.from(icon, 'utf8');
           fs.writeFileSync(path.join(outputFolder, 'icon.png'), iconBuffer);
         }
         else {
           if (this.debug) {
-            logger.log('No icon retrieved');
+            logger.logToStderr('No icon retrieved');
           }
         }
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));

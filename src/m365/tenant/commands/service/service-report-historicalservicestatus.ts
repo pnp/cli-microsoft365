@@ -30,9 +30,13 @@ class TenantServiceReportHistoricalServiceStatusCommand extends Command {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['WorkloadDisplayName', 'StatusDisplayName', 'StatusTime'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      logger.log(`Gets the historical service status of Microsoft 365 Services of the last 7 days`);
+      logger.logToStderr(`Gets the historical service status of Microsoft 365 Services of the last 7 days`);
     }
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
@@ -49,21 +53,10 @@ class TenantServiceReportHistoricalServiceStatusCommand extends Command {
 
     request.get(requestOptions)
       .then((res: any): void => {
-        if (args.options.output === 'json') {
-          logger.log(res);
-        }
-        else {
-          logger.log(res.value.map((r: any) => {
-            return {
-              WorkloadDisplayName: r.WorkloadDisplayName,
-              StatusDisplayName: r.StatusDisplayName,
-              StatusTime: r.StatusTime
-            }
-          }));
-        }
+        logger.log(res);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

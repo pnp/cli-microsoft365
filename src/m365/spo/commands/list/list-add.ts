@@ -235,7 +235,7 @@ class SpoListAddCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Creating list in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Creating list in site at ${args.options.webUrl}...`);
     }
 
     const requestBody: any = this.mapRequestBody(args.options);

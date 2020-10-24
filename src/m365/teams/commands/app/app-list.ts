@@ -8,7 +8,6 @@ import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
 import { Team } from '../../Team';
 import { TeamsApp } from '../../TeamsApp';
-import { TeamsAppInstallation } from '../../TeamsAppInstallation';
 
 interface CommandArgs {
   options: Options;
@@ -35,6 +34,10 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
     telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
     telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
     return telemetryProps;
+  }
+
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'displayName', 'distributionMethod'];
   }
 
   private getTeamId(args: CommandArgs): Promise<string> {
@@ -102,36 +105,21 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
       .getEndpointUrl(args)
       .then((endpoint: string): Promise<void> => this.getAllItems(endpoint, logger, true))
       .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          if (args.options.teamId || args.options.teamName) {
-            logger.log((this.items as unknown as TeamsAppInstallation[]).map(i => {
-              return {
-                id: i.id,
-                displayName: i.teamsApp.displayName,
-                distributionMethod: i.teamsApp.distributionMethod
-              };
-            }));
-          }
-          else {
-            logger.log(this.items.map(i => {
-              return {
-                id: i.id,
-                displayName: i.displayName,
-                distributionMethod: i.distributionMethod
-              };
-            }));
-          }
+		if (args.options.teamId || args.options.teamName) {
+          this.items.forEach(t => {
+            t.displayName = (t as any).teamsApp.displayName;
+            t.distributionMethod = (t as any).teamsApp.distributionMethod;
+          });
         }
 
+        logger.log(this.items);
+
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

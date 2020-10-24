@@ -63,13 +63,13 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     if (args.options.generateNewId) {
       newId = this.generateNewId();
       if (this.debug) {
-        logger.log('Created new solution id');
-        logger.log(newId);
+        logger.logToStderr('Created new solution id');
+        logger.logToStderr(newId);
       }
     }
 
     if (this.debug) {
-      logger.log(`Renaming SharePoint Framework project to '${args.options.newName}'`);
+      logger.logToStderr(`Renaming SharePoint Framework project to '${args.options.newName}'`);
     }
 
     try {
@@ -85,7 +85,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
     }
 
     if (this.verbose) {
-      logger.log('DONE');
+      logger.logToStderr('DONE');
     }
 
     cb();
@@ -114,7 +114,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       fs.writeFileSync(filePath, updatedContentString, 'utf-8');
 
       if (this.debug) {
-        logger.log(`Updated ${path.basename(filePath)}`);
+        logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
   }
@@ -150,7 +150,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       fs.writeFileSync(filePath, updatedContentString, 'utf-8');
 
       if (this.debug) {
-        logger.log(`Updated ${path.basename(filePath)}`);
+        logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
   }
@@ -186,7 +186,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       fs.writeFileSync(filePath, updatedContentString, 'utf-8');
 
       if (this.debug) {
-        logger.log(`Updated ${path.basename(filePath)}`);
+        logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
   }
@@ -210,7 +210,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       fs.writeFileSync(filePath, updatedContentString, 'utf-8');
 
       if (this.debug) {
-        logger.log(`Updated ${path.basename(filePath)}`);
+        logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
   }
@@ -227,7 +227,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       fs.writeFileSync(filePath, updatedContent, 'utf-8');
 
       if (this.debug) {
-        logger.log(`Updated ${path.basename(filePath)}`);
+        logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
   }

@@ -36,7 +36,7 @@ class AadGroupSettingRemoveCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeGroupSetting: () => void = (): void => {
       if (this.verbose) {
-        logger.log(`Removing group setting: ${args.options.id}...`);
+        logger.logToStderr(`Removing group setting: ${args.options.id}...`);
       }
 
       const requestOptions: any = {
@@ -50,7 +50,7 @@ class AadGroupSettingRemoveCommand extends GraphCommand {
         .delete(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

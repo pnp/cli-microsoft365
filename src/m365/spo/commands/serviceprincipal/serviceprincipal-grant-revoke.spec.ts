@@ -14,7 +14,8 @@ const command: Command = require('./serviceprincipal-grant-revoke');
 describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -29,9 +30,16 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -85,7 +93,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
     });
     command.action(logger, { options: { debug: true, grantId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -121,7 +129,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_REVOKE, () => {
     });
     command.action(logger, { options: { debug: false, grantId: '50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

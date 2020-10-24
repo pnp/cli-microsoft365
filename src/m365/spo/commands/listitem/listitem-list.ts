@@ -63,7 +63,7 @@ class SpoListItemListCommand extends SpoCommand {
     ((): Promise<any> => {
       if (args.options.query) {
         if (this.debug) {
-          logger.log(`getting request digest for query request`);
+          logger.logToStderr(`getting request digest for query request`);
         }
 
         return this.getRequestDigest(args.options.webUrl);
@@ -124,15 +124,7 @@ class SpoListItemListCommand extends SpoCommand {
         return args.options.query ? request.post(requestOptions) : request.get(requestOptions);
       })
       .then((listItemInstances: ListItemInstanceCollection): void => {
-        if (args.options.output === 'json') {
-          logger.log(listItemInstances.value);
-        }
-        else {
-          logger.log(listItemInstances.value.map(l => {
-            if ((<any>l)["ID"] && l["Id"]) delete (<any>l)["ID"];
-            return l;
-          }));
-        }
+        logger.log(listItemInstances.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

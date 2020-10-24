@@ -58,7 +58,7 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
         if (property) {
           logger.log(property.value);
         } else if (this.verbose) {
-          logger.log('Property not found.');
+          logger.logToStderr('Property not found.');
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));

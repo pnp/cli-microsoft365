@@ -8,7 +8,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { SiteScriptActionStatus } from './SiteScriptActionStatus';
 
 interface CommandArgs {
   options: Options;
@@ -28,6 +27,10 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
     return 'Gets information about the site scripts executed for the specified site design';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['ActionTitle', 'SiteScriptTitle', 'OutcomeText'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const data: any = {
       runId: args.options.runId
@@ -43,23 +46,12 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request.post<{ value: SiteScriptActionStatus[] }>(requestOptions)
-      .then((res: { value: SiteScriptActionStatus[] }): void => {
-        if (args.options.output === 'json') {
-          logger.log(res.value);
-        }
-        else {
-          logger.log(res.value.map(s => {
-            return {
-              ActionTitle: s.ActionTitle,
-              SiteScriptTitle: s.SiteScriptTitle,
-              OutcomeText: s.OutcomeText
-            };
-          }));
-        }
+    request.post<{ value: any[] }>(requestOptions)
+      .then((res: { value: any[] }): void => {
+        logger.log(res.value);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

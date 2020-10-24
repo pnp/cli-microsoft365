@@ -13,7 +13,8 @@ const command: Command = require('./o365group-renew');
 describe(commands.O365GROUP_RENEW, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,9 +28,16 @@ describe(commands.O365GROUP_RENEW, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -67,7 +75,7 @@ describe(commands.O365GROUP_RENEW, () => {
 
     command.action(logger, { options: { debug: false, id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -87,7 +95,7 @@ describe(commands.O365GROUP_RENEW, () => {
 
     command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848' } }, () => {
       try {
-        assert(loggerSpy.called);
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

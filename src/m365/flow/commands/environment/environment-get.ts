@@ -26,7 +26,7 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving information about Microsoft Flow environment ${args.options.name}...`);
+      logger.logToStderr(`Retrieving information about Microsoft Flow environment ${args.options.name}...`);
     }
 
     const requestOptions: any = {

@@ -36,7 +36,7 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Retrieving Content Type Hub URL`);
+          logger.logToStderr(`Retrieving Content Type Hub URL`);
         }
 
         const requestOptions: any = {

@@ -56,7 +56,7 @@ class SpoTermGetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Retrieving taxonomy term...`);
+          logger.logToStderr(`Retrieving taxonomy term...`);
         }
 
         let data: string = '';

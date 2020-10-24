@@ -12,7 +12,7 @@ const command: Command = require('./funsettings-list');
 describe(commands.TEAMS_FUNSETTINGS_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.TEAMS_FUNSETTINGS_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -76,7 +82,7 @@ describe(commands.TEAMS_FUNSETTINGS_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(
+        assert(loggerLogSpy.calledWith(
           {
             "allowGiphy": true,
             "giphyContentRating": "moderate",
@@ -115,7 +121,7 @@ describe(commands.TEAMS_FUNSETTINGS_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(
+        assert(loggerLogSpy.calledWith(
           {
             "allowGiphy": true,
             "giphyContentRating": "moderate",

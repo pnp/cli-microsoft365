@@ -13,7 +13,8 @@ const command: Command = require('./page-remove');
 describe(commands.PAGE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   const fakeRestCalls: (pageName?: string) => sinon.SinonStub = (pageName: string = 'page.aspx') => {
@@ -40,9 +41,16 @@ describe(commands.PAGE_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -86,7 +94,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(loggerSpy.notCalled);
+          assert(loggerLogSpy.notCalled);
           done();
         } catch (e) {
           done(e);
@@ -108,7 +116,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(loggerSpy.calledWith(chalk.green('DONE')));
+          assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
           done();
         } catch (e) {
           done(e);
@@ -137,7 +145,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(loggerSpy.calledWith(chalk.green('DONE')));
+          assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
           done();
         } catch (e) {
           done(e);
@@ -163,7 +171,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(loggerSpy.notCalled);
+          assert(loggerLogSpy.notCalled);
           done();
         } catch (e) {
           done(e);
@@ -189,7 +197,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(loggerSpy.calledWith(chalk.green('DONE')));
+          assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
           done();
         } catch (e) {
           done(e);
@@ -267,7 +275,7 @@ describe(commands.PAGE_REMOVE, () => {
       },
       () => {
         try {
-          assert(loggerSpy.notCalled);
+          assert(loggerLogSpy.notCalled);
           done();
         } catch (e) {
           done(e);

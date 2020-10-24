@@ -12,7 +12,8 @@ const command: Command = require('./customaction-get');
 describe(commands.CUSTOMACTION_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +26,16 @@ describe(commands.CUSTOMACTION_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -88,7 +96,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       url: 'https://contoso.sharepoint.com'
     } }, () => {
       try {
-        assert(loggerSpy.calledWith({ 
+        assert(loggerLogSpy.calledWith({ 
           ClientSideComponentId: '015e0fcf-fe9d-4037-95af-0a4776cdfbb4',
           ClientSideComponentProperties: '{"testMessage":"Test message"}',
           CommandUIExtension: null,
@@ -324,7 +332,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -358,7 +366,7 @@ describe(commands.CUSTOMACTION_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(`Custom action with id ${actionId} not found`));
+        assert(loggerLogToStderrSpy.calledWith(`Custom action with id ${actionId} not found`));
         done();
       }
       catch (e) {

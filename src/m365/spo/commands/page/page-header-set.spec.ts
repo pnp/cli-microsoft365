@@ -25,6 +25,12 @@ describe(commands.PAGE_HEADER_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
     sinon.stub(request, 'get').callsFake((opts) => {

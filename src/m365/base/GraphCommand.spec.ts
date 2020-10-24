@@ -41,7 +41,9 @@ describe('GraphCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {
@@ -58,7 +60,9 @@ describe('GraphCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
     command.action(logger, { options: {} }, () => {
@@ -76,7 +80,9 @@ describe('GraphCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     auth.service.connected = false;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
@@ -95,7 +101,9 @@ describe('GraphCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     auth.service.connected = true;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');

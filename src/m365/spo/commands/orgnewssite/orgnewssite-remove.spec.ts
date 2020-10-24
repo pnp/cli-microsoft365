@@ -14,7 +14,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let promptOptions: any;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -31,10 +31,16 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
     promptOptions = undefined;
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -88,7 +94,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(svcListRequest.called);
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -123,7 +129,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(svcListRequest.called);
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

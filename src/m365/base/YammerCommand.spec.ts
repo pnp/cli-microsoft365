@@ -45,7 +45,9 @@ describe('YammerCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {
@@ -62,7 +64,9 @@ describe('YammerCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
     command.action(logger, { options: {} }, () => {
@@ -80,7 +84,9 @@ describe('YammerCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     auth.service.connected = false;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
@@ -99,7 +105,9 @@ describe('YammerCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { }
+      log: (msg: any) => { },
+      logRaw: (msg: any) => { },
+      logToStderr: (msg: any) => { }
     };
     auth.service.connected = true;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
@@ -125,6 +133,8 @@ describe('YammerCommand', () => {
         command: 'command'
       },
       log: (msg?: string) => { },
+      logRaw: (msg?: string) => { },
+      logToStderr: (msg?: string) => { },
       prompt: () => { }
     };
     const mock = new MockCommand();
@@ -144,6 +154,8 @@ describe('YammerCommand', () => {
         command: 'command'
       },
       log: (msg?: string) => { },
+      logRaw: (msg?: string) => { },
+      logToStderr: (msg?: string) => { },
       prompt: () => { }
     };
     const mock = new MockCommand();
@@ -160,6 +172,8 @@ describe('YammerCommand', () => {
         command: 'command'
       },
       log: (msg?: string) => { },
+      logRaw: (msg?: string) => { },
+      logToStderr: (msg?: string) => { },
       prompt: () => { }
     };
     const mock = new MockCommand();
@@ -176,6 +190,8 @@ describe('YammerCommand', () => {
         command: 'command'
       },
       log: (msg?: string) => { },
+      logRaw: (msg?: string) => { },
+      logToStderr: (msg?: string) => { },
       prompt: () => { }
     };
     const mock = new MockCommand();

@@ -12,7 +12,7 @@ const command: Command = require('./hidedefaultthemes-get');
 describe(commands.HIDEDEFAULTTHEMES_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +26,15 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -124,7 +130,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
 
     command.action(logger, { options: { debug: true, verbose: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(true), 'Invalid request');
+        assert(loggerLogSpy.calledWith(true), 'Invalid request');
         done();
       }
       catch (e) {

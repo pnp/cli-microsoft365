@@ -60,7 +60,7 @@ class SpoTermSetAddCommand extends SpoCommand {
         formDigest = res.FormDigestValue;
 
         if (this.verbose) {
-          logger.log(`Adding taxonomy term set...`);
+          logger.logToStderr(`Adding taxonomy term set...`);
         }
 
         const termGroupQuery: string = args.options.termGroupName ?
@@ -104,7 +104,7 @@ class SpoTermSetAddCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Setting term set properties...`);
+          logger.logToStderr(`Setting term set properties...`);
         }
 
         const properties: string[] = [];

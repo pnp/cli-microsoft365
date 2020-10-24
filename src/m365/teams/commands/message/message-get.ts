@@ -43,7 +43,7 @@ class TeamsMessageGetCommand extends GraphCommand {
         logger.log(res);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -13,7 +13,8 @@ const command: Command = require('./page-text-add');
 describe(commands.PAGE_TEXT_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -29,9 +30,16 @@ describe(commands.PAGE_TEXT_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -145,7 +153,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       },
       () => {
         try {
-          assert(loggerSpy.notCalled);
+          assert(loggerLogSpy.notCalled);
           done();
         }
         catch (e) {
@@ -242,7 +250,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       },
       () => {
         try {
-          assert(loggerSpy.calledWith(chalk.green('DONE')));
+          assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
           done();
         }
         catch (e) {
@@ -339,7 +347,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       },
       () => {
         try {
-          assert(loggerSpy.calledWith(chalk.green('DONE')));
+          assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
           done();
         }
         catch (e) {
@@ -440,7 +448,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       },
       () => {
         try {
-          assert(loggerSpy.notCalled);
+          assert(loggerLogSpy.notCalled);
           done();
         }
         catch (e) {
@@ -542,7 +550,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       },
       () => {
         try {
-          assert(loggerSpy.notCalled);
+          assert(loggerLogSpy.notCalled);
           done();
         }
         catch (e) {
@@ -643,7 +651,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       },
       () => {
         try {
-          assert(loggerSpy.notCalled);
+          assert(loggerLogSpy.notCalled);
           done();
         }
         catch (e) {

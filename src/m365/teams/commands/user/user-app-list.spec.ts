@@ -12,7 +12,7 @@ const command: Command = require('./user-app-list');
 describe(commands.TEAMS_USER_APP_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -131,7 +137,7 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
       }
     } as any, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
             "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef"
@@ -177,7 +183,7 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
       }
     } as any, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
             "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef"
@@ -220,7 +226,7 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
       }
     } as any, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
             "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef"
@@ -263,7 +269,7 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
       }
     } as any, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
             "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef"

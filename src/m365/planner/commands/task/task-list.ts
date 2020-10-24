@@ -18,28 +18,18 @@ class GraphPlannerTaskListCommand extends GraphItemsListCommand<Task> {
     return 'Lists Planner tasks for the currently logged in user';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'title', 'startDateTime', 'dueDateTime', 'completedDateTime'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getAllItems(`${this.resource}/v1.0/me/planner/tasks`, logger, true)
       .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          logger.log(this.items.map(t => {
-            const task: any = {
-              id: t.id,
-              title: t.title,
-              startDateTime: t.startDateTime,
-              dueDateTime: t.dueDateTime,
-              completedDateTime: t.completedDateTime
-            };
-            return task;
-          }));
-        }
+        logger.log(this.items);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

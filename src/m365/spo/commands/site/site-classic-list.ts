@@ -36,6 +36,10 @@ class SiteClassicListCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Title', 'Url'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const webTemplate: string = args.options.webTemplate || '';
     const includeOneDriveSites: boolean = args.options.includeOneDriveSites || false;
@@ -50,7 +54,7 @@ class SiteClassicListCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Retrieving list of site collections...`);
+          logger.logToStderr(`Retrieving list of site collections...`);
         }
 
         const personalSite: string = includeOneDriveSites === false ? '0' : '1';
@@ -74,28 +78,7 @@ class SiteClassicListCommand extends SpoCommand {
         }
         else {
           const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
-          if (args.options.output === 'json') {
-            logger.log(sites._Child_Items_);
-          }
-          else {
-            logger.log(sites._Child_Items_.map(s => {
-              return {
-                Title: s.Title,
-                Url: s.Url
-              };
-            }).sort((a, b) => {
-              const urlA = a.Url.toUpperCase();
-              const urlB = b.Url.toUpperCase();
-              if (urlA < urlB) {
-                return -1;
-              }
-              if (urlA > urlB) {
-                return 1;
-              }
-
-              return 0;
-            }));
-          }
+          logger.log(sites._Child_Items_);
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));

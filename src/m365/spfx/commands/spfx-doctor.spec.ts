@@ -13,7 +13,7 @@ describe(commands.DOCTOR, () => {
   let log: string[];
   let sandbox: SinonSandbox;
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   const packageVersionResponse = (name: string, version: string): string => {
     return `{
       "dependencies": {
@@ -36,9 +36,15 @@ describe(commands.DOCTOR, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     sinon.stub(process, 'platform').value('linux');
   });
 
@@ -98,13 +104,13 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.22.0')), 'Invalid Node version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.22.0')), 'Invalid Node version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -147,13 +153,13 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -199,13 +205,13 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -251,13 +257,13 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -303,13 +309,13 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -352,13 +358,13 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -401,13 +407,13 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -453,13 +459,13 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -505,13 +511,13 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -557,13 +563,13 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
-        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
       }
       catch (e) {
@@ -590,9 +596,9 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } } as any, (err: any) => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint Framework not found')));
-        assert(!loggerSpy.calledWith('Recommended fixes:'), 'Fixes provided');
+        assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
         done();
       }
       catch (e) {
@@ -619,9 +625,9 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: true } } as any, (err: any) => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'SharePoint Framework')), 'SharePoint Framework found');
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint Framework not found')));
-        assert(!loggerSpy.calledWith('Recommended fixes:'), 'Fixes provided');
+        assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
         done();
       }
       catch (e) {
@@ -645,7 +651,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false, env: 'spo' } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'Supported in SPO')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SPO')));
         done();
       }
       catch (e) {
@@ -669,7 +675,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false, env: 'spo' } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'Supported in SPO')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SPO')));
         done();
       }
       catch (e) {
@@ -693,7 +699,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false, env: 'sp2019' } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'Supported in SP2019')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SP2019')));
         done();
       }
       catch (e) {
@@ -717,8 +723,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false, env: 'sp2019' } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'Not supported in SP2019')));
-        assert(loggerSpy.calledWith('- Use SharePoint Framework v1.4.1'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'Not supported in SP2019')));
+        assert(loggerLogSpy.calledWith('- Use SharePoint Framework v1.4.1'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -742,7 +748,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false, env: 'sp2016' } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'Supported in SP2016')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Supported in SP2016')));
         done();
       }
       catch (e) {
@@ -766,8 +772,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false, env: 'sp2016' } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'Not supported in SP2016')));
-        assert(loggerSpy.calledWith('- Use SharePoint Framework v1.1'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'Not supported in SP2016')));
+        assert(loggerLogSpy.calledWith('- Use SharePoint Framework v1.1'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -793,7 +799,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v10.18.0')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')));
         done();
       }
       catch (e) {
@@ -819,7 +825,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'Node v8.0.0')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v8.0.0')));
         done();
       }
       catch (e) {
@@ -845,8 +851,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^10.0.0 required')));
-        assert(loggerSpy.calledWith('- Install Node.js v10'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^10.0.0 required')));
+        assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -872,8 +878,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^8.0.0 || ^10.0.0 required')));
-        assert(loggerSpy.calledWith('- Install Node.js v10'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^8.0.0 || ^10.0.0 required')));
+        assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -904,7 +910,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v5.0.0')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v5.0.0')));
         done();
       }
       catch (e) {
@@ -938,7 +944,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v5.0.0')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v5.0.0')));
         done();
       }
       catch (e) {
@@ -969,7 +975,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'npm v6.0.0')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.0.0')));
         done();
       }
       catch (e) {
@@ -1000,8 +1006,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'npm v4.0.0 found, v^5.0.0 required')));
-        assert(loggerSpy.calledWith('- npm i -g npm@5'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'npm v4.0.0 found, v^5.0.0 required')));
+        assert(loggerLogSpy.calledWith('- npm i -g npm@5'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1032,8 +1038,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'npm v7.0.0 found, v^5.0.0 || ^6.0.0 required')));
-        assert(loggerSpy.calledWith('- npm i -g npm@6'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'npm v7.0.0 found, v^5.0.0 || ^6.0.0 required')));
+        assert(loggerLogSpy.calledWith('- npm i -g npm@6'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1053,7 +1059,7 @@ describe(commands.DOCTOR, () => {
     command.action(logger, { options: { debug: false } } as any, (err: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('npm not found')));
-        assert(!loggerSpy.calledWith('Recommended fixes:'), 'Fixes provided');
+        assert(!loggerLogSpy.calledWith('Recommended fixes:'), 'Fixes provided');
         done();
       }
       catch (e) {
@@ -1087,7 +1093,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'yo v3.1.1')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')));
         done();
       }
       catch (e) {
@@ -1118,8 +1124,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'yo not found')));
-        assert(loggerSpy.calledWith('- npm i -g yo'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'yo not found')));
+        assert(loggerLogSpy.calledWith('- npm i -g yo'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1154,7 +1160,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'gulp v3.9.1')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')));
         done();
       }
       catch (e) {
@@ -1185,8 +1191,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'gulp not found')));
-        assert(loggerSpy.calledWith('- npm i -g gulp'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'gulp not found')));
+        assert(loggerLogSpy.calledWith('- npm i -g gulp'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1217,8 +1223,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(!loggerSpy.calledWith(getStatus(0, 'react v16.8.5')), 'react found');
-        assert(!loggerSpy.calledWith(getStatus(1, 'react not found, v16.8.5 required')), 'react not found');
+        assert(!loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'react found');
+        assert(!loggerLogSpy.calledWith(getStatus(1, 'react not found, v16.8.5 required')), 'react not found');
         done();
       }
       catch (e) {
@@ -1252,7 +1258,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'react v15.0.0')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v15.0.0')));
         done();
       }
       catch (e) {
@@ -1286,7 +1292,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'react v16.8.5')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')));
         done();
       }
       catch (e) {
@@ -1320,8 +1326,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'react v16.0.0 found, v^15 required')));
-        assert(loggerSpy.calledWith('- npm i react@15'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'react v16.0.0 found, v^15 required')));
+        assert(loggerLogSpy.calledWith('- npm i react@15'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1355,8 +1361,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'react v16.8.6 found, v16.8.5 required')));
-        assert(loggerSpy.calledWith('- npm i react@16.8.5'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'react v16.8.6 found, v16.8.5 required')));
+        assert(loggerLogSpy.calledWith('- npm i react@16.8.5'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1390,7 +1396,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'bundled typescript used')));
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')));
         done();
       }
       catch (e) {
@@ -1424,8 +1430,8 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(1, 'typescript v3.7.5 installed in the project')));
-        assert(loggerSpy.calledWith('- npm un typescript'), 'No fix provided');
+        assert(loggerLogSpy.calledWith(getStatus(1, 'typescript v3.7.5 installed in the project')));
+        assert(loggerLogSpy.calledWith('- npm un typescript'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -1494,7 +1500,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         done();
       }
       catch (e) {

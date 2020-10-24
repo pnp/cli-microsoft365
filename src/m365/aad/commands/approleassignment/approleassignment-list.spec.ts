@@ -341,7 +341,7 @@ class CommandActionParameters {
   static appIdWithRoleAssignments: string = "36e3a540-6f25-4483-9542-9f5fa00bb633";
   static appNameWithRoleAssignments: string = "Product Catalog daemon";
   static appIdWithNoRoleAssignments: string = "1c21749e-df7a-4fed-b3ab-921dce3bb124";
-  static objectIdWithRoleAssigments: string = "3aa76d8a-4145-40d1-89ca-b15bdb943bfd";
+  static objectIdWithRoleAssignments: string = "3aa76d8a-4145-40d1-89ca-b15bdb943bfd";
   static invalidAppId: string = "12345678-abcd-9876-fedc-0123456789ab";
 }
 
@@ -363,7 +363,7 @@ class RequestStub {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppId);
       }
       // by object id
-      if ((opts.url as string).indexOf(`id eq '${CommandActionParameters.objectIdWithRoleAssigments}'`) > -1) {
+      if ((opts.url as string).indexOf(`id eq '${CommandActionParameters.objectIdWithRoleAssignments}'`) > -1) {
         return Promise.resolve(ServicePrincipalCollections.ServicePrincipalByAppId);
       }
       // by display name
@@ -396,18 +396,8 @@ class RequestStub {
 describe(commands.APPROLEASSIGNMENT_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
-  let textOutput = [
-    {
-      "resourceDisplayName": "Microsoft Graph",
-      "roleName": "User.Read.All"
-    },
-    {
-      "resourceDisplayName": "Contoso Product Catalog service",
-      "roleName": "access_as_application"
-    }
-  ];
   let jsonOutput = [
     {
       "appRoleId": "df021288-bdef-4463-88db-98f22de89214",
@@ -436,9 +426,15 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -463,12 +459,16 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['resourceDisplayName', 'roleName']);
+  });
+
   it('retrieves App Role assignments for the specified displayName', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
     command.action(logger, { options: { output: 'json', displayName: CommandActionParameters.appNameWithRoleAssignments } }, () => {
       try {
-        assert(loggerSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -483,7 +483,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
 
     command.action(logger, { options: { output: 'json', appId: CommandActionParameters.appIdWithRoleAssignments } }, () => {
       try {
-        assert(loggerSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -497,7 +497,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
 
     command.action(logger, { options: { output: 'text', appId: CommandActionParameters.appIdWithRoleAssignments } }, () => {
       try {
-        assert(loggerSpy.calledWith(textOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -509,9 +509,9 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   it('retrieves App Role assignments for the specified objectId and outputs text', (done) => {
     sinon.stub(request, 'get').callsFake(RequestStub.retrieveAppRoles);
 
-    command.action(logger, { options: { output: 'text', objectId: CommandActionParameters.objectIdWithRoleAssigments } }, () => {
+    command.action(logger, { options: { output: 'text', objectId: CommandActionParameters.objectIdWithRoleAssignments } }, () => {
       try {
-        assert(loggerSpy.calledWith(textOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -594,7 +594,7 @@ describe(commands.APPROLEASSIGNMENT_LIST, () => {
   })
 
   it('fails validation if objectId and displayName are specified', () => {
-    const actual = command.validate({ options: { displayName: CommandActionParameters.appNameWithRoleAssignments, objectId: CommandActionParameters.objectIdWithRoleAssigments } });
+    const actual = command.validate({ options: { displayName: CommandActionParameters.appNameWithRoleAssignments, objectId: CommandActionParameters.objectIdWithRoleAssignments } });
     assert.notStrictEqual(actual, true);
   })
 

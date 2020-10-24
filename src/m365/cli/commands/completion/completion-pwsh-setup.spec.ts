@@ -16,7 +16,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   const completionScriptPath: string = path.resolve(__dirname, '..', '..', '..', '..', '..', 'scripts', 'Register-CLIM365Completion.ps1');
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -28,9 +28,15 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -82,7 +88,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
 
     command.action(logger, { options: { debug: true, profile: profilePath } }, () => {
       try {
-        assert(loggerSpy.calledWithExactly(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWithExactly(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -193,7 +199,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     const error: string = 'Unexpected error';
     sinon.stub(fs, 'existsSync').callsFake((path) => path.toString().indexOf('.ps1') < 0);
-    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake((path) => { throw error; });
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { throw error; });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
     command.action(logger, { options: { debug: false, profile: profilePath } } as any, (err?: any) => {

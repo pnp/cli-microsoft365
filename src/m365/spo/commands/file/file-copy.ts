@@ -99,7 +99,7 @@ class SpoFileCopyCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log('DONE');
+          logger.logToStderr('DONE');
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
@@ -139,7 +139,7 @@ class SpoFileCopyCommand extends SpoCommand {
         .getRequestDigest(targetFolderAbsoluteUrl)
         .then((contextResponse: ContextInfo): void => {
           if (this.debug) {
-            logger.log(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
+            logger.logToStderr(`contextResponse.WebFullUrl: ${contextResponse.WebFullUrl}`);
           }
 
           if (targetUrl.charAt(0) !== '/') {
@@ -172,8 +172,8 @@ class SpoFileCopyCommand extends SpoCommand {
               }
 
               if (this.debug) {
-                logger.log(`recycleFile error...`);
-                logger.log(err);
+                logger.logToStderr(`recycleFile error...`);
+                logger.logToStderr(err);
               }
 
               reject(err);

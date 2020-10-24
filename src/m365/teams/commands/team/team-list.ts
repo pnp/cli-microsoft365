@@ -54,7 +54,7 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
         logger.log(this.items);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

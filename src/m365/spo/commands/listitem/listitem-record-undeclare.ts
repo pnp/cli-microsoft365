@@ -55,7 +55,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
       }
 
       if (this.verbose) {
-        logger.log(`Getting list id...`);
+        logger.logToStderr(`Getting list id...`);
       }
       const listRequestOptions: any = {
         url: `${listRestUrl}/id`,
@@ -71,7 +71,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
         environmentListId = res.value;
 
         if (this.debug) {
-          logger.log(`getting request digest for request`);
+          logger.logToStderr(`getting request digest for request`);
         }
 
         return this.getRequestDigest(args.options.webUrl);
@@ -83,7 +83,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
       })
       .then((objectIdentity: IdentityResponse): Promise<void> => {
         if (this.verbose) {
-          logger.log(`Undeclare list item as a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+          logger.logToStderr(`Undeclare list item as a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
         const requestOptions: any = {

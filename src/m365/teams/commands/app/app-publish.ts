@@ -28,7 +28,7 @@ class TeamsAppPublishCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const fullPath: string = path.resolve(args.options.filePath);
     if (this.verbose) {
-      logger.log(`Adding app '${fullPath}' to app catalog...`);
+      logger.logToStderr(`Adding app '${fullPath}' to app catalog...`);
     }
 
     const requestOptions: any = {
@@ -48,7 +48,7 @@ class TeamsAppPublishCommand extends GraphCommand {
         }
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

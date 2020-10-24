@@ -25,9 +25,13 @@ class SpoPageListCommand extends SpoCommand {
     return 'Lists all modern pages in the given site';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Name', 'Title'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving client-side pages...`);
+      logger.logToStderr(`Retrieving client-side pages...`);
     }
 
     const requestOptions: any = {
@@ -43,21 +47,11 @@ class SpoPageListCommand extends SpoCommand {
       .then((res: { value: any[] }): void => {
         if (res.value && res.value.length > 0) {
           const clientSidePages: any[] = res.value.filter(p => p.ListItemAllFields.ClientSideApplicationId === 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec');
-          if (args.options.output === 'json') {
-            logger.log(clientSidePages);
-          }
-          else {
-            logger.log(clientSidePages.map(p => {
-              return {
-                Name: p.Name,
-                Title: p.Title
-              }
-            }));
-          }
+          logger.log(clientSidePages);
         }
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -12,7 +12,7 @@ const command: Command = require('./apppage-add');
 describe(commands.APPPAGE_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.APPPAGE_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -64,7 +70,7 @@ describe(commands.APPPAGE_ADD, () => {
 
     command.action(logger, { options: { debug: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } }, () => {
       try {
-        assert(loggerSpy.calledWith("Done"));
+        assert(loggerLogSpy.calledWith("Done"));
         done();
       }
       catch (e) {
@@ -85,7 +91,7 @@ describe(commands.APPPAGE_ADD, () => {
 
     command.action(logger, { options: { debug: true, addToQuickLaunch: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: JSON.stringify({}) } }, () => {
       try {
-        assert(loggerSpy.calledWith("Done"));
+        assert(loggerLogSpy.calledWith("Done"));
         done();
       }
       catch (e) {

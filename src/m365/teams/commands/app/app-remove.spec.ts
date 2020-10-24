@@ -13,7 +13,7 @@ const command: Command = require('./app-remove');
 describe(commands.TEAMS_APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let requests: any[];
 
   before(() => {
@@ -27,10 +27,16 @@ describe(commands.TEAMS_APP_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
     requests = [];
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -110,7 +116,7 @@ describe(commands.TEAMS_APP_REMOVE, () => {
     command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true } }, () => {
       try {
         assert(removeTeamsAppCalled);
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       } catch (e) {
         done(e);

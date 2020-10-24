@@ -22,6 +22,10 @@ class YammerMessageGetCommand extends YammerCommand {
     return 'Returns a Yammer message';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'sender_id', 'replied_to_id', 'thread_id', 'group_id', 'created_at', 'direct_message', 'system_message', 'privacy', 'message_type', 'content_excerpt'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${this.resource}/v1/messages/${args.options.id}.json`,
@@ -35,24 +39,7 @@ class YammerMessageGetCommand extends YammerCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        if (args.options.output === 'json') {
-          logger.log(res);
-        }
-        else {
-          logger.log({
-            id: res.id,
-            sender_id: res.sender_id,
-            replied_to_id: res.replied_to_id,
-            thread_id: res.thread_id,
-            group_id: res.group_id,
-            created_at: res.created_at,
-            direct_message: res.direct_message,
-            system_message: res.system_message,
-            privacy: res.privacy,
-            message_type: res.message_type,
-            content_excerpt: res.content_excerpt
-          });
-        }
+        logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

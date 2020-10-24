@@ -39,7 +39,7 @@ class SpoUserRemoveCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeUser = (): void => {
       if (this.verbose) {
-        logger.log(`Removing user from  subsite ${args.options.webUrl} ...`);
+        logger.logToStderr(`Removing user from  subsite ${args.options.webUrl} ...`);
       }
 
       let requestUrl: string = '';
@@ -64,7 +64,7 @@ class SpoUserRemoveCommand extends SpoCommand {
         .post(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

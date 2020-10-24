@@ -13,7 +13,7 @@ describe(commands.USER_REMOVE, () => {
   let log: any[];
   let requests: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -27,10 +27,16 @@ describe(commands.USER_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
     requests = [];
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     promptOptions = undefined;
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
@@ -315,7 +321,7 @@ describe(commands.USER_REMOVE, () => {
       });
       try {
         assert(correctRequestIssued);
-        assert(loggerSpy.calledWith(sinon.match('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(sinon.match('DONE')));
         done();
       }
       catch (e) {

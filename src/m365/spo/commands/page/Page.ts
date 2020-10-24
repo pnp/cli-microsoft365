@@ -8,7 +8,7 @@ export class Page {
   public static getPage(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
     return new Promise((resolve: (page: ClientSidePage) => void, reject: (error: any) => void): void => {
       if (verbose) {
-        logger.log(`Retrieving information about the page...`);
+        logger.logToStderr(`Retrieving information about the page...`);
       }
 
       let pageName: string = name;

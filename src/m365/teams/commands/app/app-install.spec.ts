@@ -12,7 +12,8 @@ const command: Command = require('./app-install');
 describe(commands.TEAMS_APP_INSTALL, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +26,16 @@ describe(commands.TEAMS_APP_INSTALL, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -100,7 +108,7 @@ describe(commands.TEAMS_APP_INSTALL, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -127,7 +135,7 @@ describe(commands.TEAMS_APP_INSTALL, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.called);
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

@@ -47,7 +47,7 @@ class SpoFolderRenameCommand extends SpoCommand {
       })
       .then((folderObjectIdentity: IdentityResponse): Promise<void> => {
         if (this.verbose) {
-          logger.log(`Renaming folder ${args.options.folderUrl} to ${args.options.name}`);
+          logger.logToStderr(`Renaming folder ${args.options.folderUrl} to ${args.options.name}`);
         }
 
         const serverRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
@@ -76,7 +76,7 @@ class SpoFolderRenameCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log('DONE');
+          logger.logToStderr('DONE');
         }
 
         cb();

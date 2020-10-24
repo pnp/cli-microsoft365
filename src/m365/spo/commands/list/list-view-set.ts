@@ -71,7 +71,7 @@ class SpoListViewSetCommand extends SpoCommand {
         // request doesn't return any content
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

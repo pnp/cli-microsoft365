@@ -33,7 +33,7 @@ class AadGroupSettingSetCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving group setting with id '${args.options.id}'...`);
+      logger.logToStderr(`Retrieving group setting with id '${args.options.id}'...`);
     }
 
     const requestOptions: any = {
@@ -65,7 +65,7 @@ class AadGroupSettingSetCommand extends GraphCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

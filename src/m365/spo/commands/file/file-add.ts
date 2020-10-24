@@ -97,16 +97,16 @@ class SpoFileAddCommand extends SpoCommand {
     let listSettings: ListSettings;
 
     if (this.debug) {
-      logger.log(`folder path: ${folderPath}...`);
+      logger.logToStderr(`folder path: ${folderPath}...`);
     }
 
     if (this.debug) {
-      logger.log('Check if the specified folder exists.')
-      logger.log('');
+      logger.logToStderr('Check if the specified folder exists.')
+      logger.logToStderr('');
     }
 
     if (this.debug) {
-      logger.log(`file name: ${fileName}...`);
+      logger.logToStderr(`file name: ${fileName}...`);
     }
 
     const requestOptions: any = {
@@ -139,20 +139,20 @@ class SpoFileAddCommand extends SpoCommand {
       })
       .then((): Promise<void> => {
         if (this.verbose) {
-          logger.log(`Upload file to site ${args.options.webUrl}...`);
+          logger.logToStderr(`Upload file to site ${args.options.webUrl}...`);
         }
 
         const fileStats: fs.Stats = fs.statSync(fullPath);
         const fileSize: number = fileStats.size;
         if (this.debug) {
-          logger.log(`File size is ${fileSize} bytes`);
+          logger.logToStderr(`File size is ${fileSize} bytes`);
         }
 
         // only up to 250 MB are allowed in a single request
         if (fileSize > this.fileChunkingThreshold) {
           const fileChunkCount: number = Math.ceil(fileSize / this.fileChunkSize);
           if (this.verbose) {
-            logger.log(`Uploading ${fileSize} bytes in ${fileChunkCount} chunks...`);
+            logger.logToStderr(`Uploading ${fileSize} bytes in ${fileChunkCount} chunks...`);
           }
 
           // initiate chunked upload session
@@ -184,13 +184,13 @@ class SpoFileAddCommand extends SpoCommand {
               })
                 .then((): Promise<void> => {
                   if (this.verbose) {
-                    logger.log(`Finished uploading ${fileUploadInfo.Position} bytes in ${fileChunkCount} chunks`)
+                    logger.logToStderr(`Finished uploading ${fileUploadInfo.Position} bytes in ${fileChunkCount} chunks`)
                   }
                   return Promise.resolve();
                 })
                 .catch((err: any) => {
                   if (this.verbose) {
-                    logger.log('Cancelling upload session due to error...')
+                    logger.logToStderr('Cancelling upload session due to error...')
                   }
 
                   const requestOptions: any = {
@@ -207,7 +207,7 @@ class SpoFileAddCommand extends SpoCommand {
                     })
                     .catch((err_: any) => {
                       if (this.debug) {
-                        logger.log(`Failed to cancel upload session: ${err_}`);
+                        logger.logToStderr(`Failed to cancel upload session: ${err_}`);
                       }
                       return Promise.reject(err);  // original error
                     });
@@ -275,7 +275,7 @@ class SpoFileAddCommand extends SpoCommand {
         // so then no need to publish afterwards
         if (args.options.approve) {
           if (this.verbose) {
-            logger.log(`Approve file ${fileName}`);
+            logger.logToStderr(`Approve file ${fileName}`);
           }
 
           // approve the existing file with given comment
@@ -295,7 +295,7 @@ class SpoFileAddCommand extends SpoCommand {
           }
 
           if (this.verbose) {
-            logger.log(`Publish file ${fileName}`);
+            logger.logToStderr(`Publish file ${fileName}`);
           }
 
           // publish the existing file with given comment
@@ -314,7 +314,7 @@ class SpoFileAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log('DONE');
+          logger.logToStderr('DONE');
         }
 
         cb();
@@ -331,9 +331,9 @@ class SpoFileAddCommand extends SpoCommand {
             .then(_ => this.handleRejectedODataJsonPromise(err, logger, cb))
             .catch(checkoutError => {
               if (this.verbose) {
-                logger.log('Could not rollback file checkout');
-                logger.log(checkoutError);
-                logger.log('');
+                logger.logToStderr('Could not rollback file checkout');
+                logger.logToStderr(checkoutError);
+                logger.logToStderr('');
               }
 
               this.handleRejectedODataJsonPromise(err, logger, cb);
@@ -416,7 +416,7 @@ class SpoFileAddCommand extends SpoCommand {
 
   private listHasContentType(contentType: string, webUrl: string, listSettings: ListSettings, logger: any): Promise<void> {
     if (this.verbose) {
-      logger.log(`Getting list of available content types ...`);
+      logger.logToStderr(`Getting list of available content types ...`);
     }
 
     const requestOptions: any = {
@@ -489,7 +489,7 @@ class SpoFileAddCommand extends SpoCommand {
         .post<void>(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            logger.log(`Uploaded ${info.Position} of ${info.Size} bytes (${Math.round(100 * info.Position / info.Size)}%)`);
+            logger.logToStderr(`Uploaded ${info.Position} of ${info.Size} bytes (${Math.round(100 * info.Position / info.Size)}%)`);
           }
 
           if (isLastChunk) {
@@ -502,7 +502,7 @@ class SpoFileAddCommand extends SpoCommand {
         .catch((err: any) => {
           if (--info.RetriesLeft > 0) {
             if (this.verbose) {
-              logger.log(`Retrying to upload chunk due to error: ${err}`);
+              logger.logToStderr(`Retrying to upload chunk due to error: ${err}`);
             }
             info.Position -= readCount;  // rewind
             this.uploadFileChunks(info, logger, resolve, reject);
@@ -523,7 +523,7 @@ class SpoFileAddCommand extends SpoCommand {
 
       if (--info.RetriesLeft > 0) {
         if (this.verbose) {
-          logger.log(`Retrying to read chunk due to error: ${err}`);
+          logger.logToStderr(`Retrying to read chunk due to error: ${err}`);
         }
         this.uploadFileChunks(info, logger, resolve, reject);
       }
@@ -535,7 +535,7 @@ class SpoFileAddCommand extends SpoCommand {
 
   private getFileParentList(fileName: string, webUrl: string, folder: string, logger: any): Promise<ListSettings> {
     if (this.verbose) {
-      logger.log(`Getting list details in order to get its available content types afterwards...`);
+      logger.logToStderr(`Getting list details in order to get its available content types afterwards...`);
     }
 
     const requestOptions: any = {
@@ -551,7 +551,7 @@ class SpoFileAddCommand extends SpoCommand {
 
   private validateUpdateListItem(webUrl: string, folderPath: string, fileName: string, fieldsToUpdate: FieldValue[], logger: any, checkInComment?: string): Promise<void> {
     if (this.verbose) {
-      logger.log(`Validate and update list item values for file ${fileName}`);
+      logger.logToStderr(`Validate and update list item values for file ${fileName}`);
     }
 
     const requestBody: any = {
@@ -561,8 +561,8 @@ class SpoFileAddCommand extends SpoCommand {
     };
 
     if (this.debug) {
-      logger.log('ValidateUpdateListItem will perform the checkin ...');
-      logger.log('');
+      logger.logToStderr('ValidateUpdateListItem will perform the checkin ...');
+      logger.logToStderr('');
     }
 
     // update the existing file list item fields
