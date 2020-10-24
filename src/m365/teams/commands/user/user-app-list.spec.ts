@@ -109,7 +109,7 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
 
   it('list apps from the catalog for the specified user (userId)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
+      if (opts.url === `https://graph.microsoft.com/beta/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
         return Promise.resolve({
           "value": [
             {
@@ -151,7 +151,7 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
 
   it('list apps from the catalog for the specified user (userName)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
+      if (opts.url === `https://graph.microsoft.com/beta/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
         return Promise.resolve({
           "value": [
             {
@@ -197,7 +197,7 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
 
   it('list apps from the catalog for the specified user (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
+      if (opts.url === `https://graph.microsoft.com/beta/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
         return Promise.resolve({
           "value": [
             {
@@ -240,7 +240,7 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
 
   it('list apps from the catalog for the specified user (json)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
+      if (opts.url === `https://graph.microsoft.com/beta/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
         return Promise.resolve({
           "value": [
             {
