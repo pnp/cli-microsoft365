@@ -2,9 +2,11 @@ import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
+import { Team } from '../../Team';
 import { TeamsApp } from '../../TeamsApp';
 import { TeamsAppInstallation } from '../../TeamsAppInstallation';
 
@@ -15,6 +17,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   all?: boolean;
   teamId?: string;
+  teamName?: string;
 }
 
 class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
@@ -30,34 +33,80 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.all = args.options.all || false;
     telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
+    telemetryProps.teamName = typeof args.options.teamName !== 'undefined';
     return telemetryProps;
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let endpoint: string = '';
+  private getTeamId(args: CommandArgs): Promise<string> {
     if (args.options.teamId) {
-      endpoint = `${this.resource}/v1.0/teams/${encodeURIComponent(args.options.teamId)}/installedApps?$expand=teamsApp`;
-
-      if (!args.options.all) {
-        endpoint += `&$filter=teamsApp/distributionMethod eq 'organization'`;
-      }
-    }
-    else {
-      endpoint = `${this.resource}/v1.0/appCatalogs/teamsApps`;
-
-      if (!args.options.all) {
-        endpoint += `?$filter=distributionMethod eq 'organization'`;
-      }
+      return Promise.resolve(args.options.teamId);
     }
 
+    const teamRequestOptions: any = {
+      url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    return request
+      .get<{ value: Team[] }>(teamRequestOptions)
+      .then(response => {
+        const teamItem: Team | undefined = response.value[0];
+
+        if (!teamItem) {
+          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
+        }
+
+        if (response.value.length > 1) {
+          return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
+        }
+
+        return Promise.resolve(teamItem.id);
+      });
+  }
+
+  private getEndpointUrl(args: CommandArgs): Promise<string> {
+    return new Promise<string>((resolve: (endpoint: string) => void, reject: (error: string) => void): void => {
+      if (args.options.teamId || args.options.teamName) {
+        this
+          .getTeamId(args)
+          .then((teamId: string): void => {
+            let endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/installedApps?$expand=teamsApp`;
+
+            if (!args.options.all) {
+              endpoint += `&$filter=teamsApp/distributionMethod eq 'organization'`;
+            }
+
+            return resolve(endpoint);
+          })
+          .catch((err: any) => {
+            reject(err);
+          });
+      }
+      else {
+        let endpoint: string = `${this.resource}/v1.0/appCatalogs/teamsApps`;
+
+        if (!args.options.all) {
+          endpoint += `?$filter=distributionMethod eq 'organization'`;
+        }
+
+        return resolve(endpoint);
+      }
+    });
+  }
+
+  public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
-      .getAllItems(endpoint, logger, true)
+      .getEndpointUrl(args)
+      .then((endpoint: string): Promise<void> => this.getAllItems(endpoint, logger, true))
       .then((): void => {
         if (args.options.output === 'json') {
           logger.log(this.items);
         }
         else {
-          if (args.options.teamId) {
+          if (args.options.teamId || args.options.teamName) {
             logger.log((this.items as unknown as TeamsAppInstallation[]).map(i => {
               return {
                 id: i.id,
@@ -82,7 +131,7 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
         }
 
         cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -93,7 +142,11 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
       },
       {
         option: '-i, --teamId [teamId]',
-        description: 'The ID of the team for which to list installed apps'
+        description: 'The ID of the team for which to list installed apps. Specify either teamId or teamName but not both'
+      },
+      {
+        option: '-t --teamName [teamName]',
+        description: 'The display name of the team for which to list installed apps. Specify either teamId or teamName but not both'
       }
     ];
 
@@ -102,6 +155,10 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
   }
 
   public validate(args: CommandArgs): boolean | string {
+    if (args.options.teamId && args.options.teamName) {
+      return 'Specify either teamId or teamName, but not both.';
+    }
+
     if (args.options.teamId && !Utils.isValidGuid(args.options.teamId)) {
       return `${args.options.teamId} is not a valid GUID`;
     }
