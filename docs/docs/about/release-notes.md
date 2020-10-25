@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Power Automate:**
+
+- [flow run cancel](../cmd/flow/run/run-cancel.md) - cancels the specified Microsoft Flow [#1870](https://github.com/pnp/cli-microsoft365/issues/1870)
+
 **SharePoint:**
 
 - [spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md) - restores the specified deleted Site Collection from Tenant Recycle Bin [#1362](https://github.com/pnp/cli-microsoft365/issues/1362)

@@ -11,6 +11,7 @@ export default {
   FLOW_GET: `${prefix} get`,
   FLOW_LIST: `${prefix} list`,
   FLOW_REMOVE: `${prefix} remove`,
+  FLOW_RUN_CANCEL: `${prefix} run cancel`,
   FLOW_RUN_GET: `${prefix} run get`,
   FLOW_RUN_LIST: `${prefix} run list`
 };

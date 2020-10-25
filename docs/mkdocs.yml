@@ -85,6 +85,7 @@ nav:
         - environment get: 'cmd/flow/environment/environment-get.md'
         - environment list: 'cmd/flow/environment/environment-list.md'
       - run:
+        - run cancel: 'cmd/flow/run/run-cancel.md'
         - run get: 'cmd/flow/run/run-get.md'
         - run list: 'cmd/flow/run/run-list.md'
     - Microsoft Graph (graph):
