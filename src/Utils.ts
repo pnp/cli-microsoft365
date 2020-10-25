@@ -56,6 +56,12 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
+  public static isValidFlowRunId(guid: string): boolean {
+    const guidRegEx: RegExp = new RegExp(/^[0-9A-Z]{34}$/i);
+    
+    return guidRegEx.test(guid);
+  }
+
   public static isDateInRange(date: string, monthOffset: number): boolean {
     const d: Date = new Date(date);
     let cutoffDate: Date = new Date();
