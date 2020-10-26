@@ -3,6 +3,9 @@ import commands from '../../commands';
 import SpoCommand from '../../../base/SpoCommand';
 import GlobalOptions from '../../../../GlobalOptions';
 import { CommandOption, CommandCancel, CommandValidate } from '../../../../Command';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
+import config from '../../../../config';
+import { SpoOperation } from '../site/SpoOperation';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -16,15 +19,11 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-interface RestSpoOperation {
-  HasTimedout: boolean;
-  IsComplete: boolean;
-  PollingInterval: number;
-}
-
 class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
+  private context?: FormDigestInfo;
+  private spoAdminUrl?: string;
+  private dots?: string;
   private timeout?: NodeJS.Timer;
-  private readonly maxAttempts: number = 5;
 
   public get name(): string {
     return commands.TENANT_RECYCLEBINITEM_REMOVE;
@@ -43,39 +42,51 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: (err?: any) => void): void {
-    const wait: boolean = args.options.wait || false;
-    let spoAdminUrl: string;
 
     const removeDeletedSite = () => {
       this.getSpoAdminUrl(cmd, this.debug)
-      .then((adminUrl: string): Promise<RestSpoOperation> => {
-        spoAdminUrl = adminUrl;
-        return this.removeDeletedSite(args.options.url, spoAdminUrl, cmd);
-      })
-      .then((response: RestSpoOperation): Promise<void> => {
-        if (!response.HasTimedout && response.IsComplete) {
-          if (this.verbose) {
-            cmd.log('site collection removed');
-          }
+      .then((adminUrl: string): Promise<FormDigestInfo> => {
+        this.spoAdminUrl = adminUrl;
 
-          return Promise.resolve();
+        return this.ensureFormDigest(this.spoAdminUrl, cmd, this.context, this.debug);
+      })
+      .then((res: FormDigestInfo): Promise<string> => {
+        this.context = res;
+  
+        if (this.verbose) {
+          cmd.log(`Removing deleted site collection ${args.options.url}...`);
         }
-        else if (wait) {
-          return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-            this.waitForRemoveDeletedSite(
-              cmd,
-              this,
-              spoAdminUrl,
-              args.options.url,
-              resolve,
-              reject,
-              0
-            );
-          });
-        }
-        else {
-          return Promise.reject('site collection has not been removed');
-        }
+  
+        const requestOptions: any = {
+          url: `${this.spoAdminUrl as string}/_vti_bin/client.svc/ProcessQuery`,
+          headers: {
+            'X-RequestDigest': this.context.FormDigestValue
+          },
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="16" ObjectPathId="15" /><Query Id="17" ObjectPathId="15"><Query SelectAllProperties="false"><Properties><Property Name="PollingInterval" ScalarProperty="true" /><Property Name="IsComplete" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="15" ParentId="1" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${args.options.url}</Parameter></Parameters></Method><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+        };
+  
+        return request.post(requestOptions);
+      })
+      .then((res: string): Promise<void> => {
+        return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+          const json: ClientSvcResponse = JSON.parse(res);
+          const response: ClientSvcResponseContents = json[0];
+          if (response.ErrorInfo) {
+            reject(response.ErrorInfo.ErrorMessage);
+          }
+          else {
+            const operation: SpoOperation = json[json.length - 1];
+            let isComplete: boolean = operation.IsComplete;
+            if (!args.options.wait || isComplete) {
+              resolve();
+              return;
+            }
+  
+            this.timeout = setTimeout(() => {
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, cmd, this.context as FormDigestInfo, this.dots, this.timeout);
+            }, operation.PollingInterval);
+          }
+        });
       })
       .then(() => {
         if (this.verbose) {
@@ -112,56 +123,6 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
         clearTimeout(this.timeout);
       }
     }
-  }
-
-  private waitForRemoveDeletedSite(cmd: CommandInstance, command: SpoTenantRecycleBinItemRemoveCommand, spoAdminUrl: string, siteToRemoveUrl: string, resolve: () => void, reject: (error: any) => void, iteration: number): void {
-    iteration++;
-
-    new Promise((): Promise<void> => {
-      return this.removeDeletedSite(siteToRemoveUrl, spoAdminUrl, cmd)
-      .then((respRetry: RestSpoOperation) => {
-        if (!respRetry.HasTimedout && respRetry.IsComplete) {
-          if (this.verbose) {
-            cmd.log('site collection removed');
-          }
-
-          resolve();
-          return;
-        }
-        else if (respRetry.HasTimedout || iteration > this.maxAttempts) {
-          reject('Operation timeout');
-        }
-        else {
-          command.timeout = setTimeout(() => {
-            command.waitForRemoveDeletedSite(cmd, command, spoAdminUrl, siteToRemoveUrl, resolve, reject, iteration);
-          }, respRetry.PollingInterval);
-        }
-      })
-      .catch((err) => {
-        cmd.log('site collection has not been removed');
-        reject(err);
-      });
-    });
-  }
-
-  private removeDeletedSite(siteToRemoveUrl: string, spoAdminUrl: string, cmd: CommandInstance): Promise<RestSpoOperation> {
-    if (this.verbose) {
-      cmd.log(`Removing site collection ${siteToRemoveUrl} from the recycle bin...`);
-    }
-
-    const requestOptions: any = {
-      url: `${spoAdminUrl}/_api/Microsoft.Online.SharePoint.TenantAdministration.Tenant/RemoveDeletedSite`,
-      headers: {
-        accept: 'application/json;odata=nometadata',
-        'content-type': 'application/json;odata=nometadata',
-      },
-      body: {
-        siteUrl: siteToRemoveUrl
-      },
-      json: true
-    };
-
-    return request.post(requestOptions);
   }
 
   public options(): CommandOption[] {
