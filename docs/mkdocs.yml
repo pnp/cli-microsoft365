@@ -522,6 +522,7 @@ nav:
   - Sample Scripts:
     - 'Introduction': 'sample-scripts/index.md'
     - Azure Active Directory:
+      - 'Analyze User Profile Photos using Azure Computer Vision API' : 'sample-scripts/aad/analyze-user-profile-photos.md'
       - 'Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups' : 'sample-scripts/aad/manage-group-users.md'
       - 'Delete all Microsoft 365 groups' : 'sample-scripts/aad/delete-m365-groups.md'
       - 'Scan for Microsoft 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
