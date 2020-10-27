@@ -4,9 +4,14 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad approleassignment remove](../cmd/aad/approleassignment/approleassignment-remove.md) - deletes an app role assignment for the specified Azure AD Application Registration [#1872](https://github.com/pnp/cli-microsoft365/issues/1872)
+
 **Microsoft Teams:**
 
 - [teams tab get](../cmd/teams/tab/tab-get.md) - gets information about the specified Microsoft Teams tab [#1804](https://github.com/pnp/cli-microsoft365/issues/1804)
+- [teams user app list](../cmd/teams/user/user-app-list.md) - lists the apps installed in the personal scope of the specified user [#1866](https://github.com/pnp/cli-microsoft365/issues/1866)
 
 **SharePoint:**
 
@@ -25,6 +30,8 @@
 - added the 'Deploy a Microsoft Teams personal app and add it to users' sample script [#1867](https://github.com/pnp/cli-microsoft365/pull/1867)
 - added Teams scope to the list of default permissions in the docs [#1860](https://github.com/pnp/cli-microsoft365/issues/1860)
 - updated 'aad approleassignment add' to use Microsoft Graph [#1858](https://github.com/pnp/cli-microsoft365/issues/1858)
+- added the 'Removes Microsoft Teams personal app from users and Microsoft Teams app catalog' sample script [#1883](https://github.com/pnp/cli-microsoft365/pull/1883)
+- extended 'teams app list' with support for using Team's name [#1861](https://github.com/pnp/cli-microsoft365/issues/1861)
 
 ## [v3.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.1.0)
 
