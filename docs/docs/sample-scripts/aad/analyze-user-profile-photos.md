@@ -26,48 +26,51 @@ There is no better time than the present to get your profile photo game on point
 $resultDir = "Output"
 $azureVisionApiInstance = "azure-vision-api-instance-name"
 $azureVisionApiKey = "azure-vision-api-key"
+
 $photoRequirements = @{
-    requirePortrait   = $false
+    requirePortrait   = $false 
     allowClipart      = $true
     allowLinedrawing  = $true
     allowAdult        = $false
     allowRacy         = $false
     allowGory         = $false
-    $photoRequirements = @{
-    requirePortrait   = $false
-    allowClipart      = $true
-    allowLinedrawing  = $true
-    allowAdult        = $false
-    allowRacy         = $false
-    allowGory         = $false
-    forbiddenKeywords = @("cartoon", `
-            "animal", `
-            "nude", `
-            "child", `
-            "people", `
-            "group", `
-            "family", `
-            "several", `
-            "crowd", `
-            "food", `
-            "restaurant", `
-            "train", `
-            "bus", `
-            "car", `
-            "airplane", `
-            "vehicle", `
-            "platform", `
-            "station", `
-            "standing", `
-            "flying", `
-            "suitcase", `
-            "screenshot", `
-            "newspaper", `
-            "typography", `
-            "font", `
-            "document", `
-            "sport")
+    photoRequirements = @{
+        requirePortrait   = $false
+        allowClipart      = $true
+        allowLinedrawing  = $true
+        allowAdult        = $false
+        allowRacy         = $false
+        allowGory         = $false
+        forbiddenKeywords = @("cartoon", `
+                "animal", `
+                "nude", `
+                "child", `
+                "people", `
+                "group", `
+                "family", `
+                "several", `
+                "crowd", `
+                "food", `
+                "restaurant", `
+                "train", `
+                "bus", `
+                "car", `
+                "airplane", `
+                "vehicle", `
+                "platform", `
+                "station", `
+                "standing", `
+                "flying", `
+                "suitcase", `
+                "screenshot", `
+                "newspaper", `
+                "typography", `
+                "font", `
+                "document", `
+                "sport")
+    }
 }
+
 $requiredProfileProperties = "id,displayName,mail"
 $global:analysisOutcomes = @()
 
@@ -79,6 +82,7 @@ if (-not (Test-Path -Path "$outputDir" -PathType Container)) {
     Write-Host "Creating $outputDir folder..."
     New-Item -ItemType Directory -Path "$outputDir"
 }
+
 function AddAnalysisOutcome {
     param (
         [Parameter(Mandatory = $false)] [string] $UserId,
@@ -124,7 +128,7 @@ foreach ($user in $users) {
         $userMail = $user.mail
 
         try {
-            $token = m365 util accesstoken get --resource https://graph.microsoft.com --new
+            $token = m365 util accesstoken get --resource https: / / graph.microsoft.com --new
 
             try {
                 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
