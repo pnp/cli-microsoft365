@@ -28,7 +28,7 @@ $azureVisionApiInstance = "azure-vision-api-instance-name"
 $azureVisionApiKey = "azure-vision-api-key"
 
 $photoRequirements = @{
-    requirePortrait   = $false 
+    requirePortrait   = $false
     allowClipart      = $true
     allowLinedrawing  = $true
     allowAdult        = $false
@@ -128,7 +128,7 @@ foreach ($user in $users) {
         $userMail = $user.mail
 
         try {
-            $token = m365 util accesstoken get --resource https: / / graph.microsoft.com --new
+            $token = m365 util accesstoken get --resource https://graph.microsoft.com --new
 
             try {
                 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
