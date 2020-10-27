@@ -97,6 +97,7 @@ export interface Options extends GlobalOptions {
   ExcludedFileExtensionsForSyncClient: string[];
   AllowedDomainListForSyncClient: string[];
   DisabledWebPartIds: string[];
+  DisableCustomAppAuthentication: boolean;
 }
 
 class SpoTenantSettingsSetCommand extends SpoCommand {
@@ -191,6 +192,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     telemetryProps.ExcludedFileExtensionsForSyncClient = (!(!args.options.ExcludedFileExtensionsForSyncClient)).toString();
     telemetryProps.DisabledWebPartIds = (!(!args.options.DisabledWebPartIds)).toString();
     telemetryProps.AllowedDomainListForSyncClient = (!(!args.options.AllowedDomainListForSyncClient)).toString();
+    telemetryProps.DisableCustomAppAuthentication = (!(!args.options.DisableCustomAppAuthentication)).toString();
     return telemetryProps;
   }
 
@@ -676,6 +678,11 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       {
         option: '--DisabledWebPartIds [DisabledWebPartIds]',
         description: 'Sets disabled web part Ids. Array of GUIDs split by comma (\',\'). Example:c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201'
+      },
+      {
+        option: '--DisableCustomAppAuthentication [DisableCustomAppAuthentication]',
+        description: 'Configure if ACS-based app-only auth should be disabled or not.  Allowed values true|false',
+        autocomplete: ['true', 'false']
       }
     ];
 
