@@ -717,7 +717,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     // prop keys since they are nullable
     // so we have to maintain that array bellow once new global option
     // is added to the GlobalOptions interface
-    return ['output', 'debug', 'verbose'].indexOf(optionKey) > -1;
+    return ['output', 'o', 'debug', 'verbose', '_', 'query'].indexOf(optionKey) > -1;
   }
 
   public mapEnumToInt(key: string, value: string): number {
