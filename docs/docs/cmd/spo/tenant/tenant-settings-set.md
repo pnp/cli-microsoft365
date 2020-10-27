@@ -268,6 +268,9 @@ m365 spo tenant settings set [options]
 `--DisabledWebPartIds [DisabledWebPartIds]`
 : Sets disabled web part Ids. Array of GUIDs split by comma (\',\'). Example:c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201'
 
+`--DisableCustomAppAuthentication [DisableCustomAppAuthentication]`
+: Configure if ACS-based app-only auth should be disabled or not. Allowed values `true,false`
+
 !!! important
     To use this command you have to have permissions to access the tenant admin site.
 
