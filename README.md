@@ -1,63 +1,216 @@
-<img src="./docs/docs/images/pnp-cli-microsoft365-blue.svg" alt="CLI for Microsoft 365" height=78 />
+<h1 align="center">
+  <a href="https://pnp.github.io/cli-microsoft365">
+    <img alt="CLI for Microsoft 365" src="./docs/docs/images/pnp-cli-microsoft365-blue.svg" height="78">
+  </a>
+  <br>CLI for Microsoft 365<br>
+</h1>
 
-@latest/@next (master) |
-:--------------: |
-[![CircleCI](https://circleci.com/gh/pnp/cli-microsoft365/tree/master.svg?style=shield&circle-token=ce99e8046a231e1959248a61e7e32f9ae1abc8cf)](https://circleci.com/gh/pnp/cli-microsoft365/tree/master)|
-[![Coverage Status](https://coveralls.io/repos/github/pnp/cli-microsoft365/badge.svg?branch=master)](https://coveralls.io/github/pnp/cli-microsoft365?branch=master)|
+<h4 align="center">
+  One CLI for Microsoft 365
+</h4>
 
-# CLI for Microsoft 365
+<p align="center">
+  <a href="https://app.circleci.com/pipelines/github/pnp/cli-microsoft365">
+    <img src="https://img.shields.io/circleci/build/github/pnp/cli-microsoft365/master?style=flat-square&token=PkAaAAWBp9rNYBYhA5YiBhezydqwgFKhm"
+      alt="CircleCI" />
+  </a>
+  
+  <a href="https://coveralls.io/github/pnp/cli-microsoft365?branch=master">
+    <img src="https://img.shields.io/coveralls/github/pnp/cli-microsoft365/master?style=flat-square"
+      alt="Coveralls"/>
+  </a>
 
-Using CLI for Microsoft 365, you can manage your Microsoft 365 tenant and SharePoint Framework projects on any platform. No matter if you are on Windows, macOS or Linux, using Bash, Cmder or PowerShell, using CLI for Microsoft 365 you can configure Microsoft 365, manage SharePoint Framework projects and build automation scripts.
+  <a href="https://twitter.com/climicrosoft365">
+    <img src="https://img.shields.io/badge/Twitter-%40climicrosoft365-blue?style=flat-square"
+      alt="Twitter" />
+  </a>
+</p>
 
-[![asciicast](https://asciinema.org/a/346365.png)](https://asciinema.org/a/346365)
+<p align="center">
+  <a href="https://www.npmjs.com/package/@pnp/cli-microsoft365">
+    <img src="https://img.shields.io/npm/v/@pnp/cli-microsoft365/latest?style=flat-square"
+      alt="npm @pnp/cli-microsoft365@latest" />
+  </a>
+  
+  <a href="https://www.npmjs.com/package/@pnp/cli-microsoft365">
+    <img src="https://img.shields.io/npm/v/@pnp/cli-microsoft365/next?style=flat-square"
+      alt="npm @pnp/cli-microsoft365@next" />
+  </a>
+</p>
 
-## Installation
+<p align="center">CLI for Microsoft 365 helps you manage your Microsoft 365 tenant and SharePoint Framework projects.</p>
 
-CLI for Microsoft 365 is distributed as an NPM package. To use it, install it globally using:
+<p align="center">
+  <a href="https://pnp.github.io/cli-microsoft365">Website</a> | 
+  <a href="#features">Features</a> |
+  <a href="#install">Install</a> | 
+  <a href="#usage">Usage</a> | 
+  <a href="#build">Build</a> | 
+  <a href="#contribute">Contribute</a>
+</p>
+<p align="center">
+  <a href="#sharing-is-caring">Sharing is Caring</a> |
+  <a href="#code-of-conduct">Code of Conduct</a> | 
+  <a href="#disclaimer">Disclaimer</a>
+</p>
 
-```sh
-npm i -g @pnp/cli-microsoft365
+<p align="center">
+  <img alt="CLI for Microsoft 365" src="./docs/docs/images/cli-microsoft365.gif" height="500" />
+</p>
+
+## Features
+
+- Run on any OS
+  - Linux
+  - MacOS
+  - Windows
+- Run on any shell
+  - Azure Cloud Shell
+  - bash
+  - cmder
+  - PowerShell
+  - zsh
+- Unified login
+  - Access all your Microsoft 365 workloads
+- Supported workloads
+  - Azure Active Directory
+  - Microsoft Teams
+  - Microsoft To Do
+  - OneDrive
+  - Outlook
+  - Planner
+  - Power Automate
+  - Power Apps
+  - Skype for Business
+  - SharePoint Online
+  - Yammer
+- Supported authentication methods
+  - Azure Managed Identity
+  - Certificate
+  - Device Code
+  - Username and Password
+- Manage your SharePoint Framework projects
+  - Uprade your projects
+  - Check your environment compatibility
+
+> Follow our [Twitter](https://twitter.com/climicrosoft365) account to keep yourself updated about new features, improvements, and bug fixes.
+
+## Install
+
+To install this CLI, you will need [`node`](https://nodejs.org) `>= 8.0.0` installed.
+
+```
+npm install -g @pnp/cli-microsoft365
 ```
 
-or using yarn:
+<details>
+  <summary>Install beta version</summary>
 
-```sh
-yarn global add @pnp/cli-microsoft365
-```
+  ```
+  npm install -g @pnp/cli-microsoft365@next
+  ```
+</details>
 
-The beta version of CLI for Microsoft 365 can be installed by using the `@next` tag:
+<details>
+  <summary>Alternate package managers</summary>
 
-```sh
-npm i -g @pnp/cli-microsoft365@next
-```
+  ### yarn
 
-## Getting started
+  ```
+  yarn global add @pnp/cli-microsoft365
+  ```
 
-Start managing the settings of your Microsoft 365 tenant by logging in to it, using the `login` command, for example:
+  ### npx
+
+  ```
+  npx @pnp/cli-microsoft365
+  ```
+</details>
+
+## Usage
+
+Use the `login` command to start the Device Code login flow to authenticate with your Microsoft 365 tenant. 
 
 ```sh
 m365 login
 ```
 
-> CLI for Microsoft 365 will automatically detect the URL of your tenant based on the account that you use to sign in.
+>On your first login you will be asked to consent to several permissions that the `PnP Management Shell` multi-tenant app requires for the commands to work successfully against your tenant. If you want to create your own identity to use with the CLI, refer to the [Using your own Azure AD Identity](user-guide/using-own-identity/) guide.
 
-To list all available commands, type in CLI for Microsoft 365 prompt `help`:
+>For alternative authentication methods and usage, refer to the [login](https://pnp.github.io/cli-microsoft365/cmd/login/) command documentation
+
+List all commands using the global `--help` option.
 
 ```sh
-m365 help
+m365 --help
 ```
 
-See the [User Guide](docs/docs/user-guide/installing-cli.md) to learn more about CLI for Microsoft 365 and its capabilities.
+Get command information and example usage using the global `--help` option.
+
+```sh
+m365 spo site get --help
+```
+
+Execute a command and output response as text.
+
+```sh
+m365 spo site get --webUrl https://contoso.sharepoint.com
+```
+
+Execute a command and output response as JSON using the global `--output` option.
+
+```sh
+m365 spo site get --webUrl https://contoso.sharepoint.com --output json
+```
+
+Filter responses and return custom objects using [JMESPath](https://jmespath.org/) queries using the global `--query`  option.
+
+```sh
+m365 spo site list --output json --query '[?Template==`GROUP#0`].{Title:Title, Url:Url}'
+```
+
+> For more examples and usage, refer to the [command](https://pnp.github.io/cli-microsoft365/cmd/login/) and  [sample scripts](https://pnp.github.io/cli-microsoft365/sample-scripts/) documentation.
+
+## Build
+
+To build and run this CLI locally, you will need [`node`](https://nodejs.org) `>= 12.0.0` installed.
+
+```sh
+# Clone this repository
+$ git clone https://github.com/pnp/cli-microsoft365
+
+# Go into the repository
+$ cd cli-microsoft365
+
+# Install dependencies
+$ npm install
+
+# Build the CLI
+$ npm run build
+
+# Symlink your local CLI build
+$ npm link
+```
+
+When you execute any `m365` command from the terminal, it will now use your local clone of the CLI.
+
+## Contribute
+
+We love to accept contributions.
+
+If you want to get involved with helping us grow the CLI, whether that is suggesting or adding a new command, extending an existing command or updating our documentation, we would love to hear from you.
+
+Checkout our [Wiki](https://github.com/pnp/cli-microsoft365/wiki) for guides on how to contribute to this project.
 
 ## Sharing is Caring
 
-We'd love your help! If you have ideas for new features or feedback, let us know by creating an issue in the [issues list](https://github.com/pnp/cli-microsoft365/issues). Before you submit a PR with your improvements, please review our [project guides](https://github.com/pnp/cli-microsoft365/wiki).
+This project is associated with the [Microsoft 365 Patterns and Practices](https://pnp.github.io) (PnP) organisation, which is a virtual team consisting of Microsoft employees and community members focused on helping the community make the best use of Microsoft products.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+## Code of Conduct
 
-![Microsoft 365 Patterns and Practices](./docs/docs/images/parker-ms-logo-300.png)
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). 
+
+For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
 ## Disclaimer
 

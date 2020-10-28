@@ -16,7 +16,7 @@ describe(commands.TEAMS_APP_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -53,6 +53,17 @@ describe(commands.TEAMS_APP_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('fails validation if both teamId and teamName options are passed', (done) => {
+    const actual = command.validate({
+      options: {
+        teamId: '00000000-0000-0000-0000-000000000000',
+        teamName: 'Team Name'
+      }
+    });
+    assert.notStrictEqual(actual, true);
+    done();
+  });
+
   it('lists Microsoft Teams apps in the organization app catalog', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/appCatalogs/teamsApps?$filter=distributionMethod eq 'organization'`) {
@@ -80,6 +91,96 @@ describe(commands.TEAMS_APP_LIST, () => {
             "distributionMethod": "organization"
           }
         ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails to get team when team does not exists', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+        return Promise.resolve({ value: [] });
+      }
+      return Promise.reject('The specified team does not exist in the Microsoft Teams');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        teamName: 'Team Name'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails when multiple teams with same name exists', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
+          "@odata.count": 2,
+          "value": [
+            {
+              "id": "00000000-0000-0000-0000-000000000000",
+              "createdDateTime": null,
+              "displayName": "Team Name",
+              "description": "Team Description",
+              "internalId": null,
+              "classification": null,
+              "specialization": null,
+              "visibility": null,
+              "webUrl": null,
+              "isArchived": false,
+              "isMembershipLimitedToOwners": null,
+              "memberSettings": null,
+              "guestSettings": null,
+              "messagingSettings": null,
+              "funSettings": null,
+              "discoverySettings": null
+            },
+            {
+              "id": "00000000-0000-0000-0000-000000000000",
+              "createdDateTime": null,
+              "displayName": "Team Name",
+              "description": "Team Description",
+              "internalId": null,
+              "classification": null,
+              "specialization": null,
+              "visibility": null,
+              "webUrl": null,
+              "isArchived": false,
+              "isMembershipLimitedToOwners": null,
+              "memberSettings": null,
+              "guestSettings": null,
+              "messagingSettings": null,
+              "funSettings": null,
+              "discoverySettings": null
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        teamName: 'Team Name'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple Microsoft Teams teams with name Team Name found: 00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000`)));
         done();
       }
       catch (e) {
@@ -145,7 +246,7 @@ describe(commands.TEAMS_APP_LIST, () => {
     });
   });
 
-  it('lists organization\'s apps installed in a team', (done) => {
+  it('lists organization\'s apps installed in a team by team id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/6f6fd3f7-9ba5-4488-bbe6-a789004d0d55/installedApps?$expand=teamsApp&$filter=teamsApp/distributionMethod eq 'organization'`) {
         return Promise.resolve({
@@ -159,6 +260,61 @@ describe(commands.TEAMS_APP_LIST, () => {
     });
 
     command.action(logger, { options: { debug: false, teamId: '6f6fd3f7-9ba5-4488-bbe6-a789004d0d55' } }, () => {
+      try {
+        assert(loggerSpy.calledWith([
+          {
+            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=",
+            "displayName": "HelloWorld",
+            "distributionMethod": "organization"
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('lists organization\'s apps installed in a team by team name', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "00000000-0000-0000-0000-000000000000",
+              "createdDateTime": null,
+              "displayName": "Team Name",
+              "description": "Team Description",
+              "internalId": null,
+              "classification": null,
+              "specialization": null,
+              "visibility": null,
+              "webUrl": null,
+              "isArchived": false,
+              "isMembershipLimitedToOwners": null,
+              "memberSettings": null,
+              "guestSettings": null,
+              "messagingSettings": null,
+              "funSettings": null,
+              "discoverySettings": null
+            }
+          ]
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/installedApps?$expand=teamsApp&$filter=teamsApp/distributionMethod eq 'organization'`) > -1) {
+        return Promise.resolve({
+          "value": [{
+            "id": "NmY2ZmQzZjctOWJhNS00NDg4LWJiZTYtYTc4OTAwNGQwZDU1IyNiOGNjZjNmNC04NGVlLTRlNjItODJkMC1iZjZiZjk1YmRiODM=", "teamsApp": { "id": "b8ccf3f4-84ee-4e62-82d0-bf6bf95bdb83", "externalId": "912e9d76-1794-414f-82fd-e5b60fab731b", "displayName": "HelloWorld", "distributionMethod": "organization" }
+          }]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, teamName: 'Team Name' } }, () => {
       try {
         assert(loggerSpy.calledWith([
           {

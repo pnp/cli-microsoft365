@@ -58,9 +58,13 @@ class AadUserListCommand extends GraphItemsListCommand<any> {
     const filters: any = {};
     const excludeOptions: string[] = [
       'properties',
+      'p',
       'debug',
       'verbose',
-      'output'
+      'output',
+      'o',
+      'query',
+      '_'
     ];
 
     Object.keys(options).forEach(key => {

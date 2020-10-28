@@ -38,7 +38,7 @@ Param(
       if ($_ -notmatch ".zip") {
         throw "The file specified in the path argument must be a zip"
       }
-      return $true 
+      return $true
     })]
   [System.IO.FileInfo]$AppManifestPath,
   [string]$AppId,
@@ -81,23 +81,34 @@ if ($CurrentUser) {
   $connectedAs = m365 status -o json | ConvertFrom-Json
   $user = m365 aad user get --userName $connectedAs.connectedAs -o json | ConvertFrom-Json
 
-  # Adding the app to the personal apps of the specified user
-  $result = m365 teams user app add --appId $app.id --userId $user.id
-
-  if ($result -eq "Error: Conflict") { Write-Warning "The App '$($app.displayName)' with ID '$($app.id)' is already deployed to user '$($user.userPrincipalName)'." }
-  Write-Host "The App '$($app.displayName)' with ID '$($app.id)' was deployed to user '$($user.userPrincipalName)'."
+  if ($user) {
+    $Users += $user.userPrincipalName
+  }
 }  
 
 $user = $null
-$Users | ForEach-Object {
-  # Getting the specified user
-  $user = m365 aad user get --userName $_ -o json | ConvertFrom-Json
+if ($Users.Length -gt 0 -and $Install) {
+  $Users | ForEach-Object {
+    # Getting the specified user
+    $user = m365 aad user get --userName $_ -o json | ConvertFrom-Json
   
-  # Adding the app to the personal apps of the specified user
-  $result = m365 teams user app add --appId $app.id --userId $user.id
+    if ($user) {
+      $userApp = m365 teams user app list --userId $user.id --query "[?appId == '$($app.id)']" -o json | ConvertFrom-Json
 
-  if ($result -eq "Error: Conflict") { Write-Warning "The App '$($app.displayName)' with ID '$($app.id)' is already deployed to user '$($user.userPrincipalName)'." }
-  Write-Host "The App '$($app.displayName)' with ID '$($app.id)' was deployed to user '$($user.userPrincipalName)'."
+      if ($userApp.Length -eq 0) {
+        # Adding the app to the personal apps of the specified user
+        m365 teams user app add --appId $app.id --userId $user.id
+        Write-Host "The App '$($app.displayName)' with ID '$($app.id)' was deployed to user '$($user.userPrincipalName)'."
+
+      }
+      else {
+        Write-Warning "The App '$($app.displayName)' with ID '$($app.id)' is already deployed to user '$($user.userPrincipalName)'."
+      }
+    }
+    else {
+      Write-Warning "The user '$_' was not found"
+    }
+  }
 }
 ```
 

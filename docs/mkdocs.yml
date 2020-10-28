@@ -19,6 +19,7 @@ nav:
       - approleassignment:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
+        - approleassignment remove: 'cmd/aad/approleassignment/approleassignment-remove.md'
       - groupsetting:
         - groupsetting add: 'cmd/aad/groupsetting/groupsetting-add.md'
         - groupsetting get: 'cmd/aad/groupsetting/groupsetting-get.md'
@@ -461,6 +462,7 @@ nav:
         - user remove: 'cmd/aad/o365group/o365group-user-remove.md'
         - user set: 'cmd/aad/o365group/o365group-user-set.md'
         - user app add: 'cmd/teams/user/user-app-add.md'
+        - user app list: 'cmd/teams/user/user-app-list.md'
         - user app remove: 'cmd/teams/user/user-app-remove.md'
     - Microsoft 365 (tenant):
       - id:
@@ -547,6 +549,7 @@ nav:
       - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
       - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
       - 'List app usage in Microsoft Teams': 'sample-scripts/teams/list-teams-app-usage.md'
+      - 'Remove a Microsoft Teams personal app': 'sample-scripts/teams/remove-personal-app.md'
       - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'
   - About:
     - 'Why this CLI': 'about/why-cli.md'
