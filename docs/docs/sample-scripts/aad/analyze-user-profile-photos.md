@@ -71,7 +71,7 @@ $photoRequirements = @{
     }
 }
 
-$requiredProfileProperties = "id,displayName,mail"
+$requiredProfileProperties = "id,displayName,userPrincipalName"
 $global:analysisOutcomes = @()
 
 $executionDir = $PSScriptRoot
@@ -79,14 +79,13 @@ $outputDir = "$executionDir/$resultDir"
 $outputFilePath = "$outputDir/$(get-date -f yyyyMMdd-HHmmss)-scan-profile-pictures-outcome.csv"
 
 if (-not (Test-Path -Path "$outputDir" -PathType Container)) {
-    Write-Host "Creating $outputDir folder..."
     New-Item -ItemType Directory -Path "$outputDir"
+    Write-Host "Created $outputDir folder..."
 }
-
 function AddAnalysisOutcome {
     param (
         [Parameter(Mandatory = $false)] [string] $UserId,
-        [Parameter(Mandatory = $false)] [string] $UserMail,
+        [Parameter(Mandatory = $false)] [string] $UserPrincipalName,
         [Parameter(Mandatory = $false)] [bool] $IsPortraitValid,
         [Parameter(Mandatory = $false)] [bool] $IsOnlyOnePersonValid,
         [Parameter(Mandatory = $false)] [bool] $IsClipartValid,
@@ -103,7 +102,7 @@ function AddAnalysisOutcome {
     $analysisOutcome = New-Object -TypeName PSObject
 
     $analysisOutcome | Add-Member -MemberType NoteProperty -Name "UserId" -Value $UserId
-    $analysisOutcome | Add-Member -MemberType NoteProperty -Name "UserMail" -Value $UserMail
+    $analysisOutcome | Add-Member -MemberType NoteProperty -Name "UserPrincipalName" -Value $UserPrincipalName
     $analysisOutcome | Add-Member -MemberType NoteProperty -Name "IsPortraitValid" -Value $IsPortraitValid
     $analysisOutcome | Add-Member -MemberType NoteProperty -Name "IsOnlyOnePersonValid" -Value $IsOnlyOnePersonValid
     $analysisOutcome | Add-Member -MemberType NoteProperty -Name "IsClipartValid" -Value $IsClipartValid
@@ -120,15 +119,21 @@ function AddAnalysisOutcome {
 }
 
 $users = m365 aad user list --properties $requiredProfileProperties -o json | ConvertFrom-Json -AsHashtable
+$usersCount = $users.Count
+Write-Host "Number of users found : $usersCount"
 
-foreach ($user in $users) {
+try {
+    $token = m365 util accesstoken get --resource https://graph.microsoft.com --new
 
-    try {
-        $userId = $user.id
-        $userMail = $user.mail
+    $i = 0
 
+    for ($i = 0; $i -lt $usersCount; $i++) {
         try {
-            $token = m365 util accesstoken get --resource https://graph.microsoft.com --new
+            $userId = $users[$i].id
+            $userPrincipalName = $users[$i].userPrincipalName
+
+            $percentComplete = ($i / $usersCount) * 100
+            Write-Progress -Activity "Analysing" -Status "User : $userId - $userPrincipalName" -PercentComplete $percentComplete
 
             try {
                 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
@@ -136,10 +141,8 @@ foreach ($user in $users) {
                 $headers.Add("Authorization", "Bearer $token")
                 $userPhoto = (Invoke-RestMethod -Uri "https://graph.microsoft.com/v1.0/users/$userId/photo/`$value" -Headers $headers)
 
-                If ($userPhoto) {
-
+                if ($userPhoto) {
                     try {
-
                         $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
                         $headers.Add("Content-Type", "application/json")
                         $headers.Add("Ocp-Apim-Subscription-Key", $azureVisionApiKey)
@@ -187,7 +190,7 @@ foreach ($user in $users) {
                                 -and !$isForbiddenKeywordExist;
 
                             AddAnalysisOutcome $userId `
-                                $userMail `
+                                $userPrincipalName `
                                 $isPortraitValid `
                                 $isOnlyOnePersonValid `
                                 $isClipartValid `
@@ -203,7 +206,7 @@ foreach ($user in $users) {
                     }
                     catch {
                         AddAnalysisOutcome $userId `
-                            $userMail `
+                            $userPrincipalName `
                             $false `
                             $false `
                             $false `
@@ -220,7 +223,7 @@ foreach ($user in $users) {
             }
             catch {
                 AddAnalysisOutcome $userId `
-                    $userMail `
+                    $userPrincipalName `
                     $false `
                     $false `
                     $false `
@@ -235,12 +238,12 @@ foreach ($user in $users) {
             }
         }
         catch {
-            Write-Host "Unable to get new access token" -ForegroundColor Red
+            Write-Host "Unable to get profile details for this user" -ForegroundColor Red
         }
     }
-    catch {
-        Write-Host "Unable to get profile details for this user" -ForegroundColor Red
-    }
+}
+catch {
+    Write-Host "Unable to get new access token" -ForegroundColor Red
 }
 
 $global:analysisOutcomes | Export-Csv -Path "$outputFilePath" -NoTypeInformation
