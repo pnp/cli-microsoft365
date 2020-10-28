@@ -32,6 +32,9 @@
 - updated 'aad approleassignment add' to use Microsoft Graph [#1858](https://github.com/pnp/cli-microsoft365/issues/1858)
 - added the 'Removes Microsoft Teams personal app from users and Microsoft Teams app catalog' sample script [#1883](https://github.com/pnp/cli-microsoft365/pull/1883)
 - extended 'teams app list' with support for using Team's name [#1861](https://github.com/pnp/cli-microsoft365/issues/1861)
+- excluded missing global options in 'spo tenant settings set' [#1903](https://github.com/pnp/cli-microsoft365/issues/1903)
+- added support for specifying Team name in `teams channel add` [#1888](https://github.com/pnp/cli-microsoft365/issues/1888)
+- excluded missing global options in 'aad user list' [#1909](https://github.com/pnp/cli-microsoft365/issues/1909)
 
 ## [v3.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.1.0)
 
