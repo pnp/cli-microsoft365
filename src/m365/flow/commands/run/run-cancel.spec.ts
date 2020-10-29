@@ -70,19 +70,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
     });
     assert.notStrictEqual(actual, true);
   });
-
-  it('fails validation if the name is not valid RUN ID', () => {
-    const actual = command.validate({
-      options: {
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        name: 'invalid',
-      }
-    });
-    assert.notStrictEqual(actual, true);
-  });
-
-
+ 
   it('passes validation when the name, environment and flow specified', () => {
     const actual = command.validate({
       options: {
@@ -161,7 +149,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
         debug: true,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        name: '08585981115186985105550762687CU161'
+        name: '08585981115186985105550762687CU161',
       }
     }, () => {
       try {
@@ -202,7 +190,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
-          "message": "Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied."
+          "message": "You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions."
         }
       });
     });
@@ -218,7 +206,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
       }
     } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions.`)));
         done();
       }
       catch (e) {
@@ -232,7 +220,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
-          "message": "Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied."
+          "message": "You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions."
         }
       });
     });
@@ -252,7 +240,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
       }
     } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c' is denied.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`You are not permitted to make flows in this 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'. Please switch to the default environment, or to one of your own environment(s), where you have maker permissions.`)));
         done();
       }
       catch (e) {
@@ -261,10 +249,14 @@ describe(commands.FLOW_RUN_CANCEL, () => {
     });
   });
 
-  /*Check if flow is cancelled*/
-  /*it('correctly handles no Microsoft Flow found when prompt confirmed', (done) => {
+  it('correctly handles specified Microsoft Flow not found when prompt confirmed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      return Promise.resolve({ statusCode: 403 });
+      return Promise.reject({
+        "error": {
+          "code": "ConnectionAuthorizationFailed",
+          "message": "The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'."
+        }
+      });
     });
 
     Utils.restore(Cli.prompt);
@@ -272,50 +264,119 @@ describe(commands.FLOW_RUN_CANCEL, () => {
       cb({ continue: true });
     });
 
-    command.action(logger, {
-      options:
-      {
-        debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+
+    command.action(logger, { 
+      options: 
+      { 
+        debug: false, 
+        environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
+        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',  
         name: '08585981115186985105550762687CU161',
-      }
+      } 
     } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'.`)));
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });*/
+  });
 
-  /*check if flow is cancelled*/
-  /*it('correctly handles no Microsoft Flow found when confirm specified', (done) => {
+  it('correctly handles specified Microsoft Flow not found without prompting when confirm specified', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      return Promise.resolve({ statusCode: 403 });
+      return Promise.reject({
+        "error": {
+          "code": "ConnectionAuthorizationFailed",
+          "message": "The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'."
+        }
+      });
     });
 
-    command.action(logger, {
-      options:
-      {
-        debug: false,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+    command.action(logger, { 
+      options: 
+      { 
+        debug: false, 
+        environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
+        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',  
         name: '08585981115186985105550762687CU161',
         confirm: true
-      }
+      } 
     } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The caller with object id 'da8f7aea-cf43-497f-ad62-c2feae89a194' does not have permission for connection '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88' under Api 'shared_logicflows'.`)));
         done();
       }
       catch (e) {
         done(e);
       }
     });
-  });*/
+  });
+
+  it('correctly handles specified Microsoft Flow run not found when prompt confirmed', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      return Promise.reject({
+        "error": {
+          "code": "AzureResourceManagerRequestFailed",
+          "message": `Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`
+        }
+      });
+    });
+
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+
+    command.action(logger, { 
+      options: 
+      { 
+        debug: false, 
+        environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
+        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',  
+        name: '08585981115186985105550762688CP233',
+      } 
+    } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles specified Microsoft Flow run not found without prompting when confirm specified', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      return Promise.reject({
+        "error": {
+          "code": "AzureResourceManagerRequestFailed",
+          "message": `Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`
+        }
+      });
+    });
+
+    command.action(logger, { 
+      options: 
+      { 
+        debug: false, 
+        environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
+        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',  
+        name: '08585981115186985105550762688CP233',
+        confirm: true
+      } 
+    } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Request to Azure Resource Manager failed with error: '{"error":{"code":"WorkflowRunNotFound","message":"The workflow '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' run '08585981115186985105550762688CP233' could not be found."}}`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 
   it('supports debug mode', () => {
     const options = command.options();

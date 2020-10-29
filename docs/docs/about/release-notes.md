@@ -958,6 +958,7 @@
 - [azmgmt flow export](../cmd/flow/flow-export.md) - exports the specified Microsoft Flow as a file [#383](https://github.com/pnp/cli-microsoft365/issues/383)
 - [azmgmt flow run get](../cmd/flow/run/run-get.md) - gets information about a specific run of the specified Microsoft Flow [#400](https://github.com/pnp/cli-microsoft365/issues/400)
 - [azmgmt flow run list](../cmd/flow/run/run-list.md) - lists runs of the specified Microsoft Flow [#399](https://github.com/pnp/cli-microsoft365/issues/399)
+- [azmgmt flow run cancel](../cmd/flow/run/run-cancel.md) - cancels the specified Microsoft Flow [#399](https://github.com/pnp/cli-microsoft365/issues/1870)
 
 ### Changes
 

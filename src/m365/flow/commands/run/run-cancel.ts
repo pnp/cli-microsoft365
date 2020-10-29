@@ -44,20 +44,12 @@ class FlowRunCancelCommand extends AzmgmtCommand {
 
     request
       .post(requestOptions)
-      .then((rawRes: any): void => {
-        // handle 204 and throw error message to cmd when invalid flow id is passed
-        // https://github.com/pnp/cli-microsoft365/issues/1063#issuecomment-537218957
-        debugger;
-        if (rawRes.statusCode === 204) {
-          logger.log(chalk.red(`Error: Resource '${args.options.name}' does not exist in environment '${args.options.environment}'`));
-          cb();
-        }
-        else {
+      .then((): void => {
           if (this.verbose) {
             logger.log(chalk.green('DONE'));
           }
+
           cb();
-        }
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
 
@@ -69,7 +61,7 @@ class FlowRunCancelCommand extends AzmgmtCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to cancel the flow with runId ${args.options.name}?`
+        message: `Are you sure you want to cancel the flow with run ${args.options.name}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -85,11 +77,11 @@ class FlowRunCancelCommand extends AzmgmtCommand {
     const options: CommandOption[] = [
       {
         option: '-n, --name <name>',
-        description: 'The name of the run to get information about'
+        description: 'The name of the run to cancel'
       },
       {
         option: '-f, --flow <flow>',
-        description: 'The name of the Microsoft Flow for which to retrieve information'
+        description: 'The name of the Microsoft Flow to cancel'
       },
       {
         option: '-e, --environment <environment>',
@@ -109,12 +101,6 @@ class FlowRunCancelCommand extends AzmgmtCommand {
     if (!Utils.isValidGuid(args.options.flow)) {
       return `${args.options.flow} is not a valid GUID`;
     }
-
-    //Is this needed?
-    if (!Utils.isValidFlowRunId(args.options.name)) {
-      return `${args.options.name} is not a valid RUN ID`;
-    }
-
     return true;
   }
 }

@@ -56,12 +56,6 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
-  public static isValidFlowRunId(guid: string): boolean {
-    const guidRegEx: RegExp = new RegExp(/^[0-9A-Z]{34}$/i);
-    
-    return guidRegEx.test(guid);
-  }
-  
   public static isValidUserPrincipalName(upn: string): boolean {
     const upnRegEx = new RegExp(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i);
 
