@@ -257,7 +257,6 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
     });
   });
 
-
   it('correctly lists all channels in a Microsoft teams team by team name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
