@@ -1,12 +1,11 @@
-import * as os from 'os';
-import { TokenStorage } from './auth/TokenStorage';
-import { KeychainTokenStorage } from './auth/KeychainTokenStorage';
-import { WindowsTokenStorage } from './auth/WindowsTokenStorage';
+import { AuthenticationContext, ErrorResponse, Logging, LoggingLevel, TokenResponse, UserCodeInfo } from 'adal-node';
+import { asn1, pkcs12, pki } from 'node-forge';
 import { FileTokenStorage } from './auth/FileTokenStorage';
-import { AuthenticationContext, TokenResponse, ErrorResponse, UserCodeInfo, Logging, LoggingLevel } from 'adal-node';
+import { TokenStorage } from './auth/TokenStorage';
+import { Logger } from './cli';
 import { CommandError } from './Command';
 import config from './config';
-import { asn1, pkcs12, pki } from 'node-forge';
+import request from './request';
 
 export interface Hash<TValue> {
   [key: string]: TValue;
@@ -47,14 +46,11 @@ export class Service {
   }
 }
 
-export interface Logger {
-  log: (msg: any) => void
-}
-
 export enum AuthType {
   DeviceCode,
   Password,
-  Certificate
+  Certificate,
+  Identity
 }
 
 export class Auth {
@@ -90,12 +86,11 @@ export class Auth {
     });
   }
 
-  public ensureAccessToken(resource: string, stdout: Logger, debug: boolean = false, fetchNew: boolean = false): Promise<string> {
-    /* istanbul ignore next */
+  public ensureAccessToken(resource: string, logger: Logger, debug: boolean = false, fetchNew: boolean = false): Promise<string> {
     Logging.setLoggingOptions({
       level: debug ? 3 : 0,
       log: (level: LoggingLevel, message: string, error?: Error): void => {
-        stdout.log(message);
+        logger.log(message);
       }
     });
 
@@ -106,7 +101,7 @@ export class Auth {
 
       if (!fetchNew && accessToken && expiresOn > now) {
         if (debug) {
-          stdout.log(`Existing access token ${accessToken.value} still valid. Returning...`);
+          logger.log(`Existing access token ${accessToken.value} still valid. Returning...`);
         }
         resolve(accessToken.value);
         return;
@@ -114,15 +109,15 @@ export class Auth {
       else {
         if (debug) {
           if (!accessToken) {
-            stdout.log(`No token found for resource ${resource}`);
+            logger.log(`No token found for resource ${resource}`);
           }
           else {
-            stdout.log(`Access token expired. Token: ${accessToken.value}, ExpiresAt: ${accessToken.expiresOn}`);
+            logger.log(`Access token expired. Token: ${accessToken.value}, ExpiresAt: ${accessToken.expiresOn}`);
           }
         }
       }
 
-      let getTokenPromise: (resource: string, stdout: Logger, debug: boolean) => Promise<TokenResponse> = this.ensureAccessTokenWithDeviceCode.bind(this);
+      let getTokenPromise: (resource: string, logger: Logger, debug: boolean) => Promise<TokenResponse> = this.ensureAccessTokenWithDeviceCode.bind(this);
 
       if (this.service.refreshToken) {
         getTokenPromise = this.ensureAccessTokenWithRefreshToken.bind(this);
@@ -138,12 +133,15 @@ export class Auth {
           case AuthType.Certificate:
             getTokenPromise = this.ensureAccessTokenWithCertificate.bind(this);
             break;
+          case AuthType.Identity:
+            getTokenPromise = this.ensureAccessTokenWithIdentity.bind(this);
+            break;
         }
       }
 
       let error: any = undefined;
 
-      getTokenPromise(resource, stdout, debug)
+      getTokenPromise(resource, logger, debug)
         .then((tokenResponse: TokenResponse): Promise<void> => {
           this.service.accessTokens[resource] = {
             expiresOn: tokenResponse.expiresOn as string,
@@ -164,7 +162,7 @@ export class Auth {
           // _error could happen due to an issue with persisting the access
           // token which shouldn't fail the overall token retrieval process
           if (debug) {
-            stdout.log(new CommandError(_error));
+            logger.log(new CommandError(_error));
           }
           // was there an issue earlier in the process
           if (error) {
@@ -179,10 +177,10 @@ export class Auth {
     });
   }
 
-  private ensureAccessTokenWithRefreshToken(resource: string, stdout: Logger, debug: boolean): Promise<TokenResponse> {
+  private ensureAccessTokenWithRefreshToken(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
       if (debug) {
-        stdout.log(`Retrieving new access token using existing refresh token ${this.service.refreshToken}`);
+        logger.log(`Retrieving new access token using existing refresh token ${this.service.refreshToken}`);
       }
 
       this.authCtx.acquireTokenWithRefreshToken(
@@ -191,9 +189,9 @@ export class Auth {
         resource,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {
-            stdout.log('Response:');
-            stdout.log(response);
-            stdout.log('');
+            logger.log('Response:');
+            logger.log(response);
+            logger.log('');
           }
 
           if (error) {
@@ -206,22 +204,22 @@ export class Auth {
     });
   }
 
-  private ensureAccessTokenWithDeviceCode(resource: string, stdout: Logger, debug: boolean): Promise<TokenResponse> {
+  private ensureAccessTokenWithDeviceCode(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     if (debug) {
-      stdout.log(`Starting Auth.ensureAccessTokenWithDeviceCode. resource: ${resource}, debug: ${debug}`);
+      logger.log(`Starting Auth.ensureAccessTokenWithDeviceCode. resource: ${resource}, debug: ${debug}`);
     }
 
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (err: any) => void) => {
       if (debug) {
-        stdout.log('No existing refresh token. Starting new device code flow...');
+        logger.log('No existing refresh token. Starting new device code flow...');
       }
 
       this.authCtx.acquireUserCode(resource, this.appId as string, 'en-us',
         (error: Error, response: UserCodeInfo): void => {
           if (debug) {
-            stdout.log('Response:');
-            stdout.log(response);
-            stdout.log('');
+            logger.log('Response:');
+            logger.log(response);
+            logger.log('');
           }
 
           if (error) {
@@ -229,15 +227,15 @@ export class Auth {
             return;
           }
 
-          stdout.log(response.message);
+          logger.log(response.message);
 
           this.userCodeInfo = response;
           this.authCtx.acquireTokenWithDeviceCode(resource, this.appId as string, response,
             (error: Error, response: TokenResponse | ErrorResponse): void => {
               if (debug) {
-                stdout.log('Response:');
-                stdout.log(response);
-                stdout.log('');
+                logger.log('Response:');
+                logger.log(response);
+                logger.log('');
               }
 
               if (error) {
@@ -252,10 +250,10 @@ export class Auth {
     });
   }
 
-  private ensureAccessTokenWithPassword(resource: string, stdout: Logger, debug: boolean): Promise<TokenResponse> {
+  private ensureAccessTokenWithPassword(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
       if (debug) {
-        stdout.log(`Retrieving new access token using credentials...`);
+        logger.log(`Retrieving new access token using credentials...`);
       }
 
       this.authCtx.acquireTokenWithUsernamePassword(
@@ -265,9 +263,9 @@ export class Auth {
         this.appId as string,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {
-            stdout.log('Response:');
-            stdout.log(response);
-            stdout.log('');
+            logger.log('Response:');
+            logger.log(response);
+            logger.log('');
           }
 
           if (error) {
@@ -280,25 +278,26 @@ export class Auth {
     });
   }
 
-  private ensureAccessTokenWithCertificate(resource: string, stdout: Logger, debug: boolean): Promise<TokenResponse> {
+  private ensureAccessTokenWithCertificate(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
       if (debug) {
-        stdout.log(`Retrieving new access token using certificate (thumbprint ${this.service.thumbprint})...`);
+        logger.log(`Retrieving new access token using certificate (thumbprint ${this.service.thumbprint})...`);
       }
 
       let cert: string = '';
 
       if (this.service.password === undefined) {
-        var buf = Buffer.from(this.service.certificate as string, 'base64');
+        const buf = Buffer.from(this.service.certificate as string, 'base64');
         cert = buf.toString('utf8');
-      } else {
-        var buf = Buffer.from(this.service.certificate as string, 'base64');
-        let p12Asn1 = asn1.fromDer(buf.toString('binary'), false); 
+      }
+      else {
+        const buf = Buffer.from(this.service.certificate as string, 'base64');
+        const p12Asn1 = asn1.fromDer(buf.toString('binary'), false);
 
-        let p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
+        const p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
 
-        var keyBags: any = p12Parsed.getBags({ bagType: pki.oids.pkcs8ShroudedKeyBag });
-        var pkcs8ShroudedKeyBag = keyBags[pki.oids.pkcs8ShroudedKeyBag][0];
+        let keyBags: any = p12Parsed.getBags({ bagType: pki.oids.pkcs8ShroudedKeyBag });
+        const pkcs8ShroudedKeyBag = keyBags[pki.oids.pkcs8ShroudedKeyBag][0];
 
         if (debug) {
           // check if there is something in the keyBag as well as
@@ -307,10 +306,10 @@ export class Auth {
           // I could not find a way to add something to the keyBag with all 
           // my attempts, but lets keep it here for troubleshooting purposes.
 
-          stdout.log(`pkcs8ShroudedKeyBagkeyBags length is ${[pki.oids.pkcs8ShroudedKeyBag].length}`);
+          logger.log(`pkcs8ShroudedKeyBagkeyBags length is ${[pki.oids.pkcs8ShroudedKeyBag].length}`);
 
           keyBags = p12Parsed.getBags({ bagType: pki.oids.keyBag });
-          stdout.log(`keyBag length is ${keyBags[pki.oids.keyBag].length}`);
+          logger.log(`keyBag length is ${keyBags[pki.oids.keyBag].length}`);
         }
 
         // convert a Forge private key to an ASN.1 RSAPrivateKey
@@ -330,9 +329,9 @@ export class Auth {
         this.service.thumbprint as string,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {
-            stdout.log('Response:');
-            stdout.log(response);
-            stdout.log('');
+            logger.log('Response:');
+            logger.log(response);
+            logger.log('');
           }
 
           if (error) {
@@ -345,9 +344,150 @@ export class Auth {
     });
   }
 
+  private ensureAccessTokenWithIdentity(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
+    return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
+      const userName = this.service.userName;
+      if (debug) {
+        logger.log('Wil try to retrieve access token using identity...');
+      }
+
+      const requestOptions: any = {
+        url: '',
+        headers: {
+          accept: 'application/json',
+          Metadata: true,
+          'x-anonymous': true
+        },
+        responseType: 'json'
+      };
+
+      if (process.env.IDENTITY_ENDPOINT && process.env.IDENTITY_HEADER) {
+        if (debug) {
+          logger.log('IDENTITY_ENDPOINT and IDENTITY_HEADER env variables found it is Azure Function, WebApp...');
+        }
+
+        requestOptions.url = `${process.env.IDENTITY_ENDPOINT}?resource=${encodeURIComponent(resource)}&api-version=2019-08-01`;
+        requestOptions.headers['X-IDENTITY-HEADER'] = process.env.IDENTITY_HEADER;
+      }
+      else if (process.env.MSI_ENDPOINT && process.env.MSI_SECRET) {
+        if (debug) {
+          logger.log('MSI_ENDPOINT and MSI_SECRET env variables found it is Azure Function or WebApp, but using the old names of the env variables...');
+        }
+
+        requestOptions.url = `${process.env.MSI_ENDPOINT}?resource=${encodeURIComponent(resource)}&api-version=2019-08-01`;
+        requestOptions.headers['X-IDENTITY-HEADER'] = process.env.MSI_SECRET;
+      }
+      else if (process.env.IDENTITY_ENDPOINT) {
+        if (debug) {
+          logger.log('IDENTITY_ENDPOINT env variable found it is Azure Could Shell...');
+        }
+
+        if (userName && process.env.ACC_CLOUD) {
+          // reject for now since the Azure Cloud Shell does not support user-managed identity 
+          reject("Azure Cloud Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity");
+          return;
+        }
+
+        requestOptions.url = `${process.env.IDENTITY_ENDPOINT}?resource=${encodeURIComponent(resource)}`;
+
+      }
+      else if (process.env.MSI_ENDPOINT) {
+        if (debug) {
+          logger.log('MSI_ENDPOINT env variable found it is Azure Could Shell, but using the old names of the env variables...');
+        }
+
+        if (userName && process.env.ACC_CLOUD) {
+          // reject for now since the Azure Cloud Shell does not support user-managed identity 
+          reject("Azure Cloud Shell does not support user-managed identity. You can execute the command without the --userName option to login with user identity");
+          return;
+        }
+
+        requestOptions.url = `${process.env.MSI_ENDPOINT}?resource=${encodeURIComponent(resource)}`;
+      }
+      else {
+        if (debug) {
+          logger.log('IDENTITY_ENDPOINT and MSI_ENDPOINT env variables not found. Attempt to get Managed Identity token by using the Azure Virtual Machine API...');
+        }
+
+        requestOptions.url = `http://169.254.169.254/metadata/identity/oauth2/token?resource=${encodeURIComponent(resource)}&api-version=2018-02-01`;
+      }
+
+      if (userName) {
+        // if name present then the identity is user-assigned managed identity
+        // the name option in this case is either client_id or principal_id (object_id) 
+        // of the managed identity service principal
+        requestOptions.url += `&client_id=${encodeURIComponent(userName as string)}`;
+
+        if (debug) {
+          logger.log('Wil try to get token using client_id param...');
+        }
+      }
+
+      request
+        .get(requestOptions)
+        .then((res: any): void => {
+
+          resolve({ accessToken: res.access_token, expiresOn: parseInt(res.expires_on) * 1000 } as any);
+          return;
+        })
+        .catch((e: any) => {
+          if (!userName) {
+            reject(e);
+            return;
+          }
+
+          // since the userName option can be either client_id or principal_id (object_id) 
+          // and the first attempt was using client_id
+          // now lets see if the api returned 'not found' response and
+          // try to get token using principal_id (object_id)
+
+          let isNotFoundResponse = false;
+          if (e.error && e.error.Message) {
+            // check if it is Azure Function api 'not found' response
+            isNotFoundResponse = (e.error.Message.indexOf("No Managed Identity found") !== -1);
+          }
+          else if (e.error && e.error.error_description) {
+            // check if it is Azure VM api 'not found' response
+            isNotFoundResponse = (e.error.error_description === "Identity not found");
+          }
+
+          if (!isNotFoundResponse) {
+            // it is not a 'not found' response then exit with error
+            reject(e);
+            return;
+          }
+
+          if (debug) {
+            logger.log('Wil try to get token using principal_id (also known as object_id) param ...');
+          }
+
+          requestOptions.url = requestOptions.url.replace('&client_id=', '&principal_id=');
+          requestOptions.headers['x-anonymous'] = true;
+
+          request
+            .get(requestOptions)
+            .then((res: any): void => {
+              resolve({ accessToken: res.access_token, expiresOn: parseInt(res.expires_on) * 1000 } as any);
+            })
+            .catch((err: any) => {
+              // will give up and not try any further with the 'msi_res_id' (resource id) query string param
+              // since it does not work with the Azure Functions api, but just with the Azure VM api
+              if (err.error.code === 'EACCES') {
+                // the CLI does not know if managed identity is actually assigned when EACCES code thrown
+                // so show meaningful message since the raw error response could be misleading 
+                reject('Error while logging with Managed Identity. Please check if a Managed Identity is assigned to the current Azure resource.');
+              }
+              else {
+                reject(err);
+              }
+            });
+        });
+    });
+  }
+
   public cancel(): void {
     if (this.userCodeInfo) {
-      this.authCtx.cancelRequestToGetTokenWithDeviceCode(this.userCodeInfo as UserCodeInfo, /* istanbul ignore next */(error: Error, response: TokenResponse | ErrorResponse): void => { });
+      this.authCtx.cancelRequestToGetTokenWithDeviceCode(this.userCodeInfo as UserCodeInfo, (error: Error, response: TokenResponse | ErrorResponse): void => { });
     }
   }
 
@@ -390,21 +530,7 @@ export class Auth {
   }
 
   public getTokenStorage(): TokenStorage {
-    const platform: NodeJS.Platform = os.platform();
-    let tokenStorage: TokenStorage;
-    switch (platform) {
-      case 'darwin':
-        tokenStorage = new KeychainTokenStorage();
-        break;
-      case 'win32':
-        tokenStorage = new WindowsTokenStorage();
-        break;
-      default:
-        tokenStorage = new FileTokenStorage();
-        break;
-    }
-
-    return tokenStorage;
+    return new FileTokenStorage();
   }
 }
 

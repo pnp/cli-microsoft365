@@ -1,7 +1,7 @@
 defaults: &defaults
-  working_directory: ~/office365-cli
+  working_directory: ~/cli-microsoft365
   docker:
-    - image: circleci/node:10.15.3
+    - image: circleci/node:12.14.0
 
 version: 2
 jobs:
@@ -10,7 +10,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/office365-cli
+          at: ~/cli-microsoft365
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
@@ -30,15 +30,15 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: ~/office365-cli
+          at: ~/cli-microsoft365
       - run:
           name: Test
           command: npm test
       - run:
           name: Run coveralls
-          command: './node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls'
+          command: './node_modules/.bin/c8 report --reporter=text-lcov | ./node_modules/.bin/coveralls'
           environment:
-            - COVERALLS_REPO_TOKEN: "VsEM7x54Sb8kg1sjzpA6aafoyvlcTtM30"
+            - COVERALLS_REPO_TOKEN: "PkAaAAWBp9rNYBYhA5YiBhezydqwgFKhm"
             - COVERALLS_SERVICE_NAME: "circle-ci"
       - store_artifacts:
           path: coverage
@@ -47,7 +47,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: ~/office365-cli
+          at: ~/cli-microsoft365
       - run:
           name: Write .npmrc
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
@@ -61,7 +61,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: ~/office365-cli
+          at: ~/cli-microsoft365
       - run:
           name: Write .npmrc
           command: echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
@@ -69,12 +69,12 @@ jobs:
           name: Publish
           command: npm publish --access public
   deploy_docs:
-    working_directory: ~/office365-cli/docs/manual
+    working_directory: ~/cli-microsoft365/docs
     docker:
       - image: circleci/python:3.6.6-jessie-node
     steps:
       - attach_workspace:
-          at: ~/office365-cli
+          at: ~/cli-microsoft365
       - add_ssh_keys:
           fingerprints:
             - "06:39:32:e4:a1:64:01:19:0e:61:a0:ad:6a:53:37:32"
@@ -92,7 +92,7 @@ jobs:
           command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" > ~/.ssh/config
       - run:
           name: Build docs
-          command: mkdocs gh-deploy
+          command: mkdocs gh-deploy -m "[ci skip]"
 
 workflows:
   version: 2
@@ -101,49 +101,37 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: /^(dev|master|v2)/
+              ignore: /^(master)/
       - test:
           requires:
             - build
           filters:
             branches:
-              ignore: /^(dev|master|v2)/
-  check_master:
-    jobs:
-      - build:
-          filters:
-            branches:
-              only: master
-      - test:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
+              ignore: /^(master)/
   release_next:
     jobs:
       - build:
           filters:
             branches:
-              only: dev
+              only: master
       - test:
           requires:
             - build
           filters:
             branches:
-              only: dev
+              only: master
       - publish_next:
           requires:
             - test
           filters:
             branches:
-              only: dev
+              only: master
       - deploy_docs:
           requires:
             - publish_next
           filters:
             branches:
-              only: dev
+              only: master
   release:
     jobs:
       - build:
@@ -163,14 +151,6 @@ workflows:
       - publish:
           requires:
             - test
-          filters:
-            tags:
-              only: /^v[0-9]+\.[0-9]+\.[0-9]+/
-            branches:
-              ignore: /.*/
-      - deploy_docs:
-          requires:
-            - publish
           filters:
             tags:
               only: /^v[0-9]+\.[0-9]+\.[0-9]+/

@@ -1,9 +1,9 @@
-import * as sinon from 'sinon';
 import * as assert from 'assert';
+import * as fs from 'fs';
+import * as sinon from 'sinon';
+import { AuthType, Service } from '../Auth';
 import Utils from '../Utils';
 import { FileTokenStorage } from './FileTokenStorage';
-import * as fs from 'fs';
-import { Service, AuthType } from '../Auth';
 
 describe('FileTokenStorage', () => {
   const fileStorage = new FileTokenStorage();
@@ -24,7 +24,7 @@ describe('FileTokenStorage', () => {
         done('Expected fail but passed instead');
       }, (err) => {
         try {
-          assert.equal(err, 'File not found');
+          assert.strictEqual(err, 'File not found');
           done();
         }
         catch (e) {
@@ -46,7 +46,7 @@ describe('FileTokenStorage', () => {
       .get()
       .then((connectionInfo) => {
         try {
-          assert.equal(connectionInfo, JSON.stringify(tokensFile));
+          assert.strictEqual(connectionInfo, JSON.stringify(tokensFile));
           done();
         }
         catch (e) {
@@ -69,7 +69,7 @@ describe('FileTokenStorage', () => {
       .set(JSON.stringify(expected))
       .then(() => {
         try {
-          assert.equal(actual, JSON.stringify(expected));
+          assert.strictEqual(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
@@ -93,7 +93,7 @@ describe('FileTokenStorage', () => {
       .set(JSON.stringify(expected))
       .then(() => {
         try {
-          assert.equal(actual, JSON.stringify(expected));
+          assert.strictEqual(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
@@ -117,7 +117,7 @@ describe('FileTokenStorage', () => {
       .set(JSON.stringify(expected))
       .then(() => {
         try {
-          assert.equal(actual, JSON.stringify(expected));
+          assert.strictEqual(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
@@ -141,7 +141,7 @@ describe('FileTokenStorage', () => {
       .set(JSON.stringify(expected))
       .then(() => {
         try {
-          assert.equal(actual, JSON.stringify(expected));
+          assert.strictEqual(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
@@ -175,7 +175,7 @@ describe('FileTokenStorage', () => {
       .set(JSON.stringify(expected))
       .then(() => {
         try {
-          assert.equal(actual, JSON.stringify(expected));
+          assert.strictEqual(actual, JSON.stringify(expected));
           done();
         }
         catch (e) {
@@ -193,7 +193,7 @@ describe('FileTokenStorage', () => {
         done('Fail expected but passed instead');
       }, (err) => {
         try {
-          assert.equal(err, 'An error has occurred');
+          assert.strictEqual(err, 'An error has occurred');
           done();
         }
         catch (e) {
@@ -216,6 +216,7 @@ describe('FileTokenStorage', () => {
   it('succeeds with removing if the token file is empty', (done) => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '');
+    sinon.stub(fs, 'writeFile').callsFake(() => '').callsArgWith(3, null);
     fileStorage
       .remove()
       .then(() => {
@@ -228,6 +229,7 @@ describe('FileTokenStorage', () => {
   it('succeeds with removing if the token file contains empty JSON object', (done) => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '{}');
+    sinon.stub(fs, 'writeFile').callsFake(() => '').callsArgWith(3, null);
     fileStorage
       .remove()
       .then(() => {
@@ -286,7 +288,7 @@ describe('FileTokenStorage', () => {
         done('Fail expected but passed instead');
       }, (err) => {
         try {
-          assert.equal(err, 'An error has occurred');
+          assert.strictEqual(err, 'An error has occurred');
           done();
         }
         catch (e) {

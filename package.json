@@ -1,31 +1,34 @@
 {
-  "name": "@pnp/office365-cli",
-  "version": "2.2.0",
-  "description": "Manage Microsoft Office 365 and SharePoint Framework projects on any platform",
+  "name": "@pnp/cli-microsoft365",
+  "version": "3.2.0",
+  "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
   "bin": {
-    "office365": "./dist/index.js",
-    "o365": "./dist/index.js"
+    "microsoft365": "./dist/index.js",
+    "m365": "./dist/index.js",
+    "m365_comp": "./dist/autocomplete.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pnp/office365-cli.git"
+    "url": "git+https://github.com/pnp/cli-microsoft365.git"
   },
-  "homepage": "https://pnp.github.io/office365-cli/",
+  "homepage": "https://pnp.github.io/cli-microsoft365/",
   "bugs": {
-    "url": "https://github.com/pnp/office365-cli/issues"
+    "url": "https://github.com/pnp/cli-microsoft365/issues"
   },
   "scripts": {
     "build": "tsc -p . && node scripts/copy-files.js",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./dist",
-    "test": "nyc -r=lcov -r=text mocha \"dist/**/*.spec.js\""
+    "test": "c8 mocha \"dist/**/*.spec.js\""
   },
   "keywords": [
     "office 365",
+    "microsoft 365",
     "sharepoint framework",
     "o365",
+    "m365",
     "spfx",
     "sharepoint online",
     "sharepoint",
@@ -37,7 +40,7 @@
     "azure",
     "microsoft"
   ],
-  "author": "https://github.com/pnp/office365-cli/graphs/contributors",
+  "author": "https://github.com/pnp/cli-microsoft365/graphs/contributors",
   "maintainers": [
     {
       "name": "Waldek Mastykarz",
@@ -48,14 +51,40 @@
       "name": "Velin Georgiev",
       "email": "velin.georgiev@gmail.com",
       "web": "https://blog.velingeorgiev.com"
+    },
+    {
+      "name": "Garry Trinder",
+      "email": "garry.trinder@live.com",
+      "web": "https://garrytrinder.github.io/"
+    },
+    {
+      "name": "Albert-Jan Schot",
+      "email": "appie@digiwijs.nl",
+      "web": "https://www.cloudappie.nl/"
+    },
+    {
+      "name": "Rabia Williams",
+      "email": "rabiawilliams@gmail.com",
+      "web": "https://rabiawilliams.com/"
+    },
+    {
+      "name": "Mark Powney",
+      "email": "mpowney@icloud.com",
+      "web": "https://blog.powney.info/"
+    },
+    {
+      "name": "Patrick Lamber",
+      "email": "patrick@nubo.eu",
+      "web": "https://www.nubo.eu/"
     }
   ],
   "contributors": [
     "Ågren, Simon <simon.agren@sogeti.com>",
-    "Albany, Bruce <you@example.com>",
+    "Albany, Bruce <bruce.albany@gmail.com>",
     "Balasubramaniam, Jayakumar <jayakumar@live.in>",
     "Bauer, Stefan <stefan.bauer@n8d.at>",
     "Bernier, Hugo <hugoabernier@live.ca>",
+    "Bhardwaj, Aakash <aakashbhardwaj619@gmail.com>",
     "Biret, Vincent <baywet@users.noreply.github.com>",
     "Biro, Peter <Peter.Biro@xs.nestle.com>",
     "Bloemsma, Arjen <a.bloemsma@gmail.com>",
@@ -64,27 +93,40 @@
     "Connell, Andrew <me@andrewconnell.com>",
     "Deshpande, Vardhaman <vardhaman.rd@gmail.com>",
     "Georgiev, Velin <velin.georgiev@gmail.com>",
+    "Ghuge, Pramod <pramod7@gmail.com>",
     "Gölles, Thomas <thomy@outlook.at>",
+    "Hagström, Joakim <joakim.hogberg@bravero.se>",
+    "Harding, Phil <pil.harding@platinumdogs.co.uk>",
     "Hawrylak, Paweł <phawrylak@outlook.com>",
     "Högberg, Joakim <joakim.hogberg@bravero.se>",
     "Hvam, Allan <ahp@delegate.dk>",
     "Jaakke, Robert <robert.jaakke@mavention.nl>",
     "Kailasam, Balamurugan <kshsbala@engineer.com>",
+    "Kasireddy, Prasad <prasad.gietcse@gmail.com>",
     "Keijzers, Paul <KbWorks@users.noreply.github.com>",
     "Khalil, Bassem <bk@bassems-air.home>",
     "Kumar, Shantha <34408892+ktskumar@users.noreply.github.com>",
     "Lamber, Patrick <patrick@nubo.eu>",
     "Laskewitz, Daniel <daniel@laskewitz.nl>",
+    "Levert, Sebastien <slevert@outlook.com>",
     "Mastykarz, Waldek <waldek@mastykarz.nl>",
+    "Menon, Arjun <arjun.umenon@gmail.com>",
+    "Mücklisch, Steve <steve.muecklisch@gmail.com>",
+    "Nachan, Nanddeep <nanddeepnachan@gmail.com>",
+    "Nikolić, Aleksandar <alexandair@live.com>",
     "Plenevaux, Yannick <yannick.plenevaux@gmail.com>",
     "Powney, Mark <powney.mark@outlook.com>",
     "Priem, Mark <mark.priem@outlook.com>",
     "Raju, Arnie <arnie.raju@thesolutioncollective.com.au>",
+    "Ramalho, David <dramalho@storm.ie>",
     "Reekmans, Yannick <reekmans.yannick@gmail.com>",
     "Romano, Rodrigo <rodrigo@rodrigoromano.net>",
+    "Rozinov, Roman <roman.rozinov@sogeti.com>",
+    "Schaeflein, Paul <paul@schaeflein.net>",
     "Schot, Albert-Jan <appie@digiwijs.nl>",
     "Schouten, Robert <robert.schouten@wortell.nl>",
     "Schütze, Sebastian <sebastian.schuetze@razorspoint.com>",
+    "Shah, Dipen <Dips365@hotmail.com>",
     "Siatka, Piotr <piotr@valointranet.com>",
     "Sitaraman, Rajesh <rajesh.sitaraman@outlook.com>",
     "Sittler, Laurent <laurent.sittler@lsonline.fr>",
@@ -94,6 +136,7 @@
     "Tane, Peter <peter.tane@gmail.come>",
     "Tatti, Anoop <anoop@live.co.uk>",
     "Trinder, Garry <garry.trinder@live.com>",
+    "Vaghasia, Siddharth <siddh.vaghasia@gmail.com>",
     "van Hunen, Erwin <erwin.van.hunen@outlook.com>",
     "van Rousselt, Rick <rick.vanrousselt@outlook.com>",
     "Velliah, Joseph <joseph@sprider.org>",
@@ -102,40 +145,39 @@
   ],
   "dependencies": {
     "adal-node": "^0.2.1",
-    "applicationinsights": "^1.5.0",
+    "applicationinsights": "^1.8.7",
+    "axios": "^0.20.0",
     "easy-table": "^1.1.1",
-    "node-forge": "^0.9.1",
+    "inquirer": "^7.3.3",
+    "jmespath": "^0.15.0",
+    "markshell": "^1.3.0",
+    "minimist": "^1.2.5",
+    "node-forge": "^0.10.0",
     "omelette": "^0.4.12",
-    "request-promise-native": "^1.0.7",
-    "semver": "^6.3.0",
-    "strip-json-comments": "^3.0.1",
-    "typescript": "^3.6.4",
-    "update-notifier": "^3.0.1",
-    "uuid": "^3.3.3",
-    "vorpal": "https://github.com/pnp/vorpal/raw/master/vorpal-1.11.7.tgz",
-    "xmldom": "^0.1.27"
+    "semver": "^7.3.2",
+    "strip-json-comments": "^3.1.1",
+    "typescript": "^3.8.3",
+    "update-notifier": "^4.1.1",
+    "uuid": "^8.3.0",
+    "xmldom": "^0.3.0"
   },
   "devDependencies": {
     "@types/easy-table": "0.0.32",
-    "@types/mocha": "^5.2.7",
-    "@types/node": "^10.14.22",
-    "@types/node-forge": "^0.8.6",
-    "@types/request": "^2.48.3",
-    "@types/request-promise-native": "^1.0.17",
-    "@types/semver": "^6.0.2",
-    "@types/sinon": "^5.0.5",
-    "@types/update-notifier": "^2.5.0",
-    "@types/xmldom": "^0.1.29",
-    "coveralls": "^3.0.7",
-    "mocha": "^6.2.1",
-    "nyc": "^13.3.0",
-    "rimraf": "^3.0.0",
-    "sinon": "^7.5.0"
-  },
-  "nyc": {
-    "exclude": [
-      "**/*.spec.js",
-      "**/clientsidepages.js"
-    ]
+    "@types/inquirer": "^7.3.0",
+    "@types/jmespath": "^0.15.0",
+    "@types/minimist": "^1.2.0",
+    "@types/mocha": "^8.0.3",
+    "@types/node": "^12.12.62",
+    "@types/node-forge": "^0.9.5",
+    "@types/semver": "^7.3.4",
+    "@types/sinon": "^9.0.5",
+    "@types/update-notifier": "^4.1.1",
+    "@types/uuid": "^8.3.0",
+    "@types/xmldom": "^0.1.30",
+    "c8": "^7.3.0",
+    "coveralls": "^3.1.0",
+    "mocha": "^8.1.3",
+    "rimraf": "^3.0.2",
+    "sinon": "^9.0.3"
   }
 }

@@ -1,0 +1,17 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "version": "1.7.1",
+    "libraryName": "spfx",
+    "libraryId": "ddf07b43-28f5-4fd8-a1c1-cc55cf4edb67",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "spfx",
+    "skipFeatureDeployment": false,
+    "componentType": "webpart",
+    "framework": "none",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "isCreatingSolution": true,
+    "isDomainIsolated": false
+  }
+}

@@ -36,9 +36,6 @@ build/Release
 node_modules/
 jspm_packages/
 
-# Typescript v1 declaration files
-typings/
-
 # Optional npm cache directory
 .npm
 
@@ -61,7 +58,7 @@ dist
 .DS_Store
 coverage
 # generated docs
-docs/manual/site
+docs/site
 # generated commands info
 commands.json
 

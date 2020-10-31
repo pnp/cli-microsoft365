@@ -1,0 +1,588 @@
+site_name: CLI for Microsoft 365
+nav:
+  - Home: 'index.md'
+  - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
+  - User Guide:
+    - 'Installing the CLI': 'user-guide/installing-cli.md'
+    - 'Using the CLI': 'user-guide/using-cli.md'
+    - 'Logging in to Microsoft 365': 'user-guide/connecting-office-365.md'
+    - 'CLI output mode': 'user-guide/cli-output-mode.md'
+    - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
+    - 'Caveats when working with the CLI and certificate login': 'user-guide/cli-certificate-caveats.md'
+  - Commands:
+    - consent: 'cmd/cli/cli-consent.md'
+    - login: 'cmd/login.md'
+    - logout: 'cmd/logout.md'
+    - status: 'cmd/status.md'
+    - version: 'cmd/version.md'
+    - Azure Active Directory Graph (aad):
+      - approleassignment:
+        - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
+        - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
+        - approleassignment remove: 'cmd/aad/approleassignment/approleassignment-remove.md'
+      - groupsetting:
+        - groupsetting add: 'cmd/aad/groupsetting/groupsetting-add.md'
+        - groupsetting get: 'cmd/aad/groupsetting/groupsetting-get.md'
+        - groupsetting list: 'cmd/aad/groupsetting/groupsetting-list.md'
+        - groupsetting remove: 'cmd/aad/groupsetting/groupsetting-remove.md'
+        - groupsetting set: 'cmd/aad/groupsetting/groupsetting-set.md'
+      - groupsettingtemplate:
+        - groupsettingtemplate get: 'cmd/aad/groupsettingtemplate/groupsettingtemplate-get.md'
+        - groupsettingtemplate list: 'cmd/aad/groupsettingtemplate/groupsettingtemplate-list.md'
+      - o365group:
+        - o365group add: 'cmd/aad/o365group/o365group-add.md'
+        - o365group get: 'cmd/aad/o365group/o365group-get.md'
+        - o365group list: 'cmd/aad/o365group/o365group-list.md'
+        - o365group remove: 'cmd/aad/o365group/o365group-remove.md'
+        - o365group renew: 'cmd/aad/o365group/o365group-renew.md'
+        - o365group restore: 'cmd/aad/o365group/o365group-restore.md'
+        - o365group set: 'cmd/aad/o365group/o365group-set.md'
+        - o365group teamify: 'cmd/aad/o365group/o365group-teamify.md'
+        - o365group report activitycounts: 'cmd/aad/o365group/o365group-report-activitycounts.md'
+        - o365group report activitydetail: 'cmd/aad/o365group/o365group-report-activitydetail.md'
+        - o365group report activityfilecounts: 'cmd/aad/o365group/o365group-report-activityfilecounts.md'
+        - o365group report activitygroupcounts: 'cmd/aad/o365group/o365group-report-activitygroupcounts.md'
+        - o365group report activitystorage: 'cmd/aad/o365group/o365group-report-activitystorage.md'
+        - o365group user add: 'cmd/aad/o365group/o365group-user-add.md'
+        - o365group user list: 'cmd/aad/o365group/o365group-user-list.md'
+        - o365group user remove: 'cmd/aad/o365group/o365group-user-remove.md'
+        - o365group user set: 'cmd/aad/o365group/o365group-user-set.md'
+      - oauth2grant:
+        - oauth2grant add: 'cmd/aad/oauth2grant/oauth2grant-add.md'
+        - oauth2grant list: 'cmd/aad/oauth2grant/oauth2grant-list.md'
+        - oauth2grant remove: 'cmd/aad/oauth2grant/oauth2grant-remove.md'
+        - oauth2grant set: 'cmd/aad/oauth2grant/oauth2grant-set.md'
+      - siteclassification:
+        - siteclassification disable: 'cmd/aad/siteclassification/siteclassification-disable.md'
+        - siteclassification enable: 'cmd/aad/siteclassification/siteclassification-enable.md'
+        - siteclassification get: 'cmd/aad/siteclassification/siteclassification-get.md'
+        - siteclassification set: 'cmd/aad/siteclassification/siteclassification-set.md'
+      - service principal (sp):
+        - sp get: 'cmd/aad/sp/sp-get.md'
+      - user:
+        - user get: 'cmd/aad/user/user-get.md'
+        - user list: 'cmd/aad/user/user-list.md'
+    - CLI (cli):
+      - consent: 'cmd/cli/cli-consent.md'
+      - reconsent: 'cmd/cli/cli-reconsent.md'
+      - completion:
+        - completion clink update: 'cmd/cli/completion/completion-clink-update.md'
+        - completion pwsh setup: 'cmd/cli/completion/completion-pwsh-setup.md'
+        - completion pwsh update: 'cmd/cli/completion/completion-pwsh-update.md'
+        - completion sh setup: 'cmd/cli/completion/completion-sh-setup.md'
+        - completion sh update: 'cmd/cli/completion/completion-sh-update.md'
+    - Microsoft Flow (flow):
+      - disable: 'cmd/flow/flow-disable.md'
+      - enable: 'cmd/flow/flow-enable.md'
+      - export: 'cmd/flow/flow-export.md'
+      - get: 'cmd/flow/flow-get.md'
+      - list: 'cmd/flow/flow-list.md'
+      - remove: 'cmd/flow/flow-remove.md'
+      - connector:
+        - connector export: 'cmd/pa/connector/connector-export.md'
+        - connector list: 'cmd/pa/connector/connector-list.md'
+      - environment:
+        - environment get: 'cmd/flow/environment/environment-get.md'
+        - environment list: 'cmd/flow/environment/environment-list.md'
+      - run:
+        - run get: 'cmd/flow/run/run-get.md'
+        - run list: 'cmd/flow/run/run-list.md'
+    - Microsoft Graph (graph):
+      - schemaextension:
+        - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
+        - schemaextension get: 'cmd/graph/schemaextension/schemaextension-get.md'
+        - schemaextension list: 'cmd/graph/schemaextension/schemaextension-list.md'
+        - schemaextension remove: 'cmd/graph/schemaextension/schemaextension-remove.md'
+        - schemaextension set: 'cmd/graph/schemaextension/schemaextension-set.md'
+      - subscription:
+        - subscription add: 'cmd/graph/subscription/subscription-add.md'
+    - OneDrive (onedrive):
+      - report:
+        - report activityfilecounts: 'cmd/onedrive/report/report-activityfilecounts.md'
+        - report activityusercounts: 'cmd/onedrive/report/report-activityusercounts.md'
+        - report activityuserdetail: 'cmd/onedrive/report/report-activityuserdetail.md'
+        - report usageaccountcounts: 'cmd/onedrive/report/report-usageaccountcounts.md'
+        - report usageaccountdetail: 'cmd/onedrive/report/report-usageaccountdetail.md'
+        - report usagefilecounts: 'cmd/onedrive/report/report-usagefilecounts.md'
+        - report usagestorage: 'cmd/onedrive/report/report-usagestorage.md'
+    - Outlook (outlook):
+      - mail:
+        - mail send: 'cmd/outlook/mail/mail-send.md'
+      - message:
+        - message list: 'cmd/outlook/message/message-list.md'
+        - message move: 'cmd/outlook/message/message-move.md'
+      - report:
+        - report mailactivitycounts: 'cmd/outlook/report/report-mailactivitycounts.md'
+        - report mailactivityusercounts: 'cmd/outlook/report/report-mailactivityusercounts.md'
+        - report mailactivityuserdetail: 'cmd/outlook/report/report-mailactivityuserdetail.md'
+        - report mailappusageappsusercounts: 'cmd/outlook/report/report-mailappusageappsusercounts.md'
+        - report mailappusageusercounts: 'cmd/outlook/report/report-mailappusageusercounts.md'
+        - report mailappusageuserdetail: 'cmd/outlook/report/report-mailappusageuserdetail.md'
+        - report mailappusageversionsusercounts: 'cmd/outlook/report/report-mailappusageversionsusercounts.md'
+        - report mailboxusagedetail: 'cmd/outlook/report/report-mailboxusagedetail.md'
+        - report mailboxusagemailboxcount: 'cmd/outlook/report/report-mailboxusagemailboxcount.md'
+        - report mailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md'
+        - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
+    - PowerApps (pa):
+      - app:
+        - app list: 'cmd/pa/app/app-list.md'
+      - connector:
+        - connector export: 'cmd/pa/connector/connector-export.md'
+        - connector list: 'cmd/pa/connector/connector-list.md'
+      - pcf:
+        - pcf init: 'cmd/pa/pcf/pcf-init.md'
+      - solution:
+        - solution init: 'cmd/pa/solution/solution-init.md'
+        - solution reference add: 'cmd/pa/solution/solution-reference-add.md'
+    - Microsoft Planner (planner):
+      - task:
+        - task list: 'cmd/planner/task/task-list.md'
+    - Skype (skype):
+      - report:
+        - report activitycounts: 'cmd/skype/report/report-activitycounts.md'
+        - report activityusercounts: 'cmd/skype/report/report-activityusercounts.md'
+        - report activityuserdetail: 'cmd/skype/report/report-activityuserdetail.md'
+    - SharePoint Framework (spfx):
+      - doctor: 'cmd/spfx/doctor.md'
+      - project:
+        - project externalize: 'cmd/spfx/project/project-externalize.md'
+        - project rename: 'cmd/spfx/project/project-rename.md'
+        - project upgrade: 'cmd/spfx/project/project-upgrade.md'
+    - SharePoint Online (spo):
+      - get: 'cmd/spo/spo-get.md'
+      - search: 'cmd/spo/spo-search.md'
+      - set: 'cmd/spo/spo-set.md'
+      - app:
+        - app add: 'cmd/spo/app/app-add.md'
+        - app deploy: 'cmd/spo/app/app-deploy.md'
+        - app get: 'cmd/spo/app/app-get.md'
+        - app install: 'cmd/spo/app/app-install.md'
+        - app list: 'cmd/spo/app/app-list.md'
+        - app remove: 'cmd/spo/app/app-remove.md'
+        - app retract: 'cmd/spo/app/app-retract.md'
+        - app uninstall: 'cmd/spo/app/app-uninstall.md'
+        - app upgrade: 'cmd/spo/app/app-upgrade.md'
+      - apppage:
+        - apppage add: 'cmd/spo/apppage/apppage-add.md'
+        - apppage set: 'cmd/spo/apppage/apppage-set.md'
+      - cdn:
+        - cdn get: 'cmd/spo/cdn/cdn-get.md'
+        - cdn origin add: 'cmd/spo/cdn/cdn-origin-add.md'
+        - cdn origin list: 'cmd/spo/cdn/cdn-origin-list.md'
+        - cdn origin remove: 'cmd/spo/cdn/cdn-origin-remove.md'
+        - cdn policy list: 'cmd/spo/cdn/cdn-policy-list.md'
+        - cdn policy set: 'cmd/spo/cdn/cdn-policy-set.md'
+        - cdn set: 'cmd/spo/cdn/cdn-set.md'
+      - contenttype:
+        - contenttype add: 'cmd/spo/contenttype/contenttype-add.md'
+        - contenttype get: 'cmd/spo/contenttype/contenttype-get.md'
+        - contenttype remove: 'cmd/spo/contenttype/contenttype-remove.md'
+        - contenttype field remove: 'cmd/spo/contenttype/contenttype-field-remove.md'
+        - contenttype field set: 'cmd/spo/contenttype/contenttype-field-set.md'
+      - contenttypehub:
+        - contenttypehub get: 'cmd/spo/contenttypehub/contenttypehub-get.md'
+      - customaction:
+        - customaction add: 'cmd/spo/customaction/customaction-add.md'
+        - customaction clear: 'cmd/spo/customaction/customaction-clear.md'
+        - customaction get: 'cmd/spo/customaction/customaction-get.md'
+        - customaction list: 'cmd/spo/customaction/customaction-list.md'
+        - customaction remove: 'cmd/spo/customaction/customaction-remove.md'
+        - customaction set: 'cmd/spo/customaction/customaction-set.md'
+      - externaluser:
+        - externaluser list: 'cmd/spo/externaluser/externaluser-list.md'
+      - feature:
+        - feature disable: 'cmd/spo/feature/feature-disable.md'
+        - feature enable: 'cmd/spo/feature/feature-enable.md'
+        - feature list: 'cmd/spo/feature/feature-list.md'
+      - field:
+        - field add: 'cmd/spo/field/field-add.md'
+        - field get: 'cmd/spo/field/field-get.md'
+        - field remove: 'cmd/spo/field/field-remove.md'
+        - field set: 'cmd/spo/field/field-set.md'
+      - file:
+        - file add: 'cmd/spo/file/file-add.md'
+        - file checkin: 'cmd/spo/file/file-checkin.md'
+        - file checkout: 'cmd/spo/file/file-checkout.md'
+        - file copy: 'cmd/spo/file/file-copy.md'
+        - file get: 'cmd/spo/file/file-get.md'
+        - file list: 'cmd/spo/file/file-list.md'
+        - file move: 'cmd/spo/file/file-move.md'
+        - file remove: 'cmd/spo/file/file-remove.md'
+      - folder:
+        - folder add: 'cmd/spo/folder/folder-add.md'
+        - folder copy: 'cmd/spo/folder/folder-copy.md'
+        - folder get: 'cmd/spo/folder/folder-get.md'
+        - folder list: 'cmd/spo/folder/folder-list.md'
+        - folder move: 'cmd/spo/folder/folder-move.md'
+        - folder remove: 'cmd/spo/folder/folder-remove.md'
+        - folder rename: 'cmd/spo/folder/folder-rename.md'
+      - group:
+        - group get: 'cmd/spo/group/group-get.md'
+        - group list: 'cmd/spo/group/group-list.md'
+        - group remove: 'cmd/spo/group/group-remove.md'
+      - hidedefaultthemes:
+        - hidedefaultthemes get: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md'
+        - hidedefaultthemes set: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md'
+      - homesite:
+        - homesite get: 'cmd/spo/homesite/homesite-get.md'
+        - homesite remove: 'cmd/spo/homesite/homesite-remove.md'
+        - homesite set: 'cmd/spo/homesite/homesite-set.md'
+      - hubsite:
+        - hubsite connect: 'cmd/spo/hubsite/hubsite-connect.md'
+        - hubsite data get: 'cmd/spo/hubsite/hubsite-data-get.md'
+        - hubsite disconnect: 'cmd/spo/hubsite/hubsite-disconnect.md'
+        - hubsite get: 'cmd/spo/hubsite/hubsite-get.md'
+        - hubsite list: 'cmd/spo/hubsite/hubsite-list.md'
+        - hubsite register: 'cmd/spo/hubsite/hubsite-register.md'
+        - hubsite rights grant: 'cmd/spo/hubsite/hubsite-rights-grant.md'
+        - hubsite rights revoke: 'cmd/spo/hubsite/hubsite-rights-revoke.md'
+        - hubsite set: 'cmd/spo/hubsite/hubsite-set.md'
+        - hubsite theme sync: 'cmd/spo/hubsite/hubsite-theme-sync.md'
+        - hubsite unregister: 'cmd/spo/hubsite/hubsite-unregister.md'
+      - knowledgehub:
+        - knowledgehub get: 'cmd/spo/knowledgehub/knowledgehub-get.md'
+        - knowledgehub remove: 'cmd/spo/knowledgehub/knowledgehub-remove.md'
+        - knowledgehub set: 'cmd/spo/knowledgehub/knowledgehub-set.md'
+      - list:
+        - list add: 'cmd/spo/list/list-add.md'
+        - list get: 'cmd/spo/list/list-get.md'
+        - list list: 'cmd/spo/list/list-list.md'
+        - list remove: 'cmd/spo/list/list-remove.md'
+        - list set: 'cmd/spo/list/list-set.md'
+        - list contenttype add: 'cmd/spo/list/list-contenttype-add.md'
+        - list contenttype list: 'cmd/spo/list/list-contenttype-list.md'
+        - list contenttype remove: 'cmd/spo/list/list-contenttype-remove.md'
+        - list label get: 'cmd/spo/list/list-label-get.md'
+        - list label set: 'cmd/spo/list/list-label-set.md'
+        - list sitescript get: 'cmd/spo/list/list-sitescript-get.md'
+        - list view get: 'cmd/spo/list/list-view-get.md'
+        - list view list: 'cmd/spo/list/list-view-list.md'
+        - list view remove: 'cmd/spo/list/list-view-remove.md'
+        - list view set: 'cmd/spo/list/list-view-set.md'
+        - list view field add: 'cmd/spo/list/list-view-field-add.md'
+        - list view field remove: 'cmd/spo/list/list-view-field-remove.md'
+        - list webhook add: 'cmd/spo/list/list-webhook-add.md'
+        - list webhook get: 'cmd/spo/list/list-webhook-get.md'
+        - list webhook list: 'cmd/spo/list/list-webhook-list.md'
+        - list webhook remove: 'cmd/spo/list/list-webhook-remove.md'
+        - list webhook set: 'cmd/spo/list/list-webhook-set.md'
+      - listitem:
+        - listitem add: 'cmd/spo/listitem/listitem-add.md'
+        - listitem get: 'cmd/spo/listitem/listitem-get.md'
+        - listitem isrecord: 'cmd/spo/listitem/listitem-isrecord.md'
+        - listitem list: 'cmd/spo/listitem/listitem-list.md'
+        - listitem remove: 'cmd/spo/listitem/listitem-remove.md'
+        - listitem set: 'cmd/spo/listitem/listitem-set.md'
+        - listitem record declare: 'cmd/spo/listitem/listitem-record-declare.md'
+        - listitem record undeclare: 'cmd/spo/listitem/listitem-record-undeclare.md'
+      - mail:
+        - mail send: 'cmd/spo/mail/mail-send.md'
+      - navigation:
+        - navigation node add: 'cmd/spo/navigation/navigation-node-add.md'
+        - navigation node list: 'cmd/spo/navigation/navigation-node-list.md'
+        - navigation node remove: 'cmd/spo/navigation/navigation-node-remove.md'
+      - orgassetslibrary:
+        - orgassetslibrary add: 'cmd/spo/orgassetslibrary/orgassetslibrary-add.md'
+        - orgassetslibrary list: 'cmd/spo/orgassetslibrary/orgassetslibrary-list.md'
+        - orgassetslibrary remove: 'cmd/spo/orgassetslibrary/orgassetslibrary-remove.md'
+      - orgnewssite:
+        - orgnewssite list: 'cmd/spo/orgnewssite/orgnewssite-list.md'
+        - orgnewssite remove: 'cmd/spo/orgnewssite/orgnewssite-remove.md'
+        - orgnewssite set: 'cmd/spo/orgnewssite/orgnewssite-set.md'
+      - page:
+        - page add: 'cmd/spo/page/page-add.md'
+        - page get: 'cmd/spo/page/page-get.md'
+        - page list: 'cmd/spo/page/page-list.md'
+        - page remove: 'cmd/spo/page/page-remove.md'
+        - page set: 'cmd/spo/page/page-set.md'
+        - page clientsidewebpart add: 'cmd/spo/page/page-clientsidewebpart-add.md'
+        - page column get: 'cmd/spo/page/page-column-get.md'
+        - page column list: 'cmd/spo/page/page-column-list.md'
+        - page control get: 'cmd/spo/page/page-control-get.md'
+        - page control list: 'cmd/spo/page/page-control-list.md'
+        - page header set: 'cmd/spo/page/page-header-set.md'
+        - page section add: 'cmd/spo/page/page-section-add.md'
+        - page section get: 'cmd/spo/page/page-section-get.md'
+        - page section list: 'cmd/spo/page/page-section-list.md'
+        - page text add: 'cmd/spo/page/page-text-add.md'
+      - propertybag:
+        - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
+        - propertybag list: 'cmd/spo/propertybag/propertybag-list.md'
+        - propertybag remove: 'cmd/spo/propertybag/propertybag-remove.md'
+        - propertybag set: 'cmd/spo/propertybag/propertybag-set.md'
+      - report:
+        - report activityfilecounts: 'cmd/spo/report/report-activityfilecounts.md'
+        - report activitypages: 'cmd/spo/report/report-activitypages.md'
+        - report activityusercounts: 'cmd/spo/report/report-activityusercounts.md'
+        - report activityuserdetail: 'cmd/spo/report/report-activityuserdetail.md'
+        - report siteusagedetail: 'cmd/spo/report/report-siteusagedetail.md'
+        - report siteusagefilecounts: 'cmd/spo/report/report-siteusagefilecounts.md'
+        - report siteusagepages: 'cmd/spo/report/report-siteusagepages.md'
+        - report siteusagesitecounts: 'cmd/spo/report/report-siteusagesitecounts.md'
+        - report siteusagestorage: 'cmd/spo/report/report-siteusagestorage.md'
+      - serviceprincipal:
+        - serviceprincipal grant add: 'cmd/spo/serviceprincipal/serviceprincipal-grant-add.md'
+        - serviceprincipal grant list: 'cmd/spo/serviceprincipal/serviceprincipal-grant-list.md'
+        - serviceprincipal grant revoke: 'cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md'
+        - serviceprincipal permissionrequest approve: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md'
+        - serviceprincipal permissionrequest deny: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-deny.md'
+        - serviceprincipal permissionrequest list: 'cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-list.md'
+        - serviceprincipal set: 'cmd/spo/serviceprincipal/serviceprincipal-set.md'
+      - site:
+        - site add: 'cmd/spo/site/site-add.md'
+        - site get: 'cmd/spo/site/site-get.md'
+        - site groupify: 'cmd/spo/site/site-groupify.md'
+        - site list: 'cmd/spo/site/site-list.md'
+        - site remove: 'cmd/spo/site/site-remove.md'
+        - site rename: 'cmd/spo/site/site-rename.md'
+        - site set: 'cmd/spo/site/site-set.md'
+        - site appcatalog add: 'cmd/spo/site/site-appcatalog-add.md'
+        - site appcatalog remove: 'cmd/spo/site/site-appcatalog-remove.md'
+        - site classic add: 'cmd/spo/site/site-classic-add.md'
+        - site classic list: 'cmd/spo/site/site-classic-list.md'
+        - site classic remove: 'cmd/spo/site/site-remove.md'
+        - site classic set: 'cmd/spo/site/site-classic-set.md'
+        - site commsite enable: 'cmd/spo/site/site-commsite-enable.md'
+        - site inplacerecordsmanagement set: 'cmd/spo/site/site-inplacerecordsmanagement-set.md'
+      - sitedesign:
+        - sitedesign add: 'cmd/spo/sitedesign/sitedesign-add.md'
+        - sitedesign apply: 'cmd/spo/sitedesign/sitedesign-apply.md'
+        - sitedesign get: 'cmd/spo/sitedesign/sitedesign-get.md'
+        - sitedesign list: 'cmd/spo/sitedesign/sitedesign-list.md'
+        - sitedesign remove: 'cmd/spo/sitedesign/sitedesign-remove.md'
+        - sitedesign set: 'cmd/spo/sitedesign/sitedesign-set.md'
+        - sitedesign rights grant: 'cmd/spo/sitedesign/sitedesign-rights-grant.md'
+        - sitedesign rights list: 'cmd/spo/sitedesign/sitedesign-rights-list.md'
+        - sitedesign rights revoke: 'cmd/spo/sitedesign/sitedesign-rights-revoke.md'
+        - sitedesign run list: 'cmd/spo/sitedesign/sitedesign-run-list.md'
+        - sitedesign run status get: 'cmd/spo/sitedesign/sitedesign-run-status-get.md'
+        - sitedesign task get: 'cmd/spo/sitedesign/sitedesign-task-get.md'
+        - sitedesign task list: 'cmd/spo/sitedesign/sitedesign-task-list.md'
+        - sitedesign task remove: 'cmd/spo/sitedesign/sitedesign-task-remove.md'
+      - sitescript:
+        - sitescript add: 'cmd/spo/sitescript/sitescript-add.md'
+        - sitescript get: 'cmd/spo/sitescript/sitescript-get.md'
+        - sitescript list: 'cmd/spo/sitescript/sitescript-list.md'
+        - sitescript remove: 'cmd/spo/sitescript/sitescript-remove.md'
+        - sitescript set: 'cmd/spo/sitescript/sitescript-set.md'
+      - storageentity:
+        - storageentity get: 'cmd/spo/storageentity/storageentity-get.md'
+        - storageentity list: 'cmd/spo/storageentity/storageentity-list.md'
+        - storageentity remove: 'cmd/spo/storageentity/storageentity-remove.md'
+        - storageentity set: 'cmd/spo/storageentity/storageentity-set.md'
+      - tenant:
+        - tenant appcatalog add: 'cmd/spo/tenant/tenant-appcatalog-add.md'
+        - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
+        - tenant recyclebinitem list: 'cmd/spo/tenant/tenant-recyclebinitem-list.md'
+        - tenant settings list: 'cmd/spo/tenant/tenant-settings-list.md'
+        - tenant settings set: 'cmd/spo/tenant/tenant-settings-set.md'
+      - term:
+        - term add: 'cmd/spo/term/term-add.md'
+        - term get: 'cmd/spo/term/term-get.md'
+        - term list: 'cmd/spo/term/term-list.md'
+        - term group add: 'cmd/spo/term/term-group-add.md'
+        - term group get: 'cmd/spo/term/term-group-get.md'
+        - term group list: 'cmd/spo/term/term-group-list.md'
+        - term set add: 'cmd/spo/term/term-set-add.md'
+        - term set get: 'cmd/spo/term/term-set-get.md'
+        - term set list: 'cmd/spo/term/term-set-list.md'
+      - theme:
+        - theme apply: 'cmd/spo/theme/theme-apply.md'
+        - theme get: 'cmd/spo/theme/theme-get.md'
+        - theme list: 'cmd/spo/theme/theme-list.md'
+        - theme remove: 'cmd/spo/theme/theme-remove.md'
+        - theme set: 'cmd/spo/theme/theme-set.md'
+      - user:
+        - user get: 'cmd/spo/user/user-get.md'
+        - user list: 'cmd/spo/user/user-list.md'
+        - user remove: 'cmd/spo/user/user-remove.md'
+      - userprofile:
+        - userprofile set: 'cmd/spo/userprofile/userprofile-set.md'
+      - web:
+        - web add: 'cmd/spo/web/web-add.md'
+        - web clientsidewebpart list: 'cmd/spo/web/web-clientsidewebpart-list.md'
+        - web get: 'cmd/spo/web/web-get.md'
+        - web list: 'cmd/spo/web/web-list.md'
+        - web reindex: 'cmd/spo/web/web-reindex.md'
+        - web remove: 'cmd/spo/web/web-remove.md'
+        - web set: 'cmd/spo/web/web-set.md'
+    - Microsoft Teams (teams):
+      - app:
+        - app install: 'cmd/teams/app/app-install.md'
+        - app list: 'cmd/teams/app/app-list.md'
+        - app publish: 'cmd/teams/app/app-publish.md'
+        - app remove: 'cmd/teams/app/app-remove.md'
+        - app uninstall: 'cmd/teams/app/app-uninstall.md'
+        - app update: 'cmd/teams/app/app-update.md'
+      - channel:
+        - channel add: 'cmd/teams/channel/channel-add.md'
+        - channel get: 'cmd/teams/channel/channel-get.md'
+        - channel list: 'cmd/teams/channel/channel-list.md'
+        - channel remove: 'cmd/teams/channel/channel-remove.md'
+        - channel set: 'cmd/teams/channel/channel-set.md'
+      - funsettings:
+        - funsettings list: 'cmd/teams/funsettings/funsettings-list.md'
+        - funsettings set: 'cmd/teams/funsettings/funsettings-set.md'
+      - guestsettings:
+        - guestsettings list: 'cmd/teams/guestsettings/guestsettings-list.md'
+        - guestsettings set: 'cmd/teams/guestsettings/guestsettings-set.md'
+      - membersettings:
+        - membersettings list: 'cmd/teams/membersettings/membersettings-list.md'
+        - membersettings set: 'cmd/teams/membersettings/membersettings-set.md'
+      - message:
+        - message get: 'cmd/teams/message/message-get.md'
+        - message list: 'cmd/teams/message/message-list.md'
+        - message reply list: 'cmd/teams/message/message-reply-list.md'
+      - messagingsettings:
+        - messagingsettings list: 'cmd/teams/messagingsettings/messagingsettings-list.md'
+        - messagingsettings set: 'cmd/teams/messagingsettings/messagingsettings-set.md'
+      - report:
+        - report deviceusagedistributionusercounts: 'cmd/teams/report/report-deviceusagedistributionusercounts.md'
+        - report deviceusageusercounts: 'cmd/teams/report/report-deviceusageusercounts.md'
+        - report deviceusageuserdetail: 'cmd/teams/report/report-deviceusageuserdetail.md'
+        - report useractivitycounts: 'cmd/teams/report/report-useractivitycounts.md'
+        - report useractivityusercounts: 'cmd/teams/report/report-useractivityusercounts.md'
+        - report useractivityuserdetail: 'cmd/teams/report/report-useractivityuserdetail.md'
+      - tab:
+        - tab add: 'cmd/teams/tab/tab-add.md'
+        - tab get: 'cmd/teams/tab/tab-get.md'
+        - tab list: 'cmd/teams/tab/tab-list.md'
+        - tab remove: 'cmd/teams/tab/tab-remove.md'
+      - team:
+        - team add: 'cmd/teams/team/team-add.md'
+        - team archive: 'cmd/teams/team/team-archive.md'
+        - team clone: 'cmd/teams/team/team-clone.md'
+        - team list: 'cmd/teams/team/team-list.md'
+        - team remove: 'cmd/teams/team/team-remove.md'
+        - team set: 'cmd/teams/team/team-set.md'
+        - team unarchive: 'cmd/teams/team/team-unarchive.md'
+      - user:
+        - user add: 'cmd/aad/o365group/o365group-user-add.md'
+        - user list: 'cmd/aad/o365group/o365group-user-list.md'
+        - user remove: 'cmd/aad/o365group/o365group-user-remove.md'
+        - user set: 'cmd/aad/o365group/o365group-user-set.md'
+        - user app add: 'cmd/teams/user/user-app-add.md'
+        - user app list: 'cmd/teams/user/user-app-list.md'
+        - user app remove: 'cmd/teams/user/user-app-remove.md'
+    - Microsoft 365 (tenant):
+      - id:
+        - id get: 'cmd/tenant/id/id-get.md'
+      - report:
+        - report activeusercounts: 'cmd/tenant/report/report-activeusercounts.md'
+        - report activeuserdetail: 'cmd/tenant/report/report-activeuserdetail.md'
+        - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
+      - service:
+        - service list: 'cmd/tenant/service/service-list.md'
+        - service message list: 'cmd/tenant/service/service-message-list.md'
+        - service report historicalservicestatus: 'cmd/tenant/service/service-report-historicalservicestatus.md'
+      - status:
+        - status list: 'cmd/tenant/status/status-list.md'
+    - To Do (todo):
+      - list:
+        - list add: 'cmd/todo/list/list-add.md'
+        - list list: 'cmd/todo/list/list-list.md'
+        - list remove: 'cmd/todo/list/list-remove.md'
+        - list set: 'cmd/todo/list/list-set.md'
+    - Yammer (yammer):
+      - group:
+        - group list: 'cmd/yammer/group/group-list.md'
+        - group user add: 'cmd/yammer/group/group-user-add.md'
+        - group user remove: 'cmd/yammer/group/group-user-remove.md'
+      - message:
+        - message add: 'cmd/yammer/message/message-add.md'
+        - message get: 'cmd/yammer/message/message-get.md'
+        - message list: 'cmd/yammer/message/message-list.md'
+        - message remove: 'cmd/yammer/message/message-remove.md'
+        - message like set: 'cmd/yammer/message/message-like-set.md'
+      - network:
+        - network list: 'cmd/yammer/network/network-list.md'
+      - report:
+        - report activitycounts: 'cmd/yammer/report/report-activitycounts.md'
+        - report activityusercounts: 'cmd/yammer/report/report-activityusercounts.md'
+        - report activityuserdetail: 'cmd/yammer/report/report-activityuserdetail.md'
+        - report deviceusagedistributionusercounts: 'cmd/yammer/report/report-deviceusagedistributionusercounts.md'
+        - report deviceusageusercounts: 'cmd/yammer/report/report-deviceusageusercounts.md'
+        - report deviceusageuserdetail: 'cmd/yammer/report/report-deviceusageuserdetail.md'
+        - report groupsactivitycounts: 'cmd/yammer/report/report-groupsactivitycounts.md'
+        - report groupsactivitydetail: 'cmd/yammer/report/report-groupsactivitydetail.md'
+        - report groupsactivitygroupcounts: 'cmd/yammer/report/report-groupsactivitygroupcounts.md'
+      - user:
+        - user get: 'cmd/yammer/user/user-get.md'
+        - user list: 'cmd/yammer/user/user-list.md'
+    - Utilities (util):
+      - accesstoken:
+        - accesstoken get: 'cmd/util/accesstoken/accesstoken-get.md'
+  - Concepts:
+    - 'Persisting connection': 'concepts/persisting-connection.md'
+    - 'Authorization and access tokens': 'concepts/authorization-tokens.md'
+    - 'Command completion': 'concepts/completion.md'
+    - 'Communication with Microsoft 365': 'concepts/communicating-m365.md'
+    - 'GitHub Actions': 'concepts/github-actions.md'
+  - Sample Scripts:
+    - 'Introduction': 'sample-scripts/index.md'
+    - Azure Active Directory:
+      - 'Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups' : 'sample-scripts/aad/manage-group-users.md'
+      - 'Delete all Microsoft 365 groups' : 'sample-scripts/aad/delete-m365-groups.md'
+      - 'Scan for Microsoft 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
+    - Microsoft Graph:
+      - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
+    - Power Automate:
+      - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
+    - SharePoint Online:
+      - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
+      - 'Add custom client-side web part to modern page': 'sample-scripts/spo/add-custom-clientside-webpart-to-modern-page.md'
+      - 'Delete all (non-group connected) modern SharePoint sites': 'sample-scripts/spo/delete-non-group-connected-modern-sites.md'
+      - 'Delete custom color themes from SharePoint': 'sample-scripts/spo/remove-custom-themes.md'
+      - 'Delete custom SharePoint site designs': 'sample-scripts/spo/remove-site-designs.md'
+      - 'Delete custom SharePoint site scripts': 'sample-scripts/spo/remove-site-scripts.md'
+      - 'Disable the specified Tenant Wide Extension ': 'sample-scripts/spo/disable-tenant-wide-extension.md'
+      - 'Ensure the Site Assets Library is created': 'sample-scripts/spo/ensure-siteassets-library.md'
+      - 'Export configurations of Tenant Wide Extensions': 'sample-scripts/spo/export-configs-tenant-wide-extensions.md'
+      - 'Hide SharePoint list from Site Contents': 'sample-scripts/spo/hide-list-from-site-contents.md'
+      - 'Insert pictures in a SharePoint Document Library into a Word document': 'sample-scripts/spo/insert-sp-library-pictures-into-word.md'
+      - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
+      - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
+      - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
+      - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
+    - Microsoft Teams:
+      - 'Deploy a Microsoft Teams personal app and add it to users': 'sample-scripts/teams/install-personal-app.md'
+      - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
+      - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
+      - 'List app usage in Microsoft Teams': 'sample-scripts/teams/list-teams-app-usage.md'
+      - 'Remove a Microsoft Teams personal app': 'sample-scripts/teams/remove-personal-app.md'
+      - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'
+  - About:
+    - 'Why this CLI': 'about/why-cli.md'
+    - 'Comparison to SharePoint and Microsoft 365 PowerShell': 'about/comparison-powershell.md'
+    - 'Release notes': 'about/release-notes.md'
+    - License: 'about/license.md'
+theme:
+  name: 'material'
+  palette:
+    primary: 'red'
+  logo: 'images/pnp-cli-microsoft365-white.svg'
+  feature:
+    tabs: true
+google_analytics:
+  - 'UA-110480857-1'
+  - 'auto'
+extra_css:
+  - 'css/styles.css'
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - pymdownx.superfences
+  - def_list
+extra:
+  social:
+    - type: 'twitter'
+      link: 'https://twitter.com/m365pnp'
+    - type: 'youtube'
+      link: 'http://aka.ms/sppnp-videos'
+    - type: 'link'
+      link: 'https://aka.ms/sppnp'
+repo_url: http://github.com/pnp/cli-microsoft365
+edit_uri: blob/master/docs/docs
