@@ -35,6 +35,7 @@
 - excluded missing global options in 'spo tenant settings set' [#1903](https://github.com/pnp/cli-microsoft365/issues/1903)
 - added support for specifying Team name in `teams channel add` [#1888](https://github.com/pnp/cli-microsoft365/issues/1888)
 - excluded missing global options in 'aad user list' [#1909](https://github.com/pnp/cli-microsoft365/issues/1909)
+- fixed 'spo file get' for large files [#1796](https://github.com/pnp/cli-microsoft365/issues/1796)
 
 ## [v3.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.1.0)
 
