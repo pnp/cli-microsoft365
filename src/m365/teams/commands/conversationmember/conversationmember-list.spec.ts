@@ -199,9 +199,9 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
 
   it('lists conversation members (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
         return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
             "@odata.count": 2,
             "value": [
                 {
@@ -261,9 +261,9 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
 
   it('lists conversation members with teamId and channelId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
         return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
             "@odata.count": 2,
             "value": [
                 {
@@ -322,9 +322,9 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
 
   it('lists conversation members with teamName and channelName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
         return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
             "@odata.count": 2,
             "value": [
                 {
@@ -378,7 +378,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels?$filter=displayName eq '${encodeURIComponent('Private Channel')}'`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels",
           "@odata.count": 1,
           "value": [
               {
@@ -431,9 +431,9 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
 
   it('lists conversation members with teamId and channelName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
         return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
             "@odata.count": 2,
             "value": [
                 {
@@ -487,7 +487,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels?$filter=displayName eq '${encodeURIComponent('Private Channel')}'`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels",
           "@odata.count": 1,
           "value": [
               {
@@ -560,7 +560,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       try {
         assert.strictEqual(
           JSON.stringify(err), 
-          JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
+          JSON.stringify(new CommandError(`The specified team 'Other Human Resources' does not exist in Microsoft Teams`)));
         done();
       }
       catch (e) {
@@ -600,7 +600,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels?$filter=displayName eq '${encodeURIComponent('Other Private Channel')}'`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels",
           "@odata.count": 0,
           "value": []
         });
@@ -618,7 +618,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       try {
         assert.strictEqual(
           JSON.stringify(err), 
-          JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
+          JSON.stringify(new CommandError(`The specified channel 'Other Private Channel' does not exist in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`)));
         done();
       }
       catch (e) {
@@ -629,9 +629,9 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
 
   it('lists conversation members with teamName and channelId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
         return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
             "@odata.count": 2,
             "value": [
                 {
@@ -788,9 +788,9 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
 
   it('lists conversation members (json)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
         return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
             "@odata.count": 2,
             "value": [
                 {

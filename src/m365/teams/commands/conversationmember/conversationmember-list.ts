@@ -50,7 +50,7 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
         this.teamId = teamId;
         return this.getChannelId(teamId, args);
       }).then((channelId: string) => {
-        let endpoint: string = `${this.resource}/beta/teams/${this.teamId}/channels/${channelId}/members`;
+        let endpoint: string = `${this.resource}/v1.0/teams/${this.teamId}/channels/${channelId}/members`;
         return this.getAllItems(endpoint, logger, true);
       }).then((): void => {
         if (args.options.output === 'json') {
@@ -74,19 +74,19 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
     const options: CommandOption[] = [
       {
         option: '-i, --teamId [teamId]',
-        description: 'The ID of the team where the channel is located'
+        description: 'The ID of the team where the channel is located. Specify either teamId or teamName, but not both.'
       },
       {
         option: '--teamName [teamName]',
-        description: 'The name of the team where the channel is located'
+        description: 'The name of the team where the channel is located. Specify either teamId or teamName, but not both.'
       },
       {
         option: '-c, --channelId [channelId]',
-        description: 'The ID of the channel for which to list members'
+        description: 'The ID of the channel for which to list members. Specify either channelId or channelName, but not both.'
       },
       {
         option: '--channelName [channelName]',
-        description: 'The name of the channel for which to list members'
+        description: 'The name of the channel for which to list members. Specify either channelId or channelName, but not both.'
       }
     ];
 
@@ -142,7 +142,7 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
           const teamItem: Team | undefined = response.value[0];
 
           if (!teamItem) {
-            return reject(`The specified team does not exist in the Microsoft Teams`);
+            return reject(`The specified team '${args.options.teamName}' does not exist in Microsoft Teams`);
           }
 
           if (response.value.length > 1) {
@@ -174,7 +174,7 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
           const channelItem: Channel | undefined = response.value[0];
 
           if (!channelItem) {
-            return reject(`The specified channel does not exist in the Microsoft Teams team`);
+            return reject(`The specified channel '${args.options.channelName}' does not exist in the Microsoft Teams team with ID '${teamId}'`);
           }
 
           return resolve(channelItem.id);
