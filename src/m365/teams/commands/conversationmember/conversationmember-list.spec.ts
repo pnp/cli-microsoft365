@@ -122,6 +122,29 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     });
     assert.notStrictEqual(actual, true);
   });
+
+  
+  it('fails validation if teamName and teamId are specified', () => {
+    const actual = command.validate({
+      options: {
+        teamId: "fce9e580-8bba-4638-ab5c-ab40016651e3",
+        teamName: "Human Resources",
+        channelName: "Private Channel"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if channelName and channelId are specified', () => {
+    const actual = command.validate({
+      options: {
+        teamName: "Human Resources",
+        channelName: "Private Channel",
+        channelId: "19:eb30973b42a847a2a1df92d91e37c76a@thread.skype"
+      }
+    });
+    assert.notStrictEqual(actual, true);
+  });
   
   it('validates for a correct teamId and channelId input', () => {
     const actual = command.validate({
@@ -236,7 +259,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     });
   });
 
-  it('lists conversation members with (teamId and channelId)', (done) => {
+  it('lists conversation members with teamId and channelId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
         return Promise.resolve({
@@ -297,7 +320,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     });
   });
 
-  it('lists conversation members with (teamName and channelName)', (done) => {
+  it('lists conversation members with teamName and channelName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
         return Promise.resolve({
@@ -406,7 +429,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     });
   });
 
-  it('lists conversation members with (teamId and channelName)', (done) => {
+  it('lists conversation members with teamId and channelName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
         return Promise.resolve({
@@ -514,9 +537,97 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       }
     });
   });
-
   
-  it('lists conversation members with (teamName and channelId)', (done) => {
+  it('fails listing conversation members with invalid teamName', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent('Other Human Resources')}'`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
+          "@odata.count": 0,
+          "value": []
+        });
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        teamName: "Other Human Resources",
+        channelName: "Other Private Channel"
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(
+          JSON.stringify(err), 
+          JSON.stringify(new CommandError(`The specified team does not exist in the Microsoft Teams`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails listing conversation members with invalid channelName', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
+          "@odata.count": 1,
+          "value": [
+              {
+                  "id": "47d6625d-a540-4b59-a4ab-19b787e40593",
+                  "createdDateTime": null,
+                  "displayName": "Human Resources",
+                  "description": "Human Resources",
+                  "internalId": null,
+                  "classification": null,
+                  "specialization": null,
+                  "visibility": null,
+                  "webUrl": null,
+                  "isArchived": false,
+                  "isMembershipLimitedToOwners": null,
+                  "memberSettings": null,
+                  "guestSettings": null,
+                  "messagingSettings": null,
+                  "funSettings": null,
+                  "discoverySettings": null
+              }
+          ]
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels?$filter=displayName eq '${encodeURIComponent('Other Private Channel')}'`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels",
+          "@odata.count": 0,
+          "value": []
+        });
+      }
+
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, {
+      options: {
+        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
+        channelName: "Other Private Channel"
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(
+          JSON.stringify(err), 
+          JSON.stringify(new CommandError(`The specified channel does not exist in the Microsoft Teams team`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('lists conversation members with teamName and channelId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/19:586a8b9e36c4479bbbd378e439a96df2@thread.skype/members`) {
         return Promise.resolve({
