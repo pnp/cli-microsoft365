@@ -56,6 +56,12 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
+  static isValidUserPrincipalName(upn: string): boolean {
+    const upnRegEx = new RegExp(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i);
+
+    return upnRegEx.test(upn);
+  }
+
   public static isDateInRange(date: string, monthOffset: number): boolean {
     const d: Date = new Date(date);
     let cutoffDate: Date = new Date();

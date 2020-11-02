@@ -7,7 +7,7 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import AadCommand from '../../../base/AadCommand';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 import { ServicePrincipal } from './ServicePrincipal';
 
@@ -29,7 +29,7 @@ interface Options extends GlobalOptions {
   scope: string;
 }
 
-class AadAppRoleAssignmentAddCommand extends AadCommand {
+class AadAppRoleAssignmentAddCommand extends GraphCommand {
   public get name(): string {
     return commands.APPROLEASSIGNMENT_ADD;
   }
@@ -53,16 +53,16 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
       queryFilter = `$filter=appId eq '${encodeURIComponent(args.options.appId)}'`;
     }
     else if (args.options.objectId) {
-      queryFilter = `$filter=objectId eq '${encodeURIComponent(args.options.objectId)}'`;
+      queryFilter = `$filter=id eq '${encodeURIComponent(args.options.objectId)}'`;
     }
     else {
       queryFilter = `$filter=displayName eq '${encodeURIComponent(args.options.displayName as string)}'`;
     }
 
     const getServicePrinciplesRequestOptions: any = {
-      url: `${this.resource}/myorganization/servicePrincipals?api-version=1.6&${queryFilter}`,
+      url: `${this.resource}/v1.0/servicePrincipals?${queryFilter}`,
       headers: {
-        accept: 'application/json;odata=nometadata;streaming=false'
+        accept: 'application/json'
       },
       responseType: 'json'
     };
@@ -74,34 +74,34 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
           return Promise.reject('More than one service principal found. Please use the appId or objectId option to make sure the right service principal is specified.');
         }
 
-        objectId = servicePrincipalResult.value[0].objectId;
+        objectId = servicePrincipalResult.value[0].id;
 
         let resource: string = encodeURIComponent(args.options.resource);
 
         // try resolve aliases that the user might enter since these are seen in the Azure portal
         switch (args.options.resource.toLocaleLowerCase()) {
           case 'sharepoint':
-            resource = 'Microsoft 365 SharePoint Online';
+            resource = 'Office 365 SharePoint Online';
             break;
           case 'intune':
             resource = 'Microsoft Intune API';
             break;
           case 'exchange':
-            resource = 'Microsoft 365 Exchange Online';
+            resource = 'Office 365 Exchange Online';
             break;
         }
 
         // will perform resource name, appId or objectId search
-        let filter: string = `$filter=publisherName eq '${resource}' or (displayName eq '${resource}' or startswith(displayName,'${resource}'))`;
+        let filter: string = `$filter=(displayName eq '${resource}' or startswith(displayName,'${resource}'))`;
 
         if (Utils.isValidGuid(resource)) {
-          filter += ` or appId eq '${resource}' or objectId eq '${resource}'`;
+          filter += ` or appId eq '${resource}' or id eq '${resource}'`;
         }
 
         const requestOptions: any = {
-          url: `${this.resource}/myorganization/servicePrincipals?api-version=1.6&${filter}`,
+          url: `${this.resource}/v1.0/servicePrincipals?${filter}`,
           headers: {
-            'accept': 'application/json;odata=nometadata;streaming=false'
+            'accept': 'application/json'
           },
           responseType: 'json'
         };
@@ -116,7 +116,7 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
         for (const servicePrincipal of res.value) {
           for (const role of servicePrincipal.appRoles) {
             appRolesFound.push({
-              resourceId: servicePrincipal.objectId,
+              resourceId: servicePrincipal.id,
               objectId: role.id,
               value: role.value
             });
@@ -162,7 +162,7 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
         }
         else {
           logger.log(rolesAddedResponse.map((result: any) => ({
-            objectId: result.objectId,
+            objectId: result.id,
             principalDisplayName: result.principalDisplayName,
             resourceDisplayName: result.resourceDisplayName
           })));
@@ -178,14 +178,13 @@ class AadAppRoleAssignmentAddCommand extends AadCommand {
 
   private addRoleToServicePrincipal(objectId: string, appRole: AppRole): Promise<any> {
     const requestOptions: any = {
-      url: `${this.resource}/myorganization/servicePrincipals/${objectId}/appRoleAssignments?api-version=1.6`,
+      url: `${this.resource}/v1.0/servicePrincipals/${objectId}/appRoleAssignments`,
       headers: {
-        'accept': 'application/json;odata=nometadata;streaming=false',
         'Content-Type': 'application/json'
       },
       responseType: 'json',
       data: {
-        id: appRole.objectId,
+        appRoleId: appRole.objectId,
         principalId: objectId,
         resourceId: appRole.resourceId
       }

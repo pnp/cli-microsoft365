@@ -11,7 +11,7 @@ m365 aad o365group user add [options]
 ## Alias
 
 ```sh
-m365 aad teams user add
+m365 teams user add
 ```
 
 ## Options
@@ -60,5 +60,5 @@ m365 aad o365group user add --groupId '00000000-0000-0000-0000-000000000000' --u
 Add a new member to the specified Microsoft Teams team
 
 ```sh
-m365 aad teams user add --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
+m365 teams user add --teamId '00000000-0000-0000-0000-000000000000' --userName 'anne.matthews@contoso.onmicrosoft.com'
 ```

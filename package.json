@@ -1,6 +1,6 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -71,6 +71,11 @@
       "name": "Mark Powney",
       "email": "mpowney@icloud.com",
       "web": "https://blog.powney.info/"
+    },
+    {
+      "name": "Patrick Lamber",
+      "email": "patrick@nubo.eu",
+      "web": "https://www.nubo.eu/"
     }
   ],
   "contributors": [
@@ -108,6 +113,7 @@
     "Menon, Arjun <arjun.umenon@gmail.com>",
     "Mücklisch, Steve <steve.muecklisch@gmail.com>",
     "Nachan, Nanddeep <nanddeepnachan@gmail.com>",
+    "Nachan, Smita <smita.nachan@gmail.com>",
     "Nikolić, Aleksandar <alexandair@live.com>",
     "Plenevaux, Yannick <yannick.plenevaux@gmail.com>",
     "Powney, Mark <powney.mark@outlook.com>",

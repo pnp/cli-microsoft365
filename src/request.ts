@@ -123,12 +123,12 @@ class Request {
           }
           return this.req(options);
         })
-        .then((res: AxiosResponse<TResponse>): void => {
+        .then((res: any): void => {
           if (resolve) {
-            resolve(res.data);
+            resolve(options.responseType === 'stream' ? res : res.data);
           }
           else {
-            _resolve(res.data);
+            _resolve(options.responseType === 'stream' ? res : res.data);
           }
         }, (error: AxiosError): void => {
           if (error && error.response &&
