@@ -92,6 +92,7 @@ nav:
         - run cancel: 'cmd/flow/run/run-cancel.md'
         - run get: 'cmd/flow/run/run-get.md'
         - run list: 'cmd/flow/run/run-list.md'
+        - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Microsoft Graph (graph):
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
