@@ -104,7 +104,7 @@ npm install -g @pnp/cli-microsoft365
 ```
 
 <details>
-  <summary>Install beta version</summary>
+  <summary>Install beta version  β</summary>
 
   ```
   npm install -g @pnp/cli-microsoft365@next
@@ -112,7 +112,7 @@ npm install -g @pnp/cli-microsoft365
 </details>
 
 <details>
-  <summary>Alternate package managers</summary>
+  <summary>Alternate package managers 🧶</summary>
 
   ### yarn
 
@@ -127,6 +127,16 @@ npm install -g @pnp/cli-microsoft365
   ```
 </details>
 
+<details>
+  <summary>Run CLI for Microsoft 365 in a Docker container 🐳</summary>
+
+  ```
+  docker run --rm -it m365pnp/cli-microsoft365:latest
+  ```
+
+  Checkout our [guide](https://pnp.github.io/cli-microsoft365/user-guide/run-cli-in-docker-container/) to learn more about how to run CLI for Microsoft 365 using Docker
+</details>
+
 ## Usage
 
 Use the `login` command to start the Device Code login flow to authenticate with your Microsoft 365 tenant. 
@@ -135,7 +145,7 @@ Use the `login` command to start the Device Code login flow to authenticate with
 m365 login
 ```
 
->On your first login you will be asked to consent to several permissions that the `PnP Management Shell` multi-tenant app requires for the commands to work successfully against your tenant. If you want to create your own identity to use with the CLI, refer to the [Using your own Azure AD Identity](user-guide/using-own-identity/) guide.
+>On your first login you will be asked to consent to several permissions that the `PnP Management Shell` multi-tenant app requires for the commands to work successfully against your tenant. If you want to create your own identity to use with the CLI, refer to the [Using your own Azure AD Identity](https://pnp.github.io/cli-microsoft365/user-guide/using-own-identity/) guide.
 
 >For alternative authentication methods and usage, refer to the [login](https://pnp.github.io/cli-microsoft365/cmd/login/) command documentation
 
