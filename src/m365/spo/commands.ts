@@ -47,6 +47,7 @@ export default {
   FILE_LIST: `${prefix} file list`,
   FILE_MOVE: `${prefix} file move`,
   FILE_REMOVE: `${prefix} file remove`,
+  FILE_SHARINGINFO_GET: `${prefix} file sharinginfo get`,
   FOLDER_ADD: `${prefix} folder add`,
   FOLDER_COPY: `${prefix} folder copy`,
   FOLDER_GET: `${prefix} folder get`,

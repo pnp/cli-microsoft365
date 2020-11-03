@@ -209,6 +209,7 @@ nav:
         - file list: 'cmd/spo/file/file-list.md'
         - file move: 'cmd/spo/file/file-move.md'
         - file remove: 'cmd/spo/file/file-remove.md'
+        - file sharinginfo get: 'cmd/spo/file/file-sharinginfo-get.md'
       - folder:
         - folder add: 'cmd/spo/folder/folder-add.md'
         - folder copy: 'cmd/spo/folder/folder-copy.md'
