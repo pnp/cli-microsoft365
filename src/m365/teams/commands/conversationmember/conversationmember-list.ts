@@ -50,7 +50,7 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
         this.teamId = teamId;
         return this.getChannelId(teamId, args);
       }).then((channelId: string) => {
-        let endpoint: string = `${this.resource}/v1.0/teams/${this.teamId}/channels/${channelId}/members`;
+        let endpoint: string = `${this.resource}/v1.0/teams/${this.teamId}/channels/${encodeURIComponent(channelId)}/members`;
         return this.getAllItems(endpoint, logger, true);
       }).then((): void => {
         if (args.options.output === 'json') {
@@ -129,7 +129,7 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
     
     return new Promise<string>((resolve: (channelId: string) => void, reject: (error: any) => void): void => {
       const teamRequestOptions: any = {
-        url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+        url: `${this.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
@@ -156,30 +156,50 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
 
   private getChannelId(teamId: string, args: CommandArgs): Promise<string> {
     if (args.options.channelId) {
-      return Promise.resolve(args.options.channelId);
+      const channelIdRequestOptions: any = {
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=id eq '${encodeURIComponent(args.options.channelId as string)}'`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+
+      return new Promise<string>((resolve: (channelId: string) => void, reject: (error: any) => void): void => {
+        request
+          .get<{ value: Channel[] }>(channelIdRequestOptions)
+          .then(response => {
+            const channelItem: Channel | undefined = response.value[0];
+
+            if (!channelItem) {
+              return reject(`The specified channel '${args.options.channelId}' does not exist or is invalid in the Microsoft Teams team with ID '${teamId}'`);
+            }
+
+            return resolve(channelItem.id);
+          }, err => reject(err));
+      });
+    } else {
+      const channelRequestOptions: any = {
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
+        headers: {
+          accept: 'application/json;odata.metadata=none'
+        },
+        responseType: 'json'
+      };
+
+      return new Promise<string>((resolve: (channelId: string) => void, reject: (error: any) => void): void => {
+        request
+          .get<{ value: Channel[] }>(channelRequestOptions)
+          .then(response => {
+            const channelItem: Channel | undefined = response.value[0];
+
+            if (!channelItem) {
+              return reject(`The specified channel '${args.options.channelName}' does not exist in the Microsoft Teams team with ID '${teamId}'`);
+            }
+
+            return resolve(channelItem.id);
+          }, err => reject(err));
+      });
     }
-
-    const channelRequestOptions: any = {
-      url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return new Promise<string>((resolve: (channelId: string) => void, reject: (error: any) => void): void => {
-      request
-        .get<{ value: Channel[] }>(channelRequestOptions)
-        .then(response => {
-          const channelItem: Channel | undefined = response.value[0];
-
-          if (!channelItem) {
-            return reject(`The specified channel '${args.options.channelName}' does not exist in the Microsoft Teams team with ID '${teamId}'`);
-          }
-
-          return resolve(channelItem.id);
-        }, err => reject(err));
-    });
   }
 }
 
