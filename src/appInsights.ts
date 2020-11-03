@@ -10,9 +10,11 @@ config.setInternalLogging(false, false);
 // to distinguish production and dev version of the CLI
 // in the telemetry
 const version: string = `${packageJSON.version}${fs.existsSync(path.join(__dirname, `..${path.sep}src`)) ? '-dev' : ''}`;
+const env: string = process.env.CLIMICROSOFT365_ENV !== undefined ? process.env.CLIMICROSOFT365_ENV : '';
 appInsights.defaultClient.commonProperties = {
   version: version,
-  node: process.version
+  node: process.version,
+  env: env
 };
 appInsights.defaultClient.context.tags['ai.session.id'] = crypto.randomBytes(24).toString('base64');
 delete appInsights.defaultClient.context.tags['ai.cloud.roleInstance'];

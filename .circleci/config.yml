@@ -57,6 +57,36 @@ jobs:
       - run:
           name: Publish @next
           command: npm publish --tag next --access public
+      - persist_to_workspace:
+          root: .
+          paths: .
+  docker_next:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/cli-microsoft365
+      - setup_remote_docker:
+          version: 19.03.13
+      - run:
+          name: Extract version from package
+          command: |
+            echo "export PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Login to Docker Hub
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - run: 
+          name: Build :$PACKAGE_VERSION
+          command: docker build --pull --rm -t m365pnp/cli-microsoft365:$PACKAGE_VERSION "." --build-arg CLI_VERSION=$PACKAGE_VERSION
+      - run: 
+          name: Publish :$PACKAGE_VERSION
+          command: docker push m365pnp/cli-microsoft365:$PACKAGE_VERSION
+      - run: 
+          name: Build :next
+          command: docker build --pull --no-cache --rm -t m365pnp/cli-microsoft365:next "." --build-arg CLI_VERSION=$PACKAGE_VERSION
+      - run: 
+          name: Publish :next
+          command: docker push m365pnp/cli-microsoft365:next
   publish:
     <<: *defaults
     steps:
@@ -68,6 +98,33 @@ jobs:
       - run:
           name: Publish
           command: npm publish --access public
+  docker:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/cli-microsoft365
+      - setup_remote_docker:
+          version: 19.03.13
+      - run:
+          name: Extract version from package
+          command: |
+            echo "export PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Login to Docker Hub
+          command: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - run: 
+          name: Build :$PACKAGE_VERSION
+          command: docker build --pull --rm -t m365pnp/cli-microsoft365:$PACKAGE_VERSION "." --build-arg CLI_VERSION=$PACKAGE_VERSION
+      - run: 
+          name: Publish :$PACKAGE_VERSION
+          command: docker push m365pnp/cli-microsoft365:$PACKAGE_VERSION
+      - run: 
+          name: Build :latest
+          command: docker build --pull --no-cache --rm -t m365pnp/cli-microsoft365:latest "." --build-arg CLI_VERSION=$PACKAGE_VERSION
+      - run: 
+          name: Publish :latest
+          command: docker push m365pnp/cli-microsoft365:latest
   deploy_docs:
     working_directory: ~/cli-microsoft365/docs
     docker:
@@ -93,7 +150,7 @@ jobs:
       - run:
           name: Build docs
           command: mkdocs gh-deploy -m "[ci skip]"
-
+  
 workflows:
   version: 2
   check_pr:
@@ -126,6 +183,12 @@ workflows:
           filters:
             branches:
               only: master
+      - docker_next:
+          requires:
+            - publish_next
+          filters:
+            branches:
+              only: master
       - deploy_docs:
           requires:
             - publish_next
@@ -151,6 +214,14 @@ workflows:
       - publish:
           requires:
             - test
+          filters:
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+/
+            branches:
+              ignore: /.*/
+      - docker:
+          requires:
+            - publish
           filters:
             tags:
               only: /^v[0-9]+\.[0-9]+\.[0-9]+/
