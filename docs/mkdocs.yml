@@ -487,6 +487,8 @@ nav:
         - list list: 'cmd/todo/list/list-list.md'
         - list remove: 'cmd/todo/list/list-remove.md'
         - list set: 'cmd/todo/list/list-set.md'
+      - task:
+        - task list: 'cmd/todo/task/task-list.md'
     - Yammer (yammer):
       - group:
         - group list: 'cmd/yammer/group/group-list.md'
