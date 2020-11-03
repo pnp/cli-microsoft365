@@ -12,5 +12,6 @@ export default {
   FLOW_LIST: `${prefix} list`,
   FLOW_REMOVE: `${prefix} remove`,
   FLOW_RUN_GET: `${prefix} run get`,
-  FLOW_RUN_LIST: `${prefix} run list`
+  FLOW_RUN_LIST: `${prefix} run list`,
+  FLOW_RUN_RESUBMIT: `${prefix} run resubmit`,
 };
