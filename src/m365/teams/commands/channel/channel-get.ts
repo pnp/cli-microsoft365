@@ -1,14 +1,11 @@
 import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
-import { Team } from '../../Team';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -47,8 +44,8 @@ class TeamsChannelGetCommand extends GraphCommand {
       return Promise.resolve(args.options.teamId);
     }
 
-    const teamRequestOptions: any = {
-      url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+    const requestOptions: any = {
+      url: `${this.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -56,11 +53,11 @@ class TeamsChannelGetCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: Team[] }>(teamRequestOptions)
+      .get<{ value: [{ id: string }] }>(requestOptions)
       .then(response => {
-        const teamItem: Team | undefined = response.value[0];
+        const groupItem: { id: string } | undefined = response.value[0];
 
-        if (!teamItem) {
+        if (!groupItem) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 
@@ -68,7 +65,7 @@ class TeamsChannelGetCommand extends GraphCommand {
           return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
         }
 
-        return Promise.resolve(teamItem.id);
+        return Promise.resolve(groupItem.id);
       });
   }
 
