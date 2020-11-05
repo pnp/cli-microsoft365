@@ -2,10 +2,18 @@
 
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
+### New commands
+
+**SharePoint:**
+
+- [spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md) - restores the specified deleted Site Collection from Tenant Recycle Bin [#1362](https://github.com/pnp/cli-microsoft365/issues/1362)
+
 ### Changes
 
-- extends channel list with teamName fixes [#1914](https://github.com/pnp/cli-microsoft365/pull/1914)
-- extends `teams channel get` command with support for teamName and channelName options [#1918](https://github.com/pnp/cli-microsoft365/pull/1918)
+- extended channel list with teamName [#1889](https://github.com/pnp/cli-microsoft365/issues/1889)
+- extended `teams channel get` command with support for teamName and channelName options [#1887](https://github.com/pnp/cli-microsoft365/issues/1887)
+- extended 'spo tenant settings set' with DisableCustomAppAuthentication [#1829](https://github.com/pnp/cli-microsoft365/issues/1829)
+- added the 'Analyze Microsoft 365 User Profile Photos using Azure Computer Vision API' sample script [#1894](https://github.com/pnp/cli-microsoft365/issues/1894)
 
 ## [v3.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.2.0)
 
