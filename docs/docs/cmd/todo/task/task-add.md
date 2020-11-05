@@ -34,11 +34,6 @@ m365 todo task add [options]
 `--debug`
 : Runs command with debug logging
 
-## Remarks
-
-!!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
-
 ## Examples
 
 Add a task with title _New task_ to Microsoft To Do tasks list with the name _My task list_

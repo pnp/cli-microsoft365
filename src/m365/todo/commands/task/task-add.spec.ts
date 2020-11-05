@@ -14,7 +14,7 @@ describe(commands.TASK_ADD, () => {
   let logger: Logger;
 
   const getRequestData = {
-    "@odata.context": "https://graph.microsoft.com/beta/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",
     "value": [
       {
         "@odata.etag": "W/\"hHKQZHItDEOVCn8U3xuA2AABoWDAng==\"",
@@ -55,14 +55,14 @@ describe(commands.TASK_ADD, () => {
     };
     (command as any).items = [];
     sinon.stub(request, 'post').callsFake((opts: any) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists/AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==/tasks`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==/tasks`) {
         return Promise.resolve(postRequestData);
       }
       return Promise.reject();
     });
 
     sinon.stub(request, 'get').callsFake((opts: any) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'Tasks List'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks List'`) {
         return Promise.resolve(getRequestData);
       }
       return Promise.reject();
@@ -131,10 +131,10 @@ describe(commands.TASK_ADD, () => {
   it('rejects if no tasks list is found with the specified list name', (done) => {
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts: any) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'Tasks List'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'Tasks List'`) {
         return Promise.resolve(
           {
-            "@odata.context": "https://graph.microsoft.com/beta/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('4cb2b035-ad76-406c-bdc4-6c72ad403a22')/todo/lists",
             "value": []
           }
         );

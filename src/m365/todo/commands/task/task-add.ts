@@ -35,7 +35,7 @@ class TodoTaskAddCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${this.resource}/beta`;
+    const endpoint: string = `${this.resource}/v1.0`;
 
     let id: string | undefined;
 
