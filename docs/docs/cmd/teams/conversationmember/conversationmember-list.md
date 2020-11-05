@@ -1,6 +1,6 @@
 # teams conversationmember list
 
-Lists members of a private channel in Microsoft Teams in the current tenant
+Lists members of a channel in Microsoft Teams in the current tenant
 
 ## Usage
 
@@ -36,10 +36,6 @@ m365 teams conversationmember list [options]
 
 `--debug`
 : Runs command with debug logging
-
-## Remarks
-
-You can only see the content of private channels. Regular channels are not supported. The underlying API currently does not support pagination, so if there's too many members to fit into one request, you won't get all the members.
 
 ## Examples
 

@@ -31,7 +31,7 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
   }
 
   public get description(): string {
-    return 'Lists all conversational members of a private channel.';
+    return 'Lists members of a channel in Microsoft Teams in the current tenant.';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -50,7 +50,7 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
         this.teamId = teamId;
         return this.getChannelId(teamId, args);
       }).then((channelId: string) => {
-        let endpoint: string = `${this.resource}/v1.0/teams/${this.teamId}/channels/${encodeURIComponent(channelId)}/members`;
+        let endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(channelId)}/members`;
         return this.getAllItems(endpoint, logger, true);
       }).then((): void => {
         if (args.options.output === 'json') {
@@ -157,7 +157,7 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
   private getChannelId(teamId: string, args: CommandArgs): Promise<string> {
     if (args.options.channelId) {
       const channelIdRequestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=id eq '${encodeURIComponent(args.options.channelId as string)}'`,
+        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(args.options.channelId as string)}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
@@ -166,16 +166,17 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
 
       return new Promise<string>((resolve: (channelId: string) => void, reject: (error: any) => void): void => {
         request
-          .get<{ value: Channel[] }>(channelIdRequestOptions)
-          .then(response => {
-            const channelItem: Channel | undefined = response.value[0];
-
-            if (!channelItem) {
-              return reject(`The specified channel '${args.options.channelId}' does not exist or is invalid in the Microsoft Teams team with ID '${teamId}'`);
-            }
-
+          .get<Channel>(channelIdRequestOptions)
+          .then((response: Channel) => {
+            const channelItem: Channel | undefined = response;
             return resolve(channelItem.id);
-          }, err => reject(err));
+          }, (err: any) => {
+            if(err.error && err.error.code == "NotFound") {
+              return reject(`The specified channel '${args.options.channelId}' does not exist or is invalid in the Microsoft Teams team with ID '${teamId}'`);
+            } else {
+              return reject(err);
+            }            
+          });
       });
     } else {
       const channelRequestOptions: any = {
