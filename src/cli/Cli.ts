@@ -558,7 +558,7 @@ export class Cli {
       Cli.log();
 
       //Sort commands groups (because of aliased commands)
-      const sortedCommandGroupsToPrint = Object.keys(commandGroupsToPrint).sort().reduce(function (object: any, key: string) {object[key] = commandGroupsToPrint[key];return object;}, {})
+      const sortedCommandGroupsToPrint = Object.keys(commandGroupsToPrint).sort().reduce((object: { [group: string]: number }, key: string) => { object[key] = commandGroupsToPrint[key]; return object; }, {});
 
       for (let commandGroup in sortedCommandGroupsToPrint) {
         Cli.log(`  ${`${commandGroup} *`.padEnd(maxLength, ' ')}  ${commandGroupsToPrint[commandGroup]} command${commandGroupsToPrint[commandGroup] === 1 ? '' : 's'}`);
