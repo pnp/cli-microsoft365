@@ -1,5 +1,12 @@
 # Release notes
 
+## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
+
+### Changes
+
+- extends channel list with teamName fixes [#1914](https://github.com/pnp/cli-microsoft365/pull/1914)
+- extends `teams channel get` command with support for teamName and channelName options [#1918](https://github.com/pnp/cli-microsoft365/pull/1918)
+
 ## [v3.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.2.0)
 
 ### New commands
