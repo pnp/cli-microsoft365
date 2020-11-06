@@ -45,11 +45,11 @@ When specifying the JSON string with web part properties on Windows, you have to
 Update the web part data for the control with ID _3ede60d3-dc2c-438b-b5bf-cc40bb2351e1_ placed on a modern page with name _home.aspx_
 
 ```sh
-m365 spo page control get --id 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1 --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --webPartData '{"title":"New WP Title","properties": {"description": "New description"}}'
+m365 spo page control set --id 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1 --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --webPartData '{"title":"New WP Title","properties": {"description": "New description"}}'
 ```
 
 Update the web part properties for the control with ID _3ede60d3-dc2c-438b-b5bf-cc40bb2351e1_ placed on a modern page with name _home.aspx_
 
 ```sh
-m365 spo page control get --id 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1 --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --webPartProperties '{"description": "New description"}'
+m365 spo page control set --id 3ede60d3-dc2c-438b-b5bf-cc40bb2351e1 --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --webPartProperties '{"description": "New description"}'
 ```
