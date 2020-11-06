@@ -6,6 +6,7 @@ import { CommandOption, CommandCancel, CommandValidate } from '../../../../Comma
 import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
 import config from '../../../../config';
 import { SpoOperation } from '../site/SpoOperation';
+import Utils from '../../../../Utils';
 
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
@@ -35,7 +36,6 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.url = typeof args.options.url !== 'undefined';
     telemetryProps.wait = typeof args.options.wait !== 'undefined';
     telemetryProps.confirm = typeof args.options.confirm !== 'undefined';
     return telemetryProps;
@@ -62,7 +62,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
           headers: {
             'X-RequestDigest': this.context.FormDigestValue
           },
-          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="16" ObjectPathId="15" /><Query Id="17" ObjectPathId="15"><Query SelectAllProperties="false"><Properties><Property Name="PollingInterval" ScalarProperty="true" /><Property Name="IsComplete" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="15" ParentId="1" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${args.options.url}</Parameter></Parameters></Method><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
+          body: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="16" ObjectPathId="15" /><Query Id="17" ObjectPathId="15"><Query SelectAllProperties="false"><Properties><Property Name="PollingInterval" ScalarProperty="true" /><Property Name="IsComplete" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Method Id="15" ParentId="1" Name="RemoveDeletedSite"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.url)}</Parameter></Parameters></Method><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`
         };
   
         return request.post(requestOptions);
@@ -76,7 +76,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
           }
           else {
             const operation: SpoOperation = json[json.length - 1];
-            let isComplete: boolean = operation.IsComplete;
+            const isComplete: boolean = operation.IsComplete;
             if (!args.options.wait || isComplete) {
               resolve();
               return;
@@ -179,11 +179,11 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
   Examples:
 
     Removes a deleted site collection from tenant recycle bin
-    ${commands.TENANT_RECYCLEBINITEM_REMOVE} --url https://contoso.sharepoint.com/sites/team
+      ${commands.TENANT_RECYCLEBINITEM_REMOVE} --url https://contoso.sharepoint.com/sites/team
 
     Removes a deleted site collection from tenant recycle bin
     and wait for the removing process to complete
-    ${commands.TENANT_RECYCLEBINITEM_REMOVE} --url https://contoso.sharepoint.com/sites/team --wait
+      ${commands.TENANT_RECYCLEBINITEM_REMOVE} --url https://contoso.sharepoint.com/sites/team --wait
     `);
   }
 }
