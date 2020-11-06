@@ -323,15 +323,15 @@ describe(commands.TASK_LIST, () => {
         const expected = JSON.stringify([
           {
             "title": "Stay healthy",
-            "importance": "normal",
-            "isReminderOn": false,
+            "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
+            "status": "notStarted",
             "createdDateTime": "2020-11-01T17:13:13.9582172Z",
             "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z"
           },
           {
             "title": "Eat food",
-            "importance": "normal",
-            "isReminderOn": false,
+            "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuOAAA=",
+            "status": "notStarted",
             "createdDateTime": "2020-11-01T17:13:10.7970391Z",
             "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z"
           }

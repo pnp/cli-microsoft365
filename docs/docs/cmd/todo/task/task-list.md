@@ -31,11 +31,6 @@ m365 todo task list [options]
 `--debug`
 : Runs command with debug logging
 
-## Remarks
-
-!!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
-
 ## Examples
 
 List tasks from Microsoft To Do tasks list with the name _My task list_
@@ -47,5 +42,5 @@ m365 todo task list --listName "My task list"
 List tasks from Microsoft To Do tasks list with the id AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA==
 
 ```sh
-m365 todo task add --title "New task" --listId "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA=="
+m365 todo task list --listId "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA=="
 ```

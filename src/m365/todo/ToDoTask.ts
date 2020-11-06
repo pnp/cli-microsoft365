@@ -1,7 +1,7 @@
 export interface ToDoTask {
   title: string,
-  importance: string,
-  isReminderOn: boolean,
+  id: string,
+  status: string,
   createdDateTime: Date,
   lastModifiedDateTime: Date
 }

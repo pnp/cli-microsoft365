@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   listId?: string;
 }
 
-class ToDoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
+class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
   public get name(): string {
     return `${commands.TASK_LIST}`;
   }
@@ -32,13 +32,13 @@ class ToDoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
     return telemetryProps;
   }
 
-  private getListId(args: CommandArgs): Promise<string> {
+  private getTodoListId(args: CommandArgs): Promise<string> {
     if (args.options.listId) {
       return Promise.resolve(args.options.listId);
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${encodeURIComponent(args.options.listName as string)}'`,
+      url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(args.options.listName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -47,19 +47,19 @@ class ToDoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
 
     return request.get<{ value: [{ id: string }] }>(requestOptions)
       .then(response => {
-        const listItem: { id: string } | undefined = response.value[0];
+        const taskList: { id: string } | undefined = response.value[0];
 
-        if (!listItem) {
+        if (!taskList) {
           return Promise.reject(`The specified task list does not exist`);
         }
 
-        return Promise.resolve(listItem.id);
+        return Promise.resolve(taskList.id);
       });
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
-      .getListId(args)
+      .getTodoListId(args)
       .then((listId: string): Promise<any> => {
         const endpoint: string = `${this.resource}/v1.0/me/todo/lists/${listId}/tasks`;
         return this.getAllItems(endpoint, logger, true)
@@ -72,8 +72,8 @@ class ToDoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
           logger.log(this.items.map(m => {
             return {
               title: m.title,
-              importance: m.importance,
-              isReminderOn: m.isReminderOn,
+              id: m.id,
+              status: m.status,
               createdDateTime: m.createdDateTime,
               lastModifiedDateTime: m.lastModifiedDateTime
             }
@@ -117,4 +117,4 @@ class ToDoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
   }
 }
 
-module.exports = new ToDoTaskListCommand();
+module.exports = new TodoTaskListCommand();
