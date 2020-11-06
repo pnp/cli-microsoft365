@@ -132,11 +132,11 @@ class SpoPageControlSetCommand extends SpoCommand {
         description: 'URL of the site where the page to retrieve is located'
       },
       {
-        option: '--webPartData <webPartData>',
+        option: '--webPartData [webPartData]',
         description: 'JSON string with web part data as retrieved from the web part maintenance mode. Specify webPartProperties or webPartData but not both'
       },
       {
-        option: '--webPartProperties <webPartProperties>',
+        option: '--webPartProperties [webPartProperties]',
         description: 'JSON string with web part data as retrieved from the web part maintenance mode. Specify webPartProperties or webPartData but not both'
       }
     ];
