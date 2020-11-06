@@ -301,6 +301,7 @@ nav:
         - page column list: 'cmd/spo/page/page-column-list.md'
         - page control get: 'cmd/spo/page/page-control-get.md'
         - page control list: 'cmd/spo/page/page-control-list.md'
+        - page control set: 'cmd/spo/page/page-control-set.md'
         - page header set: 'cmd/spo/page/page-header-set.md'
         - page section add: 'cmd/spo/page/page-section-add.md'
         - page section get: 'cmd/spo/page/page-section-get.md'

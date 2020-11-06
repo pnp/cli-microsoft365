@@ -337,12 +337,12 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
   }
 
   /**
- * Provides functionality to extend the given object by doing a shallow copy
- *
- * @param target The object to which properties will be copied
- * @param source The source object from which properties will be copied
- *
- */
+   * Provides functionality to extend the given object by doing a shallow copy
+   *
+   * @param target The object to which properties will be copied
+   * @param source The source object from which properties will be copied
+   *
+   */
   private extend(target: any, source: any): any {
     return Object.getOwnPropertyNames(source)
       .reduce((t: any, v: string) => {

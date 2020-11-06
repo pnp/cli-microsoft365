@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
+import { ClientSidePageProperties } from './ClientSidePageProperties';
 import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './clientsidepages';
 import { PageItem } from './PageItem';
 
@@ -11,10 +12,7 @@ export class Page {
         logger.log(`Retrieving information about the page...`);
       }
 
-      let pageName: string = name;
-      if (pageName.indexOf('.aspx') < 0) {
-        pageName += '.aspx';
-      }
+      let pageName: string = this.getPageNameWithExtension(name);
 
       const requestOptions: any = {
         url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
@@ -39,6 +37,78 @@ export class Page {
           catch (e) {
             reject(e);
           }
+        }, (error: any): void => {
+          reject(error);
+        });
+    });
+  }
+
+  public static checkout(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePageProperties> {
+    return new Promise<ClientSidePageProperties>((resolve: (page: ClientSidePageProperties) => void, reject: (error: any) => void): void => {
+      if (verbose) {
+        logger.log(`Checking out ${name} page...`);
+      }
+
+      const pageName: string = this.getPageNameWithExtension(name);
+      const requestOptions: any = {
+        url: `${webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')/checkoutpage`,
+        headers: {
+          'accept': 'application/json;odata=nometadata'
+        },
+        responseType: 'json'
+      };
+
+      request
+        .post<ClientSidePageProperties>(requestOptions)
+        .then((pageData: ClientSidePageProperties) => {
+          if (!pageData) {
+            reject(`Page ${name} information not retrieved with the checkout`);
+            return;
+          }
+
+          if (verbose) {
+            logger.log(`Page ${name} is now checked out`);
+          }
+
+          resolve(pageData);
+        }, (error: any): void => {
+          reject(error);
+        });
+    });
+  }
+
+  public static save(name: string, webUrl: string, canvasContent: any, logger: Logger, debug: boolean, verbose: boolean): Promise<void> {
+    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+      if (verbose) {
+        logger.log(`Saving ${name} page...`);
+      }
+
+      if (!canvasContent) {
+        reject('No canvas content was provided');
+        return;
+      }
+
+      const pageName: string = this.getPageNameWithExtension(name);
+      const requestOptions: any = {
+        url: `${webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')/savepage`,
+        headers: {
+          'accept': 'application/json;odata=nometadata',
+          'content-type': 'application/json;odata=nometadata'
+        },
+        data: {
+          CanvasContent1: JSON.stringify(canvasContent)
+        },
+        responseType: 'json'
+      };
+
+      request
+        .post(requestOptions)
+        .then((res: any) => {
+          if (verbose) {
+            logger.log(res);
+          }
+
+          resolve();
         }, (error: any): void => {
           reject(error);
         });
@@ -96,5 +166,14 @@ export class Page {
       order: section.order,
       columns: section.columns.map(column => this.getColumnsInformation(column, isJSONOutput))
     }
+  }
+
+  private static getPageNameWithExtension(name: string): string {
+    let pageName: string = name;
+    if (pageName.indexOf('.aspx') < 0) {
+      pageName += '.aspx';
+    }
+    
+    return pageName;
   }
 }
