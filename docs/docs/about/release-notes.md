@@ -18,6 +18,8 @@
 - extended `teams channel get` command with support for teamName and channelName options [#1887](https://github.com/pnp/cli-microsoft365/issues/1887)
 - extended 'spo tenant settings set' with DisableCustomAppAuthentication [#1829](https://github.com/pnp/cli-microsoft365/issues/1829)
 - added the 'Analyze Microsoft 365 User Profile Photos using Azure Computer Vision API' sample script [#1894](https://github.com/pnp/cli-microsoft365/issues/1894)
+- fixed displaying command groups in alphabetical order in help [#1922](https://github.com/pnp/cli-microsoft365/issues/1922)
+- fixed excluding command and arguments as field values in 'spo file add' [#1936](https://github.com/pnp/cli-microsoft365/issues/1936)
 
 ## [v3.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.2.0)
 
