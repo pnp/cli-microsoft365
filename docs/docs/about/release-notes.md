@@ -4,6 +4,9 @@
 
 ### New commands
 
+**Teams:**
+- [teams conversationmember list](../cmd/teams/conversationmember/conversationmember-list.md) - List all conversational members of a channel [#1880](https://github.com/pnp/cli-microsoft365/issues/1880)
+
 **Power Automate:**
 
 - [flow run cancel](../cmd/flow/run/run-cancel.md) - cancels the specified Microsoft Flow [#1870](https://github.com/pnp/cli-microsoft365/issues/1870)
@@ -15,7 +18,7 @@
 ### Changes
 
 - extended channel list with teamName [#1889](https://github.com/pnp/cli-microsoft365/issues/1889)
-- extended `teams channel get` command with support for teamName and channelName options [#1887](https://github.com/pnp/cli-microsoft365/issues/1887)
+- extended 'teams channel get' command with support for teamName and channelName options [#1887](https://github.com/pnp/cli-microsoft365/issues/1887)
 - extended 'spo tenant settings set' with DisableCustomAppAuthentication [#1829](https://github.com/pnp/cli-microsoft365/issues/1829)
 - added the 'Analyze Microsoft 365 User Profile Photos using Azure Computer Vision API' sample script [#1894](https://github.com/pnp/cli-microsoft365/issues/1894)
 - fixed displaying command groups in alphabetical order in help [#1922](https://github.com/pnp/cli-microsoft365/issues/1922)
