@@ -1,20 +1,16 @@
 # Release notes
 
-## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
-
-### New commands
-
-**To Do:**
-
-- [todo task list](../cmd/todo/task/task-list.md) - List tasks in a Microsoft To Do task list [#1901](https://github.com/pnp/cli-microsoft365/issues/1901)
-
-
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
 ### New commands
 
 **Teams:**
-- [teams conversationmember list](../cmd/teams/conversationmember/conversationmember-list.md) - List all conversational members of a channel [#1880](https://github.com/pnp/cli-microsoft365/issues/1880)
+
+- [teams conversationmember list](../cmd/teams/conversationmember/conversationmember-list.md) - lists all conversational members of a channel [#1880](https://github.com/pnp/cli-microsoft365/issues/1880)
+
+**To Do:**
+
+- [todo task list](../cmd/todo/task/task-list.md) - lists tasks in a Microsoft To Do task list [#1901](https://github.com/pnp/cli-microsoft365/issues/1901)
 
 **Power Automate:**
 
