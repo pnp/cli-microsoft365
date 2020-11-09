@@ -498,7 +498,10 @@ export class Cli {
 
   private printCommandHelp(): void {
     let helpFilePath = '';
-    const commandNameWords = (this.optionsFromArgs as { options: minimist.ParsedArgs }).options._;
+    let commandNameWords: string[] = [];
+    if (this.commandToExecute) {
+       commandNameWords = (this.commandToExecute.name).split(' ');
+    }
     const pathChunks: string[] = [this.commandsFolder, '..', '..', 'docs', 'docs', 'cmd'];
 
     if (commandNameWords.length === 1) {
