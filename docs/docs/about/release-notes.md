@@ -1,5 +1,14 @@
 # Release notes
 
+## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
+
+### New commands
+
+**To Do:**
+
+- [todo task list](../cmd/todo/task/task-list.md) - List tasks in a Microsoft To Do task list [#1901](https://github.com/pnp/cli-microsoft365/issues/1901)
+
+
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
 ### New commands
