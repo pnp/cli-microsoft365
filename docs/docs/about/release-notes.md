@@ -4,6 +4,15 @@
 
 ### New commands
 
+**Power Automate:**
+
+- [flow run cancel](../cmd/flow/run/run-cancel.md) - cancels the specified Microsoft Flow [#1870](https://github.com/pnp/cli-microsoft365/issues/1870)
+
+**SharePoint:**
+
+- [spo tenant recyclebinitem remove](../cmd/spo/tenant/tenant-recyclebinitem-remove.md) - removes the specified deleted Site Collection from Tenant Recycle Bin [#1145](https://github.com/pnp/cli-microsoft365/issues/1145)
+- [spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md) - restores the specified deleted Site Collection from Tenant Recycle Bin [#1362](https://github.com/pnp/cli-microsoft365/issues/1362)
+
 **Teams:**
 
 - [teams conversationmember list](../cmd/teams/conversationmember/conversationmember-list.md) - lists all conversational members of a channel [#1880](https://github.com/pnp/cli-microsoft365/issues/1880)
@@ -11,14 +20,7 @@
 **To Do:**
 
 - [todo task list](../cmd/todo/task/task-list.md) - lists tasks in a Microsoft To Do task list [#1901](https://github.com/pnp/cli-microsoft365/issues/1901)
-
-**Power Automate:**
-
-- [flow run cancel](../cmd/flow/run/run-cancel.md) - cancels the specified Microsoft Flow [#1870](https://github.com/pnp/cli-microsoft365/issues/1870)
-
-**SharePoint:**
-
-- [spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md) - restores the specified deleted Site Collection from Tenant Recycle Bin [#1362](https://github.com/pnp/cli-microsoft365/issues/1362)
+- [todo task remove](../cmd/todo/task/task-remove.md) - removes the specified Microsoft To Do task [#1900](https://github.com/pnp/cli-microsoft365/issues/1900)
 
 ### Changes
 
