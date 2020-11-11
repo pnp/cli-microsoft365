@@ -375,6 +375,7 @@ nav:
         - tenant appcatalog add: 'cmd/spo/tenant/tenant-appcatalog-add.md'
         - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
         - tenant recyclebinitem list: 'cmd/spo/tenant/tenant-recyclebinitem-list.md'
+        - tenant recyclebinitem remove: 'cmd/spo/tenant/tenant-recyclebinitem-remove.md'
         - tenant recyclebinitem restore: 'cmd/spo/tenant/tenant-recyclebinitem-restore.md'
         - tenant settings list: 'cmd/spo/tenant/tenant-settings-list.md'
         - tenant settings set: 'cmd/spo/tenant/tenant-settings-set.md'
