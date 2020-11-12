@@ -70,6 +70,20 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
       })
       .then((): void => {
         logger.log(this.items);
+        if (args.options.output === 'json') {
+          logger.log(this.items);
+        }
+        else {
+          logger.log(this.items.map(m => {
+            return {
+              id: m.id,
+              title: m.title,
+              status: m.status,
+              createdDateTime: m.createdDateTime,
+              lastModifiedDateTime: m.lastModifiedDateTime
+            }
+          }));
+        }
 
         if (this.verbose) {
           logger.logToStderr(chalk.green('DONE'));
