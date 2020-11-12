@@ -63,7 +63,7 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['title', 'status', 'createdDateTime', 'lastModifiedDateTime']);
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'status', 'createdDateTime', 'lastModifiedDateTime']);
   });
 
   it('fails validation if both listId and listName options are passed', () => {
@@ -290,32 +290,18 @@ describe(commands.TASK_LIST, () => {
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('e1251b10-1ba4-49e3-b35a-933e3f21772b')/todo/lists('AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA%3D%3D')/tasks",
           "value": [
             {
-              "@odata.etag": "W/\"xMBBaLl1lk+dAn8KkjfXKQABF7wl/A==\"",
-              "importance": "normal",
-              "isReminderOn": false,
-              "status": "notStarted",
-              "title": "Stay healthy",
-              "createdDateTime": "2020-11-01T17:13:13.9582172Z",
-              "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z",
               "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
-              "body": {
-                "content": "",
-                "contentType": "text"
-              }
+              "title": "Stay healthy",
+              "status": "notStarted",
+              "createdDateTime": "2020-11-01T17:13:13.9582172Z",
+              "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z"
             },
             {
-              "@odata.etag": "W/\"xMBBaLl1lk+dAn8KkjfXKQABF7wl8w==\"",
-              "importance": "normal",
-              "isReminderOn": false,
-              "status": "notStarted",
-              "title": "Eat food",
-              "createdDateTime": "2020-11-01T17:13:10.7970391Z",
-              "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z",
               "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuOAAA=",
-              "body": {
-                "content": "",
-                "contentType": "text"
-              }
+              "title": "Eat food",
+              "status": "notStarted",
+              "createdDateTime": "2020-11-01T17:13:10.7970391Z",
+              "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z"
             }
           ]
         });
@@ -334,32 +320,18 @@ describe(commands.TASK_LIST, () => {
         const actual = JSON.stringify(log[log.length - 1]);
         const expected = JSON.stringify([
           {
-            "@odata.etag": "W/\"xMBBaLl1lk+dAn8KkjfXKQABF7wl/A==\"",
-            "importance": "normal",
-            "isReminderOn": false,
-            "status": "notStarted",
-            "title": "Stay healthy",
-            "createdDateTime": "2020-11-01T17:13:13.9582172Z",
-            "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z",
             "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
-            "body": {
-              "content": "",
-              "contentType": "text"
-            }
+            "title": "Stay healthy",
+            "status": "notStarted",
+            "createdDateTime": "2020-11-01T17:13:13.9582172Z",
+            "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z"
           },
           {
-            "@odata.etag": "W/\"xMBBaLl1lk+dAn8KkjfXKQABF7wl8w==\"",
-            "importance": "normal",
-            "isReminderOn": false,
-            "status": "notStarted",
-            "title": "Eat food",
-            "createdDateTime": "2020-11-01T17:13:10.7970391Z",
-            "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z",
             "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuOAAA=",
-            "body": {
-              "content": "",
-              "contentType": "text"
-            }
+            "title": "Eat food",
+            "status": "notStarted",
+            "createdDateTime": "2020-11-01T17:13:10.7970391Z",
+            "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z"
           }
         ]);
         assert.strictEqual(actual, expected);
