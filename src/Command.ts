@@ -112,7 +112,9 @@ export default abstract class Command {
   public getTelemetryProperties(args: any): any {
     return {
       debug: this.debug.toString(),
-      verbose: this.verbose.toString()
+      verbose: this.verbose.toString(),
+      output: args.options.output,
+      query: typeof args.options.query !== 'undefined'
     };
   }
 
