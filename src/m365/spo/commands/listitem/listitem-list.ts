@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   filter?: string;
   pageNumber?: string;
   pageSize?: string;
-  query?: string;
+  camlQuery?: string;
   title?: string;
   webUrl: string;
 }
@@ -43,7 +43,7 @@ class SpoListItemListCommand extends SpoCommand {
     telemetryProps.filter = typeof args.options.filter !== 'undefined';
     telemetryProps.pageNumber = typeof args.options.pageNumber !== 'undefined';
     telemetryProps.pageSize = typeof args.options.pageSize !== 'undefined';
-    telemetryProps.query = typeof args.options.query !== 'undefined';
+    telemetryProps.camlQuery = typeof args.options.camlQuery !== 'undefined';
     return telemetryProps;
   }
 
@@ -61,7 +61,7 @@ class SpoListItemListCommand extends SpoCommand {
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
 
     ((): Promise<any> => {
-      if (args.options.query) {
+      if (args.options.camlQuery) {
         if (this.debug) {
           logger.logToStderr(`getting request digest for query request`);
         }
@@ -73,7 +73,7 @@ class SpoListItemListCommand extends SpoCommand {
       }
     })()
       .then((res: ContextInfo): Promise<any> => {
-        formDigestValue = args.options.query ? res.FormDigestValue : '';
+        formDigestValue = args.options.camlQuery ? res.FormDigestValue : '';
 
         if (args.options.pageNumber && Number(args.options.pageNumber) > 0) {
           const rowLimit: string = `$top=${Number(args.options.pageSize) * Number(args.options.pageNumber)}`;
@@ -103,16 +103,16 @@ class SpoListItemListCommand extends SpoCommand {
         const fieldSelect: string = fieldsArray.length > 0 ?
           `?$select=${encodeURIComponent(fieldsArray.join(","))}&${rowLimit}&${skipToken}&${filter}` :
           `?${rowLimit}&${skipToken}&${filter}`
-        const requestBody: any = args.options.query ?
+        const requestBody: any = args.options.camlQuery ?
           {
             "query": {
-              "ViewXml": args.options.query
+              "ViewXml": args.options.camlQuery
             }
           }
           : ``;
 
         const requestOptions: any = {
-          url: `${listRestUrl}/${args.options.query ? `GetItems` : `items${fieldSelect}`}`,
+          url: `${listRestUrl}/${args.options.camlQuery ? `GetItems` : `items${fieldSelect}`}`,
           headers: {
             'accept': 'application/json;odata=nometadata',
             'X-RequestDigest': formDigestValue
@@ -121,7 +121,7 @@ class SpoListItemListCommand extends SpoCommand {
           data: requestBody
         };
 
-        return args.options.query ? request.post(requestOptions) : request.get(requestOptions);
+        return args.options.camlQuery ? request.post(requestOptions) : request.get(requestOptions);
       })
       .then((listItemInstances: ListItemInstanceCollection): void => {
         logger.log(listItemInstances.value);
@@ -152,16 +152,16 @@ class SpoListItemListCommand extends SpoCommand {
         description: 'Page number to return if pageSize is specified (first page is indexed as value of 0)'
       },
       {
-        option: '-q, --query [query]',
+        option: '-q, --camlQuery [camlQuery]',
         description: 'CAML query to use to retrieve items. Will ignore pageSize and pageNumber if specified'
       },
       {
         option: '-f, --fields [fields]',
-        description: 'Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested. Specify query or fields but not both'
+        description: 'Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested. Specify camlQuery or fields but not both'
       },
       {
-        option: '-l, --filter [odataFilter]',
-        description: 'OData filter to use to query the list of items with. Specify query or filter but not both'
+        option: '-l, --filter [filter]',
+        description: 'OData filter to use to query the list of items with. Specify camlQuery or filter but not both'
       },
     ];
 
@@ -175,7 +175,7 @@ class SpoListItemListCommand extends SpoCommand {
         'webUrl',
         'id',
         'title',
-        'query',
+        'camlQuery',
         'pageSize',
         'pageNumber',
         'fields',
@@ -198,16 +198,16 @@ class SpoListItemListCommand extends SpoCommand {
       return `Specify list id or title but not both`;
     }
 
-    if (args.options.query && args.options.fields) {
-      return `Specify query or fields but not both`;
+    if (args.options.camlQuery && args.options.fields) {
+      return `Specify camlQuery or fields but not both`;
     }
 
-    if (args.options.query && args.options.pageSize) {
-      return `Specify query or pageSize but not both`;
+    if (args.options.camlQuery && args.options.pageSize) {
+      return `Specify camlQuery or pageSize but not both`;
     }
 
-    if (args.options.query && args.options.pageNumber) {
-      return `Specify query or pageNumber but not both`;
+    if (args.options.camlQuery && args.options.pageNumber) {
+      return `Specify camlQuery or pageNumber but not both`;
     }
 
     if (args.options.pageSize && isNaN(Number(args.options.pageSize))) {
