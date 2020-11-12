@@ -497,6 +497,7 @@ nav:
         - task remove: 'cmd/todo/task/task-remove.md'
         - task set: 'cmd/todo/task/task-set.md'
     - Yammer (yammer):
+      - search: 'cmd/yammer/yammer-search.md'
       - group:
         - group list: 'cmd/yammer/group/group-list.md'
         - group user add: 'cmd/yammer/group/group-user-add.md'
@@ -518,7 +519,7 @@ nav:
         - report deviceusageuserdetail: 'cmd/yammer/report/report-deviceusageuserdetail.md'
         - report groupsactivitycounts: 'cmd/yammer/report/report-groupsactivitycounts.md'
         - report groupsactivitydetail: 'cmd/yammer/report/report-groupsactivitydetail.md'
-        - report groupsactivitygroupcounts: 'cmd/yammer/report/report-groupsactivitygroupcounts.md'
+        - report groupsactivitygroupcounts: 'cmd/yammer/report/report-groupsactivitygroupcounts.md'        
       - user:
         - user get: 'cmd/yammer/user/user-get.md'
         - user list: 'cmd/yammer/user/user-list.md'
