@@ -180,18 +180,18 @@ describe(commands.LISTITEM_LIST, () => {
     assert(actual);
   });
 
-  it('fails validation if query and fields are specified together', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><ViewFields><FieldRef Name="Title" /><FieldRef Name="Id" /></ViewFields></Query>', fields: 'Title,Id' } });
+  it('fails validation if camlQuery and fields are specified together', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', camlQuery: '<Query><ViewFields><FieldRef Name="Title" /><FieldRef Name="Id" /></ViewFields></Query>', fields: 'Title,Id' } });
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if query and pageSize are specified together', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><RowLimit>2</RowLimit></Query>', pageSize: 3 } });
+  it('fails validation if camlQuery and pageSize are specified together', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', camlQuery: '<Query><RowLimit>2</RowLimit></Query>', pageSize: 3 } });
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if query and pageNumber are specified together', () => {
-    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', query: '<Query><RowLimit>2</RowLimit></Query>', pageNumber: 3 } });
+  it('fails validation if camlQuery and pageNumber are specified together', () => {
+    const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com', title: 'Demo List', camlQuery: '<Query><RowLimit>2</RowLimit></Query>', pageNumber: 3 } });
     assert.notStrictEqual(actual, true);
   });
 
@@ -380,7 +380,7 @@ describe(commands.LISTITEM_LIST, () => {
     
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with a query specified, and output set to json, and debug mode is enabled', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with a camlQuery specified, and output set to json, and debug mode is enabled', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -388,7 +388,7 @@ describe(commands.LISTITEM_LIST, () => {
       debug: true, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      query: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>",
+      camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>",
       output: "json"
     }
 
@@ -403,7 +403,7 @@ describe(commands.LISTITEM_LIST, () => {
     });
   });
 
-  it('returns array of listItemInstance objects when a list of items is requested with a query specified, and debug mode is disabled', (done) => {
+  it('returns array of listItemInstance objects when a list of items is requested with a camlQuery specified, and debug mode is disabled', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
@@ -411,7 +411,7 @@ describe(commands.LISTITEM_LIST, () => {
       debug: false, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      query: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
+      camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
     }
 
     command.action(logger, { options: options } as any, () => {
@@ -433,7 +433,7 @@ describe(commands.LISTITEM_LIST, () => {
       debug: false, 
       id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      query: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
+      camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
     }
 
     command.action(logger, { options: options } as any, (err?: any) => {
