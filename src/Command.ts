@@ -292,11 +292,23 @@ export default abstract class Command {
 
   protected getUnknownOptions(options: any): any {
     const unknownOptions: any = JSON.parse(JSON.stringify(options));
+    // remove minimist catch-all option
+    delete unknownOptions._;
+
     const knownOptions: CommandOption[] = this.options();
-    const optionRegex: RegExp = /--([^\s]+)/;
+    const longOptionRegex: RegExp = /--([^\s]+)/;
+    const shortOptionRegex: RegExp = /-([a-z])\b/;
     knownOptions.forEach(o => {
-      const optionName: string = (optionRegex.exec(o.option) as RegExpExecArray)[1];
-      delete unknownOptions[optionName];
+      const longOptionName: string = (longOptionRegex.exec(o.option) as RegExpExecArray)[1];
+      delete unknownOptions[longOptionName];
+
+      // short names are optional so we need to check if the current command has
+      // one before continuing
+      const shortOptionMatch: RegExpExecArray | null = shortOptionRegex.exec(o.option);
+      if (shortOptionMatch) {
+        const shortOptionName: string = shortOptionMatch[1];
+        delete unknownOptions[shortOptionName];
+      }
     });
 
     return unknownOptions;
