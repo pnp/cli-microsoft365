@@ -46,7 +46,7 @@ class Request {
   constructor() {
     this.req = Axios.create({
       headers: {
-        'user-agent': `NONISV|SharePointPnP|Office365CLI/${packageJSON.version}`,
+        'user-agent': `NONISV|SharePointPnP|CLIMicrosoft365/${packageJSON.version}`,
         'accept-encoding': 'gzip, deflate'
       },
       decompress: true,

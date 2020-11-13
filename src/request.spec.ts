@@ -67,7 +67,7 @@ describe('Request', () => {
         done('Error expected');
       }, () => {
         try {
-          assert(_options.headers['user-agent'].indexOf('NONISV|SharePointPnP|Office365CLI') > -1);
+          assert(_options.headers['user-agent'].indexOf('NONISV|SharePointPnP|CLIMicrosoft365') > -1);
           done();
         }
         catch (err) {
