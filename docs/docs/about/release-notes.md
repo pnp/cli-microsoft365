@@ -10,6 +10,7 @@
 
 **SharePoint:**
 
+- [spo page control set](../cmd/spo/page/page-control-set.md) - updates web part data or properties of a control on a modern page [#1934](https://github.com/pnp/cli-microsoft365/issues/1934)
 - [spo tenant recyclebinitem remove](../cmd/spo/tenant/tenant-recyclebinitem-remove.md) - removes the specified deleted Site Collection from Tenant Recycle Bin [#1145](https://github.com/pnp/cli-microsoft365/issues/1145)
 - [spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md) - restores the specified deleted Site Collection from Tenant Recycle Bin [#1362](https://github.com/pnp/cli-microsoft365/issues/1362)
 
@@ -19,6 +20,7 @@
 
 **To Do:**
 
+- [todo task add](../cmd/todo/task/task-add.md) - adds a task to a Microsoft To Do list [#1898](https://github.com/pnp/cli-microsoft365/issues/1898)
 - [todo task list](../cmd/todo/task/task-list.md) - lists tasks in a Microsoft To Do task list [#1901](https://github.com/pnp/cli-microsoft365/issues/1901)
 - [todo task remove](../cmd/todo/task/task-remove.md) - removes the specified Microsoft To Do task [#1900](https://github.com/pnp/cli-microsoft365/issues/1900)
 
