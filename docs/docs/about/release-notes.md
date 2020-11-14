@@ -32,6 +32,13 @@
 - added the 'Analyze Microsoft 365 User Profile Photos using Azure Computer Vision API' sample script [#1894](https://github.com/pnp/cli-microsoft365/issues/1894)
 - fixed displaying command groups in alphabetical order in help [#1922](https://github.com/pnp/cli-microsoft365/issues/1922)
 - fixed excluding command and arguments as field values in 'spo file add' [#1936](https://github.com/pnp/cli-microsoft365/issues/1936)
+- refactored processing command output [#1552](https://github.com/pnp/cli-microsoft365/issues/1552), [#1823](https://github.com/pnp/cli-microsoft365/issues/1823) and [#1875](https://github.com/pnp/cli-microsoft365/issues/1875)
+- fixed displaying help for command's alias [#1907](https://github.com/pnp/cli-microsoft365/issues/1907)
+- added tracking output mode to telemetry [#1946](https://github.com/pnp/cli-microsoft365/pull/1946)
+- fixed retrieving unknown options [#1947](https://github.com/pnp/cli-microsoft365/issues/1947)
+- renamed `query` to `camlQuery` in `spo listitem list` [#1948](https://github.com/pnp/cli-microsoft365/issues/1948)
+- fixed user-agent header [#1951](https://github.com/pnp/cli-microsoft365/issues/1951)
+- fixed user guide env. variable naming [#1954](https://github.com/pnp/cli-microsoft365/issues/1954)
 
 ## [v3.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.2.0)
 
