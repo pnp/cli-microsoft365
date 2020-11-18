@@ -10,6 +10,7 @@
 
 **SharePoint:**
 
+- [spo file sharinginfo get](../cmd/spo/file/file-sharinginfo-get.md) - generates a sharing information report for the specified file [#1659](https://github.com/pnp/cli-microsoft365/issues/1659)
 - [spo page control set](../cmd/spo/page/page-control-set.md) - updates web part data or properties of a control on a modern page [#1934](https://github.com/pnp/cli-microsoft365/issues/1934)
 - [spo tenant recyclebinitem remove](../cmd/spo/tenant/tenant-recyclebinitem-remove.md) - removes the specified deleted Site Collection from Tenant Recycle Bin [#1145](https://github.com/pnp/cli-microsoft365/issues/1145)
 - [spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md) - restores the specified deleted Site Collection from Tenant Recycle Bin [#1362](https://github.com/pnp/cli-microsoft365/issues/1362)
