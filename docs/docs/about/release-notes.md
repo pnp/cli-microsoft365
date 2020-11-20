@@ -41,6 +41,7 @@
 - renamed `query` to `camlQuery` in `spo listitem list` [#1948](https://github.com/pnp/cli-microsoft365/issues/1948)
 - fixed user-agent header [#1951](https://github.com/pnp/cli-microsoft365/issues/1951)
 - fixed user guide env. variable naming [#1954](https://github.com/pnp/cli-microsoft365/issues/1954)
+- made 'console.log()' synchronous [#1266](https://github.com/pnp/cli-microsoft365/issues/1266)
 
 ## [v3.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.2.0)
 
