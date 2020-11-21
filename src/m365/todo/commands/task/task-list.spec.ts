@@ -63,7 +63,7 @@ describe(commands.TASK_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['title', 'status', 'createdDateTime', 'lastModifiedDateTime']);
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'status', 'createdDateTime', 'lastModifiedDateTime']);
   });
 
   it('fails validation if both listId and listName options are passed', () => {

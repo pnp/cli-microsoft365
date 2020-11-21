@@ -33,7 +33,7 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['title', 'status', 'createdDateTime', 'lastModifiedDateTime'];
+    return ['id', 'title', 'status', 'createdDateTime', 'lastModifiedDateTime'];
   }
 
   private getTodoListId(args: CommandArgs): Promise<string> {
@@ -69,7 +69,6 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
         return this.getAllItems(endpoint, logger, true)
       })
       .then((): void => {
-        logger.log(this.items);
         if (args.options.output === 'json') {
           logger.log(this.items);
         }
