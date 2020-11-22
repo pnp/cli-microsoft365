@@ -23,7 +23,6 @@
 
 - [todo task add](../cmd/todo/task/task-add.md) - adds a task to a Microsoft To Do list [#1898](https://github.com/pnp/cli-microsoft365/issues/1898)
 - [todo task list](../cmd/todo/task/task-list.md) - lists tasks in a Microsoft To Do task list [#1901](https://github.com/pnp/cli-microsoft365/issues/1901)
-- [todo task list](../cmd/todo/task/task-list.md) - extends Microsoft To Do task list with id [#1943](https://github.com/pnp/cli-microsoft365/issues/1943)
 - [todo task remove](../cmd/todo/task/task-remove.md) - removes the specified Microsoft To Do task [#1900](https://github.com/pnp/cli-microsoft365/issues/1900)
 - [todo task set](../cmd/todo/task/task-set.md) - sets a task in a Microsoft To Do list [#1899](https://github.com/pnp/cli-microsoft365/issues/1899)
 
@@ -43,6 +42,7 @@
 - fixed user-agent header [#1951](https://github.com/pnp/cli-microsoft365/issues/1951)
 - fixed user guide env. variable naming [#1954](https://github.com/pnp/cli-microsoft365/issues/1954)
 - made 'console.log()' synchronous [#1266](https://github.com/pnp/cli-microsoft365/issues/1266)
+- extended `todo task list` with id [#1943](https://github.com/pnp/cli-microsoft365/issues/1943)
 
 ## [v3.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.2.0)
 
