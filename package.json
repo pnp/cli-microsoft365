@@ -5,9 +5,9 @@
   "license": "MIT",
   "main": "./dist/index.js",
   "bin": {
-    "microsoft365": "./dist/index.js",
-    "m365": "./dist/index.js",
-    "m365_comp": "./dist/autocomplete.js"
+    "microsoft365": "dist/index.js",
+    "m365": "dist/index.js",
+    "m365_comp": "dist/autocomplete.js"
   },
   "repository": {
     "type": "git",
@@ -145,7 +145,8 @@
     "van Rousselt, Rick <rick.vanrousselt@outlook.com>",
     "Velliah, Joseph <joseph@sprider.org>",
     "Wilen, Wictor <wictor@wictorwilen.se>",
-    "Williams, Rabia <rabiawilliams@gmail.com>"
+    "Williams, Rabia <rabiawilliams@gmail.com>",
+    "Moraby, Yusuf <yusuf.moraby@riogrande100.com>"
   ],
   "dependencies": {
     "adal-node": "^0.2.1",
@@ -163,6 +164,7 @@
     "typescript": "^3.8.3",
     "update-notifier": "^4.1.1",
     "uuid": "^8.3.0",
+    "win-ca": "3.4.5",
     "xmldom": "^0.3.0"
   },
   "devDependencies": {
