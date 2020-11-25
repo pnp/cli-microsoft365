@@ -12,7 +12,7 @@ const command: Command = require('./groupsetting-list');
 describe(commands.GROUPSETTING_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.GROUPSETTING_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -51,6 +57,10 @@ describe(commands.GROUPSETTING_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName']);
   });
 
   it('lists group setting templates', (done) => {
@@ -126,9 +136,64 @@ describe(commands.GROUPSETTING_LIST, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
-          "displayName": "Group.Unified"
+          "displayName": "Group.Unified",
+          "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+          "values": [
+            {
+              "name": "CustomBlockedWordsList",
+              "value": ""
+            },
+            {
+              "name": "EnableMSStandardBlockedWords",
+              "value": "false"
+            },
+            {
+              "name": "ClassificationDescriptions",
+              "value": ""
+            },
+            {
+              "name": "DefaultClassification",
+              "value": ""
+            },
+            {
+              "name": "PrefixSuffixNamingRequirement",
+              "value": ""
+            },
+            {
+              "name": "AllowGuestsToBeGroupOwner",
+              "value": "false"
+            },
+            {
+              "name": "AllowGuestsToAccessGroups",
+              "value": "true"
+            },
+            {
+              "name": "GuestUsageGuidelinesUrl",
+              "value": ""
+            },
+            {
+              "name": "GroupCreationAllowedGroupId",
+              "value": ""
+            },
+            {
+              "name": "AllowToAddGuests",
+              "value": "true"
+            },
+            {
+              "name": "UsageGuidelinesUrl",
+              "value": ""
+            },
+            {
+              "name": "ClassificationList",
+              "value": ""
+            },
+            {
+              "name": "EnableGroupCreation",
+              "value": "true"
+            }
+          ]
         }]));
         done();
       }
@@ -211,9 +276,64 @@ describe(commands.GROUPSETTING_LIST, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
-          "displayName": "Group.Unified"
+          "displayName": "Group.Unified",
+          "templateId": "62375ab9-6b52-47ed-826b-58e47e0e304b",
+          "values": [
+            {
+              "name": "CustomBlockedWordsList",
+              "value": ""
+            },
+            {
+              "name": "EnableMSStandardBlockedWords",
+              "value": "false"
+            },
+            {
+              "name": "ClassificationDescriptions",
+              "value": ""
+            },
+            {
+              "name": "DefaultClassification",
+              "value": ""
+            },
+            {
+              "name": "PrefixSuffixNamingRequirement",
+              "value": ""
+            },
+            {
+              "name": "AllowGuestsToBeGroupOwner",
+              "value": "false"
+            },
+            {
+              "name": "AllowGuestsToAccessGroups",
+              "value": "true"
+            },
+            {
+              "name": "GuestUsageGuidelinesUrl",
+              "value": ""
+            },
+            {
+              "name": "GroupCreationAllowedGroupId",
+              "value": ""
+            },
+            {
+              "name": "AllowToAddGuests",
+              "value": "true"
+            },
+            {
+              "name": "UsageGuidelinesUrl",
+              "value": ""
+            },
+            {
+              "name": "ClassificationList",
+              "value": ""
+            },
+            {
+              "name": "EnableGroupCreation",
+              "value": "true"
+            }
+          ]
         }]));
         done();
       }
@@ -296,7 +416,7 @@ describe(commands.GROUPSETTING_LIST, () => {
 
     command.action(logger, { options: { debug: false, output: 'json' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "68498d53-e3e8-47fd-bf19-eff723d5707e",
             "displayName": "Group.Unified",

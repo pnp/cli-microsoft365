@@ -120,11 +120,29 @@ class MockCommandWithOutput extends AnonymousCommand {
   }
 }
 
+class MockCommandWithRawOutput extends AnonymousCommand {
+  public get name(): string {
+    return 'cli mock output';
+  }
+  public get description(): string {
+    return 'Mock command with output'
+  }
+  public commandAction(logger: Logger, args: any, cb: () => void): void {
+    if (this.debug) {
+      logger.logToStderr('Debug output');
+    }
+
+    logger.logRaw('Raw output');
+    cb();
+  }
+}
+
 describe('Cli', () => {
   let cli: Cli;
   let rootFolder: string;
   let cliLogStub: sinon.SinonStub;
   let cliErrorStub: sinon.SinonStub;
+  let cliFormatOutputSpy: sinon.SinonSpy;
   let processExitStub: sinon.SinonStub;
   let markshellStub: sinon.SinonStub;
   let mockCommandActionSpy: sinon.SinonSpy;
@@ -134,9 +152,10 @@ describe('Cli', () => {
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    
+
     cliLogStub = sinon.stub((Cli as any), 'log');
     cliErrorStub = sinon.stub((Cli as any), 'error');
+    cliFormatOutputSpy = sinon.spy((Cli as any), 'formatOutput');
     processExitStub = sinon.stub(process, 'exit');
     markshellStub = sinon.stub(markshell, 'toRawContent');
 
@@ -164,6 +183,7 @@ describe('Cli', () => {
     (Cli as any).instance = undefined;
     cliLogStub.reset();
     cliErrorStub.reset();
+    cliFormatOutputSpy.resetHistory();
     processExitStub.reset();
     markshellStub.reset();
     mockCommandActionSpy.resetHistory();
@@ -183,6 +203,7 @@ describe('Cli', () => {
     Utils.restore([
       (Cli as any).log,
       (Cli as any).error,
+      (Cli as any).formatOutput,
       process.exit,
       markshell.toRawContent,
       appInsights.trackEvent
@@ -486,7 +507,7 @@ describe('Cli', () => {
       .executeCommand(mockCommand, { options: { debug: true, _: [] } })
       .then(_ => {
         try {
-          assert(cliLogStub.calledWith('Executing command cli mock with options {"options":{"debug":true,"_":[]}}'));
+          assert(cliErrorStub.calledWith('Executing command cli mock with options {"options":{"debug":true,"_":[]}}'));
           done();
         }
         catch (e) {
@@ -512,6 +533,38 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
+  it('prints command output with formatting', (done) => {
+    const commandWithOutput: MockCommandWithOutput = new MockCommandWithOutput();
+    Cli
+      .executeCommand(commandWithOutput, { options: { _: [] } })
+      .then(_ => {
+        try {
+          assert(cliLogStub.called, 'Cli.log not called');
+          assert(cliFormatOutputSpy.called, 'Cli.formatOutput not called');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('prints command output without formatting', (done) => {
+    const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
+    Cli
+      .executeCommand(commandWithOutput, { options: { _: [] } })
+      .then(_ => {
+        try {
+          assert(cliLogStub.called, 'Cli.log not called');
+          assert(cliFormatOutputSpy.notCalled, 'Cli.formatOutput called');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
   it('returns command output when executing command with output', (done) => {
     const commandWithOutput: MockCommandWithOutput = new MockCommandWithOutput();
     Cli
@@ -519,6 +572,36 @@ describe('Cli', () => {
       .then((output: string) => {
         try {
           assert.strictEqual(output, 'Command output');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('returns raw command output when executing command with output', (done) => {
+    const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
+    Cli
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [] } })
+      .then((output: string) => {
+        try {
+          assert.strictEqual(output, 'Raw output');
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it('returns debug command output when executing command with output in debug mode', (done) => {
+    const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
+    Cli
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [], debug: true } })
+      .then((output: string) => {
+        try {
+          assert.strictEqual(output, 'Debug output,Raw output');
           done();
         }
         catch (e) {
@@ -689,24 +772,24 @@ describe('Cli', () => {
   });
 
   it('doesn\'t fail when undefined object is passed to the log', () => {
-    const actual = (Cli as any).logOutput(undefined);
+    const actual = (Cli as any).formatOutput(undefined);
     assert.strictEqual(actual, undefined);
   });
 
   it('returns the same object if non-array is passed to the log', () => {
     const s = 'foo';
-    const actual = (Cli as any).logOutput(s, {});
+    const actual = (Cli as any).formatOutput(s, {});
     assert.strictEqual(actual, s);
   });
 
   it('doesn\'t fail when an array with undefined object is passed to the log', () => {
-    const actual = (Cli as any).logOutput([undefined], {});
+    const actual = (Cli as any).formatOutput([undefined], {});
     assert.strictEqual(actual, '');
   });
 
   it('formats output as pretty JSON when JSON output requested', (done) => {
     const o = { lorem: 'ipsum', dolor: 'sit' };
-    const actual = (Cli as any).logOutput(o, { output: 'json' });
+    const actual = (Cli as any).formatOutput(o, { output: 'json' });
     try {
       assert.strictEqual(actual, JSON.stringify(o, null, 2));
       done();
@@ -718,7 +801,7 @@ describe('Cli', () => {
 
   it('formats simple output as text', (done) => {
     const o = false;
-    const actual = (Cli as any).logOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, {});
     try {
       assert.strictEqual(actual, `${o}`);
       done();
@@ -730,13 +813,13 @@ describe('Cli', () => {
 
   it('formats date output as text', () => {
     const d = new Date();
-    const actual = (Cli as any).logOutput(d, {});
+    const actual = (Cli as any).formatOutput(d, {});
     assert.strictEqual(actual, d.toString());
   });
 
   it('formats object output as transposed table', (done) => {
     const o = { prop1: 'value1', prop2: 'value2' };
-    const actual = (Cli as any).logOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, {});
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop2', 'value2');
@@ -755,7 +838,7 @@ describe('Cli', () => {
 
   it('formats object output as transposed table', (done) => {
     const o = { prop1: 'value1 ', prop12: 'value12' };
-    const actual = (Cli as any).logOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, {});
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop12', 'value12');
@@ -774,7 +857,7 @@ describe('Cli', () => {
 
   it('formats array values as JSON', (done) => {
     const o = { prop1: ['value1', 'value2'] };
-    const actual = (Cli as any).logOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, {});
     const expected = 'prop1: ["value1","value2"]' + '\n';
     try {
       assert.strictEqual(actual, expected);
@@ -785,12 +868,28 @@ describe('Cli', () => {
     }
   });
 
-  it('formats array output as table', (done) => {
+  it('formats array of string arrays output as comma-separated strings', (done) => {
+    const o = [
+      ['value1', 'value2'],
+      ['value3', 'value4']
+    ];
+    const actual = (Cli as any).formatOutput(o, {});
+    const expected = [o[0].join(','), o[1].join(',')].join(os.EOL);
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('formats array of object output as table', (done) => {
     const o = [
       { prop1: 'value1', prop2: 'value2' },
       { prop1: 'value3', prop2: 'value4' }
     ];
-    const actual = (Cli as any).logOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, {});
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop2', 'value2');
@@ -810,7 +909,7 @@ describe('Cli', () => {
 
   it('formats command error as error message', (done) => {
     const o = new CommandError('An error has occurred');
-    const actual = (Cli as any).logOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, {});
     const expected = chalk.red('Error: An error has occurred');
     try {
       assert.strictEqual(actual, expected);
@@ -823,7 +922,7 @@ describe('Cli', () => {
 
   it('sets array type to the first non-undefined value', (done) => {
     const o = [undefined, 'lorem', 'ipsum'];
-    const actual = (Cli as any).logOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, {});
     const expected = `${os.EOL}lorem${os.EOL}ipsum`;
     try {
       assert.strictEqual(actual, expected);
@@ -840,7 +939,7 @@ describe('Cli', () => {
       'lorem',
       { prop1: 'value3', prop2: 'value4' }
     ];
-    const actual = (Cli as any).logOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, {});
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop2', 'value2');
@@ -863,13 +962,81 @@ describe('Cli', () => {
       "first": "Joe",
       "last": "Doe"
     };
-    const actual = (Cli as any).logOutput(o, { query: 'first', output: 'json' });
+    const actual = (Cli as any).formatOutput(o, { query: 'first', output: 'json' });
     try {
       assert.strictEqual(actual, JSON.stringify("Joe"));
       done();
     }
     catch (e) {
       done(e);
+    }
+  });
+
+  it('filters output following command definition in output text', (done) => {
+    const o = [
+      { "name": "Seattle", "state": "WA" },
+      { "name": "New York", "state": "NY" },
+      { "name": "Bellevue", "state": "WA" },
+      { "name": "Olympia", "state": "WA" }
+    ];
+    const cli: Cli = Cli.getInstance();
+    (cli as any).commandToExecute = {
+      defaultProperties: ['name']
+    };
+    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const t = new Table();
+    t.cell('name', 'Seattle');
+    t.newRow();
+    t.cell('name', 'New York');
+    t.newRow();
+    t.cell('name', 'Bellevue');
+    t.newRow();
+    t.cell('name', 'Olympia');
+    t.newRow();
+    const expected = t.toString();
+    try {
+      assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      (cli as any).commandToExecute = undefined;
+    }
+  });
+
+  it('filters output wrapped in a value property following command definition in output text', (done) => {
+    const o = { value: [
+      { "name": "Seattle", "state": "WA" },
+      { "name": "New York", "state": "NY" },
+      { "name": "Bellevue", "state": "WA" },
+      { "name": "Olympia", "state": "WA" }
+    ]};
+    const cli: Cli = Cli.getInstance();
+    (cli as any).commandToExecute = {
+      defaultProperties: ['name']
+    };
+    const actual = (Cli as any).formatOutput(o, { output: 'text' });
+    const t = new Table();
+    t.cell('name', 'Seattle');
+    t.newRow();
+    t.cell('name', 'New York');
+    t.newRow();
+    t.cell('name', 'Bellevue');
+    t.newRow();
+    t.cell('name', 'Olympia');
+    t.newRow();
+    const expected = t.toString();
+    try {
+      assert.strictEqual(JSON.stringify(actual), JSON.stringify(expected));
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+    finally {
+      (cli as any).commandToExecute = undefined;
     }
   });
 
@@ -882,7 +1049,7 @@ describe('Cli', () => {
         { "name": "Olympia", "state": "WA" }
       ]
     };
-    const actual = (Cli as any).logOutput(o, {
+    const actual = (Cli as any).formatOutput(o, {
       query: `locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}`,
       output: 'json'
     });
@@ -906,7 +1073,7 @@ describe('Cli', () => {
         { "name": "Olympia", "state": "WA" }
       ]
     };
-    const actual = (Cli as any).logOutput(o, {
+    const actual = (Cli as any).formatOutput(o, {
       query: `locations[?state == 'WA'].name | sort(@) | {WashingtonCities: join(', ', @)}`,
       output: 'json',
       help: true

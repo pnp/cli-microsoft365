@@ -72,7 +72,7 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
       })
       .then((res: any): void => {
         if (this.verbose) {
-          logger.log('DONE');
+          logger.logToStderr('DONE');
         }
 
         cb();

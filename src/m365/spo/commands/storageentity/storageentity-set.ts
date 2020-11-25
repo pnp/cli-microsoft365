@@ -50,7 +50,7 @@ class SpoStorageEntitySetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Setting tenant property ${args.options.key} in ${args.options.appCatalogUrl}...`);
+          logger.logToStderr(`Setting tenant property ${args.options.key} in ${args.options.appCatalogUrl}...`);
         }
 
         const requestOptions: any = {
@@ -68,9 +68,9 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
           if (this.verbose && response.ErrorInfo.ErrorMessage.indexOf('Access denied.') > -1) {
-            logger.log('');
-            logger.log(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the ${commands.STORAGEENTITY_SET} command is a valid app catalog URL and try again.`);
-            logger.log('');
+            logger.logToStderr('');
+            logger.logToStderr(`This error is often caused by invalid URL of the app catalog site. Verify, that the URL you specified as an argument of the ${commands.STORAGEENTITY_SET} command is a valid app catalog URL and try again.`);
+            logger.logToStderr('');
           }
 
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
@@ -78,7 +78,7 @@ class SpoStorageEntitySetCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
         }
         cb();

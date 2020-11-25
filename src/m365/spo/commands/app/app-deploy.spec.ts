@@ -13,7 +13,7 @@ const command: Command = require('./app-deploy');
 describe(commands.APP_DEPLOY, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let requests: any[];
 
   before(() => {
@@ -28,9 +28,15 @@ describe(commands.APP_DEPLOY, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     requests = [];
   });
 
@@ -292,7 +298,7 @@ describe(commands.APP_DEPLOY, () => {
 
     command.action(logger, { options: { debug: true, name: 'solution.sppkg' } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -330,7 +336,7 @@ describe(commands.APP_DEPLOY, () => {
 
     command.action(logger, { options: { debug: true, name: 'solution.sppkg', scope: 'sitecollection', appCatalogUrl: 'https://contoso.sharepoint.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

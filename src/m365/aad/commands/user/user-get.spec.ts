@@ -12,7 +12,7 @@ const command: Command = require('./user-get');
 describe(commands.USER_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.USER_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -64,7 +70,7 @@ describe(commands.USER_GET, () => {
 
     command.action(logger, { options: { debug: false, id: '68be84bf-a585-4776-80b3-30aa5207aa21' } }, () => {
       try {
-        assert(loggerSpy.calledWith({"id":"68be84bf-a585-4776-80b3-30aa5207aa21","businessPhones":["+1 425 555 0100"],"displayName":"Aarif Sherzai","givenName":"Aarif","jobTitle":"Administrative","mail":null,"mobilePhone":"+1 425 555 0100","officeLocation":null,"preferredLanguage":null,"surname":"Sherzai","userPrincipalName":"AarifS@contoso.onmicrosoft.com"}));
+        assert(loggerLogSpy.calledWith({"id":"68be84bf-a585-4776-80b3-30aa5207aa21","businessPhones":["+1 425 555 0100"],"displayName":"Aarif Sherzai","givenName":"Aarif","jobTitle":"Administrative","mail":null,"mobilePhone":"+1 425 555 0100","officeLocation":null,"preferredLanguage":null,"surname":"Sherzai","userPrincipalName":"AarifS@contoso.onmicrosoft.com"}));
         done();
       }
       catch (e) {
@@ -84,7 +90,7 @@ describe(commands.USER_GET, () => {
 
     command.action(logger, { options: { debug: true, id: '68be84bf-a585-4776-80b3-30aa5207aa21' } }, () => {
       try {
-        assert(loggerSpy.calledWith({"id":"68be84bf-a585-4776-80b3-30aa5207aa21","businessPhones":["+1 425 555 0100"],"displayName":"Aarif Sherzai","givenName":"Aarif","jobTitle":"Administrative","mail":null,"mobilePhone":"+1 425 555 0100","officeLocation":null,"preferredLanguage":null,"surname":"Sherzai","userPrincipalName":"AarifS@contoso.onmicrosoft.com"}));
+        assert(loggerLogSpy.calledWith({"id":"68be84bf-a585-4776-80b3-30aa5207aa21","businessPhones":["+1 425 555 0100"],"displayName":"Aarif Sherzai","givenName":"Aarif","jobTitle":"Administrative","mail":null,"mobilePhone":"+1 425 555 0100","officeLocation":null,"preferredLanguage":null,"surname":"Sherzai","userPrincipalName":"AarifS@contoso.onmicrosoft.com"}));
         done();
       }
       catch (e) {
@@ -104,7 +110,7 @@ describe(commands.USER_GET, () => {
 
     command.action(logger, { options: { debug: false, userName: 'AarifS@contoso.onmicrosoft.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith({"id":"68be84bf-a585-4776-80b3-30aa5207aa21","businessPhones":["+1 425 555 0100"],"displayName":"Aarif Sherzai","givenName":"Aarif","jobTitle":"Administrative","mail":null,"mobilePhone":"+1 425 555 0100","officeLocation":null,"preferredLanguage":null,"surname":"Sherzai","userPrincipalName":"AarifS@contoso.onmicrosoft.com"}));
+        assert(loggerLogSpy.calledWith({"id":"68be84bf-a585-4776-80b3-30aa5207aa21","businessPhones":["+1 425 555 0100"],"displayName":"Aarif Sherzai","givenName":"Aarif","jobTitle":"Administrative","mail":null,"mobilePhone":"+1 425 555 0100","officeLocation":null,"preferredLanguage":null,"surname":"Sherzai","userPrincipalName":"AarifS@contoso.onmicrosoft.com"}));
         done();
       }
       catch (e) {
@@ -124,7 +130,7 @@ describe(commands.USER_GET, () => {
 
     command.action(logger, { options: { debug: false, userName: 'AarifS@contoso.onmicrosoft.com', properties: 'id,mail' } }, () => {
       try {
-        assert(loggerSpy.calledWith({"id":"68be84bf-a585-4776-80b3-30aa5207aa21","mail":null}));
+        assert(loggerLogSpy.calledWith({"id":"68be84bf-a585-4776-80b3-30aa5207aa21","mail":null}));
         done();
       }
       catch (e) {

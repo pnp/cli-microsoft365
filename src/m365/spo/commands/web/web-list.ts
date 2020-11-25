@@ -25,9 +25,13 @@ class SpoWebListCommand extends SpoCommand {
     return 'Lists subsites of the specified site';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Title', 'Url', 'Id'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving all webs in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving all webs in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = `${args.options.webUrl}/_api/web/webs`;
@@ -47,19 +51,7 @@ class SpoWebListCommand extends SpoCommand {
     request
       .get<WebPropertiesCollection>(requestOptions)
       .then((webProperties: WebPropertiesCollection): void => {
-        if (args.options.output === 'json') {
-          logger.log(webProperties);
-        }
-        else {
-          logger.log(webProperties.value.map(l => {
-            return {
-              Title: l.Title,
-              Url: l.Url,
-              Id: l.Id
-            };
-          }));
-        }
-
+        logger.log(webProperties);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

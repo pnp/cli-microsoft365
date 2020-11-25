@@ -35,7 +35,7 @@ class SpoUserGetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving information for group in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving information for group in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';

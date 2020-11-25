@@ -42,7 +42,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
         .getRequestDigest(args.options.webUrl)
         .then((res: ContextInfo): Promise<void> => {
           if (this.verbose) {
-            logger.log(`Removing navigation node...`);
+            logger.logToStderr(`Removing navigation node...`);
           }
 
           const requestOptions: any = {
@@ -58,7 +58,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

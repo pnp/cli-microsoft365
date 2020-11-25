@@ -13,7 +13,8 @@ const command: Command = require('./page-control-get');
 describe(commands.PAGE_CONTROL_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +27,16 @@ describe(commands.PAGE_CONTROL_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -122,7 +130,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
+        assert(loggerLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
         done();
       }
       catch (e) {
@@ -199,7 +207,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "dynamicDataPaths": { "dynamicProperty0": "WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText" }, "dynamicDataValues": { "dynamicProperty1": "" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
+        assert(loggerLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "dynamicDataPaths": { "dynamicProperty0": "WebPart.2bacb933-9f9d-457f-bfa5-b00bfc9cd625.69800bc3-0d7c-495c-a5b6-3423f226d5c5:queryText" }, "dynamicDataValues": { "dynamicProperty1": "" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
         done();
       }
       catch (e) {
@@ -276,7 +284,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
+        assert(loggerLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
         done();
       }
       catch (e) {
@@ -353,7 +361,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e5' } }, () => {
       try {
-        assert(loggerSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
+        assert(loggerLogSpy.calledWith({ "controlType": "Client-side web part", "dataVersion": "1.0", "order": 2, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5", "controlData": { "controlType": 3, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "position": { "zoneIndex": 1, "sectionIndex": 1, "controlIndex": 1, "sectionFactor": 8 }, "displayMode": 2, "addedFromPersistedData": true, "id": "3ede60d3-dc2c-438b-b5bf-cc40bb2351e5" }, "title": "News", "description": "Display recent news.", "propertieJson": { "layoutId": "FeaturedNews", "dataProviderId": "viewCounts", "emptyStateHelpItemsCount": 1, "newsDataSourceProp": 2, "newsSiteList": [], "webId": "4f118c69-66e0-497c-96ff-d7855ce0713d", "siteId": "016bd1f4-ea50-46a4-809b-e97efb96399c" }, "webPartId": "8c88f208-6c77-4bdb-86a0-0c47b4316588", "htmlProperties": "<div data-sp-prop-name=\"title\" data-sp-searchableplaintext=\"true\">News</div><a data-sp-prop-name=\"baseUrl\" href=\"/sites/team-a\"></a>", "serverProcessedContent": { "htmlStrings": {}, "searchablePlainTexts": { "title": "News" }, "imageSources": {}, "links": { "baseUrl": "https://contoso.sharepoint.com/sites/team-a" } }, "canvasDataVersion": "1.0" }));
         done();
       }
       catch (e) {
@@ -829,7 +837,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -906,7 +914,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, () => {
       try {
-        assert(loggerSpy.calledWith('Control with ID 3ede60d3-dc2c-438b-b5bf-cc40bb2351e6 not found on page home.aspx'));
+        assert(loggerLogToStderrSpy.calledWith('Control with ID 3ede60d3-dc2c-438b-b5bf-cc40bb2351e6 not found on page home.aspx'));
         done();
       }
       catch (e) {

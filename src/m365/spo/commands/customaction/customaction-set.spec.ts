@@ -12,7 +12,8 @@ const command: Command = require('./customaction-set');
 describe(commands.CUSTOMACTION_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let defaultCommandOptions: any;
   let initDefaultPostStubs = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
@@ -39,9 +40,16 @@ describe(commands.CUSTOMACTION_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     defaultCommandOptions = {
       url: 'https://contoso.sharepoint.com',
       id: '058140e3-0e37-44fc-a1d3-79c487d371a3',
@@ -366,7 +374,7 @@ describe(commands.CUSTOMACTION_SET, () => {
 
     command.action(logger, { options: defaultCommandOptions } as any, () => {
       try {
-        assert(loggerSpy.calledWith(sinon.match('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(sinon.match('DONE')));
         done();
       }
       catch (e) {
@@ -553,7 +561,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       options: defaultCommandOptions
     }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -628,7 +636,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(`Custom action with id ${actionId} not found`));
+        assert(loggerLogToStderrSpy.calledWith(`Custom action with id ${actionId} not found`));
         done();
       }
       catch (e) {

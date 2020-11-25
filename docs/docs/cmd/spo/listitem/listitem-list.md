@@ -22,17 +22,17 @@ m365 spo listitem list [options]
 `-t, --title [listTitle]`
 : Title of the list from which to retrieve the item. Specify `id` or `title` but not both
 
-`-q, --query [camlQuery]`
+`-q, --camlQuery [camlQuery]`
 : CAML query to use to query the list of items with
 
 `-f, --fields [fields]`
-: Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested. Specify `query` or `fields` but not both
+: Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested. Specify `camlQuery` or `fields` but not both
 
-`-l, --filter [odataFilter]`
-: OData filter to use to query the list of items with. Specify `query` or `filter` but not both
+`-l, --filter [filter]`
+: OData filter to use to query the list of items with. Specify `camlQuery` or `filter` but not both
 
 `-p, --pageSize [pageSize]`
-: Number of list items to return. Specify `query` or `pageSize` but not both
+: Number of list items to return. Specify `camlQuery` or `pageSize` but not both
 
 `-n, --pageNumber [pageNumber]`
 : Page number to return if `pageSize` is specified (first page is indexed as value of 0)
@@ -64,7 +64,7 @@ m365 spo listitem list --title "Demo List" --webUrl https://contoso.sharepoint.c
 From a list named _Demo List_ get all items with title _Demo list item_ using a CAML query
 
 ```sh
-m365 spo listitem list --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --query "<View><Query><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></Query></View>"
+m365 spo listitem list --title "Demo List" --webUrl https://contoso.sharepoint.com/sites/project-x --camlQuery "<View><Query><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo list item</Value></Eq></Where></Query></View>"
 ```
 
 Get all items from a list with ID _935c13a0-cc53-4103-8b48-c1d0828eaa7f_

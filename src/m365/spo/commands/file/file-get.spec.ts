@@ -14,7 +14,7 @@ const command: Command = require('./file-get');
 describe(commands.FILE_GET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,9 +27,15 @@ describe(commands.FILE_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -129,7 +135,7 @@ describe(commands.FILE_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(returnValue));
+        assert(loggerLogSpy.calledWith(returnValue));
         done();
       }
       catch (e) {
@@ -196,7 +202,7 @@ describe(commands.FILE_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "FileSystemObjectType": 0,
           "Id": 4,
           "ServerRedirectedEmbedUri": "https://contoso.sharepoint.com/sites/project-x/_layouts/15/WopiFrame.aspx?sourcedoc={b2307a39-e878-458b-bc90-03bc578531d6}&action=interactivepreview",

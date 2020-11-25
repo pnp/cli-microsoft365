@@ -12,7 +12,7 @@ const command: Command = require('./group-list');
 describe(commands.YAMMER_GROUP_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   let groupsFirstBatchList: any = [
     {
@@ -189,9 +189,15 @@ describe(commands.YAMMER_GROUP_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -215,6 +221,10 @@ describe(commands.YAMMER_GROUP_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'email', 'privacy', 'external', 'moderated']);
   });
 
   it('correctly handles error', (done) => {
@@ -277,7 +287,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
     });
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 4708910)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910)
         done();
       }
       catch (e) {
@@ -304,7 +314,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
     });
     command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].length, 3);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 3);
         done();
       }
       catch (e) {
@@ -319,7 +329,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
     });
     command.action(logger, { options: { limit: 1, output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].length, 1);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 1);
         done();
       }
       catch (e) {
@@ -368,7 +378,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
     });
     command.action(logger, { options: { userId: 10123190123128, output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 4708910)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910)
         done();
       }
       catch (e) {

@@ -5,7 +5,6 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import commands from '../../commands';
-import { AppMetadata } from './AppMetadata';
 import { SpoAppBaseCommand } from './SpoAppBaseCommand';
 
 interface CommandArgs {
@@ -33,6 +32,10 @@ class SpoAppListCommand extends SpoAppBaseCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return [`Title`, `ID`, `Deployed`, `AppCatalogVersion`];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     let appCatalogSiteUrl: string = '';
@@ -44,11 +47,11 @@ class SpoAppListCommand extends SpoAppBaseCommand {
         spoUrl = _spoUrl;
         return this.getAppCatalogSiteUrl(logger, spoUrl, args)
       })
-      .then((appCatalogUrl: string): Promise<{ value: AppMetadata[] }> => {
+      .then((appCatalogUrl: string): Promise<{ value: any[] }> => {
         appCatalogSiteUrl = appCatalogUrl;
 
         if (this.verbose) {
-          logger.log(`Retrieving apps...`);
+          logger.logToStderr(`Retrieving apps...`);
         }
 
         const requestOptions: any = {
@@ -61,25 +64,13 @@ class SpoAppListCommand extends SpoAppBaseCommand {
 
         return request.get(requestOptions);
       })
-      .then((apps: { value: AppMetadata[] }): void => {
+      .then((apps: { value: any[] }): void => {
         if (apps.value && apps.value.length > 0) {
-          if (args.options.output === 'json') {
-            logger.log(apps.value);
-          }
-          else {
-            logger.log(apps.value.map(a => {
-              return {
-                Title: a.Title,
-                ID: a.ID,
-                Deployed: a.Deployed,
-                AppCatalogVersion: a.AppCatalogVersion
-              };
-            }));
-          }
+          logger.log(apps.value);
         }
         else {
           if (this.verbose) {
-            logger.log('No apps found');
+            logger.logToStderr('No apps found');
           }
         }
         cb();

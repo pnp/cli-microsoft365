@@ -20,13 +20,13 @@ class CliCompletionShSetupCommand extends AnonymousCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.debug) {
-      logger.log('Generating command completion...');
+      logger.logToStderr('Generating command completion...');
     }
 
     autocomplete.generateShCompletion();
 
     if (this.debug) {
-      logger.log('Registering command completion with the shell...');
+      logger.logToStderr('Registering command completion with the shell...');
     }
 
     autocomplete.setupShCompletion();
@@ -34,7 +34,7 @@ class CliCompletionShSetupCommand extends AnonymousCommand {
     logger.log('Command completion successfully registered. Restart your shell to load the completion');
 
     if (this.verbose) {
-      logger.log(chalk.green('DONE'));
+      logger.logToStderr(chalk.green('DONE'));
     }
     cb();
   }

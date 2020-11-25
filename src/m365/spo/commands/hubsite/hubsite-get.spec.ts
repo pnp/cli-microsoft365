@@ -12,7 +12,7 @@ const command: Command = require('./hubsite-get');
 describe(commands.HUBSITE_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +26,15 @@ describe(commands.HUBSITE_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -74,7 +80,7 @@ describe(commands.HUBSITE_GET, () => {
 
     command.action(logger, { options: { debug: false, id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
           "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
@@ -112,7 +118,7 @@ describe(commands.HUBSITE_GET, () => {
 
     command.action(logger, { options: { debug: true, id: 'ee8b42c3-3e6f-4822-87c1-c21ad666046b' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
           "LogoUrl": "http://contoso.com/__siteIcon__.jpg",

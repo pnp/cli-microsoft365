@@ -39,7 +39,7 @@ class AadGroupSettingAddCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving group setting template with id '${args.options.templateId}'...`);
+      logger.logToStderr(`Retrieving group setting template with id '${args.options.templateId}'...`);
     }
 
     const requestOptions: any = {
@@ -72,7 +72,7 @@ class AadGroupSettingAddCommand extends GraphCommand {
         logger.log(res);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -39,7 +39,7 @@ class SpoListWebhookGetCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-      logger.log(`Retrieving information for webhook ${args.options.id} belonging to list ${list} in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving information for webhook ${args.options.id} belonging to list ${list} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -68,7 +68,7 @@ class SpoListWebhookGetCommand extends SpoCommand {
         cb();
       }, (err: any): void => {
         if (this.verbose) {
-          logger.log('Specified webhook not found');
+          logger.logToStderr('Specified webhook not found');
         }
         this.handleRejectedODataJsonPromise(err, logger, cb)
       });

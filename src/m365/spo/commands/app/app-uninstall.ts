@@ -41,7 +41,7 @@ class SpoAppUninstallCommand extends SpoCommand {
       const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
 
       if (this.verbose) {
-        logger.log(`Uninstalling app '${args.options.id}' from the site '${args.options.siteUrl}'...`);
+        logger.logToStderr(`Uninstalling app '${args.options.id}' from the site '${args.options.siteUrl}'...`);
       }
 
       const requestOptions: any = {
@@ -55,7 +55,7 @@ class SpoAppUninstallCommand extends SpoCommand {
         .post(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

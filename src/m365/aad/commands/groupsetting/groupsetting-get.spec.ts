@@ -12,7 +12,7 @@ const command: Command = require('./groupsetting-get');
 describe(commands.GROUPSETTING_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.GROUPSETTING_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -73,7 +79,7 @@ describe(commands.GROUPSETTING_GET, () => {
 
     command.action(logger, { options: { debug: false, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "displayName": "Group Setting",
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "templateId": "bb4f86e1-a598-4101-affc-97c6b136a753",
@@ -113,7 +119,7 @@ describe(commands.GROUPSETTING_GET, () => {
 
     command.action(logger, { options: { debug: true, id: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "displayName": "Group Setting",
           "id": "1caf7dcd-7e83-4c3a-94f7-932a1299c844",
           "templateId": "bb4f86e1-a598-4101-affc-97c6b136a753",

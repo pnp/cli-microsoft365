@@ -32,7 +32,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
 
     const fullPath: string = path.resolve(filePath);
     if (this.verbose) {
-      logger.log(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
+      logger.logToStderr(`Updating app with id '${appId}' and file '${fullPath}' in the app catalog...`);
     }
 
     const requestOptions: any = {
@@ -47,7 +47,7 @@ class TeamsAppUpdateCommand extends GraphCommand {
       .put(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

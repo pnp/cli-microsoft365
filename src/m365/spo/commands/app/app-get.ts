@@ -55,7 +55,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Looking up app id for app named ${args.options.name}...`);
+          logger.logToStderr(`Looking up app id for app named ${args.options.name}...`);
         }
 
         const requestOptions: any = {
@@ -70,7 +70,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
       })
       .then((res: { UniqueId: string }): Promise<AppMetadata> => {
         if (this.verbose) {
-          logger.log(`Retrieving information for app ${res}...`);
+          logger.logToStderr(`Retrieving information for app ${res}...`);
         }
 
         const requestOptions: any = {

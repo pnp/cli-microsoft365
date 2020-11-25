@@ -1,5 +1,49 @@
 # Release notes
 
+## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
+
+### New commands
+
+**Power Automate:**
+
+- [flow run cancel](../cmd/flow/run/run-cancel.md) - cancels the specified Microsoft Flow [#1870](https://github.com/pnp/cli-microsoft365/issues/1870)
+
+**SharePoint:**
+
+- [spo file sharinginfo get](../cmd/spo/file/file-sharinginfo-get.md) - generates a sharing information report for the specified file [#1659](https://github.com/pnp/cli-microsoft365/issues/1659)
+- [spo page control set](../cmd/spo/page/page-control-set.md) - updates web part data or properties of a control on a modern page [#1934](https://github.com/pnp/cli-microsoft365/issues/1934)
+- [spo tenant recyclebinitem remove](../cmd/spo/tenant/tenant-recyclebinitem-remove.md) - removes the specified deleted Site Collection from Tenant Recycle Bin [#1145](https://github.com/pnp/cli-microsoft365/issues/1145)
+- [spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md) - restores the specified deleted Site Collection from Tenant Recycle Bin [#1362](https://github.com/pnp/cli-microsoft365/issues/1362)
+
+**Teams:**
+
+- [teams conversationmember list](../cmd/teams/conversationmember/conversationmember-list.md) - lists all conversational members of a channel [#1880](https://github.com/pnp/cli-microsoft365/issues/1880)
+
+**To Do:**
+
+- [todo task add](../cmd/todo/task/task-add.md) - adds a task to a Microsoft To Do list [#1898](https://github.com/pnp/cli-microsoft365/issues/1898)
+- [todo task list](../cmd/todo/task/task-list.md) - lists tasks in a Microsoft To Do task list [#1901](https://github.com/pnp/cli-microsoft365/issues/1901)
+- [todo task remove](../cmd/todo/task/task-remove.md) - removes the specified Microsoft To Do task [#1900](https://github.com/pnp/cli-microsoft365/issues/1900)
+- [todo task set](../cmd/todo/task/task-set.md) - sets a task in a Microsoft To Do list [#1899](https://github.com/pnp/cli-microsoft365/issues/1899)
+
+### Changes
+
+- extended channel list with teamName [#1889](https://github.com/pnp/cli-microsoft365/issues/1889)
+- extended 'teams channel get' command with support for teamName and channelName options [#1887](https://github.com/pnp/cli-microsoft365/issues/1887)
+- extended 'spo tenant settings set' with DisableCustomAppAuthentication [#1829](https://github.com/pnp/cli-microsoft365/issues/1829)
+- added the 'Analyze Microsoft 365 User Profile Photos using Azure Computer Vision API' sample script [#1894](https://github.com/pnp/cli-microsoft365/issues/1894)
+- fixed displaying command groups in alphabetical order in help [#1922](https://github.com/pnp/cli-microsoft365/issues/1922)
+- fixed excluding command and arguments as field values in 'spo file add' [#1936](https://github.com/pnp/cli-microsoft365/issues/1936)
+- refactored processing command output [#1552](https://github.com/pnp/cli-microsoft365/issues/1552), [#1823](https://github.com/pnp/cli-microsoft365/issues/1823) and [#1875](https://github.com/pnp/cli-microsoft365/issues/1875)
+- fixed displaying help for command's alias [#1907](https://github.com/pnp/cli-microsoft365/issues/1907)
+- added tracking output mode to telemetry [#1946](https://github.com/pnp/cli-microsoft365/pull/1946)
+- fixed retrieving unknown options [#1947](https://github.com/pnp/cli-microsoft365/issues/1947)
+- renamed `query` to `camlQuery` in `spo listitem list` [#1948](https://github.com/pnp/cli-microsoft365/issues/1948)
+- fixed user-agent header [#1951](https://github.com/pnp/cli-microsoft365/issues/1951)
+- fixed user guide env. variable naming [#1954](https://github.com/pnp/cli-microsoft365/issues/1954)
+- made 'console.log()' synchronous [#1266](https://github.com/pnp/cli-microsoft365/issues/1266)
+- extended `todo task list` with id [#1943](https://github.com/pnp/cli-microsoft365/issues/1943)
+
 ## [v3.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.2.0)
 
 ### New commands

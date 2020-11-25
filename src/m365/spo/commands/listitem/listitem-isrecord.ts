@@ -58,20 +58,20 @@ class SpoListItemIsRecordCommand extends SpoCommand {
     let listId: string = '';
 
     if (this.debug) {
-      logger.log(`Retrieving access token for ${resource}...`);
+      logger.logToStderr(`Retrieving access token for ${resource}...`);
     }
 
     ((): Promise<{ Id: string; }> => {
       if (typeof args.options.listId !== 'undefined') {
         if (this.verbose) {
-          logger.log(`List Id passed in as an argument.`);
+          logger.logToStderr(`List Id passed in as an argument.`);
         }
 
         return Promise.resolve({ Id: args.options.listId });
       }
 
       if (this.verbose) {
-        logger.log(`Getting list id...`);
+        logger.logToStderr(`Getting list id...`);
       }
       const requestOptions: any = {
         url: `${listRestUrl}?$select=Id`,
@@ -87,7 +87,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
         listId = res.Id;
 
         if (this.debug) {
-          logger.log(`Getting request digest for request`);
+          logger.logToStderr(`Getting request digest for request`);
         }
 
         return this.getRequestDigest(args.options.webUrl);
@@ -98,7 +98,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
       })
       .then((webIdentityResp: IdentityResponse): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Checking if list item is a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+          logger.logToStderr(`Checking if list item is a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
         const requestBody = this.getIsRecordRequestBody(webIdentityResp.objectIdentity, listId, args.options.id)

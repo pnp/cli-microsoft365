@@ -9,7 +9,7 @@ describe('FolderExtensions', () => {
   let folderExtensions: FolderExtensions;
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   let stubPostResponses: any = (
     folderAddResp: any = null
@@ -47,9 +47,15 @@ describe('FolderExtensions', () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -157,7 +163,7 @@ describe('FolderExtensions', () => {
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.strictEqual(loggerSpy.lastCall.args[0], 'All sub-folders exist');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0], 'All sub-folders exist');
         done();
 
       }, (err: any) => {
@@ -177,7 +183,7 @@ describe('FolderExtensions', () => {
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.strictEqual(loggerSpy.notCalled, true);
+        assert.strictEqual(loggerLogSpy.notCalled, true);
         done();
 
       }, (err: any) => {
@@ -194,7 +200,7 @@ describe('FolderExtensions', () => {
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.strictEqual(loggerSpy.called, true);
+        assert.strictEqual(loggerLogSpy.called, true);
         done();
 
       }, (err: any) => {
@@ -211,7 +217,7 @@ describe('FolderExtensions', () => {
     folderExtensions.ensureFolder("https://contoso.sharepoint.com", "abc")
       .then(res => {
 
-        assert.strictEqual(loggerSpy.called, false);
+        assert.strictEqual(loggerLogSpy.called, false);
         done();
 
       }, (err: any) => {

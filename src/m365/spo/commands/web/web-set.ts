@@ -97,14 +97,14 @@ class SpoWebSetCommand extends SpoCommand {
     };
 
     if (this.verbose) {
-      logger.log(`Updating properties of subsite ${args.options.webUrl}...`);
+      logger.logToStderr(`Updating properties of subsite ${args.options.webUrl}...`);
     }
 
     request
       .patch(requestOptions)
       .then((): void => {
         if (this.debug) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

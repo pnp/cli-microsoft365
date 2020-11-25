@@ -12,7 +12,7 @@ const command: Command = require('./userprofile-set');
 describe(commands.USERPROFILE_SET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   const spoUrl = 'https://contoso.sharepoint.com';
 
   before(() => {
@@ -27,9 +27,15 @@ describe(commands.USERPROFILE_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -108,7 +114,7 @@ describe(commands.USERPROFILE_SET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       } catch (e) {
         done(e);
@@ -168,7 +174,7 @@ describe(commands.USERPROFILE_SET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       } catch (e) {
         done(e);

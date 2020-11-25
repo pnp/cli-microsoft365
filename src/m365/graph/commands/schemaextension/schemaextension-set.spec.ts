@@ -13,7 +13,7 @@ const command: Command = require('./schemaextension-set');
 describe(commands.SCHEMAEXTENSION_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +26,15 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -123,7 +129,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith("Schema extension successfully updated."));
+        assert(loggerLogToStderrSpy.calledWith("Schema extension successfully updated."));
         done();
       }
       catch (e) {
@@ -152,7 +158,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

@@ -45,7 +45,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
         })
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
-            logger.log(`Removing Knowledge Hub Site settings from your tenant`);
+            logger.logToStderr(`Removing Knowledge Hub Site settings from your tenant`);
           }
 
           const requestOptions: any = {
@@ -68,7 +68,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
             logger.log(json[json.length - 1]);
 
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
             cb();
           }
@@ -77,7 +77,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
 
     if (args.options.confirm) {
       if (this.debug) {
-        logger.log('Confirmation bypassed by entering confirm option. Removing Knowledge Hub Site setting...');
+        logger.logToStderr('Confirmation bypassed by entering confirm option. Removing Knowledge Hub Site setting...');
       }
       removeKnowledgehub();
     }

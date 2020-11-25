@@ -50,14 +50,14 @@ class SpoListViewFieldAddCommand extends SpoCommand {
     let currentField: { InternalName: string; };
 
     if (this.verbose) {
-      logger.log(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
+      logger.logToStderr(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
     }
 
     this
       .getField(args.options, listSelector)
       .then((field: { InternalName: string; }): Promise<void> => {
         if (this.verbose) {
-          logger.log(`Adding the field ${args.options.fieldId || args.options.fieldTitle} to the view ${args.options.viewId || args.options.viewTitle}...`);
+          logger.logToStderr(`Adding the field ${args.options.fieldId || args.options.fieldTitle} to the view ${args.options.viewId || args.options.viewTitle}...`);
         }
 
         currentField = field;
@@ -78,19 +78,19 @@ class SpoListViewFieldAddCommand extends SpoCommand {
       .then((): Promise<void> => {
         if (typeof args.options.fieldPosition === 'undefined') {
           if (this.debug) {
-            logger.log(`No field position.`);
+            logger.logToStderr(`No field position.`);
           }
 
           return Promise.resolve();
         }
 
         if (this.debug) {
-          logger.log(`moveField request...`);
-          logger.log(args.options.fieldPosition);
+          logger.logToStderr(`moveField request...`);
+          logger.logToStderr(args.options.fieldPosition);
         }
 
         if (this.verbose) {
-          logger.log(`Moving the field ${args.options.fieldId || args.options.fieldTitle} to the position ${args.options.fieldPosition} from view ${args.options.viewId || args.options.viewTitle}...`);
+          logger.logToStderr(`Moving the field ${args.options.fieldId || args.options.fieldTitle} to the position ${args.options.fieldPosition} from view ${args.options.viewId || args.options.viewTitle}...`);
         }
         const moveRequestUrl: string = `${args.options.webUrl}/_api/web/lists${listSelector}/views${viewSelector}/viewfields/moveviewfieldto`;
 

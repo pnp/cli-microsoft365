@@ -57,7 +57,7 @@ class SpoThemeApplyCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Applying theme ${args.options.name} to the ${args.options.webUrl} site...`);
+          logger.logToStderr(`Applying theme ${args.options.name} to the ${args.options.webUrl} site...`);
         }
 
         let requestOptions: any = {};

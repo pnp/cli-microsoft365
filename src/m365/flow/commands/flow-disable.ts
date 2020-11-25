@@ -29,7 +29,7 @@ class FlowDisableCommand extends AzmgmtCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Disables Microsoft Flow ${args.options.name}...`);
+      logger.logToStderr(`Disables Microsoft Flow ${args.options.name}...`);
     }
 
     const requestOptions: any = {
@@ -45,7 +45,7 @@ class FlowDisableCommand extends AzmgmtCommand {
       .then((): void => {
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

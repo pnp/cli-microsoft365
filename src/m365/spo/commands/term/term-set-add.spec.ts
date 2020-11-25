@@ -13,7 +13,7 @@ const command: Command = require('./term-set-add');
 describe(commands.TERM_SET_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.TERM_SET_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -99,7 +105,7 @@ describe(commands.TERM_SET_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           CreatedDate: '2018-10-01T18:31:32.608Z',
           Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
           LastModifiedDate: '2018-10-01T18:31:32.608Z',
@@ -164,7 +170,7 @@ describe(commands.TERM_SET_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           CreatedDate: '2018-10-01T18:31:32.608Z',
           Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
           LastModifiedDate: '2018-10-01T18:31:32.608Z',
@@ -229,7 +235,7 @@ describe(commands.TERM_SET_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           CreatedDate: '2018-10-01T18:31:32.608Z',
           Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
           LastModifiedDate: '2018-10-01T18:31:32.608Z',
@@ -302,7 +308,7 @@ describe(commands.TERM_SET_ADD, () => {
     });
     command.action(logger, { options: { debug: true, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', description: 'List of organizations' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           CreatedDate: '2018-10-01T18:31:32.608Z',
           Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
           LastModifiedDate: '2018-10-01T18:31:32.608Z',
@@ -375,7 +381,7 @@ describe(commands.TERM_SET_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', customProperties: JSON.stringify({ Prop1: 'Value 1', Prop2: 'Value 2' }) } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           CreatedDate: '2018-10-01T18:31:32.608Z',
           Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
           LastModifiedDate: '2018-10-01T18:31:32.608Z',
@@ -700,7 +706,7 @@ describe(commands.TERM_SET_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupName: 'PnPTermSets>' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           CreatedDate: '2018-10-01T18:31:32.608Z',
           Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
           LastModifiedDate: '2018-10-01T18:31:32.608Z',
@@ -765,7 +771,7 @@ describe(commands.TERM_SET_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnP-Organizations>', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           CreatedDate: '2018-10-01T18:31:32.608Z',
           Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
           LastModifiedDate: '2018-10-01T18:31:32.608Z',
@@ -838,7 +844,7 @@ describe(commands.TERM_SET_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', description: 'List of organizations>' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           CreatedDate: '2018-10-01T18:31:32.608Z',
           Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
           LastModifiedDate: '2018-10-01T18:31:32.608Z',
@@ -911,7 +917,7 @@ describe(commands.TERM_SET_ADD, () => {
     });
     command.action(logger, { options: { debug: false, name: 'PnP-Organizations', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb', customProperties: JSON.stringify({ Prop1: '<Value 1', Prop2: 'Value 2>' }) } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           CreatedDate: '2018-10-01T18:31:32.608Z',
           Id: 'b53f9aa1-1d35-4b39-8498-7e4705e57301',
           LastModifiedDate: '2018-10-01T18:31:32.608Z',

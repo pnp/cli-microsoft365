@@ -13,7 +13,7 @@ const command: Command = require('./term-group-get');
 describe(commands.TERM_GROUP_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.TERM_GROUP_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -117,7 +123,7 @@ describe(commands.TERM_GROUP_GET, () => {
     });
     command.action(logger, { options: { debug: false, id: '36a62501-17ea-455a-bed4-eff862242def' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "CreatedDate": "2018-06-20T07:23:21.033Z",
           "Id": "36a62501-17ea-455a-bed4-eff862242def",
           "LastModifiedDate": "2018-06-20T07:23:21.033Z",
@@ -194,7 +200,7 @@ describe(commands.TERM_GROUP_GET, () => {
     });
     command.action(logger, { options: { debug: true, name: 'People' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "CreatedDate": "2018-06-20T07:23:21.033Z",
           "Id": "36a62501-17ea-455a-bed4-eff862242def",
           "LastModifiedDate": "2018-06-20T07:23:21.033Z",

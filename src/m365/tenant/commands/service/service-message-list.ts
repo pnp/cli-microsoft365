@@ -24,9 +24,13 @@ class TenantServiceMessageListCommand extends Command {
     return 'Gets service messages Microsoft 365';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Workload', 'Id', 'Message'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      logger.log(`Getting service messages...`);
+      logger.logToStderr(`Getting service messages...`);
     }
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
@@ -42,23 +46,18 @@ class TenantServiceMessageListCommand extends Command {
     };
 
     request
-      .get(requestOptions)
-      .then((res: any): void => {
-        if (args.options.output === 'json') {
-          logger.log(res);
-        }
-        else {
-          logger.log(res.value.map((r: any) => {
-            return {
-              Workload: r.Id.startsWith('MC') ? r.AffectedWorkloadDisplayNames.join(', ') : r.Workload,
-              Id: r.Id,
-              Message: r.Id.startsWith('MC') ? r.Title : r.ImpactDescription
-            }
-          }));
-        }
+      .get<{ value: any[] }>(requestOptions)
+      .then((res: { value: any[] }): void => {
+        res.value.forEach(r => {
+          r.Workload = r.Id.startsWith('MC') ? r.AffectedWorkloadDisplayNames.join(', ') : r.Workload;
+          r.Id = r.Id;
+          r.Message = r.Id.startsWith('MC') ? r.Title : r.ImpactDescription;
+        });
+
+        logger.log(res);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

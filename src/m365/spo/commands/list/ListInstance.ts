@@ -50,6 +50,7 @@ export interface ListInstance {
   TemplateFeatureId: string;
   Title: string;
   RootFolder: RootFolder;
+  Url: string;
 }
 
 export interface RootFolder {

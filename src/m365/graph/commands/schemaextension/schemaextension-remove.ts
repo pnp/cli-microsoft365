@@ -34,7 +34,7 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeSchemaExtension: () => void = (): void => {
         if (this.verbose) {
-          logger.log(`Removes specified Microsoft Graph schema extension with id '${args.options.id}'...`);
+          logger.logToStderr(`Removes specified Microsoft Graph schema extension with id '${args.options.id}'...`);
         }
 
         const requestOptions: any = {
@@ -49,7 +49,7 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
       request.delete(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

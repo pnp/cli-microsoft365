@@ -45,7 +45,7 @@ class YammerMessageRemoveCommand extends YammerCommand {
         .delete(requestOptions)
         .then((res: any): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

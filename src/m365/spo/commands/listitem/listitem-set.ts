@@ -61,7 +61,7 @@ class SpoListItemSetCommand extends SpoCommand {
     ((): Promise<any> => {
       if (args.options.systemUpdate) {
         if (this.verbose) {
-          logger.log(`Getting list id...`);
+          logger.logToStderr(`Getting list id...`);
         }
 
         const listRequestOptions: any = {
@@ -85,7 +85,7 @@ class SpoListItemSetCommand extends SpoCommand {
 
         if (args.options.contentType) {
           if (this.verbose) {
-            logger.log(`Getting content types for list...`);
+            logger.logToStderr(`Getting content types for list...`);
           }
 
           const requestOptions: any = {
@@ -105,23 +105,23 @@ class SpoListItemSetCommand extends SpoCommand {
       .then((response: any): Promise<ContextInfo> => {
         if (args.options.contentType) {
           if (this.debug) {
-            logger.log('content type lookup response...');
-            logger.log(response);
+            logger.logToStderr('content type lookup response...');
+            logger.logToStderr(response);
           }
 
           const foundContentType: { Name: string; }[] = response.value.filter((ct: any) => {
             const contentTypeMatch: boolean = ct.Id.StringValue === args.options.contentType || ct.Name === args.options.contentType;
 
             if (this.debug) {
-              logger.log(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
+              logger.logToStderr(`Checking content type value [${ct.Name}]: ${contentTypeMatch}`);
             }
 
             return contentTypeMatch;
           });
 
           if (this.debug) {
-            logger.log('content type filter output...');
-            logger.log(foundContentType);
+            logger.logToStderr('content type filter output...');
+            logger.logToStderr(foundContentType);
           }
 
           if (foundContentType.length > 0) {
@@ -134,12 +134,12 @@ class SpoListItemSetCommand extends SpoCommand {
           }
 
           if (this.debug) {
-            logger.log(`using content type name: ${contentTypeName}`);
+            logger.logToStderr(`using content type name: ${contentTypeName}`);
           }
         }
         if (args.options.systemUpdate) {
           if (this.debug) {
-            logger.log(`getting request digest for systemUpdate request`);
+            logger.logToStderr(`getting request digest for systemUpdate request`);
           }
 
           return this.getRequestDigest(args.options.webUrl);
@@ -150,7 +150,7 @@ class SpoListItemSetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
+          logger.logToStderr(`Updating item in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
         formDigestValue = args.options.systemUpdate ? res['FormDigestValue'] : '';
@@ -185,7 +185,7 @@ class SpoListItemSetCommand extends SpoCommand {
 
         if (args.options.contentType && contentTypeName !== '' && !args.options.systemUpdate) {
           if (this.debug) {
-            logger.log(`Specifying content type name [${contentTypeName}] in request body`);
+            logger.logToStderr(`Specifying content type name [${contentTypeName}] in request body`);
           }
 
           requestBody.formValues.push({
@@ -375,7 +375,7 @@ class SpoListItemSetCommand extends SpoCommand {
     return new Promise<string>((resolve: any, reject: any): void => {
       request.post(requestOptions).then((res: any) => {
         if (this.debug) {
-          logger.log('Attempt to get _ObjectIdentity_ key values');
+          logger.logToStderr('Attempt to get _ObjectIdentity_ key values');
         }
 
         const json: ClientSvcResponse = JSON.parse(res);

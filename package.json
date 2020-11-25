@@ -21,7 +21,8 @@
     "build": "tsc -p . && node scripts/copy-files.js",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./dist",
-    "test": "c8 mocha \"dist/**/*.spec.js\""
+    "test": "c8 mocha \"dist/**/*.spec.js\"",
+    "test:dev": "mocha \"dist/**/*.spec.js\""
   },
   "keywords": [
     "office 365",
@@ -109,8 +110,10 @@
     "Lamber, Patrick <patrick@nubo.eu>",
     "Laskewitz, Daniel <daniel@laskewitz.nl>",
     "Levert, Sebastien <slevert@outlook.com>",
+    "Maillot, Michaël <battosaimykle@gmail.com>",
     "Mastykarz, Waldek <waldek@mastykarz.nl>",
     "Menon, Arjun <arjun.umenon@gmail.com>",
+    "Moujahid, Abderahman <rags_place@hotmail.com>",
     "Mücklisch, Steve <steve.muecklisch@gmail.com>",
     "Nachan, Nanddeep <nanddeepnachan@gmail.com>",
     "Nachan, Smita <smita.nachan@gmail.com>",

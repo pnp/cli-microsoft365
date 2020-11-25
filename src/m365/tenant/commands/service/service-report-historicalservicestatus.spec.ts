@@ -12,46 +12,7 @@ const command: Command = require('./service-report-historicalservicestatus');
 describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
   let log: any[];
   let logger: Logger;
-
-  let loggerSpy: sinon.SinonSpy;
-
-  let textOutput = [
-    {
-      WorkloadDisplayName: "Microsoft Bookings",
-      StatusDisplayName: "Normal service",
-      StatusTime: "2020-09-17T00:00:00Z"
-    },
-    {
-      WorkloadDisplayName: "Microsoft Bookings",
-      StatusDisplayName: "Normal service",
-      StatusTime: "2020-09-16T00:00:00Z"
-    },
-    {
-      WorkloadDisplayName: "Microsoft Bookings",
-      StatusDisplayName: "Normal service",
-      StatusTime: "2020-09-15T00:00:00Z"
-    },
-    {
-      WorkloadDisplayName: "Microsoft Bookings",
-      StatusDisplayName: "Normal service",
-      StatusTime: "2020-09-14T00:00:00Z"
-    },
-    {
-      WorkloadDisplayName: "Microsoft Bookings",
-      StatusDisplayName: "Normal service",
-      StatusTime: "2020-09-13T00:00:00Z"
-    },
-    {
-      WorkloadDisplayName: "Microsoft Bookings",
-      StatusDisplayName: "Normal service",
-      StatusTime: "2020-09-12T00:00:00Z"
-    },
-    {
-      WorkloadDisplayName: "Microsoft Bookings",
-      StatusDisplayName: "Normal service",
-      StatusTime: "2020-09-11T00:00:00Z"
-    }
-  ];
+  let loggerLogSpy: sinon.SinonSpy;
 
   let jsonOutput = {
     "@odata.context": "https://office365servicecomms-prod.cloudapp.net/api/v1.0/contoso.sharepoint.com/$metadata#CurrentStatus",
@@ -183,6 +144,12 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.tenantId = '48526e9f-60c5-3000-31d7-aa1dc75ecf3c|908bel80-a04a-4422-b4a0-883d9847d110:c8e761e2-d528-34d1-8776-dc51157d619a&#xA;Tenant';
+    if (!auth.service.accessTokens[auth.defaultResource]) {
+      auth.service.accessTokens[auth.defaultResource] = {
+        expiresOn: 'abc',
+        value: 'abc'
+      };
+    }
   });
 
   beforeEach(() => {
@@ -190,9 +157,15 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -216,6 +189,10 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['WorkloadDisplayName', 'StatusDisplayName', 'StatusTime']);
   });
 
   it('supports debug mode', () => {
@@ -252,7 +229,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
     });
   });
 
-  it('Gets the historical service status of the Office 365 Services of the last 7 days - JSON Output', (done) => {
+  it('Gets the historical service status of the Office 365 Services of the last 7 days', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('HistoricalStatus') > -1) {
         return Promise.resolve(jsonOutput);
@@ -262,12 +239,11 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
 
     command.action(logger, {
       options: {
-        output: 'json',
         debug: false
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -276,7 +252,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
     });
   });
 
-  it('Gets the historical service status of the Office 365 Services of the last 7 days - JSON Output (debug)', (done) => {
+  it('Gets the historical service status of the Office 365 Services of the last 7 days (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('HistoricalStatus') > -1) {
         return Promise.resolve(jsonOutput);
@@ -286,12 +262,11 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
 
     command.action(logger, {
       options: {
-        output: 'json',
         debug: true
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -300,55 +275,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
     });
   });
 
-  it('Gets the historical service status of the Office 365 Services of the last 7 days - text Output', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('HistoricalStatus') > -1) {
-        return Promise.resolve(jsonOutput);
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        output: 'text',
-        debug: false
-      }
-    }, () => {
-      try {
-        assert(loggerSpy.calledWith(textOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('Gets the historical service status of the Office 365 Services of the last 7 days - text Output (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('HistoricalStatus') > -1) {
-        return Promise.resolve(jsonOutput);
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        output: 'text',
-        debug: true
-      }
-    }, () => {
-      try {
-        assert(loggerSpy.calledWith(textOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('Gets the historical service status of the Office 365 Services of the last 7 days - JSON Output With Workload', (done) => {
+  it('Gets the historical service status of the Office 365 Services of the last 7 days With Workload', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('HistoricalStatus') > -1) {
         return Promise.resolve(jsonOutput);
@@ -359,12 +286,11 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
     command.action(logger, {
       options: {
         workload: 'Bookings',
-        output: 'json',
         debug: false
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -373,7 +299,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
     });
   });
 
-  it('Gets the historical service status of the Office 365 Services of the last 7 days - JSON Output With Workload (debug)', (done) => {
+  it('Gets the historical service status of the Office 365 Services of the last 7 days With Workload (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('HistoricalStatus') > -1) {
         return Promise.resolve(jsonOutput);
@@ -384,62 +310,11 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
     command.action(logger, {
       options: {
         workload: 'Bookings',
-        output: 'json',
         debug: true
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(jsonOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('Gets the historical service status of the Office 365 Services of the last 7 days - text Output With Workload', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('HistoricalStatus') > -1) {
-        return Promise.resolve(jsonOutput);
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        workload: 'Bookings',
-        output: 'text',
-        debug: false
-      }
-    }, () => {
-      try {
-        assert(loggerSpy.calledWith(textOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('Gets the historical service status of the Office 365 Services of the last 7 days - text Output With Workload (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('HistoricalStatus') > -1) {
-        return Promise.resolve(jsonOutput);
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        workload: 'Bookings',
-        output: 'text',
-        debug: true
-      }
-    }, () => {
-      try {
-        assert(loggerSpy.calledWith(textOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {

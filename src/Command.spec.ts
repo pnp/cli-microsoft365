@@ -135,7 +135,7 @@ class MockCommand3 extends Command {
 describe('Command', () => {
   let telemetry: any;
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let cli: Cli;
 
   before(() => {
@@ -144,9 +144,11 @@ describe('Command', () => {
       telemetry = t;
     });
     logger = {
-      log: (msg: string) => { }
+      log: (msg: string) => { },
+      logRaw: (msg: string) => { },
+      logToStderr: (msg: string) => { }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     cli = Cli.getInstance();
   });
 
@@ -242,7 +244,7 @@ describe('Command', () => {
     cli.currentCommandName = 'mc1';
     const mock = new MockCommand1();
     mock.commandAction(logger, {}, (err?: any): void => {
-      assert(loggerSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)))
+      assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)))
     });
   });
 

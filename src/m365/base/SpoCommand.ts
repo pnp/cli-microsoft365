@@ -42,7 +42,7 @@ export default abstract class SpoCommand extends Command {
     return new Promise<FormDigestInfo>((resolve: (context: FormDigestInfo) => void, reject: (error: any) => void): void => {
       if (this.isValidFormDigest(context)) {
         if (debug) {
-          logger.log('Existing form digest still valid');
+          logger.logToStderr('Existing form digest still valid');
         }
 
         resolve(context as FormDigestInfo);
@@ -88,7 +88,7 @@ export default abstract class SpoCommand extends Command {
         currentContext = res;
 
         if (this.debug) {
-          logger.log(`Checking if operation ${operationId} completed...`);
+          logger.logToStderr(`Checking if operation ${operationId} completed...`);
         }
 
         if (!this.debug && this.verbose) {
@@ -152,8 +152,8 @@ export default abstract class SpoCommand extends Command {
       .then((resp: { JobState?: number, Logs: string[] }): void => {
 
         if (this.debug) {
-          logger.log('getCopyJobProgress response...');
-          logger.log(resp);
+          logger.logToStderr('getCopyJobProgress response...');
+          logger.logToStderr(resp);
         }
 
         for (const item of resp.Logs) {
@@ -186,7 +186,7 @@ export default abstract class SpoCommand extends Command {
   protected getSpoUrl(logger: Logger, debug: boolean): Promise<string> {
     if (auth.service.spoUrl) {
       if (debug) {
-        logger.log(`SPO URL previously retrieved ${auth.service.spoUrl}. Returning...`);
+        logger.logToStderr(`SPO URL previously retrieved ${auth.service.spoUrl}. Returning...`);
       }
 
       return Promise.resolve(auth.service.spoUrl);
@@ -194,7 +194,7 @@ export default abstract class SpoCommand extends Command {
 
     return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
       if (debug) {
-        logger.log(`No SPO URL available. Retrieving from MS Graph...`);
+        logger.logToStderr(`No SPO URL available. Retrieving from MS Graph...`);
       }
 
       const requestOptions: any = {
@@ -239,7 +239,7 @@ export default abstract class SpoCommand extends Command {
   protected getTenantId(logger: Logger, debug: boolean): Promise<string> {
     if (auth.service.tenantId) {
       if (debug) {
-        logger.log(`SPO Tenant ID previously retrieved ${auth.service.tenantId}. Returning...`);
+        logger.logToStderr(`SPO Tenant ID previously retrieved ${auth.service.tenantId}. Returning...`);
       }
 
       return Promise.resolve(auth.service.tenantId);
@@ -247,7 +247,7 @@ export default abstract class SpoCommand extends Command {
 
     return new Promise<string>((resolve: (spoUrl: string) => void, reject: (error: any) => void): void => {
       if (debug) {
-        logger.log(`No SPO Tenant ID available. Retrieving...`);
+        logger.logToStderr(`No SPO Tenant ID available. Retrieving...`);
       }
 
       let spoAdminUrl: string = '';

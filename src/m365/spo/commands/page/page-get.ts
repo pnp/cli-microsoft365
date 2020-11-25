@@ -26,9 +26,13 @@ class SpoPageGetCommand extends SpoCommand {
     return 'Gets information about the specific modern page';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['commentsDisabled', 'numSections', 'numControls', 'title', 'layoutType'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving information about the page...`);
+      logger.logToStderr(`Retrieving information about the page...`);
     }
 
     let pageName: string = args.options.name;
@@ -72,14 +76,11 @@ class SpoPageGetCommand extends SpoCommand {
           page.layoutType = res.ListItemAllFields.PageLayoutType;
         }
 
-        if (args.options.output === 'json') {
-          page = Object.assign(res, page);
-        }
-
+        page = Object.assign(res, page);
         logger.log(page);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

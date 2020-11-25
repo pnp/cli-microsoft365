@@ -12,7 +12,7 @@ const command: Command = require('./app-list');
 describe(commands.APP_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +26,15 @@ describe(commands.APP_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -53,6 +59,10 @@ describe(commands.APP_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), [`Title`, `ID`, `Deployed`, `AppCatalogVersion`]);
   });
 
   it('retrieves available apps from the tenant app catalog', (done) => {
@@ -88,7 +98,7 @@ describe(commands.APP_LIST, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
             Title: 'online-client-side-solution',
@@ -143,7 +153,7 @@ describe(commands.APP_LIST, () => {
 
     command.action(logger, { options: { debug: true, scope: 'sitecollection', appCatalogUrl: 'https://contoso-admin.sharepoint.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             ID: 'b2307a39-e878-458b-bc90-03bc578531d6',
             Title: 'online-client-side-solution',
@@ -210,7 +220,7 @@ describe(commands.APP_LIST, () => {
 
     command.action(logger, { options: { debug: true, output: 'json' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "AppCatalogVersion": "1.0.0.0",
             "CanUpgrade": false,

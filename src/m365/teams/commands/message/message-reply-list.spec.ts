@@ -12,7 +12,7 @@ const command: Command = require('./message-reply-list');
 describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -50,6 +56,10 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'body']);
   });
 
   it('fails validation if teamId, channelId and messageId are not specified', () => {
@@ -216,16 +226,64 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            "id": "1501527483334",
-            "body": "<div>Hey team, I'm Lidia! I've been here about six months so far and I really like it! We've got a great team and although there's always so much to do, I enjoy how well we work together.</div>"
+        assert(loggerLogSpy.calledWith([{
+          "id": "1501527483334",
+          "replyToId": "1501527481624",
+          "etag": "1501527483334",
+          "messageType": "message",
+          "createdDateTime": "2017-07-31T18:58:03.334Z",
+          "lastModifiedDateTime": null,
+          "deletedDateTime": null,
+          "subject": "",
+          "summary": null,
+          "importance": "normal",
+          "locale": "en-us",
+          "webUrl": "https://teams.microsoft.com/l/message/19%3Ad0bba23c2fc8413991125a43a54cc30e%40thread.skype/1501527483334?groupId=02bd9fd6-8f93-4758-87c3-1fb73740a315&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35&createdTime=1501527483334&parentMessageId=1501527481624",
+          "policyViolation": null,
+          "from": {
+            "application": null,
+            "device": null,
+            "conversation": null,
+            "user": {
+              "id": "2ed03dfd-01d8-4005-a9ef-fa8ee546dc6c",
+              "displayName": "Lidia Holloway",
+              "userIdentityType": "aadUser"
+            }
           },
-          {
-            "id": "1501527482612",
-            "body": "<div>Hi everyone, I'm Joni and I've been with our group for about 6 years. Feel free to ping me with any questions you may have!</div>"
-          }
-        ]));
+          "body": "<div>Hey team, I'm Lidia! I've been here about six months so far and I really like it! We've got a great team and although there's always so much to do, I enjoy how well we work together.</div>",
+          "attachments": [],
+          "mentions": [],
+          "reactions": []
+        },
+        {
+          "id": "1501527482612",
+          "replyToId": "1501527481624",
+          "etag": "1501527482612",
+          "messageType": "message",
+          "createdDateTime": "2017-07-31T18:58:02.612Z",
+          "lastModifiedDateTime": null,
+          "deletedDateTime": null,
+          "subject": "",
+          "summary": null,
+          "importance": "normal",
+          "locale": "en-us",
+          "webUrl": "https://teams.microsoft.com/l/message/19%3Ad0bba23c2fc8413991125a43a54cc30e%40thread.skype/1501527482612?groupId=02bd9fd6-8f93-4758-87c3-1fb73740a315&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35&createdTime=1501527482612&parentMessageId=1501527481624",
+          "policyViolation": null,
+          "from": {
+            "application": null,
+            "device": null,
+            "conversation": null,
+            "user": {
+              "id": "8b209ac8-08ff-4ef1-896d-3b9fde0bbf04",
+              "displayName": "Joni Sherman",
+              "userIdentityType": "aadUser"
+            }
+          },
+          "body": "<div>Hi everyone, I'm Joni and I've been with our group for about 6 years. Feel free to ping me with any questions you may have!</div>",
+          "attachments": [],
+          "mentions": [],
+          "reactions": []
+        }]));
         done();
       }
       catch (e) {
@@ -319,16 +377,64 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            "id": "1501527483334",
-            "body": "<div>Hey team, I'm Lidia! I've been here about six months so far and I really like it! We've got a great team and although there's always so much to do, I enjoy how well we work together.</div>"
+        assert(loggerLogSpy.calledWith([{
+          "id": "1501527483334",
+          "replyToId": "1501527481624",
+          "etag": "1501527483334",
+          "messageType": "message",
+          "createdDateTime": "2017-07-31T18:58:03.334Z",
+          "lastModifiedDateTime": null,
+          "deletedDateTime": null,
+          "subject": "",
+          "summary": null,
+          "importance": "normal",
+          "locale": "en-us",
+          "webUrl": "https://teams.microsoft.com/l/message/19%3Ad0bba23c2fc8413991125a43a54cc30e%40thread.skype/1501527483334?groupId=02bd9fd6-8f93-4758-87c3-1fb73740a315&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35&createdTime=1501527483334&parentMessageId=1501527481624",
+          "policyViolation": null,
+          "from": {
+            "application": null,
+            "device": null,
+            "conversation": null,
+            "user": {
+              "id": "2ed03dfd-01d8-4005-a9ef-fa8ee546dc6c",
+              "displayName": "Lidia Holloway",
+              "userIdentityType": "aadUser"
+            }
           },
-          {
-            "id": "1501527482612",
-            "body": "<div>Hi everyone, I'm Joni and I've been with our group for about 6 years. Feel free to ping me with any questions you may have!</div>"
-          }
-        ]));
+          "body": "<div>Hey team, I'm Lidia! I've been here about six months so far and I really like it! We've got a great team and although there's always so much to do, I enjoy how well we work together.</div>",
+          "attachments": [],
+          "mentions": [],
+          "reactions": []
+        },
+        {
+          "id": "1501527482612",
+          "replyToId": "1501527481624",
+          "etag": "1501527482612",
+          "messageType": "message",
+          "createdDateTime": "2017-07-31T18:58:02.612Z",
+          "lastModifiedDateTime": null,
+          "deletedDateTime": null,
+          "subject": "",
+          "summary": null,
+          "importance": "normal",
+          "locale": "en-us",
+          "webUrl": "https://teams.microsoft.com/l/message/19%3Ad0bba23c2fc8413991125a43a54cc30e%40thread.skype/1501527482612?groupId=02bd9fd6-8f93-4758-87c3-1fb73740a315&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35&createdTime=1501527482612&parentMessageId=1501527481624",
+          "policyViolation": null,
+          "from": {
+            "application": null,
+            "device": null,
+            "conversation": null,
+            "user": {
+              "id": "8b209ac8-08ff-4ef1-896d-3b9fde0bbf04",
+              "displayName": "Joni Sherman",
+              "userIdentityType": "aadUser"
+            }
+          },
+          "body": "<div>Hi everyone, I'm Joni and I've been with our group for about 6 years. Feel free to ping me with any questions you may have!</div>",
+          "attachments": [],
+          "mentions": [],
+          "reactions": []
+        }]));
         done();
       }
       catch (e) {
@@ -423,7 +529,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "1501527483334",
             "replyToId": "1501527481624",

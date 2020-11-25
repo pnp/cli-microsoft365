@@ -50,7 +50,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
     const removeContentType = (): void => {
       ((): Promise<any> => {
         if (this.debug) {
-          logger.log(`Retrieving information about the content type ${contentTypeIdentifierLabel}...`);
+          logger.logToStderr(`Retrieving information about the content type ${contentTypeIdentifierLabel}...`);
         }
 
         if (args.options.id) {
@@ -58,7 +58,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Looking up the ID of content type ${contentTypeIdentifierLabel}...`);
+          logger.logToStderr(`Looking up the ID of content type ${contentTypeIdentifierLabel}...`);
         }
 
         const requestOptions: any = {
@@ -101,7 +101,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
           }
           else {
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
           }
 

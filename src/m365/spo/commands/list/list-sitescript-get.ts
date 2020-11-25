@@ -38,20 +38,20 @@ class SpoListSiteScriptGetCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
       const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-      logger.log(`Extracting Site Script from list ${list} in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Extracting Site Script from list ${list} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
 
     if (args.options.listId) {
       if (this.debug) {
-        logger.log(`Retrieving List Url from Id '${args.options.listId}'...`);
+        logger.logToStderr(`Retrieving List Url from Id '${args.options.listId}'...`);
       }
       requestUrl = `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(args.options.listId)}')?$expand=RootFolder`;
     }
     else {
       if (this.debug) {
-        logger.log(`Retrieving List Url from Title '${args.options.listTitle}'...`);
+        logger.logToStderr(`Retrieving List Url from Title '${args.options.listTitle}'...`);
       }
       requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.listTitle as string)}')?$expand=RootFolder`;
     }

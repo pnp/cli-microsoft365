@@ -41,7 +41,7 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
         spoAdminUrl = _spoAdminUrl;
 
         if (this.verbose) {
-          logger.log(`Retrieving request digest...`);
+          logger.logToStderr(`Retrieving request digest...`);
         }
 
         return this.getRequestDigest(spoAdminUrl);
@@ -71,7 +71,7 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
           logger.log(output);
 
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
         }
         cb();

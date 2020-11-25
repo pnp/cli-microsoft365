@@ -12,7 +12,7 @@ const command: Command = require('./list-webhook-add');
 describe(commands.LIST_WEBHOOK_ADD, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -135,7 +141,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           'clientState': 'null',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
@@ -176,7 +182,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           'clientState': 'null',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
@@ -217,7 +223,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           'clientState': 'null',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
@@ -259,7 +265,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           'clientState': 'awesome state',
           'expirationDateTime': '2019-05-29T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',
@@ -301,7 +307,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           'clientState': 'null',
           'expirationDateTime': '2019-01-09T23:00:00.000Z',
           'id': 'ef69c37d-cb0e-46d9-9758-5ebdeffd6959',

@@ -83,14 +83,14 @@ class SpoSiteClassicAddCommand extends SpoCommand {
       .then((exists: boolean): Promise<void> => {
         if (exists) {
           if (this.verbose) {
-            logger.log('Site exists in the recycle bin');
+            logger.logToStderr('Site exists in the recycle bin');
           }
 
           return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
         }
         else {
           if (this.verbose) {
-            logger.log('Site not found');
+            logger.logToStderr('Site not found');
           }
 
           return Promise.resolve();
@@ -103,7 +103,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
         this.context = res;
 
         if (this.verbose) {
-          logger.log(`Creating site collection ${args.options.url}...`);
+          logger.logToStderr(`Creating site collection ${args.options.url}...`);
         }
 
         const lcid: number = typeof args.options.lcid === 'number' ? args.options.lcid : 1033;
@@ -146,7 +146,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();
@@ -161,7 +161,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
           this.context = res;
 
           if (this.verbose) {
-            logger.log(`Checking if the site ${url} exists...`);
+            logger.logToStderr(`Checking if the site ${url} exists...`);
           }
 
           const requestOptions: any = {
@@ -197,7 +197,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
         })
         .then((exists: boolean): Promise<string> => {
           if (this.verbose) {
-            logger.log(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
+            logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
           }
 
           const requestOptions: any = {
@@ -249,7 +249,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
           this.context = res;
 
           if (this.verbose) {
-            logger.log(`Deleting site ${url} from the recycle bin...`);
+            logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
           }
 
           const requestOptions: any = {

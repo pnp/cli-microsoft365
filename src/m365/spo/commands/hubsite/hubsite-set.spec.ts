@@ -13,7 +13,7 @@ const command: Command = require('./hubsite-set');
 describe(commands.HUBSITE_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.HUBSITE_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -79,7 +85,7 @@ describe(commands.HUBSITE_SET, () => {
 
     command.action(logger, { options: { debug: false, title: 'Sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Description: "Description",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -117,7 +123,7 @@ describe(commands.HUBSITE_SET, () => {
 
     command.action(logger, { options: { debug: false, description: 'All things sales', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Description: "All things sales",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -155,7 +161,7 @@ describe(commands.HUBSITE_SET, () => {
 
     command.action(logger, { options: { debug: false, logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Description: "All things sales",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -193,7 +199,7 @@ describe(commands.HUBSITE_SET, () => {
 
     command.action(logger, { options: { debug: true, title: 'Sales', description: 'All things sales', logoUrl: 'https://contoso.com/logo.png', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Description: "All things sales",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -231,7 +237,7 @@ describe(commands.HUBSITE_SET, () => {
 
     command.action(logger, { options: { debug: true, title: '<Sales>', description: '<All things sales>', logoUrl: '<https://contoso.com/logo.png>', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Description: "<All things sales>",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "<https://contoso.com/logo.png>",
@@ -269,7 +275,7 @@ describe(commands.HUBSITE_SET, () => {
 
     command.action(logger, { options: { debug: false, title: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Description: "Description",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -307,7 +313,7 @@ describe(commands.HUBSITE_SET, () => {
 
     command.action(logger, { options: { debug: false, description: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Description: "",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "https://contoso.com/logo.png",
@@ -345,7 +351,7 @@ describe(commands.HUBSITE_SET, () => {
 
     command.action(logger, { options: { debug: false, logoUrl: '', id: '255a50b2-527f-4413-8485-57f4c17a24d1' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Description: "All things sales",
           ID: "255a50b2-527f-4413-8485-57f4c17a24d1",
           LogoUrl: "",

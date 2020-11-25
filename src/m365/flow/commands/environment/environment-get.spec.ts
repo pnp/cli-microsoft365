@@ -12,7 +12,7 @@ const command: Command = require('./environment-get');
 describe(commands.FLOW_ENVIRONMENT_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.FLOW_ENVIRONMENT_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -69,7 +75,7 @@ describe(commands.FLOW_ENVIRONMENT_GET, () => {
 
     command.action(logger, { options: { debug: true, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } }, () => {
       try {
-        assert(loggerSpy.calledWith(env));
+        assert(loggerLogSpy.calledWith(env));
         done();
       }
       catch (e) {
@@ -95,7 +101,7 @@ describe(commands.FLOW_ENVIRONMENT_GET, () => {
 
     command.action(logger, { options: { debug: false, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } }, () => {
       try {
-        assert(loggerSpy.calledWith(env));
+        assert(loggerLogSpy.calledWith(env));
         done();
       }
       catch (e) {

@@ -12,7 +12,7 @@ const command: Command = require('./site-groupify');
 describe(commands.SITE_GROUPIFY, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.SITE_GROUPIFY, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -75,7 +81,7 @@ describe(commands.SITE_GROUPIFY, () => {
 
     command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
           "ErrorMessage": null,
           "GroupId": "114e2be8-7e34-4ed1-b528-7f3762d36a6c",
@@ -113,7 +119,7 @@ describe(commands.SITE_GROUPIFY, () => {
 
     command.action(logger, { options: { debug: true, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
           "ErrorMessage": null,
           "GroupId": "114e2be8-7e34-4ed1-b528-7f3762d36a6c",
@@ -151,7 +157,7 @@ describe(commands.SITE_GROUPIFY, () => {
 
     command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', isPublic: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
           "ErrorMessage": null,
           "GroupId": "114e2be8-7e34-4ed1-b528-7f3762d36a6c",
@@ -191,7 +197,7 @@ describe(commands.SITE_GROUPIFY, () => {
 
     command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', description: 'Team A space' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
           "ErrorMessage": null,
           "GroupId": "114e2be8-7e34-4ed1-b528-7f3762d36a6c",
@@ -231,7 +237,7 @@ describe(commands.SITE_GROUPIFY, () => {
 
     command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', classification: 'HBI' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
           "ErrorMessage": null,
           "GroupId": "114e2be8-7e34-4ed1-b528-7f3762d36a6c",
@@ -271,7 +277,7 @@ describe(commands.SITE_GROUPIFY, () => {
 
     command.action(logger, { options: { debug: false, siteUrl: 'https://contoso.sharepoint.com/sites/team-a', alias: 'team-a', displayName: 'Team A', keepOldHomepage: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "DocumentsUrl": null,
           "ErrorMessage": null,
           "GroupId": "114e2be8-7e34-4ed1-b528-7f3762d36a6c",

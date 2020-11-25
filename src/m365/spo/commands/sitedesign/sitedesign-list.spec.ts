@@ -12,7 +12,7 @@ const command: Command = require('./sitedesign-list');
 describe(commands.SITEDESIGN_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,11 +25,17 @@ describe(commands.SITEDESIGN_LIST, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: any) => {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
         log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -54,6 +60,10 @@ describe(commands.SITEDESIGN_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'IsDefault', 'Title', 'Version', 'WebTemplate']);
   });
 
   it('lists available site designs', (done) => {
@@ -96,20 +106,32 @@ describe(commands.SITEDESIGN_LIST, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
-            "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+            "Description": null,
             "IsDefault": false,
+            "PreviewImageAltText": null,
+            "PreviewImageUrl": null,
+            "SiteScriptIds": [
+              "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
+            ],
             "Title": "Contoso REST",
-            "Version": 1,
-            "WebTemplate": "64"
+            "WebTemplate": "64",
+            "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+            "Version": 1
           },
           {
-            "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+            "Description": null,
             "IsDefault": false,
+            "PreviewImageAltText": null,
+            "PreviewImageUrl": null,
+            "SiteScriptIds": [
+              "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
+            ],
             "Title": "REST test",
-            "Version": 1,
-            "WebTemplate": "64"
+            "WebTemplate": "64",
+            "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+            "Version": 1
           }
         ]));
         done();
@@ -160,20 +182,32 @@ describe(commands.SITEDESIGN_LIST, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
-            "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+            "Description": null,
             "IsDefault": false,
+            "PreviewImageAltText": null,
+            "PreviewImageUrl": null,
+            "SiteScriptIds": [
+              "449c0c6d-5380-4df2-b84b-622e0ac8ec25"
+            ],
             "Title": "Contoso REST",
-            "Version": 1,
-            "WebTemplate": "64"
+            "WebTemplate": "64",
+            "Id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
+            "Version": 1
           },
           {
-            "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+            "Description": null,
             "IsDefault": false,
+            "PreviewImageAltText": null,
+            "PreviewImageUrl": null,
+            "SiteScriptIds": [
+              "449c0c6d-5380-4df2-b84b-622e0ac8ec24"
+            ],
             "Title": "REST test",
-            "Version": 1,
-            "WebTemplate": "64"
+            "WebTemplate": "64",
+            "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+            "Version": 1
           }
         ]));
         done();
@@ -224,7 +258,7 @@ describe(commands.SITEDESIGN_LIST, () => {
 
     command.action(logger, { options: { debug: false, output: 'json' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "Description": null,
             "IsDefault": false,

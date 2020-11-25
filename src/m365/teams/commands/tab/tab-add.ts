@@ -60,7 +60,7 @@ class TeamsTabAddCommand extends GraphItemsListCommand<Tab> {
       .then((res: any): void => {
         logger.log(res);
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

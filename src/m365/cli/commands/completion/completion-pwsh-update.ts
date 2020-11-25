@@ -20,13 +20,13 @@ class CliCompletionPwshUpdateCommand extends AnonymousCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.debug) {
-      logger.log('Generating command completion...');
+      logger.logToStderr('Generating command completion...');
     }
 
     autocomplete.generateShCompletion();
 
     if (this.debug) {
-      logger.log(chalk.green('DONE'));
+      logger.logToStderr(chalk.green('DONE'));
     }
 
     cb();

@@ -28,26 +28,26 @@ class TeamsMessageReplyListCommand extends GraphItemsListCommand<Reply>  {
     return 'Retrieves replies to a message from a channel in a Microsoft Teams team';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'body'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const endpoint: string = `${this.resource}/beta/teams/${args.options.teamId}/channels/${args.options.channelId}/messages/${args.options.messageId}/replies`;
 
     this
       .getAllItems(endpoint, logger, true)
       .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          logger.log(this.items.map(m => {
-            return {
-              id: m.id,
-              body: m.body.content
-            }
-          }));
+        if (args.options.output !== 'json') {
+          this.items.forEach(i => {
+            i.body = i.body.content as any;
+          });
         }
 
+        logger.log(this.items);
+
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

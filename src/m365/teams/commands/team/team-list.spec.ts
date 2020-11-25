@@ -12,7 +12,7 @@ const command: Command = require('./team-list');
 describe(commands.TEAMS_TEAM_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.TEAMS_TEAM_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -114,7 +120,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
             "displayName": "Team 1",
@@ -163,7 +169,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
             "displayName": "Team 1",
@@ -268,7 +274,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
             "displayName": "Team 1",
@@ -380,7 +386,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
 
     command.action(logger, { options: { joined: true, debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
             "displayName": "Team 1",
@@ -492,7 +498,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
 
     command.action(logger, { options: { output: 'json', debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
             "displayName": "Team 1",

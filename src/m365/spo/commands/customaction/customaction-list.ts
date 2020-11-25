@@ -32,13 +32,17 @@ class SpoCustomActionListCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Name', 'Location', 'Scope', 'Id'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const scope: string = args.options.scope ? args.options.scope : 'All';
 
     ((): Promise<CustomAction[]> => {
       if (this.debug) {
-        logger.log(`Attempt to get custom actions list with scope: ${scope}`);
-        logger.log('');
+        logger.logToStderr(`Attempt to get custom actions list with scope: ${scope}`);
+        logger.logToStderr('');
       }
 
       if (scope && scope.toLowerCase() !== "all") {
@@ -50,23 +54,15 @@ class SpoCustomActionListCommand extends SpoCommand {
       .then((customActions: CustomAction[]): void => {
         if (customActions.length === 0) {
           if (this.verbose) {
-            logger.log(`Custom actions not found`);
+            logger.logToStderr(`Custom actions not found`);
           }
         }
         else {
-          if (args.options.output === 'json') {
-            logger.log(customActions);
+          if (args.options.output !== 'json') {
+            customActions.forEach(a => a.Scope = this.humanizeScope(a.Scope) as any);
           }
-          else {
-            logger.log(customActions.map(a => {
-              return {
-                Name: a.Name,
-                Location: a.Location,
-                Scope: this.humanizeScope(a.Scope),
-                Id: a.Id
-              };
-            }));
-          }
+
+          logger.log(customActions);
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));

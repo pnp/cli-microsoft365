@@ -12,7 +12,7 @@ const command: Command = require('./sitedesign-rights-list');
 describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,11 +25,17 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: any) => {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
         log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -84,7 +90,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
 
     command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "DisplayName": "MOD Administrator",
             "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
@@ -132,7 +138,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
 
     command.action(logger, { options: { debug: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "DisplayName": "MOD Administrator",
             "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
@@ -180,7 +186,7 @@ describe(commands.SITEDESIGN_RIGHTS_LIST, () => {
 
     command.action(logger, { options: { debug: false, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "DisplayName": "MOD Administrator",
             "PrincipalName": "i:0#.f|membership|admin@contoso.onmicrosoft.com",

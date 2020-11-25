@@ -54,14 +54,14 @@ class SpoSiteRemoveCommand extends SpoCommand {
         .then((_groupId: string): Promise<void> => {
           if (_groupId === '00000000-0000-0000-0000-000000000000') {
             if (this.debug) {
-              logger.log('Site is not groupified. Going ahead with the conventional site deletion options');
+              logger.logToStderr('Site is not groupified. Going ahead with the conventional site deletion options');
             }
 
             return this.deleteSiteWithoutGroup(logger, args);
           }
           else {
             if (this.debug) {
-              logger.log(`Site attached to group ${_groupId}. Initiating group delete operation via Graph API`);
+              logger.logToStderr(`Site attached to group ${_groupId}. Initiating group delete operation via Graph API`);
             }
             if (args.options.fromRecycleBin || args.options.skipRecycleBin || args.options.wait) {
               logger.log(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'fromRecycleBin' or 'skipRecycleBin' or 'wait' will not be applicable.`))
@@ -72,7 +72,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
         })
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();
@@ -112,14 +112,14 @@ class SpoSiteRemoveCommand extends SpoCommand {
 
         if (args.options.fromRecycleBin) {
           if (this.verbose) {
-            logger.log(`Deleting site collection from recycle bin ${args.options.url}...`);
+            logger.logToStderr(`Deleting site collection from recycle bin ${args.options.url}...`);
           }
 
           return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
         }
         else {
           if (this.verbose) {
-            logger.log(`Deleting site collection ${args.options.url}...`);
+            logger.logToStderr(`Deleting site collection ${args.options.url}...`);
           }
 
           return this.deleteSite(args.options.url, args.options.wait, logger);
@@ -128,7 +128,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
       .then((): Promise<void> => {
         if (args.options.skipRecycleBin) {
           if (this.verbose) {
-            logger.log(`Also deleting site collection from recycle bin ${args.options.url}...`)
+            logger.logToStderr(`Also deleting site collection from recycle bin ${args.options.url}...`)
           }
           return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
         }
@@ -146,7 +146,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
           this.context = res;
 
           if (this.verbose) {
-            logger.log(`Deleting site ${url} ...`);
+            logger.logToStderr(`Deleting site ${url} ...`);
           }
 
           const requestOptions: any = {
@@ -188,7 +188,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
         .then((res: FormDigestInfo): Promise<string> => {
           this.context = res;
           if (this.verbose) {
-            logger.log(`Deleting site ${url} from the recycle bin...`);
+            logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
           }
 
           const requestOptions: any = {
@@ -233,7 +233,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
       .then((res: FormDigestInfo): Promise<string> => {
         this.context = res;
         if (this.verbose) {
-          logger.log(`Retrieving the GroupId of the site  ${url}`);
+          logger.logToStderr(`Retrieving the GroupId of the site  ${url}`);
         }
 
         const requestOptions: any = {
@@ -261,7 +261,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
 
   private deleteGroupifiedSite(groupId: string, logger: Logger): Promise<void> {
     if (this.verbose) {
-      logger.log(`Removing Microsoft 365 Group: ${groupId}...`);
+      logger.logToStderr(`Removing Microsoft 365 Group: ${groupId}...`);
     }
 
     const requestOptions: any = {

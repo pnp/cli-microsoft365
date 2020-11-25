@@ -12,7 +12,7 @@ const command: Command = require('./sitedesign-set');
 describe(commands.SITEDESIGN_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +26,15 @@ describe(commands.SITEDESIGN_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -81,7 +87,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'New title' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -127,7 +133,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'TeamSite' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -173,7 +179,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', webTemplate: 'CommunicationSite' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -219,7 +225,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -265,7 +271,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', siteScripts: '449c0c6d-5380-4df2-b84b-622e0ac8ec24, 449c0c6d-5380-4df2-b84b-622e0ac8ec25' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -311,7 +317,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', description: 'New description' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": "New description",
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -357,7 +363,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageUrl: 'https://contoso.com/image.png' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -403,7 +409,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', previewImageAltText: 'Logo image' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -449,7 +455,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', version: 2 } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -495,7 +501,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'true' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": true,
@@ -541,7 +547,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', isDefault: 'false' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -586,7 +592,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": null,
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": false,
@@ -641,7 +647,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
     command.action(logger, { options: { debug: true, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', previewImageAltText: 'Contoso team site preview', version: 2, isDefault: 'true' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Description": 'Contoso team site',
           "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
           "IsDefault": true,

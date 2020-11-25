@@ -17,9 +17,13 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
     return 'Lists Microsoft Flow environments in the current tenant';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['name', 'displayName'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving list of Microsoft Flow environments...`);
+      logger.logToStderr(`Retrieving list of Microsoft Flow environments...`);
     }
 
     const requestOptions: any = {
@@ -31,20 +35,14 @@ class FlowEnvironmentListCommand extends AzmgmtCommand {
     };
 
     request
-      .get<{ value: [{ name: string, properties: { displayName: string } }] }>(requestOptions)
-      .then((res: { value: [{ name: string, properties: { displayName: string } }] }): void => {
+      .get<{ value: [{ name: string, displayName: string; properties: { displayName: string } }] }>(requestOptions)
+      .then((res: { value: [{ name: string, displayName: string; properties: { displayName: string } }] }): void => {
         if (res.value && res.value.length > 0) {
-          if (args.options.output === 'json') {
-            logger.log(res.value);
-          }
-          else {
-            logger.log(res.value.map(e => {
-              return {
-                name: e.name,
-                displayName: e.properties.displayName
-              };
-            }));
-          }
+          res.value.forEach(e => {
+            e.displayName = e.properties.displayName
+          });
+
+          logger.log(res.value);
         }
 
         cb();

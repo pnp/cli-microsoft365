@@ -55,7 +55,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
 
     const removeField = (listRestUrl: string, fieldId: string | undefined, fieldTitle: string | undefined): Promise<void> => {
       if (this.verbose) {
-        logger.log(`Removing field ${fieldId || fieldTitle} ${messageEnd}...`);
+        logger.logToStderr(`Removing field ${fieldId || fieldTitle} ${messageEnd}...`);
       }
 
       let fieldRestUrl: string = '';
@@ -96,7 +96,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
 
       if (args.options.group) {
         if (this.verbose) {
-          logger.log(`Retrieving fields assigned to group ${args.options.group}...`);
+          logger.logToStderr(`Retrieving fields assigned to group ${args.options.group}...`);
         }
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/${listRestUrl}fields`,
@@ -111,7 +111,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
           .then((res: any): void => {
             const filteredResults = res.value.filter((field: { Id: string | undefined, Group: string | undefined; }) => field.Group === args.options.group);
             if (this.verbose) {
-              logger.log(`${filteredResults.length} matches found...`);
+              logger.logToStderr(`${filteredResults.length} matches found...`);
             }
 
             var promises = [];

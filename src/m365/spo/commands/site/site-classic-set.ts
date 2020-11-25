@@ -78,7 +78,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
       .then((res: FormDigestInfo): Promise<string> => {
         this.context = res;
         if (this.verbose) {
-          logger.log(`Setting basic properties ${args.options.url}...`);
+          logger.logToStderr(`Setting basic properties ${args.options.url}...`);
         }
 
         const basicProperties: string[] = [
@@ -236,7 +236,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

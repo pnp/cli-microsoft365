@@ -39,7 +39,7 @@ class SpoThemeGetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Getting ${args.options.name} theme from tenant...`);
+          logger.logToStderr(`Getting ${args.options.name} theme from tenant...`);
         }
 
         const requestOptions: any = {
@@ -67,7 +67,7 @@ class SpoThemeGetCommand extends SpoCommand {
         logger.log(theme);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

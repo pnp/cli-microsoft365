@@ -42,7 +42,7 @@ class SpoStorageEntityGetCommand extends SpoCommand {
       .then((property: TenantProperty): void => {
         if (property["odata.null"] === true) {
           if (this.verbose) {
-            logger.log(`Property with key ${args.options.key} not found`);
+            logger.logToStderr(`Property with key ${args.options.key} not found`);
           }
         }
         else {

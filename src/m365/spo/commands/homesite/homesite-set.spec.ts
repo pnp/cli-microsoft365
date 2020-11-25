@@ -14,7 +14,8 @@ const command: Command = require('./homesite-set');
 describe(commands.HOMESITE_SET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -33,9 +34,16 @@ describe(commands.HOMESITE_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -85,7 +93,7 @@ describe(commands.HOMESITE_SET, () => {
       }
     } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith('The Home site has been set to https://contoso.sharepoint.com/sites/Work.'));
+        assert(loggerLogSpy.calledWith('The Home site has been set to https://contoso.sharepoint.com/sites/Work.'));
         done();
       }
       catch (e) {
@@ -118,7 +126,7 @@ describe(commands.HOMESITE_SET, () => {
       }
     } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

@@ -46,7 +46,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
         parentInfo = parent;
 
         if (this.verbose) {
-          logger.log(`Retrieving request digest...`);
+          logger.logToStderr(`Retrieving request digest...`);
         }
 
         return this.getRequestDigest(args.options.webUrl);
@@ -78,7 +78,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
         }
         cb();
@@ -97,7 +97,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
       ((): Promise<{ Id: string; }> => {
         if (this.verbose) {
-          logger.log(`Retrieving site collection id...`);
+          logger.logToStderr(`Retrieving site collection id...`);
         }
 
         const requestOptions: any = {
@@ -114,7 +114,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
           siteId = res.Id;
 
           if (this.verbose) {
-            logger.log(`Retrieving site id...`);
+            logger.logToStderr(`Retrieving site id...`);
           }
 
           const requestOptions: any = {
@@ -131,7 +131,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
           webId = res.Id;
 
           if (this.verbose) {
-            logger.log(`Retrieving list id...`);
+            logger.logToStderr(`Retrieving list id...`);
           }
 
           const requestOptions: any = {

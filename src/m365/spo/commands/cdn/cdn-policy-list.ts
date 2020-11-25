@@ -50,7 +50,7 @@ class SpoCdnPolicyListCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Retrieving configured policies for ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
+          logger.logToStderr(`Retrieving configured policies for ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
         }
 
         const requestOptions: any = {
@@ -73,7 +73,7 @@ class SpoCdnPolicyListCommand extends SpoCommand {
         else {
           const result: string[] = json[json.length - 1];
           if (this.verbose) {
-            logger.log('Configured policies:');
+            logger.logToStderr('Configured policies:');
           }
           logger.log(result.map(o => {
             const kv: string[] = o.split(';');

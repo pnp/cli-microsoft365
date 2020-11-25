@@ -44,14 +44,14 @@ class SpoWebAddCommand extends SpoCommand {
       };
 
       if (this.verbose) {
-        logger.log(`Deleting subsite ${args.options.webUrl} ...`);
+        logger.logToStderr(`Deleting subsite ${args.options.webUrl} ...`);
       }
 
       request
         .post(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

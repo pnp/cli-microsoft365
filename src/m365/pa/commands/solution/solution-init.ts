@@ -57,21 +57,21 @@ class PaSolutionInitCommand extends AnonymousCommand {
       };
 
       if (this.verbose) {
-        logger.log(`publisherName: ${publisherName}`);
-        logger.log(`publisherPrefix: ${publisherPrefix}`);
-        logger.log(`customizationOptionValuePrefix: ${customizationOptionValuePrefix}`);
-        logger.log(`solutionInitTemplatePath: ${solutionInitTemplatePath}`);
-        logger.log(`cdsAssetsTemplatePath: ${cdsAssetsTemplatePath}`);
-        logger.log(`workingDirectory: ${workingDirectory}`);
-        logger.log(`workingDirectoryName: ${workingDirectoryName}`);
-        logger.log(`cdsAssetsDirectory: ${cdsAssetsDirectory}`);
-        logger.log(`cdsAssetsDirectorySolutionsFile: ${cdsAssetsDirectorySolutionsFile}`);
+        logger.logToStderr(`publisherName: ${publisherName}`);
+        logger.logToStderr(`publisherPrefix: ${publisherPrefix}`);
+        logger.logToStderr(`customizationOptionValuePrefix: ${customizationOptionValuePrefix}`);
+        logger.logToStderr(`solutionInitTemplatePath: ${solutionInitTemplatePath}`);
+        logger.logToStderr(`cdsAssetsTemplatePath: ${cdsAssetsTemplatePath}`);
+        logger.logToStderr(`workingDirectory: ${workingDirectory}`);
+        logger.logToStderr(`workingDirectoryName: ${workingDirectoryName}`);
+        logger.logToStderr(`cdsAssetsDirectory: ${cdsAssetsDirectory}`);
+        logger.logToStderr(`cdsAssetsDirectorySolutionsFile: ${cdsAssetsDirectorySolutionsFile}`);
       }
 
       TemplateInstantiator.instantiate(logger, solutionInitTemplatePath, workingDirectory, false, variables, this.verbose);
 
       if (this.verbose) {
-        logger.log(` `);
+        logger.logToStderr(` `);
       }
 
       logger.log(chalk.green(`CDS solution project with name '${workingDirectoryName}' created successfully in current directory.`));

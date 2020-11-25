@@ -12,7 +12,7 @@ const command: Command = require('./storageentity-get');
 describe(commands.STORAGEENTITY_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -70,9 +70,15 @@ describe(commands.STORAGEENTITY_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   after(() => {
@@ -96,7 +102,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   it('retrieves the details of an existing tenant property', (done) => {
     command.action(logger, { options: { debug: true, key: 'existingproperty', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Key: 'existingproperty',
           Value: 'dolor',
           Description: 'ipsum',
@@ -113,7 +119,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   it('retrieves the details of an existing tenant property without a description', (done) => {
     command.action(logger, { options: { debug: true, key: 'propertywithoutdescription', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Key: 'propertywithoutdescription',
           Value: 'dolor',
           Description: undefined,
@@ -130,7 +136,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   it('retrieves the details of an existing tenant property without a comment', (done) => {
     command.action(logger, { options: { debug: false, key: 'propertywithoutcomments', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Key: 'propertywithoutcomments',
           Value: 'dolor',
           Description: 'ipsum',
@@ -179,7 +185,7 @@ describe(commands.STORAGEENTITY_GET, () => {
   it('escapes special characters in property name', (done) => {
     command.action(logger, { options: { debug: true, key: '#myprop', appCatalogUrl: 'https://contoso.sharepoint.com/sites/appcatalog' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           Key: '#myprop',
           Value: 'dolor',
           Description: 'ipsum',

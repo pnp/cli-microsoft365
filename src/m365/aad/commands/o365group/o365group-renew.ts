@@ -28,7 +28,7 @@ class AadO365GroupRenewCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Renewing Microsoft 365 group's expiration: ${args.options.id}...`);
+      logger.logToStderr(`Renewing Microsoft 365 group's expiration: ${args.options.id}...`);
     }
 
     const requestOptions: any = {
@@ -42,7 +42,7 @@ class AadO365GroupRenewCommand extends GraphCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -27,27 +27,24 @@ class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
     return 'Lists tabs in the specified Microsoft Teams channel';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'displayName', 'teamsAppTabId'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${encodeURIComponent(args.options.channelId)}/tabs?$expand=teamsApp`;
 
     this
       .getAllItems(endpoint, logger, true)
       .then((): void => {
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          logger.log(this.items.map((t: Tab) => {
-            return {
-              id: t.id,
-              displayName: t.displayName,
-              teamsAppTabId: t.teamsApp.id,
-            }
-          }));
-        }
+        this.items.forEach(i => {
+          (i as any).teamsAppTabId = i.teamsApp.id;
+        });
+
+        logger.log(this.items);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

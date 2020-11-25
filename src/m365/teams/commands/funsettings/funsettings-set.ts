@@ -70,7 +70,7 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
       .patch(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

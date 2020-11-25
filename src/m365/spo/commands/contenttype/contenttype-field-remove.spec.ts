@@ -22,7 +22,8 @@ const LIST_TITLE = "TEST";
 describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   const getStubCalls = (opts: any) => {
@@ -142,13 +143,20 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
     });
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).requestDigest = '';
     (command as any).webId = '';
     (command as any).siteId = '';
@@ -319,7 +327,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -371,7 +379,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -419,7 +427,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     } as any, (err?: any) => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -517,7 +525,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -618,7 +626,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -670,7 +678,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -697,7 +705,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(postCallbackStub.notCalled);
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -721,7 +729,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -771,7 +779,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

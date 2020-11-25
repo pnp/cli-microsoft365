@@ -27,6 +27,10 @@ class SpoPageControlListCommand extends SpoCommand {
     return 'Lists controls on the specific modern page';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'type', 'title'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     Page
       .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
@@ -50,22 +54,14 @@ class SpoPageControlListCommand extends SpoCommand {
           }
         });
 
-        if (args.options.output === 'json') {
-          // drop the information about original classes from clientsidepages.ts
-          logger.log(JSON.parse(JSON.stringify(controls)));
-        }
-        else {
-          logger.log(controls.map(c => {
-            return {
-              id: c.id,
-              type: SpoPageControlListCommand.getControlTypeDisplayName((c as any).controlType),
-              title: (c as any).title
-            };
-          }));
-        }
+        controls.forEach(c => {
+          (c as any).type = SpoPageControlListCommand.getControlTypeDisplayName((c as any).controlType);
+        });
+        // drop the information about original classes from clientsidepages.ts
+        logger.log(JSON.parse(JSON.stringify(controls)));
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -38,19 +38,19 @@ class LoginCommand extends Command {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     // disconnect before re-connecting
     if (this.debug) {
-      logger.log(`Logging out from Microsoft 365...`);
+      logger.logToStderr(`Logging out from Microsoft 365...`);
     }
 
     const logout: () => void = (): void => {
       auth.service.logout();
       if (this.verbose) {
-        logger.log(chalk.green('DONE'));
+        logger.logToStderr(chalk.green('DONE'));
       }
     }
 
     const login: () => void = (): void => {
       if (this.verbose) {
-        logger.log(`Signing in to Microsoft 365...`);
+        logger.logToStderr(`Signing in to Microsoft 365...`);
       }
 
       switch (args.options.authType) {
@@ -75,16 +75,16 @@ class LoginCommand extends Command {
         .ensureAccessToken(auth.defaultResource, logger, this.debug)
         .then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           auth.service.connected = true;
           cb();
         }, (rej: string): void => {
           if (this.debug) {
-            logger.log('Error:');
-            logger.log(rej);
-            logger.log('');
+            logger.logToStderr('Error:');
+            logger.logToStderr(rej);
+            logger.logToStderr('');
           }
 
           if (rej !== 'Polling_Request_Cancelled') {
@@ -102,7 +102,7 @@ class LoginCommand extends Command {
         login();
       }, (error: any): void => {
         if (this.debug) {
-          logger.log(new CommandError(error));
+          logger.logToStderr(new CommandError(error));
         }
 
         logout();

@@ -11,7 +11,8 @@ const command: Command = require('./status');
 describe(commands.STATUS, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: any;
+  let loggerLogSpy: any;
+  let loggerLogToStderrSpy: any;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -21,11 +22,18 @@ describe(commands.STATUS, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: any) => {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
         log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -50,7 +58,7 @@ describe(commands.STATUS, () => {
     auth.service.connected = false;
     command.action(logger, { options: {} }, () => {
       try {
-        assert(loggerSpy.calledWith('Logged out'));
+        assert(loggerLogSpy.calledWith('Logged out'));
         done();
       }
       catch (e) {
@@ -63,7 +71,7 @@ describe(commands.STATUS, () => {
     auth.service.connected = false;
     command.action(logger, { options: { verbose: true } }, () => {
       try {
-        assert(loggerSpy.calledWith('Logged out from Microsoft 365'));
+        assert(loggerLogToStderrSpy.calledWith('Logged out from Microsoft 365'));
         done();
       }
       catch (e) {
@@ -80,7 +88,7 @@ describe(commands.STATUS, () => {
     auth.service.connected = true;
     command.action(logger, { options: {} }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           connectedAs: 'admin@contoso.onmicrosoft.com'
         }));
         done();

@@ -35,7 +35,7 @@ class SpoNavigationNodeListCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving navigation nodes...`);
+      logger.logToStderr(`Retrieving navigation nodes...`);
     }
 
     const requestOptions: any = {
@@ -58,7 +58,7 @@ class SpoNavigationNodeListCommand extends SpoCommand {
         }));
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

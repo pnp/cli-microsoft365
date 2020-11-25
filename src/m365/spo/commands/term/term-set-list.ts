@@ -37,6 +37,10 @@ class SpoTermSetListCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Id', 'Name'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
@@ -48,7 +52,7 @@ class SpoTermSetListCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Retrieving taxonomy term sets...`);
+          logger.logToStderr(`Retrieving taxonomy term sets...`);
         }
 
         const query: string = args.options.termGroupId ? `<Method Id="62" ParentId="60" Name="GetById"><Parameters><Parameter Type="Guid">{${args.options.termGroupId}}</Parameter></Parameters></Method>` : `<Method Id="62" ParentId="60" Name="GetByName"><Parameters><Parameter Type="String">${Utils.escapeXml(args.options.termGroupName)}</Parameter></Parameters></Method>`
@@ -73,22 +77,13 @@ class SpoTermSetListCommand extends SpoCommand {
 
         const result: TermSetCollection = json[json.length - 1];
         if (result._Child_Items_ && result._Child_Items_.length > 0) {
-          if (args.options.output === 'json') {
-            logger.log(result._Child_Items_.map(t => {
-              t.CreatedDate = new Date(Number(t.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-              t.Id = t.Id.replace('/Guid(', '').replace(')/', '');
-              t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-              return t;
-            }));
-          }
-          else {
-            logger.log(result._Child_Items_.map(t => {
-              return {
-                Id: t.Id.replace('/Guid(', '').replace(')/', ''),
-                Name: t.Name
-              };
-            }));
-          }
+          result._Child_Items_.map(t => {
+            t.CreatedDate = new Date(Number(t.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
+            t.Id = t.Id.replace('/Guid(', '').replace(')/', '');
+            t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
+            return t;
+          });
+          logger.log(result._Child_Items_);
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));

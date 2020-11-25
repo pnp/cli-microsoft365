@@ -55,7 +55,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
         formDigest = res.FormDigestValue;
 
         if (this.verbose) {
-          logger.log(`Getting taxonomy term store...`);
+          logger.logToStderr(`Getting taxonomy term store...`);
         }
 
         const requestOptions: any = {
@@ -79,7 +79,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
         const termGroupId: string = args.options.id || v4();
 
         if (this.verbose) {
-          logger.log(`Adding taxonomy term group...`);
+          logger.logToStderr(`Adding taxonomy term group...`);
         }
 
         const requestOptions: any = {
@@ -106,7 +106,7 @@ class SpoTermGroupAddCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.log(`Setting taxonomy term group description...`);
+          logger.logToStderr(`Setting taxonomy term group description...`);
         }
 
         const requestOptions: any = {

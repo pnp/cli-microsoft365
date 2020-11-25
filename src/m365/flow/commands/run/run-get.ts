@@ -26,9 +26,13 @@ class FlowRunGetCommand extends AzmgmtCommand {
     return 'Gets information about a specific run of the specified Microsoft Flow';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['name', 'startTime', 'endTime', 'status', 'triggerName'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
+      logger.logToStderr(`Retrieving information about run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
     }
 
     const requestOptions: any = {
@@ -42,19 +46,11 @@ class FlowRunGetCommand extends AzmgmtCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        if (args.options.output === 'json') {
-          logger.log(res);
-        }
-        else {
-          const summary: any = {
-            name: res.name,
-            startTime: res.properties.startTime,
-            endTime: res.properties.endTime || '',
-            status: res.properties.status,
-            triggerName: res.properties.trigger.name
-          };
-          logger.log(summary);
-        }
+        res.startTime = res.properties.startTime;
+        res.endTime = res.properties.endTime || '';
+        res.status = res.properties.status;
+        res.triggerName = res.properties.trigger.name;
+        logger.log(res);
 
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));

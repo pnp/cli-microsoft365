@@ -50,7 +50,7 @@ class SpoFeatureListCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            logger.log('No activated Features found');
+            logger.logToStderr('No activated Features found');
           }
         }
         cb();

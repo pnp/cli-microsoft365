@@ -13,7 +13,8 @@ const command: Command = require('./homesite-get');
 describe(commands.HOMESITE_GET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,9 +28,16 @@ describe(commands.HOMESITE_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -72,7 +80,7 @@ describe(commands.HOMESITE_GET, () => {
 
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "SiteId": "53ad95dc-5d2c-42a3-a63c-716f7b8014f5",
           "WebId": "288ce497-483c-4cd5-b8a2-27b726d002e2",
           "LogoUrl": "https://contoso.sharepoint.com/sites/Work/siteassets/work.png",
@@ -104,7 +112,7 @@ describe(commands.HOMESITE_GET, () => {
 
     command.action(logger, { options: { debug: true } } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -126,7 +134,7 @@ describe(commands.HOMESITE_GET, () => {
 
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

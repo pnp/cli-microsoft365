@@ -15,13 +15,13 @@ class LogoutCommand extends Command {
 
   public commandAction(logger: Logger, args: {}, cb: () => void): void {
     if (this.verbose) {
-      logger.log('Logging out from Microsoft 365...');
+      logger.logToStderr('Logging out from Microsoft 365...');
     }
 
     const logout: () => void = (): void => {
       auth.service.logout();
       if (this.verbose) {
-        logger.log(chalk.green('DONE'));
+        logger.logToStderr(chalk.green('DONE'));
       }
       cb();
     }
@@ -32,7 +32,7 @@ class LogoutCommand extends Command {
         logout();
       }, (error: any): void => {
         if (this.debug) {
-          logger.log(new CommandError(error));
+          logger.logToStderr(new CommandError(error));
         }
 
         logout();

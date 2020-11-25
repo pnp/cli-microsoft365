@@ -42,7 +42,7 @@ class SpoListWebhookSetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Updating webhook ${args.options.id} belonging to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
+      logger.logToStderr(`Updating webhook ${args.options.id} belonging to list ${args.options.listId ? encodeURIComponent(args.options.listId) : encodeURIComponent(args.options.listTitle as string)} located at site ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -144,16 +144,11 @@ class SpoListWebhookSetCommand extends SpoCommand {
 
     const parsedDateTime = Date.parse(args.options.expirationDateTime as string)
     if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
-      if (args.options.output === 'json') {
-        return `${args.options.expirationDateTime} is not a valid date format. Provide the date in one of the following formats: YYYY-MM-DD, YYYY-MM-DDThh:mm, YYYY-MM-DDThh:mmZ, YYYY-MM-DDThh:mm±hh:mm`;
-      }
-      else {
-        return `${args.options.expirationDateTime} is not a valid date format. Provide the date in one of the following formats:
+      return `${args.options.expirationDateTime} is not a valid date format. Provide the date in one of the following formats:
   ${chalk.grey('YYYY-MM-DD')}
   ${chalk.grey('YYYY-MM-DDThh:mm')}
   ${chalk.grey('YYYY-MM-DDThh:mmZ')}
   ${chalk.grey('YYYY-MM-DDThh:mm±hh:mm')}`;
-      }
     }
 
     return true;

@@ -38,6 +38,10 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['UniqueId'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     const overwrite: boolean = args.options.overwrite || false;
@@ -50,7 +54,7 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
       .then((appCatalogUrl: string): Promise<string> => {
         const fullPath: string = path.resolve(args.options.filePath);
         if (this.verbose) {
-          logger.log(`Adding app '${fullPath}' to app catalog...`);
+          logger.logToStderr(`Adding app '${fullPath}' to app catalog...`);
         }
 
         const fileName: string = path.basename(fullPath);
@@ -67,15 +71,10 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
       })
       .then((res: string): void => {
         const json: any = JSON.parse(res);
-        if (args.options.output === 'json') {
-          logger.log(json);
-        }
-        else {
-          logger.log(json.UniqueId);
-        }
+        logger.log(json);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -53,7 +53,7 @@ class SpoPageTextAddCommand extends SpoCommand {
     }
 
     if (this.verbose) {
-      logger.log(`Retrieving request digest...`);
+      logger.logToStderr(`Retrieving request digest...`);
     }
 
     this
@@ -63,7 +63,7 @@ class SpoPageTextAddCommand extends SpoCommand {
         requestDigest = res.FormDigestValue;
 
         if (this.verbose) {
-          logger.log(`Retrieving modern page ${pageName}...`);
+          logger.logToStderr(`Retrieving modern page ${pageName}...`);
         }
         // Get Client Side Page
         return Page.getPage(pageName, args.options.webUrl, logger, this.debug, this.verbose);
@@ -96,7 +96,7 @@ class SpoPageTextAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       })
@@ -113,9 +113,9 @@ class SpoPageTextAddCommand extends SpoCommand {
     const updatedContent: string = clientSidePage.toHtml();
 
     if (this.debug) {
-      logger.log('Updated canvas content: ');
-      logger.log(updatedContent);
-      logger.log('');
+      logger.logToStderr('Updated canvas content: ');
+      logger.logToStderr(updatedContent);
+      logger.logToStderr('');
     }
 
     const requestOptions: any = {

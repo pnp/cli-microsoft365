@@ -39,7 +39,7 @@ class TeamsFunSettingsListCommand extends GraphCommand {
         logger.log(res.funSettings);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

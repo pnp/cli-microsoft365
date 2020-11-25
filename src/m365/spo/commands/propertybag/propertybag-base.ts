@@ -47,7 +47,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
         .post<string>(requestOptions)
         .then((res: string) => {
           if (this.debug) {
-            logger.log('Attempt to get Properties key values');
+            logger.logToStderr('Attempt to get Properties key values');
           }
 
           const json: ClientSvcResponse = JSON.parse(res);
@@ -83,7 +83,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
     return new Promise<Object>((resolve: any, reject: any): void => {
       request.post(requestOptions).then((res: any) => {
         if (this.debug) {
-          logger.log('Attempt to get AllProperties key values');
+          logger.logToStderr('Attempt to get AllProperties key values');
         }
 
         const json: ClientSvcResponse = JSON.parse(res);

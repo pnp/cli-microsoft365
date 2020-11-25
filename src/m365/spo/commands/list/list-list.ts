@@ -25,22 +25,17 @@ class ListListCommand extends SpoCommand {
     return 'Lists all available list in the specified site';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Title', 'Url', 'Id'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving all lists in site at ${args.options.webUrl}...`);
-    }
-
-    let requestUrl: string;
-
-    if (args.options.output === 'json') {
-      requestUrl = `${args.options.webUrl}/_api/web/lists?$expand=RootFolder`;
-    }
-    else {
-      requestUrl = `${args.options.webUrl}/_api/web/lists?$expand=RootFolder&$select=Title,Id,RootFolder/ServerRelativeURL`;
+      logger.logToStderr(`Retrieving all lists in site at ${args.options.webUrl}...`);
     }
 
     const requestOptions: any = {
-      url: requestUrl,
+      url: `${args.options.webUrl}/_api/web/lists?$expand=RootFolder`,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -51,21 +46,11 @@ class ListListCommand extends SpoCommand {
     request
       .get<ListInstanceCollection>(requestOptions)
       .then((listInstances: ListInstanceCollection): void => {
-        if (args.options.output === 'json') {
-          if (listInstances.value) {
-            logger.log(listInstances.value);
-          }
-        }
-        else {
-          logger.log(listInstances.value.map(l => {
-            return {
-              Title: l.Title,
-              Url: l.RootFolder.ServerRelativeUrl,
-              Id: l.Id
-            };
-          }));
-        }
+        listInstances.value.forEach(l => {
+          l.Url = l.RootFolder.ServerRelativeUrl;
+        });
 
+        logger.log(listInstances.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

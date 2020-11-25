@@ -49,10 +49,10 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
         .then((customAction: CustomAction | void): void => {
           if (this.verbose) {
             if (customAction && customAction["odata.null"] === true) {
-              logger.log(`Custom action with id ${args.options.id} not found`);
+              logger.logToStderr(`Custom action with id ${args.options.id} not found`);
             }
             else {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
           }
           cb();

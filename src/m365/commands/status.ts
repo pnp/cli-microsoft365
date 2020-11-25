@@ -16,7 +16,7 @@ class StatusCommand extends Command {
   public commandAction(logger: Logger, args: {}, cb: (err?: any) => void): void {
     if (auth.service.connected) {
       if (this.debug) {
-        logger.log({
+        logger.logToStderr({
           connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].value),
           authType: AuthType[auth.service.authType],
           accessTokens: JSON.stringify(auth.service.accessTokens, null, 2),
@@ -31,7 +31,7 @@ class StatusCommand extends Command {
     }
     else {
       if (this.verbose) {
-        logger.log('Logged out from Microsoft 365');
+        logger.logToStderr('Logged out from Microsoft 365');
       }
       else {
         logger.log('Logged out');

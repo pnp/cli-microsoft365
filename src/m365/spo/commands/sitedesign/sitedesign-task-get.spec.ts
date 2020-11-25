@@ -12,7 +12,7 @@ const command: Command = require('./sitedesign-task-get');
 describe(commands.SITEDESIGN_TASK_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +26,15 @@ describe(commands.SITEDESIGN_TASK_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -67,7 +73,7 @@ describe(commands.SITEDESIGN_TASK_GET, () => {
 
     command.action(logger, { options: { debug: false, taskId: 'e40b1c66-0292-4697-b686-f2b05446a588' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "ID": "e40b1c66-0292-4697-b686-f2b05446a588", "LogonName": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "SiteDesignID": "6ec3ca5b-d04b-4381-b169-61378556d76e", "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575", "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
         }));
         done();
@@ -91,7 +97,7 @@ describe(commands.SITEDESIGN_TASK_GET, () => {
 
     command.action(logger, { options: { debug: true, taskId: 'e40b1c66-0292-4697-b686-f2b05446a588' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "ID": "e40b1c66-0292-4697-b686-f2b05446a588", "LogonName": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "SiteDesignID": "6ec3ca5b-d04b-4381-b169-61378556d76e", "SiteID": "24cea241-ad89-44b8-8669-d60d88d38575", "WebID": "e87e4ab8-2732-4a90-836d-9b3d0cd3a5cf"
         }));
         done();
@@ -115,7 +121,7 @@ describe(commands.SITEDESIGN_TASK_GET, () => {
 
     command.action(logger, { options: { debug: false, taskId: 'e40b1c66-0292-4697-b686-f2b05446a588' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

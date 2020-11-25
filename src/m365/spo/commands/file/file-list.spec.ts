@@ -12,7 +12,7 @@ const command: Command = require('./file-list');
 describe(commands.FILE_LIST, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.FILE_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -91,7 +97,7 @@ describe(commands.FILE_LIST, () => {
       folder: 'Shared Documents'
     } }, () => {
       try {
-        assert(loggerSpy.calledWith([{ 
+        assert(loggerLogSpy.calledWith([{ 
           CheckInComment: "",
           CheckOutType: 2,
           ContentTag: "{F09C4EFE-B8C0-4E89-A166-03418661B89B},9,12",
@@ -145,7 +151,7 @@ describe(commands.FILE_LIST, () => {
       folder: 'Shared Documents'
     } }, () => {
       try {
-        assert(loggerSpy.calledWith(
+        assert(loggerLogSpy.calledWith(
           [{
             UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
             Name: 'Test.docx',

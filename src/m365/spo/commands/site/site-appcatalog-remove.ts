@@ -44,7 +44,7 @@ class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Disabling site collection app catalog...`);
+          logger.logToStderr(`Disabling site collection app catalog...`);
         }
 
         const requestOptions: any = {
@@ -66,7 +66,7 @@ class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            logger.log('Site collection app catalog disabled');
+            logger.logToStderr('Site collection app catalog disabled');
           }
         }
         cb();

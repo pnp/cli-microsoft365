@@ -10,7 +10,7 @@ const command: Command = require('./accesstoken-get');
 
 describe(commands.UTIL_ACCESSTOKEN_GET, () => {
   let log: any[];
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   let logger: Logger;
 
   before(() => {
@@ -22,11 +22,17 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
   beforeEach(() => {
     log = [];
     logger = {
-      log: (msg: any) => {
+      log: (msg: string) => {
+        log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
         log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -61,7 +67,7 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
 
     command.action(logger, { options: { debug: false, resource: 'https://graph.microsoft.com' } }, () => {
       try {
-        assert(loggerSpy.calledWith('ABC'));
+        assert(loggerLogSpy.calledWith('ABC'));
         done();
       }
       catch (e) {

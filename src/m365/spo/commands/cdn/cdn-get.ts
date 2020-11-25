@@ -50,7 +50,7 @@ class SpoCdnGetCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Retrieving status of ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
+          logger.logToStderr(`Retrieving status of ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
         }
 
         const requestOptions: any = {
@@ -72,10 +72,10 @@ class SpoCdnGetCommand extends SpoCommand {
         else {
           const result: boolean = json[json.length - 1];
           if (this.verbose) {
-            logger.log(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${spoAdminUrl} is ${(result === true ? 'enabled' : 'disabled')}`);
+            logger.logToStderr(`${(cdnType === 0 ? 'Public' : 'Private')} CDN at ${spoAdminUrl} is ${(result === true ? 'enabled' : 'disabled')}`);
           }
           else {
-            logger.log(result);
+            logger.logToStderr(result);
           }
           cb();
         }
