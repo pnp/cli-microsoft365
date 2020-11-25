@@ -82,6 +82,7 @@ export default {
   LIST_CONTENTTYPE_ADD: `${prefix} list contenttype add`,
   LIST_CONTENTTYPE_LIST: `${prefix} list contenttype list`,
   LIST_CONTENTTYPE_REMOVE: `${prefix} list contenttype remove`,
+  LIST_CONTENTTYPE_DEFAULT_SET: `${prefix} list contenttype default set`,
   LIST_GET: `${prefix} list get`,
   LIST_LABEL_GET: `${prefix} list label get`,
   LIST_LABEL_SET: `${prefix} list label set`,
