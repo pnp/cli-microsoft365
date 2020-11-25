@@ -254,6 +254,7 @@ nav:
         - list contenttype add: 'cmd/spo/list/list-contenttype-add.md'
         - list contenttype list: 'cmd/spo/list/list-contenttype-list.md'
         - list contenttype remove: 'cmd/spo/list/list-contenttype-remove.md'
+        - list contenttype default set: 'cmd/spo/list/list-contenttype-default-set.md'
         - list label get: 'cmd/spo/list/list-label-get.md'
         - list label set: 'cmd/spo/list/list-label-set.md'
         - list sitescript get: 'cmd/spo/list/list-sitescript-get.md'
