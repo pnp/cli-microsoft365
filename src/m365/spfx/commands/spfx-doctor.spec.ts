@@ -70,6 +70,55 @@ describe(commands.DOCTOR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('passes all checks when SPFx v1.11 is provided as parameter, when all requirements are met', (done) => {
+    const sandbox = sinon.createSandbox();
+    sandbox.stub(process, 'version').value('v10.22.0');
+    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
+      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
+        callback(undefined, '6.14.6');
+        return {} as child_process.ChildProcess;
+      }
+
+      const packageName: string = (args as string[])[1];
+      switch (packageName) {
+        case '@microsoft/sp-core-library':
+          callback(undefined, packageVersionResponse(packageName, '1.11.0'));
+          break;
+        case 'yo':
+          callback(undefined, packageVersionResponse(packageName, '3.1.1'));
+          break;
+        case 'gulp':
+          callback(undefined, packageVersionResponse(packageName, '4.0.2'));
+          break;
+        case 'react':
+          callback(undefined, packageVersionResponse(packageName, '16.8.5'));
+          break;
+        case 'typescript':
+          callback(undefined, '{}');
+          break;
+        default:
+          callback(new Error(`${file} ENOENT`));
+      }
+      return {} as child_process.ChildProcess;
+    });
+
+    command.action(logger, { options: { debug: false, version: '1.11' } }, () => {
+      try {
+//        assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('passes all checks for SPFx v1.11 project when all requirements met', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.22.0');
@@ -1553,7 +1602,23 @@ describe(commands.DOCTOR, () => {
   });
 
   it('fails validation when 2016 env specified', () => {
-    const actual = command.validate({ options: { env: '2016' } });
+    const actual = (command.validate({ options: { env: '2016' } }));
     assert.notStrictEqual(actual, true);
   });
+
+  it('passes validation when spfx version parameter is specified', () => {
+    const actual = (command.validate({ options: { version: '1.11' } }));
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when spfx version parameter is specified with unsupported semver value', () => {
+    const actual = (command.validate({ options: { version: '1.12.0' } }));
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation when spfx version parameter is specified with non semver value', () => {
+    const actual = (command.validate({ options: { version: 'v1' } }));
+    assert.notStrictEqual(actual, true);
+  });
+
 });

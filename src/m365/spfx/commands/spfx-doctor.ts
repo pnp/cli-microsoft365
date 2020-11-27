@@ -13,6 +13,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   env?: string;
+  version?: string;
 }
 
 /**
@@ -69,6 +70,11 @@ enum SharePointVersion {
   SPO = 1 << 2,
   All = ~(~0 << 3)
 }
+
+/**
+ * Valid SPFx Versions
+ */
+const validSpfxVersions = ['1.11', '1.10', '1.9.1', '1.8.2', '1.8.1', '1.8.0', '1.7.1', '1.7.0', '1.6.0', '1.5.1', '1.5.0', '1.4.1', '1.4.0', '1.3.0', '1.1.0', '1.0.0']
 
 interface SpfxVersionPrerequisites {
   node: VersionCheck;
@@ -357,7 +363,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
     const fixes: string[] = [];
 
     this
-      .getSharePointFrameworkVersion(logger)
+      .getSharePointFrameworkVersion(args.options,logger)
       .then((_spfxVersion: string): Promise<void> => {
         if (!_spfxVersion) {
           logger.log(this.getStatus(CheckStatus.Failure, `SharePoint Framework`));
@@ -500,8 +506,16 @@ class SpfxDoctorCommand extends AnonymousCommand {
     return (<any>SharePointVersion)[sp.toUpperCase()];
   }
 
-  private getSharePointFrameworkVersion(logger: Logger): Promise<string> {
+  private getSharePointFrameworkVersion(argOptions: Options, logger: Logger): Promise<string> {
     return new Promise<string>((resolve: (version: string) => void, reject: (error: string) => void): void => {
+
+      if (argOptions.version) {
+        if (this.debug) {
+          logger.log('Detected SharePoint Framework version from command line options. Skipping version detection logic');
+        }
+        resolve(argOptions.version);
+      }
+
       if (this.debug) {
         logger.logToStderr('Detecting SharePoint Framework version based on @microsoft/sp-core-library local...');
       }
@@ -668,6 +682,11 @@ class SpfxDoctorCommand extends AnonymousCommand {
         option: '-e, --env [env]',
         description: 'Version of SharePoint for which to check compatibility: sp2016|sp2019|spo',
         autocomplete: ['sp2016', 'sp2019', 'spo']
+      },
+      {
+        option: '-v, --version [version]',
+        description: "Checks the prerequisites for a specific SPFx version.",
+        autocomplete: validSpfxVersions
       }
     ];
 
@@ -689,8 +708,15 @@ class SpfxDoctorCommand extends AnonymousCommand {
       }
     }
 
+    if (args.options.version) {
+      // check if this is semver after all
+      if (!validSpfxVersions.some((version) => satisfies(args.options.version!, version))) {
+        return `${args.options.version} is not in a range of supported SPFx version. Valid versions are ${validSpfxVersions.toString()}.`
+      }
+    }
+
     return true;
-  }
+  };
 }
 
 module.exports = new SpfxDoctorCommand();
