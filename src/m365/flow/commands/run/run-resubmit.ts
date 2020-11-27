@@ -30,11 +30,14 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Resubmitting run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
+      logger.logToStderr(`Resubmitting run ${args.options.name} of Microsoft Flow ${args.options.flow}...`);
     }
 
     const resubmitFlow: () => void = (): void => {
       this._getTriggerName(args.options.environment, args.options.flow).then((triggerName: string) => {
+        if (this.verbose) {
+          logger.log(triggerName);
+        }
         const requestOptions: any = {
           url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/triggers/${encodeURIComponent(triggerName)}/histories/${encodeURIComponent(args.options.name)}/resubmit?api-version=2016-11-01`,
           headers: {
@@ -63,7 +66,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to cancel the flow with run ${args.options.name}?`
+        message: `Are you sure you want to resubmit the flow with run ${args.options.name}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
