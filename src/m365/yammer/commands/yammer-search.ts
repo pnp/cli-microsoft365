@@ -11,28 +11,76 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   search: string;
+  show: string;
   limit?: number;
 }
 
 interface YammerSearchResponse {
-  count: {
-    groups: number;
-    messages: number;
-    topics: number;
-    users: number;
-  };
-  groups: any[];
-  messages: { messages: any[] };
-  topics: any[];
-  users: any[];
+  count: YammerSearchSummary;
+  groups: YammerBasicGroupResponse[];
+  messages: { messages: YammerBasicMessageResponse[] };
+  topics: YammerBasicTopicResponse[];
+  users: YammerBasicUserResponse[];
+}
+
+interface YammerSearchSummary {
+  groups: number;
+  messages: number;
+  topics: number;
+  users: number;
+}
+
+interface YammerBasicGroupResponse {
+  id: string,
+  state: string,
+  privacy: string,
+  name: string,
+  full_name: string,
+  description: string,
+  moderated: boolean,
+  url: string
+}
+
+interface YammerBasicTopicResponse {
+  id: string,
+  name: string,
+  normalized_name: string,
+  followers_count: number,
+  description: string,
+  url: string
+}
+
+interface YammerBasicUserResponse {
+  id: string,
+  state: string,
+  name: string,
+  email: string,
+  first_name: string,
+  last_name: string,
+  full_name: string,
+  admin: boolean,
+  url: string
+}
+
+interface YammerBasicMessageResponse {
+  id: string,
+  created_at: string,
+  group_id: string,
+  thread_id: string,
+  privacy: string,
+  content_excerpt: string,
+  url: string
 }
 
 class YammerSearchCommand extends YammerCommand {
-  private summary: any;
-  private messages: any[];
-  private groups: any[];
-  private topics: any[];
-  private users: any[];
+  private static showOptions: string[] =
+    ['summary', 'messages', 'users', 'topics', 'groups'];
+
+  private summary: YammerSearchSummary;
+  private messages: YammerBasicMessageResponse[];
+  private groups: YammerBasicGroupResponse[];
+  private topics: YammerBasicTopicResponse[];
+  private users: YammerBasicUserResponse[];
 
   constructor() {
     super();
@@ -58,6 +106,7 @@ class YammerSearchCommand extends YammerCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.show =  typeof args.options.show !== 'undefined';
     telemetryProps.limit =  typeof args.options.limit !== 'undefined';
     return telemetryProps;
   }
@@ -181,9 +230,65 @@ class YammerSearchCommand extends YammerCommand {
             });
         }
         else {
-          logger.log(this.summary);
+          const show = args.options.show?.toLowerCase();
+          if (show === "messages") {
+            logger.log(this.messages.map((message) => {
+              return <YammerBasicMessageResponse>
+              {
+                id: message.id,
+                content_excerpt: encodeURI(message.content_excerpt),
+                created_at: message.created_at,
+                group_id: message.group_id,
+                thread_id: message.thread_id,
+                privacy: message.privacy,
+                url: message.url
+              }
+            }));
+          } else if (show === "users") {
+            logger.log(this.users.map((user) => {
+              return <YammerBasicUserResponse>
+              {
+                id: user.id,
+                name: user.name,
+                first_name: user.first_name,
+                last_name: user.last_name,
+                full_name: user.full_name,
+                email: user.email,
+                admin: user.admin,
+                state: user.state,
+                url: user.url
+              }
+            }));
+          } else if (show === "topics") {
+            logger.log(this.topics.map((topic) => {
+              return <YammerBasicTopicResponse>
+              {
+                id: topic.id,
+                name: topic.name,
+                normalized_name: topic.normalized_name,
+                description: topic.description,
+                followers_count: topic.followers_count,
+                url: topic.url
+              }
+            }));
+          } else if (show === "groups") {
+            logger.log(this.groups.map((group) => {
+              return <YammerBasicGroupResponse>
+              {
+                id: group.id,
+                name: group.name,
+                full_name: group.full_name,
+                description: group.description,
+                privacy: group.privacy,
+                moderated: group.moderated,
+                state: group.state,
+                url: group.url
+              }
+            }));
+          } else { 
+            logger.log(this.summary);
+          }
         }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   };
@@ -195,8 +300,12 @@ class YammerSearchCommand extends YammerCommand {
         description: 'The query for the search'
       },
       {
+        option: '--show [show]',
+        description: 'Specifies the type of data to return when using --ouptut text. Allowed values Summary|Messages|Users|Topics|Groups. Defaults to Summary.'
+      },
+      {
         option: '--limit [limit]',
-        description: 'Limits the results returned for each item category. Can only be used with the --output json option.'
+        description: 'Limits the results returned for each item category.'
       }
     ];
 
@@ -209,12 +318,22 @@ class YammerSearchCommand extends YammerCommand {
       return `${args.options.search} is not a string`;
     }
 
-    if (args.options.limit && args.options.output !== 'json') {
-      return 'Limit can only used with the parameter --output json'
-    }
-
     if (args.options.limit && typeof args.options.limit !== 'number') {
       return `${args.options.limit} is not a number`;
+    }
+
+    if (args.options.output !== 'json') {
+      if (typeof args.options.show !== 'undefined') {
+        const scope = args.options.show.toString().toLowerCase();
+        if (YammerSearchCommand.showOptions.indexOf(scope) < 0) {
+          return `${args.options.scope} is not a valid value for show. Allowed values are Summary|Messages|Users|Topics|Groups`;
+        }
+      }
+    }
+    else {
+      if (typeof args.options.show !== 'undefined') {
+        return `${args.options.scope} can't be used in --output json`;
+      }
     }
 
     return true;

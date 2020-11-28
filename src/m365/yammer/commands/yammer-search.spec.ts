@@ -171,9 +171,22 @@ describe(commands.YAMMER_SEARCH, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('limit can only be used with output json', () => {
-    const actual = command.validate({ options: { search: '123', limit: 10 } });
+  it('fails validation with parameters', () => {
+    const actual = command.validate({ options: { search: '123', show: "summary", output: 'json' } });
     assert.notStrictEqual(actual, true);
+  });
+
+  it('fails if a wrong option is passed', () => {
+    const actual = command.validate({ options: { search: '123', show: 'wrongOption' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes if a correct option is passed', () => {
+    const options = ['summary', 'messages', 'users', 'topics', 'groups'];
+    options.forEach((option) => {
+      const actual = command.validate({ options: { search: '123', show: option } });
+      assert.strictEqual(actual, true);
+    })
   });
 
   it('limit must be a number', () => {
@@ -209,12 +222,103 @@ describe(commands.YAMMER_SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { search:"contents" } } as any, (err?: any) => {
+    command.action(logger, { options: { search: "contents" } } as any, (err?: any) => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].messages, 4)
         assert.strictEqual(loggerLogSpy.lastCall.args[0].groups, 2)
         assert.strictEqual(loggerLogSpy.lastCall.args[0].topics, 5)
         assert.strictEqual(loggerLogSpy.lastCall.args[0].users, 4)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns message output', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
+        return Promise.resolve(searchResults);
+      }
+      return Promise.reject('Invalid request');
+    });
+    command.action(logger, { options: { search:"contents", show: "messages" } } as any, (err?: any) => {
+      try {
+        const result = loggerLogSpy.lastCall.args[0];
+        assert.strictEqual(result.length, 4);
+        assert.strictEqual(result[0].id, 11111);
+        assert.strictEqual(result[1].id, 11112);
+        assert.strictEqual(result[2].id, 11113);
+        assert.strictEqual(result[3].id, 11114);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns topic output', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
+        return Promise.resolve(searchResults);
+      }
+      return Promise.reject('Invalid request');
+    });
+    command.action(logger, { options: { search:"contents", show: "topics" } } as any, (err?: any) => {
+      try {
+        const result = loggerLogSpy.lastCall.args[0];
+        assert.strictEqual(result.length, 5);
+        assert.strictEqual(result[0].id, 3331);
+        assert.strictEqual(result[1].id, 3332);
+        assert.strictEqual(result[2].id, 3333);
+        assert.strictEqual(result[3].id, 3334);
+        assert.strictEqual(result[4].id, 3335);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns groups output', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
+        return Promise.resolve(searchResults);
+      }
+      return Promise.reject('Invalid request');
+    });
+    command.action(logger, { options: { search:"contents", show: "groups" } } as any, (err?: any) => {
+      try {
+        const result = loggerLogSpy.lastCall.args[0];
+        assert.strictEqual(result.length, 2);
+        assert.strictEqual(result[0].id, 2221);
+        assert.strictEqual(result[1].id, 2222);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns users output', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
+        return Promise.resolve(searchResults);
+      }
+      return Promise.reject('Invalid request');
+    });
+    command.action(logger, { options: { search:"contents", show: "users" } } as any, (err?: any) => {
+      try {
+        const result = loggerLogSpy.lastCall.args[0];
+        assert.strictEqual(result.length, 4);
+        assert.strictEqual(result[0].id, 4441);
+        assert.strictEqual(result[1].id, 4442);
+        assert.strictEqual(result[2].id, 4443);
+        assert.strictEqual(result[3].id, 4444);
         done();
       }
       catch (e) {

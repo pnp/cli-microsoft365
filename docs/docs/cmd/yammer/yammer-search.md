@@ -16,8 +16,11 @@ m365 yammer search [options]
 `-s, --search <search>`
 : The query for the search
 
+`--show <show>`
+: Specifies the type of data to return when using --ouptut text. Allowed values Summary|Messages|Users|Topics|Groups. Defaults to Summary.
+
 `--limit [limit]`
-: Limits the results returned for each item category. Can only be used with the --output json option.
+: Limits the results returned for each item category.
 
 `-o, --output [output]`
 : Output type. `json,text`. Default `text`
@@ -41,6 +44,24 @@ Returns the search result summary for the query `community`
 
 ```sh
 m365 yammer search --search "community"
+```
+
+Returns the groups found with the search query `community`
+
+```sh
+m365 yammer search --search "community" --show "groups"
+```
+
+Returns the topics found with the search query `community`
+
+```sh
+m365 yammer search --search "community" --show "topics"
+```
+
+Returns the first 50 users found with the search query `nuborocks.onmicrosoft.com`
+
+```sh
+m365 yammer search --search "nuborocks.onmicrosoft.com" --show "users" --limit 50
 ```
 
 Returns all search results for the query `community`. Stops at 1000 results. 
