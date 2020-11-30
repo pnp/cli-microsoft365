@@ -113,6 +113,21 @@ describe(commands.LOGIN, () => {
   it('logs in to Microsoft 365 using certificate when authType certificate set and certificateFile is provided', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
+    command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate' } }, () => {
+      try {
+        assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
+        assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs in to Microsoft 365 using certificate when authType certificate set with thumbprint', (done) => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+
     command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } }, () => {
       try {
         assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
@@ -226,18 +241,12 @@ describe(commands.LOGIN, () => {
   });
 
   it('fails validation if authType is set to certificate and neither certificateFile nor certificateBase64Encoded are specified', () => {
-    const actual = command.validate({ options: { authType: 'certificate', thumbprint: 'thumbprint' } });
+    const actual = command.validate({ options: { authType: 'certificate' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if authType is set to certificate and certificateFile does not exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if authType is set to certificate and thumbprint not specified', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate' } });
     assert.notStrictEqual(actual, true);
   });
@@ -245,6 +254,12 @@ describe(commands.LOGIN, () => {
   it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if authType is set to certificate and certificateFile are specified', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate' } });
     assert.strictEqual(actual, true);
   });
 

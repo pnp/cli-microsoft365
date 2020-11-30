@@ -147,7 +147,7 @@ class LoginCommand extends Command {
       },
       {
         option: '--thumbprint [thumbprint]',
-        description: 'Certificate thumbprint. Required when authType is set to certificate'
+        description: 'Certificate thumbprint. If not specified, and `authType` is set to `certificate`, it will be automatically calculated based on the specified certificate'
       }
     ];
 
@@ -179,10 +179,6 @@ class LoginCommand extends Command {
         if (!fs.existsSync(args.options.certificateFile)) {
           return `File '${args.options.certificateFile}' does not exist`;
         }
-      }
-
-      if (!args.options.thumbprint) {
-        return 'Required option thumbprint missing';
       }
     }
 
