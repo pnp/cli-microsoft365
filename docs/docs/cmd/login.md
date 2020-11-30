@@ -23,7 +23,7 @@ m365 login [options]
 : Path to the file with certificate private key. Required when `authType` is set to `certificate`
 
 `--thumbprint [thumbprint]`
-: Certificate thumbprint. Required when `authType` is set to `certificate`
+: Certificate thumbprint. If not specified, and `authType` is set to `certificate`, it will be automatically calculated based on the specified certificate
 
 --8<-- "docs/cmd/_global.md"
 
@@ -66,10 +66,22 @@ m365 login --authType password --userName user@contoso.com --password pass@word1
 Log in to Microsoft 365 using a PEM certificate
 
 ```sh
-m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pem --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pem
+```
+
+Log in to Microsoft 365 using a PEM certificate. Use the specified thumbprint
+
+```sh
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pem  --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1
 ```
 
 Log in to Microsoft 365 using a personal information exchange (.pfx) file
+
+```sh
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --password 'pass@word1'
+```
+
+Log in to Microsoft 365 using a personal information exchange (.pfx) file. Use the specified thumbprint
 
 ```sh
 m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'

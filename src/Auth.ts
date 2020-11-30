@@ -1,5 +1,5 @@
 import { AuthenticationContext, ErrorResponse, Logging, LoggingLevel, TokenResponse, UserCodeInfo } from 'adal-node';
-import { asn1, pkcs12, pki } from 'node-forge';
+import { asn1, pkcs12, pki, pem, md } from 'node-forge';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import { Logger } from './cli';
@@ -22,7 +22,7 @@ export class Service {
   authType: AuthType = AuthType.DeviceCode;
   userName?: string;
   password?: string;
-  certificate?: string
+  certificate?: string;
   thumbprint?: string;
   accessTokens: Hash<AccessToken>;
   spoUrl?: string;
@@ -281,7 +281,7 @@ export class Auth {
   private ensureAccessTokenWithCertificate(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
       if (debug) {
-        logger.logToStderr(`Retrieving new access token using certificate (thumbprint ${this.service.thumbprint})...`);
+        logger.logToStderr(`Retrieving new access token using certificate...`);
       }
 
       let cert: string = '';
@@ -289,6 +289,15 @@ export class Auth {
       if (this.service.password === undefined) {
         const buf = Buffer.from(this.service.certificate as string, 'base64');
         cert = buf.toString('utf8');
+
+        if (this.service.thumbprint === undefined) {
+          const pemObjs: pem.ObjectPEM[] = pem.decode(cert);
+          const pemCertObj: pem.ObjectPEM = pemObjs.find(pem => pem.type === "CERTIFICATE") as pem.ObjectPEM;
+          const pemCertStr: string = pem.encode(pemCertObj);
+          const pemCert: pki.Certificate = pki.certificateFromPem(pemCertStr);
+
+          this.service.thumbprint = this.calculateThumbprint(pemCert);
+        }
       }
       else {
         const buf = Buffer.from(this.service.certificate as string, 'base64');
@@ -320,6 +329,17 @@ export class Auth {
 
         // convert a PKCS#8 ASN.1 PrivateKeyInfo to PEM
         cert = pki.privateKeyInfoToPem(privateKeyInfo);
+
+        if (this.service.thumbprint === undefined) {
+          const certBags: {
+            [key: string]: pkcs12.Bag[] | undefined;
+            localKeyId?: pkcs12.Bag[];
+            friendlyName?: pkcs12.Bag[];
+          } = p12Parsed.getBags({ bagType: pki.oids.certBag });
+          const certBag: pkcs12.Bag = (certBags[pki.oids.certBag] as pkcs12.Bag[])[0];
+
+          this.service.thumbprint = this.calculateThumbprint(certBag.cert as pki.Certificate);
+        }
       }
 
       this.authCtx.acquireTokenWithClientCertificate(
@@ -483,6 +503,12 @@ export class Auth {
             });
         });
     });
+  }
+
+  private calculateThumbprint(certificate: pki.Certificate): string {
+    const messageDigest: md.MessageDigest = md.sha1.create();
+    messageDigest.update(asn1.toDer(pki.certificateToAsn1(certificate)).getBytes());
+    return messageDigest.digest().toHex();
   }
 
   public cancel(): void {
