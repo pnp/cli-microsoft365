@@ -20,7 +20,10 @@ m365 login [options]
 : Password for the user. Required when `authType` is set to `password`
 
 `-c, --certificateFile [certificateFile]`
-: Path to the file with certificate private key. Required when `authType` is set to `certificate`
+: Path to the file with certificate private key. Required when `authType` is set to `certificate` and `certificateBase64Encoded` option is not specified
+
+`--certificateBase64Encoded [certificateBase64Encoded]`
+: Base64 encoded string with a certificate private key.  Required when `authType` is set to `certificate` and `certificateFile` option is not specified
 
 `--thumbprint [thumbprint]`
 : Certificate thumbprint. Required when `authType` is set to `certificate`
