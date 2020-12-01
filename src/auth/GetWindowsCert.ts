@@ -2,7 +2,7 @@ import * as ca from "win-ca";
 import * as caApi from "win-ca/api";
 import * as crypt from "crypto";
 
-const useWindowsCertsThumbprint = (id: string) => {
+export const UseWindowsCerts = (id: string): string => {
   const thumbprint = (cert: string) => {
     var shasum = crypt.createHash("sha1");
     shasum.update(Buffer.from(cert, "base64"));
@@ -10,6 +10,7 @@ const useWindowsCertsThumbprint = (id: string) => {
   };
 
   const list: string[] = [];
+  let returnValue: string = "Certificate Not Found";
 
   caApi({
     store: ["My"],
@@ -21,9 +22,9 @@ const useWindowsCertsThumbprint = (id: string) => {
     if (certThumbprint === id) {
       const toPEM = ca.der2(ca.der2.pem);
       const pem = toPEM(cert);
-      return pem;
+      returnValue = pem;
     }
   });
-};
 
-export default useWindowsCertsThumbprint;
+  return returnValue;
+};
