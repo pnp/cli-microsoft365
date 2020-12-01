@@ -20,7 +20,10 @@ m365 login [options]
 : Password for the user. Required when `authType` is set to `password`
 
 `-c, --certificateFile [certificateFile]`
-: Path to the file with certificate private key. Required when `authType` is set to `certificate`
+: Path to the file with certificate private key. When `authType` is set to `certificate`, specify either `certificateFile` or `certificateBase64Encoded`
+
+`--certificateBase64Encoded [certificateBase64Encoded]`
+: Base64-encoded string with certificate private key. When `authType` is set to `certificate`, specify either `certificateFile` or `certificateBase64Encoded`
 
 `--thumbprint [thumbprint]`
 : Certificate thumbprint. Required when `authType` is set to `certificate`
@@ -73,6 +76,12 @@ Log in to Microsoft 365 using a personal information exchange (.pfx) file
 
 ```sh
 m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --thumbprint 47C4885736C624E90491F32B98855AA8A7562AF1 --password 'pass@word1'
+```
+
+Log in to Microsoft 365 using a certificate from a base64-encoded string
+
+```sh
+m365 login --authType certificate --certificateBase64Encoded MIII2QIBAzCCCJ8GCSqGSIb3DQEHAaCCCJAEg...eX1N5AgIIAA== --thumbprint D0C9B442DE249F55D10CDA1A2418952DC7D407A3
 ```
 
 Log in to Microsoft 365 using a system assigned managed identity. Applies to Azure resources with managed identity enabled,

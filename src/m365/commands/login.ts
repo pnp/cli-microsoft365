@@ -17,6 +17,7 @@ interface Options extends GlobalOptions {
   userName?: string;
   password?: string;
   certificateFile?: string;
+  certificateBase64Encoded?: string;
   thumbprint?: string;
 }
 
@@ -61,7 +62,7 @@ class LoginCommand extends Command {
           break;
         case 'certificate':
           auth.service.authType = AuthType.Certificate;
-          auth.service.certificate = fs.readFileSync(args.options.certificateFile as string, 'base64');
+          auth.service.certificate = args.options.certificateBase64Encoded ? args.options.certificateBase64Encoded : fs.readFileSync(args.options.certificateFile as string, 'base64');
           auth.service.thumbprint = args.options.thumbprint;
           auth.service.password = args.options.password;
           break;
@@ -138,7 +139,11 @@ class LoginCommand extends Command {
       },
       {
         option: '-c, --certificateFile [certificateFile]',
-        description: 'Path to the file with certificate private key. Required when authType is set to certificate'
+        description: 'Path to the file with certificate private key. When `authType` is set to `certificate`, specify either `certificateFile` or `certificateBase64Encoded`'
+      },
+      {
+        option: '--certificateBase64Encoded [certificateBase64Encoded]',
+        description: 'Base64-encoded string with certificate private key. When `authType` is set to `certificate`, specify either `certificateFile` or `certificateBase64Encoded`'
       },
       {
         option: '--thumbprint [thumbprint]',
@@ -162,12 +167,18 @@ class LoginCommand extends Command {
     }
 
     if (args.options.authType === 'certificate') {
-      if (!args.options.certificateFile) {
-        return 'Required option certificateFile missing';
+      if (args.options.certificateFile && args.options.certificateBase64Encoded) {
+        return 'Specify either certificateFile or certificateBase64Encoded, but not both.';
       }
 
-      if (!fs.existsSync(args.options.certificateFile)) {
-        return `File '${args.options.certificateFile}' does not exist`;
+      if (!args.options.certificateFile && !args.options.certificateBase64Encoded) {
+        return 'Specify either certificateFile or certificateBase64Encoded';
+      }
+
+      if (args.options.certificateFile) {
+        if (!fs.existsSync(args.options.certificateFile)) {
+          return `File '${args.options.certificateFile}' does not exist`;
+        }
       }
 
       if (!args.options.thumbprint) {

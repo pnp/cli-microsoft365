@@ -110,10 +110,26 @@ describe(commands.LOGIN, () => {
     });
   });
 
-  it('logs in to Microsoft 365 using certificate when authType certificate set', (done) => {
+  it('logs in to Microsoft 365 using certificate when authType certificate set and certificateFile is provided', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
     command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } }, () => {
+      try {
+        assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
+        assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
+        assert.strictEqual(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs in to Microsoft 365 using certificate when authType certificate set and certificateBase64Encoded is provided', (done) => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+
+    command.action(logger, { options: { debug: false, authType: 'certificate', certificateBase64Encoded: 'certificate', thumbprint: 'thumbprint' } }, () => {
       try {
         assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
         assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
@@ -204,7 +220,12 @@ describe(commands.LOGIN, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if authType is set to certificate and certificateFile not specified', () => {
+  it('fails validation if authType is set to certificate and both certificateFile and certificateBase64Encoded are specified', () => {
+    const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', certificateBase64Encoded: 'certificateB64', thumbprint: 'thumbprint' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and neither certificateFile nor certificateBase64Encoded are specified', () => {
     const actual = command.validate({ options: { authType: 'certificate', thumbprint: 'thumbprint' } });
     assert.notStrictEqual(actual, true);
   });
