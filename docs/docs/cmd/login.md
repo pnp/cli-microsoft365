@@ -17,7 +17,7 @@ m365 login [options]
 : Name of the user to authenticate. Required when `authType` is set to `password`
 
 `-p, --password [password]`
-: Password for the user. Required when `authType` is set to `password`
+: Password for the user or the certificate. Required when `authType` is set to `password`, or when `authType` is set to `certificate` and the provided certificate requires a password to open
 
 `-c, --certificateFile [certificateFile]`
 : Path to the file with certificate private key. When `authType` is set to `certificate`, specify either `certificateFile` or `certificateBase64Encoded`

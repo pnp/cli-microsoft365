@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
-import { AuthType, Service } from '../Auth';
+import { AuthType, Service, CertificateType } from '../Auth';
 import Utils from '../Utils';
 import { FileTokenStorage } from './FileTokenStorage';
 
@@ -37,6 +37,7 @@ describe('FileTokenStorage', () => {
     const tokensFile: Service = {
       accessTokens: {},
       authType: AuthType.DeviceCode,
+      certificateType: CertificateType.Unknown,
       connected: false,
       logout: () => {}
     };
@@ -59,6 +60,7 @@ describe('FileTokenStorage', () => {
     const expected: Service = {
       accessTokens: {},
       authType: AuthType.DeviceCode,
+      certificateType: CertificateType.Unknown,
       connected: false,
       logout: () => {}
     };
@@ -82,6 +84,7 @@ describe('FileTokenStorage', () => {
     const expected: Service = {
       accessTokens: {},
       authType: AuthType.DeviceCode,
+      certificateType: CertificateType.Unknown,
       connected: false,
       logout: () => {}
     };
@@ -106,6 +109,7 @@ describe('FileTokenStorage', () => {
     const expected: Service = {
       accessTokens: {},
       authType: AuthType.DeviceCode,
+      certificateType: CertificateType.Unknown,
       connected: false,
       logout: () => {}
     };
@@ -130,6 +134,7 @@ describe('FileTokenStorage', () => {
     const expected: Service = {
       accessTokens: {},
       authType: AuthType.DeviceCode,
+      certificateType: CertificateType.Unknown,
       connected: false,
       logout: () => {}
     };
@@ -154,6 +159,7 @@ describe('FileTokenStorage', () => {
     const expected: Service = {
       accessTokens: {},
       authType: AuthType.DeviceCode,
+      certificateType: CertificateType.Unknown,
       connected: false,
       logout: () => {}
     };

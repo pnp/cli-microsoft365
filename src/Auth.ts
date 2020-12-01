@@ -22,7 +22,8 @@ export class Service {
   authType: AuthType = AuthType.DeviceCode;
   userName?: string;
   password?: string;
-  certificate?: string;
+  certificateType: CertificateType = CertificateType.Unknown;
+  certificate?: string
   thumbprint?: string;
   accessTokens: Hash<AccessToken>;
   spoUrl?: string;
@@ -39,6 +40,7 @@ export class Service {
     this.authType = AuthType.DeviceCode;
     this.userName = undefined;
     this.password = undefined;
+    this.certificateType = CertificateType.Unknown;
     this.certificate = undefined;
     this.thumbprint = undefined;
     this.spoUrl = undefined;
@@ -51,6 +53,12 @@ export enum AuthType {
   Password,
   Certificate,
   Identity
+}
+
+export enum CertificateType {
+  Unknown,
+  Base64,
+  Binary
 }
 
 export class Auth {
@@ -89,9 +97,12 @@ export class Auth {
   public ensureAccessToken(resource: string, logger: Logger, debug: boolean = false, fetchNew: boolean = false): Promise<string> {
     Logging.setLoggingOptions({
       level: debug ? 3 : 0,
-      log: (level: LoggingLevel, message: string, error?: Error): void => {
-        logger.log(message);
-      }
+      log: 
+        // Dependency code, we do not control when and how it gets called, thus ignored from coverage
+        /* c8 ignore next 3 */ 
+        (level: LoggingLevel, message: string, error?: Error): void => {
+          logger.log(message);
+        }
     });
 
     return new Promise<string>((resolve: (accessToken: string) => void, reject: (error: any) => void): void => {
@@ -285,22 +296,30 @@ export class Auth {
       }
 
       let cert: string = '';
+      const buf = Buffer.from(this.service.certificate as string, 'base64');
 
-      if (this.service.password === undefined) {
-        const buf = Buffer.from(this.service.certificate as string, 'base64');
-        cert = buf.toString('utf8');
-
-        if (this.service.thumbprint === undefined) {
+      if (this.service.certificateType === CertificateType.Unknown || this.service.certificateType === CertificateType.Base64) {
+        // First time this method is called, we don't know if certificate is PEM or PFX (type is Unknown)
+        // We assume it is PEM but when parsing of PEM fails, we assume it could be PFX
+        // Type is persisted on service so subsequent calls only run through the correct parsing flow
+        try {
+          cert = buf.toString('utf8');
           const pemObjs: pem.ObjectPEM[] = pem.decode(cert);
-          const pemCertObj: pem.ObjectPEM = pemObjs.find(pem => pem.type === "CERTIFICATE") as pem.ObjectPEM;
-          const pemCertStr: string = pem.encode(pemCertObj);
-          const pemCert: pki.Certificate = pki.certificateFromPem(pemCertStr);
 
-          this.service.thumbprint = this.calculateThumbprint(pemCert);
+          if (this.service.thumbprint === undefined) {
+            const pemCertObj: pem.ObjectPEM = pemObjs.find(pem => pem.type === "CERTIFICATE") as pem.ObjectPEM;
+            const pemCertStr: string = pem.encode(pemCertObj);
+            const pemCert: pki.Certificate = pki.certificateFromPem(pemCertStr);
+  
+            this.service.thumbprint = this.calculateThumbprint(pemCert);
+          }
+        }
+        catch (e) {
+          this.service.certificateType = CertificateType.Binary;
         }
       }
-      else {
-        const buf = Buffer.from(this.service.certificate as string, 'base64');
+
+      if (this.service.certificateType === CertificateType.Binary) {
         const p12Asn1 = asn1.fromDer(buf.toString('binary'), false);
 
         const p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
