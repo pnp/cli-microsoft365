@@ -135,7 +135,7 @@ class LoginCommand extends Command {
       },
       {
         option: '-p, --password [password]',
-        description: 'Password for the user. Required when authType is set to password'
+        description: 'Password for the user or the certificate. Required when `authType` is set to `password`, or when `authType` is set to `certificate` and the provided certificate requires a password to open'
       },
       {
         option: '-c, --certificateFile [certificateFile]',

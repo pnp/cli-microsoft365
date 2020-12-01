@@ -17,7 +17,7 @@ m365 login [options]
 : Name of the user to authenticate. Required when `authType` is set to `password`
 
 `-p, --password [password]`
-: Password for the user. Required when `authType` is set to `password`
+: Password for the user or the certificate. Required when `authType` is set to `password`, or when `authType` is set to `certificate` and the provided certificate requires a password to open
 
 `-c, --certificateFile [certificateFile]`
 : Path to the file with certificate private key. When `authType` is set to `certificate`, specify either `certificateFile` or `certificateBase64Encoded`
@@ -82,6 +82,18 @@ Log in to Microsoft 365 using a personal information exchange (.pfx) file
 
 ```sh
 m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --password 'pass@word1'
+```
+
+Log in to Microsoft 365 using a personal information exchange (.pfx) file protected with an empty password
+
+```sh
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx --password
+```
+
+Log in to Microsoft 365 using a personal information exchange (.pfx) file not protected with a password
+
+```sh
+m365 login --authType certificate --certificateFile /Users/user/dev/localhost.pfx
 ```
 
 Log in to Microsoft 365 using a personal information exchange (.pfx) file. Use the specified thumbprint
