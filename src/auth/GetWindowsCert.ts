@@ -1,10 +1,10 @@
 import * as ca from "win-ca";
 import * as caApi from "win-ca/api";
-import * as crypt from "crypto";
+import * as crypto from "crypto";
 
 export const UseWindowsCerts = (id: string): string => {
   const thumbprint = (cert: string) => {
-    var shasum = crypt.createHash("sha1");
+    var shasum = crypto.createHash("sha1");
     shasum.update(Buffer.from(cert, "base64"));
     return shasum.digest("hex").toUpperCase();
   };
