@@ -42,6 +42,7 @@
 - fixed user-agent header [#1951](https://github.com/pnp/cli-microsoft365/issues/1951)
 - fixed user guide env. variable naming [#1954](https://github.com/pnp/cli-microsoft365/issues/1954)
 - made 'console.log()' synchronous [#1266](https://github.com/pnp/cli-microsoft365/issues/1266)
+- extended `todo task list` with id [#1943](https://github.com/pnp/cli-microsoft365/issues/1943)
 
 ## [v3.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.2.0)
 
