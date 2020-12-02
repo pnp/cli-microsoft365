@@ -28,9 +28,15 @@ export class Service {
   accessTokens: Hash<AccessToken>;
   spoUrl?: string;
   tenantId?: string;
+  // ID of the Azure AD app used to authenticate
+  appId: string;
+  // ID of the tenant where the Azure AD app is registered; common if multitenant
+  tenant: string;
 
   constructor() {
     this.accessTokens = {};
+    this.appId = config.cliAadAppId;
+    this.tenant = config.tenant;
   }
 
   public logout(): void {
@@ -45,6 +51,8 @@ export class Service {
     this.thumbprint = undefined;
     this.spoUrl = undefined;
     this.tenantId = undefined;
+    this.appId = config.cliAadAppId;
+    this.tenant = config.tenant;
   }
 }
 
@@ -62,10 +70,10 @@ export enum CertificateType {
 }
 
 export class Auth {
-  protected authCtx: AuthenticationContext;
+  // assigned through this.setAuthContext() hence !
+  protected authCtx!: AuthenticationContext;
   private userCodeInfo?: UserCodeInfo;
   private _service: Service;
-  private appId: string;
 
   public get service(): Service {
     return this._service;
@@ -76,9 +84,8 @@ export class Auth {
   }
 
   constructor() {
-    this.appId = config.cliAadAppId;
     this._service = new Service();
-    this.authCtx = new AuthenticationContext(`https://login.microsoftonline.com/${config.tenant}`);
+    this.setAuthContext();
   }
 
   public restoreAuth(): Promise<void> {
@@ -87,6 +94,7 @@ export class Auth {
         .getServiceConnectionInfo<Service>()
         .then((service: Service): void => {
           this._service = Object.assign(this._service, service);
+          this.setAuthContext();
           resolve();
         }, (error: any): void => {
           resolve();
@@ -196,7 +204,7 @@ export class Auth {
 
       this.authCtx.acquireTokenWithRefreshToken(
         this.service.refreshToken as string,
-        this.appId as string,
+        this.service.appId,
         resource,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {
@@ -225,7 +233,7 @@ export class Auth {
         logger.logToStderr('No existing refresh token. Starting new device code flow...');
       }
 
-      this.authCtx.acquireUserCode(resource, this.appId as string, 'en-us',
+      this.authCtx.acquireUserCode(resource, this.service.appId, 'en-us',
         (error: Error, response: UserCodeInfo): void => {
           if (debug) {
             logger.logToStderr('Response:');
@@ -241,7 +249,7 @@ export class Auth {
           logger.log(response.message);
 
           this.userCodeInfo = response;
-          this.authCtx.acquireTokenWithDeviceCode(resource, this.appId as string, response,
+          this.authCtx.acquireTokenWithDeviceCode(resource, this.service.appId, response,
             (error: Error, response: TokenResponse | ErrorResponse): void => {
               if (debug) {
                 logger.logToStderr('Response:');
@@ -271,7 +279,7 @@ export class Auth {
         resource,
         this.service.userName as string,
         this.service.password as string,
-        this.appId as string,
+        this.service.appId,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {
             logger.logToStderr('Response:');
@@ -363,7 +371,7 @@ export class Auth {
 
       this.authCtx.acquireTokenWithClientCertificate(
         resource,
-        this.appId as string,
+        this.service.appId,
         cert as string,
         this.service.thumbprint as string,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
@@ -576,6 +584,10 @@ export class Auth {
 
   public getTokenStorage(): TokenStorage {
     return new FileTokenStorage();
+  }
+
+  public setAuthContext(): void {
+    this.authCtx = new AuthenticationContext(`https://login.microsoftonline.com/${this.service.tenant}`);
   }
 }
 

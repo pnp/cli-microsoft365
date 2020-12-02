@@ -28,6 +28,12 @@ m365 login [options]
 `--thumbprint [thumbprint]`
 : Certificate thumbprint. If not specified, and `authType` is set to `certificate`, it will be automatically calculated based on the specified certificate
 
+`--appId [appId]`
+: App ID of the Azure AD application to use for authentication. If not specified, use the app specified in the `CLIMICROSOFT365_AADAPPID` environment variable. If the environment variable is not defined, use the multitenant PnP Management Shell app
+
+`--tenant [tenant]`
+: ID of the tenant from which accounts should be able to authenticate. Use `common` or `organization` if the app is multitenant. If not specified, use the tenant specified in the `CLIMICROSOFT365_TENANT` environment variable. If the environment variable is not defined, use `common` as the tenant identifier
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -125,4 +131,16 @@ Log in to Microsoft 365 using a user-assigned managed identity. Client id or pri
 
 ```sh
 m365 login --authType identity --userName ac9fbed5-804c-4362-a369-21a4ec51109e
+```
+
+Log in to Microsoft 365 using your own multitenant Azure AD application
+
+```sh
+m365 login --appId 31359c7f-bd7e-475c-86db-fdb8c937548c
+```
+
+Log in to Microsoft 365 using your own Azure AD application that's restricted only to allow accounts from the specific tenant
+
+```sh
+m365 login --appId 31359c7f-bd7e-475c-86db-fdb8c937548c --tenant 31359c7f-bd7e-475c-86db-fdb8c937548a
 ```
