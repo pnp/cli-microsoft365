@@ -1,5 +1,18 @@
 # Release notes
 
+## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo list contenttype default set](../cmd/spo/list/list-contenttype-default-set.md) - sets the default content type for a list [#674](https://github.com/pnp/cli-microsoft365/issues/674)
+
+### Changes
+
+- updated docs for the login command with links to more info [#1966](https://github.com/pnp/cli-microsoft365/pull/1966)
+- moved global options in docs to a separate file [#1852](https://github.com/pnp/cli-microsoft365/issues/1889), [#1969](https://github.com/pnp/cli-microsoft365/issues/1969)
+
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
 ### New commands
