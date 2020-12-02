@@ -619,7 +619,7 @@ Set-PnPClientSideText|SharePointPnPPowerShellOnline|
 Set-PnPClientSideWebPart|SharePointPnPPowerShellOnline|
 Set-PnPContext|SharePointPnPPowerShellOnline|
 Set-PnPDefaultColumnValues|SharePointPnPPowerShellOnline|
-Set-PnPDefaultContentTypeToList|SharePointPnPPowerShellOnline|
+Set-PnPDefaultContentTypeToList|SharePointPnPPowerShellOnline|[spo list contenttype default set](../cmd/spo/list/list-contenttype-default-set.md)
 Set-PnPDefaultPageLayout|SharePointPnPPowerShellOnline|
 Set-PnPDocumentSetField|SharePointPnPPowerShellOnline|
 Set-PnPField|SharePointPnPPowerShellOnline|[spo field set](../cmd/spo/field/field-set.md)
