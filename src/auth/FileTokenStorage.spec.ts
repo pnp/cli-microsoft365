@@ -36,6 +36,8 @@ describe('FileTokenStorage', () => {
   it('returns connection info from file', (done) => {
     const tokensFile: Service = {
       accessTokens: {},
+      appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      tenant: 'common',
       authType: AuthType.DeviceCode,
       connected: false,
       logout: () => {}
@@ -58,6 +60,8 @@ describe('FileTokenStorage', () => {
   it('saves the connection info in the file when the file doesn\'t exist', (done) => {
     const expected: Service = {
       accessTokens: {},
+      appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      tenant: 'common',
       authType: AuthType.DeviceCode,
       connected: false,
       logout: () => {}
@@ -81,6 +85,8 @@ describe('FileTokenStorage', () => {
   it('saves the connection info in the file when the file is empty', (done) => {
     const expected: Service = {
       accessTokens: {},
+      appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      tenant: 'common',
       authType: AuthType.DeviceCode,
       connected: false,
       logout: () => {}
@@ -105,6 +111,8 @@ describe('FileTokenStorage', () => {
   it('saves the connection info in the file when the file contains an empty JSON object', (done) => {
     const expected: Service = {
       accessTokens: {},
+      appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      tenant: 'common',
       authType: AuthType.DeviceCode,
       connected: false,
       logout: () => {}
@@ -129,6 +137,8 @@ describe('FileTokenStorage', () => {
   it('saves the connection info in the file when the file contains no access tokens', (done) => {
     const expected: Service = {
       accessTokens: {},
+      appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      tenant: 'common',
       authType: AuthType.DeviceCode,
       connected: false,
       logout: () => {}
@@ -153,6 +163,8 @@ describe('FileTokenStorage', () => {
   it('adds the connection info to the file when the file contains access tokens', (done) => {
     const expected: Service = {
       accessTokens: {},
+      appId: '31359c7f-bd7e-475c-86db-fdb8c937548e',
+      tenant: 'common',
       authType: AuthType.DeviceCode,
       connected: false,
       logout: () => {}

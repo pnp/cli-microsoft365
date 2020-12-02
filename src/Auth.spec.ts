@@ -28,7 +28,6 @@ describe('Auth', () => {
   let log: any[];
   let auth: Auth;
   const resource: string = 'https://contoso.sharepoint.com';
-  const appId: string = '9bc3ab49-b65d-410a-85ad-de819febfddc';
   const refreshToken: string = 'ref';
   const logger: Logger = {
     log: (msg: any) => log.push(msg),
@@ -41,7 +40,8 @@ describe('Auth', () => {
   beforeEach(() => {
     log = [];
     auth = new Auth();
-    (auth as any).appId = appId;
+    auth.service.appId = '9bc3ab49-b65d-410a-85ad-de819febfddc';
+    auth.service.tenant = '9bc3ab49-b65d-410a-85ad-de819febfddd';
     readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
   });
 
