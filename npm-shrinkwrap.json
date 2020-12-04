@@ -1,12 +1,12 @@
 {
   "name": "@pnp/cli-microsoft365",
   "version": "3.4.0",
-  "lockfileVersion": 1,
+  "lockfileVersion": 2,
   "requires": true,
   "packages": {
     "": {
       "name": "@pnp/cli-microsoft365",
-      "version": "3.3.0",
+      "version": "3.4.0",
       "license": "MIT",
       "dependencies": {
         "adal-node": "^0.2.1",
