@@ -486,6 +486,8 @@ nav:
         - user app list: 'cmd/teams/user/user-app-list.md'
         - user app remove: 'cmd/teams/user/user-app-remove.md'
     - Microsoft 365 (tenant):
+      - auditlog:
+        - auditlog report: 'cmd/tenant/auditlog/auditlog-report.md'
       - id:
         - id get: 'cmd/tenant/id/id-get.md'
       - report:
