@@ -6,7 +6,7 @@
   "packages": {
     "": {
       "name": "@pnp/cli-microsoft365",
-      "version": "3.3.0",
+      "version": "3.4.0",
       "license": "MIT",
       "dependencies": {
         "adal-node": "^0.2.1",

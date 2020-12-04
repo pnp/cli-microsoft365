@@ -2,6 +2,7 @@ import type { AuthenticationContext, ErrorResponse, Logging, LoggingLevel, Token
 import type * as NodeForge from 'node-forge';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
+import { UseWindowsCerts } from "./auth/GetWindowsCert";
 import { Logger } from './cli';
 import { CommandError } from './Command';
 import config from './config';
@@ -60,6 +61,7 @@ export enum AuthType {
   DeviceCode,
   Password,
   Certificate,
+  WindowsCertificate,
   Identity
 }
 
@@ -158,6 +160,10 @@ export class Auth {
           case AuthType.Certificate:
             getTokenPromise = this.ensureAccessTokenWithCertificate.bind(this);
             break;
+          case AuthType.WindowsCertificate:
+              getTokenPromise = this.ensureAccessTokenWithWindowsCertificate.bind(
+                this
+              );
           case AuthType.Identity:
             getTokenPromise = this.ensureAccessTokenWithIdentity.bind(this);
             break;
@@ -398,6 +404,38 @@ export class Auth {
           resolve(<TokenResponse>response);
         });
     });
+  }
+
+  private ensureAccessTokenWithWindowsCertificate(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
+    return new Promise<TokenResponse>(( resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void ): void => {
+        if (debug) {
+          logger.logToStderr(`Retrieving new access token using certificate (thumbprint ${this.service.thumbprint})...`);
+        }
+
+        const cert: string = UseWindowsCerts(this.service.thumbprint as string);
+
+        this.authCtx.acquireTokenWithClientCertificate(
+          resource,
+          this.appId as string,
+          cert as string,
+          this.service.thumbprint as string,
+          (error: Error, response: TokenResponse | ErrorResponse): void => {
+            if (debug) {
+              logger.logToStderr("Response:");
+              logger.logToStderr(response);
+              logger.logToStderr("");
+            }
+
+            if (error) {
+              reject((response && (response as any).error_description) || error.message);
+              return;
+            }
+
+            resolve(<TokenResponse>response);
+          }
+        );
+      }
+    );
   }
 
   private ensureAccessTokenWithIdentity(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
