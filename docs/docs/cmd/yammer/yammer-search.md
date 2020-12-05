@@ -16,7 +16,7 @@ m365 yammer search [options]
 `-s, --search <search>`
 : The query for the search
 
-`--show <show>`
+`--show [show]`
 : Specifies the type of data to return when using --ouptut text. Allowed values Summary|Messages|Users|Topics|Groups.
 
 `--limit [limit]`

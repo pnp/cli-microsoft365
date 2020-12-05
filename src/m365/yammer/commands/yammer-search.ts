@@ -290,7 +290,7 @@ class YammerSearchCommand extends YammerCommand {
                 id: msg.id,
                 name: encodeURI(msg.content_excerpt),
                 url: msg.url,
-                type: "Message"
+                type: "message"
               }
             })]
             results = [...results, ...this.topics.map((topic) => {
@@ -299,7 +299,7 @@ class YammerSearchCommand extends YammerCommand {
                 id: topic.id,
                 name: topic.name,
                 url: topic.url,
-                type: "Topic"
+                type: "topic"
               }
             })]
             results = [...results, ...this.users.map((user) => {
@@ -308,7 +308,7 @@ class YammerSearchCommand extends YammerCommand {
                 id: user.id,
                 name: user.name,
                 url: user.url,
-                type: "User"
+                type: "user"
               }
             })]
             results = [...results, ...this.groups.map((group) => {
@@ -317,7 +317,7 @@ class YammerSearchCommand extends YammerCommand {
                 id: group.id,
                 name: group.name,
                 url: group.url,
-                type: "Group"
+                type: "group"
               }
             })];
 
@@ -361,7 +361,7 @@ class YammerSearchCommand extends YammerCommand {
       if (typeof args.options.show !== 'undefined') {
         const scope = args.options.show.toString().toLowerCase();
         if (YammerSearchCommand.showOptions.indexOf(scope) < 0) {
-          return `${args.options.scope} is not a valid value for show. Allowed values are Summary|Messages|Users|Topics|Groups`;
+          return `${args.options.scope} is not a valid value for show. Allowed values are summary|messages|users|topics|groups`;
         }
       }
     }
