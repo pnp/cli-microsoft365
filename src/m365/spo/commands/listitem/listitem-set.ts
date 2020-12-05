@@ -331,7 +331,12 @@ class SpoListItemSetCommand extends SpoCommand {
       'systemUpdate',
       'debug',
       'verbose',
-      'output'
+      'output',
+      's',
+      'i',
+      'u',
+      't',
+      '_'
     ];
 
     Object.keys(options).forEach(key => {
