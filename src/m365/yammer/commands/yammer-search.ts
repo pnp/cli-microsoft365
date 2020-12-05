@@ -30,36 +30,43 @@ interface YammerSearchSummary {
   users: number;
 }
 
+interface YammerBasicSearchResponse {
+  id: string,
+  name: string,
+  url: string
+  type: string
+}
+
 interface YammerBasicGroupResponse {
   id: string,
-  state: string,
-  privacy: string,
   name: string,
+  url: string,
+  state: string,
+  privacy: string
   full_name: string,
   description: string,
-  moderated: boolean,
-  url: string
+  moderated: boolean
 }
 
 interface YammerBasicTopicResponse {
   id: string,
   name: string,
+  url: string,
   normalized_name: string,
   followers_count: number,
-  description: string,
-  url: string
+  description: string
 }
 
 interface YammerBasicUserResponse {
   id: string,
-  state: string,
   name: string,
+  url: string,
+  state: string,
   email: string,
   first_name: string,
   last_name: string,
   full_name: string,
-  admin: boolean,
-  url: string
+  admin: boolean
 }
 
 interface YammerBasicMessageResponse {
@@ -128,12 +135,11 @@ class YammerSearchCommand extends YammerCommand {
         .then((results: YammerSearchResponse): void => {
           // results count should only read once
           if (page === 1) {
-            const summary = results.count;
             this.summary = {
-              messages: summary.messages,
-              topics: summary.topics,
-              users: summary.users,
-              groups: summary.groups
+              messages: results.count.messages,
+              topics: results.count.topics,
+              users: results.count.users,
+              groups: results.count.groups
             }
           }
 
@@ -185,8 +191,7 @@ class YammerSearchCommand extends YammerCommand {
             }
           }
 
-          // does not process more queries if we are not able to return a complex object 
-          if (resultsFound && continueProcessing && args.options.output === 'json') {
+          if (resultsFound && continueProcessing) {
             this
                 .getAllItems(logger, args, ++page)
                 .then((): void => {
@@ -285,8 +290,48 @@ class YammerSearchCommand extends YammerCommand {
                 url: group.url
               }
             }));
+          } else if (show === "summary") {
+            logger.log(this.summary)
           } else { 
-            logger.log(this.summary);
+            let results: YammerBasicSearchResponse[] = [];
+            results = [...results, ...this.messages.map((msg) => {
+              return <YammerBasicSearchResponse>
+              {
+                id: msg.id,
+                name: encodeURI(msg.content_excerpt),
+                url: msg.url,
+                type: "Message"
+              }
+            })]
+            results = [...results, ...this.topics.map((topic) => {
+              return <YammerBasicSearchResponse>
+              {
+                id: topic.id,
+                name: topic.name,
+                url: topic.url,
+                type: "Topic"
+              }
+            })]
+            results = [...results, ...this.users.map((user) => {
+              return <YammerBasicSearchResponse>
+              {
+                id: user.id,
+                name: user.name,
+                url: user.url,
+                type: "User"
+              }
+            })]
+            results = [...results, ...this.groups.map((group) => {
+              return <YammerBasicSearchResponse>
+              {
+                id: group.id,
+                name: group.name,
+                url: group.url,
+                type: "Group"
+              }
+            })];
+
+            logger.log(results);
           }
         }
         cb();

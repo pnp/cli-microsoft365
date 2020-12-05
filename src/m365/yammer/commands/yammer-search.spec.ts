@@ -215,7 +215,7 @@ describe(commands.YAMMER_SEARCH, () => {
     assert(containsOption);
   });
 
-  it('returns the summary', function (done) {
+  it('returns all items', function (done) {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
         return Promise.resolve(searchResults);
@@ -223,6 +223,40 @@ describe(commands.YAMMER_SEARCH, () => {
       return Promise.reject('Invalid request');
     });
     command.action(logger, { options: { search: "contents" } } as any, (err?: any) => {
+      try {
+        const result = loggerLogSpy.lastCall.args[0];
+        assert.strictEqual(result.length, 15);
+        assert.strictEqual(result[0].id, 11111);
+        assert.strictEqual(result[1].id, 11112);
+        assert.strictEqual(result[2].id, 11113);
+        assert.strictEqual(result[3].id, 11114);
+        assert.strictEqual(result[4].id, 3331);
+        assert.strictEqual(result[5].id, 3332);
+        assert.strictEqual(result[6].id, 3333);
+        assert.strictEqual(result[7].id, 3334);
+        assert.strictEqual(result[8].id, 3335);
+        assert.strictEqual(result[9].id, 4441);
+        assert.strictEqual(result[10].id, 4442);
+        assert.strictEqual(result[11].id, 4443);
+        assert.strictEqual(result[12].id, 4444);
+        assert.strictEqual(result[13].id, 2221);
+        assert.strictEqual(result[14].id, 2222);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns the summary', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
+        return Promise.resolve(searchResults);
+      }
+      return Promise.reject('Invalid request');
+    });
+    command.action(logger, { options: { search: "contents", show:"summary" } } as any, (err?: any) => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].messages, 4)
         assert.strictEqual(loggerLogSpy.lastCall.args[0].groups, 2)
