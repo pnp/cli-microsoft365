@@ -148,50 +148,40 @@ class YammerSearchCommand extends YammerCommand {
           const resultGroups = results.groups;
           const resultUsers = results.users;
 
-          let continueProcessing    = true;
-          let resultsFound = false;
-
           if (resultMessages.length > 0) {
-            resultsFound = true;
             this.messages = this.messages.concat(resultMessages);
 
             if (args.options.limit && this.messages.length > args.options.limit) {
-              continueProcessing    = false;
               this.messages = this.messages.slice(0, args.options.limit);
             }
           }
 
           if (resultTopics.length > 0) {
-            resultsFound = true;
             this.topics = this.topics.concat(resultTopics);
 
             if (args.options.limit && this.topics.length > args.options.limit) {
-              continueProcessing    = false;
               this.topics = this.topics.slice(0, args.options.limit);
             }
           }
 
           if (resultGroups.length > 0) {
-            resultsFound = true;
             this.groups = this.groups.concat(resultGroups);
 
             if (args.options.limit && this.groups.length > args.options.limit) {
-              continueProcessing    = false;
               this.groups = this.groups.slice(0, args.options.limit);
             }
           }
 
           if (resultUsers.length > 0) {
-            resultsFound = true;
             this.users = this.users.concat(resultUsers);
 
             if (args.options.limit && this.users.length > args.options.limit) {
-              continueProcessing    = false;
               this.users = this.users.slice(0, args.options.limit);
             }
           }
 
-          if (resultsFound && continueProcessing) {
+          const continueProcessing = resultMessages.length === 20 || resultUsers.length === 20 || resultGroups.length === 20 || resultTopics.length === 20;
+          if (continueProcessing) {
             this
                 .getAllItems(logger, args, ++page)
                 .then((): void => {

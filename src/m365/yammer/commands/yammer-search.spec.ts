@@ -76,6 +76,80 @@ describe(commands.YAMMER_SEARCH, () => {
       ]        
     };
 
+    const longSearchResult: any = {
+      "count": {
+        "messages":  24,
+        "groups":  0,
+        "topics":  0,
+        "users":  0
+      },
+      "messages": {
+        "messages": [{
+          "id": 11115
+        },
+        {
+          "id": 11116
+        },
+        {
+          "id": 11117
+        },
+        {
+          "id": 11118
+        },
+        {
+          "id": 11119
+        },
+        {
+          "id": 11120
+        },
+        {
+          "id": 11121
+        },
+        {
+          "id": 11122
+        },
+        {
+          "id": 11123
+        },
+        {
+          "id": 11124
+        },
+        {
+          "id": 11125
+        },
+        {
+          "id": 11127
+        },
+        {
+          "id": 11128
+        },
+        {
+          "id": 11129
+        },
+        {
+          "id": 11130
+        },
+        {
+          "id": 11131
+        },
+        {
+          "id": 11132
+        },
+        {
+          "id": 11133
+        },
+        {
+          "id": 11134
+        },
+        {
+          "id": 11135
+        }]
+      },
+      "groups": [],
+      "topics": [],
+      "users": []        
+    };
+
     const searchResults2: any = {
       "count": {
         "messages":  4,
@@ -241,6 +315,28 @@ describe(commands.YAMMER_SEARCH, () => {
         assert.strictEqual(result[12].id, 4444);
         assert.strictEqual(result[13].id, 2221);
         assert.strictEqual(result[14].id, 2222);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns long search result', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
+        return Promise.resolve(longSearchResult);
+      }
+      if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=2') {
+        return Promise.resolve(searchResults);
+      }
+      return Promise.reject('Invalid request');
+    });
+    command.action(logger, { options: { search: "contents", show:"messages" } } as any, (err?: any) => {
+      try {
+        const result = loggerLogSpy.lastCall.args[0];
+        assert.strictEqual(result.length, 24);
         done();
       }
       catch (e) {
@@ -417,7 +513,7 @@ describe(commands.YAMMER_SEARCH, () => {
   it('handles error in loop', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
-        return Promise.resolve(searchResults);
+        return Promise.resolve(longSearchResult);
       }
       if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=2') {
         return Promise.reject({
