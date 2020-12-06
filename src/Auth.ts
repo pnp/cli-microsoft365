@@ -62,7 +62,8 @@ export enum AuthType {
 }
 
 export class Auth {
-  protected authCtx: AuthenticationContext;
+  // assigned through this.setAuthContext() hence !
+  protected authCtx!: AuthenticationContext;
   private userCodeInfo?: UserCodeInfo;
   private _service: Service;
 
@@ -76,7 +77,7 @@ export class Auth {
 
   constructor() {
     this._service = new Service();
-    this.authCtx = new AuthenticationContext(`https://login.microsoftonline.com/${this.service.tenant}`);
+    this.setAuthContext();
   }
 
   public restoreAuth(): Promise<void> {
