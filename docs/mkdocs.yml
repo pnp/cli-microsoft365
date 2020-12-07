@@ -449,6 +449,7 @@ nav:
         - report deviceusagedistributionusercounts: 'cmd/teams/report/report-deviceusagedistributionusercounts.md'
         - report deviceusageusercounts: 'cmd/teams/report/report-deviceusageusercounts.md'
         - report deviceusageuserdetail: 'cmd/teams/report/report-deviceusageuserdetail.md'
+        - report pstncalls: 'cmd/teams/report/report-pstncalls.md'
         - report useractivitycounts: 'cmd/teams/report/report-useractivitycounts.md'
         - report useractivityusercounts: 'cmd/teams/report/report-useractivityusercounts.md'
         - report useractivityuserdetail: 'cmd/teams/report/report-useractivityuserdetail.md'
