@@ -14,6 +14,8 @@
 - moved global options in docs to a separate file [#1852](https://github.com/pnp/cli-microsoft365/issues/1889), [#1969](https://github.com/pnp/cli-microsoft365/issues/1969)
 - extended `login` with support for passing base64-encoded certificate [#1971](https://github.com/pnp/cli-microsoft365/issues/1971)
 - extended `login` with calculating thumbprint from the certificate [#1973](https://github.com/pnp/cli-microsoft365/issues/1973)
+- fixed 'spo listitem set' command [#1984](https://github.com/pnp/cli-microsoft365/issues/1984)
+- changed loading optional dependencies to lazy to speed up CLI [#1990](https://github.com/pnp/cli-microsoft365/pull/1990)
 
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
