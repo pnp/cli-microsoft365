@@ -2,11 +2,16 @@ import { AuthenticationContext, ErrorResponse, Logging, LoggingLevel, TokenRespo
 import { asn1, pkcs12, pki } from 'node-forge';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
-import { UseWindowsCerts } from "./auth/GetWindowsCert";
 import { Logger } from './cli';
 import { CommandError } from './Command';
+import * as crypto from 'crypto';
 import config from './config';
 import request from './request';
+import { exception } from 'console';
+import { rejects } from 'assert';
+
+const ca = require('win-ca');
+const caApi = require('win-ca/api');
 
 export interface Hash<TValue> {
   [key: string]: TValue;
@@ -51,7 +56,6 @@ export enum AuthType {
   DeviceCode,
   Password,
   Certificate,
-  WindowsCertificate,
   Identity
 }
 
@@ -135,10 +139,6 @@ export class Auth {
           case AuthType.Certificate:
             getTokenPromise = this.ensureAccessTokenWithCertificate.bind(this);
             break;
-          case AuthType.WindowsCertificate:
-              getTokenPromise = this.ensureAccessTokenWithWindowsCertificate.bind(
-                this
-              );
           case AuthType.Identity:
             getTokenPromise = this.ensureAccessTokenWithIdentity.bind(this);
             break;
@@ -297,35 +297,48 @@ export class Auth {
         cert = buf.toString('utf8');
       }
       else {
-        const buf = Buffer.from(this.service.certificate as string, 'base64');
-        const p12Asn1 = asn1.fromDer(buf.toString('binary'), false);
 
-        const p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
+        if (this.service.thumbprint && this.service.certificate === undefined) {
+          try {
+            cert = this.UseWindowsCerts(this.service.thumbprint as string);
+          }
+          catch (e: unknown) {
+            logger.logToStderr(e);
+          }
 
-        let keyBags: any = p12Parsed.getBags({ bagType: pki.oids.pkcs8ShroudedKeyBag });
-        const pkcs8ShroudedKeyBag = keyBags[pki.oids.pkcs8ShroudedKeyBag][0];
-
-        if (debug) {
-          // check if there is something in the keyBag as well as
-          // the pkcs8ShroudedKeyBag. This will give us more information
-          // whether there is a cert that can potentially store keys in the keyBag.
-          // I could not find a way to add something to the keyBag with all 
-          // my attempts, but lets keep it here for troubleshooting purposes.
-
-          logger.logToStderr(`pkcs8ShroudedKeyBagkeyBags length is ${[pki.oids.pkcs8ShroudedKeyBag].length}`);
-
-          keyBags = p12Parsed.getBags({ bagType: pki.oids.keyBag });
-          logger.logToStderr(`keyBag length is ${keyBags[pki.oids.keyBag].length}`);
+        } 
+        else {
+          const buf = Buffer.from(this.service.certificate as string, 'base64');
+          const p12Asn1 = asn1.fromDer(buf.toString('binary'), false);
+  
+          const p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
+  
+          let keyBags: any = p12Parsed.getBags({ bagType: pki.oids.pkcs8ShroudedKeyBag });
+          const pkcs8ShroudedKeyBag = keyBags[pki.oids.pkcs8ShroudedKeyBag][0];
+  
+          if (debug) {
+            // check if there is something in the keyBag as well as
+            // the pkcs8ShroudedKeyBag. This will give us more information
+            // whether there is a cert that can potentially store keys in the keyBag.
+            // I could not find a way to add something to the keyBag with all 
+            // my attempts, but lets keep it here for troubleshooting purposes.
+  
+            logger.logToStderr(`pkcs8ShroudedKeyBagkeyBags length is ${[pki.oids.pkcs8ShroudedKeyBag].length}`);
+  
+            keyBags = p12Parsed.getBags({ bagType: pki.oids.keyBag });
+            logger.logToStderr(`keyBag length is ${keyBags[pki.oids.keyBag].length}`);
+          }
+  
+          // convert a Forge private key to an ASN.1 RSAPrivateKey
+          const rsaPrivateKey = pki.privateKeyToAsn1(pkcs8ShroudedKeyBag.key);
+  
+          // wrap an RSAPrivateKey ASN.1 object in a PKCS#8 ASN.1 PrivateKeyInfo
+          const privateKeyInfo = pki.wrapRsaPrivateKey(rsaPrivateKey);
+  
+          // convert a PKCS#8 ASN.1 PrivateKeyInfo to PEM
+          cert = pki.privateKeyInfoToPem(privateKeyInfo);
         }
 
-        // convert a Forge private key to an ASN.1 RSAPrivateKey
-        const rsaPrivateKey = pki.privateKeyToAsn1(pkcs8ShroudedKeyBag.key);
-
-        // wrap an RSAPrivateKey ASN.1 object in a PKCS#8 ASN.1 PrivateKeyInfo
-        const privateKeyInfo = pki.wrapRsaPrivateKey(rsaPrivateKey);
-
-        // convert a PKCS#8 ASN.1 PrivateKeyInfo to PEM
-        cert = pki.privateKeyInfoToPem(privateKeyInfo);
       }
 
       this.authCtx.acquireTokenWithClientCertificate(
@@ -348,38 +361,6 @@ export class Auth {
           resolve(<TokenResponse>response);
         });
     });
-  }
-
-  private ensureAccessTokenWithWindowsCertificate(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
-    return new Promise<TokenResponse>(( resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void ): void => {
-        if (debug) {
-          logger.logToStderr(`Retrieving new access token using certificate (thumbprint ${this.service.thumbprint})...`);
-        }
-
-        const cert: string = UseWindowsCerts(this.service.thumbprint as string);
-
-        this.authCtx.acquireTokenWithClientCertificate(
-          resource,
-          this.appId as string,
-          cert as string,
-          this.service.thumbprint as string,
-          (error: Error, response: TokenResponse | ErrorResponse): void => {
-            if (debug) {
-              logger.logToStderr("Response:");
-              logger.logToStderr(response);
-              logger.logToStderr("");
-            }
-
-            if (error) {
-              reject((response && (response as any).error_description) || error.message);
-              return;
-            }
-
-            resolve(<TokenResponse>response);
-          }
-        );
-      }
-    );
   }
 
   private ensureAccessTokenWithIdentity(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
@@ -521,6 +502,36 @@ export class Auth {
             });
         });
     });
+  }
+
+  public UseWindowsCerts(id:string): string {
+    const thumbprint = (cert: string) => {
+      var shasum = crypto.createHash("sha1");
+      shasum.update(Buffer.from(cert, "base64"));
+      return shasum.digest("hex").toUpperCase();
+    };
+  
+    const list: string[] = [];
+    let returnValue: string = "Certificate Not Found";
+  
+    caApi({
+      store: ["My"],
+      ondata: list,
+    });
+  
+    list.forEach((cert) => {
+      const certThumbprint = thumbprint(cert);
+      if (certThumbprint === id) {
+        const toPEM = ca.der2(ca.der2.pem);
+        const pem = toPEM(cert);
+        return pem;
+      } 
+      else {
+        throw exception("The specified certificate was not found in the certificate store");
+      } 
+    });
+  
+    return returnValue;
   }
 
   public cancel(): void {

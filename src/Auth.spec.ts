@@ -1446,3 +1446,22 @@ describe('Auth', () => {
     assert.strictEqual(Auth.getResourceFromUrl('https://contoso.sharepoint.com/sites/team-a'), 'https://contoso.sharepoint.com');
   });
 });
+
+describe("Get personal certificate from Windows Store", () => {
+  let auth: Auth;
+  context("with thumbprint argument as string", () => {
+    it("Returns Certificate from Windows Personal Store", (done) => {
+      const thumbprint = "137BA5B7DDCB411BF7F60732CAA428270D335C54";
+      const result = auth.UseWindowsCerts(thumbprint);
+      assert.strictEqual(typeof result, "string");
+      done();
+    });
+
+    it("Thumbprint does not match", (done) => {
+      const thumbprint = "thumbprint";
+      const result = auth.UseWindowsCerts(thumbprint);
+      assert.strictEqual(result, "Certificate Not Found");
+      done();
+    });
+  });
+});
