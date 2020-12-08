@@ -16,6 +16,9 @@
 - extended `login` with calculating thumbprint from the certificate [#1973](https://github.com/pnp/cli-microsoft365/issues/1973)
 - fixed 'spo listitem set' command [#1984](https://github.com/pnp/cli-microsoft365/issues/1984)
 - changed loading optional dependencies to lazy to speed up CLI [#1990](https://github.com/pnp/cli-microsoft365/pull/1990)
+- extended `login` with support for .pfx certificates not protected with a password [#1974](https://github.com/pnp/cli-microsoft365/issues/1974)
+- fixed the `outlook mail send` command [#1991](https://github.com/pnp/cli-microsoft365/issues/1991)
+- extended the `login` command with appId and tenant [#1975](https://github.com/pnp/cli-microsoft365/issues/1975)
 
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
