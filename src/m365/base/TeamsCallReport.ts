@@ -20,7 +20,7 @@ export default abstract class TeamsCallReport extends GraphCommand {
   public abstract get usageEndpoint(): string;
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${this.resource}/beta/communications/callRecords/${this.usageEndpoint}(fromDateTime=${encodeURIComponent(args.options.fromDateTime)},toDateTime=${encodeURIComponent(args.options.toDateTime ? args.options.toDateTime : new Date().toISOString())})`;
+    const endpoint: string = `${this.resource}/beta/communications/callRecords/${this.usageEndpoint}(fromDateTime=${encodeURIComponent(args.options.fromDateTime)},toDateTime=${encodeURIComponent(args.options.toDateTime!)})`;
     this.executeReport(endpoint, logger, args.options.output, cb);
   }
 
