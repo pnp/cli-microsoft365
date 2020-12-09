@@ -1,19 +1,17 @@
 import commands from '../../commands';
-import Command, { CommandValidate } from '../../../../Command';
+import Command, { CommandOption, CommandValidate } from '../../../../Command';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
-const command: Command = require('./user-get');
+const command: Command = require('./user-add');
 import * as assert from 'assert';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import auth from '../../../../Auth';
 
-describe(commands.USER_GET, () => {
+describe(commands.USER_ADD, () => {
   let vorpal: Vorpal;
   let log: any[];
   let cmdInstance: any;
-  let cmdInstanceLogSpy: sinon.SinonSpy;
-  let requests: any[];
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
@@ -32,7 +30,6 @@ describe(commands.USER_GET, () => {
         log.push(msg);
       }
     };
-    cmdInstanceLogSpy = sinon.spy(cmdInstance, 'log');
   });
 
   afterEach(() => {
@@ -51,13 +48,14 @@ describe(commands.USER_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.USER_GET), true);
+    assert.equal(command.name.startsWith(commands.USER_ADD), true);
   });
 
   it('has a description', () => {
     assert.notEqual(command.description, null);
   });
 
+  
   it('fails validation if the url option not specified', () => {
     const actual = (command.validate() as CommandValidate)({ options: {
       email:"john.doe@contoso.onmicrosoft.com",
@@ -72,6 +70,53 @@ describe(commands.USER_GET, () => {
       group: "Team Site Members" 
     } });
     assert.notEqual(actual, true);
+  });
+
+  it('supports debug mode', () => {
+    const options = (command.options() as CommandOption[]);
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option === '--debug') {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('correctly retrieves groupId and add user to specified SharePoint group', (done) => {
+    let addMemberRequestIssued = false;
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/mysite/_api/web/sitegroups/GetByName('Team%20Site%20Members')`) {
+        return Promise.resolve({
+          "Id": "7"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === `https://contoso.sharepoint.com/sites/mysite/_api/web/sitegroups/GetById('7')/users` &&
+        JSON.stringify(opts.body) === `{"__metadata":{"type":"SP.User"},"LoginName":"i:0#.f|membership|john.doe@contoso.onmicrosoft.com"}`) {
+        addMemberRequestIssued = true;
+      }
+      return Promise.resolve();
+    });
+
+    cmdInstance.action = command.action();
+    cmdInstance.action({ options: { debug:false,webUrl: 'https://contoso.sharepoint.com/sites/mysite', 
+        email: "john.doe@contoso.onmicrosoft.com", 
+        group: "Team Site Members" } 
+      }, () => {
+      try {
+        assert(addMemberRequestIssued);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 
   it('fails validation if the group option not specified', () => {
@@ -91,7 +136,7 @@ describe(commands.USER_GET, () => {
     const find = sinon.stub(vorpal, 'find').callsFake(() => cmd);
     cmd.help = command.help();
     cmd.help({}, () => { });
-    assert(find.calledWith(commands.USER_GET));
+    assert(find.calledWith(commands.USER_ADD));
   });
   
 it('has help with examples', () => {

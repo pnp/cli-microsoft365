@@ -6,6 +6,7 @@ import {
   CommandValidate
 } from '../../../../Command';
 import SpoCommand from '../../../base/SpoCommand';
+
 const vorpal: Vorpal = require('../../../../vorpal-init');
 
 interface CommandArgs {
@@ -36,13 +37,9 @@ class SpoUserAddCommand extends SpoCommand {
   }
 
   public commandAction(cmd: CommandInstance, args: CommandArgs, cb: () => void): void {
-
-    if (this.verbose) {
-      cmd.log(`Adding user in site at ${args.options.webUrl}...`);
-    }
-
-    let groupRequestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/GetByName('${encodeURIComponent(args.options.group as string)}')`;
-    const groupRequestOptions: any = {
+    const groupRequestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/GetByName('${encodeURIComponent(args.options.group as string)}')`;
+    
+    const requestOptions: any = {
       url: groupRequestUrl,
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -50,36 +47,34 @@ class SpoUserAddCommand extends SpoCommand {
       json: true
     };
 
-    request.get(groupRequestOptions).then((groupInstance:any):void=>{
-      let requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/GetById('${groupInstance.Id}')/users`
-      const requestOptions: any = {
-        url: requestUrl,
-        headers: {
-          "Accept": "application/json;odata=verbose",
-          "Content-Type": "application/json;odata=verbose",
-        },
-        json: true,
-        body: {
-          '__metadata':{
-            'type':'SP.User'
+    request
+    .get<{ Id: string }>(requestOptions)
+      .then((res: { Id: string; }): Promise<{}> => {
+        const requestUrl: string = `${args.options.webUrl}/_api/web/sitegroups/GetById('${res.Id}')/users`;
+
+        const requestOptions: any = {
+          url: requestUrl,
+          headers: {
+            "Accept": "application/json;odata=verbose",
           },
-          'LoginName':`i:0#.f|membership|${args.options.email}`
+          json: true,
+          body: {
+            '__metadata': {
+              'type': 'SP.User'
+            },
+            'LoginName': `i:0#.f|membership|${args.options.email}`
           }
         };
-        request
-          .post(requestOptions)
-            .then(():void=>{
-              if (this.verbose) {
-                cmd.log(vorpal.chalk.green('DONE'));
-              }
-            cb();
-        },(error:any):void=>{
-          this.handleRejectedODataJsonPromise(error, cmd, cb)
-        });
-    },(error:any):void=>{
-      this.handleRejectedODataJsonPromise(error, cmd, cb)
-    })
-}
+        return request.post(requestOptions);
+      })
+      .then((): void => {
+        if (this.verbose) {
+          cmd.log(vorpal.chalk.green('DONE'));
+        }
+
+        cb();
+      }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
