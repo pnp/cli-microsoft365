@@ -132,6 +132,7 @@ describe(commands.USER_ADD, () => {
       options:
       {
         webUrl: 'foo',
+        email: "john.doe@contoso.onmicrosoft.com"
       }
     });
     assert.notEqual(actual, true);
