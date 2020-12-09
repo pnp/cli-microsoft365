@@ -68,10 +68,6 @@ class SpoUserAddCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((): void => {
-        if (this.verbose) {
-          cmd.log(vorpal.chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, cmd, cb));
   }

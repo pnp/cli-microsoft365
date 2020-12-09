@@ -127,6 +127,11 @@ describe(commands.USER_ADD, () => {
     assert.notEqual(actual, true);
   });
 
+  it('fails validation if url is not a valid SharePoint URL', () => {
+    const actual = (command.validate() as CommandValidate)({ options: { url: 'abc' } });
+    assert.notEqual(actual, true);
+  });
+
   it('has help referring to the right command', () => {
     const cmd: any = {
       log: (msg: string) => { },
