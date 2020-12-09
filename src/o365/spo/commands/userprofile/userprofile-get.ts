@@ -46,7 +46,18 @@ class SpoUserProfileGetCommand extends SpoCommand {
         if (this.debug) {
           cmd.log(vorpal.chalk.green('DONE'));
         }
-        cmd.log(res);
+        if(args.options.output === 'json'){
+          cmd.log(res);
+        }
+        else{
+          cmd.log(res.UserProfileProperties.map((property: any) => {
+            return {
+              key:property.Key,
+              Value:property.Value
+            };
+          }));
+        }
+
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, cmd, cb));
   }

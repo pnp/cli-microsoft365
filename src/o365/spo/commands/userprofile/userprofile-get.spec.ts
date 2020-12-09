@@ -138,6 +138,95 @@ describe(commands.USERPROFILE_GET, () => {
     });
   });
 
+  it('retrieves user profile properties by user email with option is passed', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor') > -1) {
+        return Promise.resolve({
+          "UserProfileProperties":[
+            {
+              "Key":"UserProfile_GUID",
+              "Value":"f3f102bb-7ac7-408e-9184-384062abd0d5",
+            },
+            {
+              "Key":"SID",
+              "Value":"i:0h.f|membership|10032000840f3681@live.com",
+            }]
+          }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: true,
+        userName: 'john.doe@contoso.onmicrosoft.com'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            key:"UserProfile_GUID",
+            Value:"f3f102bb-7ac7-408e-9184-384062abd0d5",
+          },
+          {
+            key:"SID",
+            Value:"i:0h.f|membership|10032000840f3681@live.com",
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves user profile properties by user email with option is passed (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor') > -1) {
+        return Promise.resolve({
+          "UserProfileProperties":[
+            {
+              "Key":"UserProfile_GUID",
+              "Value":"f3f102bb-7ac7-408e-9184-384062abd0d5",
+            },
+            {
+              "Key":"SID",
+              "Value":"i:0h.f|membership|10032000840f3681@live.com",
+            }]
+          }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    cmdInstance.action({
+      options: {
+        debug: true,
+        userName: 'john.doe@contoso.onmicrosoft.com'
+      }
+    }, () => {
+      try {
+        assert(cmdInstanceLogSpy.calledWith(vorpal.chalk.green('DONE')));
+        assert(cmdInstanceLogSpy.calledWith([
+          {
+            key:"UserProfile_GUID",
+            Value:"f3f102bb-7ac7-408e-9184-384062abd0d5",
+          },
+          {
+            key:"SID",
+            Value:"i:0h.f|membership|10032000840f3681@live.com",
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('retrieves user profile properties by user email with output option json (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/SP.UserProfiles.PeopleManager/GetPropertiesFor') > -1) {
