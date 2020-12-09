@@ -127,8 +127,13 @@ describe(commands.USER_ADD, () => {
     assert.notEqual(actual, true);
   });
 
-  it('fails validation if url is not a valid SharePoint URL', () => {
-    const actual = (command.validate() as CommandValidate)({ options: { url: 'abc' } });
+  it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
+    const actual = (command.validate() as CommandValidate)({
+      options:
+      {
+        webUrl: 'foo',
+      }
+    });
     assert.notEqual(actual, true);
   });
 
