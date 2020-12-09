@@ -106,6 +106,7 @@ class SpoUserAddCommand extends SpoCommand {
       if(!args.options.group){
         return 'Required parameter group name missing';
       }
+      
       return SpoCommand.isValidSharePointUrl(args.options.webUrl);
     };
   }
