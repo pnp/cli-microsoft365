@@ -5,6 +5,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
@@ -35,22 +36,52 @@ class SpoAppPageAddCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/sitepages/Pages/CreateFullPageApp`,
+    const createPageRequestOptions: any = {
+      url: `${args.options.webUrl}/_api/sitepages/Pages/CreateAppPage`,
       headers: {
         'content-type': 'application/json;odata=nometadata',
         accept: 'application/json;odata=nometadata'
       },
       responseType: 'json',
       data: {
-        title: args.options.title,
-        addToQuickLaunch: args.options.addToQuickLaunch ? true : false,
         webPartDataAsJson: args.options.webPartData
       }
     };
 
     request
-      .post(requestOptions)
+      .post<{ value: string }>(createPageRequestOptions)
+      .then((page: { value: string }): Promise<{ ListItemAllFields: { Id: string; }; }> => {
+        const pageUrl: string = page.value;
+
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/${pageUrl}')?$expand=ListItemAllFields`,
+          headers: {
+            'content-type': 'application/json;charset=utf-8',
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        return request.get<{ ListItemAllFields: { Id: string; }; }>(requestOptions);
+      })
+      .then((file: { ListItemAllFields: { Id: string; }; }): Promise<any> => {
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/sitepages/Pages/UpdateAppPage`,
+          headers: {
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json',
+          data: {
+            pageId: file.ListItemAllFields.Id,
+            webPartDataAsJson: args.options.webPartData,
+            title: args.options.title,
+            includeInNavigation: args.options.addToQuickLaunch
+          }
+        };
+
+        return request.post(requestOptions);
+      })
       .then((res: any): void => {
         logger.log(res);
 
