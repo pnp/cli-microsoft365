@@ -39,7 +39,6 @@ class SpoSiteDesignGetCommand extends SpoCommand {
     const requestOptions: any = {
       url: `${this.spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`,
       headers: {
-        'X-RequestDigest': this.formDigestValue,
         accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
