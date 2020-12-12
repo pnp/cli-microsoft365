@@ -14,6 +14,36 @@ describe(commands.YAMMER_SEARCH, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
+  const messageTrimming: any = {
+    "count": {
+      "messages":  4,
+      "groups":  0,
+      "topics":  0,
+      "users":  0
+    },
+    "messages": {
+      "messages": [{
+        "id": 11111,
+        "content_excerpt": "this is a very long message. Longer than 80 chars. this is a very long message. Longer than 80 chars. this is a very long message. Longer than 80 chars. this is a very long message. Longer than 80 chars. this is a very long message. Longer than 80 chars. this is a very long message. Longer than 80 chars. "
+      },
+      {
+        "id": 11112,
+        "content_excerpt": "short"
+      },
+      {
+        "id": 11113,
+        "content_excerpt": undefined
+      },
+      {
+        "id": 11114,
+        "content_excerpt": "shortmessage"
+      }]
+    },
+    "groups": [],
+    "topics": [],
+    "users": []        
+  };
+
   const searchResults: any = {
       "count": {
         "messages":  4,
@@ -236,45 +266,45 @@ describe(commands.YAMMER_SEARCH, () => {
   });
 
   it('passes validation with one parameter', () => {
-    const actual = command.validate({ options: { search: '123123' } });
+    const actual = command.validate({ options: { queryText: '123123' } });
     assert.notStrictEqual(actual, false);
   });
 
   it('passes validation with parameters', () => {
-    const actual = command.validate({ options: { search: '123', limit: 10, output: 'json' } });
+    const actual = command.validate({ options: { queryText: '123', limit: 10, output: 'json' } });
     assert.strictEqual(actual, true);
   });
 
   it('fails validation with parameters', () => {
-    const actual = command.validate({ options: { search: '123', show: "summary", output: 'json' } });
+    const actual = command.validate({ options: { queryText: '123', show: "summary", output: 'json' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails if a wrong option is passed', () => {
-    const actual = command.validate({ options: { search: '123', show: 'wrongOption' } });
+    const actual = command.validate({ options: { queryText: '123', show: 'wrongOption' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('passes if a correct option is passed', () => {
     const options = ['summary', 'messages', 'users', 'topics', 'groups'];
     options.forEach((option) => {
-      const actual = command.validate({ options: { search: '123', show: option } });
+      const actual = command.validate({ options: { queryText: '123', show: option } });
       assert.strictEqual(actual, true);
     })
   });
 
   it('limit must be a number', () => {
-    const actual = command.validate({ options: { search: '123', limit: 'abc', output: 'json' } });
+    const actual = command.validate({ options: { queryText: '123', limit: 'abc', output: 'json' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('query must be a string', () => {
-    const actual = command.validate({ options: { search: 'abc' } });
+    const actual = command.validate({ options: { queryText: 'abc' } });
     assert.strictEqual(actual, true);
   });
 
   it('query must be a string', () => {
-    const actual = command.validate({ options: { search: 123 } });
+    const actual = command.validate({ options: { queryText: 123 } });
     assert.notStrictEqual(actual, true);
   });
 
@@ -296,7 +326,7 @@ describe(commands.YAMMER_SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { search: "contents" } } as any, (err?: any) => {
+    command.action(logger, { options: { queryText: "contents" } } as any, (err?: any) => {
       try {
         const result = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(result.length, 15);
@@ -333,7 +363,7 @@ describe(commands.YAMMER_SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { search: "contents", show:"messages" } } as any, (err?: any) => {
+    command.action(logger, { options: { queryText: "contents", show:"messages" } } as any, (err?: any) => {
       try {
         const result = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(result.length, 24);
@@ -352,12 +382,66 @@ describe(commands.YAMMER_SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { search: "contents", show:"summary" } } as any, (err?: any) => {
+    command.action(logger, { options: { queryText: "contents", show:"summary" } } as any, (err?: any) => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].messages, 4)
         assert.strictEqual(loggerLogSpy.lastCall.args[0].groups, 2)
         assert.strictEqual(loggerLogSpy.lastCall.args[0].topics, 5)
         assert.strictEqual(loggerLogSpy.lastCall.args[0].users, 4)
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('trims the output message', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
+        return Promise.resolve(messageTrimming);
+      }
+      return Promise.reject('Invalid request');
+    });
+    command.action(logger, { options: { queryText: "contents" } } as any, (err?: any) => {
+      try {
+        
+        const result = loggerLogSpy.lastCall.args[0];
+        assert.strictEqual(result.length, 4);
+        assert.strictEqual(result[0].id, 11111);
+        assert.strictEqual(result[0].description.length, 83);
+        assert.strictEqual(result[1].id, 11112);
+        assert.strictEqual(result[1].description.length, 5);
+        assert.strictEqual(result[2].id, 11113);
+        assert.strictEqual(result[3].id, 11114);
+        assert.strictEqual(result[3].description.length, 12);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('trims the output message with message filter', function (done) {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://www.yammer.com/api/v1/search.json?search=contents&page=1') {
+        return Promise.resolve(messageTrimming);
+      }
+      return Promise.reject('Invalid request');
+    });
+    command.action(logger, { options: { queryText:"contents", show:"messages" } } as any, (err?: any) => {
+      try {
+        
+        const result = loggerLogSpy.lastCall.args[0];
+        assert.strictEqual(result.length, 4);
+        assert.strictEqual(result[0].id, 11111);
+        assert.strictEqual(result[0].content_excerpt.length, 83);
+        assert.strictEqual(result[1].id, 11112);
+        assert.strictEqual(result[1].content_excerpt.length, 5);
+        assert.strictEqual(result[2].id, 11113);
+        assert.strictEqual(result[3].id, 11114);
+        assert.strictEqual(result[3].content_excerpt.length, 12);
         done();
       }
       catch (e) {
@@ -373,7 +457,7 @@ describe(commands.YAMMER_SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { search:"contents", show: "messages" } } as any, (err?: any) => {
+    command.action(logger, { options: { queryText:"contents", show: "messages" } } as any, (err?: any) => {
       try {
         const result = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(result.length, 4);
@@ -396,7 +480,7 @@ describe(commands.YAMMER_SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { search:"contents", show: "topics" } } as any, (err?: any) => {
+    command.action(logger, { options: { queryText:"contents", show: "topics" } } as any, (err?: any) => {
       try {
         const result = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(result.length, 5);
@@ -420,7 +504,7 @@ describe(commands.YAMMER_SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { search:"contents", show: "groups" } } as any, (err?: any) => {
+    command.action(logger, { options: { queryText:"contents", show: "groups" } } as any, (err?: any) => {
       try {
         const result = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(result.length, 2);
@@ -441,7 +525,7 @@ describe(commands.YAMMER_SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { search:"contents", show: "users" } } as any, (err?: any) => {
+    command.action(logger, { options: { queryText:"contents", show: "users" } } as any, (err?: any) => {
       try {
         const result = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(result.length, 4);
@@ -464,7 +548,7 @@ describe(commands.YAMMER_SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { search:"contents", limit: 1, output: "json"  } } as any, (err?: any) => {
+    command.action(logger, { options: { queryText:"contents", limit: 1, output: "json"  } } as any, (err?: any) => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.messages, 4, "summary returns 4 messages")
         assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.groups, 2, "sumamry returns 2 groups")
@@ -492,7 +576,7 @@ describe(commands.YAMMER_SEARCH, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { search:"contents", output: "json" } } as any, (err?: any) => {
+    command.action(logger, { options: { queryText:"contents", output: "json" } } as any, (err?: any) => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.messages, 4, "summary returns 4 messages")
         assert.strictEqual(loggerLogSpy.lastCall.args[0].summary.groups, 2, "sumamry returns 2 groups")
@@ -525,7 +609,7 @@ describe(commands.YAMMER_SEARCH, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { search:"contents", output: "json" } } as any, (err?: any) => {
+    command.action(logger, { options: { queryText:"contents", output: "json" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();

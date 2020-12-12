@@ -10,7 +10,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  search: string;
+  queryText: string;
   show: string;
   limit?: number;
 }
@@ -30,17 +30,17 @@ interface YammerSearchSummary {
   users: number;
 }
 
-interface YammerBasicSearchResponse {
+interface YammerConsolidatedResponse {
   id: string,
-  name: string,
-  url: string
-  type: string
+  description: string,
+  type: string,
+  web_url: string
 }
 
 interface YammerBasicGroupResponse {
   id: string,
   name: string,
-  url: string,
+  web_url: string,
   state: string,
   privacy: string
   full_name: string,
@@ -51,7 +51,7 @@ interface YammerBasicGroupResponse {
 interface YammerBasicTopicResponse {
   id: string,
   name: string,
-  url: string,
+  web_url: string,
   normalized_name: string,
   followers_count: number,
   description: string
@@ -60,7 +60,7 @@ interface YammerBasicTopicResponse {
 interface YammerBasicUserResponse {
   id: string,
   name: string,
-  url: string,
+  web_url: string,
   state: string,
   email: string,
   first_name: string,
@@ -76,7 +76,7 @@ interface YammerBasicMessageResponse {
   thread_id: string,
   privacy: string,
   content_excerpt: string,
-  url: string
+  web_url: string
 }
 
 class YammerSearchCommand extends YammerCommand {
@@ -120,7 +120,7 @@ class YammerSearchCommand extends YammerCommand {
 
   private getAllItems(logger: Logger, args: CommandArgs, page: number): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      const endpoint = `${this.resource}/v1/search.json?search=${args.options.search}&page=${page}`;
+      const endpoint = `${this.resource}/v1/search.json?search=${args.options.queryText}&page=${page}`;
       const requestOptions: any = {
         url: endpoint,
         headers: {
@@ -228,15 +228,18 @@ class YammerSearchCommand extends YammerCommand {
           const show = args.options.show?.toLowerCase();
           if (show === "messages") {
             logger.log(this.messages.map((message) => {
+              let trimmedMessage = message.content_excerpt;
+              trimmedMessage = trimmedMessage?.length >= 80 ? (trimmedMessage.substring(0, 80) + "...") : trimmedMessage;
+              trimmedMessage = trimmedMessage?.replace(/\n/g, " ")
               return <YammerBasicMessageResponse>
               {
                 id: message.id,
-                content_excerpt: encodeURI(message.content_excerpt),
+                content_excerpt: trimmedMessage,
                 created_at: message.created_at,
                 group_id: message.group_id,
                 thread_id: message.thread_id,
                 privacy: message.privacy,
-                url: message.url
+                web_url: message.web_url
               }
             }));
           } else if (show === "users") {
@@ -251,7 +254,7 @@ class YammerSearchCommand extends YammerCommand {
                 email: user.email,
                 admin: user.admin,
                 state: user.state,
-                url: user.url
+                web_url: user.web_url
               }
             }));
           } else if (show === "topics") {
@@ -263,7 +266,7 @@ class YammerSearchCommand extends YammerCommand {
                 normalized_name: topic.normalized_name,
                 description: topic.description,
                 followers_count: topic.followers_count,
-                url: topic.url
+                web_url: topic.web_url
               }
             }));
           } else if (show === "groups") {
@@ -277,47 +280,50 @@ class YammerSearchCommand extends YammerCommand {
                 privacy: group.privacy,
                 moderated: group.moderated,
                 state: group.state,
-                url: group.url
+                web_url: group.web_url
               }
             }));
           } else if (show === "summary") {
             logger.log(this.summary)
           } else { 
-            let results: YammerBasicSearchResponse[] = [];
+            let results: YammerConsolidatedResponse[] = [];
             results = [...results, ...this.messages.map((msg) => {
-              return <YammerBasicSearchResponse>
+              let trimmedMessage = msg.content_excerpt;
+              trimmedMessage = trimmedMessage?.length >= 80 ? (trimmedMessage.substring(0, 80) + "...") : trimmedMessage;
+              trimmedMessage = trimmedMessage?.replace(/\n/g, " ")
+              return <YammerConsolidatedResponse>
               {
                 id: msg.id,
-                name: encodeURI(msg.content_excerpt),
-                url: msg.url,
-                type: "message"
+                description: trimmedMessage,
+                type: "message",
+                web_url: msg.web_url
               }
             })]
             results = [...results, ...this.topics.map((topic) => {
-              return <YammerBasicSearchResponse>
+              return <YammerConsolidatedResponse>
               {
                 id: topic.id,
-                name: topic.name,
-                url: topic.url,
-                type: "topic"
+                description: topic.name,
+                type: "topic",
+                web_url: topic.web_url
               }
             })]
             results = [...results, ...this.users.map((user) => {
-              return <YammerBasicSearchResponse>
+              return <YammerConsolidatedResponse>
               {
                 id: user.id,
-                name: user.name,
-                url: user.url,
-                type: "user"
+                description: user.name,
+                type: "user",
+                web_url: user.web_url
               }
             })]
             results = [...results, ...this.groups.map((group) => {
-              return <YammerBasicSearchResponse>
+              return <YammerConsolidatedResponse>
               {
                 id: group.id,
-                name: group.name,
-                url: group.url,
-                type: "group"
+                description: group.name,
+                type: "group",
+                web_url: group.web_url
               }
             })];
 
@@ -331,7 +337,7 @@ class YammerSearchCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-s, --search <search>',
+        option: '--queryText <queryText>',
         description: 'The query for the search'
       },
       {
@@ -349,8 +355,8 @@ class YammerSearchCommand extends YammerCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (args.options.search && typeof args.options.search !== 'string') {
-      return `${args.options.search} is not a string`;
+    if (args.options.queryText && typeof args.options.queryText !== 'string') {
+      return `${args.options.queryText} is not a string`;
     }
 
     if (args.options.limit && typeof args.options.limit !== 'number') {

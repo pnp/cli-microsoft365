@@ -13,7 +13,7 @@ m365 yammer search [options]
 `-h, --help`
 : output usage information
 
-`-s, --search <search>`
+`--queryText <queryText>`
 : The query for the search
 
 `--show [show]`
@@ -43,35 +43,35 @@ m365 yammer search [options]
 Returns the search result for the query `community`
 
 ```sh
-m365 yammer search --search "community"
+m365 yammer search --queryText "community"
 ```
 
 Returns the groups found with the search query `community`
 
 ```sh
-m365 yammer search --search "community" --show "groups"
+m365 yammer search --queryText "community" --show "groups"
 ```
 
 Returns the topics found with the search query `community`
 
 ```sh
-m365 yammer search --search "community" --show "topics"
+m365 yammer search --queryText "community" --show "topics"
 ```
 
 Returns the first 50 users found with the search query `nuborocks.onmicrosoft.com`
 
 ```sh
-m365 yammer search --search "nuborocks.onmicrosoft.com" --show "users" --limit 50
+m365 yammer search --queryText "nuborocks.onmicrosoft.com" --show "users" --limit 50
 ```
 
 Returns all search results for the query `community`. Stops at 1000 results. 
 
 ```sh
-m365 yammer search --search "community" --output json
+m365 yammer search --queryText "community" --output json
 ```
 
 Returns the search results for the query `community` and limits the results to the first 50 entries for each result category.
 
 ```sh
-m365 yammer search --search "community" --output json --limit 50
+m365 yammer search --queryText "community" --output json --limit 50
 ```
