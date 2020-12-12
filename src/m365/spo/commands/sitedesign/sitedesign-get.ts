@@ -8,7 +8,6 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 import { SiteDesign } from './SiteDesign';
 
 interface CommandArgs {
@@ -21,7 +20,6 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignGetCommand extends SpoCommand {
   private spoUrl: string = "";
-  private formDigestValue: string = '';
 
   public get name(): string {
     return `${commands.SITEDESIGN_GET}`;
@@ -64,19 +62,14 @@ class SpoSiteDesignGetCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getSpoUrl(logger, this.debug)
-      .then((_spoUrl: string): Promise<ContextInfo> => {
+      .then((_spoUrl: string): Promise<string> => {
         this.spoUrl = _spoUrl
-        return this.getRequestDigest(this.spoUrl);
-      })
-      .then((res: ContextInfo): Promise<string> => {
-        this.formDigestValue = res.FormDigestValue;
         return this.getSiteDesignId(args);
       })
       .then((siteDesignId: string): Promise<string> => {
         const requestOptions: any = {
           url: `${this.spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignMetadata`,
           headers: {
-            'X-RequestDigest': this.formDigestValue,
             'content-type': 'application/json;charset=utf-8',
             accept: 'application/json;odata=nometadata'
           },
