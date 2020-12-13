@@ -135,7 +135,7 @@ export class Cli {
     }
 
     return Cli
-      .executeCommand(this.commandToExecute.command, this.optionsFromArgs)
+      .executeCommand(this.commandToExecute.command, Cli.removeShortOptions(this.optionsFromArgs))
       .then(_ => process.exit(0), err => this.closeWithError(err));
   }
 
@@ -691,5 +691,14 @@ export class Cli {
     inquirer
       .prompt(options)
       .then(result => cb(result));
+  }
+
+  private static removeShortOptions(args: { options: minimist.ParsedArgs }): any {
+    const filteredArgs = JSON.parse(JSON.stringify(args));
+    const optionsToRemove: string[] = Object.getOwnPropertyNames(args.options)
+      .filter(option => option.length === 1 || option === '--');
+    optionsToRemove.forEach(option => delete filteredArgs.options[option]);
+
+    return filteredArgs;
   }
 }
