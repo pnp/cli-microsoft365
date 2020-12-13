@@ -173,7 +173,7 @@ m365 spo site list --output json --query '[?Template==`GROUP#0`].{Title:Title, U
 
 ## Build
 
-To build and run this CLI locally, you will need [`node`](https://nodejs.org) `>= 12.0.0` installed.
+To build and run this CLI locally, you will need [`node`](https://nodejs.org) `>= 14.0.0` installed.
 
 ```sh
 # Clone this repository

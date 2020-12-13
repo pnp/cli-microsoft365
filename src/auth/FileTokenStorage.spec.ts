@@ -70,7 +70,7 @@ describe('FileTokenStorage', () => {
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token; }).callsArgWith(3, null);
+    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);
     fileStorage
       .set(JSON.stringify(expected))
       .then(() => {
@@ -97,7 +97,7 @@ describe('FileTokenStorage', () => {
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '');
-    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token; }).callsArgWith(3, null);
+    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);
     fileStorage
       .set(JSON.stringify(expected))
       .then(() => {
@@ -124,7 +124,7 @@ describe('FileTokenStorage', () => {
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '{}');
-    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token; }).callsArgWith(3, null);
+    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);
     fileStorage
       .set(JSON.stringify(expected))
       .then(() => {
@@ -151,7 +151,7 @@ describe('FileTokenStorage', () => {
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => '{"accessTokens":{},"authType":0,"connected":false}');
-    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token; }).callsArgWith(3, null);
+    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);
     fileStorage
       .set(JSON.stringify(expected))
       .then(() => {
@@ -188,7 +188,7 @@ describe('FileTokenStorage', () => {
       connected: true,
       refreshToken: 'ref'
     }));
-    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token; }).callsArgWith(3, null);
+    sinon.stub(fs, 'writeFile').callsFake((path, token) => { actual = token as string; }).callsArgWith(3, null);
     fileStorage
       .set(JSON.stringify(expected))
       .then(() => {

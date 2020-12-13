@@ -41,7 +41,7 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
       const cdsProjectMutator = new CdsProjectMutator(cdsProjectFileContent);
       cdsProjectMutator.addProjectReference(relativeReferencedProjectFilePath);
 
-      fs.writeFileSync(cdsProjectFilePath, cdsProjectMutator.cdsProjectDocument);
+      fs.writeFileSync(cdsProjectFilePath, cdsProjectMutator.cdsProjectDocument as any);
 
       cb();
     }

@@ -167,7 +167,7 @@ describe('Cli', () => {
     return new Promise((resolve) => {
       fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string): void => {
         rootFolder = resolvedPath;
-        resolve();
+        resolve(undefined);
       });
     })
   });
