@@ -19,6 +19,9 @@
 - extended `login` with support for .pfx certificates not protected with a password [#1974](https://github.com/pnp/cli-microsoft365/issues/1974)
 - fixed the `outlook mail send` command [#1991](https://github.com/pnp/cli-microsoft365/issues/1991)
 - extended the `login` command with appId and tenant [#1975](https://github.com/pnp/cli-microsoft365/issues/1975)
+- fixed the `spo apppage add` command [#2000](https://github.com/pnp/cli-microsoft365/issues/2000)
+- removed short options from args passed to commands [#1992](https://github.com/pnp/cli-microsoft365/issues/1992)
+- extended `spo sitedesign get` to include `title` [#1884](https://github.com/pnp/cli-microsoft365/issues/1884)
 
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
