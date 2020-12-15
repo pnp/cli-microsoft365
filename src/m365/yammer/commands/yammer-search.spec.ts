@@ -436,12 +436,12 @@ describe(commands.YAMMER_SEARCH, () => {
         const result = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(result.length, 4);
         assert.strictEqual(result[0].id, 11111);
-        assert.strictEqual(result[0].content_excerpt.length, 83);
+        assert.strictEqual(result[0].description.length, 83);
         assert.strictEqual(result[1].id, 11112);
-        assert.strictEqual(result[1].content_excerpt.length, 5);
+        assert.strictEqual(result[1].description.length, 5);
         assert.strictEqual(result[2].id, 11113);
         assert.strictEqual(result[3].id, 11114);
-        assert.strictEqual(result[3].content_excerpt.length, 12);
+        assert.strictEqual(result[3].description.length, 12);
         done();
       }
       catch (e) {
