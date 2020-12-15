@@ -8,6 +8,10 @@
 
 - [spo list contenttype default set](../cmd/spo/list/list-contenttype-default-set.md) - sets the default content type for a list [#674](https://github.com/pnp/cli-microsoft365/issues/674)
 
+**Yammer:**
+
+- [yammer search](../cmd/yammer/yammer-search.md) - returns a list of messages, users, topics and groups that match the specified query [#1454](https://github.com/pnp/cli-microsoft365/issues/1454)
+
 ### Changes
 
 - updated docs for the login command with links to more info [#1966](https://github.com/pnp/cli-microsoft365/pull/1966)
@@ -22,6 +26,7 @@
 - fixed the `spo apppage add` command [#2000](https://github.com/pnp/cli-microsoft365/issues/2000)
 - removed short options from args passed to commands [#1992](https://github.com/pnp/cli-microsoft365/issues/1992)
 - extended `spo sitedesign get` to include `title` [#1884](https://github.com/pnp/cli-microsoft365/issues/1884)
+- removed unnecessary request digest from `spo sitedesign list` [#2006](https://github.com/pnp/cli-microsoft365/issues/2006)
 
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
