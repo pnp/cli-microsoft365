@@ -226,106 +226,60 @@ class YammerSearchCommand extends YammerCommand {
         }
         else {
           const show = args.options.show?.toLowerCase();
-          if (show === "messages") {
-            logger.log(this.messages.map((message) => {
-              let trimmedMessage = message.content_excerpt;
-              trimmedMessage = trimmedMessage?.length >= 80 ? (trimmedMessage.substring(0, 80) + "...") : trimmedMessage;
-              trimmedMessage = trimmedMessage?.replace(/\n/g, " ")
-              return <YammerBasicMessageResponse>
-              {
-                id: message.id,
-                content_excerpt: trimmedMessage,
-                created_at: message.created_at,
-                group_id: message.group_id,
-                thread_id: message.thread_id,
-                privacy: message.privacy,
-                web_url: message.web_url
-              }
-            }));
-          } else if (show === "users") {
-            logger.log(this.users.map((user) => {
-              return <YammerBasicUserResponse>
-              {
-                id: user.id,
-                name: user.name,
-                first_name: user.first_name,
-                last_name: user.last_name,
-                full_name: user.full_name,
-                email: user.email,
-                admin: user.admin,
-                state: user.state,
-                web_url: user.web_url
-              }
-            }));
-          } else if (show === "topics") {
-            logger.log(this.topics.map((topic) => {
-              return <YammerBasicTopicResponse>
-              {
-                id: topic.id,
-                name: topic.name,
-                normalized_name: topic.normalized_name,
-                description: topic.description,
-                followers_count: topic.followers_count,
-                web_url: topic.web_url
-              }
-            }));
-          } else if (show === "groups") {
-            logger.log(this.groups.map((group) => {
-              return <YammerBasicGroupResponse>
-              {
-                id: group.id,
-                name: group.name,
-                full_name: group.full_name,
-                description: group.description,
-                privacy: group.privacy,
-                moderated: group.moderated,
-                state: group.state,
-                web_url: group.web_url
-              }
-            }));
-          } else if (show === "summary") {
+          if (show === "summary") {
             logger.log(this.summary)
           } else { 
             let results: YammerConsolidatedResponse[] = [];
-            results = [...results, ...this.messages.map((msg) => {
-              let trimmedMessage = msg.content_excerpt;
-              trimmedMessage = trimmedMessage?.length >= 80 ? (trimmedMessage.substring(0, 80) + "...") : trimmedMessage;
-              trimmedMessage = trimmedMessage?.replace(/\n/g, " ")
-              return <YammerConsolidatedResponse>
-              {
-                id: msg.id,
-                description: trimmedMessage,
-                type: "message",
-                web_url: msg.web_url
-              }
-            })]
-            results = [...results, ...this.topics.map((topic) => {
-              return <YammerConsolidatedResponse>
-              {
-                id: topic.id,
-                description: topic.name,
-                type: "topic",
-                web_url: topic.web_url
-              }
-            })]
-            results = [...results, ...this.users.map((user) => {
-              return <YammerConsolidatedResponse>
-              {
-                id: user.id,
-                description: user.name,
-                type: "user",
-                web_url: user.web_url
-              }
-            })]
-            results = [...results, ...this.groups.map((group) => {
-              return <YammerConsolidatedResponse>
-              {
-                id: group.id,
-                description: group.name,
-                type: "group",
-                web_url: group.web_url
-              }
-            })];
+            if (show === undefined || show === "messages") {
+              results = [...results, ...this.messages.map((msg) => {
+                let trimmedMessage = msg.content_excerpt;
+                trimmedMessage = trimmedMessage?.length >= 80 ? (trimmedMessage.substring(0, 80) + "...") : trimmedMessage;
+                trimmedMessage = trimmedMessage?.replace(/\n/g, " ")
+                return <YammerConsolidatedResponse>
+                {
+                  id: msg.id,
+                  description: trimmedMessage,
+                  type: "message",
+                  web_url: msg.web_url
+                }
+              })]
+            }
+
+            if (show === undefined || show === "topics") {
+              results = [...results, ...this.topics.map((topic) => {
+                return <YammerConsolidatedResponse>
+                {
+                  id: topic.id,
+                  description: topic.name,
+                  type: "topic",
+                  web_url: topic.web_url
+                }
+              })]
+            }
+
+            if (show === undefined || show === "users") {
+              results = [...results, ...this.users.map((user) => {
+                return <YammerConsolidatedResponse>
+                {
+                  id: user.id,
+                  description: user.name,
+                  type: "user",
+                  web_url: user.web_url
+                }
+              })]
+            }
+
+            if (show === undefined || show === "groups") {
+              results = [...results, ...this.groups.map((group) => {
+                return <YammerConsolidatedResponse>
+                {
+                  id: group.id,
+                  description: group.name,
+                  type: "group",
+                  web_url: group.web_url
+                }
+              })];
+            }
 
             logger.log(results);
           }
