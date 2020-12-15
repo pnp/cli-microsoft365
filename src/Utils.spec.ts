@@ -453,6 +453,11 @@ describe('Utils', () => {
     assert.strictEqual(actual, '/sites/site1/Shared Documents/MyFolder');
   });
 
+  it('should get server relative path when https://CONTOSO.sharepoint.com/sites/team1', () => {
+    const actual = Utils.getServerRelativePath('https://CONTOSO.sharepoint.com/sites/team1', '');
+    assert.strictEqual(actual, '/sites/team1');
+  });
+
   it('should get web relative path when / relative path passed as param', () => {
     const actual = Utils.getWebRelativePath('/', '/');
     assert.strictEqual(actual, '/');
@@ -676,6 +681,11 @@ describe('Utils', () => {
   it('should get web relative path when sub folder present url e.g. sites/site1 and /sites/Site1/Shared Documents/MyFolder', () => {
     const actual = Utils.getWebRelativePath('sites/site1', '/sites/Site1/Shared Documents/MyFolder');
     assert.strictEqual(actual, '/Shared Documents/MyFolder');
+  });
+
+  it('should get web relative path for https://CONTOSO.sharepoint.com/sites/team1 and Shared Documents', () => {
+    const actual = Utils.getWebRelativePath('https://CONTOSO.sharepoint.com/sites/team1', 'Shared Documents');
+    assert.strictEqual(actual, '/Shared Documents');
   });
 
   it('should get absolute URL of a folder using webUrl and the folder server relative url', () => {
