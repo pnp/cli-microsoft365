@@ -39,11 +39,21 @@ describe('FN003003_CFG_bundles', () => {
             "manifest": "./src/extensions/helloWorld/HelloWorldApplicationCustomizer.manifest.json",
             "outputPath": "./dist/hello-world.bundle.js"
           }
-        ]
+        ],
+        source: JSON.stringify({
+          "entries": [
+            {
+              "entry": "./lib/extensions/helloWorld/HelloWorldApplicationCustomizer.js",
+              "manifest": "./src/extensions/helloWorld/HelloWorldApplicationCustomizer.manifest.json",
+              "outputPath": "./dist/hello-world.bundle.js"
+            }
+          ]
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 1, 'Incorrect line number');
   });
 
   it('should correctly convert entries schema to bundle schema', () => {

@@ -1,8 +1,8 @@
 import { Finding, Hash, Occurrence } from "../";
-import { ConfigJson, Project } from "../../model";
-import { Rule } from "./Rule";
+import { ConfigJson, JsonFile, Project } from "../../model";
+import { JsonRule } from "./JsonRule";
 
-export class FN003005_CFG_localizedResource_pathLib extends Rule {
+export class FN003005_CFG_localizedResource_pathLib extends JsonRule {
   get id(): string {
     return 'FN003005';
   }
@@ -43,9 +43,11 @@ export class FN003005_CFG_localizedResource_pathLib extends Rule {
       if (path.indexOf('lib/') !== 0) {
         const resolution: any = { localizedResources: {} };
         resolution.localizedResources[k] = `lib/${path}`;
+        const node = this.getAstNodeFromFile(project.configJson as JsonFile, `localizedResources.${k}`)
         occurrences.push({
           file: this.file,
-          resolution: JSON.stringify(resolution, null, 2)
+          resolution: JSON.stringify(resolution, null, 2),
+          position: this.getPositionFromNode(node)
         });
       }
     });

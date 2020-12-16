@@ -1,6 +1,7 @@
+import { JsonFile } from ".";
 import { Hash } from "../project-upgrade/";
 
-export interface ConfigJson {
+export interface ConfigJson extends JsonFile {
   $schema?: string;
   bundles?: Object;
   entries?: Entry[];

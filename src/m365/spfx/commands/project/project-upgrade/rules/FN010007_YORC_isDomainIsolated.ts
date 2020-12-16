@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN010007_YORC_isDomainIsolated extends Rule {
+export class FN010007_YORC_isDomainIsolated extends JsonRule {
   constructor(private value: boolean) {
     super();
   }
@@ -45,7 +45,8 @@ export class FN010007_YORC_isDomainIsolated extends Rule {
     }
 
     if (project.yoRcJson["@microsoft/generator-sharepoint"].isDomainIsolated !== this.value) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.isDomainIsolated');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

@@ -1,9 +1,9 @@
 import { lt, valid, validRange } from "semver";
 import { Finding, Hash } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export abstract class DependencyRule extends Rule {
+export abstract class DependencyRule extends JsonRule {
   constructor(protected packageName: string, protected packageVersion: string, protected isDevDep: boolean = false, protected isOptional: boolean = false, protected add: boolean = true) {
     super();
   }
@@ -48,30 +48,41 @@ export abstract class DependencyRule extends Rule {
     const packageVersion: string | null = valid(versionEntry);
     const versionRange: string | null = validRange(versionEntry);
     if (this.add) {
+      let jsonProperty: string = this.isDevDep ? 'devDependencies' : 'dependencies';
+
       if (versionEntry) {
+        jsonProperty += `.${this.packageName}`;
+
         if (packageVersion) {
           if (lt(packageVersion, this.packageVersion)) {
-            this.addFinding(findings);
+            const node = this.getAstNodeFromFile(project.packageJson, jsonProperty);
+            this.addFindingWithPosition(findings, node);
           }
         }
         else {
           if (versionRange) {
-            this.addFinding(findings);
+            const node = this.getAstNodeFromFile(project.packageJson, jsonProperty);
+            this.addFindingWithPosition(findings, node);
           }
         }
       }
       else {
         if (!this.isOptional || this.customCondition(project)) {
+          const node = this.getAstNodeFromFile(project.packageJson, jsonProperty);
           this.addFindingWithCustomInfo(this.packageName, this.description.replace('Upgrade', 'Install'), [{
             file: this.file,
-            resolution: this.resolution
+            resolution: this.resolution,
+            position: this.getPositionFromNode(node)
           }], findings);
         }
       }
     }
     else {
+      let jsonProperty: string = `${(this.isDevDep ? 'devDependencies' : 'dependencies')}.${this.packageName}`;
+
       if (versionEntry) {
-        this.addFinding(findings);
+        const node = this.getAstNodeFromFile(project.packageJson, jsonProperty);
+        this.addFindingWithPosition(findings, node);
       }
     }
   }

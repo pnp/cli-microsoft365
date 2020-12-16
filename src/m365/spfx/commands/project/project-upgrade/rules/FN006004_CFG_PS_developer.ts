@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN006004_CFG_PS_developer extends Rule {
+export class FN006004_CFG_PS_developer extends JsonRule {
   constructor() {
     super();
   }
@@ -52,7 +52,8 @@ export class FN006004_CFG_PS_developer extends Rule {
     }
 
     if (!project.packageSolutionJson.solution.developer) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.packageSolutionJson, 'solution');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

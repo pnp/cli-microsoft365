@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN010006_YORC_framework extends Rule {
+export class FN010006_YORC_framework extends JsonRule {
   constructor(private framework: string, private add: boolean) {
     super();
   }
@@ -46,12 +46,14 @@ export class FN010006_YORC_framework extends Rule {
 
     if (this.add) {
       if (project.yoRcJson["@microsoft/generator-sharepoint"].framework !== this.framework) {
-        this.addFinding(findings);
+        const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.framework');
+        this.addFindingWithPosition(findings, node);
       }
     }
     else {
       if (project.yoRcJson["@microsoft/generator-sharepoint"].framework) {
-        this.addFinding(findings);
+        const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.framework');
+        this.addFindingWithPosition(findings, node);
       }
     }
   }

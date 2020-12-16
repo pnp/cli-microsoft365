@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export abstract class PackageRule extends Rule {
+export abstract class PackageRule extends JsonRule {
   constructor(protected propertyName: string, protected add: boolean, protected propertyValue?: string) {
     super();
   }
@@ -41,7 +41,8 @@ export abstract class PackageRule extends Rule {
     if (!project.packageJson || 
         (this.add && !(project.packageJson as any)[this.propertyName]) ||
         (!this.add && (project.packageJson as any)[this.propertyName])) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.packageJson, this.propertyName);
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

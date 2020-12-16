@@ -119,6 +119,12 @@
       "integrity": "sha1-SgFikJaoYjHIkaDi3szBX1PJKR0=",
       "dev": true
     },
+    "@types/json-to-ast": {
+      "version": "2.1.1",
+      "resolved": "https://registry.npmjs.org/@types/json-to-ast/-/json-to-ast-2.1.1.tgz",
+      "integrity": "sha512-AupZnTBnteAXatB8xWdfRCmdMvk5HGQ/jwUi3fU/oiTmbWsMHuBlsPS3myFWEghcMpAOKIesusrYgHlQj1AR5A==",
+      "dev": true
+    },
     "@types/minimist": {
       "version": "1.2.1",
       "resolved": "https://registry.npmjs.org/@types/minimist/-/minimist-1.2.1.tgz",
@@ -693,6 +699,11 @@
         }
       }
     },
+    "code-error-fragment": {
+      "version": "0.0.230",
+      "resolved": "https://registry.npmjs.org/code-error-fragment/-/code-error-fragment-0.0.230.tgz",
+      "integrity": "sha512-cadkfKp6932H8UkhzE/gcUqhRMNf8jHzkAN7+5Myabswaghu4xABTgPHDCjW+dBAJxj/SpkTYokpzDqY4pCzQw=="
+    },
     "color-convert": {
       "version": "2.0.1",
       "resolved": "https://registry.npmjs.org/color-convert/-/color-convert-2.0.1.tgz",
@@ -1249,6 +1260,11 @@
       "resolved": "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.4.tgz",
       "integrity": "sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw=="
     },
+    "grapheme-splitter": {
+      "version": "1.0.4",
+      "resolved": "https://registry.npmjs.org/grapheme-splitter/-/grapheme-splitter-1.0.4.tgz",
+      "integrity": "sha512-bzh50DW9kTPM00T8y4o8vQg89Di9oLJVLW/KaOGIXJWP/iqCN6WKYkbNOF04vFLJhwcpYUh9ydh/+5vpOqV4YQ=="
+    },
     "growl": {
       "version": "1.10.5",
       "resolved": "https://registry.npmjs.org/growl/-/growl-1.10.5.tgz",
@@ -1600,6 +1616,15 @@
       "version": "5.0.1",
       "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz",
       "integrity": "sha1-Epai1Y/UXxmg9s4B1lcB4sc1tus="
+    },
+    "json-to-ast": {
+      "version": "2.1.0",
+      "resolved": "https://registry.npmjs.org/json-to-ast/-/json-to-ast-2.1.0.tgz",
+      "integrity": "sha512-W9Lq347r8tA1DfMvAGn9QNcgYm4Wm7Yc+k8e6vezpMnRT+NHbtlxgNBXRVjXe9YM6eTn6+p/MKOlV/aABJcSnQ==",
+      "requires": {
+        "code-error-fragment": "0.0.230",
+        "grapheme-splitter": "^1.0.4"
+      }
     },
     "jsprim": {
       "version": "1.4.1",

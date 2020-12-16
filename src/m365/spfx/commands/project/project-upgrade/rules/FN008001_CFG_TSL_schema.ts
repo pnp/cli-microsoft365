@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN008001_CFG_TSL_schema extends Rule {
+export class FN008001_CFG_TSL_schema extends JsonRule {
   constructor(private schema: string) {
     super();
   }
@@ -43,7 +43,8 @@ export class FN008001_CFG_TSL_schema extends Rule {
     }
 
     if (project.tsLintJson.$schema !== this.schema) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsLintJson, '$schema');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

@@ -40,7 +40,7 @@ export class FN013001_GULP_msGridSassSuppression extends Rule {
       return;
     }
 
-    if (project.gulpfileJs.src.indexOf(this.resolution) < 0) {
+    if (project.gulpfileJs.source.indexOf(this.resolution) < 0) {
       this.addFinding(findings);
     }
   }

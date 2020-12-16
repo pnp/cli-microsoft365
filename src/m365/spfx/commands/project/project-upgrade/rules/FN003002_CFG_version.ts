@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN003002_CFG_version extends Rule {
+export class FN003002_CFG_version extends JsonRule {
   constructor(private version: string) {
     super();
   }
@@ -43,7 +43,8 @@ export class FN003002_CFG_version extends Rule {
     }
 
     if (project.configJson.version !== this.version) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.configJson, 'version');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

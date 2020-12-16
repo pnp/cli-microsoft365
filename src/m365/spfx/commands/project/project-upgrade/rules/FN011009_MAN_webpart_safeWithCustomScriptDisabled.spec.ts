@@ -36,6 +36,30 @@ describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it('returns notification if safeWithCustomScriptDisabled found and should be removed', () => {
+    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled(false);
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [
+        {
+          path: '/usr/tmp/manifest.json',
+          $schema: 'test-schema',
+          componentType: 'WebPart',
+          safeWithCustomScriptDisabled: true,
+          source: JSON.stringify({
+            path: '/usr/tmp/manifest.json',
+            $schema: 'test-schema',
+            componentType: 'WebPart',
+            safeWithCustomScriptDisabled: true
+          }, null, 2)
+        }
+      ]
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 5, 'Incorrect line number');
+  });
+
   it('doesn\'t return notifications if safeWithCustomScriptDisabled found while it should be added', () => {
     rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled(true);
     const project: Project = {
@@ -51,5 +75,27 @@ describe('FN011009_MAN_webpart_safeWithCustomScriptDisabled', () => {
     };
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
+  });
+
+  it('returns notification if safeWithCustomScriptDisabled not found and it should be added', () => {
+    rule = new FN011009_MAN_webpart_safeWithCustomScriptDisabled(true);
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [
+        {
+          path: '/usr/tmp/manifest.json',
+          $schema: 'test-schema',
+          componentType: 'WebPart',
+          source: JSON.stringify({
+            path: '/usr/tmp/manifest.json',
+            $schema: 'test-schema',
+            componentType: 'WebPart'
+          }, null, 2)
+        }
+      ]
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 1, 'Incorrect line number');
   });
 });

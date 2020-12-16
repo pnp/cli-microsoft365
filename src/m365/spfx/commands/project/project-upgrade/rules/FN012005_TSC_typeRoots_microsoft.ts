@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012005_TSC_typeRoots_microsoft extends Rule {
+export class FN012005_TSC_typeRoots_microsoft extends JsonRule {
   constructor() {
     super();
   }
@@ -48,7 +48,8 @@ export class FN012005_TSC_typeRoots_microsoft extends Rule {
 
     if (!project.tsConfigJson.compilerOptions.typeRoots ||
       project.tsConfigJson.compilerOptions.typeRoots.indexOf('./node_modules/@microsoft') < 0) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'compilerOptions.typeRoots');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

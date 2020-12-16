@@ -61,10 +61,18 @@ describe('FN008002_CFG_TSL_removeRule', () => {
           rules: {
             "no-unused-imports": false
           }
-        }
+        },
+        source: JSON.stringify({
+          lintConfig: {
+            rules: {
+              "no-unused-imports": false
+            }
+          }
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 4, 'Incorrect line number');
   });
 });

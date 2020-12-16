@@ -1,4 +1,6 @@
-export interface TsConfigJson {
+import { JsonFile } from ".";
+
+export interface TsConfigJson extends JsonFile {
   extends?: string;
   compilerOptions?: {
     lib?: string[];

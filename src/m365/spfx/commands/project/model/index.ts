@@ -3,6 +3,7 @@ export * from './CopyAssetsJson';
 export * from './DeployAzureStorageJson';
 export * from './GulpfileJs';
 export * from './Manifest';
+export * from './JsonFile';
 export * from './PackageJson';
 export * from './PackageSolutionJson';
 export * from './Project';

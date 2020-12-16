@@ -25,6 +25,25 @@ describe('FN012002_TSC_moduleResolution', () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it('returns notification if moduleResolution is not up-to-date', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      tsConfigJson: {
+        compilerOptions: {
+          moduleResolution: 'browser'
+        },
+        source: JSON.stringify({
+          compilerOptions: {
+            moduleResolution: 'browser'
+          }
+        }, null, 2)
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
+  });
+
   it('doesn\'t return notification if tsconfig is not available', () => {
     const project: Project = {
       path: '/usr/tmp'

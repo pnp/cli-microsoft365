@@ -33,4 +33,25 @@ describe('FN011010_MAN_webpart_version', () => {
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
+
+  it('returns notification if version not set to *', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [{
+        path: '/usr/tmp/manifest.json',
+        $schema: 'test-schema',
+        componentType: 'WebPart',
+        version: '0.0.1',
+        source: JSON.stringify({
+          path: '/usr/tmp/manifest.json',
+          $schema: 'test-schema',
+          componentType: 'WebPart',
+          version: '0.0.1'
+        }, null, 2)
+      }]
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 5, 'Incorrect line number');
+  });
 });

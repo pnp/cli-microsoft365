@@ -40,11 +40,17 @@ describe('FN012015_TSC_strictNullChecks', () => {
       tsConfigJson: {
         compilerOptions: {
           strictNullChecks: true
-        }
+        },
+        source: JSON.stringify({
+          compilerOptions: {
+            strictNullChecks: true
+          }
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
 
   it('returns notification if strictNullChecks is missing', () => {

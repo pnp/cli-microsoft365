@@ -42,11 +42,14 @@ describe('FN014001_CODE_settings_jsonSchemas', () => {
     const project: Project = {
       path: '/usr/tmp',
       vsCode: {
-        settingsJson: {}
+        settingsJson: {
+          source: JSON.stringify({})
+        }
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 1, 'Incorrect line number');
   });
 
   it('doesn\'t return notification if .vscode/settings.json is not available', () => {

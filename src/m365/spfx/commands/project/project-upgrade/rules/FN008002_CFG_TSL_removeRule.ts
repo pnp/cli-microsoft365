@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN008002_CFG_TSL_removeRule extends Rule {
+export class FN008002_CFG_TSL_removeRule extends JsonRule {
   constructor(private rule: string) {
     super();
   }
@@ -50,7 +50,8 @@ export class FN008002_CFG_TSL_removeRule extends Rule {
     }
 
     if (typeof project.tsLintJson.lintConfig.rules[this.rule] !== 'undefined') {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsLintJson, `lintConfig.rules.${this.rule}`);
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

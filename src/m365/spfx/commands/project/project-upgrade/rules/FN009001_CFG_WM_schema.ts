@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN009001_CFG_WM_schema extends Rule {
+export class FN009001_CFG_WM_schema extends JsonRule {
   constructor(private schema: string) {
     super();
   }
@@ -43,7 +43,8 @@ export class FN009001_CFG_WM_schema extends Rule {
     }
 
     if (project.writeManifestsJson.$schema !== this.schema) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.writeManifestsJson, '$schema');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

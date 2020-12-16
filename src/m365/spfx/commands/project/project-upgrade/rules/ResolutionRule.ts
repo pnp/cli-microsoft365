@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export abstract class ResolutionRule extends Rule {
+export abstract class ResolutionRule extends JsonRule {
   constructor(protected packageName: string, protected packageVersion: string) {
     super();
   }
@@ -47,7 +47,8 @@ export abstract class ResolutionRule extends Rule {
     if (this.customCondition(project) &&
       (!project.packageJson.resolutions ||
         project.packageJson.resolutions[this.packageName] !== this.packageVersion)) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.packageJson, `resolutions.${this.packageName}`);
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

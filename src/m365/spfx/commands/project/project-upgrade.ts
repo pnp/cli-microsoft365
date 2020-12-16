@@ -487,7 +487,7 @@ ${f.resolution}
     };
 
     findings.forEach(f => {
-      const lineNumber: number = f.position && f.position.line ? f.position.line : this.getLineToModify(f, project.path);
+      const lineNumber: number = f.position && f.position.line ? f.position.line : 1;
 
       let resolution: string = '';
       switch (f.resolutionType) {
@@ -518,7 +518,7 @@ ${f.resolution}
 
       // Create a tour step entry
       const step: FindingTourStep = {
-        title: `${sev}: ${f.title}`,
+        title: `${sev}: ${f.title} (${f.id})`,
         description: `### ${sev}\r\n\r\n${f.description}\r\n\r\n${resolution}`,
         line: lineNumber
       };
@@ -541,30 +541,6 @@ ${f.resolution}
     });
 
     return JSON.stringify(tourFindings, null, 2);
-  }
-
-  private getLineToModify(finding: FindingToReport, rootPath: string): number {
-    const filePath: string = path.resolve(path.join(rootPath, finding.file));
-
-    // Don't cause an issue if the file isn't there
-    if (!fs.existsSync(filePath)) {
-      return 1;
-    }
-
-    // Read the file content
-    const fileContent: string = fs.readFileSync(filePath, 'utf-8');
-
-    // Try to find the line this relates to
-    const lines: string[] = fileContent.split('\n'); // os.EOL doesn't work here
-
-    const lineIndex: number = lines.findIndex((line: string) => line.indexOf(finding.title) > -1);
-    if (lineIndex < 1) {
-      return 1;
-    }
-    else {
-      // Lines are 1-based in files
-      return lineIndex + 1;
-    }
   }
 
   private getReportData(findings: FindingToReport[]): ReportData {
