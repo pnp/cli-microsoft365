@@ -27,6 +27,7 @@
 - removed short options from args passed to commands [#1992](https://github.com/pnp/cli-microsoft365/issues/1992)
 - extended `spo sitedesign get` to include `title` [#1884](https://github.com/pnp/cli-microsoft365/issues/1884)
 - removed unnecessary request digest from `spo sitedesign list` [#2006](https://github.com/pnp/cli-microsoft365/issues/2006)
+- fixed issue with resolving uppercase URLs [#2011](https://github.com/pnp/cli-microsoft365/issues/2011)
 
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
