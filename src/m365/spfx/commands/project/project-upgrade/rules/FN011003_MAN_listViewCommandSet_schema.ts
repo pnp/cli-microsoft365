@@ -40,7 +40,8 @@ export class FN011003_MAN_listViewCommandSet_schema extends ManifestRule {
       if (manifest.componentType === 'Extension' &&
         manifest.extensionType === 'ListViewCommandSet' &&
         manifest.$schema !== this.schema) {
-        this.addOccurrence(this.resolution, manifest.path, project.path, occurrences);
+        const node = this.getAstNodeFromFile(manifest, '$schema');
+        this.addOccurrence(this.resolution, manifest.path, project.path, node, occurrences);
       }
     });
 

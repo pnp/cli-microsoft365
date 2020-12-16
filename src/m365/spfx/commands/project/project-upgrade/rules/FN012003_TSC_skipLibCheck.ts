@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012003_TSC_skipLibCheck extends Rule {
+export class FN012003_TSC_skipLibCheck extends JsonRule {
   constructor(private skipLibCheck: boolean) {
     super();
   }
@@ -45,7 +45,8 @@ export class FN012003_TSC_skipLibCheck extends Rule {
     }
 
     if (project.tsConfigJson.compilerOptions.skipLibCheck !== this.skipLibCheck) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'compilerOptions.skipLibCheck');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

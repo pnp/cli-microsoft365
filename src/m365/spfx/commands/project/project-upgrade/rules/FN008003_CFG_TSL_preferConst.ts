@@ -1,8 +1,8 @@
 import { Project } from "../../model";
 import { Finding } from "../Finding";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN008003_CFG_TSL_preferConst extends Rule {
+export class FN008003_CFG_TSL_preferConst extends JsonRule {
   constructor() {
     super();
   }
@@ -48,7 +48,8 @@ export class FN008003_CFG_TSL_preferConst extends Rule {
 
     if (project.tsLintJson.lintConfig && project.tsLintJson.lintConfig.rules &&
       project.tsLintJson.lintConfig.rules["prefer-const"] === true) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsLintJson, 'lintConfig.rules.prefer-const');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

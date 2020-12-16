@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012007_TSC_lib_es5 extends Rule {
+export class FN012007_TSC_lib_es5 extends JsonRule {
   constructor() {
     super();
   }
@@ -48,7 +48,8 @@ export class FN012007_TSC_lib_es5 extends Rule {
 
     if (!project.tsConfigJson.compilerOptions.lib ||
       project.tsConfigJson.compilerOptions.lib.indexOf('es5') < 0) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'compilerOptions.lib');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

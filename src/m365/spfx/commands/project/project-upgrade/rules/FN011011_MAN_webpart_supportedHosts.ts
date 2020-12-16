@@ -43,7 +43,8 @@ export class FN011011_MAN_webpart_supportedHosts extends ManifestRule {
 
       if ((this.add && manifest.supportedHosts === undefined) ||
         (!this.add && manifest.supportedHosts !== undefined)) {
-        this.addOccurrence(this.resolution, manifest.path, project.path, occurrences);
+        const node = this.getAstNodeFromFile(manifest, 'supportedHosts');
+        this.addOccurrence(this.resolution, manifest.path, project.path, node, occurrences);
       }
     });
 

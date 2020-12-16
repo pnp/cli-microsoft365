@@ -73,4 +73,25 @@ describe('ResolutionRule', () => {
     depRule2.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
+
+  it('returns notification if the resolution is not up-to-date', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      packageJson: {
+        dependencies: {},
+        resolutions: {
+          'test-package': '0.9.0'
+        },
+        source: JSON.stringify({
+          dependencies: {},
+          resolutions: {
+            'test-package': '0.9.0'
+          }
+        }, null, 2)
+      }
+    };
+    depRule2.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 4, 'Incorrect line number');
+  });
 });

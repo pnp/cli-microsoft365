@@ -25,11 +25,20 @@ describe('FN003004_CFG_entries', () => {
             "entry": "./lib/extensions/helloWorld/HelloWorldApplicationCustomizer.js",
             "manifest": "./src/extensions/helloWorld/HelloWorldApplicationCustomizer.manifest.json",
             "outputPath": "./dist/hello-world.bundle.js"
-          }]
+          }],
+        source: JSON.stringify({
+          "entries": [
+            {
+              "entry": "./lib/extensions/helloWorld/HelloWorldApplicationCustomizer.js",
+              "manifest": "./src/extensions/helloWorld/HelloWorldApplicationCustomizer.manifest.json",
+              "outputPath": "./dist/hello-world.bundle.js"
+            }]
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
   });
 
   it('should show the entries schema in the resolution', () => {

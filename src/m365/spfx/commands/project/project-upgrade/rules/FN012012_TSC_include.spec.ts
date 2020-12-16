@@ -25,6 +25,21 @@ describe('FN012012_TSC_include', () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it('returns notification if include misses some elements', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      tsConfigJson: {
+        include: [],
+        source: JSON.stringify({
+          include: []
+        }, null, 2)
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
+  });
+
   it('doesn\'t return notification if include has the required elements', () => {
     const project: Project = {
       path: '/usr/tmp',

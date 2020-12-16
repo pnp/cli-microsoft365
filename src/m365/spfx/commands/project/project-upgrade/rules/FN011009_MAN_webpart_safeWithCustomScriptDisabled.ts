@@ -43,7 +43,8 @@ export class FN011009_MAN_webpart_safeWithCustomScriptDisabled extends ManifestR
 
       if ((this.add && manifest.safeWithCustomScriptDisabled === undefined) ||
         (!this.add && manifest.safeWithCustomScriptDisabled !== undefined)) {
-        this.addOccurrence(this.resolution, manifest.path, project.path, occurrences);
+        const node = this.getAstNodeFromFile(manifest, 'safeWithCustomScriptDisabled');
+        this.addOccurrence(this.resolution, manifest.path, project.path, node, occurrences);
       }
     });
 

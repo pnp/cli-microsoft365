@@ -21,4 +21,19 @@ describe('FN019001_TSL_rulesDirectory', () => {
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
+
+  it('returns notification if rulesDirectory is defined', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      tsLintJsonRoot: {
+        rulesDirectory: [],
+        source: JSON.stringify({
+          rulesDirectory: []
+        }, null, 2)
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
+  });
 });

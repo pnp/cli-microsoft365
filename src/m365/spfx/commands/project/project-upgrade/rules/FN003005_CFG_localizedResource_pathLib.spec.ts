@@ -52,11 +52,17 @@ describe('FN003005_CFG_localizedResource_pathLib', () => {
       configJson: {
         localizedResources: {
           'HelloWorldWebPartStrings': 'webparts/helloWorld/loc/{locale}.js'
-        }
+        },
+        source: JSON.stringify({
+          localizedResources: {
+            'HelloWorldWebPartStrings': 'webparts/helloWorld/loc/{locale}.js'
+          }
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
 
   it('returned notification has correct resolution', () => {

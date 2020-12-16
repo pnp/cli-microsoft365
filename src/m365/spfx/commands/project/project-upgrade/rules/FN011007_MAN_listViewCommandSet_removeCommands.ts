@@ -43,7 +43,8 @@ export class FN011007_MAN_listViewCommandSet_removeCommands extends ManifestRule
         return;
       }
 
-      this.addOccurrence(JSON.stringify({ commands: commandSetManifest.commands }, null, 2), manifest.path, project.path, occurrences);
+      const node = this.getAstNodeFromFile(manifest, 'commands');
+      this.addOccurrence(JSON.stringify({ commands: commandSetManifest.commands }, null, 2), manifest.path, project.path, node, occurrences);
     });
 
     if (occurrences.length > 0) {

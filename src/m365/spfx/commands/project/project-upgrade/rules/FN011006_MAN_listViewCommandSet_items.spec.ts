@@ -30,17 +30,23 @@ describe('FN011006_MAN_listViewCommandSet_items', () => {
     assert.strictEqual(findings.length, 0);
   });
 
-  it('returns notification if items is not in the manifest', () => {
+  it('returns notification if items property is not in the manifest', () => {
     const project: Project = {
       path: '/usr/tmp',
       manifests: [{
         path: '/usr/tmp',
         componentType: 'Extension',
-        extensionType: 'ListViewCommandSet'
+        extensionType: 'ListViewCommandSet',
+        source: JSON.stringify({
+          path: '/usr/tmp',
+          componentType: 'Extension',
+          extensionType: 'ListViewCommandSet'
+        }, null, 2)
       } as Manifest]
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 1, 'Incorrect line number');
   });
 
   it('returns notification if commands has to be converted to items', () => {
@@ -59,12 +65,28 @@ describe('FN011006_MAN_listViewCommandSet_items', () => {
             "title": "Command Two",
             "iconImageUrl": "icons/cancel.png"
           }
-        }
+        },
+        source: JSON.stringify({
+          path: '/usr/tmp',
+          componentType: 'Extension',
+          extensionType: 'ListViewCommandSet',
+          commands: {
+            "COMMAND_1": {
+              "title": "Command One",
+              "iconImageUrl": "icons/request.png"
+            },
+            "COMMAND_2": {
+              "title": "Command Two",
+              "iconImageUrl": "icons/cancel.png"
+            }
+          }
+        }, null, 2)
       }]
     };
     
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 5, 'Incorrect line number');
   });
 
   it('should correctly convert commands schema to items schema', () => {

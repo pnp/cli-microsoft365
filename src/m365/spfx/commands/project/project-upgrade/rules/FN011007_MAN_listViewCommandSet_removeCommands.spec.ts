@@ -81,11 +81,27 @@ describe('FN011007_MAN_listViewCommandSet_removeCommands', () => {
             "title": "Command Two",
             "iconImageUrl": "icons/cancel.png"
           }
-        }
+        },
+        source: JSON.stringify({
+          path: '/usr/tmp',
+          componentType: 'Extension',
+          extensionType: 'ListViewCommandSet',
+          commands: {
+            "COMMAND_1": {
+              "title": "Command One",
+              "iconImageUrl": "icons/request.png"
+            },
+            "COMMAND_2": {
+              "title": "Command Two",
+              "iconImageUrl": "icons/cancel.png"
+            }
+          }
+        }, null, 2)
       }]
     };
     
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 5, 'Incorrecft line number');
   });
 });

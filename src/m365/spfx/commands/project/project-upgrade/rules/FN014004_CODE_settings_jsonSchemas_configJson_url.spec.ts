@@ -92,11 +92,22 @@ describe('FN014004_CODE_settings_jsonSchemas_configJson_url', () => {
               ],
               url: './node_modules/@microsoft/sp-build-web/lib/schemas/config.schema.json'
             }
-          ]
+          ],
+          source: JSON.stringify({
+            "json.schemas": [
+              {
+                fileMatch: [
+                  '/config/config.json'
+                ],
+                url: './node_modules/@microsoft/sp-build-web/lib/schemas/config.schema.json'
+              }
+            ]
+          }, null, 2)
         }
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
 });

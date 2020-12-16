@@ -40,11 +40,17 @@ describe('FN012016_TSC_noUnusedLocals', () => {
       tsConfigJson: {
         compilerOptions: {
           noUnusedLocals: true
-        }
+        },
+        source: JSON.stringify({
+          compilerOptions: {
+            noUnusedLocals: true
+          }
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
 
   it('returns notification if noUnusedLocals is missing', () => {

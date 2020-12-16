@@ -26,6 +26,21 @@ describe('FN012013_TSC_exclude', () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it('returns notification if exclude misses elements', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      tsConfigJson: {
+        exclude: [],
+        source: JSON.stringify({
+          exclude: []
+        }, null, 2)
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
+  });
+
   it('doesn\'t return notification if exclude has the exact same elements in different order', () => {
     const project: Project = {
       path: '/usr/tmp',

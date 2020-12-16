@@ -16,7 +16,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const configJsonPath: string = path.join(projectRootPath, 'config/config.json');
     if (fs.existsSync(configJsonPath)) {
       try {
-        project.configJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(configJsonPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(configJsonPath, 'utf-8'));
+        project.configJson = JSON.parse(source);
+        project.configJson!.source = source;
       }
       catch { }
     }
@@ -24,7 +26,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const copyAssetsJsonPath: string = path.join(projectRootPath, 'config/copy-assets.json');
     if (fs.existsSync(copyAssetsJsonPath)) {
       try {
-        project.copyAssetsJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(copyAssetsJsonPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(copyAssetsJsonPath, 'utf-8'));
+        project.copyAssetsJson = JSON.parse(source);
+        project.copyAssetsJson!.source = source;
       }
       catch { }
     }
@@ -32,7 +36,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const deployAzureStorageJsonPath: string = path.join(projectRootPath, 'config/deploy-azure-storage.json');
     if (fs.existsSync(deployAzureStorageJsonPath)) {
       try {
-        project.deployAzureStorageJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(deployAzureStorageJsonPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(deployAzureStorageJsonPath, 'utf-8'));
+        project.deployAzureStorageJson = JSON.parse(source);
+        project.deployAzureStorageJson!.source = source;
       }
       catch { }
     }
@@ -40,7 +46,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const packageJsonPath: string = path.join(projectRootPath, 'package.json');
     if (fs.existsSync(packageJsonPath)) {
       try {
-        project.packageJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(packageJsonPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(packageJsonPath, 'utf-8'));
+        project.packageJson = JSON.parse(source);
+        project.packageJson!.source = source;
       }
       catch { }
     }
@@ -48,7 +56,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const packageSolutionJsonPath: string = path.join(projectRootPath, 'config/package-solution.json');
     if (fs.existsSync(packageSolutionJsonPath)) {
       try {
-        project.packageSolutionJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(packageSolutionJsonPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(packageSolutionJsonPath, 'utf-8'));
+        project.packageSolutionJson = JSON.parse(source);
+        project.packageSolutionJson!.source = source;
       }
       catch { }
     }
@@ -56,7 +66,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const serveJsonPath: string = path.join(projectRootPath, 'config/serve.json');
     if (fs.existsSync(serveJsonPath)) {
       try {
-        project.serveJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(serveJsonPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(serveJsonPath, 'utf-8'));
+        project.serveJson = JSON.parse(source);
+        project.serveJson!.source = source;
       }
       catch { }
     }
@@ -64,7 +76,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const tsConfigJsonPath: string = path.join(projectRootPath, 'tsconfig.json');
     if (fs.existsSync(tsConfigJsonPath)) {
       try {
-        project.tsConfigJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(tsConfigJsonPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(tsConfigJsonPath, 'utf-8'));
+        project.tsConfigJson = JSON.parse(source);
+        project.tsConfigJson!.source = source;
       }
       catch { }
     }
@@ -72,7 +86,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const tsLintJsonPath: string = path.join(projectRootPath, 'config/tslint.json');
     if (fs.existsSync(tsLintJsonPath)) {
       try {
-        project.tsLintJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(tsLintJsonPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(tsLintJsonPath, 'utf-8'));
+        project.tsLintJson = JSON.parse(source);
+        project.tsLintJson!.source = source;
       }
       catch { }
     }
@@ -80,7 +96,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const tsLintJsonRootPath: string = path.join(projectRootPath, 'tslint.json');
     if (fs.existsSync(tsLintJsonRootPath)) {
       try {
-        project.tsLintJsonRoot = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(tsLintJsonRootPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(tsLintJsonRootPath, 'utf-8'));
+        project.tsLintJsonRoot = JSON.parse(source);
+        project.tsLintJsonRoot!.source = source;
       }
       catch { }
     }
@@ -88,7 +106,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const writeManifestJsonPath: string = path.join(projectRootPath, 'config/write-manifests.json');
     if (fs.existsSync(writeManifestJsonPath)) {
       try {
-        project.writeManifestsJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(writeManifestJsonPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(writeManifestJsonPath, 'utf-8'));
+        project.writeManifestsJson = JSON.parse(source);
+        project.writeManifestsJson!.source = source;
       }
       catch { }
     }
@@ -96,7 +116,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const yoRcJsonPath: string = path.join(projectRootPath, '.yo-rc.json');
     if (fs.existsSync(yoRcJsonPath)) {
       try {
-        project.yoRcJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(yoRcJsonPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(yoRcJsonPath, 'utf-8'));
+        project.yoRcJson = JSON.parse(source);
+        project.yoRcJson!.source = source;
       }
       catch { }
     }
@@ -104,7 +126,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const gulpfileJsPath: string = path.join(projectRootPath, 'gulpfile.js');
     if (fs.existsSync(gulpfileJsPath)) {
       project.gulpfileJs = {
-        src: fs.readFileSync(gulpfileJsPath, 'utf-8')
+        source: fs.readFileSync(gulpfileJsPath, 'utf-8')
       };
     }
 
@@ -112,7 +134,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const vsCodeSettingsPath: string = path.join(projectRootPath, '.vscode', 'settings.json');
     if (fs.existsSync(vsCodeSettingsPath)) {
       try {
-        project.vsCode.settingsJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(vsCodeSettingsPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(vsCodeSettingsPath, 'utf-8'));
+        project.vsCode.settingsJson = JSON.parse(source);
+        project.vsCode.settingsJson!.source = source;
       }
       catch { }
     }
@@ -120,7 +144,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const vsCodeExtensionsPath: string = path.join(projectRootPath, '.vscode', 'extensions.json');
     if (fs.existsSync(vsCodeExtensionsPath)) {
       try {
-        project.vsCode.extensionsJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(vsCodeExtensionsPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(vsCodeExtensionsPath, 'utf-8'));
+        project.vsCode.extensionsJson = JSON.parse(source);
+        project.vsCode.extensionsJson!.source = source;
       }
       catch { }
     }
@@ -128,7 +154,9 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
     const vsCodeLaunchPath: string = path.join(projectRootPath, '.vscode', 'launch.json');
     if (fs.existsSync(vsCodeLaunchPath)) {
       try {
-        project.vsCode.launchJson = JSON.parse(Utils.removeSingleLineComments(fs.readFileSync(vsCodeLaunchPath, 'utf-8')));
+        const source = Utils.removeSingleLineComments(fs.readFileSync(vsCodeLaunchPath, 'utf-8'));
+        project.vsCode.launchJson = JSON.parse(source);
+        project.vsCode.launchJson!.source = source;
       }
       catch { }
     }
@@ -140,6 +168,7 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       const manifestStr = Utils.removeSingleLineComments(fs.readFileSync(f, 'utf-8'));
       const manifest: Manifest = GlobalUtils.parseJsonWithBom(manifestStr);
       manifest.path = f;
+      manifest.source = manifestStr;
       return manifest;
     });
     project.manifests = manifests;

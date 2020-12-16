@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN010005_YORC_environment extends Rule {
+export class FN010005_YORC_environment extends JsonRule {
   constructor(private environment: string) {
     super();
   }
@@ -45,7 +45,8 @@ export class FN010005_YORC_environment extends Rule {
     }
 
     if (project.yoRcJson["@microsoft/generator-sharepoint"].environment !== this.environment) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.environment');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

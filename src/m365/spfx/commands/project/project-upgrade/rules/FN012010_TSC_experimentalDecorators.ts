@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012010_TSC_experimentalDecorators extends Rule {
+export class FN012010_TSC_experimentalDecorators extends JsonRule {
   constructor() {
     super();
   }
@@ -45,7 +45,8 @@ export class FN012010_TSC_experimentalDecorators extends Rule {
     }
 
     if (!project.tsConfigJson.compilerOptions.experimentalDecorators) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'compilerOptions.experimentalDecorators');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

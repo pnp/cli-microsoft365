@@ -36,9 +36,10 @@ export class FN011008_MAN_requiresCustomScript extends ManifestRule {
     const occurrences: Occurrence[] = [];
     project.manifests.forEach(manifest => {
       if (typeof manifest.safeWithCustomScriptDisabled !== 'undefined') {
+        const node = this.getAstNodeFromFile(manifest, 'safeWithCustomScriptDisabled');
         this.addOccurrence(`{
   "requiresCustomScript": ${!manifest.safeWithCustomScriptDisabled}
-}`, manifest.path, project.path, occurrences);
+}`, manifest.path, project.path, node, occurrences);
       }
     });
 
