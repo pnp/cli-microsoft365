@@ -1,4 +1,4 @@
-# teams report pstn calls
+# teams report pstncalls
 
 Get details about PSTN calls made within a given time period
 
@@ -10,30 +10,26 @@ m365 teams report pstncalls [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `--fromDateTime <fromDateTime>`
 : The start of time range to query. UTC, inclusive
 
 `--toDateTime [toDateTime]`
-: The end time range to query. UTC, inclusive. Defaults to current DateTime if omitted
+: The end time range to query. UTC, inclusive. Defaults to today if omitted
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
+--8<-- "docs/cmd/_global.md"
 
-`-o, --output [output]`
-: Output type. `text,json`. Default `text`
+## Remarks
 
-`--verbose`
-: Runs command with verbose logging
+This command only works with app-only permissions. You will need to create your own Azure AD app with `CallRecords.Read.All` permissions assigned. Instructions on how to create your own Azure AD app can be found at [Using your own Azure AD identity](user-guide/using-own-identity.md)
 
-`--debug`
-: Runs command with debug logging
+`fromDateTime` and `toDateTime` cannot exceed a period of 90 days
+
+!!! attention
+    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
 
 ## Examples
 
-Get details about PSTN calls made between 2020-10-31 and current DateTime
+Get details about PSTN calls made between 2020-10-31 and today
 
 ```sh
 m365 teams report pstncalls --fromDateTime 2020-10-31
