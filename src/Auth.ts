@@ -8,11 +8,9 @@ import * as crypto from 'crypto';
 import config from './config';
 import request from './request';
 import { exception } from 'console';
-import { rejects } from 'assert';
 
 const ca = require('win-ca');
 const caApi = require('win-ca/api');
-
 export interface Hash<TValue> {
   [key: string]: TValue;
 }
@@ -30,6 +28,7 @@ export class Service {
   password?: string;
   certificate?: string
   thumbprint?: string;
+  windowsThumbprint?: string;
   accessTokens: Hash<AccessToken>;
   spoUrl?: string;
   tenantId?: string;
@@ -292,20 +291,45 @@ export class Auth {
 
       let cert: string = '';
 
-      if (this.service.password === undefined) {
-        const buf = Buffer.from(this.service.certificate as string, 'base64');
-        cert = buf.toString('utf8');
+      if (this.service.thumbprint && this.service.certificate === undefined && this.service.password === undefined ) {
+          const list: string[] = [];
+          
+          const thumbprint = (cert: string) => {
+            var shasum = crypto.createHash("sha1");
+            shasum.update(Buffer.from(cert, "base64"));
+            return shasum.digest("hex").toUpperCase();
+          };
+         
+          caApi({
+            store: ["My"],
+            ondata: list,
+          });
+
+          try {
+            list.forEach((cert) => {
+
+             this.service.windowsThumbprint = thumbprint(cert);
+  
+              if (this.service.windowsThumbprint === this.service.thumbprint) {
+                const toPEM = ca.der2(ca.der2.pem);
+                cert = toPEM(cert);
+              } 
+              else {
+                throw exception("The specified certificate was not found in the certificate store");
+              } 
+  
+            });
+          } catch (e) {
+              logger.logToStderr(e);
+          }
+        
+
       }
       else {
 
-        if (this.service.thumbprint && this.service.certificate === undefined) {
-          try {
-            cert = this.UseWindowsCerts(this.service.thumbprint as string);
-          }
-          catch (e: unknown) {
-            logger.logToStderr(e);
-          }
-
+        if (this.service.password === undefined) {
+          const buf = Buffer.from(this.service.certificate as string, 'base64');
+          cert = buf.toString('utf8');
         } 
         else {
           const buf = Buffer.from(this.service.certificate as string, 'base64');
@@ -502,36 +526,6 @@ export class Auth {
             });
         });
     });
-  }
-
-  public UseWindowsCerts(id:string): string {
-    const thumbprint = (cert: string) => {
-      var shasum = crypto.createHash("sha1");
-      shasum.update(Buffer.from(cert, "base64"));
-      return shasum.digest("hex").toUpperCase();
-    };
-  
-    const list: string[] = [];
-    let returnValue: string = "Certificate Not Found";
-  
-    caApi({
-      store: ["My"],
-      ondata: list,
-    });
-  
-    list.forEach((cert) => {
-      const certThumbprint = thumbprint(cert);
-      if (certThumbprint === id) {
-        const toPEM = ca.der2(ca.der2.pem);
-        const pem = toPEM(cert);
-        return pem;
-      } 
-      else {
-        throw exception("The specified certificate was not found in the certificate store");
-      } 
-    });
-  
-    return returnValue;
   }
 
   public cancel(): void {
