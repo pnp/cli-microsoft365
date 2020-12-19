@@ -217,3 +217,4 @@ For more information see the [Code of Conduct FAQ](https://opensource.microsoft.
 **THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.**
 
 ![telemetry](https://telemetry.sharepointpnp.com/cli-microsoft365/readme)
+
