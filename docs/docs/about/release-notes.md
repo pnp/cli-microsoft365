@@ -8,6 +8,10 @@
 
 - [spo list contenttype default set](../cmd/spo/list/list-contenttype-default-set.md) - sets the default content type for a list [#674](https://github.com/pnp/cli-microsoft365/issues/674)
 
+**Teams:**
+
+- [teams report pstncalls](../cmd/teams/report/report-pstncalls.md) - gets details about PSTN calls made within a given time period [#1771](https://github.com/pnp/cli-microsoft365/issues/1771)
+
 **Yammer:**
 
 - [yammer search](../cmd/yammer/yammer-search.md) - returns a list of messages, users, topics and groups that match the specified query [#1454](https://github.com/pnp/cli-microsoft365/issues/1454)
@@ -29,6 +33,7 @@
 - removed unnecessary request digest from `spo sitedesign list` [#2006](https://github.com/pnp/cli-microsoft365/issues/2006)
 - fixed issue with resolving uppercase URLs [#2011](https://github.com/pnp/cli-microsoft365/issues/2011)
 - added Dockerfile [#1786](https://github.com/pnp/cli-microsoft365/issues/1786)
+- added line information to JSON-based rules in 'spfx project upgrade' [#1602](https://github.com/pnp/cli-microsoft365/issues/1602)
 
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
