@@ -1,5 +1,5 @@
 export const mockPage = {
-  "ListItemAllFields": {
+  ListItemAllFields: {
     "CommentsDisabled": false,
     "FileSystemObjectType": 0,
     "Id": 1,
@@ -20,7 +20,28 @@ export const mockPage = {
     "Description": "Lorem ipsum Dolor samet Lorem ipsum",
     "PromotedState": null,
     "FirstPublishedDate": null,
-    "LayoutWebpartsContent": null,
+    "LayoutWebpartsContent": [{
+      "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+      "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+      "title": "Title Region",
+      "description": "Title Region Description",
+      "serverProcessedContent": {
+        "htmlStrings": {},
+        "searchablePlainTexts": {},
+        "imageSources": {},
+        "links": {}
+      },
+      "dataVersion": "1.4",
+      "properties": {
+        "title": "Page",
+        "imageSourceType": 4,
+        "layoutType": "FullWidthImage",
+        "textAlignment": "Left",
+        "showKicker": false,
+        "showPublishDate": false,
+        "kicker": ""
+      }
+    }],
     "AuthorsId": null,
     "AuthorsStringId": null,
     "OriginalSourceUrl": null,
@@ -112,3 +133,5 @@ export const mockPageDataFail = {
     id: "fake"
   }])
 }
+
+export const mockCanvasContent = "<div>just some test content</div>";
