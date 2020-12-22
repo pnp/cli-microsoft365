@@ -1638,4 +1638,12 @@ describe('Auth', () => {
   it('correctly retrieves resource from a SharePoint site collection', () => {
     assert.strictEqual(Auth.getResourceFromUrl('https://contoso.sharepoint.com/sites/team-a'), 'https://contoso.sharepoint.com');
   });
+
+  it('returns undefined if access token is not set when determining auth type', () => {
+    assert.strictEqual(Auth.isAppOnlyAuth(''), undefined);
+  });
+
+  it(`returns undefined if access token is not valid`, () => {
+    assert.strictEqual(Auth.isAppOnlyAuth('123.456'), undefined);
+  });
 });
