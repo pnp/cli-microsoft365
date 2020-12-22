@@ -1,8 +1,8 @@
 import { Project } from "../../model";
 import { Finding } from "../Finding";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN019001_TSL_rulesDirectory extends Rule {
+export class FN019001_TSL_rulesDirectory extends JsonRule {
   constructor() {
     super();
   }
@@ -43,7 +43,8 @@ export class FN019001_TSL_rulesDirectory extends Rule {
     }
 
     if (project.tsLintJsonRoot.rulesDirectory) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsLintJsonRoot, 'rulesDirectory');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

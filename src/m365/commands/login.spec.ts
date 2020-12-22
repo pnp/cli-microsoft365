@@ -13,7 +13,8 @@ const command: Command = require('./login');
 describe(commands.LOGIN, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -27,9 +28,16 @@ describe(commands.LOGIN, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(auth.service, 'logout').callsFake(() => { });
   });
 
@@ -102,10 +110,41 @@ describe(commands.LOGIN, () => {
     });
   });
 
-  it('logs in to Microsoft 365 using certificate when authType certificate set', (done) => {
+  it('logs in to Microsoft 365 using certificate when authType certificate set and certificateFile is provided', (done) => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+
+    command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate' } }, () => {
+      try {
+        assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
+        assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs in to Microsoft 365 using certificate when authType certificate set with thumbprint', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
 
     command.action(logger, { options: { debug: false, authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } }, () => {
+      try {
+        assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
+        assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
+        assert.strictEqual(auth.service.thumbprint, 'thumbprint', 'Incorrect thumbprint set');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs in to Microsoft 365 using certificate when authType certificate set and certificateBase64Encoded is provided', (done) => {
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+
+    command.action(logger, { options: { debug: false, authType: 'certificate', certificateBase64Encoded: 'certificate', thumbprint: 'thumbprint' } }, () => {
       try {
         assert.strictEqual(auth.service.authType, AuthType.Certificate, 'Incorrect authType set');
         assert.strictEqual(auth.service.certificate, 'certificate', 'Incorrect certificate set');
@@ -196,19 +235,18 @@ describe(commands.LOGIN, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it('fails validation if authType is set to certificate and certificateFile not specified', () => {
-    const actual = command.validate({ options: { authType: 'certificate', thumbprint: 'thumbprint' } });
+  it('fails validation if authType is set to certificate and both certificateFile and certificateBase64Encoded are specified', () => {
+    const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', certificateBase64Encoded: 'certificateB64', thumbprint: 'thumbprint' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if authType is set to certificate and neither certificateFile nor certificateBase64Encoded are specified', () => {
+    const actual = command.validate({ options: { authType: 'certificate' } });
     assert.notStrictEqual(actual, true);
   });
 
   it('fails validation if authType is set to certificate and certificateFile does not exist', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
-    assert.notStrictEqual(actual, true);
-  });
-
-  it('fails validation if authType is set to certificate and thumbprint not specified', () => {
-    sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate' } });
     assert.notStrictEqual(actual, true);
   });
@@ -216,6 +254,12 @@ describe(commands.LOGIN, () => {
   it('passes validation if authType is set to certificate and certificateFile and thumbprint are specified', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate', thumbprint: 'thumbprint' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if authType is set to certificate and certificateFile are specified', () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const actual = command.validate({ options: { authType: 'certificate', certificateFile: 'certificate' } });
     assert.strictEqual(actual, true);
   });
 
@@ -238,7 +282,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
     command.action(logger, { options: {} }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -251,7 +295,7 @@ describe(commands.LOGIN, () => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith('Polling_Request_Cancelled'));
+        assert(loggerLogToStderrSpy.calledWith('Polling_Request_Cancelled'));
         done();
       }
       catch (e) {

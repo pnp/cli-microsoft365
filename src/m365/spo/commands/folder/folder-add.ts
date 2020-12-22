@@ -30,7 +30,7 @@ class SpoFolderAddCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Adding folder to site ${args.options.webUrl}...`);
+      logger.logToStderr(`Adding folder to site ${args.options.webUrl}...`);
     }
 
     const parentFolderServerRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.parentFolderUrl);

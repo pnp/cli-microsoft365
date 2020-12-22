@@ -18,6 +18,10 @@ class SpoTenantRecycleBinItemListCommand extends SpoCommand {
     return 'Returns all modern and classic site collections in the tenant scoped recycle bin';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['DaysRemaining', 'DeletionTime', 'Url'];
+  }
+
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
@@ -47,28 +51,14 @@ class SpoTenantRecycleBinItemListCommand extends SpoCommand {
         }
 
         const results: DeletedSitePropertiesEnumerable = json[json.length - 1];
-        if (args.options.output === 'json') {
-          logger.log(results._Child_Items_);
+        if (args.options.output !== 'json') {
+          results._Child_Items_.forEach(s => {
+            s.DaysRemaining = Number(s.DaysRemaining);
+            s.DeletionTime = this.dateParser(s.DeletionTime as string);
+          });
         }
-        else {
-          logger.log(results._Child_Items_.map((r: any) => {
-            return {
-              DaysRemaining: Number(r.DaysRemaining),
-              DeletionTime: this.dateParser(r.DeletionTime as string),
-              Url: r.Url
-            };
-          }).sort((a, b) => {
-            const urlA = a.Url.toUpperCase();
-            const urlB = b.Url.toUpperCase();
-            if (urlA < urlB) {
-              return -1;
-            }
-            if (urlA > urlB) {
-              return 1;
-            }
-            return 0;
-          }));
-        }
+        logger.log(results._Child_Items_);
+
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }

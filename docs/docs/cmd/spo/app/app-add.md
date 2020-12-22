@@ -10,9 +10,6 @@ m365 spo app add [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-p, --filePath <filePath>`
 : Absolute or relative path to the solution package file to add to the app catalog
 
@@ -25,17 +22,7 @@ m365 spo app add [options]
 `-u, --appCatalogUrl [appCatalogUrl]`
 : The URL of the app catalog where the solution package will be added. It must be specified when the scope is `sitecollection`
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

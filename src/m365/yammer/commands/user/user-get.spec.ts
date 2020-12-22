@@ -12,7 +12,7 @@ const command: Command = require('./user-get');
 describe(commands.YAMMER_USER_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.YAMMER_USER_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
     (command as any).items = [];
   });
 
@@ -53,6 +59,10 @@ describe(commands.YAMMER_USER_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'full_name', 'email', 'job_title', 'state', 'url']);
+  });
+
   it('calls user by e-mail', function (done) {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/by_email.json?email=pl%40nubo.eu') {
@@ -64,7 +74,7 @@ describe(commands.YAMMER_USER_GET, () => {
     });
     command.action(logger, { options: { email: "pl@nubo.eu" } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -84,7 +94,7 @@ describe(commands.YAMMER_USER_GET, () => {
     });
     command.action(logger, { options: { userId: 1496550646 } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].id, 1496550646)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646)
         done();
       }
       catch (e) {
@@ -104,7 +114,7 @@ describe(commands.YAMMER_USER_GET, () => {
     });
     command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].id, 1496550646)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646)
         done();
       }
       catch (e) {

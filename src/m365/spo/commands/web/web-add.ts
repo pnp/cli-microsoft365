@@ -75,7 +75,7 @@ class SpoWebAddCommand extends SpoCommand {
         };
 
         if (this.verbose) {
-          logger.log(`Creating subsite ${args.options.parentWebUrl}/${args.options.webUrl}...`);
+          logger.logToStderr(`Creating subsite ${args.options.parentWebUrl}/${args.options.webUrl}...`);
         }
 
         return request.post(requestOptions)
@@ -88,7 +88,7 @@ class SpoWebAddCommand extends SpoCommand {
         }
 
         if (this.verbose) {
-          logger.log("Setting inheriting navigation from the parent site...");
+          logger.logToStderr("Setting inheriting navigation from the parent site...");
         }
 
         subsiteFullUrl = `${args.options.parentWebUrl}/${encodeURIComponent(args.options.webUrl)}`;
@@ -115,7 +115,7 @@ class SpoWebAddCommand extends SpoCommand {
         /// for the effects of NoScript
         if (!permissions.has(PermissionKind.AddAndCustomizePages)) {
           if (this.verbose) {
-            logger.log("No script is enabled. Skipping the InheritParentNavigation settings.");
+            logger.logToStderr("No script is enabled. Skipping the InheritParentNavigation settings.");
           }
 
           return Promise.reject(SpoWebAddCommand.DONE);
@@ -145,7 +145,7 @@ class SpoWebAddCommand extends SpoCommand {
           logger.log(siteInfo);
 
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
         }
         cb();
@@ -154,7 +154,7 @@ class SpoWebAddCommand extends SpoCommand {
           logger.log(siteInfo);
 
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

@@ -1,5 +1,5 @@
 import { AuthenticationContext, ErrorResponse, Logging, LoggingLevel, TokenResponse, UserCodeInfo } from 'adal-node';
-import { asn1, pkcs12, pki } from 'node-forge';
+import { asn1, pkcs12, pki, pem, md } from 'node-forge';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import { Logger } from './cli';
@@ -22,14 +22,21 @@ export class Service {
   authType: AuthType = AuthType.DeviceCode;
   userName?: string;
   password?: string;
+  certificateType: CertificateType = CertificateType.Unknown;
   certificate?: string
   thumbprint?: string;
   accessTokens: Hash<AccessToken>;
   spoUrl?: string;
   tenantId?: string;
+  // ID of the Azure AD app used to authenticate
+  appId: string;
+  // ID of the tenant where the Azure AD app is registered; common if multitenant
+  tenant: string;
 
   constructor() {
     this.accessTokens = {};
+    this.appId = config.cliAadAppId;
+    this.tenant = config.tenant;
   }
 
   public logout(): void {
@@ -39,10 +46,13 @@ export class Service {
     this.authType = AuthType.DeviceCode;
     this.userName = undefined;
     this.password = undefined;
+    this.certificateType = CertificateType.Unknown;
     this.certificate = undefined;
     this.thumbprint = undefined;
     this.spoUrl = undefined;
     this.tenantId = undefined;
+    this.appId = config.cliAadAppId;
+    this.tenant = config.tenant;
   }
 }
 
@@ -53,11 +63,17 @@ export enum AuthType {
   Identity
 }
 
+export enum CertificateType {
+  Unknown,
+  Base64,
+  Binary
+}
+
 export class Auth {
-  protected authCtx: AuthenticationContext;
+  // assigned through this.setAuthContext() hence !
+  protected authCtx!: AuthenticationContext;
   private userCodeInfo?: UserCodeInfo;
   private _service: Service;
-  private appId: string;
 
   public get service(): Service {
     return this._service;
@@ -68,9 +84,8 @@ export class Auth {
   }
 
   constructor() {
-    this.appId = config.cliAadAppId;
     this._service = new Service();
-    this.authCtx = new AuthenticationContext(`https://login.microsoftonline.com/${config.tenant}`);
+    this.setAuthContext();
   }
 
   public restoreAuth(): Promise<void> {
@@ -79,6 +94,7 @@ export class Auth {
         .getServiceConnectionInfo<Service>()
         .then((service: Service): void => {
           this._service = Object.assign(this._service, service);
+          this.setAuthContext();
           resolve();
         }, (error: any): void => {
           resolve();
@@ -89,9 +105,12 @@ export class Auth {
   public ensureAccessToken(resource: string, logger: Logger, debug: boolean = false, fetchNew: boolean = false): Promise<string> {
     Logging.setLoggingOptions({
       level: debug ? 3 : 0,
-      log: (level: LoggingLevel, message: string, error?: Error): void => {
-        logger.log(message);
-      }
+      log: 
+        // Dependency code, we do not control when and how it gets called, thus ignored from coverage
+        /* c8 ignore next 3 */ 
+        (level: LoggingLevel, message: string, error?: Error): void => {
+          logger.log(message);
+        }
     });
 
     return new Promise<string>((resolve: (accessToken: string) => void, reject: (error: any) => void): void => {
@@ -101,7 +120,7 @@ export class Auth {
 
       if (!fetchNew && accessToken && expiresOn > now) {
         if (debug) {
-          logger.log(`Existing access token ${accessToken.value} still valid. Returning...`);
+          logger.logToStderr(`Existing access token ${accessToken.value} still valid. Returning...`);
         }
         resolve(accessToken.value);
         return;
@@ -109,10 +128,10 @@ export class Auth {
       else {
         if (debug) {
           if (!accessToken) {
-            logger.log(`No token found for resource ${resource}`);
+            logger.logToStderr(`No token found for resource ${resource}`);
           }
           else {
-            logger.log(`Access token expired. Token: ${accessToken.value}, ExpiresAt: ${accessToken.expiresOn}`);
+            logger.logToStderr(`Access token expired. Token: ${accessToken.value}, ExpiresAt: ${accessToken.expiresOn}`);
           }
         }
       }
@@ -162,7 +181,7 @@ export class Auth {
           // _error could happen due to an issue with persisting the access
           // token which shouldn't fail the overall token retrieval process
           if (debug) {
-            logger.log(new CommandError(_error));
+            logger.logToStderr(new CommandError(_error));
           }
           // was there an issue earlier in the process
           if (error) {
@@ -180,18 +199,18 @@ export class Auth {
   private ensureAccessTokenWithRefreshToken(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
       if (debug) {
-        logger.log(`Retrieving new access token using existing refresh token ${this.service.refreshToken}`);
+        logger.logToStderr(`Retrieving new access token using existing refresh token ${this.service.refreshToken}`);
       }
 
       this.authCtx.acquireTokenWithRefreshToken(
         this.service.refreshToken as string,
-        this.appId as string,
+        this.service.appId,
         resource,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {
-            logger.log('Response:');
-            logger.log(response);
-            logger.log('');
+            logger.logToStderr('Response:');
+            logger.logToStderr(response);
+            logger.logToStderr('');
           }
 
           if (error) {
@@ -206,20 +225,20 @@ export class Auth {
 
   private ensureAccessTokenWithDeviceCode(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     if (debug) {
-      logger.log(`Starting Auth.ensureAccessTokenWithDeviceCode. resource: ${resource}, debug: ${debug}`);
+      logger.logToStderr(`Starting Auth.ensureAccessTokenWithDeviceCode. resource: ${resource}, debug: ${debug}`);
     }
 
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (err: any) => void) => {
       if (debug) {
-        logger.log('No existing refresh token. Starting new device code flow...');
+        logger.logToStderr('No existing refresh token. Starting new device code flow...');
       }
 
-      this.authCtx.acquireUserCode(resource, this.appId as string, 'en-us',
+      this.authCtx.acquireUserCode(resource, this.service.appId, 'en-us',
         (error: Error, response: UserCodeInfo): void => {
           if (debug) {
-            logger.log('Response:');
-            logger.log(response);
-            logger.log('');
+            logger.logToStderr('Response:');
+            logger.logToStderr(response);
+            logger.logToStderr('');
           }
 
           if (error) {
@@ -230,12 +249,12 @@ export class Auth {
           logger.log(response.message);
 
           this.userCodeInfo = response;
-          this.authCtx.acquireTokenWithDeviceCode(resource, this.appId as string, response,
+          this.authCtx.acquireTokenWithDeviceCode(resource, this.service.appId, response,
             (error: Error, response: TokenResponse | ErrorResponse): void => {
               if (debug) {
-                logger.log('Response:');
-                logger.log(response);
-                logger.log('');
+                logger.logToStderr('Response:');
+                logger.logToStderr(response);
+                logger.logToStderr('');
               }
 
               if (error) {
@@ -253,19 +272,19 @@ export class Auth {
   private ensureAccessTokenWithPassword(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
       if (debug) {
-        logger.log(`Retrieving new access token using credentials...`);
+        logger.logToStderr(`Retrieving new access token using credentials...`);
       }
 
       this.authCtx.acquireTokenWithUsernamePassword(
         resource,
         this.service.userName as string,
         this.service.password as string,
-        this.appId as string,
+        this.service.appId,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {
-            logger.log('Response:');
-            logger.log(response);
-            logger.log('');
+            logger.logToStderr('Response:');
+            logger.logToStderr(response);
+            logger.logToStderr('');
           }
 
           if (error) {
@@ -281,17 +300,34 @@ export class Auth {
   private ensureAccessTokenWithCertificate(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
       if (debug) {
-        logger.log(`Retrieving new access token using certificate (thumbprint ${this.service.thumbprint})...`);
+        logger.logToStderr(`Retrieving new access token using certificate...`);
       }
 
       let cert: string = '';
+      const buf = Buffer.from(this.service.certificate as string, 'base64');
 
-      if (this.service.password === undefined) {
-        const buf = Buffer.from(this.service.certificate as string, 'base64');
-        cert = buf.toString('utf8');
+      if (this.service.certificateType === CertificateType.Unknown || this.service.certificateType === CertificateType.Base64) {
+        // First time this method is called, we don't know if certificate is PEM or PFX (type is Unknown)
+        // We assume it is PEM but when parsing of PEM fails, we assume it could be PFX
+        // Type is persisted on service so subsequent calls only run through the correct parsing flow
+        try {
+          cert = buf.toString('utf8');
+          const pemObjs: pem.ObjectPEM[] = pem.decode(cert);
+
+          if (this.service.thumbprint === undefined) {
+            const pemCertObj: pem.ObjectPEM = pemObjs.find(pem => pem.type === "CERTIFICATE") as pem.ObjectPEM;
+            const pemCertStr: string = pem.encode(pemCertObj);
+            const pemCert: pki.Certificate = pki.certificateFromPem(pemCertStr);
+  
+            this.service.thumbprint = this.calculateThumbprint(pemCert);
+          }
+        }
+        catch (e) {
+          this.service.certificateType = CertificateType.Binary;
+        }
       }
-      else {
-        const buf = Buffer.from(this.service.certificate as string, 'base64');
+
+      if (this.service.certificateType === CertificateType.Binary) {
         const p12Asn1 = asn1.fromDer(buf.toString('binary'), false);
 
         const p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
@@ -306,10 +342,10 @@ export class Auth {
           // I could not find a way to add something to the keyBag with all 
           // my attempts, but lets keep it here for troubleshooting purposes.
 
-          logger.log(`pkcs8ShroudedKeyBagkeyBags length is ${[pki.oids.pkcs8ShroudedKeyBag].length}`);
+          logger.logToStderr(`pkcs8ShroudedKeyBagkeyBags length is ${[pki.oids.pkcs8ShroudedKeyBag].length}`);
 
           keyBags = p12Parsed.getBags({ bagType: pki.oids.keyBag });
-          logger.log(`keyBag length is ${keyBags[pki.oids.keyBag].length}`);
+          logger.logToStderr(`keyBag length is ${keyBags[pki.oids.keyBag].length}`);
         }
 
         // convert a Forge private key to an ASN.1 RSAPrivateKey
@@ -320,18 +356,29 @@ export class Auth {
 
         // convert a PKCS#8 ASN.1 PrivateKeyInfo to PEM
         cert = pki.privateKeyInfoToPem(privateKeyInfo);
+
+        if (this.service.thumbprint === undefined) {
+          const certBags: {
+            [key: string]: pkcs12.Bag[] | undefined;
+            localKeyId?: pkcs12.Bag[];
+            friendlyName?: pkcs12.Bag[];
+          } = p12Parsed.getBags({ bagType: pki.oids.certBag });
+          const certBag: pkcs12.Bag = (certBags[pki.oids.certBag] as pkcs12.Bag[])[0];
+
+          this.service.thumbprint = this.calculateThumbprint(certBag.cert as pki.Certificate);
+        }
       }
 
       this.authCtx.acquireTokenWithClientCertificate(
         resource,
-        this.appId as string,
+        this.service.appId,
         cert as string,
         this.service.thumbprint as string,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {
-            logger.log('Response:');
-            logger.log(response);
-            logger.log('');
+            logger.logToStderr('Response:');
+            logger.logToStderr(response);
+            logger.logToStderr('');
           }
 
           if (error) {
@@ -348,7 +395,7 @@ export class Auth {
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
       const userName = this.service.userName;
       if (debug) {
-        logger.log('Wil try to retrieve access token using identity...');
+        logger.logToStderr('Wil try to retrieve access token using identity...');
       }
 
       const requestOptions: any = {
@@ -363,7 +410,7 @@ export class Auth {
 
       if (process.env.IDENTITY_ENDPOINT && process.env.IDENTITY_HEADER) {
         if (debug) {
-          logger.log('IDENTITY_ENDPOINT and IDENTITY_HEADER env variables found it is Azure Function, WebApp...');
+          logger.logToStderr('IDENTITY_ENDPOINT and IDENTITY_HEADER env variables found it is Azure Function, WebApp...');
         }
 
         requestOptions.url = `${process.env.IDENTITY_ENDPOINT}?resource=${encodeURIComponent(resource)}&api-version=2019-08-01`;
@@ -371,7 +418,7 @@ export class Auth {
       }
       else if (process.env.MSI_ENDPOINT && process.env.MSI_SECRET) {
         if (debug) {
-          logger.log('MSI_ENDPOINT and MSI_SECRET env variables found it is Azure Function or WebApp, but using the old names of the env variables...');
+          logger.logToStderr('MSI_ENDPOINT and MSI_SECRET env variables found it is Azure Function or WebApp, but using the old names of the env variables...');
         }
 
         requestOptions.url = `${process.env.MSI_ENDPOINT}?resource=${encodeURIComponent(resource)}&api-version=2019-08-01`;
@@ -379,7 +426,7 @@ export class Auth {
       }
       else if (process.env.IDENTITY_ENDPOINT) {
         if (debug) {
-          logger.log('IDENTITY_ENDPOINT env variable found it is Azure Could Shell...');
+          logger.logToStderr('IDENTITY_ENDPOINT env variable found it is Azure Could Shell...');
         }
 
         if (userName && process.env.ACC_CLOUD) {
@@ -393,7 +440,7 @@ export class Auth {
       }
       else if (process.env.MSI_ENDPOINT) {
         if (debug) {
-          logger.log('MSI_ENDPOINT env variable found it is Azure Could Shell, but using the old names of the env variables...');
+          logger.logToStderr('MSI_ENDPOINT env variable found it is Azure Could Shell, but using the old names of the env variables...');
         }
 
         if (userName && process.env.ACC_CLOUD) {
@@ -406,7 +453,7 @@ export class Auth {
       }
       else {
         if (debug) {
-          logger.log('IDENTITY_ENDPOINT and MSI_ENDPOINT env variables not found. Attempt to get Managed Identity token by using the Azure Virtual Machine API...');
+          logger.logToStderr('IDENTITY_ENDPOINT and MSI_ENDPOINT env variables not found. Attempt to get Managed Identity token by using the Azure Virtual Machine API...');
         }
 
         requestOptions.url = `http://169.254.169.254/metadata/identity/oauth2/token?resource=${encodeURIComponent(resource)}&api-version=2018-02-01`;
@@ -419,7 +466,7 @@ export class Auth {
         requestOptions.url += `&client_id=${encodeURIComponent(userName as string)}`;
 
         if (debug) {
-          logger.log('Wil try to get token using client_id param...');
+          logger.logToStderr('Wil try to get token using client_id param...');
         }
       }
 
@@ -458,7 +505,7 @@ export class Auth {
           }
 
           if (debug) {
-            logger.log('Wil try to get token using principal_id (also known as object_id) param ...');
+            logger.logToStderr('Wil try to get token using principal_id (also known as object_id) param ...');
           }
 
           requestOptions.url = requestOptions.url.replace('&client_id=', '&principal_id=');
@@ -483,6 +530,12 @@ export class Auth {
             });
         });
     });
+  }
+
+  private calculateThumbprint(certificate: pki.Certificate): string {
+    const messageDigest: md.MessageDigest = md.sha1.create();
+    messageDigest.update(asn1.toDer(pki.certificateToAsn1(certificate)).getBytes());
+    return messageDigest.digest().toHex();
   }
 
   public cancel(): void {
@@ -531,6 +584,10 @@ export class Auth {
 
   public getTokenStorage(): TokenStorage {
     return new FileTokenStorage();
+  }
+
+  public setAuthContext(): void {
+    this.authCtx = new AuthenticationContext(`https://login.microsoftonline.com/${this.service.tenant}`);
   }
 }
 

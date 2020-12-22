@@ -147,7 +147,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     let title: string;
 
     if (this.verbose) {
-      logger.log(`Retrieving information about the page...`);
+      logger.logToStderr(`Retrieving information about the page...`);
     }
 
     const requestOptions: any = {
@@ -275,7 +275,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();
@@ -284,7 +284,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
   private getSiteId(siteUrl: string, verbose: boolean, logger: Logger): Promise<any> {
     if (verbose) {
-      logger.log(`Retrieving information about the site collection...`);
+      logger.logToStderr(`Retrieving information about the site collection...`);
     }
 
     const requestOptions: any = {
@@ -300,7 +300,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
   private getWebId(siteUrl: string, verbose: boolean, logger: Logger): Promise<any> {
     if (verbose) {
-      logger.log(`Retrieving information about the site...`);
+      logger.logToStderr(`Retrieving information about the site...`);
     }
 
     const requestOptions: any = {
@@ -316,7 +316,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
   private getImageInfo(siteUrl: string, imageUrl: string, verbose: boolean, logger: Logger): Promise<any> {
     if (verbose) {
-      logger.log(`Retrieving information about the header image...`);
+      logger.logToStderr(`Retrieving information about the header image...`);
     }
 
     const requestOptions: any = {

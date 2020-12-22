@@ -12,7 +12,7 @@ const command: Command = require('./subscription-add');
 describe(commands.SUBSCRIPTION_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let mockNowNumber = Date.parse("2019-01-01T00:00:00.000Z");
 
   before(() => {
@@ -26,9 +26,15 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -134,7 +140,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith("Matching resource in default values 'groups' => 'groups'"));
+        assert(loggerLogToStderrSpy.calledWith("Matching resource in default values 'groups' => 'groups'"));
         done();
       }
       catch (e) {
@@ -174,7 +180,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith("An expiration maximum delay is resolved for the resource 'groups' : 4230 minutes."));
+        assert(loggerLogToStderrSpy.calledWith("An expiration maximum delay is resolved for the resource 'groups' : 4230 minutes."));
         done();
       }
       catch (e) {
@@ -213,7 +219,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith("Expiration date time is specified (2019-01-03T00:00:00Z)."));
+        assert(loggerLogToStderrSpy.calledWith("Expiration date time is specified (2019-01-03T00:00:00Z)."));
         done();
       }
       catch (e) {
@@ -294,7 +300,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith("An expiration maximum delay couldn't be resolved for the resource 'teams'. Will use generic default value: 4230 minutes."));
+        assert(loggerLogToStderrSpy.calledWith("An expiration maximum delay couldn't be resolved for the resource 'teams'. Will use generic default value: 4230 minutes."));
         done();
       }
       catch (e) {
@@ -334,8 +340,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
     }, () => {
       try {
         // Expected for groups resource is 4230 minutes (-1 minutes for safe delay) = 72h - 1h31
-        // assert.strictEqual(log[4], expectedLog);
-        assert(loggerSpy.calledWith("Actual expiration date time: 2019-01-03T22:29:00.000Z"));
+        assert(loggerLogToStderrSpy.calledWith("Actual expiration date time: 2019-01-03T22:29:00.000Z"));
         done();
       }
       catch (e) {

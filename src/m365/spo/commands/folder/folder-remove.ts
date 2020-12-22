@@ -38,7 +38,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeFolder: () => void = (): void => {
       if (this.verbose) {
-        logger.log(`Removing folder in site at ${args.options.webUrl}...`);
+        logger.logToStderr(`Removing folder in site at ${args.options.webUrl}...`);
       }
 
       const serverRelativeUrl: string = Utils.getServerRelativePath(args.options.webUrl, args.options.folderUrl);
@@ -61,7 +61,7 @@ class SpoFolderRemoveCommand extends SpoCommand {
         .post(requestOptions)
         .then((): void => {
           if (this.verbose) {
-            logger.log('DONE');
+            logger.logToStderr('DONE');
           }
 
           cb();

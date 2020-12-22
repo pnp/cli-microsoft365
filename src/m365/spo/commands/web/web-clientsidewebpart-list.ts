@@ -49,7 +49,7 @@ class SpoWebClientSideWebPartListCommand extends SpoCommand {
         });
 
         if (clientSideWebParts.length === 0 && this.verbose) {
-          logger.log("No client-side web parts available for this site");
+          logger.logToStderr("No client-side web parts available for this site");
         }
 
         if (clientSideWebParts.length > 0) {

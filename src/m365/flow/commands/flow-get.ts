@@ -26,9 +26,13 @@ class FlowGetCommand extends AzmgmtCommand {
     return 'Gets information about the specified Microsoft Flow';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['name', 'displayName', 'description', 'triggers', 'actions'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving information about Microsoft Flow ${args.options.name}...`);
+      logger.logToStderr(`Retrieving information about Microsoft Flow ${args.options.name}...`);
     }
 
     const requestOptions: any = {
@@ -42,20 +46,12 @@ class FlowGetCommand extends AzmgmtCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        if (args.options.output === 'json') {
-          logger.log(res);
-        }
-        else {
-          const summary: any = {
-            name: res.name,
-            displayName: res.properties.displayName,
-            description: res.properties.definitionSummary.description || '',
-            triggers: Object.keys(res.properties.definition.triggers).join(', '),
-            actions: Object.keys(res.properties.definition.actions).join(', ')
-          };
-          logger.log(summary);
-        }
+        res.displayName = res.properties.displayName;
+        res.description = res.properties.definitionSummary.description || '';
+        res.triggers = Object.keys(res.properties.definition.triggers).join(', ');
+        res.actions = Object.keys(res.properties.definition.actions).join(', ');
 
+        logger.log(res);
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }

@@ -99,7 +99,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
       .post<CustomAction>(requestOptions)
       .then((customAction: CustomAction): void => {
         if (this.verbose) {
-          logger.log({
+          logger.logToStderr({
             ClientSideComponentId: customAction.ClientSideComponentId,
             ClientSideComponentProperties: customAction.ClientSideComponentProperties,
             CommandUIExtension: customAction.CommandUIExtension,

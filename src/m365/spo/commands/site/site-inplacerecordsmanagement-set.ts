@@ -49,14 +49,14 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
     };
 
     if (this.verbose) {
-      logger.log(`${enabled ? 'Activating' : 'Deactivating'} in-place records management for site ${args.options.siteUrl}`);
+      logger.logToStderr(`${enabled ? 'Activating' : 'Deactivating'} in-place records management for site ${args.options.siteUrl}`);
     }
 
     request
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

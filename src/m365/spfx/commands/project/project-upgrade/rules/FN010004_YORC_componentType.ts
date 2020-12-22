@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Manifest, Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN010004_YORC_componentType extends Rule {
+export class FN010004_YORC_componentType extends JsonRule {
   constructor() {
     super();
   }
@@ -61,13 +61,15 @@ export class FN010004_YORC_componentType extends Rule {
     }
 
     if (project.yoRcJson["@microsoft/generator-sharepoint"].componentType !== componentType) {
+      const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.componentType');
       this.addFindingWithOccurrences([{
         file: this.file,
         resolution: JSON.stringify({
           "@microsoft/generator-sharepoint": {
             "componentType": componentType
           }
-        }, null, 2)
+        }, null, 2),
+        position: this.getPositionFromNode(node)
       }], findings);
     }
   }

@@ -17,12 +17,16 @@ class SpoThemeListCommand extends SpoCommand {
     return 'Retrieves the list of custom themes';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Name'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getSpoAdminUrl(logger, this.debug)
       .then((spoAdminUrl: string): Promise<any> => {
         if (this.verbose) {
-          logger.log(`Retrieving themes from tenant store...`);
+          logger.logToStderr(`Retrieving themes from tenant store...`);
         }
 
         const requestOptions: any = {
@@ -38,18 +42,11 @@ class SpoThemeListCommand extends SpoCommand {
       .then((rawRes: any): void => {
         const themePreviews: any[] = rawRes.themePreviews;
         if (themePreviews && themePreviews.length > 0) {
-          if (args.options.output === 'json') {
-            logger.log(themePreviews);
-          }
-          else {
-            logger.log(themePreviews.map(a => {
-              return { Name: a.name };
-            }));
-          }
+          logger.log(themePreviews);
         }
         else {
           if (this.verbose) {
-            logger.log('No themes found');
+            logger.logToStderr('No themes found');
           }
         }
         cb();

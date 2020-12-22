@@ -41,12 +41,12 @@ class SpoPageControlGetCommand extends SpoCommand {
           logger.log(JSON.parse(JSON.stringify(Page.getControlsInformation(control, isJSONOutput))));
 
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
         }
         else {
           if (this.verbose) {
-            logger.log(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
+            logger.logToStderr(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
           }
         }
 

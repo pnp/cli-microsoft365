@@ -12,7 +12,7 @@ const command: Command = require('./user-list');
 describe(commands.USER_LIST, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.USER_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -50,6 +56,10 @@ describe(commands.USER_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Title', 'LoginName']);
   });
 
   it('retrieves lists of site users with output option json', (done) => {
@@ -99,7 +109,7 @@ describe(commands.USER_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           value: [{
             Id: 6,
             IsHiddenInUI: false,
@@ -137,7 +147,7 @@ describe(commands.USER_LIST, () => {
     });
   });
 
-  it('retrieves lists of site users without output option', (done) => {
+  it('retrieves lists of site users', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/siteusers') > -1) {
         return Promise.resolve(
@@ -167,18 +177,20 @@ describe(commands.USER_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(
-          [{
-            Id: 6,
-            Title: "John Doe",
-            LoginName: "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
+        assert(loggerLogSpy.calledWith({
+          value: [{
+            "Id": 6,
+            "Title": "John Doe",
+            "Email": "john.deo@mytenant.onmicrosoft.com",
+            "LoginName": "i:0#.f|membership|john.doe@mytenant.onmicrosoft.com"
           },
           {
-            Id: 7,
-            Title: "FName Lname",
-            LoginName: "i:0#.f|membership|abc@mytenant.onmicrosoft.com"
+            "Id": 7,
+            "Title": "FName Lname",
+            "Email": "abc@mytenant.onmicrosoft.com",
+            "LoginName": "i:0#.f|membership|abc@mytenant.onmicrosoft.com"
           }]
-        ));
+        }));
         done();
       }
       catch (e) {

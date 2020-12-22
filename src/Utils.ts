@@ -56,7 +56,7 @@ export default class Utils {
     return guidRegEx.test(guid);
   }
 
-  static isValidUserPrincipalName(upn: string): boolean {
+  public static isValidUserPrincipalName(upn: string): boolean {
     const upnRegEx = new RegExp(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/i);
 
     return upnRegEx.test(upn);
@@ -187,7 +187,9 @@ export default class Utils {
    */
   public static getServerRelativePath(webUrl: string, folderRelativePath: string): string {
     const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
-    let webRelativePath: string = webUrl.replace(tenantUrl, '');
+    // if webUrl is a server-relative URL then tenantUrl will resolve to null//null
+    // in which case we should keep webUrl
+    let webRelativePath: string = tenantUrl !== 'null//null' ? webUrl.substr(tenantUrl.length) : webUrl;
 
     // will be used to remove relative path from the folderRelativePath
     // in case the web relative url is included
@@ -277,7 +279,9 @@ export default class Utils {
     let folderWebRelativePath: string = '';
 
     const tenantUrl: string = `${url.parse(webUrl).protocol}//${url.parse(webUrl).hostname}`;
-    let webRelativePath: string = webUrl.replace(tenantUrl, '');
+    // if webUrl is a server-relative URL then tenantUrl will resolve to null//null
+    // in which case we should keep webUrl
+    let webRelativePath: string = tenantUrl !== 'null//null' ? webUrl.substr(tenantUrl.length) : webUrl;
 
     // will be used to remove relative path from the folderRelativePath
     // in case the web relative url is included

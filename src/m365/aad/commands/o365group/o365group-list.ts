@@ -40,6 +40,10 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['id', 'displayName', 'mailNickname', 'deletedDateTime', 'siteUrl'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const groupFilter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
     const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g, `''`)}')` : '';
@@ -89,31 +93,10 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
           });
         }
 
-        if (args.options.output === 'json') {
-          logger.log(this.items);
-        }
-        else {
-          logger.log(this.items.map(g => {
-            const group: any = {
-              id: g.id,
-              displayName: g.displayName,
-              mailNickname: g.mailNickname
-            };
-
-            if (args.options.deleted) {
-              group.deletedDateTime = g.deletedDateTime;
-            }
-
-            if (args.options.includeSiteUrl) {
-              group.siteUrl = g.siteUrl;
-            }
-
-            return group;
-          }));
-        }
+        logger.log(this.items);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

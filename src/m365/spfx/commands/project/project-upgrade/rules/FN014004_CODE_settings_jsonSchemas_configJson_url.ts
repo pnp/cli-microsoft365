@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project, VsCodeSettingsJsonJsonSchema } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN014004_CODE_settings_jsonSchemas_configJson_url extends Rule {
+export class FN014004_CODE_settings_jsonSchemas_configJson_url extends JsonRule {
   constructor(private url: string) {
     super();
   }
@@ -59,7 +59,8 @@ export class FN014004_CODE_settings_jsonSchemas_configJson_url extends Rule {
       }
       
       if (schema.url !== this.url) {
-        this.addFinding(findings);
+        const node = this.getAstNodeFromFile(project.vsCode.settingsJson, `json;#schemas[${i}]`);
+        this.addFindingWithPosition(findings, node);
       }
 
       return;

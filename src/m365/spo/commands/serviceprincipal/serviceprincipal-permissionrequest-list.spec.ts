@@ -13,7 +13,7 @@ const command: Command = require('./serviceprincipal-permissionrequest-list');
 describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -84,7 +90,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
     });
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
           Resource: 'Microsoft Graph',
           ResourceId: 'Microsoft Graph',
@@ -125,7 +131,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST, () => {
     });
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
+        assert(loggerLogSpy.calledWith([{
           Id: '4dc4c043-25ee-40f2-81d3-b3bf63da7538',
           Resource: 'Microsoft Graph',
           ResourceId: 'Microsoft Graph',

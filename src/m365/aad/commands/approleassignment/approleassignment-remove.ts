@@ -137,7 +137,7 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
           return Promise.all(tasks);
         }).then((): void => {
           if (this.verbose) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
 
           cb();

@@ -62,7 +62,7 @@ export default abstract class Command {
     const cli: Cli = Cli.getInstance();
     if (cli.currentCommandName &&
       cli.currentCommandName.indexOf(deprecated) === 0) {
-      logger.log(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
+      logger.logToStderr(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
     }
   }
 
@@ -112,7 +112,9 @@ export default abstract class Command {
   public getTelemetryProperties(args: any): any {
     return {
       debug: this.debug.toString(),
-      verbose: this.verbose.toString()
+      verbose: this.verbose.toString(),
+      output: args.options.output,
+      query: typeof args.options.query !== 'undefined'
     };
   }
 
@@ -121,6 +123,14 @@ export default abstract class Command {
   }
 
   public autocomplete(): string[] | undefined {
+    return;
+  }
+
+  /**
+   * Returns list of properties that should be returned in the text output.
+   * Returns all properties if no default properties specified
+   */
+  public defaultProperties(): string[] | undefined {
     return;
   }
 
@@ -282,11 +292,23 @@ export default abstract class Command {
 
   protected getUnknownOptions(options: any): any {
     const unknownOptions: any = JSON.parse(JSON.stringify(options));
+    // remove minimist catch-all option
+    delete unknownOptions._;
+
     const knownOptions: CommandOption[] = this.options();
-    const optionRegex: RegExp = /--([^\s]+)/;
+    const longOptionRegex: RegExp = /--([^\s]+)/;
+    const shortOptionRegex: RegExp = /-([a-z])\b/;
     knownOptions.forEach(o => {
-      const optionName: string = (optionRegex.exec(o.option) as RegExpExecArray)[1];
-      delete unknownOptions[optionName];
+      const longOptionName: string = (longOptionRegex.exec(o.option) as RegExpExecArray)[1];
+      delete unknownOptions[longOptionName];
+
+      // short names are optional so we need to check if the current command has
+      // one before continuing
+      const shortOptionMatch: RegExpExecArray | null = shortOptionRegex.exec(o.option);
+      if (shortOptionMatch) {
+        const shortOptionName: string = shortOptionMatch[1];
+        delete unknownOptions[shortOptionName];
+      }
     });
 
     return unknownOptions;

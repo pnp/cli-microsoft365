@@ -19,6 +19,7 @@ export default {
   YAMMER_REPORT_GROUPSACTIVITYCOUNTS: `${prefix} report groupsactivitycounts`,
   YAMMER_REPORT_GROUPSACTIVITYDETAIL: `${prefix} report groupsactivitydetail`,
   YAMMER_REPORT_GROUPSACTIVITYGROUPCOUNTS: `${prefix} report groupsactivitygroupcounts`,
+  YAMMER_SEARCH: `${prefix} search`,
   YAMMER_USER_GET: `${prefix} user get`,
   YAMMER_USER_LIST: `${prefix} user list`
 };

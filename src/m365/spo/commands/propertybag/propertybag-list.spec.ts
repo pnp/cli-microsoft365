@@ -13,7 +13,7 @@ const command: Command = require('./propertybag-list');
 describe(commands.PROPERTYBAG_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   let stubAllPostRequests: any = (
     requestObjectIdentityResp: any = null,
     getFolderPropertyBagResp: any = null,
@@ -94,9 +94,15 @@ describe(commands.PROPERTYBAG_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -311,7 +317,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
       try {
         assert(formatOutputSpy.calledOnce === true);
 
-        const out = loggerSpy.lastCall.args[0];
+        const out = loggerLogSpy.lastCall.args[0];
         const expectedDate = new Date(2017, 10, 7, 11, 29, 31, 0);
 
         assert.strictEqual(out[0].key, 'vti_folderitemcount');

@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN006003_CFG_PS_isDomainIsolated extends Rule {
+export class FN006003_CFG_PS_isDomainIsolated extends JsonRule {
   constructor(private isDomainIsolated: boolean) {
     super();
   }
@@ -46,7 +46,8 @@ export class FN006003_CFG_PS_isDomainIsolated extends Rule {
     }
 
     if (project.packageSolutionJson.solution.isDomainIsolated !== this.isDomainIsolated) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.packageSolutionJson, 'solution.isDomainIsolated');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

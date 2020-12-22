@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN010002_YORC_isCreatingSolution extends Rule {
+export class FN010002_YORC_isCreatingSolution extends JsonRule {
   constructor(private value: boolean) {
     super();
   }
@@ -45,7 +45,8 @@ export class FN010002_YORC_isCreatingSolution extends Rule {
     }
 
     if (project.yoRcJson["@microsoft/generator-sharepoint"].isCreatingSolution !== this.value) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.isCreatingSolution');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

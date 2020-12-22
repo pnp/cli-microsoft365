@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012016_TSC_noUnusedLocals extends Rule {
+export class FN012016_TSC_noUnusedLocals extends JsonRule {
   constructor(private noUnusedLocals: boolean) {
     super();
   }
@@ -45,7 +45,8 @@ export class FN012016_TSC_noUnusedLocals extends Rule {
     }
 
     if (project.tsConfigJson.compilerOptions.noUnusedLocals !== this.noUnusedLocals) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'compilerOptions.noUnusedLocals');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

@@ -32,4 +32,23 @@ describe('FN010003_YORC_packageManager', () => {
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
+
+  it('returns notification if packageManager is not up-to-date', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      yoRcJson: {
+        "@microsoft/generator-sharepoint": {
+          packageManager: 'foo'
+        },
+        source: JSON.stringify({
+          "@microsoft/generator-sharepoint": {
+            packageManager: 'foo'
+          }
+        }, null, 2)
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
+  });
 });

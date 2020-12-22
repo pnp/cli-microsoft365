@@ -121,11 +121,11 @@ class SpoSiteAddCommand extends SpoCommand {
         spoUrl = _spoUrl;
 
         if (args.options.allowFileSharingForGuestUsers && this.verbose) {
-          logger.log(chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
+          logger.logToStderr(chalk.yellow(`Option 'allowFileSharingForGuestUsers' is deprecated. Please use 'shareByEmailEnabled' instead`));
         }
 
         if (this.verbose) {
-          logger.log(`Creating new site...`);
+          logger.logToStderr(`Creating new site...`);
         }
 
         let requestOptions: any = {}
@@ -264,14 +264,14 @@ class SpoSiteAddCommand extends SpoCommand {
       .then((exists: boolean): Promise<void> => {
         if (exists) {
           if (this.verbose) {
-            logger.log('Site exists in the recycle bin');
+            logger.logToStderr('Site exists in the recycle bin');
           }
 
           return this.deleteSiteFromTheRecycleBin(args.options.url as string, args.options.wait, logger);
         }
         else {
           if (this.verbose) {
-            logger.log('Site not found');
+            logger.logToStderr('Site not found');
           }
 
           return Promise.resolve();
@@ -284,7 +284,7 @@ class SpoSiteAddCommand extends SpoCommand {
         this.context = res;
 
         if (this.verbose) {
-          logger.log(`Creating site collection ${args.options.url}...`);
+          logger.logToStderr(`Creating site collection ${args.options.url}...`);
         }
 
         const lcid: number = typeof args.options.lcid === 'number' ? args.options.lcid : 1033;
@@ -327,7 +327,7 @@ class SpoSiteAddCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();
@@ -342,7 +342,7 @@ class SpoSiteAddCommand extends SpoCommand {
           this.context = res;
 
           if (this.verbose) {
-            logger.log(`Checking if the site ${url} exists...`);
+            logger.logToStderr(`Checking if the site ${url} exists...`);
           }
 
           const requestOptions: any = {
@@ -378,7 +378,7 @@ class SpoSiteAddCommand extends SpoCommand {
         })
         .then((exists: boolean): Promise<string> => {
           if (this.verbose) {
-            logger.log(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
+            logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
           }
 
           const requestOptions: any = {
@@ -430,7 +430,7 @@ class SpoSiteAddCommand extends SpoCommand {
           this.context = res;
 
           if (this.verbose) {
-            logger.log(`Deleting site ${url} from the recycle bin...`);
+            logger.logToStderr(`Deleting site ${url} from the recycle bin...`);
           }
 
           const requestOptions: any = {

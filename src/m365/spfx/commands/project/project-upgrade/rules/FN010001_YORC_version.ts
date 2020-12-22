@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN010001_YORC_version extends Rule {
+export class FN010001_YORC_version extends JsonRule {
   constructor(private version: string) {
     super();
   }
@@ -45,7 +45,8 @@ export class FN010001_YORC_version extends Rule {
     }
 
     if (project.yoRcJson["@microsoft/generator-sharepoint"].version !== this.version) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.version');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

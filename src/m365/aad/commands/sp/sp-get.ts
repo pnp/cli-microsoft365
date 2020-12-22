@@ -37,7 +37,7 @@ class AadSpGetCommand extends AadCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving service principal information...`);
+      logger.logToStderr(`Retrieving service principal information...`);
     }
 
     let spMatchQuery: string = '';

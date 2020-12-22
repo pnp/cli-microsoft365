@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012006_TSC_types_es6_collections extends Rule {
+export class FN012006_TSC_types_es6_collections extends JsonRule {
   constructor(private add: boolean) {
     super();
   }
@@ -49,13 +49,15 @@ export class FN012006_TSC_types_es6_collections extends Rule {
     if (this.add) {
       if (!project.tsConfigJson.compilerOptions.types ||
         project.tsConfigJson.compilerOptions.types.indexOf('es6-collections') < 0) {
-        this.addFinding(findings);
+        const node = this.getAstNodeFromFile(project.tsConfigJson, 'compilerOptions.types');
+        this.addFindingWithPosition(findings, node);
       }
     }
     else {
       if (project.tsConfigJson.compilerOptions.types &&
         project.tsConfigJson.compilerOptions.types.indexOf('es6-collections') > -1) {
-        this.addFinding(findings);
+        const node = this.getAstNodeFromFile(project.tsConfigJson, 'compilerOptions.types[es6-collections]');
+        this.addFindingWithPosition(findings, node);
       }
     }
   }

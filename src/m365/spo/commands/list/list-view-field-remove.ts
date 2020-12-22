@@ -49,14 +49,14 @@ class SpoListViewFieldRemoveCommand extends SpoCommand {
 
     const removeFieldFromView: () => void = (): void => {
       if (this.verbose) {
-        logger.log(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
+        logger.logToStderr(`Getting field ${args.options.fieldId || args.options.fieldTitle}...`);
       }
 
       this
         .getField(args.options, listSelector)
         .then((field: { InternalName: string; }): Promise<void> => {
           if (this.verbose) {
-            logger.log(`Removing field ${args.options.fieldId || args.options.fieldTitle} from view ${args.options.viewId || args.options.viewTitle}...`);
+            logger.logToStderr(`Removing field ${args.options.fieldId || args.options.fieldTitle} from view ${args.options.viewId || args.options.viewTitle}...`);
           }
 
           const viewSelector: string = args.options.viewId ? `('${encodeURIComponent(args.options.viewId)}')` : `/GetByTitle('${encodeURIComponent(args.options.viewTitle as string)}')`;

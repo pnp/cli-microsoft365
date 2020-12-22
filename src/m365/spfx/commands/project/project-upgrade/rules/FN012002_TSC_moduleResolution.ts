@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012002_TSC_moduleResolution extends Rule {
+export class FN012002_TSC_moduleResolution extends JsonRule {
   constructor(private moduleResolution: string) {
     super();
   }
@@ -45,7 +45,8 @@ export class FN012002_TSC_moduleResolution extends Rule {
     }
 
     if (project.tsConfigJson.compilerOptions.moduleResolution !== this.moduleResolution) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'compilerOptions.moduleResolution');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

@@ -1,8 +1,10 @@
+export interface OccurrencePosition {
+  character: number;
+  line: number;
+}
+
 export interface Occurrence {
   file: string;
-  position?: {
-    character: number;
-    line: number;
-  };
+  position?: OccurrencePosition;
   resolution: string;
 }

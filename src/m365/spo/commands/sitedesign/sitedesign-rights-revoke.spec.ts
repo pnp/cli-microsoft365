@@ -13,7 +13,8 @@ const command: Command = require('./sitedesign-rights-revoke');
 describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -29,9 +30,16 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     promptOptions = undefined;
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
@@ -81,7 +89,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
     command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -107,7 +115,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
     command.action(logger, { options: { debug: true, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF' } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -133,7 +141,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
     command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF,AdeleV' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -159,7 +167,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
     command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com,AdeleV@contoso.com' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -185,7 +193,7 @@ describe(commands.SITEDESIGN_RIGHTS_REVOKE, () => {
 
     command.action(logger, { options: { debug: false, confirm: true, id: '0f27a016-d277-4bb4-b3c3-b5b040c9559b', principals: 'PattiF@contoso.com, AdeleV@contoso.com' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

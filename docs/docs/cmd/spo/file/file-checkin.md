@@ -10,9 +10,6 @@ m365 spo file checkin [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --webUrl <webUrl>`
 : The URL of the site where the file is located
 
@@ -28,17 +25,7 @@ m365 spo file checkin [options]
 `--comment [comment]`
 : Comment to set when checking the file in. It\'s length must be less than 1024 letters. Default is empty string
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

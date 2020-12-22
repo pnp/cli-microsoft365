@@ -94,7 +94,7 @@ class SpoSearchCommand extends SpoCommand {
         webUrl = _webUrl;
 
         if (this.verbose) {
-          logger.log(`Executing search query '${args.options.queryText}' on site at ${webUrl}...`);
+          logger.logToStderr(`Executing search query '${args.options.queryText}' on site at ${webUrl}...`);
         }
 
         const startRow = args.options.startRow ? args.options.startRow : 0;
@@ -186,7 +186,7 @@ class SpoSearchCommand extends SpoCommand {
     );
 
     if (this.debug) {
-      logger.log(`RequestURL: ${requestUrl}`);
+      logger.logToStderr(`RequestURL: ${requestUrl}`);
     }
 
     return requestUrl;

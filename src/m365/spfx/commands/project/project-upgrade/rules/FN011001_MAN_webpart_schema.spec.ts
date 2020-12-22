@@ -19,4 +19,23 @@ describe('FN011001_MAN_webpart_schema', () => {
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
+
+  it('returns notifications if webpart manifest has incorrect schema', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [{
+        $schema: 'old-schema',
+        componentType: 'WebPart',
+        path: '/usr/tmp/manifest',
+        source: JSON.stringify({
+          $schema: 'old-schema',
+          componentType: 'WebPart',
+          path: '/usr/tmp/manifest'
+        }, null, 2)
+      }]
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
+  });
 });

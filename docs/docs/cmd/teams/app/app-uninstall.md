@@ -10,9 +10,6 @@ m365 teams app uninstall [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `--appId <appId>`
 : The unique id of the app instance installed in the Microsoft Teams team
 
@@ -22,17 +19,7 @@ m365 teams app uninstall [options]
 `--confirm`
 : Don't prompt for confirmation when uninstalling the app
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

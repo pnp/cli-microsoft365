@@ -10,9 +10,6 @@ m365 spo page set [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-n, --name <name>`
 : Name of the page to update
 
@@ -34,17 +31,7 @@ m365 spo page set [options]
 `--publishMessage [publishMessage]`
 : Message to set when publishing the page
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

@@ -12,7 +12,7 @@ const command: Command = require('./feature-list');
 describe(commands.FEATURE_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.FEATURE_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -81,7 +87,7 @@ describe(commands.FEATURE_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
             DisplayName: "TenantSitesList"
@@ -128,7 +134,7 @@ describe(commands.FEATURE_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
             DisplayName: "TenantSitesList"
@@ -178,7 +184,7 @@ describe(commands.FEATURE_LIST, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             DefinitionId: "3019c9b4-e371-438d-98f6-0a08c34d06eb",
             DisplayName: "TenantSitesList"
@@ -231,7 +237,7 @@ describe(commands.FEATURE_LIST, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerSpy.calledWith(
+        assert(loggerLogSpy.calledWith(
           [
             {
               "odata.type": "SP.Feature",
@@ -481,7 +487,7 @@ describe(commands.FEATURE_LIST, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Web' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             DefinitionId: '00bfea71-5932-4f9c-ad71-1557e5751100',
             DisplayName: 'WebPageLibrary'
@@ -513,7 +519,7 @@ describe(commands.FEATURE_LIST, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/abc', scope: 'Site' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             DefinitionId: '3019c9b4-e371-438d-98f6-0a08c34d06eb',
             DisplayName: 'TenantSitesList'

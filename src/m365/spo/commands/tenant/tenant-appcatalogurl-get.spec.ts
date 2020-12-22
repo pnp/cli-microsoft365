@@ -14,7 +14,8 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
   let requests: any[];
   let logger: Logger;
 
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -30,9 +31,16 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -110,7 +118,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.lastCall.args[0] === 'https://contoso.sharepoint.com/sites/apps');
+        assert(loggerLogSpy.lastCall.args[0] === 'https://contoso.sharepoint.com/sites/apps');
         done();
       }
       catch (e) {
@@ -135,7 +143,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -160,7 +168,7 @@ describe(commands.TENANT_APPCATALOGURL_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith('Tenant app catalog is not configured.'));
+        assert(loggerLogToStderrSpy.calledWith('Tenant app catalog is not configured.'));
         done();
       }
       catch (e) {

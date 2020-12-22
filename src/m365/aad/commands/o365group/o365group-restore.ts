@@ -34,7 +34,7 @@ class AadO365GroupRestoreCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Restoring Microsoft 365 Group: ${args.options.id}...`);
+      logger.logToStderr(`Restoring Microsoft 365 Group: ${args.options.id}...`);
     }
 
     const requestOptions: any = {
@@ -48,7 +48,7 @@ class AadO365GroupRestoreCommand extends GraphCommand {
       .post(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

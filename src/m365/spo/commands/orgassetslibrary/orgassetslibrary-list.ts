@@ -74,14 +74,10 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
               })
             }
 
-            if (args.options.output === 'json') {
-              logger.log(JSON.stringify(orgAssets));
-            } else {
-              logger.log(orgAssets);
-            }
+            logger.log(orgAssets);
 
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
           }
           cb();

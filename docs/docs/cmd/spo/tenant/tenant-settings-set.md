@@ -10,20 +10,7 @@ m365 spo tenant settings set [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 `--MinCompatibilityLevel [MinCompatibilityLevel]`
 : Specifies the lower bound on the compatibility level for new sites'
@@ -267,6 +254,9 @@ m365 spo tenant settings set [options]
 
 `--DisabledWebPartIds [DisabledWebPartIds]`
 : Sets disabled web part Ids. Array of GUIDs split by comma (\',\'). Example:c9b1909e-901a-0000-2cdb-e91c3f46320a,c9b1909e-901a-0000-2cdb-e91c3f463201'
+
+`--DisableCustomAppAuthentication [DisableCustomAppAuthentication]`
+: Configure if ACS-based app-only auth should be disabled or not. Allowed values `true,false`
 
 !!! important
     To use this command you have to have permissions to access the tenant admin site.

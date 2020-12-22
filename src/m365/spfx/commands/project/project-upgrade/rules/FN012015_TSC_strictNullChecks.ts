@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012015_TSC_strictNullChecks extends Rule {
+export class FN012015_TSC_strictNullChecks extends JsonRule {
   constructor(private strictNullChecks: boolean) {
     super();
   }
@@ -45,7 +45,8 @@ export class FN012015_TSC_strictNullChecks extends Rule {
     }
 
     if (project.tsConfigJson.compilerOptions.strictNullChecks !== this.strictNullChecks) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'compilerOptions.strictNullChecks');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

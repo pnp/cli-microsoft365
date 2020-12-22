@@ -13,7 +13,8 @@ const command: Command = require('./web-set');
 describe(commands.WEB_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +27,16 @@ describe(commands.WEB_SET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -66,7 +74,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -88,7 +96,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', description: 'New description' } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -110,7 +118,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', siteLogoUrl: 'image.png' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -132,7 +140,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'false' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -154,7 +162,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', quickLaunchEnabled: 'true' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -176,7 +184,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'compact' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -198,7 +206,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerLayout: 'standard' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -220,7 +228,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 0 } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -242,7 +250,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 1 } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -264,7 +272,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 2 } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -286,7 +294,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', headerEmphasis: 3 } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -308,7 +316,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'true' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -330,7 +338,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', megaMenuEnabled: 'false' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -359,7 +367,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: 'New title', description: 'New description', siteLogoUrl: 'image.png', quickLaunchEnabled: 'true', headerLayout: 'compact', headerEmphasis: 1, megaMenuEnabled: 'true', footerEnabled: 'true' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -378,7 +386,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, welcomePage: 'SitePages/Home.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -397,7 +405,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: true, welcomePage: 'SitePages/Home.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert(loggerSpy.called);
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -593,7 +601,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'true' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -615,7 +623,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', footerEnabled: 'false' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -672,7 +680,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'defaultscope' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -694,7 +702,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'tenant' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -716,7 +724,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'hub' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -738,7 +746,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'site' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -760,7 +768,7 @@ describe(commands.WEB_SET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', searchScope: 'Site' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

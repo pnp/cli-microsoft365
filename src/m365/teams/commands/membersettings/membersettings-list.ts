@@ -42,7 +42,7 @@ class TeamsMemberSettingsListCommand extends GraphCommand {
         logger.log(res.memberSettings);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -12,7 +12,8 @@ const command: Command = require('./folder-move');
 describe(commands.FOLDER_MOVE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   let stubAllPostRequests: any = (
     recycleFolder: any = null,
@@ -78,9 +79,16 @@ describe(commands.FOLDER_MOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -120,7 +128,7 @@ describe(commands.FOLDER_MOVE, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.lastCall.args[0] === 'DONE');
+        assert(loggerLogToStderrSpy.lastCall.args[0] === 'DONE');
         done();
       }
       catch (e) {
@@ -141,7 +149,7 @@ describe(commands.FOLDER_MOVE, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.callCount === 0);
+        assert(loggerLogSpy.callCount === 0);
         done();
       }
       catch (e) {
@@ -186,7 +194,7 @@ describe(commands.FOLDER_MOVE, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.lastCall.args[0] === 'DONE');
+        assert(loggerLogToStderrSpy.lastCall.args[0] === 'DONE');
         done();
       }
       catch (e) {

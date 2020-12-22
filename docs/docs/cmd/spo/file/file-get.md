@@ -10,9 +10,6 @@ m365 spo file get [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-w, --webUrl <webUrl>`
 : The URL of the site where the file is located
 
@@ -34,17 +31,7 @@ m365 spo file get [options]
 `-p, --path [path]`
 : The local path where to save the retrieved file. Must be specified when the `--asFile` option is used
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

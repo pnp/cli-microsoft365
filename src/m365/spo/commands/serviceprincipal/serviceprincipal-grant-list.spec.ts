@@ -13,7 +13,7 @@ const command: Command = require('./serviceprincipal-grant-list');
 describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -86,7 +92,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
     });
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             ObjectId: '50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw',
             Resource: 'Windows Azure Active Directory',
@@ -136,7 +142,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_LIST, () => {
     });
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             ObjectId: '50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw',
             Resource: 'Windows Azure Active Directory',

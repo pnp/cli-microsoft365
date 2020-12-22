@@ -12,7 +12,7 @@ const command: Command = require('./hubsite-list');
 describe(commands.HUBSITE_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +26,16 @@ describe(commands.HUBSITE_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    (command as any).batchSize = 30;
   });
 
   afterEach(() => {
@@ -53,6 +60,10 @@ describe(commands.HUBSITE_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['ID', 'SiteUrl', 'Title']);
   });
 
   it('lists hub sites', (done) => {
@@ -89,15 +100,25 @@ describe(commands.HUBSITE_LIST, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
+            "Description": null,
             "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+            "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
             "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+            "Targets": null,
+            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
             "Title": "Sales"
           },
           {
+            "Description": null,
             "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+            "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
             "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
+            "Targets": null,
+            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
             "Title": "Travel Programs"
           }
         ]));
@@ -143,15 +164,25 @@ describe(commands.HUBSITE_LIST, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
+            "Description": null,
             "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+            "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
             "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+            "Targets": null,
+            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
             "Title": "Sales"
           },
           {
+            "Description": null,
             "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+            "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
             "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
+            "Targets": null,
+            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
             "Title": "Travel Programs"
           }
         ]));
@@ -163,7 +194,7 @@ describe(commands.HUBSITE_LIST, () => {
     });
   });
 
-  it('lists hub sites with all properties for JSON output', (done) => {
+  it('lists hub sites with all properties', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/hubsites`) > -1) {
         return Promise.resolve({
@@ -197,7 +228,7 @@ describe(commands.HUBSITE_LIST, () => {
 
     command.action(logger, { options: { debug: false, output: 'json' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
+        assert(loggerLogSpy.calledWith([
           {
             "Description": null,
             "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
@@ -217,362 +248,6 @@ describe(commands.HUBSITE_LIST, () => {
             "Targets": null,
             "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
             "Title": "Travel Programs"
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('does not list associated sites allong the hub sites, if the includeAssociatedSites option is provided, if the output is TEXT', (done) => {
-    sinon.stub(request, 'get').resolves({
-      value: [
-        {
-          "Description": null,
-          "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-          "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-          "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-          "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
-          "Targets": null,
-          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-          "Title": "Sales"
-        },
-        {
-          "Description": null,
-          "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-          "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-          "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-          "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
-          "Targets": null,
-          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-          "Title": "Travel Programs"
-        }
-      ]
-    });
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
-        && JSON.stringify(opts.data) === JSON.stringify({
-          parameters: {
-            ViewXml: "<View><Query><Where><And><And><IsNull><FieldRef Name=\"TimeDeleted\"/></IsNull><Neq><FieldRef Name=\"State\"/><Value Type='Integer'>0</Value></Neq></And><Neq><FieldRef Name=\"HubSiteId\"/><Value Type='Text'>{00000000-0000-0000-0000-000000000000}</Value></Neq></And></Where><OrderBy><FieldRef Name='Title' Ascending='true' /></OrderBy></Query><ViewFields><FieldRef Name=\"Title\"/><FieldRef Name=\"SiteUrl\"/><FieldRef Name=\"SiteId\"/><FieldRef Name=\"HubSiteId\"/></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit></View>",
-            DatesInUtc: true
-          }
-        })
-      ) {
-        return Promise.resolve({
-          FilterLink: "?",
-          FirstRow: 1,
-          FolderPermissions: "0x7fffffffffffffff",
-          ForceNoHierarchy: 1,
-          HierarchyHasIndention: null,
-          LastRow: 5,
-          Row: [{
-            "ID": "25",
-            "PermMask": "0x7fffffffffffffff",
-            "FSObjType": "0",
-            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
-            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
-            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F25%5F%2E000",
-            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
-            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
-            "ItemChildCount": "0",
-            "FolderChildCount": "0",
-            "SMTotalSize": "494",
-            "Title": "North",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/north",
-            "HubSiteId": "{389D0D83-40BB-40AD-B92A-534B7CB37D0B}",
-            "TimeDeleted": "",
-            "State": "",
-            "State.": ""
-          }, {
-            "ID": "28",
-            "PermMask": "0x7fffffffffffffff",
-            "FSObjType": "0",
-            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
-            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000",
-            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F28%5F%2E000",
-            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000",
-            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000",
-            "ItemChildCount": "0",
-            "FolderChildCount": "0",
-            "SMTotalSize": "526",
-            "Title": "South",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/south",
-            "HubSiteId": "{389D0D83-40BB-40AD-B92A-534B7CB37D0B}",
-            "TimeDeleted": "",
-            "State": "",
-            "State.": ""
-          }, {
-            "ID": "29",
-            "PermMask": "0x7fffffffffffffff",
-            "FSObjType": "0",
-            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
-            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000",
-            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F29%5F%2E000",
-            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000",
-            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000",
-            "ItemChildCount": "0",
-            "FolderChildCount": "0",
-            "SMTotalSize": "494",
-            "Title": "Europe",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/europe",
-            "HubSiteId": "{B2C94CA1-0957-4BDD-B549-B7D365EDC10F}",
-            "TimeDeleted": "",
-            "State": "",
-            "State.": ""
-          }, {
-            "ID": "27",
-            "PermMask": "0x7fffffffffffffff",
-            "FSObjType": "0",
-            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
-            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000",
-            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F27%5F%2E000",
-            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000",
-            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000",
-            "ItemChildCount": "0",
-            "FolderChildCount": "0",
-            "SMTotalSize": "526",
-            "Title": "Asia",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/asia",
-            "HubSiteId": "{B2C94CA1-0957-4BDD-B549-B7D365EDC10F}",
-            "TimeDeleted": "",
-            "State": "",
-            "State.": ""
-          }, {
-            "ID": "24",
-            "PermMask": "0x7fffffffffffffff",
-            "FSObjType": "0",
-            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
-            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000",
-            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F24%5F%2E000",
-            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000",
-            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000",
-            "ItemChildCount": "0",
-            "FolderChildCount": "0",
-            "SMTotalSize": "490",
-            "Title": "America",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/america",
-            "HubSiteId": "{B2C94CA1-0957-4BDD-B549-B7D365EDC10F}",
-            "TimeDeleted": "",
-            "State": "",
-            "State.": ""
-          }],
-          RowLimit: 100
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: false, includeAssociatedSites: true } }, () => {
-      try {
-        assert(loggerSpy.calledWith([
-          {
-            "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
-            "Title": "Sales"
-          },
-          {
-            "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
-            "Title": "Travel Programs"
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('lists hub sites, including associated sites, with all properties for JSON output', (done) => {
-    sinon.stub(request, 'get').resolves({
-      value: [
-        {
-          "Description": null,
-          "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-          "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-          "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-          "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
-          "Targets": null,
-          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-          "Title": "Sales"
-        },
-        {
-          "Description": null,
-          "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-          "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-          "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-          "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
-          "Targets": null,
-          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-          "Title": "Travel Programs"
-        }
-      ]
-    });
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
-        && JSON.stringify(opts.data) === JSON.stringify({
-          parameters: {
-            ViewXml: "<View><Query><Where><And><And><IsNull><FieldRef Name=\"TimeDeleted\"/></IsNull><Neq><FieldRef Name=\"State\"/><Value Type='Integer'>0</Value></Neq></And><Neq><FieldRef Name=\"HubSiteId\"/><Value Type='Text'>{00000000-0000-0000-0000-000000000000}</Value></Neq></And></Where><OrderBy><FieldRef Name='Title' Ascending='true' /></OrderBy></Query><ViewFields><FieldRef Name=\"Title\"/><FieldRef Name=\"SiteUrl\"/><FieldRef Name=\"SiteId\"/><FieldRef Name=\"HubSiteId\"/></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit></View>",
-            DatesInUtc: true
-          }
-        })
-      ) {
-        return Promise.resolve({
-          FilterLink: "?",
-          FirstRow: 1,
-          FolderPermissions: "0x7fffffffffffffff",
-          ForceNoHierarchy: 1,
-          HierarchyHasIndention: null,
-          LastRow: 5,
-          Row: [{
-            "ID": "25",
-            "PermMask": "0x7fffffffffffffff",
-            "FSObjType": "0",
-            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
-            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
-            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F25%5F%2E000",
-            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
-            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
-            "ItemChildCount": "0",
-            "FolderChildCount": "0",
-            "SMTotalSize": "494",
-            "Title": "North",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/north",
-            "HubSiteId": "{389D0D83-40BB-40AD-B92A-534B7CB37D0B}",
-            "TimeDeleted": "",
-            "State": "",
-            "State.": ""
-          }, {
-            "ID": "28",
-            "PermMask": "0x7fffffffffffffff",
-            "FSObjType": "0",
-            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
-            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000",
-            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F28%5F%2E000",
-            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000",
-            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000",
-            "ItemChildCount": "0",
-            "FolderChildCount": "0",
-            "SMTotalSize": "526",
-            "Title": "South",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/south",
-            "HubSiteId": "{389D0D83-40BB-40AD-B92A-534B7CB37D0B}",
-            "TimeDeleted": "",
-            "State": "",
-            "State.": ""
-          }, {
-            "ID": "29",
-            "PermMask": "0x7fffffffffffffff",
-            "FSObjType": "0",
-            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
-            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000",
-            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F29%5F%2E000",
-            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000",
-            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000",
-            "ItemChildCount": "0",
-            "FolderChildCount": "0",
-            "SMTotalSize": "494",
-            "Title": "Europe",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/europe",
-            "HubSiteId": "{B2C94CA1-0957-4BDD-B549-B7D365EDC10F}",
-            "TimeDeleted": "",
-            "State": "",
-            "State.": ""
-          }, {
-            "ID": "27",
-            "PermMask": "0x7fffffffffffffff",
-            "FSObjType": "0",
-            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
-            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000",
-            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F27%5F%2E000",
-            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000",
-            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000",
-            "ItemChildCount": "0",
-            "FolderChildCount": "0",
-            "SMTotalSize": "526",
-            "Title": "Asia",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/asia",
-            "HubSiteId": "{B2C94CA1-0957-4BDD-B549-B7D365EDC10F}",
-            "TimeDeleted": "",
-            "State": "",
-            "State.": ""
-          }, {
-            "ID": "24",
-            "PermMask": "0x7fffffffffffffff",
-            "FSObjType": "0",
-            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
-            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000",
-            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F24%5F%2E000",
-            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000",
-            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000",
-            "ItemChildCount": "0",
-            "FolderChildCount": "0",
-            "SMTotalSize": "490",
-            "Title": "America",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/america",
-            "HubSiteId": "{B2C94CA1-0957-4BDD-B549-B7D365EDC10F}",
-            "TimeDeleted": "",
-            "State": "",
-            "State.": ""
-          }],
-          RowLimit: 100
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } }, () => {
-      try {
-        assert(loggerSpy.calledWith([
-          {
-            "Description": null,
-            "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-            "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
-            "Targets": null,
-            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-            "Title": "Sales",
-            "AssociatedSites": [
-              {
-                "Title": "North",
-                "SiteUrl": "https://contoso.sharepoint.com/sites/north"
-              }
-              , {
-                "Title": "South",
-                "SiteUrl": "https://contoso.sharepoint.com/sites/south"
-              }
-            ]
-          },
-          {
-            "Description": null,
-            "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
-            "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
-            "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
-            "Targets": null,
-            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
-            "Title": "Travel Programs",
-            "AssociatedSites": [
-              {
-                "Title": "Europe",
-                "SiteUrl": "https://contoso.sharepoint.com/sites/europe"
-              },
-              {
-                "Title": "Asia",
-                "SiteUrl": "https://contoso.sharepoint.com/sites/asia"
-              },
-              {
-                "Title": "America",
-                "SiteUrl": "https://contoso.sharepoint.com/sites/america"
-              }
-            ]
           }
         ]));
         done();
@@ -761,6 +436,201 @@ describe(commands.HUBSITE_LIST, () => {
     command.action(logger, { options: { debug: true, includeAssociatedSites: true, output: 'json' } }, () => {
       try {
         assert.strictEqual((firstPagedRequest && secondPagedRequest && thirdPagedRequest), true);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('lists hub sites, including associated sites, with all properties for JSON output', (done) => {
+    sinon.stub(request, 'get').resolves({
+      value: [
+        {
+          "Description": null,
+          "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+          "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+          "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+          "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+          "Targets": null,
+          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+          "Title": "Sales"
+        },
+        {
+          "Description": null,
+          "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+          "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+          "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+          "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
+          "Targets": null,
+          "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+          "Title": "Travel Programs"
+        }
+      ]
+    });
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/lists/GetByTitle('DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECOLLECTIONS')/RenderListDataAsStream`) > -1
+        && JSON.stringify(opts.data) === JSON.stringify({
+          parameters: {
+            ViewXml: "<View><Query><Where><And><And><IsNull><FieldRef Name=\"TimeDeleted\"/></IsNull><Neq><FieldRef Name=\"State\"/><Value Type='Integer'>0</Value></Neq></And><Neq><FieldRef Name=\"HubSiteId\"/><Value Type='Text'>{00000000-0000-0000-0000-000000000000}</Value></Neq></And></Where><OrderBy><FieldRef Name='Title' Ascending='true' /></OrderBy></Query><ViewFields><FieldRef Name=\"Title\"/><FieldRef Name=\"SiteUrl\"/><FieldRef Name=\"SiteId\"/><FieldRef Name=\"HubSiteId\"/></ViewFields><RowLimit Paged=\"TRUE\">30</RowLimit></View>",
+            DatesInUtc: true
+          }
+        })
+      ) {
+        return Promise.resolve({
+          FilterLink: "?",
+          FirstRow: 1,
+          FolderPermissions: "0x7fffffffffffffff",
+          ForceNoHierarchy: 1,
+          HierarchyHasIndention: null,
+          LastRow: 5,
+          Row: [{
+            "ID": "25",
+            "PermMask": "0x7fffffffffffffff",
+            "FSObjType": "0",
+            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
+            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F25%5F%2E000",
+            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/25_.000",
+            "ItemChildCount": "0",
+            "FolderChildCount": "0",
+            "SMTotalSize": "494",
+            "Title": "North",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/north",
+            "HubSiteId": "{389D0D83-40BB-40AD-B92A-534B7CB37D0B}",
+            "TimeDeleted": "",
+            "State": "",
+            "State.": ""
+          }, {
+            "ID": "28",
+            "PermMask": "0x7fffffffffffffff",
+            "FSObjType": "0",
+            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
+            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000",
+            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F28%5F%2E000",
+            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000",
+            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/28_.000",
+            "ItemChildCount": "0",
+            "FolderChildCount": "0",
+            "SMTotalSize": "526",
+            "Title": "South",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/south",
+            "HubSiteId": "{389D0D83-40BB-40AD-B92A-534B7CB37D0B}",
+            "TimeDeleted": "",
+            "State": "",
+            "State.": ""
+          }, {
+            "ID": "29",
+            "PermMask": "0x7fffffffffffffff",
+            "FSObjType": "0",
+            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
+            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000",
+            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F29%5F%2E000",
+            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000",
+            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/29_.000",
+            "ItemChildCount": "0",
+            "FolderChildCount": "0",
+            "SMTotalSize": "494",
+            "Title": "Europe",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/europe",
+            "HubSiteId": "{B2C94CA1-0957-4BDD-B549-B7D365EDC10F}",
+            "TimeDeleted": "",
+            "State": "",
+            "State.": ""
+          }, {
+            "ID": "27",
+            "PermMask": "0x7fffffffffffffff",
+            "FSObjType": "0",
+            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
+            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000",
+            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F27%5F%2E000",
+            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000",
+            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/27_.000",
+            "ItemChildCount": "0",
+            "FolderChildCount": "0",
+            "SMTotalSize": "526",
+            "Title": "Asia",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/asia",
+            "HubSiteId": "{B2C94CA1-0957-4BDD-B549-B7D365EDC10F}",
+            "TimeDeleted": "",
+            "State": "",
+            "State.": ""
+          }, {
+            "ID": "24",
+            "PermMask": "0x7fffffffffffffff",
+            "FSObjType": "0",
+            "ContentTypeId": "0x0100F14AFE642BCF6347882B6B8ABA3E15E3",
+            "FileRef": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000",
+            "FileRef.urlencode": "%2FLists%2FDO%5FNOT%5FDELETE%5FSPLIST%5FTENANTADMIN%5FAGGREGATED%5FSITECO%2F24%5F%2E000",
+            "FileRef.urlencodeasurl": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000",
+            "FileRef.urlencoding": "/Lists/DO_NOT_DELETE_SPLIST_TENANTADMIN_AGGREGATED_SITECO/24_.000",
+            "ItemChildCount": "0",
+            "FolderChildCount": "0",
+            "SMTotalSize": "490",
+            "Title": "America",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/america",
+            "HubSiteId": "{B2C94CA1-0957-4BDD-B549-B7D365EDC10F}",
+            "TimeDeleted": "",
+            "State": "",
+            "State.": ""
+          }],
+          RowLimit: 100
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, includeAssociatedSites: true, output: 'json' } }, () => {
+      try {
+        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify([
+          {
+            "Description": null,
+            "ID": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+            "SiteId": "389d0d83-40bb-40ad-b92a-534b7cb37d0b",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/Sales",
+            "Targets": null,
+            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+            "Title": "Sales",
+            "AssociatedSites": [
+              {
+                "Title": "North",
+                "SiteUrl": "https://contoso.sharepoint.com/sites/north"
+              },
+              {
+                "Title": "South",
+                "SiteUrl": "https://contoso.sharepoint.com/sites/south"
+              }
+            ]
+          },
+          {
+            "Description": null,
+            "ID": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+            "LogoUrl": "http://contoso.com/__siteIcon__.jpg",
+            "SiteId": "b2c94ca1-0957-4bdd-b549-b7d365edc10f",
+            "SiteUrl": "https://contoso.sharepoint.com/sites/travelprograms",
+            "Targets": null,
+            "TenantInstanceId": "00000000-0000-0000-0000-000000000000",
+            "Title": "Travel Programs",
+            "AssociatedSites": [
+              {
+                "Title": "Europe",
+                "SiteUrl": "https://contoso.sharepoint.com/sites/europe"
+              },
+              {
+                "Title": "Asia",
+                "SiteUrl": "https://contoso.sharepoint.com/sites/asia"
+              },
+              {
+                "Title": "America",
+                "SiteUrl": "https://contoso.sharepoint.com/sites/america"
+              }
+            ]
+          }
+        ]));
         done();
       }
       catch (e) {

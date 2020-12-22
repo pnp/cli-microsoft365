@@ -41,7 +41,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
       let spoAdminUrl: string = '';
 
       if (this.verbose) {
-        logger.log(`Removing tenant property ${args.options.key} from ${args.options.appCatalogUrl}...`);
+        logger.logToStderr(`Removing tenant property ${args.options.key} from ${args.options.appCatalogUrl}...`);
       }
 
       this
@@ -69,7 +69,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
           }
           else {
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
             cb();
           }

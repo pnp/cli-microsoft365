@@ -58,10 +58,14 @@ describe('FN012017_TSC_extends', () => {
     const project: Project = {
       path: '/usr/tmp',
       tsConfigJson: {
-        extends: 'abc'
+        extends: 'abc',
+        source: JSON.stringify({
+          extends: 'abc'
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
   });
 });

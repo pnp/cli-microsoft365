@@ -1,8 +1,9 @@
+import * as parse from 'json-to-ast';
 import * as path from 'path';
 import { Occurrence } from "../";
-import { Rule } from "./Rule";
+import { JsonRule } from './JsonRule';
 
-export abstract class ManifestRule extends Rule {
+export abstract class ManifestRule extends JsonRule {
   get resolutionType(): string {
     return 'json';
   };
@@ -11,10 +12,11 @@ export abstract class ManifestRule extends Rule {
     return '';
   };
 
-  protected addOccurrence(resolution: string, filePath: string, projectPath: string, occurrences: Occurrence[]): void {
+  protected addOccurrence(resolution: string, filePath: string, projectPath: string, node: parse.ASTNode | undefined, occurrences: Occurrence[]): void {
     occurrences.push({
       file: path.relative(projectPath, filePath),
-      resolution: resolution
+      resolution: resolution,
+      position: this.getPositionFromNode(node)
     });
   }
 }

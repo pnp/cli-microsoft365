@@ -22,4 +22,19 @@ describe('FN019002_TSL_extends', () => {
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
+
+  it('returns notification if extends is not correctly configured', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      tsLintJsonRoot: {
+        extends: '@microsoft/sp-tslint-rules/old-tslint.json',
+        source: JSON.stringify({
+          extends: '@microsoft/sp-tslint-rules/old-tslint.json'
+        }, null, 2)
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
+  });
 });

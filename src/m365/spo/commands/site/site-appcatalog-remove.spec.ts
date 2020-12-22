@@ -13,7 +13,7 @@ const command: Command = require('./site-appcatalog-remove');
 describe(commands.SITE_APPCATALOG_REMOVE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -127,7 +133,7 @@ describe(commands.SITE_APPCATALOG_REMOVE, () => {
 
     command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } }, () => {
       try {
-        assert(loggerSpy.called);
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

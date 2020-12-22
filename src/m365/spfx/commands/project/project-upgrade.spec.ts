@@ -36,6 +36,12 @@ describe(commands.PROJECT_UPGRADE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
     telemetry = null;
@@ -2350,7 +2356,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       
       return existsSyncOriginal(path);
     });
-    const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => {});
+    const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
 
     command.action(logger, { options: { output: 'tour', toVersion: '1.6.0' } } as any, (err?: any) => {
       assert(writeFileSyncStub.calledWith(path.join(process.cwd(), projectPath, '/.tours/upgrade.tour')), 'Tour file not created');
@@ -2370,7 +2376,7 @@ describe(commands.PROJECT_UPGRADE, () => {
       
       return existsSyncOriginal(path);
     });
-    const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => {});
+    const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
 
     command.action(logger, { options: { output: 'tour', toVersion: '1.6.0' } } as any, (err?: any) => {
       assert(writeFileSyncStub.calledWith(path.join(process.cwd(), projectPath, '/.tours/upgrade.tour')), 'Tour file not created');

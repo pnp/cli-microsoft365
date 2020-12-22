@@ -1,4 +1,6 @@
-export interface TsLintJson {
+import { JsonFile } from ".";
+
+export interface TsLintJson extends JsonFile {
   $schema?: string;
   extends?: string;
   lintConfig?: {

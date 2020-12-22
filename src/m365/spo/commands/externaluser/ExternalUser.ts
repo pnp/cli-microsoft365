@@ -1,5 +1,5 @@
 export interface ExternalUser {
-  _ObjectType_: string;
+  _ObjectType_?: string;
   DisplayName: string;
   InvitedAs: string;
   UniqueId: string;

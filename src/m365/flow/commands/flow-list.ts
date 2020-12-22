@@ -1,6 +1,6 @@
 import { Logger } from '../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import { AzmgmtItemsListCommand } from '../../base/AzmgmtItemsListCommand';
@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   asAdmin: boolean;
 }
 
-class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, properties: { displayName: string } }> {
+class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName: string, properties: { displayName: string } }> {
   public get name(): string {
     return commands.FLOW_LIST;
   }
@@ -30,6 +30,10 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, properties:
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['name', 'displayName'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const url: string = `${this.resource}providers/Microsoft.ProcessSimple${args.options.asAdmin ? '/scopes/admin' : ''}/environments/${encodeURIComponent(args.options.environment)}/flows?api-version=2016-11-01`;
 
@@ -37,21 +41,15 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, properties:
       .getAllItems(url, logger, true)
       .then((): void => {
         if (this.items.length > 0) {
-          if (args.options.output === 'json') {
-            logger.log(this.items);
-          }
-          else {
-            logger.log(this.items.map(f => {
-              return {
-                name: f.name,
-                displayName: f.properties.displayName
-              };
-            }));
-          }
+          this.items.forEach(i => {
+            i.displayName = i.properties.displayName
+          });
+
+          logger.log(this.items);
         }
         else {
           if (this.verbose) {
-            logger.log('No Flows found');
+            logger.logToStderr('No Flows found');
           }
         }
 

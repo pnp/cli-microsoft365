@@ -12,34 +12,7 @@ const command: Command = require('./status-list');
 describe(commands.TENANT_STATUS_LIST, () => {
   let log: any[];
   let logger: Logger;
-
-  let loggerSpy: sinon.SinonSpy;
-
-  const textOutputForms = [
-    {
-      Name: "Microsoft Forms",
-      Status: "Normal service"
-    }
-  ];
-
-  const textOutput = [
-    {
-      Name: "Microsoft Forms",
-      Status: "Normal service"
-    },
-    {
-      Name: "Planner",
-      Status: "Normal service"
-    },
-    {
-      Name: "Microsoft Stream",
-      Status: "Normal service"
-    },
-    {
-      Name: "SharePoint Online",
-      Status: "Normal service"
-    }
-  ];
+  let loggerLogSpy: sinon.SinonSpy;
 
   const jsonOutput = {
     "value": [
@@ -242,9 +215,15 @@ describe(commands.TENANT_STATUS_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -267,6 +246,10 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['WorkloadDisplayName', 'StatusDisplayName']);
   });
 
   it('supports debug mode', () => {
@@ -313,12 +296,11 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
     command.action(logger, {
       options: {
-        output: 'json',
         debug: false
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -337,12 +319,11 @@ describe(commands.TENANT_STATUS_LIST, () => {
 
     command.action(logger, {
       options: {
-        output: 'json',
         debug: true
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(jsonOutput));
+        assert(loggerLogSpy.calledWith(jsonOutput));
         done();
       }
       catch (e) {
@@ -351,55 +332,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
     });
   });
 
-  it('gets the status of Microsoft 365 services as text', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
-        return Promise.resolve(jsonOutput);
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        output: 'text',
-        debug: false
-      }
-    }, () => {
-      try {
-        assert(loggerSpy.calledWith(textOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('gets the status of Microsoft 365 services as text (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
-        return Promise.resolve(jsonOutput);
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        output: 'text',
-        debug: true
-      }
-    }, () => {
-      try {
-        assert(loggerSpy.calledWith(textOutput));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('gets the status of Microsoft 365 services - JSON Output With Workload', (done) => {
+  it('gets the status of Microsoft 365 services with Workload', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
         return Promise.resolve(jsonOutputForms);
@@ -410,12 +343,11 @@ describe(commands.TENANT_STATUS_LIST, () => {
     command.action(logger, {
       options: {
         workload: 'Forms',
-        output: 'json',
         debug: false
       }
     } as any, () => {
       try {
-        assert(loggerSpy.calledWith(jsonOutputForms));
+        assert(loggerLogSpy.calledWith(jsonOutputForms));
         done();
       }
       catch (e) {
@@ -424,7 +356,7 @@ describe(commands.TENANT_STATUS_LIST, () => {
     });
   });
 
-  it('gets the status of Microsoft 365 services - JSON Output With Workload (debug)', (done) => {
+  it('gets the status of Microsoft 365 services with Workload (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
         return Promise.resolve(jsonOutputForms);
@@ -435,12 +367,11 @@ describe(commands.TENANT_STATUS_LIST, () => {
     command.action(logger, {
       options: {
         workload: 'Forms',
-        output: 'json',
         debug: true
       }
     } as any, () => {
       try {
-        assert(loggerSpy.calledWith(jsonOutputForms));
+        assert(loggerLogSpy.calledWith(jsonOutputForms));
         done();
       }
       catch (e) {
@@ -448,55 +379,4 @@ describe(commands.TENANT_STATUS_LIST, () => {
       }
     });
   });
-
-  it('gets the status of Microsoft 365 services - text Output With Workload', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
-        return Promise.resolve(jsonOutputForms);
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        workload: 'Forms',
-        output: 'text',
-        debug: false
-      }
-    } as any, () => {
-      try {
-        assert(loggerSpy.calledWith(textOutputForms));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('gets the status of Microsoft 365 services - text Output With Workload (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf('ServiceComms/CurrentStatus') > -1) {
-        return Promise.resolve(jsonOutputForms);
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        workload: 'Forms',
-        output: 'text',
-        debug: true
-      }
-    } as any, () => {
-      try {
-        assert(loggerSpy.calledWith(textOutputForms));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
 });

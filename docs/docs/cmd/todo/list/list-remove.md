@@ -10,9 +10,6 @@ m365 todo list remove [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-n, --name [name]`
 : The name of the task list to remove. Specify either `id` or `name` but not both
 
@@ -22,17 +19,7 @@ m365 todo list remove [options]
 `--confirm`
 : Don't prompt for confirming removing the task list
 
-`--query [query]`
-: JMESPath query string. See http://jmespath.org/ for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

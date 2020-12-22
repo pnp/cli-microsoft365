@@ -34,6 +34,10 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['ID', 'SiteDesignID', 'SiteDesignTitle', 'StartTime'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const data: any = {};
     if (args.options.siteDesignId) {
@@ -52,22 +56,15 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
 
     request.post<{ value: SiteDesignRun[] }>(requestOptions)
       .then((res: { value: SiteDesignRun[] }): void => {
-        if (args.options.output === 'json') {
-          logger.log(res.value);
+        if (args.options.output !== 'json') {
+          res.value.forEach(d => {
+            d.StartTime = new Date(parseInt(d.StartTime)).toLocaleString();
+          });
         }
-        else {
-          logger.log(res.value.map(d => {
-            return {
-              ID: d.ID,
-              SiteDesignID: d.SiteDesignID,
-              SiteDesignTitle: d.SiteDesignTitle,
-              StartTime: new Date(parseInt(d.StartTime)).toLocaleString()
-            };
-          }));
-        }
+        logger.log(res.value);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

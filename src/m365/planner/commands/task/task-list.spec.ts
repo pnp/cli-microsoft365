@@ -12,7 +12,8 @@ const command: Command = require('./task-list');
 describe(commands.PLANNER_TASK_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +26,16 @@ describe(commands.PLANNER_TASK_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -51,6 +59,10 @@ describe(commands.PLANNER_TASK_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'startDateTime', 'dueDateTime', 'completedDateTime']);
   });
 
   it('lists planner tasks of the current logged in user as a JSON result', (done) => {
@@ -147,7 +159,7 @@ describe(commands.PLANNER_TASK_LIST, () => {
 
     command.action(logger, { options: { debug: true, output: 'json' } }, () => {
       try {
-        assert(loggerSpy.called);
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -250,7 +262,7 @@ describe(commands.PLANNER_TASK_LIST, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerSpy.called);
+        assert(loggerLogSpy.called);
         done();
       }
       catch (e) {
@@ -355,7 +367,7 @@ describe(commands.PLANNER_TASK_LIST, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.called);
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

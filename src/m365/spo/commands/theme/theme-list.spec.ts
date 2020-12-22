@@ -12,7 +12,8 @@ const command: Command = require('./theme-list');
 describe(commands.THEME_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -26,9 +27,16 @@ describe(commands.THEME_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -52,6 +60,10 @@ describe(commands.THEME_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Name']);
   });
 
   it('uses correct API url', (done) => {
@@ -95,7 +107,7 @@ describe(commands.THEME_LIST, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso-admin.sharepoint.com/_api/thememanager/GetTenantThemingOptions');
         assert.strictEqual(postStub.lastCall.args[0].headers['accept'], 'application/json;odata=nometadata');
-        assert.strictEqual(loggerSpy.called, true);
+        assert.strictEqual(loggerLogToStderrSpy.called, true);
         done();
       }
       catch (e) {
@@ -117,11 +129,13 @@ describe(commands.THEME_LIST, () => {
 
     command.action(logger, { options: { debug: true, verbose: true } }, () => {
       try {
-        assert(loggerSpy.calledWith([{
-          Name: 'Mint',
+        assert(loggerLogSpy.calledWith([{
+          "name": "Mint",
+          "themeJson": "{\"isInverted\":false,\"name\":\"Mint\",\"palette\":{\"themePrimary\":\"#43cfbb\",\"themeLighterAlt\":\"#f2fcfa\",\"themeLighter\":\"#ddf6f2\",\"themeLight\":\"#adeae1\",\"themeTertiary\":\"#71dbcb\",\"themeSecondary\":\"#4ad1bd\",\"themeDarkAlt\":\"#32c3ae\",\"themeDark\":\"#248b7b\",\"themeDarker\":\"#1f776a\",\"neutralLighterAlt\":\"#f8f8f8\",\"neutralLighter\":\"#f4f4f4\",\"neutralLight\":\"#eaeaea\",\"neutralQuaternaryAlt\":\"#dadada\",\"neutralQuaternary\":\"#d0d0d0\",\"neutralTertiaryAlt\":\"#c8c8c8\",\"neutralTertiary\":\"#a6a6a6\",\"neutralSecondary\":\"#666666\",\"neutralPrimaryAlt\":\"#3c3c3c\",\"neutralPrimary\":\"#333\",\"neutralDark\":\"#212121\",\"black\":\"#1c1c1c\",\"white\":\"#fff\",\"primaryBackground\":\"#fff\",\"primaryText\":\"#333\",\"bodyBackground\":\"#fff\",\"bodyText\":\"#333\",\"disabledBackground\":\"#f4f4f4\",\"disabledText\":\"#c8c8c8\"}}"
         },
         {
-          Name: 'Mint Inverted'
+          "name": "Mint Inverted",
+          "themeJson": "{\"isInverted\":true,\"name\":\"Mint Inverted\",\"palette\":{\"themePrimary\":\"#43cfbb\",\"themeLighterAlt\":\"#f2fcfa\",\"themeLighter\":\"#ddf6f2\",\"themeLight\":\"#adeae1\",\"themeTertiary\":\"#71dbcb\",\"themeSecondary\":\"#4ad1bd\",\"themeDarkAlt\":\"#32c3ae\",\"themeDark\":\"#248b7b\",\"themeDarker\":\"#1f776a\",\"neutralLighterAlt\":\"#f8f8f8\",\"neutralLighter\":\"#f4f4f4\",\"neutralLight\":\"#eaeaea\",\"neutralQuaternaryAlt\":\"#dadada\",\"neutralQuaternary\":\"#d0d0d0\",\"neutralTertiaryAlt\":\"#c8c8c8\",\"neutralTertiary\":\"#a6a6a6\",\"neutralSecondary\":\"#666666\",\"neutralPrimaryAlt\":\"#3c3c3c\",\"neutralPrimary\":\"#333\",\"neutralDark\":\"#212121\",\"black\":\"#1c1c1c\",\"white\":\"#fff\",\"primaryBackground\":\"#fff\",\"primaryText\":\"#333\",\"bodyBackground\":\"#fff\",\"bodyText\":\"#333\",\"disabledBackground\":\"#f4f4f4\",\"disabledText\":\"#c8c8c8\"}}"
         }]), 'Invalid request');
         done();
       }
@@ -144,7 +158,7 @@ describe(commands.THEME_LIST, () => {
 
     command.action(logger, { options: { debug: true, verbose: true, output: 'json' } }, () => {
       try {
-        assert(loggerSpy.calledWith(expected.themePreviews), 'Invalid request');
+        assert(loggerLogSpy.calledWith(expected.themePreviews), 'Invalid request');
         done();
       }
       catch (e) {
@@ -166,7 +180,7 @@ describe(commands.THEME_LIST, () => {
 
     command.action(logger, { options: { debug: true, verbose: true } }, () => {
       try {
-        assert(loggerSpy.calledWith('No themes found'), 'Invalid request');
+        assert(loggerLogToStderrSpy.calledWith('No themes found'), 'Invalid request');
         done();
       }
       catch (e) {

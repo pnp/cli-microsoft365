@@ -28,7 +28,7 @@ class AadOAuth2GrantSetCommand extends AadCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Updating OAuth2 permissions...`);
+      logger.logToStderr(`Updating OAuth2 permissions...`);
     }
 
     const requestOptions: any = {
@@ -46,7 +46,7 @@ class AadOAuth2GrantSetCommand extends AadCommand {
       .patch(requestOptions)
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

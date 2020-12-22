@@ -12,7 +12,7 @@ const command: Command = require('./site-get');
 describe(commands.SITE_GET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.SITE_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -109,7 +115,7 @@ describe(commands.SITE_GET, () => {
 
     command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert(loggerSpy.calledWith(siteProperties));
+        assert(loggerLogSpy.calledWith(siteProperties));
         done();
       }
       catch (e) {
@@ -175,7 +181,7 @@ describe(commands.SITE_GET, () => {
 
     command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/project-x' } }, () => {
       try {
-        assert(loggerSpy.calledWith(siteProperties));
+        assert(loggerLogSpy.calledWith(siteProperties));
         done();
       }
       catch (e) {

@@ -14,7 +14,7 @@ const command: Command = require('./homesite-remove');
 describe(commands.HOMESITE_REMOVE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -34,9 +34,15 @@ describe(commands.HOMESITE_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -173,7 +179,7 @@ describe(commands.HOMESITE_REMOVE, () => {
     });
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(homeSiteRemoveCallIssued && loggerSpy.calledWith(chalk.green('DONE')));
+        assert(homeSiteRemoveCallIssued && loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

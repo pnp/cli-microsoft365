@@ -33,7 +33,7 @@ class SpoTenantAppCatalogUrlGetCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            logger.log("Tenant app catalog is not configured.");
+            logger.logToStderr("Tenant app catalog is not configured.");
           }
         }
         cb();

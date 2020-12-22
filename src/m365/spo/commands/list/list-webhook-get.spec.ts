@@ -12,7 +12,7 @@ const command: Command = require('./list-webhook-get');
 describe(commands.LIST_WEBHOOK_GET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.LIST_WEBHOOK_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -81,7 +87,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "clientState": null,
           "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
           "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
@@ -126,7 +132,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "clientState": null,
           "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
           "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
@@ -171,7 +177,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "clientState": null,
           "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
           "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",
@@ -216,7 +222,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "clientState": null,
           "expirationDateTime": "2019-01-27T16:32:05.4610008Z",
           "id": "cc27a922-8224-4296-90a5-ebbc54da2e85",

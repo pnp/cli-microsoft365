@@ -10,9 +10,6 @@ m365 spo feature enable [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --url <url>`
 : The URL of the site or web for which to enable the feature
 
@@ -25,17 +22,7 @@ m365 spo feature enable [options]
 `--force`
 : Specifies whether to overwrite an existing feature with the same feature identifier. This parameter is ignored if there are no errors.
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

@@ -79,4 +79,29 @@ describe('FN014006_CODE_launch_sourceMapPathOverrides', () => {
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
+
+  it('returns notifications if the configuration does not contains the specified override', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      vsCode: {
+        launchJson: {
+          version: '1.0',
+          configurations: [{
+            sourceMapPathOverrides: {}
+          }],
+          source: JSON.stringify({
+            version: '1.0',
+            configurations: [
+              {
+                sourceMapPathOverrides: {}
+              }
+            ]
+          }, null, 2)
+        }
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 5, 'Incorrect line number');
+  });
 });

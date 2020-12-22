@@ -1,4 +1,6 @@
-export interface VsCodeSettingsJson {
+import { JsonFile } from ".";
+
+export interface VsCodeSettingsJson extends JsonFile {
   "json.schemas"?: VsCodeSettingsJsonJsonSchema[];
 }
 

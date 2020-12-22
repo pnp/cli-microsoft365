@@ -59,21 +59,21 @@ class PaPcfInitCommand extends AnonymousCommand {
       };
 
       if (this.verbose) {
-        logger.log(`name: ${args.options.name}`);
-        logger.log(`namespace: ${args.options.namespace}`);
-        logger.log(`template: ${args.options.template}`);
-        logger.log(`pcfTemplatePath: ${pcfTemplatePath}`);
-        logger.log(`pcfComponentTemplatePath: ${pcfComponentTemplatePath}`);
-        logger.log(`workingDirectory: ${workingDirectory}`);
-        logger.log(`workingDirectoryName: ${workingDirectoryName}`);
-        logger.log(`componentDirectory: ${componentDirectory}`);
+        logger.logToStderr(`name: ${args.options.name}`);
+        logger.logToStderr(`namespace: ${args.options.namespace}`);
+        logger.logToStderr(`template: ${args.options.template}`);
+        logger.logToStderr(`pcfTemplatePath: ${pcfTemplatePath}`);
+        logger.logToStderr(`pcfComponentTemplatePath: ${pcfComponentTemplatePath}`);
+        logger.logToStderr(`workingDirectory: ${workingDirectory}`);
+        logger.logToStderr(`workingDirectoryName: ${workingDirectoryName}`);
+        logger.logToStderr(`componentDirectory: ${componentDirectory}`);
       }
 
       TemplateInstantiator.instantiate(logger, pcfTemplatePath, workingDirectory, false, variables, this.verbose);
       TemplateInstantiator.instantiate(logger, pcfComponentTemplatePath, componentDirectory, true, variables, this.verbose);
 
       if (this.verbose) {
-        logger.log(` `);
+        logger.logToStderr(` `);
       }
 
       logger.log(chalk.green(`The PowerApps component framework project was successfully created in '${workingDirectory}'.`));

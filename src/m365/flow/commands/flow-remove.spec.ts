@@ -13,7 +13,8 @@ const command: Command = require('./flow-remove');
 describe(commands.FLOW_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -27,9 +28,16 @@ describe(commands.FLOW_REMOVE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -148,7 +156,7 @@ describe(commands.FLOW_REMOVE, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.called);
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -228,7 +236,7 @@ describe(commands.FLOW_REMOVE, () => {
       }
     }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -254,7 +262,7 @@ describe(commands.FLOW_REMOVE, () => {
         confirm: true
       }
     }, () => {
-      assert(loggerSpy.calledWith(chalk.green('DONE')));
+      assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
       done();
     });
   });
@@ -277,7 +285,7 @@ describe(commands.FLOW_REMOVE, () => {
         asAdmin: true
       }
     }, () => {
-      assert(loggerSpy.calledWith(chalk.green('DONE')));
+      assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
       done();
     });
   });
@@ -363,7 +371,7 @@ describe(commands.FLOW_REMOVE, () => {
       }
     } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
+        assert(loggerLogSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
         done();
       }
       catch (e) {
@@ -387,7 +395,7 @@ describe(commands.FLOW_REMOVE, () => {
       }
     } as any, (err?: any) => {
       try {
-        assert(loggerSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
+        assert(loggerLogSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
         done();
       }
       catch (e) {

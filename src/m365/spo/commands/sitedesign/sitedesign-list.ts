@@ -4,7 +4,6 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ContextInfo } from '../../spo';
 import { SiteDesign } from './SiteDesign';
 
 interface CommandArgs {
@@ -20,20 +19,17 @@ class SpoSiteDesignListCommand extends SpoCommand {
     return 'Lists available site designs for creating modern sites';
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let spoUrl: string = '';
+  public defaultProperties(): string[] | undefined {
+    return ['Id', 'IsDefault', 'Title', 'Version', 'WebTemplate'];
+  }
 
+  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getSpoUrl(logger, this.debug)
-      .then((_spoUrl: string): Promise<ContextInfo> => {
-        spoUrl = _spoUrl;
-        return this.getRequestDigest(spoUrl);
-      })
-      .then((res: ContextInfo): Promise<{ value: SiteDesign[] }> => {
+      .then((spoUrl: string): Promise<{ value: SiteDesign[] }> => {
         const requestOptions: any = {
           url: `${spoUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesigns`,
           headers: {
-            'X-RequestDigest': res.FormDigestValue,
             accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
@@ -42,23 +38,10 @@ class SpoSiteDesignListCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((res: { value: SiteDesign[] }): void => {
-        if (args.options.output === 'json') {
-          logger.log(res.value);
-        }
-        else {
-          logger.log(res.value.map(d => {
-            return {
-              Id: d.Id,
-              IsDefault: d.IsDefault,
-              Title: d.Title,
-              Version: d.Version,
-              WebTemplate: d.WebTemplate
-            };
-          }));
-        }
+        logger.log(res.value);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

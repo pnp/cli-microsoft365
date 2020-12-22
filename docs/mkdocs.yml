@@ -5,6 +5,7 @@ nav:
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
     - 'Using the CLI': 'user-guide/using-cli.md'
+    - 'Run CLI in a Docker Container': 'user-guide/run-cli-in-docker-container.md'
     - 'Logging in to Microsoft 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
     - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
@@ -85,6 +86,7 @@ nav:
         - environment get: 'cmd/flow/environment/environment-get.md'
         - environment list: 'cmd/flow/environment/environment-list.md'
       - run:
+        - run cancel: 'cmd/flow/run/run-cancel.md'
         - run get: 'cmd/flow/run/run-get.md'
         - run list: 'cmd/flow/run/run-list.md'
     - Microsoft Graph (graph):
@@ -208,6 +210,7 @@ nav:
         - file list: 'cmd/spo/file/file-list.md'
         - file move: 'cmd/spo/file/file-move.md'
         - file remove: 'cmd/spo/file/file-remove.md'
+        - file sharinginfo get: 'cmd/spo/file/file-sharinginfo-get.md'
       - folder:
         - folder add: 'cmd/spo/folder/folder-add.md'
         - folder copy: 'cmd/spo/folder/folder-copy.md'
@@ -252,6 +255,7 @@ nav:
         - list contenttype add: 'cmd/spo/list/list-contenttype-add.md'
         - list contenttype list: 'cmd/spo/list/list-contenttype-list.md'
         - list contenttype remove: 'cmd/spo/list/list-contenttype-remove.md'
+        - list contenttype default set: 'cmd/spo/list/list-contenttype-default-set.md'
         - list label get: 'cmd/spo/list/list-label-get.md'
         - list label set: 'cmd/spo/list/list-label-set.md'
         - list sitescript get: 'cmd/spo/list/list-sitescript-get.md'
@@ -300,6 +304,7 @@ nav:
         - page column list: 'cmd/spo/page/page-column-list.md'
         - page control get: 'cmd/spo/page/page-control-get.md'
         - page control list: 'cmd/spo/page/page-control-list.md'
+        - page control set: 'cmd/spo/page/page-control-set.md'
         - page header set: 'cmd/spo/page/page-header-set.md'
         - page section add: 'cmd/spo/page/page-section-add.md'
         - page section get: 'cmd/spo/page/page-section-get.md'
@@ -374,6 +379,8 @@ nav:
         - tenant appcatalog add: 'cmd/spo/tenant/tenant-appcatalog-add.md'
         - tenant appcatalogurl get: 'cmd/spo/tenant/tenant-appcatalogurl-get.md'
         - tenant recyclebinitem list: 'cmd/spo/tenant/tenant-recyclebinitem-list.md'
+        - tenant recyclebinitem remove: 'cmd/spo/tenant/tenant-recyclebinitem-remove.md'
+        - tenant recyclebinitem restore: 'cmd/spo/tenant/tenant-recyclebinitem-restore.md'
         - tenant settings list: 'cmd/spo/tenant/tenant-settings-list.md'
         - tenant settings set: 'cmd/spo/tenant/tenant-settings-set.md'
       - term:
@@ -420,6 +427,8 @@ nav:
         - channel list: 'cmd/teams/channel/channel-list.md'
         - channel remove: 'cmd/teams/channel/channel-remove.md'
         - channel set: 'cmd/teams/channel/channel-set.md'
+      - conversationmember:
+        - conversationmember list: 'cmd/teams/conversationmember/conversationmember-list.md'
       - funsettings:
         - funsettings list: 'cmd/teams/funsettings/funsettings-list.md'
         - funsettings set: 'cmd/teams/funsettings/funsettings-set.md'
@@ -440,6 +449,7 @@ nav:
         - report deviceusagedistributionusercounts: 'cmd/teams/report/report-deviceusagedistributionusercounts.md'
         - report deviceusageusercounts: 'cmd/teams/report/report-deviceusageusercounts.md'
         - report deviceusageuserdetail: 'cmd/teams/report/report-deviceusageuserdetail.md'
+        - report pstncalls: 'cmd/teams/report/report-pstncalls.md'
         - report useractivitycounts: 'cmd/teams/report/report-useractivitycounts.md'
         - report useractivityusercounts: 'cmd/teams/report/report-useractivityusercounts.md'
         - report useractivityuserdetail: 'cmd/teams/report/report-useractivityuserdetail.md'
@@ -483,7 +493,13 @@ nav:
         - list list: 'cmd/todo/list/list-list.md'
         - list remove: 'cmd/todo/list/list-remove.md'
         - list set: 'cmd/todo/list/list-set.md'
+      - task:
+        - task add: 'cmd/todo/task/task-add.md'
+        - task list: 'cmd/todo/task/task-list.md'
+        - task remove: 'cmd/todo/task/task-remove.md'
+        - task set: 'cmd/todo/task/task-set.md'
     - Yammer (yammer):
+      - search: 'cmd/yammer/yammer-search.md'
       - group:
         - group list: 'cmd/yammer/group/group-list.md'
         - group user add: 'cmd/yammer/group/group-user-add.md'
@@ -505,7 +521,7 @@ nav:
         - report deviceusageuserdetail: 'cmd/yammer/report/report-deviceusageuserdetail.md'
         - report groupsactivitycounts: 'cmd/yammer/report/report-groupsactivitycounts.md'
         - report groupsactivitydetail: 'cmd/yammer/report/report-groupsactivitydetail.md'
-        - report groupsactivitygroupcounts: 'cmd/yammer/report/report-groupsactivitygroupcounts.md'
+        - report groupsactivitygroupcounts: 'cmd/yammer/report/report-groupsactivitygroupcounts.md'        
       - user:
         - user get: 'cmd/yammer/user/user-get.md'
         - user list: 'cmd/yammer/user/user-list.md'
@@ -521,6 +537,7 @@ nav:
   - Sample Scripts:
     - 'Introduction': 'sample-scripts/index.md'
     - Azure Active Directory:
+      - 'Analyze User Profile Photos using Azure Computer Vision API' : 'sample-scripts/aad/analyze-user-profile-photos.md'
       - 'Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups' : 'sample-scripts/aad/manage-group-users.md'
       - 'Delete all Microsoft 365 groups' : 'sample-scripts/aad/delete-m365-groups.md'
       - 'Scan for Microsoft 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
@@ -575,6 +592,7 @@ markdown_extensions:
   - toc:
       permalink: true
   - pymdownx.superfences
+  - pymdownx.snippets
   - def_list
 extra:
   social:

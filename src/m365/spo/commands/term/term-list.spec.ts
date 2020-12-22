@@ -13,7 +13,7 @@ const command: Command = require('./term-list');
 describe(commands.TERM_LIST, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -28,9 +28,15 @@ describe(commands.TERM_LIST, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -55,6 +61,10 @@ describe(commands.TERM_LIST, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['Id', 'Name']);
   });
 
   it('gets taxonomy terms from term set by id, term group by id', (done) => {
@@ -124,20 +134,78 @@ describe(commands.TERM_LIST, () => {
     });
     command.action(logger, { options: { debug: false, termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            Id: "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
-            Name: "HR"
-          },
-          {
-            Id: "247543b6-45f2-4232-b9e8-66c5bf53c31e",
-            Name: "IT"
-          },
-          {
-            Id: "ffc3608f-1250-4d28-b388-381fad8d4602",
-            Name: "Leadership"
-          }
-        ]));
+        assert(loggerLogSpy.calledWith([{
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==",
+          "CreatedDate": "2018-09-13T11:52:55.320Z",
+          "Id": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
+          "LastModifiedDate": "2018-09-13T11:52:55.337Z",
+          "Name": "HR",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "HR",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7tkN1JPJFMkK56GbFv1PDHg==",
+          "CreatedDate": "2018-09-13T11:52:55.477Z",
+          "Id": "247543b6-45f2-4232-b9e8-66c5bf53c31e",
+          "LastModifiedDate": "2018-09-13T11:52:55.490Z",
+          "Name": "IT",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "IT",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7j2DD/1ASKE2ziDgfrY1GAg==",
+          "CreatedDate": "2018-09-13T11:52:55.600Z",
+          "Id": "ffc3608f-1250-4d28-b388-381fad8d4602",
+          "LastModifiedDate": "2018-09-13T11:52:55.617Z",
+          "Name": "Leadership",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "Leadership",
+          "TermsCount": 0
+        }]));
         done();
       }
       catch (e) {
@@ -213,20 +281,78 @@ describe(commands.TERM_LIST, () => {
     });
     command.action(logger, { options: { debug: true, termSetName: 'PnPTermSets', termGroupId: '0e8f395e-ff58-4d45-9ff7-e331ab728beb' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            Id: "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
-            Name: "HR"
-          },
-          {
-            Id: "247543b6-45f2-4232-b9e8-66c5bf53c31e",
-            Name: "IT"
-          },
-          {
-            Id: "ffc3608f-1250-4d28-b388-381fad8d4602",
-            Name: "Leadership"
-          }
-        ]));
+        assert(loggerLogSpy.calledWith([{
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==",
+          "CreatedDate": "2018-09-13T11:52:55.320Z",
+          "Id": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
+          "LastModifiedDate": "2018-09-13T11:52:55.337Z",
+          "Name": "HR",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "HR",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7tkN1JPJFMkK56GbFv1PDHg==",
+          "CreatedDate": "2018-09-13T11:52:55.477Z",
+          "Id": "247543b6-45f2-4232-b9e8-66c5bf53c31e",
+          "LastModifiedDate": "2018-09-13T11:52:55.490Z",
+          "Name": "IT",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "IT",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7j2DD/1ASKE2ziDgfrY1GAg==",
+          "CreatedDate": "2018-09-13T11:52:55.600Z",
+          "Id": "ffc3608f-1250-4d28-b388-381fad8d4602",
+          "LastModifiedDate": "2018-09-13T11:52:55.617Z",
+          "Name": "Leadership",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "Leadership",
+          "TermsCount": 0
+        }]));
         done();
       }
       catch (e) {
@@ -302,20 +428,78 @@ describe(commands.TERM_LIST, () => {
     });
     command.action(logger, { options: { debug: false, termSetId: '7a167c47-2b37-41d0-94d0-e962c1a4f2ed', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            Id: "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
-            Name: "HR"
-          },
-          {
-            Id: "247543b6-45f2-4232-b9e8-66c5bf53c31e",
-            Name: "IT"
-          },
-          {
-            Id: "ffc3608f-1250-4d28-b388-381fad8d4602",
-            Name: "Leadership"
-          }
-        ]));
+        assert(loggerLogSpy.calledWith([{
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==",
+          "CreatedDate": "2018-09-13T11:52:55.320Z",
+          "Id": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
+          "LastModifiedDate": "2018-09-13T11:52:55.337Z",
+          "Name": "HR",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "HR",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7tkN1JPJFMkK56GbFv1PDHg==",
+          "CreatedDate": "2018-09-13T11:52:55.477Z",
+          "Id": "247543b6-45f2-4232-b9e8-66c5bf53c31e",
+          "LastModifiedDate": "2018-09-13T11:52:55.490Z",
+          "Name": "IT",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "IT",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7j2DD/1ASKE2ziDgfrY1GAg==",
+          "CreatedDate": "2018-09-13T11:52:55.600Z",
+          "Id": "ffc3608f-1250-4d28-b388-381fad8d4602",
+          "LastModifiedDate": "2018-09-13T11:52:55.617Z",
+          "Name": "Leadership",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "Leadership",
+          "TermsCount": 0
+        }]));
         done();
       }
       catch (e) {
@@ -391,20 +575,78 @@ describe(commands.TERM_LIST, () => {
     });
     command.action(logger, { options: { debug: false, termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            Id: "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
-            Name: "HR"
-          },
-          {
-            Id: "247543b6-45f2-4232-b9e8-66c5bf53c31e",
-            Name: "IT"
-          },
-          {
-            Id: "ffc3608f-1250-4d28-b388-381fad8d4602",
-            Name: "Leadership"
-          }
-        ]));
+        assert(loggerLogSpy.calledWith([{
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==",
+          "CreatedDate": "2018-09-13T11:52:55.320Z",
+          "Id": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
+          "LastModifiedDate": "2018-09-13T11:52:55.337Z",
+          "Name": "HR",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "HR",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7tkN1JPJFMkK56GbFv1PDHg==",
+          "CreatedDate": "2018-09-13T11:52:55.477Z",
+          "Id": "247543b6-45f2-4232-b9e8-66c5bf53c31e",
+          "LastModifiedDate": "2018-09-13T11:52:55.490Z",
+          "Name": "IT",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "IT",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7j2DD/1ASKE2ziDgfrY1GAg==",
+          "CreatedDate": "2018-09-13T11:52:55.600Z",
+          "Id": "ffc3608f-1250-4d28-b388-381fad8d4602",
+          "LastModifiedDate": "2018-09-13T11:52:55.617Z",
+          "Name": "Leadership",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "Leadership",
+          "TermsCount": 0
+        }]));
         done();
       }
       catch (e) {
@@ -426,7 +668,7 @@ describe(commands.TERM_LIST, () => {
     });
     command.action(logger, { options: { debug: false, termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets', output: 'json' } }, () => {
       try {
-        assert(loggerSpy.calledWith([{ "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "10ca969e-3062-0000-2cdb-e38e5b6fba03|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==", "CreatedDate": "2018-09-13T11:52:55.320Z", "Id": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b", "LastModifiedDate": "2018-09-13T11:52:55.337Z", "Name": "HR", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "HR", "TermsCount": 0 }, { "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "10ca969e-3062-0000-2cdb-e38e5b6fba03|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7tkN1JPJFMkK56GbFv1PDHg==", "CreatedDate": "2018-09-13T11:52:55.477Z", "Id": "247543b6-45f2-4232-b9e8-66c5bf53c31e", "LastModifiedDate": "2018-09-13T11:52:55.490Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }, { "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "10ca969e-3062-0000-2cdb-e38e5b6fba03|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7j2DD/1ASKE2ziDgfrY1GAg==", "CreatedDate": "2018-09-13T11:52:55.600Z", "Id": "ffc3608f-1250-4d28-b388-381fad8d4602", "LastModifiedDate": "2018-09-13T11:52:55.617Z", "Name": "Leadership", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Leadership", "TermsCount": 2 }]));
+        assert(loggerLogSpy.calledWith([{ "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "10ca969e-3062-0000-2cdb-e38e5b6fba03|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==", "CreatedDate": "2018-09-13T11:52:55.320Z", "Id": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b", "LastModifiedDate": "2018-09-13T11:52:55.337Z", "Name": "HR", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "HR", "TermsCount": 0 }, { "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "10ca969e-3062-0000-2cdb-e38e5b6fba03|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7tkN1JPJFMkK56GbFv1PDHg==", "CreatedDate": "2018-09-13T11:52:55.477Z", "Id": "247543b6-45f2-4232-b9e8-66c5bf53c31e", "LastModifiedDate": "2018-09-13T11:52:55.490Z", "Name": "IT", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "IT", "TermsCount": 0 }, { "_ObjectType_": "SP.Taxonomy.Term", "_ObjectIdentity_": "10ca969e-3062-0000-2cdb-e38e5b6fba03|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7j2DD/1ASKE2ziDgfrY1GAg==", "CreatedDate": "2018-09-13T11:52:55.600Z", "Id": "ffc3608f-1250-4d28-b388-381fad8d4602", "LastModifiedDate": "2018-09-13T11:52:55.617Z", "Name": "Leadership", "CustomProperties": {}, "CustomSortOrder": null, "IsAvailableForTagging": true, "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com", "Description": "", "IsDeprecated": false, "IsKeyword": false, "IsPinned": false, "IsPinnedRoot": false, "IsReused": false, "IsRoot": true, "IsSourceTerm": true, "LocalCustomProperties": {}, "MergedTermIds": [], "PathOfTerm": "Leadership", "TermsCount": 2 }]));
         done();
       }
       catch (e) {
@@ -502,20 +744,78 @@ describe(commands.TERM_LIST, () => {
     });
     command.action(logger, { options: { debug: false, termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets>' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            Id: "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
-            Name: "HR"
-          },
-          {
-            Id: "247543b6-45f2-4232-b9e8-66c5bf53c31e",
-            Name: "IT"
-          },
-          {
-            Id: "ffc3608f-1250-4d28-b388-381fad8d4602",
-            Name: "Leadership"
-          }
-        ]));
+        assert(loggerLogSpy.calledWith([{
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==",
+          "CreatedDate": "2018-09-13T11:52:55.320Z",
+          "Id": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
+          "LastModifiedDate": "2018-09-13T11:52:55.337Z",
+          "Name": "HR",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "HR",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7tkN1JPJFMkK56GbFv1PDHg==",
+          "CreatedDate": "2018-09-13T11:52:55.477Z",
+          "Id": "247543b6-45f2-4232-b9e8-66c5bf53c31e",
+          "LastModifiedDate": "2018-09-13T11:52:55.490Z",
+          "Name": "IT",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "IT",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7j2DD/1ASKE2ziDgfrY1GAg==",
+          "CreatedDate": "2018-09-13T11:52:55.600Z",
+          "Id": "ffc3608f-1250-4d28-b388-381fad8d4602",
+          "LastModifiedDate": "2018-09-13T11:52:55.617Z",
+          "Name": "Leadership",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "Leadership",
+          "TermsCount": 0
+        }]));
         done();
       }
       catch (e) {
@@ -591,20 +891,78 @@ describe(commands.TERM_LIST, () => {
     });
     command.action(logger, { options: { debug: false, termSetName: 'PnP-Organizations>', termGroupName: 'PnPTermSets' } }, () => {
       try {
-        assert(loggerSpy.calledWith([
-          {
-            Id: "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
-            Name: "HR"
-          },
-          {
-            Id: "247543b6-45f2-4232-b9e8-66c5bf53c31e",
-            Name: "IT"
-          },
-          {
-            Id: "ffc3608f-1250-4d28-b388-381fad8d4602",
-            Name: "Leadership"
-          }
-        ]));
+        assert(loggerLogSpy.calledWith([{
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7niHPAumMhU6sBKkTpEpdKw==",
+          "CreatedDate": "2018-09-13T11:52:55.320Z",
+          "Id": "02cf219e-8ce9-4e85-ac04-a913a44a5d2b",
+          "LastModifiedDate": "2018-09-13T11:52:55.337Z",
+          "Name": "HR",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "HR",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7tkN1JPJFMkK56GbFv1PDHg==",
+          "CreatedDate": "2018-09-13T11:52:55.477Z",
+          "Id": "247543b6-45f2-4232-b9e8-66c5bf53c31e",
+          "LastModifiedDate": "2018-09-13T11:52:55.490Z",
+          "Name": "IT",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "IT",
+          "TermsCount": 0
+        },
+        {
+          "_ObjectType_": "SP.Taxonomy.Term",
+          "_ObjectIdentity_": "1e1e969e-7056-0000-2cdb-ea009f6c99c8|fec14c62-7c3b-481b-851b-c80d7802b224:te:YU1+cBy9wUuh/fzgFZGpUV45jw5Y/0VNn/fjMatyi+ts4nkUgBOoQZGDcrxallG7j2DD/1ASKE2ziDgfrY1GAg==",
+          "CreatedDate": "2018-09-13T11:52:55.600Z",
+          "Id": "ffc3608f-1250-4d28-b388-381fad8d4602",
+          "LastModifiedDate": "2018-09-13T11:52:55.617Z",
+          "Name": "Leadership",
+          "CustomProperties": {},
+          "CustomSortOrder": null,
+          "IsAvailableForTagging": true,
+          "Owner": "i:0#.f|membership|admin@contoso.onmicrosoft.com",
+          "Description": "",
+          "IsDeprecated": false,
+          "IsKeyword": false,
+          "IsPinned": false,
+          "IsPinnedRoot": false,
+          "IsReused": false,
+          "IsRoot": true,
+          "IsSourceTerm": true,
+          "LocalCustomProperties": {},
+          "MergedTermIds": [],
+          "PathOfTerm": "Leadership",
+          "TermsCount": 0
+        }]));
         done();
       }
       catch (e) {
@@ -731,7 +1089,7 @@ describe(commands.TERM_LIST, () => {
     });
     command.action(logger, { options: { debug: false, termSetName: 'PnP-Organizations', termGroupName: 'PnPTermSets', output: 'json' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

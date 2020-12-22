@@ -86,7 +86,7 @@ class GraphSubscriptionAddCommand extends GraphCommand {
         logger.log(res);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();
@@ -96,14 +96,14 @@ class GraphSubscriptionAddCommand extends GraphCommand {
   private getExpirationDateTimeOrDefault(logger: Logger, args: CommandArgs): string {
     if (args.options.expirationDateTime) {
       if (this.debug) {
-        logger.log(`Expiration date time is specified (${args.options.expirationDateTime}).`);
+        logger.logToStderr(`Expiration date time is specified (${args.options.expirationDateTime}).`);
       }
 
       return args.options.expirationDateTime;
     }
 
     if (this.debug) {
-      logger.log(`Expiration date time is not specified. Will try to get appropriate maximum value`);
+      logger.logToStderr(`Expiration date time is not specified. Will try to get appropriate maximum value`);
     }
 
     const fromNow = (minutes: number) => {
@@ -125,13 +125,13 @@ class GraphSubscriptionAddCommand extends GraphCommand {
       const actualExpirationIsoString = actualExpiration.toISOString();
 
       if (this.debug) {
-        logger.log(`Matching resource in default values '${args.options.resource}' => '${resource}'`);
-        logger.log(`Resolved expiration delay: ${resolvedExpirationDelay} (safe delta: ${SAFE_MINUTES_DELTA})`);
-        logger.log(`Actual expiration date time: ${actualExpirationIsoString}`);
+        logger.logToStderr(`Matching resource in default values '${args.options.resource}' => '${resource}'`);
+        logger.logToStderr(`Resolved expiration delay: ${resolvedExpirationDelay} (safe delta: ${SAFE_MINUTES_DELTA})`);
+        logger.logToStderr(`Actual expiration date time: ${actualExpirationIsoString}`);
       }
 
       if (this.verbose) {
-        logger.log(`An expiration maximum delay is resolved for the resource '${args.options.resource}' : ${resolvedExpirationDelay} minutes.`);
+        logger.logToStderr(`An expiration maximum delay is resolved for the resource '${args.options.resource}' : ${resolvedExpirationDelay} minutes.`);
       }
 
       return actualExpirationIsoString;
@@ -139,14 +139,14 @@ class GraphSubscriptionAddCommand extends GraphCommand {
 
     // If an resource specific expiration has not been found, return a default expiration delay
     if (this.verbose) {
-      logger.log(`An expiration maximum delay couldn't be resolved for the resource '${args.options.resource}'. Will use generic default value: ${DEFAULT_EXPIRATION_DELAY_IN_MINUTES} minutes.`);
+      logger.logToStderr(`An expiration maximum delay couldn't be resolved for the resource '${args.options.resource}'. Will use generic default value: ${DEFAULT_EXPIRATION_DELAY_IN_MINUTES} minutes.`);
     }
 
     const actualExpiration = fromNow(DEFAULT_EXPIRATION_DELAY_IN_MINUTES - SAFE_MINUTES_DELTA);
     const actualExpirationIsoString = actualExpiration.toISOString();
 
     if (this.debug) {
-      logger.log(`Actual expiration date time: ${actualExpirationIsoString}`);
+      logger.logToStderr(`Actual expiration date time: ${actualExpirationIsoString}`);
     }
 
     return actualExpirationIsoString;

@@ -69,7 +69,7 @@ class SpoUserProfileSetCommand extends SpoCommand {
       })
       .then((): void => {
         if (this.debug) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         
         cb();

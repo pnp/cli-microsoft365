@@ -12,7 +12,7 @@ const command: Command = require('./siteclassification-get');
 describe(commands.SITECLASSIFICATION_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.SITECLASSIFICATION_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -231,7 +237,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Classifications": ["TopSecret"],
           "DefaultClassification": "TopSecret",
           "UsageGuidelinesUrl": "https://test",
@@ -318,7 +324,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Classifications": ["TopSecret", "HBI"],
           "DefaultClassification": "TopSecret",
           "UsageGuidelinesUrl": "https://test",
@@ -405,7 +411,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
 
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "Classifications": [],
           "DefaultClassification": "",
           "UsageGuidelinesUrl": "",

@@ -16,7 +16,7 @@ describe('FN013001_GULP_msGridSassSuppression', () => {
     const project: Project = {
       path: '/usr/tmp',
       gulpfileJs: {
-        src: rule.resolution
+        source: rule.resolution
       }
     };
     rule.visit(project, findings);

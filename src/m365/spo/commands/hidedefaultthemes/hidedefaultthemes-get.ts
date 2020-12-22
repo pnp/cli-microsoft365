@@ -22,7 +22,7 @@ class SpoHideDefaultThemesGetCommand extends SpoCommand {
       .getSpoAdminUrl(logger, this.debug)
       .then((spoAdminUrl: string): Promise<any> => {
         if (this.verbose) {
-          logger.log(`Getting the current value of the HideDefaultThemes setting...`);
+          logger.logToStderr(`Getting the current value of the HideDefaultThemes setting...`);
         }
 
         const requestOptions: any = {

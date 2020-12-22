@@ -12,7 +12,7 @@ const command: Command = require('./list-view-get');
 describe(commands.LIST_VIEW_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.LIST_VIEW_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -120,7 +126,7 @@ describe(commands.LIST_VIEW_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List 1', viewId: 'ba84217c-8561-4234-aa95-265081e74be9' } }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].Id, 'ba84217c-8561-4234-aa95-265081e74be9');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].Id, 'ba84217c-8561-4234-aa95-265081e74be9');
         done();
       }
       catch (e) {
@@ -144,7 +150,7 @@ describe(commands.LIST_VIEW_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listUrl: 'lists/List1', viewTitle: 'All Items' } }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].Title, 'All Items');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].Title, 'All Items');
         done();
       }
       catch (e) {
@@ -168,7 +174,7 @@ describe(commands.LIST_VIEW_GET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com', listId: 'dac05e4a-5f6c-41dd-bba3-2be1104c711e', viewId: 'ba84217c-8561-4234-aa95-265081e74be9' } }, () => {
       try {
-        assert.strictEqual(loggerSpy.lastCall.args[0].Title, 'All Items');
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].Title, 'All Items');
         done();
       }
       catch (e) {

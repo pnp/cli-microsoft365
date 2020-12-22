@@ -51,7 +51,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
     const removeFieldLink = (): void => {
       if (this.debug) {
-        logger.log(`Get SiteId required by ProcessQuery endpoint.`);
+        logger.logToStderr(`Get SiteId required by ProcessQuery endpoint.`);
       }
 
       // GET SiteId
@@ -69,8 +69,8 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           siteId = res.Id;
 
           if (this.debug) {
-            logger.log(`SiteId: ${siteId}`);
-            logger.log(`Get WebId required by ProcessQuery endpoint.`);
+            logger.logToStderr(`SiteId: ${siteId}`);
+            logger.logToStderr(`Get WebId required by ProcessQuery endpoint.`);
           }
 
           // GET WebId
@@ -88,7 +88,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
           webId = res.Id;
 
           if (this.debug) {
-            logger.log(`WebId: ${webId}`);
+            logger.logToStderr(`WebId: ${webId}`);
           }
 
           // If ListTitle is provided
@@ -111,7 +111,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             listId = res.Id;
 
             if (this.debug) {
-              logger.log(`ListId: ${listId}`);
+              logger.logToStderr(`ListId: ${listId}`);
             }
           }
 
@@ -124,9 +124,9 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
 
           if (this.debug) {
             const additionalLog = args.options.listTitle ? `; ListTitle='${args.options.listTitle}'` : ` ; UpdateChildContentTypes='${updateChildContentTypes}`;
-            logger.log(`Remove FieldLink from ContentType. FieldLinkId='${args.options.fieldLinkId}' ; ContentTypeId='${args.options.contentTypeId}' ${additionalLog}`);
-            logger.log(`Execute ProcessQuery.`);
-            logger.log('');
+            logger.logToStderr(`Remove FieldLink from ContentType. FieldLinkId='${args.options.fieldLinkId}' ; ContentTypeId='${args.options.contentTypeId}' ${additionalLog}`);
+            logger.logToStderr(`Execute ProcessQuery.`);
+            logger.logToStderr('');
           }
 
           let requestBody: string = '';
@@ -155,7 +155,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             return;
           }
           if (this.debug) {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
           cb();
         }, (error: any): void => {

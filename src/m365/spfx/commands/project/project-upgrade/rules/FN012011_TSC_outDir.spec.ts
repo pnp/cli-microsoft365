@@ -25,6 +25,25 @@ describe('FN012011_TSC_outDir', () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it('returns notification if outDir is not up-to-date', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      tsConfigJson: {
+        compilerOptions: {
+          outDir: 'tmp'
+        },
+        source: JSON.stringify({
+          compilerOptions: {
+            outDir: 'tmp'
+          }
+        }, null, 2)
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
+  });
+
   it('doesn\'t return notification if object is missing', () => {
     const project: Project = {
       path: '/usr/tmp',

@@ -50,7 +50,7 @@ class SpoCdnOriginListCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Retrieving configured origins for ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
+          logger.logToStderr(`Retrieving configured origins for ${(cdnType === 1 ? 'Private' : 'Public')} CDN...`);
         }
 
         const requestOptions: any = {

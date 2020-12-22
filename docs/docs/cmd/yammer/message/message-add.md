@@ -10,9 +10,6 @@ m365 yammer message add [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-b, --body <body>`
 : The text of the message body
 
@@ -28,14 +25,7 @@ m365 yammer message add [options]
 `--networkId [networkId]`
 : Post a message in the "All Company" feed of this network, if repliedToId, directToUserIds and groupId are all omitted
 
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

@@ -45,7 +45,7 @@ class AadO365GroupSetCommand extends GraphCommand {
       }
 
       if (this.verbose) {
-        logger.log(`Updating Microsoft 365 Group ${args.options.id}...`);
+        logger.logToStderr(`Updating Microsoft 365 Group ${args.options.id}...`);
       }
 
       const update: any = {};
@@ -73,7 +73,7 @@ class AadO365GroupSetCommand extends GraphCommand {
       .then((): Promise<void> => {
         if (!args.options.logoPath) {
           if (this.debug) {
-            logger.log('logoPath not set. Skipping');
+            logger.logToStderr('logoPath not set. Skipping');
           }
 
           return Promise.resolve();
@@ -81,7 +81,7 @@ class AadO365GroupSetCommand extends GraphCommand {
 
         const fullPath: string = path.resolve(args.options.logoPath);
         if (this.verbose) {
-          logger.log(`Setting group logo ${fullPath}...`);
+          logger.logToStderr(`Setting group logo ${fullPath}...`);
         }
 
         const requestOptions: any = {
@@ -99,7 +99,7 @@ class AadO365GroupSetCommand extends GraphCommand {
       .then((): Promise<{ value: { id: string; }[] }> => {
         if (!args.options.owners) {
           if (this.debug) {
-            logger.log('Owners not set. Skipping');
+            logger.logToStderr('Owners not set. Skipping');
           }
 
           return Promise.resolve(undefined as any);
@@ -108,7 +108,7 @@ class AadO365GroupSetCommand extends GraphCommand {
         const owners: string[] = args.options.owners.split(',').map(o => o.trim());
 
         if (this.verbose) {
-          logger.log('Retrieving user information to set group owners...');
+          logger.logToStderr('Retrieving user information to set group owners...');
         }
 
         const requestOptions: any = {
@@ -140,7 +140,7 @@ class AadO365GroupSetCommand extends GraphCommand {
       .then((): Promise<{ value: { id: string; }[] }> => {
         if (!args.options.members) {
           if (this.debug) {
-            logger.log('Members not set. Skipping');
+            logger.logToStderr('Members not set. Skipping');
           }
 
           return Promise.resolve(undefined as any);
@@ -149,7 +149,7 @@ class AadO365GroupSetCommand extends GraphCommand {
         const members: string[] = args.options.members.split(',').map(o => o.trim());
 
         if (this.verbose) {
-          logger.log('Retrieving user information to set group members...');
+          logger.logToStderr('Retrieving user information to set group members...');
         }
 
         const requestOptions: any = {
@@ -180,7 +180,7 @@ class AadO365GroupSetCommand extends GraphCommand {
       })
       .then((): void => {
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();
@@ -192,9 +192,9 @@ class AadO365GroupSetCommand extends GraphCommand {
       .put(requestOptions)
       .then((res: any): void => {
         if (this.debug) {
-          logger.log('Response:');
-          logger.log(res);
-          logger.log('');
+          logger.logToStderr('Response:');
+          logger.logToStderr(res);
+          logger.logToStderr('');
         }
 
         resolve();

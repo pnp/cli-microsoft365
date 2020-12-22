@@ -36,6 +36,10 @@ class SpoSiteListCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Title', 'Url'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const siteType: string = args.options.type || 'TeamSite';
     const webTemplate: string = siteType === 'TeamSite' ? 'GROUP#0' : 'SITEPAGEPUBLISHING#0';
@@ -51,7 +55,7 @@ class SpoSiteListCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Retrieving list of site collections...`);
+          logger.logToStderr(`Retrieving list of site collections...`);
         }
 
         let requestBody: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${Utils.escapeXml(args.options.filter || '')}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`;
@@ -78,28 +82,7 @@ class SpoSiteListCommand extends SpoCommand {
         }
         else {
           const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
-          if (args.options.output === 'json') {
-            logger.log(sites._Child_Items_);
-          }
-          else {
-            logger.log(sites._Child_Items_.map(s => {
-              return {
-                Title: s.Title,
-                Url: s.Url
-              };
-            }).sort((a, b) => {
-              const urlA = a.Url.toUpperCase();
-              const urlB = b.Url.toUpperCase();
-              if (urlA < urlB) {
-                return -1;
-              }
-              if (urlA > urlB) {
-                return 1;
-              }
-
-              return 0;
-            }));
-          }
+          logger.log(sites._Child_Items_);
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));

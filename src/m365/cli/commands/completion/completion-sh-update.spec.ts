@@ -12,7 +12,7 @@ const command: Command = require('./completion-sh-update');
 describe(commands.COMPLETION_SH_UPDATE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let generateShCompletionStub: sinon.SinonStub;
 
   before(() => {
@@ -25,9 +25,15 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -64,7 +70,7 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
   it('build command completion (debug)', (done) => {
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

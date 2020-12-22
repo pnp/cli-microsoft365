@@ -12,7 +12,8 @@ const command: Command = require('./hubsite-data-get');
 describe(commands.HUBSITE_DATA_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +26,16 @@ describe(commands.HUBSITE_DATA_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -72,7 +80,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "themeKey": null,
           "name": "CommunicationSite",
           "url": "https://contoso.sharepoint.com/sites/Sales",
@@ -108,7 +116,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X', forceRefresh: true } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "themeKey": null,
           "name": "CommunicationSite",
           "url": "https://contoso.sharepoint.com/sites/Sales",
@@ -144,7 +152,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } }, () => {
       try {
-        assert(loggerSpy.calledWith({
+        assert(loggerLogSpy.calledWith({
           "themeKey": null,
           "name": "CommunicationSite",
           "url": "https://contoso.sharepoint.com/sites/Sales",
@@ -171,7 +179,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
@@ -191,7 +199,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/Project-X' } }, () => {
       try {
-        assert(loggerSpy.calledWith(`https://contoso.sharepoint.com/sites/Project-X is not connected to a hub site and is not a hub site itself`));
+        assert(loggerLogToStderrSpy.calledWith(`https://contoso.sharepoint.com/sites/Project-X is not connected to a hub site and is not a hub site itself`));
         done();
       }
       catch (e) {

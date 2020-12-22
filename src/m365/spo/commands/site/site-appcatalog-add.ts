@@ -44,7 +44,7 @@ class SpoSiteAppCatalogAddCommand extends SpoCommand {
       })
       .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
-          logger.log(`Adding site collection app catalog...`);
+          logger.logToStderr(`Adding site collection app catalog...`);
         }
 
         const requestOptions: any = {
@@ -66,7 +66,7 @@ class SpoSiteAppCatalogAddCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            logger.log('Site collection app catalog created');
+            logger.logToStderr('Site collection app catalog created');
           }
         }
         cb();

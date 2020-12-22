@@ -10,9 +10,6 @@ m365 spo term get [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --id [id]`
 : ID of the term to retrieve. Specify `name` or `id` but not both
 
@@ -31,17 +28,7 @@ m365 spo term get [options]
 `--termSetName [termSetName]`
 : Name of the term set to which the term belongs. Specify `termSetId` or `termSetName` but not both
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 !!! important
     To use this command you have to have permissions to access the tenant admin site.

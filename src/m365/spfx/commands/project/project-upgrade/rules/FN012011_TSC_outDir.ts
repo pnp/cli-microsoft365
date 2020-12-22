@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012011_TSC_outDir extends Rule {
+export class FN012011_TSC_outDir extends JsonRule {
   constructor(private outDir: string) {
     super();
   }
@@ -45,7 +45,8 @@ export class FN012011_TSC_outDir extends Rule {
     }
 
     if (project.tsConfigJson.compilerOptions.outDir !== this.outDir) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'compilerOptions.outDir');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

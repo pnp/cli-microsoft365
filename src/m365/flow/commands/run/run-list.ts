@@ -25,9 +25,13 @@ class FlowRunListCommand extends AzmgmtCommand {
     return 'Lists runs of the specified Microsoft Flow';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['name', 'startTime', 'status'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving list of runs for Microsoft Flow ${args.options.flow}...`);
+      logger.logToStderr(`Retrieving list of runs for Microsoft Flow ${args.options.flow}...`);
     }
 
     const requestOptions: any = {
@@ -39,25 +43,19 @@ class FlowRunListCommand extends AzmgmtCommand {
     };
 
     request
-      .get<{ value: [{ name: string, properties: { startTime: string, status: string } }] }>(requestOptions)
-      .then((res: { value: [{ name: string, properties: { startTime: string, status: string } }] }): void => {
+      .get<{ value: [{ name: string; startTime: string; status: string; properties: { startTime: string, status: string } }] }>(requestOptions)
+      .then((res: { value: [{ name: string, startTime: string; status: string; properties: { startTime: string, status: string } }] }): void => {
         if (res.value && res.value.length > 0) {
-          if (args.options.output === 'json') {
-            logger.log(res.value);
-          }
-          else {
-            logger.log(res.value.map(e => {
-              return {
-                name: e.name,
-                startTime: e.properties.startTime,
-                status: e.properties.status
-              };
-            }));
-          }
+          res.value.forEach(r => {
+            r.startTime = r.properties.startTime;
+            r.status = r.properties.status;
+          });
+
+          logger.log(res.value);
         }
         else {
           if (this.verbose) {
-            logger.log('No runs found');
+            logger.logToStderr('No runs found');
           }
         }
 

@@ -12,7 +12,7 @@ const command: Command = require('./sp-get');
 describe(commands.SP_GET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -25,9 +25,15 @@ describe(commands.SP_GET, () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -69,7 +75,7 @@ describe(commands.SP_GET, () => {
 
     command.action(logger, { options: { debug: true, displayName: 'SharePoint Online Client' } }, () => {
       try {
-        assert(loggerSpy.calledWith(sp));
+        assert(loggerLogSpy.calledWith(sp));
         done();
       }
       catch (e) {
@@ -95,7 +101,7 @@ describe(commands.SP_GET, () => {
 
     command.action(logger, { options: { debug: false, displayName: 'SharePoint Online Client' } }, () => {
       try {
-        assert(loggerSpy.calledWith(sp));
+        assert(loggerLogSpy.calledWith(sp));
         done();
       }
       catch (e) {
@@ -121,7 +127,7 @@ describe(commands.SP_GET, () => {
 
     command.action(logger, { options: { debug: false, appId: '57fb890c-0dab-4253-a5e0-7188c88b2bb4' } }, () => {
       try {
-        assert(loggerSpy.calledWith(sp));
+        assert(loggerLogSpy.calledWith(sp));
         done();
       }
       catch (e) {
@@ -147,7 +153,7 @@ describe(commands.SP_GET, () => {
 
     command.action(logger, { options: { debug: false, objectId: '57fb890c-0dab-4253-a5e0-7188c88b2bb4' } }, () => {
       try {
-        assert(loggerSpy.calledWith(sp));
+        assert(loggerLogSpy.calledWith(sp));
         done();
       }
       catch (e) {
@@ -171,7 +177,7 @@ describe(commands.SP_GET, () => {
 
     command.action(logger, { options: { debug: false, displayName: 'Foo' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

@@ -7,7 +7,6 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { SiteDesignTask } from './SiteDesignTask';
 
 interface CommandArgs {
   options: Options;
@@ -26,6 +25,10 @@ class SpoSiteDesignTaskListCommand extends SpoCommand {
     return 'Lists site designs scheduled for execution on the specified site';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['ID', 'SiteDesignID', 'LogonName'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const requestOptions: any = {
       url: `${args.options.webUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTasks`,
@@ -35,23 +38,12 @@ class SpoSiteDesignTaskListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request.post<{ value: SiteDesignTask[] }>(requestOptions)
-      .then((res: { value: SiteDesignTask[] }): void => {
-        if (args.options.output === 'json') {
-          logger.log(res.value);
-        }
-        else {
-          logger.log(res.value.map(d => {
-            return {
-              ID: d.ID,
-              SiteDesignID: d.SiteDesignID,
-              LogonName: d.LogonName
-            };
-          }));
-        }
+    request.post<{ value: any[] }>(requestOptions)
+      .then((res: { value: any[] }): void => {
+        logger.log(res.value);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

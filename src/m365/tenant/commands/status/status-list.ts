@@ -30,9 +30,13 @@ class TenantStatusListCommand extends Command {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['WorkloadDisplayName', 'StatusDisplayName'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
-      logger.log(`Getting the health status of the different services in Microsoft 365.`);
+      logger.logToStderr(`Getting the health status of the different services in Microsoft 365.`);
     }
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
@@ -50,20 +54,10 @@ class TenantStatusListCommand extends Command {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        if (args.options.output === 'json') {
-          logger.log(res);
-        }
-        else {
-          logger.log(res.value.map((r: any) => {
-            return {
-              Name: r.WorkloadDisplayName,
-              Status: r.StatusDisplayName
-            }
-          }));
-        }
+        logger.log(res);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

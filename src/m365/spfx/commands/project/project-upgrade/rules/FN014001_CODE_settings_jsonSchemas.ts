@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN014001_CODE_settings_jsonSchemas extends Rule {
+export class FN014001_CODE_settings_jsonSchemas extends JsonRule {
   constructor(private add: boolean) {
     super();
   }
@@ -44,12 +44,14 @@ export class FN014001_CODE_settings_jsonSchemas extends Rule {
 
     if (this.add) {
       if (!project.vsCode.settingsJson["json.schemas"]) {
-        this.addFinding(findings);
+        const node = this.getAstNodeFromFile(project.vsCode.settingsJson, 'json.schemas');
+        this.addFindingWithPosition(findings, node);
       }
     }
     else {
       if (project.vsCode.settingsJson["json.schemas"]) {
-        this.addFinding(findings);
+        const node = this.getAstNodeFromFile(project.vsCode.settingsJson, 'json.schemas');
+        this.addFindingWithPosition(findings, node);
       }
     }
   }

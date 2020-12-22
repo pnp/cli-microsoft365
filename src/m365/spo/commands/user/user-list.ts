@@ -24,9 +24,13 @@ class SpoUserListCommand extends SpoCommand {
     return 'Lists all the users within specific web';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['Id', 'Title', 'LoginName'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Retrieving users from web ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving users from web ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -45,18 +49,7 @@ class SpoUserListCommand extends SpoCommand {
     request
       .get(requestOptions)
       .then((users: any): void => {
-        if (args.options.output === 'json') {
-          logger.log(users);
-        }
-        else {
-          logger.log(users.value.map((user: any) => {
-            return {
-              Id: user.Id,
-              Title: user.Title,
-              LoginName: user.LoginName
-            };
-          }));
-        }
+        logger.log(users);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

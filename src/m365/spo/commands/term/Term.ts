@@ -1,6 +1,6 @@
 export interface Term {
-  _ObjectType_: string;
-  _ObjectIdentity_: string;
+  _ObjectType_?: string;
+  _ObjectIdentity_?: string;
   CreatedDate: string;
   CustomProperties: Hash;
   Description: string;

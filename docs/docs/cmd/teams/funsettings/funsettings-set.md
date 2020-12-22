@@ -10,9 +10,6 @@ m365 graph teams funsettings set [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --teamId <teamId>`
 : The ID of the Teams team for which to update settings
 
@@ -28,17 +25,7 @@ m365 graph teams funsettings set [options]
 `--allowCustomMemes [allowCustomMemes]`
 : Set to `true` to allow custom memes and to `false` to disable them
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

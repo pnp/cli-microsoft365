@@ -1,7 +1,7 @@
 export interface SPOWebAppServicePrincipalPermissionGrant {
-  _ObjectType_: string;
-  ClientId: string;
-  ConsentType: string;
+  _ObjectType_?: string;
+  ClientId?: string;
+  ConsentType?: string;
   ObjectId: string;
   Resource: string;
   ResourceId: string;

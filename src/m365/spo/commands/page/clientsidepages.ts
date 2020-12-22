@@ -604,7 +604,7 @@ export abstract class CanvasControl {
   constructor(
     protected controlType: number | undefined,
     public dataVersion: string | null,
-    public column: CanvasColumn | null = null,
+    public column: CanvasColumn | undefined = undefined,
     public order = 1,
     public id: string | undefined = getGUID(),
     public controlData: ClientSideControlData | null = null,

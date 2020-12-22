@@ -2,5 +2,16 @@
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.detectIndentation": false,
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "docker.commands.runInteractive": [
+      {
+        "label": "Default run command",
+        "template": "docker run --rm -it ${exposedPorts} ${tag}"
+      },
+      {
+        "label": "Run docs container",
+        "template": "docker run --rm -it ${exposedPorts} -v ${workspaceFolder}/docs:/docs ${tag}",
+        "match": "squidfunk"
+      }
+    ]
 }

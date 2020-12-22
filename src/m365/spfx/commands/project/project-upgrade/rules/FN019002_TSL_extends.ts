@@ -1,8 +1,8 @@
 import { Project } from "../../model";
 import { Finding } from "../Finding";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN019002_TSL_extends extends Rule {
+export class FN019002_TSL_extends extends JsonRule {
   constructor(private _extends: string) {
     super();
   }
@@ -43,7 +43,8 @@ export class FN019002_TSL_extends extends Rule {
     }
 
     if (project.tsLintJsonRoot.extends !== this._extends) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsLintJsonRoot, 'extends');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

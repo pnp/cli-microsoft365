@@ -96,9 +96,9 @@ class SpoCustomActionSetCommand extends SpoCommand {
       .then((customAction: CustomAction | undefined): void => {
         if (this.verbose) {
           if (customAction && customAction["odata.null"] === true) {
-            logger.log(`Custom action with id ${args.options.id} not found`);
+            logger.logToStderr(`Custom action with id ${args.options.id} not found`);
           } else {
-            logger.log(chalk.green('DONE'));
+            logger.logToStderr(chalk.green('DONE'));
           }
         }
         cb();
@@ -267,7 +267,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
    * another merge request is send with `site` scope.
    */
   private searchAllScopes(options: Options): Promise<CustomAction | undefined> {
-    return new Promise<CustomAction>((resolve: (customAction: CustomAction | undefined) => void, reject: (error: any) => void): void => {
+    return new Promise<CustomAction | undefined>((resolve: (customAction: CustomAction | undefined) => void, reject: (error: any) => void): void => {
       options.scope = "Web";
 
       this

@@ -503,21 +503,21 @@ class SpfxDoctorCommand extends AnonymousCommand {
   private getSharePointFrameworkVersion(logger: Logger): Promise<string> {
     return new Promise<string>((resolve: (version: string) => void, reject: (error: string) => void): void => {
       if (this.debug) {
-        logger.log('Detecting SharePoint Framework version based on @microsoft/sp-core-library local...');
+        logger.logToStderr('Detecting SharePoint Framework version based on @microsoft/sp-core-library local...');
       }
 
       this
         .getPackageVersion('@microsoft/sp-core-library', PackageSearchMode.LocalOnly, HandlePromise.Fail, logger)
         .then((version: string): Promise<string> => {
           if (this.debug) {
-            logger.log(`Found @microsoft/sp-core-library@${version}`);
+            logger.logToStderr(`Found @microsoft/sp-core-library@${version}`);
           }
 
           return Promise.resolve(version);
         })
         .catch((): Promise<string> => {
           if (this.debug) {
-            logger.log(`@microsoft/sp-core-library not found. Search for @microsoft/generator-sharepoint local or global...`);
+            logger.logToStderr(`@microsoft/sp-core-library not found. Search for @microsoft/generator-sharepoint local or global...`);
           }
 
           return this.getPackageVersion('@microsoft/generator-sharepoint', PackageSearchMode.LocalAndGlobal, HandlePromise.Fail, logger);
@@ -527,7 +527,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
         })
         .catch((error?: string): void => {
           if (this.debug) {
-            logger.log('@microsoft/generator-sharepoint not found');
+            logger.logToStderr('@microsoft/generator-sharepoint not found');
           }
 
           if (error && error.indexOf('ENOENT') > -1) {
@@ -585,7 +585,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       const packageName: string = args[1];
 
       if (this.debug) {
-        logger.log(`Executing npm: ${args.join(' ')}...`);
+        logger.logToStderr(`Executing npm: ${args.join(' ')}...`);
       }
 
       child_process.execFile(/^win/.test(process.platform) ? 'npm.logger' : 'npm', args, (err: child_process.ExecException | null, stdout: string, stderr: string): void => {

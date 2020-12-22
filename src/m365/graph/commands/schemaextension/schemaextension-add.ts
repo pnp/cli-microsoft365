@@ -32,7 +32,7 @@ class GraphSchemaExtensionAdd extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log(`Adding schema extension with id '${args.options.id}'...`);
+      logger.logToStderr(`Adding schema extension with id '${args.options.id}'...`);
     }
 
     const targetTypes: string[] = args.options.targetTypes.split(',').map(t => t.trim());
@@ -60,7 +60,7 @@ class GraphSchemaExtensionAdd extends GraphCommand {
         logger.log(res);
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

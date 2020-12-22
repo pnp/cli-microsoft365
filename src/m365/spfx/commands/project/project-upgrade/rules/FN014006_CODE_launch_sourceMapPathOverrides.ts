@@ -1,9 +1,9 @@
 import * as path from 'path';
 import { Finding, Occurrence } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from './JsonRule';
 
-export class FN014006_CODE_launch_sourceMapPathOverrides extends Rule {
+export class FN014006_CODE_launch_sourceMapPathOverrides extends JsonRule {
   constructor(private overrideKey: string, private overrideValue: string) {
     super();
   }
@@ -52,12 +52,14 @@ export class FN014006_CODE_launch_sourceMapPathOverrides extends Rule {
     }
 
     const occurrences: Occurrence[] = [];
-    project.vsCode.launchJson.configurations.forEach(configuration => {
+    project.vsCode.launchJson.configurations.forEach((configuration, i) => {
       if (configuration.sourceMapPathOverrides &&
         !configuration.sourceMapPathOverrides[this.overrideKey]) {
+        const node = this.getAstNodeFromFile(project.vsCode!.launchJson!, `configurations[${i}].sourceMapPathOverrides`);
         occurrences.push({
           file: path.relative(project.path, this.file),
-          resolution: this.resolution
+          resolution: this.resolution,
+          position: this.getPositionFromNode(node)
         });
       }
     });

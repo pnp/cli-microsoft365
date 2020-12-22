@@ -53,7 +53,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
         })
         .then((res: ContextInfo): Promise<string> => {
           if (this.verbose) {
-            logger.log(`${(enabled ? 'Enabling' : 'Disabling')} service principal...`);
+            logger.logToStderr(`${(enabled ? 'Enabling' : 'Disabling')} service principal...`);
           }
 
           const requestOptions: any = {
@@ -80,7 +80,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
             logger.log(output);
 
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
           }
           cb();

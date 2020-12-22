@@ -34,7 +34,7 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
-      logger.log('Retrieving hub site data...');
+      logger.logToStderr('Retrieving hub site data...');
     }
 
     const forceRefresh: boolean = args.options.forceRefresh === true;
@@ -55,12 +55,12 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
         }
         else {
           if (this.verbose) {
-            logger.log(`${args.options.webUrl} is not connected to a hub site and is not a hub site itself`);
+            logger.logToStderr(`${args.options.webUrl} is not connected to a hub site and is not a hub site itself`);
           }
         }
 
         if (this.verbose) {
-          logger.log(chalk.green('DONE'));
+          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

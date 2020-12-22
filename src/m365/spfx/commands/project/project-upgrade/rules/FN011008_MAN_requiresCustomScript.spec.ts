@@ -36,4 +36,25 @@ describe('FN011008_MAN_requiresCustomScript', () => {
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
+
+  it('returns notifications if safeWithCustomScriptDisabled is defined', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [{
+        path: '/usr/tmp/manifest.json',
+        $schema: 'test-schema',
+        componentType: 'WebPart',
+        safeWithCustomScriptDisabled: true,
+        source: JSON.stringify({
+          path: '/usr/tmp/manifest.json',
+          $schema: 'test-schema',
+          componentType: 'WebPart',
+          safeWithCustomScriptDisabled: true
+        }, null, 2)
+      }]
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 5, 'Incorrect line number');
+  });
 });

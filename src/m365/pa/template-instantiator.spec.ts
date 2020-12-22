@@ -31,9 +31,15 @@ describe('TemplateInstantiator', () => {
     logger = {
       log: (msg: string) => {
         log.push(msg);
+      },
+      logRaw: (msg: string) => {
+        log.push(msg);
+      },
+      logToStderr: (msg: string) => {
+        log.push(msg);
       }
     };
-    fsMkdirSync = sinon.stub(fs, 'mkdirSync').callsFake(() => {});
+    fsMkdirSync = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
     fsCopyFileSync = sinon.stub(fs, 'copyFileSync').callsFake(() => {});
     fsWriteFileSync = sinon.stub(fs, 'writeFileSync').callsFake(() => {});
   });

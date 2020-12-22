@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project, TsConfigJson } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012013_TSC_exclude extends Rule {
+export class FN012013_TSC_exclude extends JsonRule {
   constructor(private exclude: string[]) {
     super();
   }
@@ -44,7 +44,8 @@ export class FN012013_TSC_exclude extends Rule {
 
     if (!project.tsConfigJson.exclude ||
       this.exclude.filter(e => ((project.tsConfigJson as TsConfigJson).exclude as string[]).indexOf(e) < 0).length > 0) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'exclude');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

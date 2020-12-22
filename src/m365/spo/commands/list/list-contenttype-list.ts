@@ -34,10 +34,14 @@ class SpoListContentTypeListCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['StringId', 'Name', 'Hidden', 'ReadOnly', 'Sealed'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       const list: string = args.options.listId ? encodeURIComponent(args.options.listId as string) : encodeURIComponent(args.options.listTitle as string);
-      logger.log(`Retrieving content types information for list ${list} in site at ${args.options.webUrl}...`);
+      logger.logToStderr(`Retrieving content types information for list ${list} in site at ${args.options.webUrl}...`);
     }
 
     let requestUrl: string = '';
@@ -61,21 +65,7 @@ class SpoListContentTypeListCommand extends SpoCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        if (args.options.output === 'json') {
-          logger.log(res.value);
-        }
-        else {
-          logger.log(res.value.map((ct: any) => {
-            return {
-              StringId: ct.StringId,
-              Name: ct.Name,
-              Hidden: ct.Hidden,
-              ReadOnly: ct.ReadOnly,
-              Sealed: ct.Sealed
-            };
-          }));
-        }
-
+        logger.log(res.value);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

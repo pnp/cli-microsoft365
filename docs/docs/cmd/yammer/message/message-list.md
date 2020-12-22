@@ -10,9 +10,6 @@ m365 yammer message list [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `--olderThanId [olderThanId]`
 : Returns messages older than the message ID specified as a numeric string
 
@@ -31,17 +28,7 @@ m365 yammer message list [options]
 `--limit [limit]`
 : Limits the messages returned
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
