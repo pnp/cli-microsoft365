@@ -420,9 +420,7 @@ ${f.resolution}
         case 'js':
         case 'ts':
         case 'scss':
-          resolution = `In file [${f.file}](${f.file}) update the code as follows:
-
-\`\`\`${f.resolutionType}
+          resolution = `\`\`\`${f.resolutionType}
 ${f.resolution}
 \`\`\`
 `;
