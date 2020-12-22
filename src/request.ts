@@ -1,4 +1,5 @@
 import Axios, { AxiosError, AxiosInstance, AxiosPromise, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { Stream } from 'stream';
 import auth, { Auth } from './Auth';
 import { Logger } from './cli';
 import Utils from './Utils';
@@ -16,23 +17,37 @@ class Request {
       this.req.interceptors.request.use((config: AxiosRequestConfig): AxiosRequestConfig => {
         if (this._logger) {
           this._logger.logToStderr('Request:');
-          this._logger.logToStderr(JSON.stringify(Utils.filterObject(config, ['url', 'method', 'headers', 'data', 'responseType', 'decompress']), null, 2));
+          const properties: string[] = ['url', 'method', 'headers', 'responseType', 'decompress'];
+          if (config.responseType !== 'stream') {
+            properties.push('data');
+          }
+          this._logger.logToStderr(JSON.stringify(Utils.filterObject(config, properties), null, 2));
         }
         return config;
       });
       // since we're stubbing requests, response interceptor is never called in
       // tests, so let's exclude it from coverage
-      /* c8 ignore next 13 */
+      /* c8 ignore next 22 */
       this.req.interceptors.response.use((response: AxiosResponse): AxiosResponse => {
         if (this._logger) {
           this._logger.logToStderr('Response:');
-          this._logger.logToStderr(JSON.stringify(Utils.filterObject(response, ['data', 'status', 'statusText', 'headers']), null, 2));
+          const properties: string[] = ['status', 'statusText', 'headers'];
+          if (response.headers['content-type'] &&
+            response.headers['content-type'].indexOf('json') > -1) {
+            properties.push('data');
+          }
+          this._logger.logToStderr(JSON.stringify(Utils.filterObject(response, properties), null, 2));
         }
         return response;
       }, (error: AxiosError): void => {
         if (this._logger) {
+          const properties: string[] = ['status', 'statusText', 'headers'];
+          if (error.response &&
+            !(error.response.data instanceof Stream)) {
+            properties.push('data');
+          }
           this._logger.logToStderr('Request error');
-          this._logger.logToStderr(JSON.stringify(Utils.filterObject(error.response, ['data', 'status', 'statusText', 'headers']), null, 2));
+          this._logger.logToStderr(JSON.stringify(Utils.filterObject(error.response, properties), null, 2));
         }
         throw error;
       });
@@ -102,13 +117,12 @@ class Request {
     }
 
     return new Promise<TResponse>((_resolve: (res: TResponse) => void, _reject: (error: any) => void): void => {
-      const resource: string = Auth.getResourceFromUrl(options.url as string);
-
       ((): Promise<string> => {
         if (options.headers && options.headers['x-anonymous']) {
           return Promise.resolve('');
         }
         else {
+          const resource: string = Auth.getResourceFromUrl(options.url as string);
           return auth.ensureAccessToken(resource, this._logger as Logger, this._debug)
         }
       })()

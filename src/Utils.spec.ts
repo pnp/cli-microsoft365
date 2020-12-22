@@ -758,6 +758,11 @@ describe('Utils', () => {
     assert.strictEqual(actual, '');
   });
 
+  it('returns empty tenant id when invalid access token passed', () => {
+    const actual = Utils.getTenantIdFromAccessToken('abc.ghi');
+    assert.strictEqual(actual, '');
+  });
+
   it('isJavascriptReservedWord returns true if value equals a JavaScript Reserved Word (eg. onload)', () => {
     const result = Utils.isJavascriptReservedWord('onload');
     assert.strictEqual(result, true);
