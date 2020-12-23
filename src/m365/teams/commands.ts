@@ -27,6 +27,7 @@ export default {
   TEAMS_REPORT_DEVICEUSAGEDISTRIBUTIONUSERCOUNTS: `${prefix} report deviceusagedistributionusercounts`,
   TEAMS_REPORT_DEVICEUSAGEUSERCOUNTS: `${prefix} report deviceusageusercounts`,
   TEAMS_REPORT_DEVICEUSAGEUSERDETAIL: `${prefix} report deviceusageuserdetail`,
+  TEAMS_REPORT_DIRECTROUTINGCALLS: `${prefix} report directroutingcalls`,
   TEAMS_REPORT_PSTNCALLS: `${prefix} report pstncalls`,
   TEAMS_REPORT_USERACTIVITYCOUNTS: `${prefix} report useractivitycounts`,
   TEAMS_REPORT_USERACTIVITYUSERCOUNTS: `${prefix} report useractivityusercounts`,
