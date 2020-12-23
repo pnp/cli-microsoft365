@@ -34,6 +34,8 @@
 - fixed issue with resolving uppercase URLs [#2011](https://github.com/pnp/cli-microsoft365/issues/2011)
 - added Dockerfile [#1786](https://github.com/pnp/cli-microsoft365/issues/1786)
 - added line information to JSON-based rules in 'spfx project upgrade' [#1602](https://github.com/pnp/cli-microsoft365/issues/1602)
+- removed the 'started' telemetry event [#2018](https://github.com/pnp/cli-microsoft365/pull/2018)
+- clarified SPFx project upgrade actions [#1857](https://github.com/pnp/cli-microsoft365/issues/1857), [#1569](https://github.com/pnp/cli-microsoft365/issues/1569)
 
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
