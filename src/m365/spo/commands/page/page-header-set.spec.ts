@@ -285,6 +285,79 @@ describe(commands.PAGE_HEADER_SET, () => {
     });
   });
 
+  it('check when no CanvasContent1 is provided', (done) => {
+    const mockData = {
+      CanvasContent1: "",
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {},
+          "links": {}
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 4,
+          "layoutType": "NoImage",
+          "textAlignment": "Left",
+          "showKicker": false,
+          "showPublishDate": false,
+          "kicker": ""
+        }
+      }])
+    };
+
+    Utils.restore(request.get);
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
+        return Promise.resolve({
+          IsPageCheckedOutToCurrentUser: true,
+          Title: 'Page'
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/site?`) > -1) {
+        return Promise.resolve({
+          Id: 'c7678ab2-c9dc-454b-b2ee-7fcffb983d4e'
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/web?`) > -1) {
+        return Promise.resolve({
+          Id: '0df4d2d2-5ecf-45e9-94f5-c638106bfc65'
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
+        return Promise.resolve({
+          ListId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
+          UniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$expand=ListItemAllFields`) > -1) {
+        return Promise.resolve(null);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } }, () => {
+      try {
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('sets page header to custom when custom type specified', (done) => {
     const mockData = {
       CanvasContent1: mockCanvasContent,
