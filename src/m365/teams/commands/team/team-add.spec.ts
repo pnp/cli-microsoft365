@@ -122,16 +122,16 @@ describe(commands.TEAMS_TEAM_ADD, () => {
 
   it('creates Microsoft Teams team in the tenant when no template is supplied (verbose)', (done) => {
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
       }
       return Promise.reject('Invalid request');
     });
 
     const getRequestStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
           "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
           "operationType": "createTeam",
           "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -156,7 +156,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     }, () => {
       try {
         assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
           displayName: 'Architecture',
           description: 'Architecture Discussion'
         });
@@ -173,21 +173,21 @@ describe(commands.TEAMS_TEAM_ADD, () => {
   it('creates Microsoft Teams team in the tenant when template is supplied (verbose)', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => `
     {
-      "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
     }`);
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
       }
       return Promise.reject('Invalid request');
     });
 
     const getRequestStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
           "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
           "operationType": "createTeam",
           "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -211,7 +211,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     }, () => {
       try {
         assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
           displayName: 'Sample Engineering Team',
           description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
         });
@@ -228,21 +228,21 @@ describe(commands.TEAMS_TEAM_ADD, () => {
   it('creates Microsoft Teams team in the tenant when template and name is supplied (verbose)', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => `
     {
-      "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
     }`);
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
       }
       return Promise.reject('Invalid request');
     });
 
     const getRequestStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
           "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
           "operationType": "createTeam",
           "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -267,7 +267,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     }, () => {
       try {
         assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
           displayName: 'Sample Classroom Team',
           description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
         });
@@ -284,21 +284,21 @@ describe(commands.TEAMS_TEAM_ADD, () => {
   it('creates Microsoft Teams team in the tenant when template and description is supplied (verbose)', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => `
     {
-      "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
     }`);
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
       }
       return Promise.reject('Invalid request');
     });
 
     const getRequestStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
           "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
           "operationType": "createTeam",
           "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -323,7 +323,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     }, () => {
       try {
         assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
           displayName: 'Sample Engineering Team',
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
         });
@@ -340,21 +340,21 @@ describe(commands.TEAMS_TEAM_ADD, () => {
   it('creates Microsoft Teams team in the tenant when template, name and description is supplied (verbose)', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => `
     {
-      "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
     }`);
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
       }
       return Promise.reject('Invalid request');
     });
 
     const getRequestStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
           "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
           "operationType": "createTeam",
           "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -380,7 +380,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     }, () => {
       try {
         assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
           displayName: 'Sample Classroom Team',
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
         });
@@ -397,12 +397,12 @@ describe(commands.TEAMS_TEAM_ADD, () => {
   it('creates Microsoft Teams team in the tenant when template, name and description is supplied and waits for command to complete (verbose)', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => `
     {
-      "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
     }`);
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
       }
       return Promise.reject('Invalid request');
@@ -411,9 +411,9 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     const getRequestStub = sinon.stub(request, 'get')
     getRequestStub.onCall(0)
       .callsFake((opts) => {
-        if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+        if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
           return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
             "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
             "operationType": "createTeam",
             "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -429,9 +429,9 @@ describe(commands.TEAMS_TEAM_ADD, () => {
         return Promise.reject('Invalid request');
       });
     getRequestStub.onCall(1).callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
           "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
           "operationType": "createTeam",
           "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -447,9 +447,9 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
     getRequestStub.onCall(2).callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
           "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
           "operationType": "createTeam",
           "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -481,7 +481,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     }, () => {
       try {
         assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
           displayName: 'Sample Classroom Team',
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
         });
@@ -519,12 +519,12 @@ describe(commands.TEAMS_TEAM_ADD, () => {
   it('correctly handles operation error when creating a Team when waiting for command to complete', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => `
     {
-      "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
     }`);
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
       }
       return Promise.reject('Invalid request');
@@ -533,9 +533,9 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     const getRequestStub = sinon.stub(request, 'get')
     getRequestStub.onCall(0)
       .callsFake((opts) => {
-        if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+        if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
           return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
             "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
             "operationType": "createTeam",
             "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -551,9 +551,9 @@ describe(commands.TEAMS_TEAM_ADD, () => {
         return Promise.reject('Invalid request');
       });
     getRequestStub.onCall(1).callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
           "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
           "operationType": "createTeam",
           "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -584,7 +584,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     } as any, (err?: any) => {
       try {
         assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
           displayName: 'Sample Classroom Team',
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
         });
@@ -600,12 +600,12 @@ describe(commands.TEAMS_TEAM_ADD, () => {
   it('correctly handles inProgress operation status when creating a Team and waiting for the command to complete', (done) => {
     sinon.stub(fs, 'readFileSync').callsFake(() => `
     {
-      "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+      "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
       "displayName": "Sample Engineering Team",
       "description": "This is a sample engineering team, used to showcase the range of properties supported by this API"
     }`);
     const requestStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams`) {
         return Promise.resolve({ statusCode: 202, headers: { location: "/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')" } });
       }
       return Promise.reject('Invalid request');
@@ -614,9 +614,9 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     const getRequestStub = sinon.stub(request, 'get')
     getRequestStub.onCall(0)
       .callsFake((opts) => {
-        if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+        if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
           return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
             "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
             "operationType": "createTeam",
             "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -632,9 +632,9 @@ describe(commands.TEAMS_TEAM_ADD, () => {
         return Promise.reject('Invalid request');
       });
     getRequestStub.onCall(1).callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations/$entity",
           "id": "8ad1effa-7ed1-4d03-bd60-fe177d8d56f1",
           "operationType": "createTeam",
           "createdDateTime": "2020-06-15T22:28:16.3007846Z",
@@ -665,7 +665,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
     } as any, (err?: any) => {
       try {
         assert.deepEqual(requestStub.getCall(0).args[0].data, {
-          "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
+          "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",
           displayName: 'Sample Classroom Team',
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
         });
