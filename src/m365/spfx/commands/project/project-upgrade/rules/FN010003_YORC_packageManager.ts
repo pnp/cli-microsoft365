@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN010003_YORC_packageManager extends Rule {
+export class FN010003_YORC_packageManager extends JsonRule {
   constructor(private packageManager: string) {
     super();
   }
@@ -45,7 +45,8 @@ export class FN010003_YORC_packageManager extends Rule {
     }
 
     if (project.yoRcJson["@microsoft/generator-sharepoint"].packageManager !== this.packageManager) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.yoRcJson, '@microsoft/generator-sharepoint.packageManager');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

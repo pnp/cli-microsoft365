@@ -69,11 +69,15 @@ describe('DependencyRule', () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: {
-        dependencies: {}
+        dependencies: {},
+        source: JSON.stringify({
+          dependencies: {}
+        }, null, 2)
       }
     };
     devDepRule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 1, 'Incorrect line number');
   });
 
   it('doesn\'t return notification if dependency is already up-to-date', () => {
@@ -139,11 +143,18 @@ describe('DependencyRule', () => {
         dependencies: {
           'test-package': '>=0.0.8 <1.1.0'
         },
-        devDependencies: {}
+        devDependencies: {},
+        source: JSON.stringify({
+          dependencies: {
+            'test-package': '>=0.0.8 <1.1.0'
+          },
+          devDependencies: {}
+        }, null, 2)
       }
     };
     depRule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of finding');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
 
   it('returns notification even if semver version satisfies package requirement', () => {

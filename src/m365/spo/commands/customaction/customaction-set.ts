@@ -267,7 +267,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
    * another merge request is send with `site` scope.
    */
   private searchAllScopes(options: Options): Promise<CustomAction | undefined> {
-    return new Promise<CustomAction>((resolve: (customAction: CustomAction | undefined) => void, reject: (error: any) => void): void => {
+    return new Promise<CustomAction | undefined>((resolve: (customAction: CustomAction | undefined) => void, reject: (error: any) => void): void => {
       options.scope = "Web";
 
       this

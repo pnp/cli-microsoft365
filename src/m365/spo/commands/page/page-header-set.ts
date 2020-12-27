@@ -7,6 +7,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { ClientSidePageProperties } from './ClientSidePageProperties';
 import { CustomPageHeader, CustomPageHeaderProperties, CustomPageHeaderServerProcessedContent, PageHeader } from './PageHeader';
 
 interface CommandArgs {
@@ -145,6 +146,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       pageFullName += '.aspx';
     }
     let title: string;
+    let canvasContent: string;
 
     if (this.verbose) {
       logger.logToStderr(`Retrieving information about the page...`);
@@ -160,24 +162,33 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
     request
       .get<{ IsPageCheckedOutToCurrentUser: boolean, Title: string; }>(requestOptions)
-      .then((res: { IsPageCheckedOutToCurrentUser: boolean, Title: string; }): Promise<void> => {
+      .then((res: { IsPageCheckedOutToCurrentUser: boolean, Title: string; }): Promise<ClientSidePageProperties | null> => {
         title = res.Title;
 
         if (res.IsPageCheckedOutToCurrentUser) {
-          return Promise.resolve();
+          const requestOptions: any = {
+            url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$expand=ListItemAllFields`,
+            headers: {
+              'accept': 'application/json;odata=nometadata'
+            },
+            responseType: 'json'
+          };
+
+          return request.get<ClientSidePageProperties>(requestOptions);
         }
+        else {
+          const requestOptions: any = {
+            url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
+            headers: {
+              'accept': 'application/json;odata=nometadata'
+            },
+            responseType: 'json'
+          };
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/checkoutpage`,
-          headers: {
-            'accept': 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
-
-        return request.post(requestOptions);
+          return request.post<ClientSidePageProperties>(requestOptions);
+        }
       })
-      .then((): Promise<any[] | void> => {
+      .then((pageData: ClientSidePageProperties | null): Promise<any[] | void> => {
         switch (args.options.type) {
           case 'None':
             header = noPageHeader;
@@ -191,6 +202,8 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           default:
             header = defaultPageHeader;
         }
+
+        canvasContent = pageData ? pageData.CanvasContent1 : "";
 
         header.properties.title = title;
         header.properties.textAlignment = args.options.textAlignment as any || 'Left';
@@ -266,6 +279,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata'
           },
           data: {
+            CanvasContent1: canvasContent,
             LayoutWebpartsContent: JSON.stringify([header])
           },
           responseType: 'json'

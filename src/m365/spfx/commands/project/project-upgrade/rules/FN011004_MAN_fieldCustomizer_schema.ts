@@ -40,7 +40,8 @@ export class FN011004_MAN_fieldCustomizer_schema extends ManifestRule {
       if (manifest.componentType === 'Extension' &&
         manifest.extensionType === 'FieldCustomizer' &&
         manifest.$schema !== this.schema) {
-        this.addOccurrence(this.resolution, manifest.path, project.path, occurrences);
+        const node = this.getAstNodeFromFile(manifest, '$schema');
+        this.addOccurrence(this.resolution, manifest.path, project.path, node, occurrences);
       }
     });
 

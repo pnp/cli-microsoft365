@@ -41,14 +41,13 @@ describe('PackageRule', () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: {
-
       } as PackageJson
     };
     packageRule.visit(project, findings);
     assert.strictEqual(findings.length, 1);
   });
 
-  it('doesn\'t return any notifications package.json has the property', () => {
+  it('doesn\'t return any notifications package.json already has the property', () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: {
@@ -59,7 +58,7 @@ describe('PackageRule', () => {
     assert.strictEqual(findings.length, 0);
   });
 
-  it('doesn\'t return notification if the packege.json property is being removed already', () => {
+  it('doesn\'t return notification if the package.json property is removed already', () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: {
@@ -70,18 +69,22 @@ describe('PackageRule', () => {
     assert.strictEqual(findings.length, 0);
   });
 
-  it('returns notification if the packege.json property has to be removed', () => {
+  it('returns notification if the package.json property has to be removed', () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: {
-        main: "abc"
+        main: "abc",
+        source: JSON.stringify({
+          main: "abc"
+        }, null, 2)
       } as any
     };
     packageRule2.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
   });
 
-  it('doesn\'t return notification if the packege.json is missing', () => {
+  it('doesn\'t return notification if the package.json is missing', () => {
     const project: Project = {
       path: '/usr/tmp',
       packageJson: undefined

@@ -1,4 +1,6 @@
-export interface PackageSolutionJson {
+import { JsonFile } from ".";
+
+export interface PackageSolutionJson extends JsonFile {
   $schema: string;
   solution?: {
     developer?: PackageSolutionJsonDeveloper;

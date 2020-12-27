@@ -1,5 +1,43 @@
 # Release notes
 
+## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo list contenttype default set](../cmd/spo/list/list-contenttype-default-set.md) - sets the default content type for a list [#674](https://github.com/pnp/cli-microsoft365/issues/674)
+
+**Teams:**
+
+- [teams report pstncalls](../cmd/teams/report/report-pstncalls.md) - gets details about PSTN calls made within a given time period [#1771](https://github.com/pnp/cli-microsoft365/issues/1771)
+
+**Yammer:**
+
+- [yammer search](../cmd/yammer/yammer-search.md) - returns a list of messages, users, topics and groups that match the specified query [#1454](https://github.com/pnp/cli-microsoft365/issues/1454)
+
+### Changes
+
+- updated docs for the login command with links to more info [#1966](https://github.com/pnp/cli-microsoft365/pull/1966)
+- moved global options in docs to a separate file [#1852](https://github.com/pnp/cli-microsoft365/issues/1889), [#1969](https://github.com/pnp/cli-microsoft365/issues/1969)
+- extended `login` with support for passing base64-encoded certificate [#1971](https://github.com/pnp/cli-microsoft365/issues/1971)
+- extended `login` with calculating thumbprint from the certificate [#1973](https://github.com/pnp/cli-microsoft365/issues/1973)
+- fixed 'spo listitem set' command [#1984](https://github.com/pnp/cli-microsoft365/issues/1984)
+- changed loading optional dependencies to lazy to speed up CLI [#1990](https://github.com/pnp/cli-microsoft365/pull/1990)
+- extended `login` with support for .pfx certificates not protected with a password [#1974](https://github.com/pnp/cli-microsoft365/issues/1974)
+- fixed the `outlook mail send` command [#1991](https://github.com/pnp/cli-microsoft365/issues/1991)
+- extended the `login` command with appId and tenant [#1975](https://github.com/pnp/cli-microsoft365/issues/1975)
+- fixed the `spo apppage add` command [#2000](https://github.com/pnp/cli-microsoft365/issues/2000)
+- removed short options from args passed to commands [#1992](https://github.com/pnp/cli-microsoft365/issues/1992)
+- extended `spo sitedesign get` to include `title` [#1884](https://github.com/pnp/cli-microsoft365/issues/1884)
+- removed unnecessary request digest from `spo sitedesign list` [#2006](https://github.com/pnp/cli-microsoft365/issues/2006)
+- fixed issue with resolving uppercase URLs [#2011](https://github.com/pnp/cli-microsoft365/issues/2011)
+- added Dockerfile [#1786](https://github.com/pnp/cli-microsoft365/issues/1786)
+- added line information to JSON-based rules in 'spfx project upgrade' [#1602](https://github.com/pnp/cli-microsoft365/issues/1602)
+- removed the 'started' telemetry event [#2018](https://github.com/pnp/cli-microsoft365/pull/2018)
+- clarified SPFx project upgrade actions [#1857](https://github.com/pnp/cli-microsoft365/issues/1857), [#1569](https://github.com/pnp/cli-microsoft365/issues/1569)
+- added preserving page content to `spo page header set` [#2019](https://github.com/pnp/cli-microsoft365/issues/2019)
+
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 
 ### New commands

@@ -136,7 +136,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   it('creates profile path when it does not exist and appends the completion script to it', (done) => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const mkdirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(() => { });
+    const mkdirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 
@@ -156,7 +156,7 @@ describe(commands.COMPLETION_PWSH_SETUP, () => {
   it('creates profile path when it does not exist and appends the completion script to it (debug)', (done) => {
     const profilePath: string = '/Users/steve/.config/powershell/Microsoft.PowerShell_profile.ps1';
     sinon.stub(fs, 'existsSync').callsFake(() => false);
-    const mkdirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(() => { });
+    const mkdirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
     const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     const appendFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'appendFileSync').callsFake(() => { });
 

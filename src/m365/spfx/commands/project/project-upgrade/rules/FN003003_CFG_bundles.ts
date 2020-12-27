@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Entry, Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN003003_CFG_bundles extends Rule {
+export class FN003003_CFG_bundles extends JsonRule {
   get id(): string {
     return 'FN003003';
   }
@@ -52,9 +52,11 @@ export class FN003003_CFG_bundles extends Rule {
       };
     });
 
+    const node = this.getAstNodeFromFile(project.configJson, 'bundles');
     this.addFindingWithOccurrences([{
       file: this.file,
-      resolution: JSON.stringify(resolution, null, 2)
+      resolution: JSON.stringify(resolution, null, 2),
+      position: this.getPositionFromNode(node)
     }], findings);
   }
 

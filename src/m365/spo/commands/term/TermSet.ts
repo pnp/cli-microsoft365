@@ -1,6 +1,6 @@
 export interface TermSet {
-  _ObjectType_: string;
-  _ObjectIdentity_: string;
+  _ObjectType_?: string;
+  _ObjectIdentity_?: string;
   CreatedDate: string;
   Description: string;
   Id: string;

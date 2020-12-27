@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project, TsConfigJson } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012012_TSC_include extends Rule {
+export class FN012012_TSC_include extends JsonRule {
   constructor(private include: string[]) {
     super();
   }
@@ -16,7 +16,7 @@ export class FN012012_TSC_include extends Rule {
   }
 
   get description(): string {
-    return `Update tsconfig.json include property`;
+    return `Add to the tsconfig.json include property`;
   };
 
   get resolution(): string {
@@ -44,7 +44,8 @@ export class FN012012_TSC_include extends Rule {
 
     if (!project.tsConfigJson.include ||
       this.include.filter(i => ((project.tsConfigJson as TsConfigJson).include as string[]).indexOf(i) < 0).length > 0) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'include');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

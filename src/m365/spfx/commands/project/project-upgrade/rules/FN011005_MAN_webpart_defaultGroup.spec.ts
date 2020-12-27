@@ -35,4 +35,33 @@ describe('FN011005_MAN_webpart_defaultGroup', () => {
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
+
+  it('returns notifications if web part is in the old default group', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      manifests: [{
+        $schema: 'test-schema',
+        path: '/usr/tmp/manifest.json',
+        componentType: 'WebPart',
+        preconfiguredEntries: [{
+          group: { default: 'Under Development' }
+        }],
+        source: JSON.stringify({
+          $schema: 'test-schema',
+          path: '/usr/tmp/manifest.json',
+          componentType: 'WebPart',
+          preconfiguredEntries: [
+            {
+              group: {
+                default: 'Under Development'
+              }
+            }
+          ]
+        }, null, 2)
+      }]
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 8, 'Incorrect line number');
+  });
 });

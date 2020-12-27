@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012014_TSC_inlineSources extends Rule {
+export class FN012014_TSC_inlineSources extends JsonRule {
   constructor(private inlineSources: boolean) {
     super();
   }
@@ -45,7 +45,8 @@ export class FN012014_TSC_inlineSources extends Rule {
     }
 
     if (project.tsConfigJson.compilerOptions.inlineSources !== this.inlineSources) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'compilerOptions.inlineSources');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

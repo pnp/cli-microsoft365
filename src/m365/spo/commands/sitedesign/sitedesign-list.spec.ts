@@ -17,7 +17,6 @@ describe(commands.SITEDESIGN_LIST, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
-    sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -47,7 +46,6 @@ describe(commands.SITEDESIGN_LIST, () => {
   after(() => {
     Utils.restore([
       auth.restoreAuth,
-      (command as any).getRequestDigest,
       appInsights.trackEvent
     ]);
     auth.service.connected = false;

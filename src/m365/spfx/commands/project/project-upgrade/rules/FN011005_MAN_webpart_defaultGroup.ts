@@ -41,9 +41,10 @@ export class FN011005_MAN_webpart_defaultGroup extends ManifestRule {
     project.manifests.forEach(manifest => {
       if (manifest.componentType === 'WebPart' &&
         manifest.preconfiguredEntries) {
-        manifest.preconfiguredEntries.forEach(e => {
+        manifest.preconfiguredEntries.forEach((e, i) => {
           if (e.group && e.group.default === this.oldDefaultGroup) {
-            this.addOccurrence(this.resolution, manifest.path, project.path, occurrences);
+            const node = this.getAstNodeFromFile(manifest, `preconfiguredEntries[${i}].group.default`);
+            this.addOccurrence(this.resolution, manifest.path, project.path, node, occurrences);
           }
         });
       }

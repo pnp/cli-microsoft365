@@ -25,6 +25,25 @@ describe('FN012007_TSC_lib_es5', () => {
     assert.strictEqual(findings.length, 0);
   });
 
+  it('returns notification if es5 is not present', () => {
+    const project: Project = {
+      path: '/usr/tmp',
+      tsConfigJson: {
+        compilerOptions: {
+          lib: []
+        },
+        source: JSON.stringify({
+          compilerOptions: {
+            lib: []
+          }
+        }, null, 2)
+      }
+    };
+    rule.visit(project, findings);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
+  });
+
   it('doesn\'t return notification if tsconfig is not available', () => {
     const project: Project = {
       path: '/usr/tmp'

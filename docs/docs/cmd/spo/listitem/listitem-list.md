@@ -10,9 +10,6 @@ m365 spo listitem list [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --webUrl <webUrl>`
 : URL of the site from which the item should be retrieved
 
@@ -37,17 +34,7 @@ m365 spo listitem list [options]
 `-n, --pageNumber [pageNumber]`
 : Page number to return if `pageSize` is specified (first page is indexed as value of 0)
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

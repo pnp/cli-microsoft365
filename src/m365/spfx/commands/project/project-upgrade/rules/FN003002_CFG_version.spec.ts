@@ -12,7 +12,7 @@ describe('FN003002_CFG_version', () => {
     rule = new FN003002_CFG_version('2.0');
   })
 
-  it('doesn\'t return notification if schema is already up-to-date', () => {
+  it('doesn\'t return notification if version is already up-to-date', () => {
     const project: Project = {
       path: '/usr/tmp',
       configJson: {
@@ -25,15 +25,21 @@ describe('FN003002_CFG_version', () => {
     assert.strictEqual(findings.length, 0);
   });
 
-  it('returns notification if schema is not up-to-date', () => {
+  it('returns notification if version is not up-to-date', () => {
     const project: any = {
       path: '/usr/tmp',
       configJson: {
-        $schema: 'test-schema'
+        $schema: 'test-schema',
+        version: '1.0',
+        source: JSON.stringify({
+          $schema: 'test-schema',
+          version: '1.0'
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
 
   it('exits if no config json', () => {

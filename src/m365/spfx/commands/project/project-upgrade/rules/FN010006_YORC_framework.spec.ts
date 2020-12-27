@@ -53,11 +53,16 @@ describe('FN010006_YORC_framework', () => {
       path: '/usr/tmp',
       yoRcJson: {
         "@microsoft/generator-sharepoint": {
-        }
+        },
+        source: JSON.stringify({
+          "@microsoft/generator-sharepoint": {
+          }
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
   });
 
   it('returns notification if framework found while it should be removed', () => {
@@ -67,10 +72,16 @@ describe('FN010006_YORC_framework', () => {
       yoRcJson: {
         "@microsoft/generator-sharepoint": {
           framework: 'react'
-        }
+        },
+        source: JSON.stringify({
+          "@microsoft/generator-sharepoint": {
+            framework: 'react'
+          }
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
 });

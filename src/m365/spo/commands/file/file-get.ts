@@ -101,7 +101,7 @@ class SpoFileGetCommand extends SpoCommand {
               reject(err);
             });
             writer.on('close', () => {
-              resolve(args.options.path);
+              resolve(args.options.path as string);
             });
           });
         })

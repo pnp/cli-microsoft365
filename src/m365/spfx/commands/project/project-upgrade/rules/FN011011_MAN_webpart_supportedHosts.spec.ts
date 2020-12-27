@@ -61,12 +61,18 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
         {
           path: '/usr/tmp/manifest.json',
           $schema: 'test-schema',
-          componentType: 'WebPart'
+          componentType: 'WebPart',
+          source: JSON.stringify({
+            path: '/usr/tmp/manifest.json',
+            $schema: 'test-schema',
+            componentType: 'WebPart'
+          }, null, 2)
         }
       ]
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 1, 'Incorrect line number');
   });
 
   it('returns notifications if supportedHosts found while it should be removed', () => {
@@ -78,11 +84,18 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
           path: '/usr/tmp/manifest.json',
           $schema: 'test-schema',
           componentType: 'WebPart',
-          supportedHosts: ['SharePointWebPart']
+          supportedHosts: ['SharePointWebPart'],
+          source: JSON.stringify({
+            path: '/usr/tmp/manifest.json',
+            $schema: 'test-schema',
+            componentType: 'WebPart',
+            supportedHosts: ['SharePointWebPart']
+          }, null, 2)
         }
       ]
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 5, 'Incorrect line number')
   });
 });

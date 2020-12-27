@@ -47,7 +47,8 @@ export class FN011006_MAN_listViewCommandSet_items extends ManifestRule {
           resolution.items[k].type = 'command';
       });
 
-      this.addOccurrence(JSON.stringify(resolution, null, 2), manifest.path, project.path, occurrences);
+      const node = this.getAstNodeFromFile(manifest, 'commands');
+      this.addOccurrence(JSON.stringify(resolution, null, 2), manifest.path, project.path, node, occurrences);
     });
 
     if (occurrences.length > 0) {

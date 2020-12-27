@@ -1,4 +1,6 @@
-export interface YoRcJson {
+import { JsonFile } from ".";
+
+export interface YoRcJson extends JsonFile {
   "@microsoft/generator-sharepoint": {
     componentType?: string;
     environment?: string;

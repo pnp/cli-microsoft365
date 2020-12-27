@@ -1,6 +1,7 @@
+import { JsonFile } from ".";
 import { Hash } from "../project-upgrade/";
 
-export interface VsCodeLaunchJson {
+export interface VsCodeLaunchJson extends JsonFile {
   version: string;
   configurations?: VsCodeLaunchJsonConfiguration[];
 }

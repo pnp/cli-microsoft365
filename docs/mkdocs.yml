@@ -5,6 +5,7 @@ nav:
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
     - 'Using the CLI': 'user-guide/using-cli.md'
+    - 'Run CLI in a Docker Container': 'user-guide/run-cli-in-docker-container.md'
     - 'Logging in to Microsoft 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
     - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
@@ -255,6 +256,7 @@ nav:
         - list contenttype add: 'cmd/spo/list/list-contenttype-add.md'
         - list contenttype list: 'cmd/spo/list/list-contenttype-list.md'
         - list contenttype remove: 'cmd/spo/list/list-contenttype-remove.md'
+        - list contenttype default set: 'cmd/spo/list/list-contenttype-default-set.md'
         - list label get: 'cmd/spo/list/list-label-get.md'
         - list label set: 'cmd/spo/list/list-label-set.md'
         - list sitescript get: 'cmd/spo/list/list-sitescript-get.md'
@@ -448,6 +450,7 @@ nav:
         - report deviceusagedistributionusercounts: 'cmd/teams/report/report-deviceusagedistributionusercounts.md'
         - report deviceusageusercounts: 'cmd/teams/report/report-deviceusageusercounts.md'
         - report deviceusageuserdetail: 'cmd/teams/report/report-deviceusageuserdetail.md'
+        - report pstncalls: 'cmd/teams/report/report-pstncalls.md'
         - report useractivitycounts: 'cmd/teams/report/report-useractivitycounts.md'
         - report useractivityusercounts: 'cmd/teams/report/report-useractivityusercounts.md'
         - report useractivityuserdetail: 'cmd/teams/report/report-useractivityuserdetail.md'
@@ -497,6 +500,7 @@ nav:
         - task remove: 'cmd/todo/task/task-remove.md'
         - task set: 'cmd/todo/task/task-set.md'
     - Yammer (yammer):
+      - search: 'cmd/yammer/yammer-search.md'
       - group:
         - group list: 'cmd/yammer/group/group-list.md'
         - group user add: 'cmd/yammer/group/group-user-add.md'
@@ -518,7 +522,7 @@ nav:
         - report deviceusageuserdetail: 'cmd/yammer/report/report-deviceusageuserdetail.md'
         - report groupsactivitycounts: 'cmd/yammer/report/report-groupsactivitycounts.md'
         - report groupsactivitydetail: 'cmd/yammer/report/report-groupsactivitydetail.md'
-        - report groupsactivitygroupcounts: 'cmd/yammer/report/report-groupsactivitygroupcounts.md'
+        - report groupsactivitygroupcounts: 'cmd/yammer/report/report-groupsactivitygroupcounts.md'        
       - user:
         - user get: 'cmd/yammer/user/user-get.md'
         - user list: 'cmd/yammer/user/user-list.md'
@@ -589,6 +593,7 @@ markdown_extensions:
   - toc:
       permalink: true
   - pymdownx.superfences
+  - pymdownx.snippets
   - def_list
 extra:
   social:

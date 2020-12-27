@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN006002_CFG_PS_includeClientSideAssets extends Rule {
+export class FN006002_CFG_PS_includeClientSideAssets extends JsonRule {
   constructor(private includeClientSideAssets: boolean) {
     super();
   }
@@ -46,7 +46,8 @@ export class FN006002_CFG_PS_includeClientSideAssets extends Rule {
     }
 
     if (project.packageSolutionJson.solution.includeClientSideAssets !== this.includeClientSideAssets) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.packageSolutionJson, 'solution.includeClientSideAssets');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

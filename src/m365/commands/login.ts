@@ -5,6 +5,7 @@ import { Logger } from '../../cli';
 import Command, {
   CommandError, CommandOption
 } from '../../Command';
+import config from '../../config';
 import GlobalOptions from '../../GlobalOptions';
 import commands from './commands';
 
@@ -17,7 +18,10 @@ interface Options extends GlobalOptions {
   userName?: string;
   password?: string;
   certificateFile?: string;
+  certificateBase64Encoded?: string;
   thumbprint?: string;
+  appId?: string;
+  tenant?: string;
 }
 
 class LoginCommand extends Command {
@@ -53,6 +57,9 @@ class LoginCommand extends Command {
         logger.logToStderr(`Signing in to Microsoft 365...`);
       }
 
+      auth.service.appId = args.options.appId || config.cliAadAppId;
+      auth.service.tenant = args.options.tenant || config.tenant;
+
       switch (args.options.authType) {
         case 'password':
           auth.service.authType = AuthType.Password;
@@ -61,7 +68,7 @@ class LoginCommand extends Command {
           break;
         case 'certificate':
           auth.service.authType = AuthType.Certificate;
-          auth.service.certificate = fs.readFileSync(args.options.certificateFile as string, 'base64');
+          auth.service.certificate = args.options.certificateBase64Encoded ? args.options.certificateBase64Encoded : fs.readFileSync(args.options.certificateFile as string, 'base64');
           auth.service.thumbprint = args.options.thumbprint;
           auth.service.password = args.options.password;
           break;
@@ -70,6 +77,9 @@ class LoginCommand extends Command {
           auth.service.userName = args.options.userName;
           break;
       }
+
+      // necessary to apply the tenant configured on the service to auth
+      auth.setAuthContext();
 
       auth
         .ensureAccessToken(auth.defaultResource, logger, this.debug)
@@ -134,15 +144,27 @@ class LoginCommand extends Command {
       },
       {
         option: '-p, --password [password]',
-        description: 'Password for the user. Required when authType is set to password'
+        description: 'Password for the user or the certificate. Required when `authType` is set to `password`, or when `authType` is set to `certificate` and the provided certificate requires a password to open'
       },
       {
         option: '-c, --certificateFile [certificateFile]',
-        description: 'Path to the file with certificate private key. Required when authType is set to certificate'
+        description: 'Path to the file with certificate private key. When `authType` is set to `certificate`, specify either `certificateFile` or `certificateBase64Encoded`'
+      },
+      {
+        option: '--certificateBase64Encoded [certificateBase64Encoded]',
+        description: 'Base64-encoded string with certificate private key. When `authType` is set to `certificate`, specify either `certificateFile` or `certificateBase64Encoded`'
       },
       {
         option: '--thumbprint [thumbprint]',
-        description: 'Certificate thumbprint. Required when authType is set to certificate'
+        description: 'Certificate thumbprint. If not specified, and `authType` is set to `certificate`, it will be automatically calculated based on the specified certificate'
+      },
+      {
+        option: '--appId [appId]',
+        description: 'App ID of the Azure AD application to use for authentication. If not specified, use the app specified in the CLIMICROSOFT365_AADAPPID environment variable. If the environment variable is not defined, use the multitenant PnP Management Shell app'
+      },
+      {
+        option: '--tenant [tenant]',
+        description: `ID of the tenant from which accounts should be able to authenticate. Use common or organization if the app is multitenant. If not specified, use the tenant specified in the CLIMICROSOFT365_TENANT environment variable. If the environment variable is not defined, use 'common' as the tenant identifier`
       }
     ];
 
@@ -162,16 +184,18 @@ class LoginCommand extends Command {
     }
 
     if (args.options.authType === 'certificate') {
-      if (!args.options.certificateFile) {
-        return 'Required option certificateFile missing';
+      if (args.options.certificateFile && args.options.certificateBase64Encoded) {
+        return 'Specify either certificateFile or certificateBase64Encoded, but not both.';
       }
 
-      if (!fs.existsSync(args.options.certificateFile)) {
-        return `File '${args.options.certificateFile}' does not exist`;
+      if (!args.options.certificateFile && !args.options.certificateBase64Encoded) {
+        return 'Specify either certificateFile or certificateBase64Encoded';
       }
 
-      if (!args.options.thumbprint) {
-        return 'Required option thumbprint missing';
+      if (args.options.certificateFile) {
+        if (!fs.existsSync(args.options.certificateFile)) {
+          return `File '${args.options.certificateFile}' does not exist`;
+        }
       }
     }
 

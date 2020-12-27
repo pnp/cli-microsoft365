@@ -10,9 +10,6 @@ m365 spo listitem record declare [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --webUrl <webUrl>`
 : URL of the site where the list is located
 
@@ -28,17 +25,7 @@ m365 spo listitem record declare [options]
 `-d, --date [date]`
 : Record declaration date in ISO format. eg. 2019-12-31
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

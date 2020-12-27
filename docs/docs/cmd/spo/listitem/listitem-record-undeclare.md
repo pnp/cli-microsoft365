@@ -10,9 +10,6 @@ m365 spo listitem record undeclare [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --webUrl <webUrl>`
 : The URL of the site where the list is located
 
@@ -25,17 +22,7 @@ m365 spo listitem record undeclare [options]
 `-t, --listTitle [listTitle]`
 : The title of the list where the item is located. Specify `listId` or `listTitle` but not both
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default text
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

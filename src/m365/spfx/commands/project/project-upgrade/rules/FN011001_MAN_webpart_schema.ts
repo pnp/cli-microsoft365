@@ -39,7 +39,8 @@ export class FN011001_MAN_webpart_schema extends ManifestRule {
     project.manifests.forEach(manifest => {
       if (manifest.componentType === 'WebPart' &&
         manifest.$schema !== this.schema) {
-        this.addOccurrence(this.resolution, manifest.path, project.path, occurrences);
+        const node = this.getAstNodeFromFile(manifest, '$schema');
+        this.addOccurrence(this.resolution, manifest.path, project.path, node, occurrences);
       }
     });
 

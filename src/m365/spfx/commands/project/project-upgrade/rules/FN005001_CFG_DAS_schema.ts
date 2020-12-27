@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN005001_CFG_DAS_schema extends Rule {
+export class FN005001_CFG_DAS_schema extends JsonRule {
   constructor(private schema: string) {
     super();
   }
@@ -43,7 +43,8 @@ export class FN005001_CFG_DAS_schema extends Rule {
     }
 
     if (project.deployAzureStorageJson.$schema !== this.schema) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.deployAzureStorageJson, '$schema');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

@@ -10,11 +10,11 @@ m365 spfx doctor [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-e, --env [env]`
 : Version of SharePoint for which to check compatibility: `sp2016|sp2019|spo`
+
+`-h, --help`
+: output usage information
 
 `--query [query]`
 : JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples

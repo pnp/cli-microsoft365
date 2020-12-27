@@ -19,9 +19,6 @@ m365 spo site groupify
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --siteUrl <siteUrl>`
 : URL of the site collection being connected to new Microsoft 365 Group
 
@@ -43,17 +40,7 @@ m365 spo site groupify
 `--keepOldHomepage`
 : For sites that already have a modern page set as homepage, set this option, to keep it as the homepage
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

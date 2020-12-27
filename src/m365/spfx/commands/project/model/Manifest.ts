@@ -1,4 +1,6 @@
-export interface Manifest {
+import { JsonFile } from ".";
+
+export interface Manifest extends JsonFile {
   path: string;
   
   $schema: string;

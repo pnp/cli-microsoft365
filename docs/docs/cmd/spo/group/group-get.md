@@ -10,9 +10,6 @@ m365 spo group get [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-u, --webUrl <webUrl>`
 : URL of the site where the group is located
 
@@ -22,17 +19,7 @@ m365 spo group get [options]
 `--name [name]`
 : Name of the site group to get. Specify either `id` or `name` but not both e.g `Team Site Members`
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Examples
 

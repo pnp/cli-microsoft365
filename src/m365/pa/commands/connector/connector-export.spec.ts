@@ -22,7 +22,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    mkdirSyncStub = sinon.stub(fs, 'mkdirSync').callsFake(() => { });
+    mkdirSyncStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
     writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     auth.service.connected = true;
   });

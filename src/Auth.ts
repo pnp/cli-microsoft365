@@ -1,5 +1,5 @@
 import { AuthenticationContext, ErrorResponse, Logging, LoggingLevel, TokenResponse, UserCodeInfo } from 'adal-node';
-import { asn1, pkcs12, pki } from 'node-forge';
+import { asn1, pkcs12, pki, pem, md } from 'node-forge';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import { Logger } from './cli';
@@ -22,14 +22,21 @@ export class Service {
   authType: AuthType = AuthType.DeviceCode;
   userName?: string;
   password?: string;
+  certificateType: CertificateType = CertificateType.Unknown;
   certificate?: string
   thumbprint?: string;
   accessTokens: Hash<AccessToken>;
   spoUrl?: string;
   tenantId?: string;
+  // ID of the Azure AD app used to authenticate
+  appId: string;
+  // ID of the tenant where the Azure AD app is registered; common if multitenant
+  tenant: string;
 
   constructor() {
     this.accessTokens = {};
+    this.appId = config.cliAadAppId;
+    this.tenant = config.tenant;
   }
 
   public logout(): void {
@@ -39,10 +46,13 @@ export class Service {
     this.authType = AuthType.DeviceCode;
     this.userName = undefined;
     this.password = undefined;
+    this.certificateType = CertificateType.Unknown;
     this.certificate = undefined;
     this.thumbprint = undefined;
     this.spoUrl = undefined;
     this.tenantId = undefined;
+    this.appId = config.cliAadAppId;
+    this.tenant = config.tenant;
   }
 }
 
@@ -53,11 +63,17 @@ export enum AuthType {
   Identity
 }
 
+export enum CertificateType {
+  Unknown,
+  Base64,
+  Binary
+}
+
 export class Auth {
-  protected authCtx: AuthenticationContext;
+  // assigned through this.setAuthContext() hence !
+  protected authCtx!: AuthenticationContext;
   private userCodeInfo?: UserCodeInfo;
   private _service: Service;
-  private appId: string;
 
   public get service(): Service {
     return this._service;
@@ -68,9 +84,8 @@ export class Auth {
   }
 
   constructor() {
-    this.appId = config.cliAadAppId;
     this._service = new Service();
-    this.authCtx = new AuthenticationContext(`https://login.microsoftonline.com/${config.tenant}`);
+    this.setAuthContext();
   }
 
   public restoreAuth(): Promise<void> {
@@ -79,6 +94,7 @@ export class Auth {
         .getServiceConnectionInfo<Service>()
         .then((service: Service): void => {
           this._service = Object.assign(this._service, service);
+          this.setAuthContext();
           resolve();
         }, (error: any): void => {
           resolve();
@@ -89,9 +105,12 @@ export class Auth {
   public ensureAccessToken(resource: string, logger: Logger, debug: boolean = false, fetchNew: boolean = false): Promise<string> {
     Logging.setLoggingOptions({
       level: debug ? 3 : 0,
-      log: (level: LoggingLevel, message: string, error?: Error): void => {
-        logger.log(message);
-      }
+      log: 
+        // Dependency code, we do not control when and how it gets called, thus ignored from coverage
+        /* c8 ignore next 3 */ 
+        (level: LoggingLevel, message: string, error?: Error): void => {
+          logger.log(message);
+        }
     });
 
     return new Promise<string>((resolve: (accessToken: string) => void, reject: (error: any) => void): void => {
@@ -185,7 +204,7 @@ export class Auth {
 
       this.authCtx.acquireTokenWithRefreshToken(
         this.service.refreshToken as string,
-        this.appId as string,
+        this.service.appId,
         resource,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {
@@ -214,7 +233,7 @@ export class Auth {
         logger.logToStderr('No existing refresh token. Starting new device code flow...');
       }
 
-      this.authCtx.acquireUserCode(resource, this.appId as string, 'en-us',
+      this.authCtx.acquireUserCode(resource, this.service.appId, 'en-us',
         (error: Error, response: UserCodeInfo): void => {
           if (debug) {
             logger.logToStderr('Response:');
@@ -230,7 +249,7 @@ export class Auth {
           logger.log(response.message);
 
           this.userCodeInfo = response;
-          this.authCtx.acquireTokenWithDeviceCode(resource, this.appId as string, response,
+          this.authCtx.acquireTokenWithDeviceCode(resource, this.service.appId, response,
             (error: Error, response: TokenResponse | ErrorResponse): void => {
               if (debug) {
                 logger.logToStderr('Response:');
@@ -260,7 +279,7 @@ export class Auth {
         resource,
         this.service.userName as string,
         this.service.password as string,
-        this.appId as string,
+        this.service.appId,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
           if (debug) {
             logger.logToStderr('Response:');
@@ -281,17 +300,34 @@ export class Auth {
   private ensureAccessTokenWithCertificate(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
       if (debug) {
-        logger.logToStderr(`Retrieving new access token using certificate (thumbprint ${this.service.thumbprint})...`);
+        logger.logToStderr(`Retrieving new access token using certificate...`);
       }
 
       let cert: string = '';
+      const buf = Buffer.from(this.service.certificate as string, 'base64');
 
-      if (this.service.password === undefined) {
-        const buf = Buffer.from(this.service.certificate as string, 'base64');
-        cert = buf.toString('utf8');
+      if (this.service.certificateType === CertificateType.Unknown || this.service.certificateType === CertificateType.Base64) {
+        // First time this method is called, we don't know if certificate is PEM or PFX (type is Unknown)
+        // We assume it is PEM but when parsing of PEM fails, we assume it could be PFX
+        // Type is persisted on service so subsequent calls only run through the correct parsing flow
+        try {
+          cert = buf.toString('utf8');
+          const pemObjs: pem.ObjectPEM[] = pem.decode(cert);
+
+          if (this.service.thumbprint === undefined) {
+            const pemCertObj: pem.ObjectPEM = pemObjs.find(pem => pem.type === "CERTIFICATE") as pem.ObjectPEM;
+            const pemCertStr: string = pem.encode(pemCertObj);
+            const pemCert: pki.Certificate = pki.certificateFromPem(pemCertStr);
+  
+            this.service.thumbprint = this.calculateThumbprint(pemCert);
+          }
+        }
+        catch (e) {
+          this.service.certificateType = CertificateType.Binary;
+        }
       }
-      else {
-        const buf = Buffer.from(this.service.certificate as string, 'base64');
+
+      if (this.service.certificateType === CertificateType.Binary) {
         const p12Asn1 = asn1.fromDer(buf.toString('binary'), false);
 
         const p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
@@ -320,11 +356,22 @@ export class Auth {
 
         // convert a PKCS#8 ASN.1 PrivateKeyInfo to PEM
         cert = pki.privateKeyInfoToPem(privateKeyInfo);
+
+        if (this.service.thumbprint === undefined) {
+          const certBags: {
+            [key: string]: pkcs12.Bag[] | undefined;
+            localKeyId?: pkcs12.Bag[];
+            friendlyName?: pkcs12.Bag[];
+          } = p12Parsed.getBags({ bagType: pki.oids.certBag });
+          const certBag: pkcs12.Bag = (certBags[pki.oids.certBag] as pkcs12.Bag[])[0];
+
+          this.service.thumbprint = this.calculateThumbprint(certBag.cert as pki.Certificate);
+        }
       }
 
       this.authCtx.acquireTokenWithClientCertificate(
         resource,
-        this.appId as string,
+        this.service.appId,
         cert as string,
         this.service.thumbprint as string,
         (error: Error, response: TokenResponse | ErrorResponse): void => {
@@ -485,6 +532,12 @@ export class Auth {
     });
   }
 
+  private calculateThumbprint(certificate: pki.Certificate): string {
+    const messageDigest: md.MessageDigest = md.sha1.create();
+    messageDigest.update(asn1.toDer(pki.certificateToAsn1(certificate)).getBytes());
+    return messageDigest.digest().toHex();
+  }
+
   public cancel(): void {
     if (this.userCodeInfo) {
       this.authCtx.cancelRequestToGetTokenWithDeviceCode(this.userCodeInfo as UserCodeInfo, (error: Error, response: TokenResponse | ErrorResponse): void => { });
@@ -531,6 +584,10 @@ export class Auth {
 
   public getTokenStorage(): TokenStorage {
     return new FileTokenStorage();
+  }
+
+  public setAuthContext(): void {
+    this.authCtx = new AuthenticationContext(`https://login.microsoftonline.com/${this.service.tenant}`);
   }
 }
 

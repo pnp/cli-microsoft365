@@ -71,7 +71,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        data: {
+        body: {
           contentType: 'Text',
           content: 'Lorem ipsum'
         },
@@ -104,7 +104,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        data: {
+        body: {
           contentType: 'Text',
           content: 'Lorem ipsum'
         },
@@ -137,7 +137,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        data: {
+        body: {
           contentType: 'Text',
           content: 'Lorem ipsum'
         },
@@ -171,7 +171,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        data: {
+        body: {
           contentType: 'HTML',
           content: 'Lorem <b>ipsum</b>'
         },
@@ -205,7 +205,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        data: {
+        body: {
           contentType: 'Text',
           content: 'Lorem ipsum'
         },
@@ -242,7 +242,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
     const expected: string = JSON.stringify({
       message: {
         subject: 'Lorem ipsum',
-        data: {
+        body: {
           contentType: 'Text',
           content: 'Lorem ipsum'
         },

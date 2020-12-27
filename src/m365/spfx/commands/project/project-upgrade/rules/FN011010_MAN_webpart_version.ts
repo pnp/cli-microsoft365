@@ -35,7 +35,8 @@ export class FN011010_MAN_webpart_version extends ManifestRule {
     project.manifests.forEach(manifest => {
       if (manifest.componentType === 'WebPart' &&
         manifest.version !== '*') {
-        this.addOccurrence(this.resolution, manifest.path, project.path, occurrences);
+        const node = this.getAstNodeFromFile(manifest, 'version');
+        this.addOccurrence(this.resolution, manifest.path, project.path, node, occurrences);
       }
     });
 

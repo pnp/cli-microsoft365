@@ -1,8 +1,8 @@
 import * as chalk from 'chalk';
 import * as fs from 'fs';
-import * as inquirer from 'inquirer';
-import * as jmespath from 'jmespath';
-import * as markshell from 'markshell';
+import type { Inquirer } from 'inquirer';
+import type * as JMESPath from 'jmespath';
+import type * as Markshell from 'markshell';
 import * as minimist from 'minimist';
 import * as os from 'os';
 import * as path from 'path';
@@ -10,7 +10,6 @@ import { Logger } from '.';
 import Command, { CommandError } from '../Command';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
-import Table = require('easy-table');
 import Utils from '../Utils';
 const packageJSON = require('../../package.json');
 
@@ -136,7 +135,7 @@ export class Cli {
     }
 
     return Cli
-      .executeCommand(this.commandToExecute.command, this.optionsFromArgs)
+      .executeCommand(this.commandToExecute.command, Cli.removeShortOptions(this.optionsFromArgs))
       .then(_ => process.exit(0), err => this.closeWithError(err));
   }
 
@@ -366,6 +365,7 @@ export class Cli {
 
     if (options.query &&
       !options.help) {
+      const jmespath: typeof JMESPath = require('jmespath');
       logStatement = jmespath.search(logStatement, options.query);
     }
 
@@ -453,7 +453,8 @@ export class Cli {
     }
     // display object as a table where each property is a column
     else {
-      const t: Table = new Table();
+      const Table = require('easy-table');
+      const t = new Table();
       logStatement.forEach((r: any) => {
         if (typeof r !== 'object') {
           return;
@@ -500,7 +501,7 @@ export class Cli {
     let helpFilePath = '';
     let commandNameWords: string[] = [];
     if (this.commandToExecute) {
-       commandNameWords = (this.commandToExecute.name).split(' ');
+      commandNameWords = (this.commandToExecute.name).split(' ');
     }
     const pathChunks: string[] = [this.commandsFolder, '..', '..', 'docs', 'docs', 'cmd'];
 
@@ -521,6 +522,9 @@ export class Cli {
     if (fs.existsSync(helpFilePath)) {
       Cli.log();
 
+      // because of prism, loading markshell slows down CLI a lot
+      // let's lazy-load it only when it's needed (help was requested)
+      const markshell: typeof Markshell = require('markshell');
       const theme = markshell.getTheme();
       const admonitionStyles = theme.admonitions.getStyles();
       admonitionStyles.indent.beforeIndent = 0;
@@ -531,6 +535,7 @@ export class Cli {
       theme.headline = chalk.white;
       theme.inlineCode = chalk.cyan;
       theme.sourceCodeTheme = 'solarizelight';
+      theme.includePath = path.join(this.commandsFolder, '..', '..', 'docs');
       markshell.setTheme(theme);
 
       Cli.log(markshell.toRawContent(helpFilePath));
@@ -682,8 +687,18 @@ export class Cli {
   }
 
   public static prompt(options: any, cb: (result: any) => void): void {
+    const inquirer: Inquirer = require('inquirer');
     inquirer
       .prompt(options)
       .then(result => cb(result));
+  }
+
+  private static removeShortOptions(args: { options: minimist.ParsedArgs }): any {
+    const filteredArgs = JSON.parse(JSON.stringify(args));
+    const optionsToRemove: string[] = Object.getOwnPropertyNames(args.options)
+      .filter(option => option.length === 1 || option === '--');
+    optionsToRemove.forEach(option => delete filteredArgs.options[option]);
+
+    return filteredArgs;
   }
 }

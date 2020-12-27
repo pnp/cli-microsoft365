@@ -40,11 +40,17 @@ describe('FN012014_TSC_inlineSources', () => {
       tsConfigJson: {
         compilerOptions: {
           inlineSources: true
-        }
+        },
+        source: JSON.stringify({
+          compilerOptions: {
+            inlineSources: true
+          }
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert.strictEqual(findings.length, 1);
+    assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number')
   });
 
   it('returns notification if inlineSources is missing', () => {

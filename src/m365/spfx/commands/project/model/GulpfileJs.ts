@@ -1,3 +1,3 @@
 export interface GulpfileJs {
-  src: string;
+  source: string;
 }

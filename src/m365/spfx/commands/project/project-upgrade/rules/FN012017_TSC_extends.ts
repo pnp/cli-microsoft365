@@ -1,8 +1,8 @@
 import { Finding } from "../";
 import { Project } from "../../model";
-import { Rule } from "./Rule";
+import { JsonRule } from "./JsonRule";
 
-export class FN012017_TSC_extends extends Rule {
+export class FN012017_TSC_extends extends JsonRule {
 
   // extends is a reserved word so _extends is used instead
   constructor(private _extends: string) {
@@ -45,7 +45,8 @@ export class FN012017_TSC_extends extends Rule {
     }
 
     if (!project.tsConfigJson.extends || project.tsConfigJson.extends !== this._extends) {
-      this.addFinding(findings);
+      const node = this.getAstNodeFromFile(project.tsConfigJson, 'extends');
+      this.addFindingWithPosition(findings, node);
     }
   }
 }

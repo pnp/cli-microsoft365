@@ -10,9 +10,6 @@ m365 graph schemaextension set [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-i, --id <id>`
 : The unique identifier for the schema extension definition
 
@@ -31,17 +28,7 @@ m365 graph schemaextension set [options]
 `-p, --properties [properties]`
 : The collection of property names and types that make up the schema extension definition formatted as a JSON string
 
-`--query [query]`
-: JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
-
-`-o, --output [output]`
-: Output type. `json,text`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 

@@ -47,11 +47,16 @@ describe('FN010004_YORC_componentType', () => {
       }],
       yoRcJson: {
         "@microsoft/generator-sharepoint": {
-        }
+        },
+        source: JSON.stringify({
+          "@microsoft/generator-sharepoint": {
+          }
+        }, null, 2)
       }
     };
     rule.visit(project, findings);
-    assert(findings[0].occurrences[0].resolution.indexOf('"componentType": "webpart"') > -1);
+    assert(findings[0].occurrences[0].resolution.indexOf('"componentType": "webpart"') > -1, 'Incorrect suggestion');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
   });
 
   it('suggests setting componentType to extension for a project with an extension', () => {

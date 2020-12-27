@@ -10,9 +10,6 @@ m365 spo report activityuserdetail [options]
 
 ## Options
 
-`-h, --help`
-: output usage information
-
 `-d, --date [date]`
 : The date for which you would like to view the users who performed any activity. Supported date format is `YYYY-MM-DD`. Specify the date or period, but not both.
 
@@ -22,14 +19,7 @@ m365 spo report activityuserdetail [options]
 `-f, --outputFile [outputFile]`
 : Path to the file where the Microsoft Teams device usage by user report should be stored in
 
-`-o, --output [output]`
-: Output type. `text,json`. Default `text`
-
-`--verbose`
-: Runs command with verbose logging
-
-`--debug`
-: Runs command with debug logging
+--8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
