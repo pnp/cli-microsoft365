@@ -10,6 +10,7 @@
 
 **Teams:**
 
+- [teams report directroutingcalls](../cmd/teams/report/report-directroutingcalls.md) - gets details about direct routing calls made within a given time period [#1772](https://github.com/pnp/cli-microsoft365/issues/1772)
 - [teams report pstncalls](../cmd/teams/report/report-pstncalls.md) - gets details about PSTN calls made within a given time period [#1771](https://github.com/pnp/cli-microsoft365/issues/1771)
 
 **Yammer:**
