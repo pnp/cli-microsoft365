@@ -101,7 +101,7 @@ class TeamsTeamAddCommand extends GraphCommand {
     const requestOptions: AxiosRequestConfig = {
       url: `${this.resource}/v1.0/teams`,
       headers: {
-        'accept': 'application/json;odata=nometadata'
+        'accept': 'application/json;odata.metadata=none'
       },
       data: requestBody,
       responseType: 'stream'
@@ -110,9 +110,6 @@ class TeamsTeamAddCommand extends GraphCommand {
     request
       .post(requestOptions)
       .then((res: any): Promise<TeamsAsyncOperation> => {
-        // Avoid Error: Converting circular structure to JSON
-        JSON.stringify(res.headers);
-
         const requestOptions: any = {
           url: `${this.resource}/v1.0${res.headers.location}`,
           headers: {
