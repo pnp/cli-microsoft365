@@ -17,6 +17,8 @@ nav:
     - status: 'cmd/status.md'
     - version: 'cmd/version.md'
     - Azure Active Directory Graph (aad):
+      - app:
+        - app add: 'cmd/aad/app/app-add.md'
       - approleassignment:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'

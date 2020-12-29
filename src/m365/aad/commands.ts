@@ -1,6 +1,7 @@
 const prefix: string = 'aad';
 
 export default {
+  APP_ADD: `${prefix} app add`,
   APPROLEASSIGNMENT_ADD: `${prefix} approleassignment add`,
   APPROLEASSIGNMENT_LIST: `${prefix} approleassignment list`,
   APPROLEASSIGNMENT_REMOVE: `${prefix} approleassignment remove`,
