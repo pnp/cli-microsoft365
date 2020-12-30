@@ -709,7 +709,7 @@ Get-FlowApproval|Microsoft.PowerApps.PowerShell|
 Get-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Get-FlowEnvironment|Microsoft.PowerApps.PowerShell|[flow environment list](../cmd/flow/environment/environment-list.md), [flow environment get](../cmd/flow/environment/environment-get.md)
 Get-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
-Get-FlowRun|Microsoft.PowerApps.PowerShell|[flow run list](../cmd/flow/run/run-list.md), [flow run get](../cmd/flow/run/run-get.md), [flow run resubmit](../cmd/flow/run/run-resubmit.md)
+Get-FlowRun|Microsoft.PowerApps.PowerShell|[flow run list](../cmd/flow/run/run-list.md), [flow run get](../cmd/flow/run/run-get.md)
 Get-PowerApp|Microsoft.PowerApps.PowerShell|
 Get-PowerAppConnection|Microsoft.PowerApps.PowerShell|
 Get-PowerAppConnectionRoleAssignment|Microsoft.PowerApps.PowerShell|

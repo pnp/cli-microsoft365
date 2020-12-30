@@ -36,7 +36,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
     const resubmitFlow: () => void = (): void => {
       this._getTriggerName(args.options.environment, args.options.flow).then((triggerName: string) => {
         if (this.verbose) {
-          logger.log(triggerName);
+          logger.logToStderr(chalk.yellow(`Retrieved triggername: ${triggerName}`));
         }
         const requestOptions: any = {
           url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/triggers/${encodeURIComponent(triggerName)}/histories/${encodeURIComponent(args.options.name)}/resubmit?api-version=2016-11-01`,
@@ -50,7 +50,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
           .post(requestOptions)
           .then((): void => {
             if (this.verbose) {
-              logger.log(chalk.green('DONE'));
+              logger.logToStderr(chalk.green('DONE'));
             }
 
             cb();
@@ -91,7 +91,8 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
       request
         .get(requestOptions)
         .then((res: any): void => {
-          return resolve(res['value'][0]['name']);
+          const triggerName: string = res['value'][0]['name'];
+          return resolve(triggerName);
         }).catch((ex: ExceptionInformation) => {
           reject(ex);
         });
@@ -114,7 +115,7 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
       },
       {
         option: '--confirm',
-        description: 'Don\'t prompt for confirming cancelling the Flow'
+        description: 'Don\'t prompt for confirming'
       }
     ];
 
