@@ -38,7 +38,7 @@ class AadO365GroupRecycleBinItemCommand extends GraphItemsListCommand<Group> {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
+    const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
     const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g, `''`)}')` : '';
     const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.mailNickname).replace(/'/g, `''`)}')` : '';
     const topCount: string = '&$top=100';
