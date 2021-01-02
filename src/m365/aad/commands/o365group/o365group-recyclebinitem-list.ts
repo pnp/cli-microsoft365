@@ -67,7 +67,7 @@ class AadO365GroupRecycleBinItemCommand extends GraphItemsListCommand<Group> {
         description: 'Lists groups with displayName starting with the specified value'
       },
       {
-        option: '-m, --mailNickname [displayName]',
+        option: '-m, --mailNickname [mailNickname]',
         description: 'Lists groups with mailNickname starting with the specified value'
       }
     ];
