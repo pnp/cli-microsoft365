@@ -13,7 +13,7 @@ m365 aad o365group recyclebinitem list [options]
 `-d, --displayName [displayName]`
 : Lists groups with displayName starting with the specified value
 
-`-m, --mailNickname [displayName]`
+`-m, --mailNickname [mailNickname]`
 : Lists groups with mailNickname starting with the specified value
 
 --8<-- "docs/cmd/_global.md"
