@@ -78,9 +78,6 @@ class LoginCommand extends Command {
           break;
       }
 
-      // necessary to apply the tenant configured on the service to auth
-      auth.setAuthContext();
-
       auth
         .ensureAccessToken(auth.defaultResource, logger, this.debug)
         .then((): void => {

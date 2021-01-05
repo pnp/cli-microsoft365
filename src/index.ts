@@ -2,7 +2,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import * as updateNotifier from 'update-notifier';
+import type * as UpdateNotifier from 'update-notifier';
 import appInsights from './appInsights';
 import { Cli } from './cli';
 
@@ -16,13 +16,15 @@ if ((process.stdout as any)._handle) {
   (process.stdout as any)._handle.setBlocking(true);
 }
 
-updateNotifier({ pkg: packageJSON }).notify({ defer: false });
+if (!process.env.CLIMICROSOFT365_NOUPDATE) {
+  const updateNotifier: typeof UpdateNotifier = require('update-notifier');
+  updateNotifier({ pkg: packageJSON }).notify({ defer: false });
+}
 
 fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string): void => {
   try {
     const cli: Cli = Cli.getInstance();
-    cli
-      .execute(path.join(resolvedPath, 'm365'), process.argv.slice(2))
+    cli.execute(path.join(resolvedPath, 'm365'), process.argv.slice(2));
   }
   catch (e) {
     appInsights.trackException({

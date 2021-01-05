@@ -1,4 +1,4 @@
-import * as chalk from 'chalk';
+import type * as Chalk from 'chalk';
 import appInsights from './appInsights';
 import auth from './Auth';
 import { Cli } from './cli';
@@ -62,6 +62,7 @@ export default abstract class Command {
     const cli: Cli = Cli.getInstance();
     if (cli.currentCommandName &&
       cli.currentCommandName.indexOf(deprecated) === 0) {
+      const chalk: typeof Chalk = require('chalk');
       logger.logToStderr(chalk.yellow(`Command '${deprecated}' is deprecated. Please use '${recommended}' instead`));
     }
   }

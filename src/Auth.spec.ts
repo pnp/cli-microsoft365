@@ -9,6 +9,10 @@ import { Logger } from './cli';
 import { CommandError } from './Command';
 import request from './request';
 import Utils from './Utils';
+// required because both packages are lazy-loaded which breaks tests
+// if this is not included
+import 'adal-node';
+import 'node-forge';
 
 class MockTokenStorage implements TokenStorage {
   public get(): Promise<string> {
