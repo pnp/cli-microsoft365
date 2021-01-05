@@ -77,3 +77,7 @@ If you're experiencing problems when using the CLI for Microsoft 365, you can us
 ## Command completion
 
 To help you use its commands, CLI for Microsoft 365 offers you the ability to autocomplete commands and options that you're typing in the prompt. Some additional setup, specific for the shell and terminal that you use, is required to enable command completion for CLI for Microsoft 365. For more information on configuring command completion for the CLI for Microsoft 365 see the [command completion](../concepts/completion.md) article.
+
+## Disable automatic checking for updates
+
+Each time you run CLI for Microsoft 365, it will automatically check if there is a new version available and prompt you with update instructions if that's the case. If you use CLI for Microsoft 365 in CI/CD or in scripts and want to make it run faster, you can disable the check by setting the `CLIMICROSOFT365_NOUPDATE` environment variable to `1`.

@@ -1,4 +1,4 @@
-import * as chalk from 'chalk';
+import type * as Chalk from 'chalk';
 import * as fs from 'fs';
 import type { Inquirer } from 'inquirer';
 import type * as JMESPath from 'jmespath';
@@ -374,6 +374,7 @@ export class Cli {
     }
 
     if (logStatement instanceof CommandError) {
+      const chalk: typeof Chalk = require('chalk');
       return chalk.red(`Error: ${logStatement.message}`);
     }
 
@@ -525,6 +526,7 @@ export class Cli {
       // because of prism, loading markshell slows down CLI a lot
       // let's lazy-load it only when it's needed (help was requested)
       const markshell: typeof Markshell = require('markshell');
+      const chalk: typeof Chalk = require('chalk');
       const theme = markshell.getTheme();
       const admonitionStyles = theme.admonitions.getStyles();
       admonitionStyles.indent.beforeIndent = 0;
@@ -646,6 +648,7 @@ export class Cli {
   }
 
   private closeWithError(error: any, showHelp: boolean = false): Promise<void> {
+    const chalk: typeof Chalk = require('chalk');
     let exitCode: number = 1;
 
     if (error instanceof CommandError) {
