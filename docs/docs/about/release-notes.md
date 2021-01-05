@@ -1,5 +1,21 @@
 # Release notes
 
+## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
+
+### New commands
+
+**File:**
+
+- [file convert pdf](../cmd/file/convert/convert-pdf.md) - converts the specified file to PDF using Microsoft Graph [#2010](https://github.com/pnp/cli-microsoft365/issues/2010)
+
+**Power Automate:**
+
+- [flow run resubmit](../cmd/flow/run/run-resubmit.md) - resubmits a specific flow run for the specified Microsoft Flow [#1871](https://github.com/pnp/cli-microsoft365/issues/1871)
+
+### Changes
+
+- updated 'teams team add' to use Microsoft Graph v1.0 API [#2020](https://github.com/pnp/cli-microsoft365/issues/2020)
+
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
 ### New commands
