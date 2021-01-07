@@ -1,5 +1,21 @@
 # Release notes
 
+## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
+
+### New commands
+
+**File:**
+
+- [file convert pdf](../cmd/file/convert/convert-pdf.md) - converts the specified file to PDF using Microsoft Graph [#2010](https://github.com/pnp/cli-microsoft365/issues/2010)
+
+**Power Automate:**
+
+- [flow run resubmit](../cmd/flow/run/run-resubmit.md) - resubmits a specific flow run for the specified Microsoft Flow [#1871](https://github.com/pnp/cli-microsoft365/issues/1871)
+
+### Changes
+
+- updated 'teams team add' to use Microsoft Graph v1.0 API [#2020](https://github.com/pnp/cli-microsoft365/issues/2020)
+
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
 ### New commands
@@ -10,6 +26,7 @@
 
 **Teams:**
 
+- [teams report directroutingcalls](../cmd/teams/report/report-directroutingcalls.md) - gets details about direct routing calls made within a given time period [#1772](https://github.com/pnp/cli-microsoft365/issues/1772)
 - [teams report pstncalls](../cmd/teams/report/report-pstncalls.md) - gets details about PSTN calls made within a given time period [#1771](https://github.com/pnp/cli-microsoft365/issues/1771)
 
 **Yammer:**
@@ -34,6 +51,9 @@
 - fixed issue with resolving uppercase URLs [#2011](https://github.com/pnp/cli-microsoft365/issues/2011)
 - added Dockerfile [#1786](https://github.com/pnp/cli-microsoft365/issues/1786)
 - added line information to JSON-based rules in 'spfx project upgrade' [#1602](https://github.com/pnp/cli-microsoft365/issues/1602)
+- removed the 'started' telemetry event [#2018](https://github.com/pnp/cli-microsoft365/pull/2018)
+- clarified SPFx project upgrade actions [#1857](https://github.com/pnp/cli-microsoft365/issues/1857), [#1569](https://github.com/pnp/cli-microsoft365/issues/1569)
+- added preserving page content to `spo page header set` [#2019](https://github.com/pnp/cli-microsoft365/issues/2019)
 
 ## [v3.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.3.0)
 

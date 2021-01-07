@@ -16,7 +16,7 @@ export class FN012012_TSC_include extends JsonRule {
   }
 
   get description(): string {
-    return `Update tsconfig.json include property`;
+    return `Add to the tsconfig.json include property`;
   };
 
   get resolution(): string {

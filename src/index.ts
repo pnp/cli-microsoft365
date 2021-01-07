@@ -8,10 +8,6 @@ import { Cli } from './cli';
 
 const packageJSON = require('../package.json');
 
-appInsights.trackEvent({
-  name: 'started'
-});
-
 // required to make console.log() in combination with piped output synchronous
 // on Windows/in PowerShell so that the output is not trimmed by calling
 // process.exit() after executing the command, while the output is still

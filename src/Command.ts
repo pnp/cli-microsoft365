@@ -218,49 +218,44 @@ export default abstract class Command {
     if (response.error &&
       response.error['odata.error'] &&
       response.error['odata.error'].message) {
-      callback(new CommandError(response.error['odata.error'].message.value));
+      return callback(new CommandError(response.error['odata.error'].message.value));
     }
-    else {
-      if (response.error) {
-        if (response.error.error &&
-          response.error.error.message) {
-          callback(new CommandError(response.error.error.message));
-        }
-        else {
-          if (response.error.message) {
-            callback(new CommandError(response.error.message));
-          }
-          else {
-            if (response.error.error_description) {
-              callback(new CommandError(response.error.error_description));
-            }
-            else {
-              try {
-                const error: any = JSON.parse(response.error);
-                if (error &&
-                  error.error &&
-                  error.error.message) {
-                  callback(new CommandError(error.error.message));
-                }
-                else {
-                  callback(new CommandError(response.error));
-                }
-              }
-              catch {
-                callback(new CommandError(response.error));
-              }
-            }
-          }
-        }
+
+    if (!response.error) {
+      if (response instanceof Error) {
+        return callback(new CommandError(response.message));
       }
       else {
-        if (response instanceof Error) {
-          callback(new CommandError(response.message));
-        }
-        else {
-          callback(new CommandError(response));
-        }
+        return callback(new CommandError(response));
       }
+    }
+
+    if (response.error.error &&
+      response.error.error.message) {
+      return callback(new CommandError(response.error.error.message));
+    }
+
+    if (response.error.message) {
+      return callback(new CommandError(response.error.message));
+    }
+
+    if (response.error.error_description) {
+      return callback(new CommandError(response.error.error_description));
+    }
+
+    try {
+      const error: any = JSON.parse(response.error);
+      if (error &&
+        error.error &&
+        error.error.message) {
+        callback(new CommandError(error.error.message));
+      }
+      else {
+        callback(new CommandError(response.error));
+      }
+    }
+    catch {
+      callback(new CommandError(response.error));
     }
   }
 

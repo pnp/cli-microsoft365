@@ -72,6 +72,9 @@ nav:
         - completion pwsh update: 'cmd/cli/completion/completion-pwsh-update.md'
         - completion sh setup: 'cmd/cli/completion/completion-sh-setup.md'
         - completion sh update: 'cmd/cli/completion/completion-sh-update.md'
+    - File (file):
+      - convert:
+        - convert pdf: 'cmd/file/convert/convert-pdf.md'
     - Microsoft Flow (flow):
       - disable: 'cmd/flow/flow-disable.md'
       - enable: 'cmd/flow/flow-enable.md'
@@ -89,6 +92,7 @@ nav:
         - run cancel: 'cmd/flow/run/run-cancel.md'
         - run get: 'cmd/flow/run/run-get.md'
         - run list: 'cmd/flow/run/run-list.md'
+        - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Microsoft Graph (graph):
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
@@ -449,6 +453,7 @@ nav:
         - report deviceusagedistributionusercounts: 'cmd/teams/report/report-deviceusagedistributionusercounts.md'
         - report deviceusageusercounts: 'cmd/teams/report/report-deviceusageusercounts.md'
         - report deviceusageuserdetail: 'cmd/teams/report/report-deviceusageuserdetail.md'
+        - report directroutingcalls: 'cmd/teams/report/report-directroutingcalls.md'
         - report pstncalls: 'cmd/teams/report/report-pstncalls.md'
         - report useractivitycounts: 'cmd/teams/report/report-useractivitycounts.md'
         - report useractivityusercounts: 'cmd/teams/report/report-useractivityusercounts.md'

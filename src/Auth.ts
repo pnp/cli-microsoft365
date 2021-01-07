@@ -589,6 +589,29 @@ export class Auth {
   public setAuthContext(): void {
     this.authCtx = new AuthenticationContext(`https://login.microsoftonline.com/${this.service.tenant}`);
   }
+
+  public static isAppOnlyAuth(accessToken: string): boolean | undefined {
+    let isAppOnlyAuth: boolean | undefined;
+
+    if (!accessToken || accessToken.length === 0) {
+      return isAppOnlyAuth;
+    }
+
+    const chunks = accessToken.split('.');
+    if (chunks.length !== 3) {
+      return isAppOnlyAuth;
+    }
+
+    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
+    try {
+      const token: any = JSON.parse(tokenString);
+      isAppOnlyAuth = !token.upn;
+    }
+    catch {
+    }
+
+    return isAppOnlyAuth;
+  }
 }
 
 export default new Auth();

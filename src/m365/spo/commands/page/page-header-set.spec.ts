@@ -1,3 +1,4 @@
+import { mockCanvasContent, mockPage } from './page-control-set.mock';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
@@ -33,6 +34,7 @@ describe(commands.PAGE_HEADER_SET, () => {
         log.push(msg);
       }
     };
+
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
         return Promise.resolve({
@@ -41,8 +43,13 @@ describe(commands.PAGE_HEADER_SET, () => {
         });
       }
 
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$expand=ListItemAllFields`) > -1) {
+        return Promise.resolve({ CanvasContent1: mockCanvasContent });
+      }
+
       return Promise.reject('Invalid request');
     });
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/savepage`) > -1) {
         data = opts.data;
@@ -94,7 +101,7 @@ describe(commands.PAGE_HEADER_SET, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`) > -1) {
         checkedOut = true;
-        return Promise.resolve({});
+        return Promise.resolve(mockPage.ListItemAllFields);
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`) > -1) {
@@ -112,7 +119,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(checkedOut, true);
+        assert.strictEqual(checkedOut, true);
         done();
       }
       catch (e) {
@@ -155,7 +162,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       }
     }, () => {
       try {
-        assert.deepEqual(checkingOut, false);
+        assert.deepStrictEqual(checkingOut, false);
         done();
       }
       catch (e) {
@@ -165,32 +172,35 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to default when no type specified', (done) => {
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
+    const mockData = {
+      CanvasContent1: mockCanvasContent,
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {},
+          "links": {}
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 4,
+          "layoutType": "FullWidthImage",
+          "textAlignment": "Left",
+          "showKicker": false,
+          "showPublishDate": false,
+          "kicker": ""
+        }
+      }])
+    };
+    
+    command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify({
-          LayoutWebpartsContent: JSON.stringify([{
-            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "title": "Title Region",
-            "description": "Title Region Description",
-            "serverProcessedContent": {
-              "htmlStrings": {},
-              "searchablePlainTexts": {},
-              "imageSources": {},
-              "links": {}
-            },
-            "dataVersion": "1.4",
-            "properties": {
-              "title": "Page",
-              "imageSourceType": 4,
-              "layoutType": "FullWidthImage",
-              "textAlignment": "Left",
-              "showKicker": false,
-              "showPublishDate": false,
-              "kicker": ""
-            }
-          }])
-        }));
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
       }
       catch (e) {
@@ -200,32 +210,35 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to default when default type specified', (done) => {
+    const mockData = {
+      CanvasContent1: mockCanvasContent,
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {},
+          "links": {}
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 4,
+          "layoutType": "FullWidthImage",
+          "textAlignment": "Left",
+          "showKicker": false,
+          "showPublishDate": false,
+          "kicker": ""
+        }
+      }])
+    };
+    
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify({
-          LayoutWebpartsContent: JSON.stringify([{
-            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "title": "Title Region",
-            "description": "Title Region Description",
-            "serverProcessedContent": {
-              "htmlStrings": {},
-              "searchablePlainTexts": {},
-              "imageSources": {},
-              "links": {}
-            },
-            "dataVersion": "1.4",
-            "properties": {
-              "title": "Page",
-              "imageSourceType": 4,
-              "layoutType": "FullWidthImage",
-              "textAlignment": "Left",
-              "showKicker": false,
-              "showPublishDate": false,
-              "kicker": ""
-            }
-          }])
-        }));
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
       }
       catch (e) {
@@ -235,32 +248,108 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to none when none specified', (done) => {
+    const mockData = {
+      CanvasContent1: mockCanvasContent,
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {},
+          "links": {}
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 4,
+          "layoutType": "NoImage",
+          "textAlignment": "Left",
+          "showKicker": false,
+          "showPublishDate": false,
+          "kicker": ""
+        }
+      }])
+    };
+
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify({
-          LayoutWebpartsContent: JSON.stringify([{
-            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "title": "Title Region",
-            "description": "Title Region Description",
-            "serverProcessedContent": {
-              "htmlStrings": {},
-              "searchablePlainTexts": {},
-              "imageSources": {},
-              "links": {}
-            },
-            "dataVersion": "1.4",
-            "properties": {
-              "title": "Page",
-              "imageSourceType": 4,
-              "layoutType": "NoImage",
-              "textAlignment": "Left",
-              "showKicker": false,
-              "showPublishDate": false,
-              "kicker": ""
-            }
-          }])
-        }));
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('check when no CanvasContent1 is provided', (done) => {
+    const mockData = {
+      CanvasContent1: "",
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {},
+          "links": {}
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 4,
+          "layoutType": "NoImage",
+          "textAlignment": "Left",
+          "showKicker": false,
+          "showPublishDate": false,
+          "kicker": ""
+        }
+      }])
+    };
+
+    Utils.restore(request.get);
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
+        return Promise.resolve({
+          IsPageCheckedOutToCurrentUser: true,
+          Title: 'Page'
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/site?`) > -1) {
+        return Promise.resolve({
+          Id: 'c7678ab2-c9dc-454b-b2ee-7fcffb983d4e'
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/web?`) > -1) {
+        return Promise.resolve({
+          Id: '0df4d2d2-5ecf-45e9-94f5-c638106bfc65'
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
+        return Promise.resolve({
+          ListId: 'e1557527-d333-49f2-9d60-ea8a3003fda8',
+          UniqueId: '102f496d-23a2-415f-803a-232b8a6c7613'
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$expand=ListItemAllFields`) > -1) {
+        return Promise.resolve(null);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } }, () => {
+      try {
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
       }
       catch (e) {
@@ -270,6 +359,50 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to custom when custom type specified', (done) => {
+    const mockData = {
+      CanvasContent1: mockCanvasContent,
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {
+            "imageSource": "/sites/team-a/siteassets/hero.jpg"
+          },
+          "links": {},
+          "customMetadata": {
+            "imageSource": {
+              "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+              "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+              "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+              "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613"
+            }
+          }
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 2,
+          "layoutType": "FullWidthImage",
+          "textAlignment": "Left",
+          "showKicker": false,
+          "showPublishDate": false,
+          "kicker": "",
+          "authors": [],
+          "altText": "",
+          "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+          "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+          "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+          "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613",
+          "translateX": 42.3837520042758,
+          "translateY": 56.4285714285714
+        }
+      }])
+    };
+
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
@@ -298,53 +431,16 @@ describe(commands.PAGE_HEADER_SET, () => {
         });
       }
 
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$expand=ListItemAllFields`) > -1) {
+        return Promise.resolve({ CanvasContent1: mockCanvasContent });
+      }
+
       return Promise.reject('Invalid request');
     });
 
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify({
-          LayoutWebpartsContent: JSON.stringify([{
-            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "title": "Title Region",
-            "description": "Title Region Description",
-            "serverProcessedContent": {
-              "htmlStrings": {},
-              "searchablePlainTexts": {},
-              "imageSources": {
-                "imageSource": "/sites/team-a/siteassets/hero.jpg"
-              },
-              "links": {},
-              "customMetadata": {
-                "imageSource": {
-                  "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
-                  "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
-                  "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
-                  "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613"
-                }
-              }
-            },
-            "dataVersion": "1.4",
-            "properties": {
-              "title": "Page",
-              "imageSourceType": 2,
-              "layoutType": "FullWidthImage",
-              "textAlignment": "Left",
-              "showKicker": false,
-              "showPublishDate": false,
-              "kicker": "",
-              "authors": [],
-              "altText": "",
-              "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
-              "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
-              "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
-              "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613",
-              "translateX": 42.3837520042758,
-              "translateY": 56.4285714285714
-            }
-          }])
-        }));
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
       }
       catch (e) {
@@ -354,6 +450,50 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets page header to custom when custom type specified (debug)', (done) => {
+    const mockData = {
+      CanvasContent1: mockCanvasContent,
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {
+            "imageSource": "/sites/team-a/siteassets/hero.jpg"
+          },
+          "links": {},
+          "customMetadata": {
+            "imageSource": {
+              "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+              "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+              "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+              "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613"
+            }
+          }
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 2,
+          "layoutType": "FullWidthImage",
+          "textAlignment": "Left",
+          "showKicker": false,
+          "showPublishDate": false,
+          "kicker": "",
+          "authors": [],
+          "altText": "",
+          "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+          "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+          "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+          "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613",
+          "translateX": 42.3837520042758,
+          "translateY": 56.4285714285714
+        }
+      }])
+    };
+
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
@@ -382,53 +522,16 @@ describe(commands.PAGE_HEADER_SET, () => {
         });
       }
 
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$expand=ListItemAllFields`) > -1) {
+        return Promise.resolve({ CanvasContent1: mockCanvasContent });
+      }
+
       return Promise.reject('Invalid request');
     });
 
     command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg', translateX: 42.3837520042758, translateY: 56.4285714285714 } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify({
-          LayoutWebpartsContent: JSON.stringify([{
-            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "title": "Title Region",
-            "description": "Title Region Description",
-            "serverProcessedContent": {
-              "htmlStrings": {},
-              "searchablePlainTexts": {},
-              "imageSources": {
-                "imageSource": "/sites/team-a/siteassets/hero.jpg"
-              },
-              "links": {},
-              "customMetadata": {
-                "imageSource": {
-                  "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
-                  "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
-                  "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
-                  "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613"
-                }
-              }
-            },
-            "dataVersion": "1.4",
-            "properties": {
-              "title": "Page",
-              "imageSourceType": 2,
-              "layoutType": "FullWidthImage",
-              "textAlignment": "Left",
-              "showKicker": false,
-              "showPublishDate": false,
-              "kicker": "",
-              "authors": [],
-              "altText": "",
-              "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
-              "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
-              "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
-              "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613",
-              "translateX": 42.3837520042758,
-              "translateY": 56.4285714285714
-            }
-          }])
-        }));
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
       }
       catch (e) {
@@ -438,50 +541,52 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets image to empty when header set to custom and no image specified', (done) => {
+    const mockData = {
+      CanvasContent1: mockCanvasContent,
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {
+            "imageSource": ""
+          },
+          "links": {},
+          "customMetadata": {
+            "imageSource": {
+              "siteId": "",
+              "webId": "",
+              "listId": "",
+              "uniqueId": ""
+            }
+          }
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 2,
+          "layoutType": "FullWidthImage",
+          "textAlignment": "Left",
+          "showKicker": false,
+          "showPublishDate": false,
+          "kicker": "",
+          "authors": [],
+          "altText": "",
+          "webId": "",
+          "siteId": "",
+          "listId": "",
+          "uniqueId": "",
+          "translateX": 0,
+          "translateY": 0
+        }
+      }])
+    }
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify({
-          LayoutWebpartsContent: JSON.stringify([{
-            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "title": "Title Region",
-            "description": "Title Region Description",
-            "serverProcessedContent": {
-              "htmlStrings": {},
-              "searchablePlainTexts": {},
-              "imageSources": {
-                "imageSource": ""
-              },
-              "links": {},
-              "customMetadata": {
-                "imageSource": {
-                  "siteId": "",
-                  "webId": "",
-                  "listId": "",
-                  "uniqueId": ""
-                }
-              }
-            },
-            "dataVersion": "1.4",
-            "properties": {
-              "title": "Page",
-              "imageSourceType": 2,
-              "layoutType": "FullWidthImage",
-              "textAlignment": "Left",
-              "showKicker": false,
-              "showPublishDate": false,
-              "kicker": "",
-              "authors": [],
-              "altText": "",
-              "webId": "",
-              "siteId": "",
-              "listId": "",
-              "uniqueId": "",
-              "translateX": 0,
-              "translateY": 0
-            }
-          }])
-        }));
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
       }
       catch (e) {
@@ -491,6 +596,50 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('sets focus coordinates to 0 0 if none specified', (done) => {
+    const mockData = {
+      CanvasContent1: mockCanvasContent,
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {
+            "imageSource": "/sites/team-a/siteassets/hero.jpg"
+          },
+          "links": {},
+          "customMetadata": {
+            "imageSource": {
+              "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+              "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+              "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+              "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613"
+            }
+          }
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 2,
+          "layoutType": "FullWidthImage",
+          "textAlignment": "Left",
+          "showKicker": false,
+          "showPublishDate": false,
+          "kicker": "",
+          "authors": [],
+          "altText": "",
+          "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
+          "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
+          "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
+          "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613",
+          "translateX": 0,
+          "translateY": 0
+        }
+      }])
+    };
+
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$select=IsPageCheckedOutToCurrentUser,Title`) > -1) {
@@ -519,53 +668,16 @@ describe(commands.PAGE_HEADER_SET, () => {
         });
       }
 
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$expand=ListItemAllFields`) > -1) {
+        return Promise.resolve({ CanvasContent1: mockCanvasContent });
+      }
+
       return Promise.reject('Invalid request');
     });
 
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', imageUrl: '/sites/team-a/siteassets/hero.jpg' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify({
-          LayoutWebpartsContent: JSON.stringify([{
-            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "title": "Title Region",
-            "description": "Title Region Description",
-            "serverProcessedContent": {
-              "htmlStrings": {},
-              "searchablePlainTexts": {},
-              "imageSources": {
-                "imageSource": "/sites/team-a/siteassets/hero.jpg"
-              },
-              "links": {},
-              "customMetadata": {
-                "imageSource": {
-                  "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
-                  "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
-                  "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
-                  "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613"
-                }
-              }
-            },
-            "dataVersion": "1.4",
-            "properties": {
-              "title": "Page",
-              "imageSourceType": 2,
-              "layoutType": "FullWidthImage",
-              "textAlignment": "Left",
-              "showKicker": false,
-              "showPublishDate": false,
-              "kicker": "",
-              "authors": [],
-              "altText": "",
-              "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
-              "siteId": "c7678ab2-c9dc-454b-b2ee-7fcffb983d4e",
-              "listId": "e1557527-d333-49f2-9d60-ea8a3003fda8",
-              "uniqueId": "102f496d-23a2-415f-803a-232b8a6c7613",
-              "translateX": 0,
-              "translateY": 0
-            }
-          }])
-        }));
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
       }
       catch (e) {
@@ -575,32 +687,35 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('centers text when textAlignment set to Center', (done) => {
+    const mockData = {
+      CanvasContent1: mockCanvasContent,
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {},
+          "links": {}
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 4,
+          "layoutType": "FullWidthImage",
+          "textAlignment": "Center",
+          "showKicker": false,
+          "showPublishDate": false,
+          "kicker": ""
+        }
+      }])
+    };
+
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', textAlignment: 'Center' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify({
-          LayoutWebpartsContent: JSON.stringify([{
-            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "title": "Title Region",
-            "description": "Title Region Description",
-            "serverProcessedContent": {
-              "htmlStrings": {},
-              "searchablePlainTexts": {},
-              "imageSources": {},
-              "links": {}
-            },
-            "dataVersion": "1.4",
-            "properties": {
-              "title": "Page",
-              "imageSourceType": 4,
-              "layoutType": "FullWidthImage",
-              "textAlignment": "Center",
-              "showKicker": false,
-              "showPublishDate": false,
-              "kicker": ""
-            }
-          }])
-        }));
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
       }
       catch (e) {
@@ -610,32 +725,35 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('shows kicker with the specified kicker text', (done) => {
+    const mockData = {
+      CanvasContent1: mockCanvasContent,
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {},
+          "links": {}
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 4,
+          "layoutType": "FullWidthImage",
+          "textAlignment": "Left",
+          "showKicker": true,
+          "showPublishDate": false,
+          "kicker": "Team Awesome"
+        }
+      }])
+    };
+
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showKicker: true, kicker: 'Team Awesome' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify({
-          LayoutWebpartsContent: JSON.stringify([{
-            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "title": "Title Region",
-            "description": "Title Region Description",
-            "serverProcessedContent": {
-              "htmlStrings": {},
-              "searchablePlainTexts": {},
-              "imageSources": {},
-              "links": {}
-            },
-            "dataVersion": "1.4",
-            "properties": {
-              "title": "Page",
-              "imageSourceType": 4,
-              "layoutType": "FullWidthImage",
-              "textAlignment": "Left",
-              "showKicker": true,
-              "showPublishDate": false,
-              "kicker": "Team Awesome"
-            }
-          }])
-        }));
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
       }
       catch (e) {
@@ -645,32 +763,35 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('shows publish date', (done) => {
+    const mockData = {
+      CanvasContent1: mockCanvasContent,
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {},
+          "links": {}
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 4,
+          "layoutType": "FullWidthImage",
+          "textAlignment": "Left",
+          "showKicker": false,
+          "showPublishDate": true,
+          "kicker": ""
+        }
+      }])
+    };
+
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showPublishDate: true } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify({
-          LayoutWebpartsContent: JSON.stringify([{
-            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "title": "Title Region",
-            "description": "Title Region Description",
-            "serverProcessedContent": {
-              "htmlStrings": {},
-              "searchablePlainTexts": {},
-              "imageSources": {},
-              "links": {}
-            },
-            "dataVersion": "1.4",
-            "properties": {
-              "title": "Page",
-              "imageSourceType": 4,
-              "layoutType": "FullWidthImage",
-              "textAlignment": "Left",
-              "showKicker": false,
-              "showPublishDate": true,
-              "kicker": ""
-            }
-          }])
-        }));
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
       }
       catch (e) {
@@ -680,50 +801,53 @@ describe(commands.PAGE_HEADER_SET, () => {
   });
 
   it('shows page authors', (done) => {
+    const mockData = {
+      CanvasContent1: mockCanvasContent,
+      LayoutWebpartsContent: JSON.stringify([{
+        "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
+        "title": "Title Region",
+        "description": "Title Region Description",
+        "serverProcessedContent": {
+          "htmlStrings": {},
+          "searchablePlainTexts": {},
+          "imageSources": {
+            "imageSource": ""
+          },
+          "links": {},
+          "customMetadata": {
+            "imageSource": {
+              "siteId": "",
+              "webId": "",
+              "listId": "",
+              "uniqueId": ""
+            }
+          }
+        },
+        "dataVersion": "1.4",
+        "properties": {
+          "title": "Page",
+          "imageSourceType": 2,
+          "layoutType": "FullWidthImage",
+          "textAlignment": "Left",
+          "showKicker": false,
+          "showPublishDate": false,
+          "kicker": "",
+          "authors": ['Joe Doe', 'Jane Doe'],
+          "altText": "",
+          "webId": "",
+          "siteId": "",
+          "listId": "",
+          "uniqueId": "",
+          "translateX": 0,
+          "translateY": 0
+        }
+      }])
+    };
+
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', authors: 'Joe Doe, Jane Doe' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(data), JSON.stringify({
-          LayoutWebpartsContent: JSON.stringify([{
-            "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "instanceId": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
-            "title": "Title Region",
-            "description": "Title Region Description",
-            "serverProcessedContent": {
-              "htmlStrings": {},
-              "searchablePlainTexts": {},
-              "imageSources": {
-                "imageSource": ""
-              },
-              "links": {},
-              "customMetadata": {
-                "imageSource": {
-                  "siteId": "",
-                  "webId": "",
-                  "listId": "",
-                  "uniqueId": ""
-                }
-              }
-            },
-            "dataVersion": "1.4",
-            "properties": {
-              "title": "Page",
-              "imageSourceType": 2,
-              "layoutType": "FullWidthImage",
-              "textAlignment": "Left",
-              "showKicker": false,
-              "showPublishDate": false,
-              "kicker": "",
-              "authors": ['Joe Doe', 'Jane Doe'],
-              "altText": "",
-              "webId": "",
-              "siteId": "",
-              "listId": "",
-              "uniqueId": "",
-              "translateX": 0,
-              "translateY": 0
-            }
-          }])
-        }));
+        assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
       }
       catch (e) {
@@ -785,6 +909,10 @@ describe(commands.PAGE_HEADER_SET, () => {
 
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('%2Fsites%2Fteam-a%2Fsiteassets%2Fhero.jpg')?$select=ListId,UniqueId`) > -1) {
         return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')?$expand=ListItemAllFields`) > -1) {
+        return Promise.resolve({ CanvasContent1: mockCanvasContent });
       }
 
       return Promise.reject('Invalid request');

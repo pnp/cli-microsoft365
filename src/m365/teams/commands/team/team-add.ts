@@ -89,31 +89,29 @@ class TeamsTeamAddCommand extends GraphCommand {
         };
         requestBody.description = args.options.description;
       }
-
     }
     else {
       requestBody = {
-        'template@odata.bind': `https://graph.microsoft.com/beta/teamsTemplates('standard')`,
+        'template@odata.bind': `https://graph.microsoft.com/v1.0/teamsTemplates('standard')`,
         displayName: args.options.name,
         description: args.options.description
       }
     }
 
     const requestOptions: AxiosRequestConfig = {
-      url: `${this.resource}/beta/teams`,
+      url: `${this.resource}/v1.0/teams`,
       headers: {
-        accept: 'application/json;odata.metadata=none',
-        'content-type': 'application/json;odata.metadata=none'
+        'accept': 'application/json;odata.metadata=none'
       },
       data: requestBody,
-      responseType: 'json'
+      responseType: 'stream'
     };
 
     request
       .post(requestOptions)
       .then((res: any): Promise<TeamsAsyncOperation> => {
         const requestOptions: any = {
-          url: `${this.resource}/beta${res.headers.location}`,
+          url: `${this.resource}/v1.0${res.headers.location}`,
           headers: {
             accept: 'application/json;odata.metadata=minimal'
           },
@@ -132,7 +130,8 @@ class TeamsTeamAddCommand extends GraphCommand {
               }
             });
         });
-      }).then((teamsAsyncOperation: TeamsAsyncOperation) => {
+      })
+      .then((teamsAsyncOperation: TeamsAsyncOperation) => {
         if (teamsAsyncOperation.status !== TeamsAsyncOperationStatus.Succeeded) {
           return Promise.resolve(teamsAsyncOperation);
         }
