@@ -160,6 +160,23 @@ describe(commands.PAGE_ADD, () => {
         });
       }
 
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
@@ -195,6 +212,23 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page on root of tenant (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+      
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sitepages/page.aspx',
@@ -390,6 +424,23 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page using the Home layout', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
@@ -450,6 +501,23 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page and promotes it as NewsPage', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
@@ -521,6 +589,27 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page and promotes it as Template', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsTemplate`) > -1) {
+        return Promise.resolve({ Id: 1, BannerImageUrl: 'url', CanvasContent1: 'content1', LayoutWebpartsContent: 'content', UniqueId: 'a4eb92e3-4eae-427f-8f6d-4e2ed907c2c4' });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
@@ -571,10 +660,6 @@ describe(commands.PAGE_ADD, () => {
         return Promise.resolve({ Id: '1' });
       }
 
-      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsTemplate`) > -1) {
-        return Promise.resolve({ Id: '2', BannerImageUrl: 'url', CanvasContent1: 'content1', LayoutWebpartsContent: 'content', UniqueId: 'a4eb92e3-4eae-427f-8f6d-4e2ed907c2c4' });
-      }
-
       if ((opts.url as string).indexOf(`/_api/web/getfilebyid('a4eb92e3-4eae-427f-8f6d-4e2ed907c2c4')/ListItemAllFields/SetCommentsDisabled`) > -1) {
         return Promise.resolve();
       }
@@ -599,6 +684,23 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page using the Home layout and promotes it as HomePage (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
@@ -778,7 +880,24 @@ describe(commands.PAGE_ADD, () => {
         return Promise.resolve();
       }
 
-      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/Publish(\'\')') > -1) {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/CheckIn(comment=@a1,checkintype=@a2)?@a1=\'\'&@a2=1') > -1) {
         return Promise.resolve();
       }
 
@@ -798,6 +917,27 @@ describe(commands.PAGE_ADD, () => {
 
   it('creates new modern page and publishes it with a message (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "page",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyid('64201083-46ba-4966-8bc5-b0cb31e3456c')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Initial%20version'&@a2=1`) > -1) {
+        return Promise.resolve();
+      }
+
       if ((opts.url as string).indexOf(`/_api/web/getfolderbyserverrelativeurl('/sites/team-a/sitepages')/files/AddTemplateFile`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
           urlOfFile: '/sites/team-a/sitepages/page.aspx',
@@ -844,10 +984,6 @@ describe(commands.PAGE_ADD, () => {
       }
 
       if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/ListItemAllFields/SetCommentsDisabled(true)') > -1) {
-        return Promise.resolve();
-      }
-
-      if ((opts.url as string).indexOf('_api/web/getfilebyid(\'64201083-46ba-4966-8bc5-b0cb31e3456c\')/Publish(\'Initial%20version\')') > -1) {
         return Promise.resolve();
       }
 
