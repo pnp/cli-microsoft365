@@ -31,6 +31,9 @@ m365 spo page set [options]
 `--publishMessage [publishMessage]`
 : Message to set when publishing the page
 
+`--description [description]`
+: The description to set for the page
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -75,4 +78,10 @@ Publish existing page
 
 ```sh
 m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --publish
+```
+
+Set page description
+
+```sh
+m365 spo page set --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --description "Description to add for the page"
 ```

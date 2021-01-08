@@ -10,6 +10,8 @@ import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ContextInfo } from '../../spo';
+import { ClientSidePageProperties } from './ClientSidePageProperties';
+import { Page } from './Page';
 
 interface CommandArgs {
   options: Options;
@@ -23,6 +25,7 @@ interface Options extends GlobalOptions {
   commentsEnabled?: string;
   publish: boolean;
   publishMessage?: string;
+  description?: string;
 }
 
 class SpoPageSetCommand extends SpoCommand {
@@ -41,6 +44,7 @@ class SpoPageSetCommand extends SpoCommand {
     telemetryProps.commentsEnabled = args.options.commentsEnabled || false;
     telemetryProps.publish = args.options.publish || false;
     telemetryProps.publishMessage = typeof args.options.publishMessage !== 'undefined';
+    telemetryProps.description = typeof args.options.description !== 'undefined';
     return telemetryProps;
   }
 
@@ -52,7 +56,9 @@ class SpoPageSetCommand extends SpoCommand {
     let bannerImageUrl: string = '';
     let canvasContent1: string = '';
     let layoutWebpartsContent: string = '';
-    let templateListItemId: string = '';
+    let pageTitle: string | null = null;
+    let pageId: number | null = null;
+    let pageDescription: string = args.options.description || "";
 
     if (!pageName.endsWith('.aspx')) {
       pageName += '.aspx';
@@ -61,8 +67,20 @@ class SpoPageSetCommand extends SpoCommand {
 
     this
       .getRequestDigest(args.options.webUrl)
-      .then((res: ContextInfo): Promise<void> => {
+      .then((res: ContextInfo): Promise<ClientSidePageProperties> => {
         requestDigest = res.FormDigestValue;
+
+        return Page.checkout(args.options.name, args.options.webUrl, logger, this.debug, this.verbose);
+      })
+      .then((res: ClientSidePageProperties): Promise<void> => {
+        if (res) {
+          pageTitle = res.Title;
+          pageId = res.Id;
+
+          bannerImageUrl = res.BannerImageUrl;
+          canvasContent1 = res.CanvasContent1;
+          layoutWebpartsContent = res.LayoutWebpartsContent;
+        }
 
         if (!args.options.layoutType) {
           return Promise.resolve();
@@ -142,9 +160,9 @@ class SpoPageSetCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((res: { Id: string }): Promise<{ Id: string, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }> => {
+      .then((res: { Id: string }): Promise<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }> => {
         if (args.options.promoteAs !== 'Template') {
-          return Promise.resolve({ Id: '', BannerImageUrl: '', CanvasContent1: '', LayoutWebpartsContent: '' });
+          return Promise.resolve({ Id: null, BannerImageUrl: '', CanvasContent1: '', LayoutWebpartsContent: '' });
         }
 
         const requestOptions: any = {
@@ -161,7 +179,7 @@ class SpoPageSetCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((res: { Id: string, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }): Promise<void> => {
+      .then((res: { Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }): Promise<void> => {
         if (args.options.promoteAs !== 'Template') {
           return Promise.resolve();
         }
@@ -169,11 +187,11 @@ class SpoPageSetCommand extends SpoCommand {
         bannerImageUrl = res.BannerImageUrl;
         canvasContent1 = res.CanvasContent1;
         layoutWebpartsContent = res.LayoutWebpartsContent;
-        templateListItemId = res.Id;
+        pageId = res.Id;
 
-        const requestOptions: any = {
+        let requestOptions: any = {
           responseType: 'json',
-          url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePage`,
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
           headers: {
             'X-RequestDigest': requestDigest,
             'X-HTTP-Method': 'MERGE',
@@ -184,33 +202,57 @@ class SpoPageSetCommand extends SpoCommand {
           data: {
             BannerImageUrl: bannerImageUrl,
             CanvasContent1: canvasContent1,
-            LayoutWebpartsContent: layoutWebpartsContent
+            LayoutWebpartsContent: layoutWebpartsContent,
+            Description: pageDescription
           }
         };
+
         return request.post(requestOptions);
       })
       .then((): Promise<void> => {
-        if (args.options.promoteAs !== 'Template') {
-          return Promise.resolve();
-        }
+        let requestOptions: any = {};
 
-        const requestOptions: any = {
-          responseType: 'json',
-          url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePageAsDraft`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'X-HTTP-Method': 'MERGE',
-            'IF-MATCH': '*',
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: {
-            Title: fileNameWithoutExtension,
-            BannerImageUrl: bannerImageUrl,
-            CanvasContent1: canvasContent1,
-            LayoutWebpartsContent: layoutWebpartsContent
+        if (args.options.promoteAs !== 'Template') {
+          if (!pageId) {
+            return Promise.resolve();
           }
-        };
+
+          requestOptions = {
+            responseType: 'json',
+            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
+            headers: {
+              'content-type': 'application/json;odata=nometadata',
+              'accept': 'application/json;odata=nometadata'
+            },
+            data: {
+              Title: pageTitle,
+              BannerImageUrl: bannerImageUrl,
+              CanvasContent1: canvasContent1,
+              LayoutWebpartsContent: layoutWebpartsContent,
+              Description: pageDescription
+            }
+          };
+        }
+        else {
+          requestOptions = {
+            responseType: 'json',
+            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
+            headers: {
+              'X-RequestDigest': requestDigest,
+              'X-HTTP-Method': 'MERGE',
+              'IF-MATCH': '*',
+              'content-type': 'application/json;odata=nometadata',
+              accept: 'application/json;odata=nometadata'
+            },
+            data: {
+              Title: fileNameWithoutExtension,
+              BannerImageUrl: bannerImageUrl,
+              CanvasContent1: canvasContent1,
+              LayoutWebpartsContent: layoutWebpartsContent,
+              Description: pageDescription
+            }
+          };
+        }
 
         return request.post(requestOptions);
       })
@@ -237,7 +279,7 @@ class SpoPageSetCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/Publish('${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}')`,
+          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
           headers: {
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
@@ -289,6 +331,10 @@ class SpoPageSetCommand extends SpoCommand {
       {
         option: '--publishMessage [publishMessage]',
         description: 'Message to set when publishing the page'
+      },
+      {
+        option: '--description [description]',
+        description: 'The description to set for the page'
       }
     ];
 

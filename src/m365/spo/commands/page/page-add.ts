@@ -10,6 +10,8 @@ import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ContextInfo } from '../../spo';
+import { ClientSidePageProperties } from './ClientSidePageProperties';
+import { Page } from './Page';
 
 interface CommandArgs {
   options: Options;
@@ -23,6 +25,7 @@ interface Options extends GlobalOptions {
   commentsEnabled: boolean;
   publish: boolean;
   publishMessage?: string;
+  description?: string;
   title?: string;
 }
 
@@ -42,6 +45,7 @@ class SpoPageAddCommand extends SpoCommand {
     telemetryProps.commentsEnabled = args.options.commentsEnabled || false;
     telemetryProps.publish = args.options.publish || false;
     telemetryProps.publishMessage = typeof args.options.publishMessage !== 'undefined';
+    telemetryProps.description = typeof args.options.description !== 'undefined';
     return telemetryProps;
   }
 
@@ -55,7 +59,9 @@ class SpoPageAddCommand extends SpoCommand {
     let bannerImageUrl: string = '';
     let canvasContent1: string = '';
     let layoutWebpartsContent: string = '';
-    let templateListItemId: string = '';
+    const pageTitle: string = args.options.title ? args.options.title : (args.options.name.indexOf('.aspx') > -1 ? args.options.name.substr(0, args.options.name.indexOf('.aspx')) : args.options.name);
+    let pageId: number | null = null;
+    const pageDescription: string = args.options.description || "";
 
     this
       .getRequestDigest(args.options.webUrl)
@@ -97,7 +103,7 @@ class SpoPageAddCommand extends SpoCommand {
           },
           data: {
             ContentTypeId: '0x0101009D1CB255DA76424F860D91F20E6C4118',
-            Title: args.options.title ? args.options.title : (args.options.name.indexOf('.aspx') > -1 ? args.options.name.substr(0, args.options.name.indexOf('.aspx')) : args.options.name),
+            Title: pageTitle,
             ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
             PageLayoutType: layoutType
           },
@@ -114,7 +120,18 @@ class SpoPageAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): Promise<{ Id: string }> => {
+      .then((): Promise<ClientSidePageProperties> => {
+        return Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
+      })
+      .then((res: ClientSidePageProperties): Promise<{ Id: string }> => {
+        if (res) {
+          pageId = res.Id;
+
+          bannerImageUrl = res.BannerImageUrl;
+          canvasContent1 = res.CanvasContent1;
+          layoutWebpartsContent = res.LayoutWebpartsContent;
+        }
+
         if (!args.options.promoteAs) {
           return Promise.resolve({ Id: '' });
         }
@@ -163,9 +180,9 @@ class SpoPageAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((res: { Id: string }): Promise<{ Id: string, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string, UniqueId: string }> => {
+      .then((res: { Id: string }): Promise<{ Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string, UniqueId: string }> => {
         if (args.options.promoteAs !== 'Template') {
-          return Promise.resolve({ Id: '', BannerImageUrl: '', CanvasContent1: '', LayoutWebpartsContent: '', UniqueId: '' });
+          return Promise.resolve({ Id: null, BannerImageUrl: '', CanvasContent1: '', LayoutWebpartsContent: '', UniqueId: '' });
         }
 
         const requestOptions: any = {
@@ -182,7 +199,7 @@ class SpoPageAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((res: { Id: string, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string, UniqueId: string }): Promise<void> => {
+      .then((res: { Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string, UniqueId: string }): Promise<void> => {
         if (args.options.promoteAs !== 'Template') {
           return Promise.resolve();
         }
@@ -190,7 +207,7 @@ class SpoPageAddCommand extends SpoCommand {
         bannerImageUrl = res.BannerImageUrl;
         canvasContent1 = res.CanvasContent1;
         layoutWebpartsContent = res.LayoutWebpartsContent;
-        templateListItemId = res.Id;
+        pageId = res.Id;
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/getfilebyid('${res.UniqueId}')/ListItemAllFields/SetCommentsDisabled(${!args.options.commentsEnabled})`,
@@ -205,26 +222,44 @@ class SpoPageAddCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((): Promise<void> => {
+        let requestOptions: any = {};
+
         if (args.options.promoteAs !== 'Template') {
-          return Promise.resolve();
+          requestOptions = {
+            responseType: 'json',
+            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
+            headers: {
+              'content-type': 'application/json;odata=nometadata',
+              'accept': 'application/json;odata=nometadata'
+            },
+            data: {
+              Title: pageTitle,
+              BannerImageUrl: bannerImageUrl,
+              CanvasContent1: canvasContent1,
+              LayoutWebpartsContent: layoutWebpartsContent,
+              Description: pageDescription
+            }
+          };
+        } else {
+          requestOptions = {
+            responseType: 'json',
+            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
+            headers: {
+              'X-RequestDigest': requestDigest,
+              'X-HTTP-Method': 'MERGE',
+              'IF-MATCH': '*',
+              'content-type': 'application/json;odata=nometadata',
+              accept: 'application/json;odata=nometadata'
+            },
+            data: {
+              BannerImageUrl: bannerImageUrl,
+              CanvasContent1: canvasContent1,
+              LayoutWebpartsContent: layoutWebpartsContent,
+              Description: pageDescription
+            }
+          };
         }
 
-        const requestOptions: any = {
-          responseType: 'json',
-          url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePage`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'X-HTTP-Method': 'MERGE',
-            'IF-MATCH': '*',
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          data: {
-            BannerImageUrl: bannerImageUrl,
-            CanvasContent1: canvasContent1,
-            LayoutWebpartsContent: layoutWebpartsContent
-          }
-        };
         return request.post(requestOptions);
       })
       .then((): Promise<void> => {
@@ -234,7 +269,7 @@ class SpoPageAddCommand extends SpoCommand {
 
         const requestOptions: any = {
           responseType: 'json',
-          url: `${args.options.webUrl}/_api/SitePages/Pages(${templateListItemId})/SavePageAsDraft`,
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
           headers: {
             'X-RequestDigest': requestDigest,
             'X-HTTP-Method': 'MERGE',
@@ -246,7 +281,8 @@ class SpoPageAddCommand extends SpoCommand {
             Title: fileNameWithoutExtension,
             BannerImageUrl: bannerImageUrl,
             CanvasContent1: canvasContent1,
-            LayoutWebpartsContent: layoutWebpartsContent
+            LayoutWebpartsContent: layoutWebpartsContent,
+            Description: pageDescription
           }
         };
 
@@ -271,7 +307,7 @@ class SpoPageAddCommand extends SpoCommand {
         }
 
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/Publish('${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}')`,
+          url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
           headers: {
             'X-RequestDigest': requestDigest,
             'content-type': 'application/json;odata=nometadata',
@@ -326,6 +362,10 @@ class SpoPageAddCommand extends SpoCommand {
       {
         option: '--publishMessage [publishMessage]',
         description: 'Message to set when publishing the page'
+      },
+      {
+        option: '--description [description]',
+        description: 'The description to set for the page'
       }
     ];
 
