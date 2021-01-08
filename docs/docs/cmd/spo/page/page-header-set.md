@@ -32,19 +32,19 @@ m365 spo page header set [options]
 : Y focal point of the header image
 
 `--layout [layout]`
-: Layout to use in the header. Allowed values `FullWidthImage,NoImage`. Default `FullWidthImage`
+: Layout to use in the header. Allowed values `FullWidthImage,NoImage,ColorBlock,CutInShape`. Default `FullWidthImage`
 
 `--textAlignment [textAlignment]`
 : How to align text in the header. Allowed values `Center,Left`. Default `Left`
 
-`--showKicker`
-: Set, to show the kicker
+`--showTopicHeader`
+: Set, to show the topic header
 
 `--showPublishDate`
 : Set, to show the publishing date
 
-`--kicker [kicker]`
-: Text to show in the kicker, when showKicker is set
+`--topicHeader [topicHeader]`
+: Text to show in the topic header, when showTopicHeader is set
 
 `--authors [authors]`
 : Comma-separated list of page authors to show in the header
@@ -54,8 +54,6 @@ m365 spo page header set [options]
 ## Remarks
 
 If the specified `name` doesn't refer to an existing modern page, you will get a `File doesn't exists` error.
-
-The `showKicker`, `kicker` and `authors` options are based on preview functionality that isn't available on all tenants yet.
 
 ## Examples
 
