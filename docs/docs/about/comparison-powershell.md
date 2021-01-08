@@ -109,7 +109,7 @@ New-SPOSiteSharingReportJob|Microsoft.Online.SharePoint.PowerShell|
 New-SPOTenantOrgRelation|Microsoft.Online.SharePoint.PowerShell|
 Register-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
 Register-SPOHubSite|Microsoft.Online.SharePoint.PowerShell|[spo hubsite register](../cmd/spo/hubsite/hubsite-register.md)
-Remove-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|
+Remove-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|[spo tenant recyclebinitem remove](../cmd/spo/tenant/tenant-recyclebinitem-remove.md)
 Remove-SPOExternalUser|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOGeoAdministrator|Microsoft.Online.SharePoint.PowerShell|
 Remove-SPOHomeSite|Microsoft.Online.SharePoint.PowerShell|[spo homesite remove](../cmd/spo/homesite/homesite-remove.md)
@@ -143,7 +143,7 @@ Repair-SPOSite|Microsoft.Online.SharePoint.PowerShell|
 Request-SPOPersonalSite|Microsoft.Online.SharePoint.PowerShell|
 Request-SPOUpgradeEvaluationSite|Microsoft.Online.SharePoint.PowerShell|
 Restore-SPODataEncryptionPolicy|Microsoft.Online.SharePoint.PowerShell|
-Restore-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|
+Restore-SPODeletedSite|Microsoft.Online.SharePoint.PowerShell|[spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md)
 Revoke-SPOHubSiteRights|Microsoft.Online.SharePoint.PowerShell|[spo hubsite rights revoke](../cmd/spo/hubsite/hubsite-rights-revoke.md)
 Revoke-SPOSiteDesignRights|Microsoft.Online.SharePoint.PowerShell|[spo sitedesign rights revoke](../cmd/spo/sitedesign/sitedesign-rights-revoke.md)
 Revoke-SPOTenantServicePrincipalPermission|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal grant revoke](../cmd/spo/serviceprincipal/serviceprincipal-grant-revoke.md)
@@ -272,7 +272,7 @@ Clear-PnPMicrosoft365GroupMember|SharePointPnPPowerShellOnline|
 Clear-PnPMicrosoft365GroupOwner|SharePointPnPPowerShellOnline|
 Clear-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
 Clear-PnPTenantAppCatalogUrl|SharePointPnPPowerShellOnline|
-Clear-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
+Clear-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|[spo tenant recyclebinitem remove](../cmd/spo/tenant/tenant-recyclebinitem-remove.md)
 Clear-PnPUnifiedGroupOwner|SharePointPnPPowerShellOnline|
 Connect-PnPHubSite|SharePointPnPPowerShellOnline|[spo hubsite connect](../cmd/spo/hubsite/hubsite-connect.md)
 Connect-PnPMicrosoftGraph|SharePointPnPPowerShellOnline|[login](../cmd/login.md)
@@ -599,7 +599,7 @@ Restore-PnPDeletedMicrosoft365Group|SharePointPnPPowerShellOnline|[aad o365group
 Restore-PnPDeletedUnifiedGroup|SharePointPnPPowerShellOnline|[aad o365group restore](../cmd/aad/o365group/o365group-restore.md)
 Restore-PnPFileVersion|SharePointPnPPowerShellOnline|
 Restore-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
-Restore-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|
+Restore-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|[spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md)
 Resolve-PnPFolder|SharePointPnPPowerShellOnline|
 Resume-PnPWorkflowInstance|SharePointPnPPowerShellOnline|
 Revoke-PnPHubSiteRights|SharePointPnPPowerShellOnline|[spo hubsite rights revoke](../cmd/spo/hubsite/hubsite-rights-revoke.md)
