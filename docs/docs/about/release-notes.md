@@ -4,6 +4,15 @@
 
 ### New commands
 
+**Adaptive Cards:**
+
+- [adaptivecard send](../cmd/adaptivecard/adaptivecard-send.md) - sends adaptive card to the specified URL [#2005](https://github.com/pnp/cli-microsoft365/issues/2005)
+
+**Azure Active Directory:**
+
+- [aad app add](../cmd/aad/app/app-add.md) - creates new Azure AD app registration [#1962](https://github.com/pnp/cli-microsoft365/issues/1962)
+- [aad o365group recyclebinitem list](../cmd/aad/o365group/o365group-recyclebinitem-list.md) - lists Groups from the recycle bin in the current tenant [#2032](https://github.com/pnp/cli-microsoft365/issues/2032)
+
 **File:**
 
 - [file convert pdf](../cmd/file/convert/convert-pdf.md) - converts the specified file to PDF using Microsoft Graph [#2010](https://github.com/pnp/cli-microsoft365/issues/2010)
@@ -15,6 +24,7 @@
 ### Changes
 
 - updated 'teams team add' to use Microsoft Graph v1.0 API [#2020](https://github.com/pnp/cli-microsoft365/issues/2020)
+- applied multiple performance improvements [#2047](https://github.com/pnp/cli-microsoft365/pull/2047)
 
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
