@@ -129,13 +129,22 @@ export class Cli {
       }
     }
 
-    const validationResult: boolean | string = this.commandToExecute.command.validate(this.optionsFromArgs);
+    const optionsWithoutShorts = Cli.removeShortOptions(this.optionsFromArgs);
+    try {
+      // replace values staring with @ with file contents
+      Cli.loadOptionValuesFromFiles(optionsWithoutShorts);
+    }
+    catch (e) {
+      return this.closeWithError(e);
+    }
+
+    const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
     if (typeof validationResult === 'string') {
       return this.closeWithError(validationResult, true);
     }
 
     return Cli
-      .executeCommand(this.commandToExecute.command, Cli.removeShortOptions(this.optionsFromArgs))
+      .executeCommand(this.commandToExecute.command, optionsWithoutShorts)
       .then(_ => process.exit(0), err => this.closeWithError(err));
   }
 
@@ -696,12 +705,31 @@ export class Cli {
       .then(result => cb(result));
   }
 
-  private static removeShortOptions(args: { options: minimist.ParsedArgs }): any {
+  private static removeShortOptions(args: { options: minimist.ParsedArgs }): { options: minimist.ParsedArgs } {
     const filteredArgs = JSON.parse(JSON.stringify(args));
     const optionsToRemove: string[] = Object.getOwnPropertyNames(args.options)
       .filter(option => option.length === 1 || option === '--');
     optionsToRemove.forEach(option => delete filteredArgs.options[option]);
 
     return filteredArgs;
+  }
+
+  private static loadOptionValuesFromFiles(args: { options: minimist.ParsedArgs }) {
+    const optionNames: string[] = Object.getOwnPropertyNames(args.options);
+    optionNames.forEach(option => {
+      const value = args.options[option];
+      if (!value ||
+        typeof value !== 'string' ||
+        !value.startsWith('@')) {
+        return;
+      }
+
+      const filePath: string = value.substr(1);
+      if (!fs.existsSync(filePath)) {
+        throw `File ${filePath} specified in option ${option} does not exist`;
+      }
+
+      args.options[option] = fs.readFileSync(filePath, 'utf-8');
+    });
   }
 }
