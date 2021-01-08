@@ -43,6 +43,7 @@ class MockCommand extends AnonymousCommand {
     };
   }
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
+    logger.log(args.options.parameterX);
     cb();
   }
 }
@@ -153,7 +154,7 @@ describe('Cli', () => {
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
 
-    cliLogStub = sinon.stub((Cli as any), 'log');
+    cliLogStub = sinon.stub((Cli as any), 'log').callsFake(_ => { });
     cliErrorStub = sinon.stub((Cli as any), 'error');
     cliFormatOutputSpy = sinon.spy((Cli as any), 'formatOutput');
     processExitStub = sinon.stub(process, 'exit');
@@ -190,6 +191,7 @@ describe('Cli', () => {
     Utils.restore([
       Cli.executeCommand,
       fs.existsSync,
+      fs.readFileSync,
       mockCommandWithValidation.validate,
       mockCommandWithValidation.action,
       inquirer.prompt,
@@ -1007,12 +1009,14 @@ describe('Cli', () => {
   });
 
   it('filters output wrapped in a value property following command definition in output text', (done) => {
-    const o = { value: [
-      { "name": "Seattle", "state": "WA" },
-      { "name": "New York", "state": "NY" },
-      { "name": "Bellevue", "state": "WA" },
-      { "name": "Olympia", "state": "WA" }
-    ]};
+    const o = {
+      value: [
+        { "name": "Seattle", "state": "WA" },
+        { "name": "New York", "state": "NY" },
+        { "name": "Bellevue", "state": "WA" },
+        { "name": "Olympia", "state": "WA" }
+      ]
+    };
     const cli: Cli = Cli.getInstance();
     (cli as any).commandToExecute = {
       defaultProperties: ['name']
@@ -1150,6 +1154,39 @@ describe('Cli', () => {
       }, () => {
         try {
           assert(processExitStub.calledWith(5));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
+  it(`replaces option value with the content of the specified file when value starts with @ and the specified file exists`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => 'abc');
+    cli
+      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith('abc'));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(`Error: ${e}`));
+  });
+
+  it(`returns error when the specified file in @ value doesn't exist`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    cli
+    .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
+    .then(_ => {
+        done('Promise completed while error expected');
+      }, _ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.red(`Error: File file.txt specified in option parameterX does not exist`)));
           done();
         }
         catch (e) {
