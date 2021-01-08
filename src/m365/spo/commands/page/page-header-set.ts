@@ -18,10 +18,10 @@ interface Options extends GlobalOptions {
   altText?: string;
   authors?: string;
   imageUrl?: string;
-  kicker?: string;
+  topicHeader?: string;
   layout?: string;
   pageName: string;
-  showKicker?: boolean;
+  showTopicHeader?: boolean;
   showPublishDate?: boolean;
   textAlignment?: string;
   translateX?: number;
@@ -44,9 +44,9 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     telemetryProps.altText = typeof args.options.altText !== 'undefined';
     telemetryProps.authors = typeof args.options.authors !== 'undefined';
     telemetryProps.imageUrl = typeof args.options.imageUrl !== 'undefined';
-    telemetryProps.kicker = typeof args.options.kicker !== 'undefined';
+    telemetryProps.topicHeader = typeof args.options.topicHeader !== 'undefined';
     telemetryProps.layout = args.options.layout;
-    telemetryProps.showKicker = args.options.showKicker;
+    telemetryProps.showTopicHeader = args.options.showTopicHeader;
     telemetryProps.showPublishDate = args.options.showPublishDate;
     telemetryProps.textAlignment = args.options.textAlignment;
     telemetryProps.translateX = typeof args.options.translateX !== 'undefined';
@@ -73,9 +73,9 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         "imageSourceType": 4,
         "layoutType": "NoImage",
         "textAlignment": "Left",
-        "showKicker": false,
+        "showTopicHeader": false,
         "showPublishDate": false,
-        "kicker": ""
+        "topicHeader": ""
       }
     };
     const defaultPageHeader: PageHeader = {
@@ -95,9 +95,9 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         "imageSourceType": 4,
         "layoutType": "FullWidthImage",
         "textAlignment": "Left",
-        "showKicker": false,
+        "showTopicHeader": false,
         "showPublishDate": false,
-        "kicker": ""
+        "topicHeader": ""
       }
     };
     const customPageHeader: CustomPageHeader = {
@@ -127,9 +127,9 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         "imageSourceType": 2,
         "layoutType": "FullWidthImage",
         "textAlignment": "Left",
-        "showKicker": false,
+        "showTopicHeader": false,
         "showPublishDate": false,
-        "kicker": "",
+        "topicHeader": "",
         "authors": [],
         "altText": "",
         "webId": "",
@@ -207,8 +207,8 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
         header.properties.title = title;
         header.properties.textAlignment = args.options.textAlignment as any || 'Left';
-        header.properties.showKicker = args.options.showKicker || false;
-        header.properties.kicker = args.options.kicker || '';
+        header.properties.showTopicHeader = args.options.showTopicHeader || false;
+        header.properties.topicHeader = args.options.topicHeader || '';
         header.properties.showPublishDate = args.options.showPublishDate || false;
 
         if (args.options.type !== 'None') {
@@ -280,7 +280,8 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           },
           data: {
             CanvasContent1: canvasContent,
-            LayoutWebpartsContent: JSON.stringify([header])
+            LayoutWebpartsContent: JSON.stringify([header]),
+            TopicHeader: args.options.topicHeader || ""
           },
           responseType: 'json'
         };
@@ -377,8 +378,8 @@ class SpoPageHeaderSetCommand extends SpoCommand {
       },
       {
         option: '--layout [layout]',
-        description: 'Layout to use in the header. Allowed values FullWidthImage|NoImage. Default FullWidthImage',
-        autocomplete: ['FullWidthImage', 'NoImage']
+        description: 'Layout to use in the header. Allowed values FullWidthImage|NoImage|ColorBlock|CutInShape. Default FullWidthImage',
+        autocomplete: ['FullWidthImage', 'NoImage', 'ColorBlock', 'CutInShape']
       },
       {
         option: '--textAlignment [textAlignment]',
@@ -386,16 +387,16 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         autocomplete: ['Left', 'Center']
       },
       {
-        option: '--showKicker',
-        description: 'Set, to show the kicker'
+        option: '--showTopicHeader',
+        description: 'Set, to show the topic header'
       },
       {
         option: '--showPublishDate',
         description: 'Set, to show the publishing date'
       },
       {
-        option: '--kicker [kicker]',
-        description: 'Text to show in the kicker, when showKicker is set'
+        option: '--topicHeader [topicHeader]',
+        description: 'Text to show in the topic header, when showTopicHeader is set'
       },
       {
         option: '--authors [authors]',
@@ -425,8 +426,10 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
     if (args.options.layout &&
       args.options.layout !== 'FullWidthImage' &&
-      args.options.layout !== 'NoImage') {
-      return `${args.options.layout} is not a valid layout value. Allowed values FullWidthImage|NoImage`;
+      args.options.layout !== 'NoImage' &&
+      args.options.layout !== 'ColorBlock' &&
+      args.options.layout !== 'CutInShape') {
+      return `${args.options.layout} is not a valid layout value. Allowed values FullWidthImage|NoImage|ColorBlock|CutInShape`;
     }
 
     if (args.options.textAlignment &&

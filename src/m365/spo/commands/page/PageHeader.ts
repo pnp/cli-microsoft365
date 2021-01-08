@@ -15,9 +15,9 @@ export interface CustomPageHeader extends PageHeader {
 
 export interface PageHeaderProperties {
   imageSourceType: number;
-  kicker: string;
-  layoutType: "NoImage" | "FullWidthImage";
-  showKicker: boolean;
+  topicHeader: string;
+  layoutType: "NoImage" | "FullWidthImage" | "ColorBlock" | "CutInShape";
+  showTopicHeader: boolean;
   showPublishDate: boolean;
   textAlignment: "Left" | "Center";
   title: string;

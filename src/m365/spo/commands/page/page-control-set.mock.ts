@@ -37,9 +37,9 @@ export const mockPage = {
         "imageSourceType": 4,
         "layoutType": "FullWidthImage",
         "textAlignment": "Left",
-        "showKicker": false,
+        "showTopicHeader": false,
         "showPublishDate": false,
-        "kicker": ""
+        "topicHeader": ""
       }
     }],
     "AuthorsId": null,
