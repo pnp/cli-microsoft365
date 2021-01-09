@@ -9,6 +9,9 @@ import { Logger } from './cli';
 import { CommandError } from './Command';
 import request from './request';
 import Utils from './Utils';
+import * as crypto from 'crypto';
+
+const caApi = require('win-ca/api');
 class MockTokenStorage implements TokenStorage {
   public get(): Promise<string> {
     return Promise.resolve('ABC');
@@ -528,17 +531,36 @@ describe('Auth', () => {
   });
 
   it('retrieves certs from Windows Cert Store for certificate flow when authType certificate specified (debug)', (done) => {
-    const ensureAccessTokenWithCertificate = sinon.stub((auth as any).authCtx, 'acquireTokenWithClientCertificate').callsArgWith(4, undefined, {});
+    const ensureAccessTokenWithCertificateStub = sinon.stub((auth as any).authCtx, 'acquireTokenWithClientCertificate').callsArgWith(4, undefined, {});
     sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+    const list = [] as string[]
+
+    const thumbprint = (cert: string) => {
+      var shasum = crypto.createHash("sha1");
+      shasum.update(Buffer.from(cert, "base64"));
+      return shasum.digest("hex").toUpperCase();
+    };
+
+    caApi({
+      store: ["My"],
+      ondata: list,
+    });
 
     auth.service.authType = AuthType.Certificate;
     auth.service.password = undefined;
-    auth.service.thumbprint = '137BA5B7DDCB411BF7F60732CAA428270D335C54';
-    auth.service.windowsThumbprint  = '137BA5B7DDCB411BF7F60732CAA428270D335C54';
-    auth.service.certificate = undefined;
+    auth.service.certificate = undefined;  
+
+    list?.forEach((cert, index) =>{
+      if (index === 0) {
+        auth.service.thumbprint =  thumbprint(cert);
+      }
+    })
+
     auth.ensureAccessToken(resource, logger, true).then((accessToken) => {
       try {
-        assert(ensureAccessTokenWithCertificate.called);
+        assert.strictEqual(ensureAccessTokenWithCertificateStub.lastCall.args[0], "https://contoso.sharepoint.com");
+        assert.strictEqual(ensureAccessTokenWithCertificateStub.lastCall.args[1],"9bc3ab49-b65d-410a-85ad-de819febfddc");
+        assert.strictEqual(ensureAccessTokenWithCertificateStub.lastCall.args[3], auth.service.thumbprint);
         done();
       }
       catch (e) {
