@@ -25,6 +25,9 @@
 
 - updated 'teams team add' to use Microsoft Graph v1.0 API [#2020](https://github.com/pnp/cli-microsoft365/issues/2020)
 - applied multiple performance improvements [#2047](https://github.com/pnp/cli-microsoft365/pull/2047)
+- fixed 'page header set' command [#2049](https://github.com/pnp/cli-microsoft365/issues/2049), [#2050](https://github.com/pnp/cli-microsoft365/issues/2050)
+- added wait-npm-publish script to CI/CD [#2053](https://github.com/pnp/cli-microsoft365/pull/2053)
+- added support for passing complex content from files [#2042](https://github.com/pnp/cli-microsoft365/issues/2042)
 
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
