@@ -13,6 +13,16 @@ import { CommandOptionInfo } from './CommandOptionInfo';
 import Utils from '../Utils';
 const packageJSON = require('../../package.json');
 
+export interface CommandOutput {
+  stdout: string;
+  stderr: string;
+}
+
+export interface CommandErrorWithOutput {
+  error: CommandError;
+  stderr: string;
+}
+
 export class Cli {
   public commands: CommandInfo[] = [];
   /**
@@ -163,8 +173,17 @@ export class Cli {
         logger.logToStderr(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
       }
 
+      // store the current command name, if any and set the name to the name of
+      // the command to execute
+      const cli = Cli.getInstance();
+      const parentCommandName: string | undefined = cli.currentCommandName;
+      cli.currentCommandName = command.getCommandName();
+
       command
         .action(logger, args as any, (err: any): void => {
+          // restore the original command name
+          cli.currentCommandName = parentCommandName;
+
           if (err) {
             return reject(err);
           }
@@ -174,18 +193,19 @@ export class Cli {
     });
   }
 
-  public static executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }): Promise<string> {
-    return new Promise((resolve: (result: string) => void, reject: (error: any) => void): void => {
+  public static executeCommandWithOutput(command: Command, args: { options: minimist.ParsedArgs }): Promise<CommandOutput> {
+    return new Promise((resolve: (result: CommandOutput) => void, reject: (error: any) => void): void => {
       const log: string[] = [];
+      const logErr: string[] = [];
       const logger: Logger = {
         log: (message: any): void => {
-          log.push(message);
+          log.push(Cli.formatOutput(message, args.options));
         },
         logRaw: (message: any): void => {
-          log.push(message);
+          log.push(Cli.formatOutput(message, args.options));
         },
         logToStderr: (message: any): void => {
-          log.push(message);
+          logErr.push(message);
         }
       };
 
@@ -193,12 +213,27 @@ export class Cli {
         Cli.log(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
       }
 
+      // store the current command name, if any and set the name to the name of
+      // the command to execute
+      const cli = Cli.getInstance();
+      const parentCommandName: string | undefined = cli.currentCommandName;
+      cli.currentCommandName = command.getCommandName();
+
       command.action(logger, args as any, (err: any): void => {
+        // restore the original command name
+        cli.currentCommandName = parentCommandName;
+
         if (err) {
-          return reject(err);
+          return reject({
+            error: err,
+            stderr: logErr.join(os.EOL)
+          });
         }
 
-        resolve(log.join());
+        resolve({ 
+          stdout: log.join(os.EOL),
+          stderr: logErr.join(os.EOL)
+        });
       });
     });
   }

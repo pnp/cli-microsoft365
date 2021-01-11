@@ -23,7 +23,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   classification?: string;
   disableFlows?: string;
   isPublic?: string;

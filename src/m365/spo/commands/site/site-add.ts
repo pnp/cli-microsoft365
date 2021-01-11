@@ -18,7 +18,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   type?: string;
   title?: string;
   alias?: string;
@@ -578,7 +578,7 @@ class SpoSiteAddCommand extends SpoCommand {
       }
 
       if (args.options.url || args.options.siteDesign || args.options.removeDeletedSite || args.options.wait || args.options.shareByEmailEnabled || args.options.allowFileSharingForGuestUsers || args.options.siteDesignId || args.options.timeZone || args.options.resourceQuota || args.options.resourceQuotaWarningLevel || args.options.storageQuota || args.options.storageQuotaWarningLevel || args.options.webTemplate) {
-        return "Type TeamSites supports only the parameters title, lcid, alias, owners, classification, isPublic, and description";
+        return "Type TeamSite supports only the parameters title, lcid, alias, owners, classification, isPublic, and description";
       }
     }
     else if (isCommunicationSite) {

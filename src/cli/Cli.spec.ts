@@ -13,6 +13,7 @@ import AnonymousCommand from '../m365/base/AnonymousCommand';
 import Utils from '../Utils';
 import { Logger } from './Logger';
 import Table = require('easy-table');
+import { CommandOutput } from './Cli';
 const packageJSON = require('../../package.json');
 
 class MockCommand extends AnonymousCommand {
@@ -571,9 +572,9 @@ describe('Cli', () => {
     const commandWithOutput: MockCommandWithOutput = new MockCommandWithOutput();
     Cli
       .executeCommandWithOutput(commandWithOutput, { options: { _: [] } })
-      .then((output: string) => {
+      .then((output: CommandOutput) => {
         try {
-          assert.strictEqual(output, 'Command output');
+          assert.strictEqual(output.stdout, 'Command output');
           done();
         }
         catch (e) {
@@ -586,9 +587,9 @@ describe('Cli', () => {
     const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
     Cli
       .executeCommandWithOutput(commandWithOutput, { options: { _: [] } })
-      .then((output: string) => {
+      .then((output: CommandOutput) => {
         try {
-          assert.strictEqual(output, 'Raw output');
+          assert.strictEqual(output.stdout, 'Raw output');
           done();
         }
         catch (e) {
@@ -601,9 +602,10 @@ describe('Cli', () => {
     const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
     Cli
       .executeCommandWithOutput(commandWithOutput, { options: { _: [], debug: true } })
-      .then((output: string) => {
+      .then((output: CommandOutput) => {
         try {
-          assert.strictEqual(output, 'Debug output,Raw output');
+          assert.strictEqual(output.stdout, 'Raw output');
+          assert.strictEqual(output.stderr, 'Debug output');
           done();
         }
         catch (e) {
@@ -668,7 +670,7 @@ describe('Cli', () => {
         done('Command succeeded while expected fail');
       }, e => {
         try {
-          assert.strictEqual(e, 'Error');
+          assert.strictEqual(e.error, 'Error');
           done();
         }
         catch (e) {
