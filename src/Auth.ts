@@ -1,5 +1,5 @@
-import { AuthenticationContext, ErrorResponse, Logging, LoggingLevel, TokenResponse, UserCodeInfo } from 'adal-node';
-import { asn1, pkcs12, pki, pem, md } from 'node-forge';
+import type { AuthenticationContext, ErrorResponse, Logging, LoggingLevel, TokenResponse, UserCodeInfo } from 'adal-node';
+import type * as NodeForge from 'node-forge';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import { Logger } from './cli';
@@ -70,8 +70,15 @@ export enum CertificateType {
 }
 
 export class Auth {
-  // assigned through this.setAuthContext() hence !
-  protected authCtx!: AuthenticationContext;
+  private _authCtx: AuthenticationContext | undefined;
+  protected get authCtx(): AuthenticationContext {
+    if (!this._authCtx) {
+      const authenticationContext: typeof AuthenticationContext = require('adal-node').AuthenticationContext;
+      this._authCtx = new authenticationContext(`https://login.microsoftonline.com/${this.service.tenant}`);
+    }
+
+    return this._authCtx;
+  };
   private userCodeInfo?: UserCodeInfo;
   private _service: Service;
 
@@ -85,7 +92,6 @@ export class Auth {
 
   constructor() {
     this._service = new Service();
-    this.setAuthContext();
   }
 
   public restoreAuth(): Promise<void> {
@@ -94,7 +100,6 @@ export class Auth {
         .getServiceConnectionInfo<Service>()
         .then((service: Service): void => {
           this._service = Object.assign(this._service, service);
-          this.setAuthContext();
           resolve();
         }, (error: any): void => {
           resolve();
@@ -103,11 +108,12 @@ export class Auth {
   }
 
   public ensureAccessToken(resource: string, logger: Logger, debug: boolean = false, fetchNew: boolean = false): Promise<string> {
-    Logging.setLoggingOptions({
+    const logging: typeof Logging = require('adal-node').Logging;
+    logging.setLoggingOptions({
       level: debug ? 3 : 0,
-      log: 
+      log:
         // Dependency code, we do not control when and how it gets called, thus ignored from coverage
-        /* c8 ignore next 3 */ 
+        /* c8 ignore next 3 */
         (level: LoggingLevel, message: string, error?: Error): void => {
           logger.log(message);
         }
@@ -298,6 +304,9 @@ export class Auth {
   }
 
   private ensureAccessTokenWithCertificate(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
+    const nodeForge: typeof NodeForge = require('node-forge');
+    const { pem, pki, asn1, pkcs12 } = nodeForge;
+    
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
       if (debug) {
         logger.logToStderr(`Retrieving new access token using certificate...`);
@@ -312,13 +321,13 @@ export class Auth {
         // Type is persisted on service so subsequent calls only run through the correct parsing flow
         try {
           cert = buf.toString('utf8');
-          const pemObjs: pem.ObjectPEM[] = pem.decode(cert);
+          const pemObjs: NodeForge.pem.ObjectPEM[] = pem.decode(cert);
 
           if (this.service.thumbprint === undefined) {
-            const pemCertObj: pem.ObjectPEM = pemObjs.find(pem => pem.type === "CERTIFICATE") as pem.ObjectPEM;
+            const pemCertObj: NodeForge.pem.ObjectPEM = pemObjs.find(pem => pem.type === "CERTIFICATE") as NodeForge.pem.ObjectPEM;
             const pemCertStr: string = pem.encode(pemCertObj);
-            const pemCert: pki.Certificate = pki.certificateFromPem(pemCertStr);
-  
+            const pemCert: NodeForge.pki.Certificate = pki.certificateFromPem(pemCertStr);
+
             this.service.thumbprint = this.calculateThumbprint(pemCert);
           }
         }
@@ -359,13 +368,13 @@ export class Auth {
 
         if (this.service.thumbprint === undefined) {
           const certBags: {
-            [key: string]: pkcs12.Bag[] | undefined;
-            localKeyId?: pkcs12.Bag[];
-            friendlyName?: pkcs12.Bag[];
+            [key: string]: NodeForge.pkcs12.Bag[] | undefined;
+            localKeyId?: NodeForge.pkcs12.Bag[];
+            friendlyName?: NodeForge.pkcs12.Bag[];
           } = p12Parsed.getBags({ bagType: pki.oids.certBag });
-          const certBag: pkcs12.Bag = (certBags[pki.oids.certBag] as pkcs12.Bag[])[0];
+          const certBag: NodeForge.pkcs12.Bag = (certBags[pki.oids.certBag] as NodeForge.pkcs12.Bag[])[0];
 
-          this.service.thumbprint = this.calculateThumbprint(certBag.cert as pki.Certificate);
+          this.service.thumbprint = this.calculateThumbprint(certBag.cert as NodeForge.pki.Certificate);
         }
       }
 
@@ -532,8 +541,11 @@ export class Auth {
     });
   }
 
-  private calculateThumbprint(certificate: pki.Certificate): string {
-    const messageDigest: md.MessageDigest = md.sha1.create();
+  private calculateThumbprint(certificate: NodeForge.pki.Certificate): string {
+    const nodeForge: typeof NodeForge = require('node-forge');
+    const { md, asn1, pki } = nodeForge;
+
+    const messageDigest: NodeForge.md.MessageDigest = md.sha1.create();
     messageDigest.update(asn1.toDer(pki.certificateToAsn1(certificate)).getBytes());
     return messageDigest.digest().toHex();
   }
@@ -584,10 +596,6 @@ export class Auth {
 
   public getTokenStorage(): TokenStorage {
     return new FileTokenStorage();
-  }
-
-  public setAuthContext(): void {
-    this.authCtx = new AuthenticationContext(`https://login.microsoftonline.com/${this.service.tenant}`);
   }
 
   public static isAppOnlyAuth(accessToken: string): boolean | undefined {

@@ -1,4 +1,7 @@
 const packageJSON = require('../package.json');
+// disable automatic third-party instrumentation for Application Insights
+// speeds up execution by preventing loading unnecessary dependencies
+process.env.APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 'none';
 import * as appInsights from 'applicationinsights';
 import * as crypto from 'crypto';
 import * as fs from 'fs';

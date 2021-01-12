@@ -73,6 +73,9 @@ jobs:
             echo "export PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $BASH_ENV
             source $BASH_ENV
       - run:
+          name: Wait for npm publish
+          command: node scripts/wait-npm-publish.js next $PACKAGE_VERSION
+      - run:
           name: Login to Docker Hub
           command: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
       - run: 
@@ -110,6 +113,9 @@ jobs:
           command: |
             echo "export PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $BASH_ENV
             source $BASH_ENV
+      - run:
+          name: Wait for npm publish
+          command: node scripts/wait-npm-publish.js latest $PACKAGE_VERSION
       - run:
           name: Login to Docker Hub
           command: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD

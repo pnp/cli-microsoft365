@@ -55,6 +55,18 @@ If you use the CLI for Microsoft 365 in Bash, the outer pair of quotes will be p
 m365 spo sitescript add --title "Contoso" --description "Contoso theme script" --content '`{"abc": "def"}`'
 ```
 
+## Passing complex content into CLI options
+
+When passing complex content into CLI options, such as JSON strings, you will need to properly escape nested quotes. The exact way to do it, depends on the shell that you're using. Alternatively, you can choose to pass complex content by storing the complex content in a file and passing the path to the file prefixed with an `@`, for example:
+
+```sh
+m365 spo sitescript add --title "Contoso" --description "Contoso theme script" --content @themeScript.json
+```
+
+CLI for Microsoft 365 will load the contents from the specified file and use it in the command that you specified.
+
+You can use the `@` token in any command, with any option that accepts a value.
+
 ## Verbose and debug mode
 
 By default, commands output only the information returned by the corresponding Microsoft 365 API, whether the command result or error. You can choose for a more user-friendly output by using the `--verbose` option or setting the `CLIMICROSOFT365_VERBOSE` environment variable to `1`. For example: by default, when checking status of the Microsoft 365 Public CDN, you would see:
@@ -77,3 +89,7 @@ If you're experiencing problems when using the CLI for Microsoft 365, you can us
 ## Command completion
 
 To help you use its commands, CLI for Microsoft 365 offers you the ability to autocomplete commands and options that you're typing in the prompt. Some additional setup, specific for the shell and terminal that you use, is required to enable command completion for CLI for Microsoft 365. For more information on configuring command completion for the CLI for Microsoft 365 see the [command completion](../concepts/completion.md) article.
+
+## Disable automatic checking for updates
+
+Each time you run CLI for Microsoft 365, it will automatically check if there is a new version available and prompt you with update instructions if that's the case. If you use CLI for Microsoft 365 in CI/CD or in scripts and want to make it run faster, you can disable the check by setting the `CLIMICROSOFT365_NOUPDATE` environment variable to `1`.

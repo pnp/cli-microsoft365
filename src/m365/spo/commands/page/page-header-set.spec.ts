@@ -1,4 +1,3 @@
-import { mockCanvasContent, mockPage } from './page-control-set.mock';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
@@ -8,6 +7,7 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
+import { mockCanvasContent, mockPage } from './page-control-set.mock';
 const command: Command = require('./page-header-set');
 
 describe(commands.PAGE_HEADER_SET, () => {
@@ -17,7 +17,7 @@ describe(commands.PAGE_HEADER_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -191,13 +191,14 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 4,
           "layoutType": "FullWidthImage",
           "textAlignment": "Left",
-          "showKicker": false,
+          "showTopicHeader": false,
           "showPublishDate": false,
-          "kicker": ""
+          "topicHeader": ""
         }
-      }])
+      }]),
+      TopicHeader: ""
     };
-    
+
     command.action(logger, { options: { debug: true, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
@@ -229,13 +230,14 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 4,
           "layoutType": "FullWidthImage",
           "textAlignment": "Left",
-          "showKicker": false,
+          "showTopicHeader": false,
           "showPublishDate": false,
-          "kicker": ""
+          "topicHeader": ""
         }
-      }])
+      }]),
+      TopicHeader: ""
     };
-    
+
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
@@ -267,11 +269,12 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 4,
           "layoutType": "NoImage",
           "textAlignment": "Left",
-          "showKicker": false,
+          "showTopicHeader": false,
           "showPublishDate": false,
-          "kicker": ""
+          "topicHeader": ""
         }
-      }])
+      }]),
+      TopicHeader: ""
     };
 
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'None' } }, () => {
@@ -305,11 +308,12 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 4,
           "layoutType": "NoImage",
           "textAlignment": "Left",
-          "showKicker": false,
+          "showTopicHeader": false,
           "showPublishDate": false,
-          "kicker": ""
+          "topicHeader": ""
         }
-      }])
+      }]),
+      TopicHeader: ""
     };
 
     Utils.restore(request.get);
@@ -388,9 +392,9 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 2,
           "layoutType": "FullWidthImage",
           "textAlignment": "Left",
-          "showKicker": false,
+          "showTopicHeader": false,
           "showPublishDate": false,
-          "kicker": "",
+          "topicHeader": "",
           "authors": [],
           "altText": "",
           "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
@@ -400,7 +404,8 @@ describe(commands.PAGE_HEADER_SET, () => {
           "translateX": 42.3837520042758,
           "translateY": 56.4285714285714
         }
-      }])
+      }]),
+      TopicHeader: ""
     };
 
     Utils.restore(request.get);
@@ -479,9 +484,9 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 2,
           "layoutType": "FullWidthImage",
           "textAlignment": "Left",
-          "showKicker": false,
+          "showTopicHeader": false,
           "showPublishDate": false,
-          "kicker": "",
+          "topicHeader": "",
           "authors": [],
           "altText": "",
           "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
@@ -491,7 +496,8 @@ describe(commands.PAGE_HEADER_SET, () => {
           "translateX": 42.3837520042758,
           "translateY": 56.4285714285714
         }
-      }])
+      }]),
+      TopicHeader: ""
     };
 
     Utils.restore(request.get);
@@ -570,9 +576,9 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 2,
           "layoutType": "FullWidthImage",
           "textAlignment": "Left",
-          "showKicker": false,
+          "showTopicHeader": false,
           "showPublishDate": false,
-          "kicker": "",
+          "topicHeader": "",
           "authors": [],
           "altText": "",
           "webId": "",
@@ -582,7 +588,8 @@ describe(commands.PAGE_HEADER_SET, () => {
           "translateX": 0,
           "translateY": 0
         }
-      }])
+      }]),
+      TopicHeader: ""
     }
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom' } }, () => {
       try {
@@ -625,9 +632,9 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 2,
           "layoutType": "FullWidthImage",
           "textAlignment": "Left",
-          "showKicker": false,
+          "showTopicHeader": false,
           "showPublishDate": false,
-          "kicker": "",
+          "topicHeader": "",
           "authors": [],
           "altText": "",
           "webId": "0df4d2d2-5ecf-45e9-94f5-c638106bfc65",
@@ -637,7 +644,8 @@ describe(commands.PAGE_HEADER_SET, () => {
           "translateX": 0,
           "translateY": 0
         }
-      }])
+      }]),
+      TopicHeader: ""
     };
 
     Utils.restore(request.get);
@@ -706,11 +714,12 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 4,
           "layoutType": "FullWidthImage",
           "textAlignment": "Center",
-          "showKicker": false,
+          "showTopicHeader": false,
           "showPublishDate": false,
-          "kicker": ""
+          "topicHeader": ""
         }
-      }])
+      }]),
+      TopicHeader: ""
     };
 
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', textAlignment: 'Center' } }, () => {
@@ -724,7 +733,7 @@ describe(commands.PAGE_HEADER_SET, () => {
     });
   });
 
-  it('shows kicker with the specified kicker text', (done) => {
+  it('shows topicHeader with the specified topicHeader text', (done) => {
     const mockData = {
       CanvasContent1: mockCanvasContent,
       LayoutWebpartsContent: JSON.stringify([{
@@ -744,14 +753,15 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 4,
           "layoutType": "FullWidthImage",
           "textAlignment": "Left",
-          "showKicker": true,
+          "showTopicHeader": true,
           "showPublishDate": false,
-          "kicker": "Team Awesome"
+          "topicHeader": "Team Awesome"
         }
-      }])
+      }]),
+      TopicHeader: "Team Awesome"
     };
 
-    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showKicker: true, kicker: 'Team Awesome' } }, () => {
+    command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showTopicHeader: true, topicHeader: 'Team Awesome' } }, () => {
       try {
         assert.strictEqual(JSON.stringify(data), JSON.stringify(mockData));
         done();
@@ -782,11 +792,12 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 4,
           "layoutType": "FullWidthImage",
           "textAlignment": "Left",
-          "showKicker": false,
+          "showTopicHeader": false,
           "showPublishDate": true,
-          "kicker": ""
+          "topicHeader": ""
         }
-      }])
+      }]),
+      TopicHeader: ""
     };
 
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Default', showPublishDate: true } }, () => {
@@ -830,9 +841,9 @@ describe(commands.PAGE_HEADER_SET, () => {
           "imageSourceType": 2,
           "layoutType": "FullWidthImage",
           "textAlignment": "Left",
-          "showKicker": false,
+          "showTopicHeader": false,
           "showPublishDate": false,
-          "kicker": "",
+          "topicHeader": "",
           "authors": ['Joe Doe', 'Jane Doe'],
           "altText": "",
           "webId": "",
@@ -842,7 +853,8 @@ describe(commands.PAGE_HEADER_SET, () => {
           "translateX": 0,
           "translateY": 0
         }
-      }])
+      }]),
+      TopicHeader: ""
     };
 
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom', authors: 'Joe Doe, Jane Doe' } }, () => {
@@ -1002,6 +1014,16 @@ describe(commands.PAGE_HEADER_SET, () => {
 
   it('passes validation if layout is NoImage', () => {
     const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'NoImage' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if layout is ColorBlock', () => {
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'ColorBlock' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if layout is CutInShape', () => {
+    const actual = command.validate({ options: { pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layout: 'CutInShape' } });
     assert.strictEqual(actual, true);
   });
 

@@ -17,4 +17,5 @@ commands.json
 tsconfig.json
 *.map
 *.spec.js
+*.mock.js
 test-projects

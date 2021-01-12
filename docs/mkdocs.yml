@@ -17,6 +17,8 @@ nav:
     - status: 'cmd/status.md'
     - version: 'cmd/version.md'
     - Azure Active Directory Graph (aad):
+      - app:
+        - app add: 'cmd/aad/app/app-add.md'
       - approleassignment:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
@@ -34,6 +36,7 @@ nav:
         - o365group add: 'cmd/aad/o365group/o365group-add.md'
         - o365group get: 'cmd/aad/o365group/o365group-get.md'
         - o365group list: 'cmd/aad/o365group/o365group-list.md'
+        - o365group recyclebinitem list: 'cmd/aad/o365group/o365group-recyclebinitem-list.md'
         - o365group remove: 'cmd/aad/o365group/o365group-remove.md'
         - o365group renew: 'cmd/aad/o365group/o365group-renew.md'
         - o365group restore: 'cmd/aad/o365group/o365group-restore.md'
@@ -63,6 +66,8 @@ nav:
       - user:
         - user get: 'cmd/aad/user/user-get.md'
         - user list: 'cmd/aad/user/user-list.md'
+    - Adaptive Card (adaptivecard):
+      - send: 'cmd/adaptivecard/adaptivecard-send.md'
     - CLI (cli):
       - consent: 'cmd/cli/cli-consent.md'
       - reconsent: 'cmd/cli/cli-reconsent.md'
