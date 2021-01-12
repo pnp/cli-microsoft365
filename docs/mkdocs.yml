@@ -318,6 +318,7 @@ nav:
         - page section add: 'cmd/spo/page/page-section-add.md'
         - page section get: 'cmd/spo/page/page-section-get.md'
         - page section list: 'cmd/spo/page/page-section-list.md'
+        - page template list: 'cmd/spo/page/page-template-list.md'
         - page text add: 'cmd/spo/page/page-text-add.md'
       - propertybag:
         - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
