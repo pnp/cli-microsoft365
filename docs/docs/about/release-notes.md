@@ -28,6 +28,7 @@
 - fixed 'page header set' command [#2049](https://github.com/pnp/cli-microsoft365/issues/2049), [#2050](https://github.com/pnp/cli-microsoft365/issues/2050)
 - added wait-npm-publish script to CI/CD [#2053](https://github.com/pnp/cli-microsoft365/pull/2053)
 - added support for passing complex content from files [#2042](https://github.com/pnp/cli-microsoft365/issues/2042)
+- added support for adding page description to 'spo page add' and 'spo page set' [#2044](https://github.com/pnp/cli-microsoft365/issues/2044)
 
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
