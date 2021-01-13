@@ -20,8 +20,8 @@ RUN apk add --no-cache \
   bash \
   shadow \
   bash-completion \
-  nodejs=12.18.4-r0 \
-  npm=12.18.4-r0
+  nodejs \
+  npm
 
 RUN adduser --system cli-microsoft365
 USER cli-microsoft365

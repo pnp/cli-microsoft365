@@ -34,6 +34,9 @@ m365 spo page add [options]
 `--publishMessage [publishMessage]`
 : Message to set when publishing the page
 
+`--description [description]`
+: The description to set for the page
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -90,4 +93,10 @@ Create new article page and publish it
 
 ```sh
 m365 spo page add --name new-page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --publish
+```
+
+Create new article page with description
+
+```sh
+m365 spo page add --name page.aspx --webUrl https://contoso.sharepoint.com/sites/a-team --description "Description to add for the page"
 ```

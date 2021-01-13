@@ -38,10 +38,45 @@ describe(commands.PAGE_SET, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/article.aspx')/ListItemAllFields`) > -1 ||
+           (opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/article.aspx')/ListItemAllFields`) > -1) &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          PageLayoutType: 'Article',
+          PromotedState: 0,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          }
+        })) {
+        return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/article.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "article",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
   });
 
   afterEach(() => {
     Utils.restore([
+      request.get,
       request.post
     ]);
   });
@@ -64,23 +99,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('updates page layout to Article', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          PageLayoutType: 'Article',
-          PromotedState: 0,
-          BannerImageUrl: {
-            Description: '/_layouts/15/images/sitepagethumbnail.png',
-            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
-          }
-        })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Article' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'article.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Article' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -92,23 +111,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('updates page layout to Article (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          PageLayoutType: 'Article',
-          PromotedState: 0,
-          BannerImageUrl: {
-            Description: '/_layouts/15/images/sitepagethumbnail.png',
-            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
-          }
-        })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Article' } }, () => {
+    command.action(logger, { options: { debug: true, name: 'article.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Article' } }, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
@@ -120,23 +123,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('updates page layout to Article on root of tenant(debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          PageLayoutType: 'Article',
-          PromotedState: 0,
-          BannerImageUrl: {
-            Description: '/_layouts/15/images/sitepagethumbnail.png',
-            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
-          }
-        })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Article' } }, () => {
+    command.action(logger, { options: { debug: true, name: 'article.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Article' } }, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
@@ -148,23 +135,7 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('automatically appends the .aspx extension', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          PageLayoutType: 'Article',
-          PromotedState: 0,
-          BannerImageUrl: {
-            Description: '/_layouts/15/images/sitepagethumbnail.png',
-            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
-          }
-        })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: false, name: 'page', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Article' } }, () => {
+    command.action(logger, { options: { debug: false, name: 'article', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Article' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -176,6 +147,8 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('updates page layout to Home', (done) => {
+    Utils.restore([request.post]);
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -199,11 +172,17 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('promotes the page as NewsPage', (done) => {
+    Utils.restore([request.post]);
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         opts.data.PromotedState === 2 &&
         opts.data.FirstPublishedDate) {
         return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({});
       }
 
       return Promise.reject('Invalid request');
@@ -221,6 +200,8 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('promotes the page as Template', (done) => {
+    Utils.restore([request.post]);
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         !opts.data) {
@@ -233,6 +214,10 @@ describe(commands.PAGE_SET, () => {
 
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(2)/SavePage`) > -1) {
         return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({});
       }
 
       return Promise.reject('Invalid request');
@@ -250,6 +235,8 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('updates page layout to Home and promotes it as HomePage (debug)', (done) => {
+    Utils.restore([request.post]);
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1 &&
         JSON.stringify(opts.data) === JSON.stringify({
@@ -261,6 +248,10 @@ describe(commands.PAGE_SET, () => {
       if ((opts.url as string).indexOf('_api/web/rootfolder') > -1 &&
         opts.data.WelcomePage === 'SitePages/page.aspx') {
         return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({});
       }
 
       return Promise.reject('Invalid request');
@@ -278,9 +269,15 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('enables comments on the page', (done) => {
+    Utils.restore([request.post]);
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
         return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({});
       }
 
       return Promise.reject('Invalid request');
@@ -298,6 +295,8 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('disables comments on the page (debug)', (done) => {
+    Utils.restore([request.post]);
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(true)`) > -1) {
         return Promise.resolve();
@@ -318,8 +317,31 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('publishes page', (done) => {
+    Utils.restore([request.post]);
+    
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('')`) > -1) {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1) {
+        return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "article",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1=\'\'&@a2=1`) > -1) {
         return Promise.resolve();
       }
 
@@ -338,8 +360,14 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('publishes page with a message (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('Initial%20version')`) > -1) {
+    Utils.restore([request.post]);
+    
+    sinon.stub(request, 'post').callsFake((opts) => {      
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({});
+      }
+      
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Initial%20version'&@a2=1`) > -1) {
         return Promise.resolve();
       }
 
@@ -358,6 +386,8 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('escapes special characters in user input', (done) => {
+    Utils.restore([request.post]);
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('Don%39t%20tell')`) > -1) {
         return Promise.resolve();
@@ -378,6 +408,8 @@ describe(commands.PAGE_SET, () => {
   });
 
   it('correctly handles OData error when creating modern page', (done) => {
+    Utils.restore([request.post]);
+    
     sinon.stub(request, 'post').callsFake((opts) => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
