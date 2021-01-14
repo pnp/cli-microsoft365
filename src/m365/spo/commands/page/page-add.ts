@@ -222,43 +222,23 @@ class SpoPageAddCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((): Promise<void> => {
-        let requestOptions: any = {};
-
-        if (args.options.promoteAs !== 'Template') {
-          requestOptions = {
-            responseType: 'json',
-            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
-            headers: {
-              'content-type': 'application/json;odata=nometadata',
-              'accept': 'application/json;odata=nometadata'
-            },
-            data: {
-              Title: pageTitle,
-              BannerImageUrl: bannerImageUrl,
-              CanvasContent1: canvasContent1,
-              LayoutWebpartsContent: layoutWebpartsContent,
-              Description: pageDescription
-            }
-          };
-        } else {
-          requestOptions = {
-            responseType: 'json',
-            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
-            headers: {
-              'X-RequestDigest': requestDigest,
-              'X-HTTP-Method': 'MERGE',
-              'IF-MATCH': '*',
-              'content-type': 'application/json;odata=nometadata',
-              accept: 'application/json;odata=nometadata'
-            },
-            data: {
-              BannerImageUrl: bannerImageUrl,
-              CanvasContent1: canvasContent1,
-              LayoutWebpartsContent: layoutWebpartsContent,
-              Description: pageDescription
-            }
-          };
-        }
+        const requestOptions: any = {
+          responseType: 'json',
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
+          headers: {
+            'X-RequestDigest': requestDigest,
+            'X-HTTP-Method': 'MERGE',
+            'IF-MATCH': '*',
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          data: {
+            BannerImageUrl: bannerImageUrl,
+            CanvasContent1: canvasContent1,
+            LayoutWebpartsContent: layoutWebpartsContent,
+            Description: pageDescription
+          }
+        };
 
         return request.post(requestOptions);
       })
@@ -302,19 +282,40 @@ class SpoPageAddCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((): Promise<void> => {
-        if (!args.options.publish) {
-          return Promise.resolve();
-        }
+        let requestOptions: any = {};
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+        if (!args.options.publish) {
+          if (args.options.promoteAs === 'Template' || !pageId) {
+            return Promise.resolve();
+          }
+
+          requestOptions = {
+            responseType: 'json',
+            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
+            headers: {
+              'content-type': 'application/json;odata=nometadata',
+              'accept': 'application/json;odata=nometadata'
+            },
+            data: {
+              Title: pageTitle,
+              Description: pageDescription,
+              BannerImageUrl: bannerImageUrl,
+              CanvasContent1: canvasContent1,
+              LayoutWebpartsContent: layoutWebpartsContent
+            }
+          };
+        }
+        else {
+          requestOptions = {
+            url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
+            headers: {
+              'X-RequestDigest': requestDigest,
+              'content-type': 'application/json;odata=nometadata',
+              accept: 'application/json;odata=nometadata'
+            },
+            responseType: 'json'
+          };
+        }
 
         return request.post(requestOptions);
       })

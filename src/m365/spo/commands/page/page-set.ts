@@ -59,6 +59,9 @@ class SpoPageSetCommand extends SpoCommand {
     let pageTitle: string | null = null;
     let pageId: number | null = null;
     let pageDescription: string = args.options.description || "";
+    let topicHeader: string = "";
+    let authorByline: string[] = [];
+    let pageData: any = {};
 
     if (!pageName.endsWith('.aspx')) {
       pageName += '.aspx';
@@ -80,6 +83,9 @@ class SpoPageSetCommand extends SpoCommand {
           bannerImageUrl = res.BannerImageUrl;
           canvasContent1 = res.CanvasContent1;
           layoutWebpartsContent = res.LayoutWebpartsContent;
+          pageDescription = pageDescription || res.Description;
+          topicHeader = res.TopicHeader;
+          authorByline = res.AuthorByline;
         }
 
         if (!args.options.layoutType) {
@@ -181,15 +187,49 @@ class SpoPageSetCommand extends SpoCommand {
       })
       .then((res: { Id: number | null, BannerImageUrl: string, CanvasContent1: string, LayoutWebpartsContent: string }): Promise<void> => {
         if (args.options.promoteAs !== 'Template') {
-          return Promise.resolve();
+          if (pageTitle) {
+            pageData.Title = pageTitle;
+          }
+          if (pageDescription) {
+            pageData.Description = pageDescription;
+          }
+          if (bannerImageUrl) {
+            pageData.BannerImageUrl = bannerImageUrl;
+          }
+          if (canvasContent1) {
+            pageData.CanvasContent1 = canvasContent1;
+          }
+          if (layoutWebpartsContent) {
+            pageData.LayoutWebpartsContent = layoutWebpartsContent;
+          }
+          if (topicHeader) {
+            pageData.TopicHeader = topicHeader;
+          }
+          if (authorByline) {
+            pageData.AuthorByline = authorByline;
+          }
+        }
+        else {
+          if (fileNameWithoutExtension) {
+            pageData.Title = fileNameWithoutExtension;
+          }
+          if (pageDescription) {
+            pageData.Description = pageDescription;
+          }
+          if (res.BannerImageUrl) {
+            pageData.BannerImageUrl = res.BannerImageUrl;
+          }
+          if (res.LayoutWebpartsContent) {
+            pageData.LayoutWebpartsContent = res.LayoutWebpartsContent;
+          }
+          if (res.CanvasContent1) {
+            pageData.CanvasContent1 = res.CanvasContent1;
+          }
+
+          pageId = res.Id;
         }
 
-        bannerImageUrl = res.BannerImageUrl;
-        canvasContent1 = res.CanvasContent1;
-        layoutWebpartsContent = res.LayoutWebpartsContent;
-        pageId = res.Id;
-
-        let requestOptions: any = {
+        const requestOptions: any = {
           responseType: 'json',
           url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
           headers: {
@@ -199,60 +239,28 @@ class SpoPageSetCommand extends SpoCommand {
             'content-type': 'application/json;odata=nometadata',
             accept: 'application/json;odata=nometadata'
           },
-          data: {
-            BannerImageUrl: bannerImageUrl,
-            CanvasContent1: canvasContent1,
-            LayoutWebpartsContent: layoutWebpartsContent,
-            Description: pageDescription
-          }
+          data: pageData
         };
 
         return request.post(requestOptions);
       })
       .then((): Promise<void> => {
-        let requestOptions: any = {};
-
         if (args.options.promoteAs !== 'Template') {
-          if (!pageId) {
-            return Promise.resolve();
-          }
+          return Promise.resolve();
+        }
 
-          requestOptions = {
-            responseType: 'json',
-            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePage`,
-            headers: {
-              'content-type': 'application/json;odata=nometadata',
-              'accept': 'application/json;odata=nometadata'
-            },
-            data: {
-              Title: pageTitle,
-              BannerImageUrl: bannerImageUrl,
-              CanvasContent1: canvasContent1,
-              LayoutWebpartsContent: layoutWebpartsContent,
-              Description: pageDescription
-            }
-          };
-        }
-        else {
-          requestOptions = {
-            responseType: 'json',
-            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
-            headers: {
-              'X-RequestDigest': requestDigest,
-              'X-HTTP-Method': 'MERGE',
-              'IF-MATCH': '*',
-              'content-type': 'application/json;odata=nometadata',
-              accept: 'application/json;odata=nometadata'
-            },
-            data: {
-              Title: fileNameWithoutExtension,
-              BannerImageUrl: bannerImageUrl,
-              CanvasContent1: canvasContent1,
-              LayoutWebpartsContent: layoutWebpartsContent,
-              Description: pageDescription
-            }
-          };
-        }
+        const requestOptions: any = {
+          responseType: 'json',
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
+          headers: {
+            'X-RequestDigest': requestDigest,
+            'X-HTTP-Method': 'MERGE',
+            'IF-MATCH': '*',
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          data: pageData
+        };
 
         return request.post(requestOptions);
       })
@@ -274,19 +282,34 @@ class SpoPageSetCommand extends SpoCommand {
         return request.post(requestOptions);
       })
       .then((): Promise<void> => {
-        if (!args.options.publish) {
-          return Promise.resolve();
-        }
+        let requestOptions: any;
 
-        const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
-          headers: {
-            'X-RequestDigest': requestDigest,
-            'content-type': 'application/json;odata=nometadata',
-            accept: 'application/json;odata=nometadata'
-          },
-          responseType: 'json'
-        };
+        if (!args.options.publish) {
+          if (args.options.promoteAs === 'Template' || !pageId) {
+            return Promise.resolve();
+          }
+
+          requestOptions = {
+            responseType: 'json',
+            url: `${args.options.webUrl}/_api/SitePages/Pages(${pageId})/SavePageAsDraft`,
+            headers: {
+              'content-type': 'application/json;odata=nometadata',
+              'accept': 'application/json;odata=nometadata'
+            },
+            data: pageData
+          };
+        }
+        else {
+          requestOptions = {
+            url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
+            headers: {
+              'X-RequestDigest': requestDigest,
+              'content-type': 'application/json;odata=nometadata',
+              accept: 'application/json;odata=nometadata'
+            },
+            responseType: 'json'
+          };
+        }
 
         return request.post(requestOptions);
       })
