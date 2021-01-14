@@ -69,6 +69,10 @@ describe(commands.PAGE_SET, () => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
         return Promise.resolve();
       }
+      
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
+        return Promise.resolve();
+      }
 
       return Promise.reject('Invalid request');
     });
@@ -251,7 +255,24 @@ describe(commands.PAGE_SET, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({});
+        return Promise.resolve({
+          Title: "article",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+      
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
@@ -277,7 +298,24 @@ describe(commands.PAGE_SET, () => {
       }
 
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({});
+        return Promise.resolve({
+          Title: "article",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
+      }
+      
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
@@ -364,7 +402,20 @@ describe(commands.PAGE_SET, () => {
     
     sinon.stub(request, 'post').callsFake((opts) => {      
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
-        return Promise.resolve({});
+        return Promise.resolve({
+          Title: "article",
+          Id: 1,
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          layoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        return Promise.resolve();
       }
       
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Initial%20version'&@a2=1`) > -1) {
