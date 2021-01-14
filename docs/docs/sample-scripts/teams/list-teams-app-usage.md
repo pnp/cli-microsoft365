@@ -5,7 +5,7 @@ Inspired by: [Thomy Goelles](https://thomy.tech/list-teams-app-usage/)
 A sample script which iterates through all the teams in your tenant and lists all apps in each team. This script will be handy if you want to generate a report of available apps in Teams across your tenant.
 
 ```powershell tab="PowerShell Core"
-$availableTeams = o365 teams team list -o json | ConvertFrom-Json
+$availableTeams = m365 teams team list -o json | ConvertFrom-Json
 
 if ($availableTeams.count -gt 15) {
     $duration =  [math]::Round(($availableTeams.count/60),1);
@@ -15,7 +15,7 @@ if ($availableTeams.count -gt 15) {
 }
 
 foreach ($team in $availableTeams) {
-    $apps = o365 teams app list -i $team.Id -a    
+    $apps = m365 teams app list -i $team.Id -a    
     Write-Output "All apps in team are given below: $($team.displayName) $($team.id)"
     Write-Output $apps
 }
@@ -28,7 +28,7 @@ foreach ($team in $availableTeams) {
 defaultIFS=$IFS
 IFS=$'\n'
 
-availableTeams=$(o365 teams team list -o json)
+availableTeams=$(m365 teams team list -o json)
 
 if [[ $(echo $availableTeams | jq length) -gt 15 ]]; 
 then

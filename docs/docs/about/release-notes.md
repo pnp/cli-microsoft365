@@ -29,6 +29,8 @@
 - added wait-npm-publish script to CI/CD [#2053](https://github.com/pnp/cli-microsoft365/pull/2053)
 - added support for passing complex content from files [#2042](https://github.com/pnp/cli-microsoft365/issues/2042)
 - added support for adding page description to 'spo page add' and 'spo page set' [#2044](https://github.com/pnp/cli-microsoft365/issues/2044)
+- added new sample for emptying the tenant recycle bin [#1142](https://github.com/pnp/cli-microsoft365/issues/1142)
+- updated sample script changing CLI command name to m365 [#2063](https://github.com/pnp/cli-microsoft365/issues/2063)
 
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
