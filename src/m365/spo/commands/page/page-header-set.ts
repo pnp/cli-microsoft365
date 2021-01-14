@@ -145,8 +145,13 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     if (pageFullName.indexOf('.aspx') < 0) {
       pageFullName += '.aspx';
     }
-    let title: string;
-    let canvasContent: string;
+
+    let canvasContent: string = "";
+    let bannerImageUrl: string = "";
+    let description: string = "";
+    let title: string = "";
+    let authorByline: string[] = args.options.authors ? args.options.authors.split(',').map(a => a.trim()) : [];
+    let topicHeader: string = args.options.topicHeader || "";
 
     if (this.verbose) {
       logger.logToStderr(`Retrieving information about the page...`);
@@ -203,7 +208,14 @@ class SpoPageHeaderSetCommand extends SpoCommand {
             header = defaultPageHeader;
         }
 
-        canvasContent = pageData ? pageData.CanvasContent1 : "";
+        if (pageData) {
+          canvasContent = pageData.CanvasContent1;
+          authorByline = authorByline.length > 0 ? authorByline : pageData.AuthorByline;
+          bannerImageUrl = pageData.BannerImageUrl;
+          description = pageData.Description;
+          title = pageData.Title;
+          topicHeader = topicHeader || pageData.TopicHeader || "";
+        }
 
         header.properties.title = title;
         header.properties.textAlignment = args.options.textAlignment as any || 'Left';
@@ -221,7 +233,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           };
           const properties: CustomPageHeaderProperties = header.properties as CustomPageHeaderProperties;
           properties.altText = args.options.altText || '';
-          properties.authors = args.options.authors ? args.options.authors.split(',').map(a => a.trim()) : [];
           properties.translateX = args.options.translateX || 0;
           properties.translateY = args.options.translateY || 0;
           header.properties = properties;
@@ -272,17 +283,38 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           header.properties = properties;
         }
 
+        const pageData: any = {
+          LayoutWebpartsContent: JSON.stringify([header])
+        };
+
+        if (title) {
+          pageData.Title = title;
+        }
+        if (topicHeader) {
+          pageData.TopicHeader = topicHeader;
+        }
+        if (description) {
+          pageData.Description = description;
+        }
+        if (authorByline) {
+          pageData.AuthorByline = authorByline;
+        }
+        if (bannerImageUrl) {
+          pageData.BannerImageUrl = bannerImageUrl;
+        }
+        if (canvasContent) {
+          pageData.CanvasContent1 = canvasContent;
+        }
+
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/SavePageAsDraft`,
           headers: {
-            'accept': 'application/json;odata=nometadata',
-            'content-type': 'application/json;odata=nometadata'
+            'X-HTTP-Method': 'MERGE',
+            'IF-MATCH': '*',
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
           },
-          data: {
-            CanvasContent1: canvasContent,
-            LayoutWebpartsContent: JSON.stringify([header]),
-            TopicHeader: args.options.topicHeader || ""
-          },
+          data: pageData,
           responseType: 'json'
         };
 
