@@ -12,6 +12,7 @@ const command: Command = require('./project-rename');
 describe(commands.PROJECT_RENAME, () => {
   let log: any[];
   let logger: Logger;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
   let trackEvent: any;
   let telemetry: any;
   let writeFileSyncSpy: sinon.SinonStub;
@@ -37,6 +38,7 @@ describe(commands.PROJECT_RENAME, () => {
       }
     };
     telemetry = null;
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     writeFileSyncSpy = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
   });
 
@@ -349,7 +351,7 @@ describe(commands.PROJECT_RENAME, () => {
   it('replaces project name in README.md', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
 
-    const replacedContent = `## spfx-react
+    let replacedContent = `## spfx-react
 
 This is where you include your WebPart documentation.
 
@@ -377,9 +379,13 @@ gulp bundle - TODO
 gulp package-solution - TODO
 `;
 
-    command.action(logger, { options: { newName: 'spfx-react' } } as any, (err?: any) => {
+    command.action(logger, { options: { newName: 'spfx-react', debug: true } } as any, (err?: any) => {
       try {
-        assert(writeFileSyncSpy.calledWith(sinon.match.string, replacedContent, 'utf-8'));
+        let fileSyncContent: string = writeFileSyncSpy.lastCall.args[1];
+        fileSyncContent = fileSyncContent.replace(/(\r\n|\n|\r)/gm, "");
+        replacedContent = replacedContent.replace(/(\r\n|\n|\r)/gm, "");
+        assert.strictEqual(fileSyncContent, replacedContent);
+        assert.strictEqual(loggerLogToStderrSpy.getCall(5).args[0], `Updated README.md`);
         done();
       }
       catch (ex) {
