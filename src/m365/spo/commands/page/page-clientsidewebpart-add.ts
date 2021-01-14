@@ -10,6 +10,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { StandardWebPart, StandardWebPartUtils } from '../../StandardWebPartTypes';
 import { Control } from './canvasContent';
+import { ClientSidePageProperties } from './ClientSidePageProperties';
 import {
   ClientSidePageComponent, ClientSideWebpart
 } from './clientsidepages';
@@ -54,6 +55,14 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let canvasContent: Control[];
 
+    let layoutWebpartsContent: string = "";
+    let authorByline: string[] = [""];
+    let bannerImageUrl: string = "";
+    let description: string = "";
+    let title: string = "";
+    let topicHeader: string = "";
+    let pageData: any = {};
+
     let pageFullName: string = args.options.pageName;
     if (args.options.pageName.indexOf('.aspx') < 0) {
       pageFullName += '.aspx';
@@ -64,7 +73,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')?$select=CanvasContent1,IsPageCheckedOutToCurrentUser`,
+      url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -72,12 +81,10 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     };
 
     request
-      .get<{ CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }>(requestOptions)
-      .then((res: { CanvasContent1: string; IsPageCheckedOutToCurrentUser: boolean }): Promise<void> => {
-        canvasContent = JSON.parse(res.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
-
+      .get<ClientSidePageProperties>(requestOptions)
+      .then((res: ClientSidePageProperties): Promise<ClientSidePageProperties> => {
         if (res.IsPageCheckedOutToCurrentUser) {
-          return Promise.resolve();
+          return Promise.resolve(res);
         }
 
         const requestOptions: any = {
@@ -88,15 +95,27 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        return request.post(requestOptions);
+        return request.post<ClientSidePageProperties>(requestOptions);
       })
-      .then((): Promise<ClientSideWebpart> => {
+      .then((res: ClientSidePageProperties): Promise<ClientSideWebpart> => {
+        if (res) {
+          layoutWebpartsContent = res.LayoutWebpartsContent;
+          authorByline = res.AuthorByline;
+          bannerImageUrl = res.BannerImageUrl;
+          description = res.Description;
+          title = res.Title;
+          topicHeader = res.TopicHeader;
+        }
+
         if (this.verbose) {
           logger.logToStderr(
             `Retrieving definition for web part ${args.options.webPartId ||
             args.options.standardWebPart}...`
           );
         }
+
+        canvasContent = JSON.parse(res.CanvasContent1 || "[{\"controlType\":0,\"pageSettingsSlice\":{\"isDefaultDescription\":true,\"isDefaultThumbnail\":true}}]");
+
         // Get the WebPart according to arguments
         return this.getWebPart(logger, args);
       })
@@ -221,15 +240,37 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
           });
         }
 
+        if (authorByline) {
+          pageData.AuthorByline = authorByline;
+        }
+        if (bannerImageUrl) {
+          pageData.BannerImageUrl = bannerImageUrl;
+        }
+        if (description) {
+          pageData.Description = description;
+        }
+        if (title) {
+          pageData.Title = title;
+        }
+        if (topicHeader) {
+          pageData.TopicHeader = topicHeader;
+        }
+        if (layoutWebpartsContent) {
+          pageData.LayoutWebpartsContent = layoutWebpartsContent;
+        }
+        if (canvasContent) {
+          pageData.CanvasContent1 = JSON.stringify(canvasContent);
+        }
+
         const requestOptions: any = {
-          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/savepage`,
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/SavePageAsDraft`,
           headers: {
-            'accept': 'application/json;odata=nometadata',
-            'content-type': 'application/json;odata=nometadata'
+            'X-HTTP-Method': 'MERGE',
+            'IF-MATCH': '*',
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
           },
-          data: {
-            CanvasContent1: JSON.stringify(canvasContent)
-          },
+          data: pageData,
           responseType: 'json'
         };
 
