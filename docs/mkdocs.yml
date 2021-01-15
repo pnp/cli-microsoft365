@@ -554,6 +554,7 @@ nav:
     - Microsoft Graph:
       - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
     - Power Automate:
+      - 'Export all Flows in environment' : 'sample-scripts/flow/export-all-flows-in-environment.md'
       - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
     - SharePoint Online:
       - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
