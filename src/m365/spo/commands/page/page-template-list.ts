@@ -31,7 +31,7 @@ class SpoPageControlListCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/sitepages/pages/templates'`,
+      url: `${args.options.webUrl}/_api/sitepages/pages/templates`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -50,7 +50,16 @@ class SpoPageControlListCommand extends SpoCommand {
 
         cb();
       })
-      .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .catch((err: any): void => {
+        // The API returns a 404 when no templates are created on the site collection
+        if (err && err.response && err.response.status && err.response.status === 404) {
+          logger.log([]);
+          cb();
+          return;
+        }
+
+        return this.handleRejectedODataJsonPromise(err, logger, cb)
+      });
   }
 
   public options(): CommandOption[] {

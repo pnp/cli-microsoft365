@@ -135,6 +135,22 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
     });
   });
 
+  it('correctly handles error when retrieving page templates on a site which does not have any', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.reject({ response: { status: 404 } });
+    });
+
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
+      try {
+        assert(loggerLogSpy.calledWith([]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports debug mode', () => {
     const options = command.options();
     let containsOption = false;
