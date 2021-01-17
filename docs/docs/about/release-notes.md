@@ -32,6 +32,8 @@
 - added new sample script for emptying the tenant recycle bin [#1142](https://github.com/pnp/cli-microsoft365/issues/1142)
 - updated sample script changing CLI command name to m365 [#2063](https://github.com/pnp/cli-microsoft365/issues/2063)
 - added new sample script 'Export all Flows in environment' [#2082](https://github.com/pnp/cli-microsoft365/pull/2082)
+- added new sample script 'List all application customizers' [#2074](https://github.com/pnp/cli-microsoft365/issues/2074)
+- changed secret expiration to 1 year in `aad app add` [#2064](https://github.com/pnp/cli-microsoft365/issues/2064)
 
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
