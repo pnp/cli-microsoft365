@@ -289,7 +289,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
     }
 
     const secretExpirationDate = new Date();
-    secretExpirationDate.setFullYear(secretExpirationDate.getFullYear() + 100);
+    secretExpirationDate.setFullYear(secretExpirationDate.getFullYear() + 1);
 
     const requestOptions: any = {
       url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}/addPassword`,
