@@ -25,6 +25,10 @@ class SpoPageControlListCommand extends SpoCommand {
     return 'Lists all page templates in the given site';
   }
 
+  public defaultProperties(): string[] | undefined { 
+    return ['AbsoluteUrl', 'FileName', 'Id', 'PageLayoutType', 'Url']; 
+  } 
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     if (this.verbose) {
       logger.logToStderr(`Retrieving templates...`);
