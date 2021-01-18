@@ -123,21 +123,19 @@ class TenantAuditlogReportCommand extends Command {
         if (hasActiveSubscription) {
           return Promise.resolve();
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(`Starting subscription since subscription is not active for the content type`);
-          }
-          const startSubscriptionEndPoint: string = `activity/feed/subscriptions/start?contentType=${(<any>AuditContentTypes)[args.options.contentType]}&PublisherIdentifier=${this.tenantId}`;
-          const requestOptions: any = {
-            url: `${this.serviceUrl}/${this.tenantId}/${startSubscriptionEndPoint}`,
-            headers: {
-              accept: 'application/json;odata.metadata=none'
-            },
-            responseType: 'json'
-          };
-
-          return request.post(requestOptions);
+        if (this.verbose) {
+          logger.logToStderr(`Starting subscription since subscription is not active for the content type`);
         }
+        const startSubscriptionEndPoint: string = `activity/feed/subscriptions/start?contentType=${(<any>AuditContentTypes)[args.options.contentType]}&PublisherIdentifier=${this.tenantId}`;
+        const requestOptions: any = {
+          url: `${this.serviceUrl}/${this.tenantId}/${startSubscriptionEndPoint}`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        };
+
+        return request.post(requestOptions);
       });
   }
 
@@ -180,7 +178,7 @@ class TenantAuditlogReportCommand extends Command {
     if (this.verbose) {
       logger.logToStderr(`Starting Batch : ${batchNumber}`);
     }
-    
+
     Promise
       .all(this.batchedPromises[batchNumber])
       .then((data: any) => {
