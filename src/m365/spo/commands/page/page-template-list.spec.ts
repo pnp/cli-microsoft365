@@ -59,6 +59,10 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['AbsoluteUrl', 'FileName', 'Id', 'PageLayoutType', 'Url']);
+  });
+
   it('list all page templates', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/templates`) > -1) {
