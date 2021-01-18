@@ -10,7 +10,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./auditlog-report');
 
-describe(commands.TENANT_AUDITLOG_REPORT, () => {
+describe.only(commands.TENANT_AUDITLOG_REPORT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -43,7 +43,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
       }
     ];
 
-  const JSONNOListAuditContent : any = [];
+  const EmptyJSONListAuditContent : any = [];
 
   //Assumed Batch size is 10 or less than 10
   const JSONListAuditContentMultipleBatches =
@@ -573,10 +573,13 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
       }
 
       if ((opts.url as string).indexOf('activity/feed/subscriptions/content') > -1) {
-        return Promise.resolve(JSONNOListAuditContent);
+        return Promise.resolve(EmptyJSONListAuditContent);
       }
 
+      return Promise.resolve(NOAuditLogOutput);
+
       if ((opts.url as string).indexOf('/activity/feed/audit/') > -1) {
+        console.log(`Running it`);
         return Promise.resolve(NOAuditLogOutput);
       }
 

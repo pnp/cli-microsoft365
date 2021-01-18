@@ -50,7 +50,6 @@ enum AuditContentTypes {
 class TenantAuditlogReportCommand extends Command {
   private serviceUrl: string = 'https://manage.office.com/api/v1.0';
   private tenantId: string | undefined;
-  private batchedPromises: any = [];
   private completeAuditReports: AuditlogReport[] = [];
 
   public get name(): string {
@@ -93,9 +92,11 @@ class TenantAuditlogReportCommand extends Command {
   private getCompleteAuditReports(args: CommandArgs, logger: Logger): Promise<AuditlogReport[]> {
     return this.startContentSubscriptionIfNotActive(args, logger)
       .then((): Promise<AuditContentList[]> => this.getAuditContentList(args, logger))
-      .then((auditContentLists: AuditContentList[]): void => this.getBatchedPromises(auditContentLists, 10))
-      .then((): Promise<void> => {
-        return new Promise<void>((resolve: () => void): void => { if (this.batchedPromises.length > 0) this.getBatchedAuditlogData(logger, 0, resolve); })
+      .then((auditContentLists: AuditContentList[]): Promise<any> => this.getBatchedPromises(auditContentLists, 10))
+      .then((batchedPromise : Promise<any>[]): Promise<void> => {
+        return new Promise<void>((resolve: () => void): void => { 
+          if (batchedPromise.length > 0) this.getBatchedAuditlogData(logger,batchedPromise, 0, resolve);
+          else resolve(); })
       })
       .then((): AuditlogReport[] => { return this.completeAuditReports.flat(2) });
   }
@@ -166,25 +167,28 @@ class TenantAuditlogReportCommand extends Command {
     return request.get<AuditContentList[]>(requestOptions)
   }
 
-  private getBatchedPromises(auditContentLists: AuditContentList[], batchSize: number): void {
+  private getBatchedPromises(auditContentLists: AuditContentList[], batchSize: number): Promise<any> {
+    let batchedPromises: any = [];
     for (let i: number = 0; i < auditContentLists.length; i += batchSize) {
       const promiseRequestBatch: Promise<AuditlogReport[]>[] = auditContentLists.slice(i, i + batchSize < auditContentLists.length ? i + batchSize : auditContentLists.length)
         .map((AuditContentList: AuditContentList) => this.getAuditLogReportForSingleContentURL(AuditContentList.contentUri))
-      this.batchedPromises.push(promiseRequestBatch);
+      batchedPromises.push(promiseRequestBatch);
     }
+
+    return Promise.resolve(batchedPromises);
   }
 
-  private getBatchedAuditlogData(logger: Logger, batchNumber: number, resolve: () => void): void {
+  private getBatchedAuditlogData(logger: Logger,batchedPromiseList : any, batchNumber: number, resolve: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Starting Batch : ${batchNumber}`);
     }
 
     Promise
-      .all(this.batchedPromises[batchNumber])
+      .all(batchedPromiseList[batchNumber])
       .then((data: any) => {
         this.completeAuditReports.push(data);
-        if (batchNumber < this.batchedPromises.length - 1) {
-          this.getBatchedAuditlogData(logger, ++batchNumber, resolve)
+        if (batchNumber < batchedPromiseList.length - 1) {
+          this.getBatchedAuditlogData(logger,batchedPromiseList, ++batchNumber, resolve)
         }
         else {
           resolve();
