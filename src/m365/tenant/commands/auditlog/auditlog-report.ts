@@ -93,10 +93,11 @@ class TenantAuditlogReportCommand extends Command {
     return this.startContentSubscriptionIfNotActive(args, logger)
       .then((): Promise<AuditContentList[]> => this.getAuditContentList(args, logger))
       .then((auditContentLists: AuditContentList[]): Promise<any> => this.getBatchedPromises(auditContentLists, 10))
-      .then((batchedPromise : Promise<any>[]): Promise<void> => {
-        return new Promise<void>((resolve: () => void): void => { 
-          if (batchedPromise.length > 0) this.getBatchedAuditlogData(logger,batchedPromise, 0, resolve);
-          else resolve(); })
+      .then((batchedPromise: Promise<any>[]): Promise<void> => {
+        return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
+          if (batchedPromise.length > 0) this.getBatchedAuditlogData(logger, batchedPromise, 0, resolve, reject);
+          else resolve();
+        })
       })
       .then((): AuditlogReport[] => { return this.completeAuditReports.flat(2) });
   }
@@ -178,7 +179,7 @@ class TenantAuditlogReportCommand extends Command {
     return Promise.resolve(batchedPromises);
   }
 
-  private getBatchedAuditlogData(logger: Logger,batchedPromiseList : any, batchNumber: number, resolve: () => void): void {
+  private getBatchedAuditlogData(logger: Logger, batchedPromiseList: any, batchNumber: number, resolve: () => void, reject: (err: any) => void): void {
     if (this.verbose) {
       logger.logToStderr(`Starting Batch : ${batchNumber}`);
     }
@@ -188,11 +189,13 @@ class TenantAuditlogReportCommand extends Command {
       .then((data: any) => {
         this.completeAuditReports.push(data);
         if (batchNumber < batchedPromiseList.length - 1) {
-          this.getBatchedAuditlogData(logger,batchedPromiseList, ++batchNumber, resolve)
+          this.getBatchedAuditlogData(logger, batchedPromiseList, ++batchNumber, resolve, reject)
         }
         else {
           resolve();
         }
+      }, (err: any): void => {
+        reject(err);
       });
   }
 

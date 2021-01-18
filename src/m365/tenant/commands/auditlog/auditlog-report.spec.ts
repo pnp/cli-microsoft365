@@ -10,7 +10,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./auditlog-report');
 
-describe.only(commands.TENANT_AUDITLOG_REPORT, () => {
+describe(commands.TENANT_AUDITLOG_REPORT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -622,9 +622,16 @@ describe.only(commands.TENANT_AUDITLOG_REPORT, () => {
     });
   });
 
-  it('Handles Error - For a particular Content Audit Content URL', (done) => {
+  it('command correctly handles error for a particular Content Audit Content URL of a Batched Promise', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('activity/feed/subscriptions/list') > -1) {
+        return Promise.resolve(JSONActiveSubscription);
+      }
+
+      if ((opts.url as string).indexOf('activity/feed/subscriptions/content') > -1) {
+        return Promise.resolve(JSONListAuditContent);
+      }
 
       if ((opts.url as string).indexOf('/activity/feed/audit/') > -1) {
         return Promise.reject(err);
