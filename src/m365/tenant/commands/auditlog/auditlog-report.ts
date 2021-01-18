@@ -171,7 +171,7 @@ class TenantAuditlogReportCommand extends Command {
     let batchedPromises: any = [];
     for (let i: number = 0; i < auditContentLists.length; i += batchSize) {
       const promiseRequestBatch: Promise<AuditlogReport[]>[] = auditContentLists.slice(i, i + batchSize < auditContentLists.length ? i + batchSize : auditContentLists.length)
-        .map((AuditContentList: AuditContentList) => this.getAuditLogReportForSingleContentURL(AuditContentList.contentUri))
+        .map((AuditContentList: AuditContentList) => this.getAuditLogReportForSingleContentUrl(AuditContentList.contentUri))
       batchedPromises.push(promiseRequestBatch);
     }
 
@@ -196,7 +196,7 @@ class TenantAuditlogReportCommand extends Command {
       });
   }
 
-  private getAuditLogReportForSingleContentURL(auditURL: string): Promise<AuditlogReport[]> {
+  private getAuditLogReportForSingleContentUrl(auditURL: string): Promise<AuditlogReport[]> {
     const requestOptions: any = {
       url: auditURL,
       headers: {

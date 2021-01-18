@@ -577,13 +577,6 @@ describe.only(commands.TENANT_AUDITLOG_REPORT, () => {
       }
 
       return Promise.resolve(NOAuditLogOutput);
-
-      if ((opts.url as string).indexOf('/activity/feed/audit/') > -1) {
-        console.log(`Running it`);
-        return Promise.resolve(NOAuditLogOutput);
-      }
-
-      return Promise.reject('Invalid request');
     });
 
     command.action(logger, {
