@@ -57,12 +57,15 @@ describe(commands.PAGE_SET, () => {
         return Promise.resolve({
           Title: "article",
           Id: 1,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
           BannerImageUrl: {
             Description: '/_layouts/15/images/sitepagethumbnail.png',
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           },
           CanvasContent1: "{}",
-          layoutWebpartsContent: "{}"
+          LayoutWebpartsContent: "{}"
         });
       }
 
@@ -227,7 +230,7 @@ describe(commands.PAGE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', promoteAs: 'Template' } } as any, (res: { Id: string }) => {
+    command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', description: "template", promoteAs: 'Template' } } as any, (res: { Id: string }) => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -258,12 +261,15 @@ describe(commands.PAGE_SET, () => {
         return Promise.resolve({
           Title: "article",
           Id: 1,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
           BannerImageUrl: {
             Description: '/_layouts/15/images/sitepagethumbnail.png',
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           },
           CanvasContent1: "{}",
-          layoutWebpartsContent: "{}"
+          LayoutWebpartsContent: "{}"
         });
       }
 
@@ -278,7 +284,7 @@ describe(commands.PAGE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home', promoteAs: 'HomePage' } }, () => {
+    command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', layoutType: 'Home', promoteAs: 'HomePage', description: "Page Description" } }, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
@@ -301,12 +307,15 @@ describe(commands.PAGE_SET, () => {
         return Promise.resolve({
           Title: "article",
           Id: 1,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
           BannerImageUrl: {
             Description: '/_layouts/15/images/sitepagethumbnail.png',
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           },
           CanvasContent1: "{}",
-          layoutWebpartsContent: "{}"
+          LayoutWebpartsContent: "{}"
         });
       }
 
@@ -366,12 +375,15 @@ describe(commands.PAGE_SET, () => {
         return Promise.resolve({
           Title: "article",
           Id: 1,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
           BannerImageUrl: {
             Description: '/_layouts/15/images/sitepagethumbnail.png',
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           },
           CanvasContent1: "{}",
-          layoutWebpartsContent: "{}"
+          LayoutWebpartsContent: "{}"
         });
       }
 
@@ -405,12 +417,15 @@ describe(commands.PAGE_SET, () => {
         return Promise.resolve({
           Title: "article",
           Id: 1,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
           BannerImageUrl: {
             Description: '/_layouts/15/images/sitepagethumbnail.png',
             Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
           },
           CanvasContent1: "{}",
-          layoutWebpartsContent: "{}"
+          LayoutWebpartsContent: "{}"
         });
       }
 
