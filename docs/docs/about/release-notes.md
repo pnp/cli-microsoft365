@@ -21,6 +21,10 @@
 
 - [flow run resubmit](../cmd/flow/run/run-resubmit.md) - resubmits a specific flow run for the specified Microsoft Flow [#1871](https://github.com/pnp/cli-microsoft365/issues/1871)
 
+**SharePoint:**
+
+- [spo page template list](../cmd/spo/page/page-template-list.md) - lists all page templates in the given site [#2065](https://github.com/pnp/cli-microsoft365/issues/2065)
+
 ### Changes
 
 - updated 'teams team add' to use Microsoft Graph v1.0 API [#2020](https://github.com/pnp/cli-microsoft365/issues/2020)
@@ -34,6 +38,9 @@
 - added new sample script 'Export all Flows in environment' [#2082](https://github.com/pnp/cli-microsoft365/pull/2082)
 - added new sample script 'List all application customizers' [#2074](https://github.com/pnp/cli-microsoft365/issues/2074)
 - changed secret expiration to 1 year in `aad app add` [#2064](https://github.com/pnp/cli-microsoft365/issues/2064)
+- added support for setting authors and checks in page in 'spo page header set' [#2069](https://github.com/pnp/cli-microsoft365/issues/2069), [#2070](https://github.com/pnp/cli-microsoft365/issues/2070)
+- fixed removing previous values and checks in page in 'spo page clientsidewebpart add' [#2068](https://github.com/pnp/cli-microsoft365/issues/2068), [#2069](https://github.com/pnp/cli-microsoft365/issues/2069)
+- checking in page if not published in 'spo page add' and 'spo page set' [#2069](https://github.com/pnp/cli-microsoft365/issues/2069)
 
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
