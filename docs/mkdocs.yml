@@ -318,6 +318,7 @@ nav:
         - page section add: 'cmd/spo/page/page-section-add.md'
         - page section get: 'cmd/spo/page/page-section-get.md'
         - page section list: 'cmd/spo/page/page-section-list.md'
+        - page template list: 'cmd/spo/page/page-template-list.md'
         - page text add: 'cmd/spo/page/page-text-add.md'
       - propertybag:
         - propertybag get: 'cmd/spo/propertybag/propertybag-get.md'
@@ -554,6 +555,7 @@ nav:
     - Microsoft Graph:
       - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
     - Power Automate:
+      - 'Export all Flows in environment' : 'sample-scripts/flow/export-all-flows-in-environment.md'
       - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
     - SharePoint Online:
       - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
@@ -569,6 +571,7 @@ nav:
       - 'Hide SharePoint list from Site Contents': 'sample-scripts/spo/hide-list-from-site-contents.md'
       - 'Insert pictures in a SharePoint Document Library into a Word document': 'sample-scripts/spo/insert-sp-library-pictures-into-word.md'
       - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
+      - 'Lists all application customizers in the tenant': 'sample-scripts/spo/list-all-application-customizers.md'
       - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
       - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'

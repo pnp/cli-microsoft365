@@ -6,9 +6,6 @@ The [Power Automate Admin Center](https://admin.flow.microsoft.com) provides a l
 
 The `bash` version of this script uses an external file to process owner mapping. This is provided in the jq tab and should be saved to the same folder as the bash script and named `merge.jq`.
 
-!!! attention
-    There is a known issue when running scripts that retrieve large amounts of content. See issue [#1266](https://github.com/pnp/cli-microsoft365/issues/1266) for further detail. A best practice is to use a temporary file to enable processing large return sets.
-
 ```powershell tab="PowerShell Core"
 #!/usr/local/bin/pwsh -File
 

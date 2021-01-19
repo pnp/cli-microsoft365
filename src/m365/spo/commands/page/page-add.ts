@@ -304,7 +304,8 @@ class SpoPageAddCommand extends SpoCommand {
               LayoutWebpartsContent: layoutWebpartsContent
             }
           };
-        } else {
+        }
+        else {
           requestOptions = {
             url: `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
             headers: {

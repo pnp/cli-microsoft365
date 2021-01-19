@@ -286,7 +286,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         const pageData: any = {
           LayoutWebpartsContent: JSON.stringify([header])
         };
-        
         if (title) {
           pageData.Title = title;
         }
@@ -305,8 +304,6 @@ class SpoPageHeaderSetCommand extends SpoCommand {
         if (canvasContent) {
           pageData.CanvasContent1 = canvasContent;
         }
-
-        console.log(pageData)
 
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageFullName)}')/SavePageAsDraft`,

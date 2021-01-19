@@ -208,7 +208,8 @@ class SpoPageSetCommand extends SpoCommand {
           if (authorByline) {
             pageData.AuthorByline = authorByline;
           }
-        } else {
+        }
+        else {
           if (fileNameWithoutExtension) {
             pageData.Title = fileNameWithoutExtension;
           }
@@ -224,7 +225,7 @@ class SpoPageSetCommand extends SpoCommand {
           if (res.CanvasContent1) {
             pageData.CanvasContent1 = res.CanvasContent1;
           }
-  
+
           pageId = res.Id;
         }
 
@@ -297,7 +298,8 @@ class SpoPageSetCommand extends SpoCommand {
             },
             data: pageData
           };
-        } else {
+        }
+        else {
           requestOptions = {
             url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/CheckIn(comment=@a1,checkintype=@a2)?@a1='${encodeURIComponent(args.options.publishMessage || '').replace(/'/g, '%39')}'&@a2=1`,
             headers: {

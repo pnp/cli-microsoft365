@@ -80,7 +80,8 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request.get<ClientSidePageProperties>(requestOptions)
+    request
+      .get<ClientSidePageProperties>(requestOptions)
       .then((res: ClientSidePageProperties): Promise<ClientSidePageProperties> => {
         if (res.IsPageCheckedOutToCurrentUser) {
           return Promise.resolve(res);
@@ -239,6 +240,28 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
           });
         }
         
+        if (authorByline) {
+          pageData.AuthorByline = authorByline;
+        }
+        if (bannerImageUrl) {
+          pageData.BannerImageUrl = bannerImageUrl;
+        }
+        if (description) {
+          pageData.Description = description;
+        }
+        if (title) {
+          pageData.Title = title;
+        }
+        if (topicHeader) {
+          pageData.TopicHeader = topicHeader;
+        }
+        if (layoutWebpartsContent) {
+          pageData.LayoutWebpartsContent = layoutWebpartsContent;
+        }
+        if (canvasContent) {
+          pageData.CanvasContent1 = JSON.stringify(canvasContent);
+        }
+
         if (authorByline) {
           pageData.AuthorByline = authorByline;
         }
