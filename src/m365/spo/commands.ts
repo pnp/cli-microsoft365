@@ -121,6 +121,7 @@ export default {
   ORGNEWSSITE_REMOVE: `${prefix} orgnewssite remove`,
   ORGNEWSSITE_SET: `${prefix} orgnewssite set`,
   PAGE_ADD: `${prefix} page add`,
+  PAGE_COPY: `${prefix} page copy`,
   PAGE_GET: `${prefix} page get`,
   PAGE_LIST: `${prefix} page list`,
   PAGE_REMOVE: `${prefix} page remove`,
