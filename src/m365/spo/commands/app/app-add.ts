@@ -38,10 +38,6 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
     return telemetryProps;
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['UniqueId'];
-  }
-
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const scope: string = (args.options.scope) ? args.options.scope.toLowerCase() : 'tenant';
     const overwrite: boolean = args.options.overwrite || false;
@@ -70,8 +66,13 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
         return request.post(requestOptions);
       })
       .then((res: string): void => {
-        const json: any = JSON.parse(res);
-        logger.log(json);
+        const json: { UniqueId: string; } = JSON.parse(res);
+        if (args.options.output === 'json') {
+          logger.log(json);
+        }
+        else {
+          logger.log(json.UniqueId);
+        }
 
         if (this.verbose) {
           logger.logToStderr(chalk.green('DONE'));
