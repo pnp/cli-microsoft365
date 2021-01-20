@@ -13,6 +13,10 @@
 - [aad app add](../cmd/aad/app/app-add.md) - creates new Azure AD app registration [#1962](https://github.com/pnp/cli-microsoft365/issues/1962)
 - [aad o365group recyclebinitem list](../cmd/aad/o365group/o365group-recyclebinitem-list.md) - lists Groups from the recycle bin in the current tenant [#2032](https://github.com/pnp/cli-microsoft365/issues/2032)
 
+**Microsoft 365:**
+
+- [tenant auditlog report](../cmd/tenant/auditlog/auditlog-report.md) - gets audit logs from the Office 365 Management API [#1739](https://github.com/pnp/cli-microsoft365/issues/1739)
+
 **File:**
 
 - [file convert pdf](../cmd/file/convert/convert-pdf.md) - converts the specified file to PDF using Microsoft Graph [#2010](https://github.com/pnp/cli-microsoft365/issues/2010)
@@ -41,6 +45,7 @@
 - added support for setting authors and checks in page in 'spo page header set' [#2069](https://github.com/pnp/cli-microsoft365/issues/2069), [#2070](https://github.com/pnp/cli-microsoft365/issues/2070)
 - fixed removing previous values and checks in page in 'spo page clientsidewebpart add' [#2068](https://github.com/pnp/cli-microsoft365/issues/2068), [#2069](https://github.com/pnp/cli-microsoft365/issues/2069)
 - checking in page if not published in 'spo page add' and 'spo page set' [#2069](https://github.com/pnp/cli-microsoft365/issues/2069)
+- fixed bug in 'spo app add' returning an object instead of just the app ID [#2080](https://github.com/pnp/cli-microsoft365/issues/2080)
 
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
