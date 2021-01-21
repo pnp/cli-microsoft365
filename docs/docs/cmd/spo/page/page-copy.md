@@ -13,8 +13,8 @@ m365 spo page copy [options]
 `--sourceName <sourceName>`
 : The name of the source file
 
-`--sourceName <sourceName>`
-: The name of the target file to create
+`--targetUrl <targetUrl>`
+: The url of the target file. You are able to provide the page its name, relative path, or absolute path
 
 `--overwrite`
 : Overwrite the target page when it already exists
@@ -42,4 +42,10 @@ Create a copy of a page template.
 
 ```sh
 m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "templates/PageTemplate.aspx" --targetName "page.aspx"
+```
+
+Create a copy of a page on another site.
+
+```sh
+m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "templates/PageTemplate.aspx" --targetName "https://contoso.sharepoint.com/sites/team-b/sitepages/page.aspx"
 ```
