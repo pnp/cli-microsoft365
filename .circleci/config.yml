@@ -164,43 +164,43 @@ workflows:
       - build:
           filters:
             branches:
-              ignore: /^(master)/
+              ignore: /^(main)/
       - test:
           requires:
             - build
           filters:
             branches:
-              ignore: /^(master)/
+              ignore: /^(main)/
   release_next:
     jobs:
       - build:
           filters:
             branches:
-              only: master
+              only: main
       - test:
           requires:
             - build
           filters:
             branches:
-              only: master
+              only: main
       - publish_next:
           requires:
             - test
           filters:
             branches:
-              only: master
+              only: main
       - docker_next:
           requires:
             - publish_next
           filters:
             branches:
-              only: master
+              only: main
       - deploy_docs:
           requires:
             - publish_next
           filters:
             branches:
-              only: master
+              only: main
   release:
     jobs:
       - build:

@@ -24,20 +24,20 @@ Typos are embarrassing! Most PR's that fix typos will be accepted immediately. I
 
 Before contributing:
 
-- ensure that the **master** branch on your fork is in sync with the original **cli-microsoft365** repository
+- ensure that the **main** branch on your fork is in sync with the original **cli-microsoft365** repository
 
     ```sh
     # assuming you are in the folder of your locally cloned fork....
-    git checkout master
+    git checkout main
 
     # assuming you have a remote named `upstream` pointing to the official **cli-microsoft365** repo
     git fetch upstream
 
-    # update your local master to be a mirror of what's in the main repo
-    git pull --rebase upstream master
+    # update your local main to be a mirror of what's in the main repo
+    git pull --rebase upstream main
     ```
 
-- create a feature branch for your change. If you'll get stuck on an issue or merging your PR will take a while, this will allow you to have a clean master branch that you can use for contributing other changes
+- create a feature branch for your change. If you'll get stuck on an issue or merging your PR will take a while, this will allow you to have a clean main branch that you can use for contributing other changes
 
     ```sh
     git checkout -b my-contribution

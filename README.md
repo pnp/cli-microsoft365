@@ -11,12 +11,12 @@
 
 <p align="center">
   <a href="https://app.circleci.com/pipelines/github/pnp/cli-microsoft365">
-    <img src="https://img.shields.io/circleci/build/github/pnp/cli-microsoft365/master?style=flat-square&token=PkAaAAWBp9rNYBYhA5YiBhezydqwgFKhm"
+    <img src="https://img.shields.io/circleci/build/github/pnp/cli-microsoft365/main?style=flat-square&token=PkAaAAWBp9rNYBYhA5YiBhezydqwgFKhm"
       alt="CircleCI" />
   </a>
   
-  <a href="https://coveralls.io/github/pnp/cli-microsoft365?branch=master">
-    <img src="https://img.shields.io/coveralls/github/pnp/cli-microsoft365/master?style=flat-square"
+  <a href="https://coveralls.io/github/pnp/cli-microsoft365?branch=main">
+    <img src="https://img.shields.io/coveralls/github/pnp/cli-microsoft365/main?style=flat-square"
       alt="Coveralls"/>
   </a>
 
