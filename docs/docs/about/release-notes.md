@@ -27,6 +27,7 @@
 
 **SharePoint:**
 
+- [spo list view field set](../cmd/spo/list/list-view-field-set.md) - updates existing column in an existing view (eg. move to a specific position) [#2059](https://github.com/pnp/cli-microsoft365/issues/2059)
 - [spo page template list](../cmd/spo/page/page-template-list.md) - lists all page templates in the given site [#2065](https://github.com/pnp/cli-microsoft365/issues/2065)
 
 ### Changes
