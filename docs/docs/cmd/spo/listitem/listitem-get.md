@@ -1,4 +1,4 @@
-# spo listitem add
+# spo listitem get
 
 Gets a list item from the specified list
 
