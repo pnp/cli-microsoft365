@@ -2,6 +2,7 @@ import type { AuthenticationContext, ErrorResponse, Logging, LoggingLevel, Token
 import type * as NodeForge from 'node-forge';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
+import type { AuthServer } from './AuthServer';
 import { Logger } from './cli';
 import { CommandError } from './Command';
 import config from './config';
@@ -14,6 +15,11 @@ export interface Hash<TValue> {
 export interface AccessToken {
   expiresOn: string;
   value: string;
+}
+
+export interface InteractiveAuthorizationCodeResponse {
+  code: string;
+  redirectUri: string;
 }
 
 export class Service {
@@ -60,7 +66,8 @@ export enum AuthType {
   DeviceCode,
   Password,
   Certificate,
-  Identity
+  Identity,
+  Browser
 }
 
 export enum CertificateType {
@@ -71,6 +78,7 @@ export enum CertificateType {
 
 export class Auth {
   private _authCtx: AuthenticationContext | undefined;
+  private _authServer: AuthServer | undefined;
   protected get authCtx(): AuthenticationContext {
     if (!this._authCtx) {
       const authenticationContext: typeof AuthenticationContext = require('adal-node').AuthenticationContext;
@@ -161,6 +169,9 @@ export class Auth {
           case AuthType.Identity:
             getTokenPromise = this.ensureAccessTokenWithIdentity.bind(this);
             break;
+          case AuthType.Browser:
+            getTokenPromise = this.ensureAccessTokenWithBrowser.bind(this);
+            break;
         }
       }
 
@@ -199,6 +210,62 @@ export class Auth {
             resolve(this.service.accessTokens[resource].value);
           }
         });
+    });
+  }
+
+  private retrieveAuthCodeWithBrowser = (resource: string, logger: Logger, debug: boolean): Promise<InteractiveAuthorizationCodeResponse | ErrorResponse> => {
+    return new Promise<InteractiveAuthorizationCodeResponse | ErrorResponse>((resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: ErrorResponse) => void): void => {
+      // _authServer is never set before hitting this line, but this check
+      // is implemented so that we can support lazy loading
+      // but also stub it for testing
+      /* c8 ignore next 3 */
+      if (!this._authServer) {
+        this._authServer = require('./AuthServer').default;
+      }
+
+      (this._authServer as AuthServer).initializeServer(this.service, resource, resolve, reject, logger, debug);
+    });
+  }
+
+  private ensureAccessTokenWithBrowser(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
+    return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
+      if (debug) {
+        logger.logToStderr(`Retrieving new access token using interactive browser session...`);
+      }
+
+      this
+        .retrieveAuthCodeWithBrowser(resource, logger, debug)
+        .then((response: InteractiveAuthorizationCodeResponse | ErrorResponse) => {
+          const code = response as InteractiveAuthorizationCodeResponse;
+          if (debug) {
+            logger.logToStderr(`The service returned the code '${code.code}'`);
+          }
+
+          this.authCtx.acquireTokenWithAuthorizationCode(
+            code.code,
+            code.redirectUri,
+            this.defaultResource,
+            this.service.appId,
+            "",
+            (error: Error, response: TokenResponse | ErrorResponse): void => {
+              if (debug) {
+                logger.logToStderr('Response:');
+                logger.logToStderr(response);
+                logger.logToStderr('');
+              }
+
+              if (error) {
+                reject((response && (response as ErrorResponse).errorDescription) || error.message);
+                return;
+              }
+
+              resolve(<TokenResponse>response);
+            });
+        })
+        .catch((response: ErrorResponse) => {
+          reject((response && (response as ErrorResponse).errorDescription) || response.error);
+          return;
+        })
     });
   }
 
@@ -306,7 +373,7 @@ export class Auth {
   private ensureAccessTokenWithCertificate(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     const nodeForge: typeof NodeForge = require('node-forge');
     const { pem, pki, asn1, pkcs12 } = nodeForge;
-    
+
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
       if (debug) {
         logger.logToStderr(`Retrieving new access token using certificate...`);
