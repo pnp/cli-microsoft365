@@ -11,7 +11,7 @@ m365 login [options]
 ## Options
 
 `-t, --authType [authType]`
-: The type of authentication to use. Allowed values `certificate,deviceCode,password,identity`. Default `deviceCode`
+: The type of authentication to use. Allowed values `certificate,deviceCode,password,identity,browser`. Default `deviceCode`
 
 `-u, --userName [userName]`
 : Name of the user to authenticate. Required when `authType` is set to `password`
@@ -143,4 +143,10 @@ Log in to Microsoft 365 using your own Azure AD application that's restricted on
 
 ```sh
 m365 login --appId 31359c7f-bd7e-475c-86db-fdb8c937548c --tenant 31359c7f-bd7e-475c-86db-fdb8c937548a
+```
+
+Log in to Microsoft 365 using the interactive browser authentication. Uses the identity of the current user.
+
+```sh
+m365 login --authType browser
 ```

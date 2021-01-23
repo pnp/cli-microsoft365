@@ -98,6 +98,16 @@ openssl pkcs12 -in protected.pfx -out privateKeyWithPassphrase.pem -nodes
 
 At this point the `privateKeyWithPassphrase.pem` file can be used to log in the CLI for Microsoft 365 following the instructions above for logging in using a PEM certificate.
 
+#### Log in using a browser authentication
+
+Yet another way to log in to Microsoft 365 in the CLI for Microsoft 365 is by using a an interactive browser authentication. To use this authentication method, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of the Azure AD application that you want to use to authenticate the CLI for Microsoft 365 and the `CLIMICROSOFT365_TENANT` environment variable to the ID of your Azure AD directory. When calling the login command, set the `authType` option to `browser`.
+
+To log in to Microsoft 365 using an interactive browser authentication, execute:
+
+```sh
+m365 login --authType browser
+```
+
 ### Check login status
 
 To see if you're logged in to Microsoft 365 and if so, with which account, use the `status` command.

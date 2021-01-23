@@ -2,6 +2,7 @@ import type { AuthenticationContext, ErrorResponse, Logging, LoggingLevel, Token
 import type * as NodeForge from 'node-forge';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
+import authServer from './AuthServer';
 import { Logger } from './cli';
 import { CommandError } from './Command';
 import config from './config';
@@ -14,6 +15,11 @@ export interface Hash<TValue> {
 export interface AccessToken {
   expiresOn: string;
   value: string;
+}
+
+export interface InteractiveAuthorizationCodeResponse {
+  code: string;
+  redirectUri: string;
 }
 
 export class Service {
@@ -60,7 +66,8 @@ export enum AuthType {
   DeviceCode,
   Password,
   Certificate,
-  Identity
+  Identity,
+  Browser
 }
 
 export enum CertificateType {
@@ -71,6 +78,7 @@ export enum CertificateType {
 
 export class Auth {
   private _authCtx: AuthenticationContext | undefined;
+  private _authServer = authServer;
   protected get authCtx(): AuthenticationContext {
     if (!this._authCtx) {
       const authenticationContext: typeof AuthenticationContext = require('adal-node').AuthenticationContext;
@@ -160,6 +168,9 @@ export class Auth {
             break;
           case AuthType.Identity:
             getTokenPromise = this.ensureAccessTokenWithIdentity.bind(this);
+            break;            
+          case AuthType.Browser:
+            getTokenPromise = this.ensureAccessTokenWithBrowser.bind(this);
             break;
         }
       }
@@ -199,6 +210,51 @@ export class Auth {
             resolve(this.service.accessTokens[resource].value);
           }
         });
+    });
+  }
+
+  private retrieveAuthCodeWithBrowser = (resource: string, logger: Logger, debug: boolean): Promise<InteractiveAuthorizationCodeResponse | ErrorResponse> => {
+    return new Promise<InteractiveAuthorizationCodeResponse | ErrorResponse>((resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: ErrorResponse) => void): void => {
+      this._authServer.initializeServer(this.service, resource, resolve, reject, logger, debug);
+    });
+  }
+
+  private ensureAccessTokenWithBrowser(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
+    return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
+      if (debug) {
+        logger.logToStderr(`Retrieving new access token using interactive browser session...`);
+      }
+
+      this.retrieveAuthCodeWithBrowser(resource, logger, debug).then((response: InteractiveAuthorizationCodeResponse | ErrorResponse) => {
+        const code = response as InteractiveAuthorizationCodeResponse;
+        if (debug) {
+          logger.logToStderr(`The service returned the code '${code.code}'`);
+        }
+
+        this.authCtx.acquireTokenWithAuthorizationCode(
+          code.code,
+          code.redirectUri,
+          this.defaultResource,
+          this.service.appId,
+          "",
+          (error: Error, response: TokenResponse | ErrorResponse): void => {
+            if (debug) {
+              logger.logToStderr('Response:');
+              logger.logToStderr(response);
+              logger.logToStderr('');
+            }
+
+            if (error) {
+              reject((response && (response as ErrorResponse).errorDescription) || error.message);
+              return;
+            }
+
+            resolve(<TokenResponse>response);
+          });
+        }).catch((response: ErrorResponse) => {
+          reject((response && (response as ErrorResponse).errorDescription) || response.error);
+          return;
+        })
     });
   }
 

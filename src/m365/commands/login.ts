@@ -75,7 +75,10 @@ class LoginCommand extends Command {
         case 'identity':
           auth.service.authType = AuthType.Identity;
           auth.service.userName = args.options.userName;
-          break;
+          break;        
+        case 'browser':
+            auth.service.authType = AuthType.Browser;
+            break;
       }
 
       auth
@@ -132,8 +135,8 @@ class LoginCommand extends Command {
     const options: CommandOption[] = [
       {
         option: '-t, --authType [authType]',
-        description: 'The type of authentication to use. Allowed values certificate|deviceCode|password|identity. Default deviceCode',
-        autocomplete: ['certificate', 'deviceCode', 'password', 'identity']
+        description: 'The type of authentication to use. Allowed values certificate|deviceCode|password|identity|browser. Default deviceCode',
+        autocomplete: ['certificate', 'deviceCode', 'password', 'identity', 'browser']
       },
       {
         option: '-u, --userName [userName]',
