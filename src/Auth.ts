@@ -6,7 +6,10 @@ import { Logger } from './cli';
 import { CommandError } from './Command';
 import config from './config';
 import request from './request';
+import * as crypto from 'crypto';
 
+const ca = require('win-ca');
+const caApi = require('win-ca/api')
 export interface Hash<TValue> {
   [key: string]: TValue;
 }
@@ -24,6 +27,7 @@ export class Service {
   password?: string;
   certificate?: string
   thumbprint?: string;
+  windowsThumbprint?: string;
   accessTokens: Hash<AccessToken>;
   spoUrl?: string;
   tenantId?: string;
@@ -41,6 +45,7 @@ export class Service {
     this.password = undefined;
     this.certificate = undefined;
     this.thumbprint = undefined;
+    this.windowsThumbprint = undefined;
     this.spoUrl = undefined;
     this.tenantId = undefined;
   }
@@ -286,40 +291,78 @@ export class Auth {
 
       let cert: string = '';
 
-      if (this.service.password === undefined) {
-        const buf = Buffer.from(this.service.certificate as string, 'base64');
-        cert = buf.toString('utf8');
+      if (this.service.thumbprint && this.service.certificate === undefined && this.service.password === undefined ) {
+          const list: string[] = [];
+          
+          const thumbprint = (cert: string) => {
+            var shasum = crypto.createHash("sha1");
+            shasum.update(Buffer.from(cert, "base64"));
+            return shasum.digest("hex").toUpperCase();
+          };
+         
+          caApi({
+            store: ["My"],
+            ondata: list,
+          });
+
+          try {
+            list.forEach((cert) => {
+
+             this.service.windowsThumbprint = thumbprint(cert);
+  
+              if (this.service.windowsThumbprint === this.service.thumbprint) {
+                const toPEM = ca.der2(ca.der2.pem);
+                cert = toPEM(cert);
+              } 
+              else {
+                reject("The specified certificate was not found in the certificate store");
+              } 
+  
+            });
+          } catch (e) {
+              logger.logToStderr(e);
+          }
+        
+
       }
       else {
-        const buf = Buffer.from(this.service.certificate as string, 'base64');
-        const p12Asn1 = asn1.fromDer(buf.toString('binary'), false);
 
-        const p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
-
-        let keyBags: any = p12Parsed.getBags({ bagType: pki.oids.pkcs8ShroudedKeyBag });
-        const pkcs8ShroudedKeyBag = keyBags[pki.oids.pkcs8ShroudedKeyBag][0];
-
-        if (debug) {
-          // check if there is something in the keyBag as well as
-          // the pkcs8ShroudedKeyBag. This will give us more information
-          // whether there is a cert that can potentially store keys in the keyBag.
-          // I could not find a way to add something to the keyBag with all 
-          // my attempts, but lets keep it here for troubleshooting purposes.
-
-          logger.logToStderr(`pkcs8ShroudedKeyBagkeyBags length is ${[pki.oids.pkcs8ShroudedKeyBag].length}`);
-
-          keyBags = p12Parsed.getBags({ bagType: pki.oids.keyBag });
-          logger.logToStderr(`keyBag length is ${keyBags[pki.oids.keyBag].length}`);
+        if (this.service.password === undefined) {
+          const buf = Buffer.from(this.service.certificate as string, 'base64');
+          cert = buf.toString('utf8');
+        } 
+        else {
+          const buf = Buffer.from(this.service.certificate as string, 'base64');
+          const p12Asn1 = asn1.fromDer(buf.toString('binary'), false);
+  
+          const p12Parsed = pkcs12.pkcs12FromAsn1(p12Asn1, false, this.service.password);
+  
+          let keyBags: any = p12Parsed.getBags({ bagType: pki.oids.pkcs8ShroudedKeyBag });
+          const pkcs8ShroudedKeyBag = keyBags[pki.oids.pkcs8ShroudedKeyBag][0];
+  
+          if (debug) {
+            // check if there is something in the keyBag as well as
+            // the pkcs8ShroudedKeyBag. This will give us more information
+            // whether there is a cert that can potentially store keys in the keyBag.
+            // I could not find a way to add something to the keyBag with all 
+            // my attempts, but lets keep it here for troubleshooting purposes.
+  
+            logger.logToStderr(`pkcs8ShroudedKeyBagkeyBags length is ${[pki.oids.pkcs8ShroudedKeyBag].length}`);
+  
+            keyBags = p12Parsed.getBags({ bagType: pki.oids.keyBag });
+            logger.logToStderr(`keyBag length is ${keyBags[pki.oids.keyBag].length}`);
+          }
+  
+          // convert a Forge private key to an ASN.1 RSAPrivateKey
+          const rsaPrivateKey = pki.privateKeyToAsn1(pkcs8ShroudedKeyBag.key);
+  
+          // wrap an RSAPrivateKey ASN.1 object in a PKCS#8 ASN.1 PrivateKeyInfo
+          const privateKeyInfo = pki.wrapRsaPrivateKey(rsaPrivateKey);
+  
+          // convert a PKCS#8 ASN.1 PrivateKeyInfo to PEM
+          cert = pki.privateKeyInfoToPem(privateKeyInfo);
         }
 
-        // convert a Forge private key to an ASN.1 RSAPrivateKey
-        const rsaPrivateKey = pki.privateKeyToAsn1(pkcs8ShroudedKeyBag.key);
-
-        // wrap an RSAPrivateKey ASN.1 object in a PKCS#8 ASN.1 PrivateKeyInfo
-        const privateKeyInfo = pki.wrapRsaPrivateKey(rsaPrivateKey);
-
-        // convert a PKCS#8 ASN.1 PrivateKeyInfo to PEM
-        cert = pki.privateKeyInfoToPem(privateKeyInfo);
       }
 
       this.authCtx.acquireTokenWithClientCertificate(
