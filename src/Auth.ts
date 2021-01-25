@@ -563,6 +563,12 @@ export class Auth {
       resource = resource.substr(0, pos);
     }
 
+    if (resource === 'https://api.bap.microsoft.com') {
+      // api.bap.microsoft.com is not a valid resource
+      // we need to use https://management.azure.com/ instead
+      resource = 'https://management.azure.com/';
+    }
+
     return resource;
   }
 
