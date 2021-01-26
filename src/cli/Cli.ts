@@ -359,7 +359,7 @@ export class Cli {
       return logStatement.toString();
     }
 
-    const logStatementType: string = typeof logStatement;
+    let logStatementType: string = typeof logStatement;
 
     if (logStatementType === 'undefined') {
       return logStatement;
@@ -376,6 +376,10 @@ export class Cli {
       !options.help) {
       const jmespath: typeof JMESPath = require('jmespath');
       logStatement = jmespath.search(logStatement, options.query);
+      // we need to update the statement type in case the JMESPath query
+      // returns an object of different shape than the original message to log
+      // #2095
+      logStatementType = typeof logStatement;
     }
 
     if (options.output === 'json') {
