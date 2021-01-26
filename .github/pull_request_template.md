@@ -55,9 +55,9 @@ Closes #
 > _(DELETE THIS SECTION AFTER READING)_
 >
 
-> ### Master Branch Only
+> ### Main Branch Only
 >
-> You should only submit your changes to the **master** branch.
+> You should only submit your changes to the **main** branch.
 >
 > Pull requests submitted to other branches will be rejected.
 >
@@ -68,15 +68,15 @@ Closes #
 >
 > Merge conflicts occur when the branch you want to merge is out of date. To ensure this does not happen, you should ensure that your branch is up-to-date before submitting your pull request by executing the below git commands.
 >
-> `git checkout master`
+> `git checkout main`
 >
-> `git pull upstream master`
+> `git pull upstream main`
 >
-> `git push origin master`
+> `git push origin main`
 >
 > `git checkout <your-branch>`
 >
-> `git rebase master`
+> `git rebase main`
 >
 > `git push origin <your-branch> -f`
 >
