@@ -49,12 +49,6 @@ When the value, that you want to provide contains quotes, it needs to be wrapped
 m365 spo sitescript add --title "Contoso" --description "Contoso theme script" --content '{"abc": "def"}'
 ```
 
-If you use the CLI for Microsoft 365 in Bash, the outer pair of quotes will be processed by Bash so the value needs to be wrapped in an additional pair of quotes, for example:
-
-```sh
-m365 spo sitescript add --title "Contoso" --description "Contoso theme script" --content '`{"abc": "def"}`'
-```
-
 ## Passing complex content into CLI options
 
 When passing complex content into CLI options, such as JSON strings, you will need to properly escape nested quotes. The exact way to do it, depends on the shell that you're using. Alternatively, you can choose to pass complex content by storing the complex content in a file and passing the path to the file prefixed with an `@`, for example:
