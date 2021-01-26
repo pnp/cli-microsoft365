@@ -47,6 +47,8 @@
 - fixed removing previous values and checks in page in 'spo page clientsidewebpart add' [#2068](https://github.com/pnp/cli-microsoft365/issues/2068), [#2069](https://github.com/pnp/cli-microsoft365/issues/2069)
 - checking in page if not published in 'spo page add' and 'spo page set' [#2069](https://github.com/pnp/cli-microsoft365/issues/2069)
 - fixed bug in 'spo app add' returning an object instead of just the app ID [#2080](https://github.com/pnp/cli-microsoft365/issues/2080)
+- fixed 'spo listitem get' doc [#2093](https://github.com/pnp/cli-microsoft365/issues/2093)
+- fixed bug in exporting flows [#2091](https://github.com/pnp/cli-microsoft365/issues/2091)
 
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
