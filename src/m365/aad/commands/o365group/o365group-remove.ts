@@ -16,6 +16,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   id: string;
   confirm?: boolean;
+  skipRecycleBin?: boolean;
 }
 
 class AadO365GroupRemoveCommand extends GraphCommand {
@@ -49,11 +50,36 @@ class AadO365GroupRemoveCommand extends GraphCommand {
       request
         .delete(requestOptions)
         .then((): void => {
-          if (this.verbose) {
+
+          if (args.options.skipRecycleBin) {
+            const requestOptions2: any = {
+              url: `${this.resource}/v1.0/directory/deletedItems/${args.options.id}`,
+              headers: {
+                'accept': 'application/json;odata.metadata=none'
+              },
+            };
+
+            request
+            .delete(requestOptions2)
+            .then((): void => {
+              if (this.verbose) {
+                logger.logToStderr(chalk.green('DONE'));
+              }
+              cb();
+             })
+          } else {
+            if (this.verbose) {
+              logger.logToStderr(chalk.green('DONE'));
+            }
+  
+            cb();
+          }
+
+          /*if (this.verbose) {
             logger.logToStderr(chalk.green('DONE'));
           }
 
-          cb();
+          cb();*/
         }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
 
@@ -85,6 +111,10 @@ class AadO365GroupRemoveCommand extends GraphCommand {
       {
         option: '--confirm',
         description: 'Don\'t prompt for confirming removing the group'
+      },
+      {
+        option: '--skipRecycleBin',
+        description: 'Set to directly remove the group without moving it to the Recycle Bin'
       }
     ];
 
