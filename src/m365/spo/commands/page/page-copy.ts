@@ -33,15 +33,16 @@ class SpoPageCopyCommand extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.sourceName = typeof args.options.sourceName !== 'undefined';
-    telemetryProps.targetUrl = typeof args.options.targetUrl !== 'undefined';
     telemetryProps.overwrite = !!args.options.overwrite;
     return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    let { webUrl, targetUrl, overwrite } = args.options;
+    webUrl = this.removeTrailingSlash(webUrl);
+
     let sourceFullName: string = args.options.sourceName.toLowerCase();
-    const targetPageInfo: { siteUrl: string, pageName: string } = this.getSiteUrl(args.options.webUrl, args.options.targetUrl.toLowerCase());
+    const targetPageInfo: { siteUrl: string, pageName: string } = this.getTargetSiteUrl(webUrl, targetUrl.toLowerCase());
     let { siteUrl: targetSiteUrl, pageName: targetFullName } = targetPageInfo;
 
     if (sourceFullName.indexOf('.aspx') < 0) {
@@ -50,10 +51,8 @@ class SpoPageCopyCommand extends SpoCommand {
     if (targetFullName.indexOf('.aspx') < 0) {
       targetFullName += '.aspx';
     }
-
-    if (targetSiteUrl.endsWith('/')) {
-      targetSiteUrl = targetSiteUrl.substring(0, targetSiteUrl.length - 1);
-    }
+    
+    targetSiteUrl = this.removeTrailingSlash(targetSiteUrl);
     if (targetFullName.startsWith('/')) {
       targetFullName = targetFullName.substring(1);
     }
@@ -63,15 +62,15 @@ class SpoPageCopyCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/SP.MoveCopyUtil.CopyFileByPath()`,
+      url: `${webUrl}/_api/SP.MoveCopyUtil.CopyFileByPath()`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
       data: {
-        srcPath: { DecodedUrl: `${args.options.webUrl}/sitepages/${sourceFullName}` },
+        srcPath: { DecodedUrl: `${webUrl}/sitepages/${sourceFullName}` },
         destPath: { DecodedUrl: `${targetSiteUrl}/sitepages/${targetFullName}` },
         options: { ResetAuthorAndCreatedOnCopy: true, ShouldBypassSharedLocks: true },
-        overwrite: !!args.options.overwrite
+        overwrite: !!overwrite
       },
       responseType: 'json'
     };
@@ -123,7 +122,7 @@ class SpoPageCopyCommand extends SpoCommand {
       },
       {
         option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page should be created'
+        description: 'URL of the site where the page to retrieve is located'
       },
       {
         option: '--overwrite',
@@ -136,15 +135,10 @@ class SpoPageCopyCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    return true;
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 
-  private getSiteUrl(webUrl: string, targetFullName: string): { siteUrl: string, pageName: string } {
+  private getTargetSiteUrl(webUrl: string, targetFullName: string): { siteUrl: string, pageName: string } {
     const siteSplit = targetFullName.split('sitepages/');
     if (targetFullName.startsWith("http")) {
       return {
@@ -157,6 +151,13 @@ class SpoPageCopyCommand extends SpoCommand {
         pageName: siteSplit.length > 1 ? siteSplit[1] : targetFullName
       };
     }
+  }
+
+  private removeTrailingSlash(value: string) {
+    if (value.endsWith('/')) {
+      value = value.substring(0, value.length - 1);
+    }
+    return value;
   }
 }
 

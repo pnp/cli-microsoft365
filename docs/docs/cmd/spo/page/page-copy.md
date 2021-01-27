@@ -29,23 +29,23 @@ m365 spo page copy [options]
 Create a copy of the `home.aspx` page.
 
 ```sh
-m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "home.aspx" --targetName "home-copy.aspx"
+m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "home.aspx" --targetUrl "home-copy.aspx"
 ```
 
 Overwrite the page copy if it already exists.
 
 ```sh
-m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "home.aspx" --targetName "home-copy.aspx" --overwrite
+m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "home.aspx" --targetUrl "home-copy.aspx" --overwrite
 ```
 
 Create a copy of a page template.
 
 ```sh
-m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "templates/PageTemplate.aspx" --targetName "page.aspx"
+m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "templates/PageTemplate.aspx" --targetUrl "page.aspx"
 ```
 
 Create a copy of a page on another site.
 
 ```sh
-m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "templates/PageTemplate.aspx" --targetName "https://contoso.sharepoint.com/sites/team-b/sitepages/page.aspx"
+m365 spo page copy --webUrl https://contoso.sharepoint.com/sites/team-a --sourceName "templates/PageTemplate.aspx" --targetUrl "https://contoso.sharepoint.com/sites/team-b/sitepages/page.aspx"
 ```
