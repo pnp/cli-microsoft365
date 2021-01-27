@@ -67,16 +67,13 @@ class SpoFileCheckoutCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the file is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --fileUrl [fileUrl]',
-        description: 'The server-relative URL of the file to retrieve. Specify either fileUrl or id but not both'
+        option: '-f, --fileUrl [fileUrl]'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The UniqueId (GUID) of the file to retrieve. Specify either fileUrl or id but not both'
+        option: '-i, --id [id]'
       }
     ];
 

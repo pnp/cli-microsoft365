@@ -108,83 +108,64 @@ class SpoCustomActionSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'Url of the site or site collection to update the custom action'
+        option: '-u, --url <url>'
       },
       {
-        option: '-i, --id <id>',
-        description: 'ID of the custom action to update'
+        option: '-i, --id <id>'
       },
       {
-        option: '-n, --name [name]',
-        description: 'The name of the custom action'
+        option: '-n, --name [name]'
       },
       {
-        option: '-t, --title [title]',
-        description: 'The title of the custom action'
+        option: '-t, --title [title]'
       },
       {
-        option: '-l, --location [location]',
-        description: 'The actual location where this custom action need to be added like "CommandUI.Ribbon"'
+        option: '-l, --location [location]'
       },
       {
-        option: '-g, --group [group]',
-        description: 'The group of the custom action like "SiteActions"'
+        option: '-g, --group [group]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'The description of the custom action'
+        option: '-d, --description [description]'
       },
       {
-        option: '--sequence [sequence]',
-        description: 'Sequence of this CustomAction being injected. Use when you have a specific sequence with which to have multiple CustomActions being added to the page'
+        option: '--sequence [sequence]'
       },
       {
-        option: '--actionUrl [actionUrl]',
-        description: 'The URL, URI or JavaScript function associated with the action. URL example ~site/_layouts/sampleurl.aspx or ~sitecollection/_layouts/sampleurl.aspx'
+        option: '--actionUrl [actionUrl]'
       },
       {
-        option: '--imageUrl [imageUrl]',
-        description: 'The URL of the image associated with the custom action'
+        option: '--imageUrl [imageUrl]'
       },
       {
-        option: '-e, --commandUIExtension [commandUIExtension]',
-        description: 'XML fragment that determines user interface properties of the custom action'
+        option: '-e, --commandUIExtension [commandUIExtension]'
       },
       {
-        option: '--registrationId [registrationId]',
-        description: 'Specifies the identifier of the list or item content type that this action is associated with, or the file type or programmatic identifier'
+        option: '--registrationId [registrationId]'
       },
       {
         option: '--registrationType [registrationType]',
-        description: 'Specifies the type of object associated with the custom action. Allowed values None|List|ContentType|ProgId|FileType. Default None',
         autocomplete: ['None', 'List', 'ContentType', 'ProgId', 'FileType']
       },
       {
         option: '--rights [rights]',
-        description: `A case-sensitive string array that contain the permissions needed for the custom action. Allowed values ${this.permissionsKindMap.join('|')}. Default ${this.permissionsKindMap[0]}`,
         autocomplete: this.permissionsKindMap
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the existing custom action. Allowed values Site|Web|All. Default All. Note, this would not update the scope, but might speed up the execution of the scope of the custom action is known.',
         autocomplete: ['Site', 'Web', 'All']
       },
       {
-        option: '--scriptBlock [scriptBlock]',
-        description: 'Specifies a block of script to be executed. This attribute is only applicable when the Location attribute is set to ScriptLink'
+        option: '--scriptBlock [scriptBlock]'
       },
       {
-        option: '--scriptSrc [scriptSrc]',
-        description: 'Specifies a file that contains script to be executed. This attribute is only applicable when the Location attribute is set to ScriptLink'
+        option: '--scriptSrc [scriptSrc]'
       },
       {
-        option: '-c, --clientSideComponentId [clientSideComponentId]',
-        description: 'The Client Side Component Id (GUID) of the custom action'
+        option: '-c, --clientSideComponentId [clientSideComponentId]'
       },
       {
-        option: '-p, --clientSideComponentProperties [clientSideComponentProperties]',
-        description: 'The Client Side Component Properties of the custom action. Specify values as a JSON string : "{Property1 : "Value1", Property2: "Value2"}"'
+        option: '-p, --clientSideComponentProperties [clientSideComponentProperties]'
       }
     ];
     const parentOptions: CommandOption[] = super.options();

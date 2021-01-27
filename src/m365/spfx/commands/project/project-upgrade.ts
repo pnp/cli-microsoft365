@@ -661,17 +661,14 @@ ${f.resolution}
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-v, --toVersion [toVersion]',
-        description: 'The version of SharePoint Framework to which upgrade the project'
+        option: '-v, --toVersion [toVersion]'
       },
       {
         option: '--packageManager [packageManager]',
-        description: 'The package manager you use. Supported managers npm|pnpm|yarn. Default npm',
         autocomplete: ['npm', 'pnpm', 'yarn']
       },
       {
         option: '--shell [shell]',
-        description: 'The shell you use. Supported shells bash|powershell|cmd. Default bash',
         autocomplete: ['bash', 'powershell', 'cmd']
       }
     ];
@@ -679,7 +676,6 @@ ${f.resolution}
     const parentOptions: CommandOption[] = super.options();
     parentOptions.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
-        o.description = 'Output type. json|text|md|tour. Default text';
         o.autocomplete = ['json', 'text', 'md', 'tour'];
       }
     })

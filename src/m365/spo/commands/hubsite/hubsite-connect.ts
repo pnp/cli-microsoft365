@@ -55,12 +55,10 @@ class SpoHubSiteConnectCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the site collection to connect to the hub site'
+        option: '-u, --url <url>'
       },
       {
-        option: '-i, --hubSiteId <hubSiteId>',
-        description: 'The ID of the hub site to which to connect the site collection'
+        option: '-i, --hubSiteId <hubSiteId>'
       }
     ];
 

@@ -100,8 +100,7 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-j, --joined',
-        description: 'Retrieve only joined teams'
+        option: '-j, --joined'
       }
     ];
 

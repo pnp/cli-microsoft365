@@ -55,16 +55,13 @@ class FlowEnableCommand extends AzmgmtCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'The name of the Microsoft Flow to enable'
+        option: '-n, --name <name>'
       },
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment for which to enable Flow'
+        option: '-e, --environment <environment>'
       },
       {
-        option: '--asAdmin',
-        description: 'Set, to enable the Flow as admin'
+        option: '--asAdmin'
       }
     ];
 

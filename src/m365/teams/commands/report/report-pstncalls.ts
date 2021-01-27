@@ -57,12 +57,10 @@ class TeamsReportPstncallsCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--fromDateTime <fromDateTime>',
-        description: 'The start of time range to query. UTC, inclusive'
+        option: '--fromDateTime <fromDateTime>'
       },
       {
-        option: '--toDateTime [toDateTime]',
-        description: 'The end time range to query. UTC, inclusive. Defaults to today if omitted'
+        option: '--toDateTime [toDateTime]'
       }
     ];
 

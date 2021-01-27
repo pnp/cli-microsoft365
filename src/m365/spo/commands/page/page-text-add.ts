@@ -140,28 +140,22 @@ class SpoPageTextAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to add the text to is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --pageName <pageName>',
-        description: 'Name of the page to which add the text'
+        option: '-n, --pageName <pageName>'
       },
       {
-        option: '-t, --text <text>',
-        description: 'Text to add to the page'
+        option: '-t, --text <text>'
       },
       {
-        option: '--section [section]',
-        description: 'Number of the section to which the text should be added (1 or higher)'
+        option: '--section [section]'
       },
       {
-        option: '--column [column]',
-        description: 'Number of the column in which the text should be added (1 or higher)'
+        option: '--column [column]'
       },
       {
-        option: '--order [order]',
-        description: 'Order of the text in the column'
+        option: '--order [order]'
       }
     ];
 

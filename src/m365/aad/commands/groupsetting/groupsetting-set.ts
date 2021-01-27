@@ -105,8 +105,7 @@ class AadGroupSettingSetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the group setting to update'
+        option: '-i, --id <id>'
       }
     ];
 

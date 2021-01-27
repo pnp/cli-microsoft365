@@ -25,12 +25,10 @@ class MockCommand extends AnonymousCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-x, --parameterX <parameterX>',
-        description: 'Required parameter'
+        option: '-x, --parameterX <parameterX>'
       },
       {
-        option: '-y, --parameterY [parameterY]',
-        description: 'Optional parameter'
+        option: '-y, --parameterY [parameterY]'
       }
     ];
     const parentOptions: CommandOption[] = super.options();
@@ -73,12 +71,10 @@ class MockCommandWithValidation extends AnonymousCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-x, --parameterX <parameterX>',
-        description: 'Required parameter'
+        option: '-x, --parameterX <parameterX>'
       },
       {
-        option: '-y, --parameterY [parameterY]',
-        description: 'Optional parameter'
+        option: '-y, --parameterY [parameterY]'
       }
     ];
     const parentOptions: CommandOption[] = super.options();

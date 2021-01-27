@@ -55,16 +55,13 @@ class SpoPageColumnListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to list columns of'
+        option: '-n, --name <name>'
       },
       {
-        option: '-s, --section <sectionId>',
-        description: 'ID of the section for which to list columns'
+        option: '-s, --section <sectionId>'
       }
     ];
 

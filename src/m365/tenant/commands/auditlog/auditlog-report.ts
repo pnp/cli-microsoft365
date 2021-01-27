@@ -244,16 +244,13 @@ class TenantAuditlogReportCommand extends Command {
     const options: CommandOption[] = [
       {
         option: '-c, --contentType <contentType>',
-        description: `Audit content type of logs to be retrieved, should be one of the following: ${this.auditContentTypeLists.join(', ')}`,
         autocomplete: this.auditContentTypeLists
       },
       {
-        option: '-s, --startTime [startTime]',
-        description: 'Start time of logs to be retrieved. Start time and end time must both be specified (or both omitted) and must be less than or equal to 24 hours apart.'
+        option: '-s, --startTime [startTime]'
       },
       {
-        option: '-e, --endTime [endTime]',
-        description: 'End time of logs to be retrieved. Start time and end time must both be specified (or both omitted) and must be less than or equal to 24 hours apart.'
+        option: '-e, --endTime [endTime]'
       }
     ];
 

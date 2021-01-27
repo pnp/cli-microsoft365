@@ -55,8 +55,7 @@ class GraphSchemaExtensionGet extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: `The unique identifier for the schema extension definition`
+        option: '-i, --id <id>'
       }
     ];
 

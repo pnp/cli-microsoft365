@@ -202,7 +202,6 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
     const parentOptions: CommandOption[] = super.options();
     parentOptions.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
-        o.description = 'Output type. json|text|md. Default text';
         o.autocomplete = ['json', 'text', 'md'];
       }
     });

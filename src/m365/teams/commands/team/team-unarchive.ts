@@ -50,8 +50,7 @@ class TeamsUnarchiveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Microsoft Teams team to restore'
+        option: '-i, --teamId <teamId>'
       }
     ];
 

@@ -52,8 +52,7 @@ class TeamsMemberSettingsListCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the team for which to get the member settings'
+        option: '-i, --teamId <teamId>'
       }
     ];
 

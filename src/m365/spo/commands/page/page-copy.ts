@@ -103,20 +103,16 @@ class SpoPageCopyCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--sourceName <sourceName>',
-        description: 'The name of the source file'
+        option: '--sourceName <sourceName>'
       },
       {
-        option: '--targetUrl <targetUrl>',
-        description: 'The url of the target file. You are able to provide the page its name, relative path, or absolute path'
+        option: '--targetUrl <targetUrl>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to copy is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--overwrite',
-        description: 'Overwrite the target page when it already exists'
+        option: '--overwrite'
       }
     ];
 

@@ -93,28 +93,22 @@ class TeamsSetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Microsoft Teams team for which to update settings'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--displayName [displayName]',
-        description: 'The display name for the Microsoft Teams team'
+        option: '--displayName [displayName]'
       },
       {
-        option: '--description [description]',
-        description: 'The description for the Microsoft Teams team'
+        option: '--description [description]'
       },
       {
-        option: '--mailNickName [mailNickName]',
-        description: 'The mail alias for the Microsoft Teams team'
+        option: '--mailNickName [mailNickName]'
       },
       {
-        option: '--classification [classification]',
-        description: 'The classification for the Microsoft Teams team'
+        option: '--classification [classification]'
       },
       {
         option: '--visibility [visibility]',
-        description: 'The visibility of the Microsoft Teams team. Valid values Private|Public',
         autocomplete: ['Private', 'Public']
       }
     ];

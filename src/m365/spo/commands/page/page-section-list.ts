@@ -61,12 +61,10 @@ class SpoPageSectionListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to list sections of'
+        option: '-n, --name <name>'
       }
     ];
 

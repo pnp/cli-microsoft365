@@ -74,8 +74,7 @@ class SpoKnowledgehubSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site to set as Knowledge Hub'
+        option: '-u, --url <url>'
       }
     ];
 

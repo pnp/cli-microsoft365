@@ -60,12 +60,10 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment for which to retrieve available Flows'
+        option: '-e, --environment <environment>'
       },
       {
-        option: '--asAdmin',
-        description: 'Set, to list all Flows as admin. Otherwise will return only your own Flows'
+        option: '--asAdmin'
       }
     ];
 

@@ -122,24 +122,19 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the list is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listId [listId]',
-        description: 'The ID of the list where the item is located. Specify listId or listTitle but not both'
+        option: '-l, --listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'The title of the list where the item is located. Specify listId or listTitle but not both'
+        option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the list item to declare as record'
+        option: '-i, --id <id>'
       },
       {
-        option: '-d, --date [date]',
-        description: 'Record declaration date in ISO format, eg. 2019-12-31'
+        option: '-d, --date [date]'
       }
     ];
 

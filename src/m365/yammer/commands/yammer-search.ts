@@ -292,17 +292,14 @@ class YammerSearchCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--queryText <queryText>',
-        description: 'The query for the search'
+        option: '--queryText <queryText>'
       },
       {
         option: '--show [show]',
-        description: `Specifies the type of data to return when using --output text. Allowed values ${YammerSearchCommand.showOptions.join(', ')}. When not set, shows search results of all types`,
         autocomplete: YammerSearchCommand.showOptions
       },
       {
-        option: '--limit [limit]',
-        description: 'Limits the results returned for each item category.'
+        option: '--limit [limit]'
       }
     ];
 

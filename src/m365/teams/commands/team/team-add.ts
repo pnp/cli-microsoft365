@@ -184,20 +184,16 @@ class TeamsTeamAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name [name]',
-        description: 'Display name for the Microsoft Teams team. Required if templatePath not supplied'
+        option: '-n, --name [name]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Description for the Microsoft Teams team. Required if templatePath not supplied'
+        option: '-d, --description [description]'
       },
       {
-        option: '--templatePath [templatePath]',
-        description: 'Local path to the file containing the template. If name or description are supplied, these take precedence over the template values'
+        option: '--templatePath [templatePath]'
       },
       {
-        option: '--wait',
-        description: 'Wait for the team to be provisioned before completing the command'
+        option: '--wait'
       }
     ];
 

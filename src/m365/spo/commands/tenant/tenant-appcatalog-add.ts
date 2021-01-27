@@ -139,24 +139,19 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The absolute site url'
+        option: '-u, --url <url>'
       },
       {
-        option: '--owner <owner>',
-        description: 'The account name of the site owner'
+        option: '--owner <owner>'
       },
       {
-        option: '-z, --timeZone <timeZone>',
-        description: 'Integer representing time zone to use for the site'
+        option: '-z, --timeZone <timeZone>'
       },
       {
-        option: '--wait',
-        description: 'Wait for the site to be provisioned before completing the command'
+        option: '--wait'
       },
       {
-        option: '--force',
-        description: 'Force creating a new app catalog site if one already exists'
+        option: '--force'
       }
     ];
 

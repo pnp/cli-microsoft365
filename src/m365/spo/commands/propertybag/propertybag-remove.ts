@@ -121,20 +121,16 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site from which the property should be removed'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-k, --key <key>',
-        description: 'Key of the property to be removed. Case-sensitive'
+        option: '-k, --key <key>'
       },
       {
-        option: '-f, --folder [folder]',
-        description: 'Site-relative URL of the folder from which to remove the property bag value',
+        option: '-f, --folder [folder]'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removal of property bag value'
+        option: '--confirm'
       }
     ];
 

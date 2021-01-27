@@ -99,16 +99,13 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --appCatalogUrl <appCatalogUrl>',
-        description: 'URL of the app catalog site'
+        option: '-u, --appCatalogUrl <appCatalogUrl>'
       },
       {
-        option: '-k, --key <key>',
-        description: 'Name of the tenant property to retrieve'
+        option: '-k, --key <key>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removal of a tenant property'
+        option: '--confirm'
       }
     ];
 

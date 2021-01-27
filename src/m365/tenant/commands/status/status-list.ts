@@ -66,8 +66,7 @@ class TenantStatusListCommand extends Command {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-w, --workload [workload]',
-        description: 'Retrieve service status for the specified service. If not provided, will list the current service status of all services'
+        option: '-w, --workload [workload]'
       }
     ];
 

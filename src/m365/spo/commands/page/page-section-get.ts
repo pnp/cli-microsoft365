@@ -51,16 +51,13 @@ class SpoPageSectionGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to get section information of'
+        option: '-n, --name <name>'
       },
       {
-        option: '-s, --section <sectionId>',
-        description: 'ID of the section for which to retrieve information'
+        option: '-s, --section <sectionId>'
       }
     ];
 

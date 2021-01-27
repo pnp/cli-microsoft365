@@ -76,29 +76,23 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site to which navigation should be modified'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-l, --location <location>',
-        description: 'Navigation type where the node should be added. Available options: QuickLaunch|TopNavigationBar',
         autocomplete: ['QuickLaunch', 'TopNavigationBar']
       },
       {
-        option: '-t, --title <title>',
-        description: 'Navigation node title'
+        option: '-t, --title <title>'
       },
       {
-        option: '--url <url>',
-        description: 'Navigation node URL'
+        option: '--url <url>'
       },
       {
-        option: '--parentNodeId [parentNodeId]',
-        description: 'ID of the node below which the node should be added'
+        option: '--parentNodeId [parentNodeId]'
       },
       {
-        option: '--isExternal',
-        description: 'Set, if the navigation node points to an external URL'
+        option: '--isExternal'
       }
     ];
 

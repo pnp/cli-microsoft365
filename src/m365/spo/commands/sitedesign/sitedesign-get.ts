@@ -93,12 +93,10 @@ class SpoSiteDesignGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id [id]',
-        description: 'Site design ID. Specify either id or title but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '--title [title]',
-        description: 'Site design title. Specify either id or title but not both'
+        option: '--title [title]'
       }
     ];
 

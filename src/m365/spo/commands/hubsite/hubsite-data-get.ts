@@ -70,12 +70,10 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site for which to retrieve hub site data'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --forceRefresh',
-        description: `Set, to refresh the server cache with the latest updates`
+        option: '-f, --forceRefresh'
       }
     ];
 

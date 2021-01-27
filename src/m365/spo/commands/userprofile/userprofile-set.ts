@@ -79,16 +79,13 @@ class SpoUserProfileSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --userName <userName>',
-        description: 'Account name of the user'
+        option: '-u, --userName <userName>'
       },
       {
-        option: '-n, --propertyName <propertyName>',
-        description: 'The name of the property to be set'
+        option: '-n, --propertyName <propertyName>'
       },
       {
-        option: '-v, --propertyValue <propertyValue>',
-        description: 'The value of the property to be set'
+        option: '-v, --propertyValue <propertyValue>'
       }
     ];
 

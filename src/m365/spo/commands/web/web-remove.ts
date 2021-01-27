@@ -81,12 +81,10 @@ class SpoWebAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the subsite to remove'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--confirm',
-        description: 'Do not prompt for confirmation before deleting the subsite'
+        option: '--confirm'
       }
     ];
 

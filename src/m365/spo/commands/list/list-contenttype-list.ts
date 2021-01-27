@@ -73,16 +73,13 @@ class SpoListContentTypeListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listId [listId]',
-        description: 'ID of the list for which to list configured content types. Specify listId or listTitle but not both'
+        option: '-l, --listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list for which to list configured content types. Specify listId or listTitle but not both'
+        option: '-t, --listTitle [listTitle]'
       }
     ];
 

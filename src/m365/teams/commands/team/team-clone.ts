@@ -78,29 +78,23 @@ class TeamsCloneCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Microsoft Teams team to clone'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '-n, --displayName <displayName>',
-        description: 'The display name for the new Microsoft Teams Team'
+        option: '-n, --displayName <displayName>'
       },
       {
         option: '-p, --partsToClone <partsToClone>',
-        description: 'A comma-separated list of the parts to clone. Allowed values are apps|channels|members|settings|tabs',
         autocomplete: ['apps', 'channels', 'members', 'settings', 'tabs']
       },
       {
-        option: '-d, --description [description]',
-        description: 'The description for the new Microsoft Teams Team'
+        option: '-d, --description [description]'
       },
       {
-        option: '-c, --classification [classification]',
-        description: 'The classification for the new Microsoft Teams Team. If not specified, will be copied from the original Microsoft Teams Team'
+        option: '-c, --classification [classification]'
       },
       {
         option: '-v, --visibility [visibility]',
-        description: 'Specify the visibility of the new Microsoft Teams Team. Allowed values are Private|Public.',
         autocomplete: ['Private', 'Public']
       }
     ];

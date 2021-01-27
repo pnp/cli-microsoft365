@@ -55,8 +55,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --groupId <groupId>',
-        description: 'The ID of the Microsoft 365 Group to connect to Microsoft Teams'
+        option: '-i, --groupId <groupId>'
       }
     ];
 

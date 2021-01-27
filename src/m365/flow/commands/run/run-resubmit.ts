@@ -104,20 +104,16 @@ class FlowRunResubmitCommand extends AzmgmtCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'The name of the run to resubmit'
+        option: '-n, --name <name>'
       },
       {
-        option: '-f, --flow <flow>',
-        description: 'he name of the Microsoft Flow to resubmit'
+        option: '-f, --flow <flow>'
       },
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment where the Flow is located'
+        option: '-e, --environment <environment>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming'
+        option: '--confirm'
       }
     ];
 

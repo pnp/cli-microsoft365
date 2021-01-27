@@ -80,8 +80,7 @@ class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '-i, --requestId <requestId>',
-      description: 'ID of the permission request to approve'
+      option: '-i, --requestId <requestId>'
     }];
 
     const parentOptions: CommandOption[] = super.options();

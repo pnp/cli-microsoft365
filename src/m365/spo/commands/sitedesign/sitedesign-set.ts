@@ -107,41 +107,32 @@ class SpoSiteDesignSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the site design to update'
+        option: '-i, --id <id>'
       },
       {
-        option: '-t, --title [title]',
-        description: 'The new display name of the updated site design'
+        option: '-t, --title [title]'
       },
       {
         option: '-w, --webTemplate [webTemplate]',
-        description: 'The new template to add the site design to. Allowed values TeamSite|CommunicationSite',
         autocomplete: ['TeamSite', 'CommunicationSite']
       },
       {
-        option: '-s, --siteScripts [siteScripts]',
-        description: 'Comma-separated list of new site script IDs. The scripts will run in the order listed'
+        option: '-s, --siteScripts [siteScripts]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'The new display description of updated site design'
+        option: '-d, --description [description]'
       },
       {
-        option: '-m, --previewImageUrl [previewImageUrl]',
-        description: 'The new URL of a preview image. If none is specified SharePoint will use a generic image'
+        option: '-m, --previewImageUrl [previewImageUrl]'
       },
       {
-        option: '-a, --previewImageAltText [previewImageAltText]',
-        description: 'The new alt text description of the image for accessibility'
+        option: '-a, --previewImageAltText [previewImageAltText]'
       },
       {
-        option: '-v, --version [version]',
-        description: 'The new version number for the site design'
+        option: '-v, --version [version]'
       },
       {
-        option: '--isDefault [isDefault]',
-        description: 'Set to true if the site design is applied as the default site design'
+        option: '--isDefault [isDefault]'
       },
     ];
 

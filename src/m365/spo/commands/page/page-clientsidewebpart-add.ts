@@ -395,40 +395,31 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to add the web part to is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --pageName <pageName>',
-        description: 'Name of the page to which add the web part'
+        option: '-n, --pageName <pageName>'
       },
       {
-        option: '--standardWebPart [standardWebPart]',
-        description: `Name of the standard web part to add (see the possible values below)`
+        option: '--standardWebPart [standardWebPart]'
       },
       {
-        option: '--webPartId [webPartId]',
-        description: 'ID of the custom web part to add'
+        option: '--webPartId [webPartId]'
       },
       {
-        option: '--webPartProperties [webPartProperties]',
-        description: 'JSON string with web part properties to set on the web part. Specify webPartProperties or webPartData but not both'
+        option: '--webPartProperties [webPartProperties]'
       },
       {
-        option: '--webPartData [webPartData]',
-        description: 'JSON string with web part data as retrieved from the web part maintenance mode. Specify webPartProperties or webPartData but not both'
+        option: '--webPartData [webPartData]'
       },
       {
-        option: '--section [section]',
-        description: 'Number of the section to which the web part should be added (1 or higher)'
+        option: '--section [section]'
       },
       {
-        option: '--column [column]',
-        description: 'Number of the column in which the web part should be added (1 or higher)'
+        option: '--column [column]'
       },
       {
-        option: '--order [order]',
-        description: 'Order of the web part in the column'
+        option: '--order [order]'
       }
     ];
 

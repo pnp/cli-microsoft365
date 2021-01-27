@@ -90,12 +90,10 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--userId',
-        description: 'The ID of user to get the apps from. Specify userId or userName but not both.'
+        option: '--userId'
       },
       {
-        option: '--userName',
-        description: 'The UPN of user to get the apps from. Specify userId or userName but not both.'
+        option: '--userName'
       }
     ];
 

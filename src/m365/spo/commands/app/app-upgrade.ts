@@ -62,16 +62,13 @@ class SpoAppUpgradeCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the app to upgrade'
+        option: '-i, --id <id>'
       },
       {
-        option: '-s, --siteUrl <siteUrl>',
-        description: 'Absolute URL of the site to upgrade the app in'
+        option: '-s, --siteUrl <siteUrl>'
       },
       {
         option: '--scope [scope]',
-        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
         autocomplete: ['tenant', 'sitecollection']
       }
     ];

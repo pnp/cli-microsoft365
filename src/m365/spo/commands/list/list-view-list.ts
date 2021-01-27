@@ -72,16 +72,13 @@ class SpoListViewListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --listId [listId]',
-        description: 'ID of the list for which to list configured views. Specify listId or listTitle but not both'
+        option: '-i, --listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list for which to list configured views. Specify listId or listTitle but not both'
+        option: '-t, --listTitle [listTitle]'
       }
     ];
 

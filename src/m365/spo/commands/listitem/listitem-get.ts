@@ -77,24 +77,19 @@ class SpoListItemGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site from which the item should be retrieved'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id <id>',
-        description: 'ID of the item to retrieve.'
+        option: '-i, --id <id>'
       },
       {
-        option: '-l, --listId [listId]',
-        description: 'ID of the list from which to retrieve the item. Specify listId or listTitle but not both'
+        option: '-l, --listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list from which to retrieve the item. Specify listId or listTitle but not both'
+        option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-f, --fields [fields]',
-        description: 'Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested'
+        option: '-f, --fields [fields]'
       },
     ];
 

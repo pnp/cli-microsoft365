@@ -61,12 +61,10 @@ class SpoSiteDesignRunStatusGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site for which to get the information'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --runId <runId>',
-        description: 'ID of the site design applied to the site as retrieved using \'spo sitedesign run list\''
+        option: '-i, --runId <runId>'
       }
     ];
 

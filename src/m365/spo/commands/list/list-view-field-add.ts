@@ -130,36 +130,28 @@ class SpoListViewFieldAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--listId [listId]',
-        description: 'ID of the list where the view is located. Specify `listTitle` or `listId` but not both'
+        option: '--listId [listId]'
       },
       {
-        option: '--listTitle [listTitle]',
-        description: 'Title of the list where the view is located. Specify `listTitle` or `listId` but not both'
+        option: '--listTitle [listTitle]'
       },
       {
-        option: '--viewId [viewId]',
-        description: 'ID of the view to update. Specify `viewTitle` or `viewId` but not both'
+        option: '--viewId [viewId]'
       },
       {
-        option: '--viewTitle [viewTitle]',
-        description: 'Title of the view to update. Specify `viewTitle` or `viewId` but not both'
+        option: '--viewTitle [viewTitle]'
       },
       {
-        option: '--fieldId [fieldId]',
-        description: 'ID of the field to add. Specify `fieldId` or `fieldTitle` but not both'
+        option: '--fieldId [fieldId]'
       },
       {
-        option: '--fieldTitle [fieldTitle]',
-        description: 'The case-sensitive internal name or display name of the field to add. Specify `fieldId` or `fieldTitle` but not both'
+        option: '--fieldTitle [fieldTitle]'
       },
       {
-        option: '--fieldPosition [fieldPosition]',
-        description: 'The zero-based index of the position for the field'
+        option: '--fieldPosition [fieldPosition]'
       }
     ];
 

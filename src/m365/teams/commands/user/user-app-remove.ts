@@ -81,16 +81,13 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--appId <appId>',
-        description: 'The unique id of the app instance installed for the user'
+        option: '--appId <appId>'
       },
       {
-        option: '--userId <userId>',
-        description: 'The ID of the user to uninstall the app for'
+        option: '--userId <userId>'
       },
       {
-        option: '--confirm',
-        description: 'Confirm removal of app for user'
+        option: '--confirm'
       }
     ];
 

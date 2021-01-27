@@ -99,12 +99,10 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site to restore'
+        option: '-u, --url <url>'
       },
       {
-        option: '--wait',
-        description: 'Wait for the deleted site to be restored'
+        option: '--wait'
       }
     ];
 

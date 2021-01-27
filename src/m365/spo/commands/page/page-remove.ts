@@ -95,16 +95,13 @@ class SpoPageRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to remove'
+        option: '-n, --name <name>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site from which the page should be removed'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--confirm',
-        description: `Don't prompt before removing the page`
+        option: '--confirm'
       }
     ];
 

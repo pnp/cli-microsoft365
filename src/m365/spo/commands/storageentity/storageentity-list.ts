@@ -79,8 +79,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '-u, --appCatalogUrl <appCatalogUrl>',
-      description: 'URL of the app catalog site'
+      option: '-u, --appCatalogUrl <appCatalogUrl>'
     }];
 
     const parentOptions: CommandOption[] = super.options();

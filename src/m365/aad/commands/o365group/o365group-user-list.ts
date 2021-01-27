@@ -100,17 +100,13 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "-i, --groupId [groupId]",
-        description: "The ID of the Microsoft 365 group for which to list users"
+        option: "-i, --groupId [groupId]"
       },
       {
-        option: "--teamId [teamId]",
-        description: "The ID of the Microsoft Teams team for which to list users"
+        option: "--teamId [teamId]"
       },
       {
         option: "-r, --role [type]",
-        description:
-          "Filter the results to only users with the given role: Owner|Member|Guest",
         autocomplete: ["Owner", "Member", "Guest"]
       }
     ];

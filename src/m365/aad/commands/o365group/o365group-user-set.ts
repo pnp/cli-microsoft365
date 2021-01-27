@@ -151,20 +151,16 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "-i, --groupId [groupId]",
-        description: "The ID of the Microsoft 365 group for which to update user"
+        option: "-i, --groupId [groupId]"
       },
       {
-        option: "--teamId [teamId]",
-        description: "The ID of the Microsoft Teams team for which to update user"
+        option: "--teamId [teamId]"
       },
       {
-        option: '-n, --userName <userName>',
-        description: 'UPN of the user for whom to update the role (eg. johndoe@example.com)'
+        option: '-n, --userName <userName>'
       },
       {
         option: '-r, --role <role>',
-        description: 'Role to set for the given user in the specified Microsoft 365 Group or Microsoft Teams team. Allowed values: Owner|Member',
         autocomplete: ['Owner', 'Member']
       }
     ];

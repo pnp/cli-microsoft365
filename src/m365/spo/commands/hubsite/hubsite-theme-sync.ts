@@ -52,8 +52,7 @@ class SpoHubSiteThemeSyncCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site to apply theme updates from the hub site to'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

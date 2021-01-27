@@ -53,8 +53,7 @@ class PaSolutionReferenceAddCommand extends AnonymousCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-p, --path <path>',
-        description: 'The path to the referenced project'
+        option: '-p, --path <path>'
       }
     ];
 

@@ -167,8 +167,7 @@ class SpoWebReindexCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the subsite to reindex'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

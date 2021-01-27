@@ -106,8 +106,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming disabling site classification'
+        option: '--confirm'
       }
     ];
 

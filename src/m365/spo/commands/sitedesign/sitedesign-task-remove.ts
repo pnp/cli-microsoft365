@@ -81,12 +81,10 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --taskId <taskId>',
-        description: 'The ID of the site design task to remove'
+        option: '-i, --taskId <taskId>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the site design task'
+        option: '--confirm'
       }
     ];
 

@@ -187,20 +187,16 @@ class SpoPageSectionAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to add section to'
+        option: '-n, --name <name>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-t, --sectionTemplate <sectionTemplate>',
-        description: 'Type of section to add. Allowed values OneColumn|OneColumnFullWidth|TwoColumn|ThreeColumn|TwoColumnLeft|TwoColumnRight'
+        option: '-t, --sectionTemplate <sectionTemplate>'
       },
       {
-        option: '--order [order]',
-        description: 'Order of the section to add'
+        option: '--order [order]'
       }
     ];
 

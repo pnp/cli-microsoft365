@@ -216,32 +216,25 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL where to send the card to'
+        option: '-u, --url <url>'
       },
       {
-        option: '-t, --title [title]',
-        description: 'Title of the card'
+        option: '-t, --title [title]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Contents of the card'
+        option: '-d, --description [description]'
       },
       {
-        option: '-i, --imageUrl [imageUrl]',
-        description: 'URL of the image to include on the card'
+        option: '-i, --imageUrl [imageUrl]'
       },
       {
-        option: '-a, --actionUrl [actionUrl]',
-        description: 'URL that users should be sent to after clicking the View button on the card'
+        option: '-a, --actionUrl [actionUrl]'
       },
       {
-        option: '--card [card]',
-        description: 'Card definition'
+        option: '--card [card]'
       },
       {
-        option: '--cardData [cardData]',
-        description: 'Card data. If your card is a card template, using cardData you can apply data to it. If you specify cardData, unknown options will be ignored.'
+        option: '--cardData [cardData]'
       }
     ];
 

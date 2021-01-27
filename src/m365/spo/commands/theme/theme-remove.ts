@@ -86,12 +86,10 @@ class SpoThemeRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the theme to remove'
+        option: '-n, --name <name>'
       },
       {
-        option: '--confirm',
-        description: 'Do not prompt for confirmation before removing theme'
+        option: '--confirm'
       }
     ];
 

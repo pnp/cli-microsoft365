@@ -88,16 +88,13 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--libraryUrl <libraryUrl>',
-        description: 'The URL of the library to promote'
+        option: '--libraryUrl <libraryUrl>'
       },
       {
-        option: '--thumbnailUrl [thumbnailUrl]',
-        description: 'The URL of the thumbnail to render'
+        option: '--thumbnailUrl [thumbnailUrl]'
       },
       {
         option: '--cdnType [cdnType]',
-        description: 'Specifies the CDN type. Public,Private. Default is Private',
         autocomplete: ['Public', 'Private']
       }
     ];

@@ -177,29 +177,23 @@ class YammerMessageListCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--olderThanId [olderThanId]',
-        description: 'Returns messages older than the message ID specified as a numeric string'
+        option: '--olderThanId [olderThanId]'
       },
       {
         option: '-f, --feedType [feedType]',
-        description: 'Returns messages from a specific feed. Available options: All|Top|My|Following|Sent|Private|Received. Default All',
         autocomplete: YammerMessageListCommand.feedTypes
       },
       {
-        option: '--groupId [groupId]',
-        description: 'Returns the messages from a specific group'
+        option: '--groupId [groupId]'
       },
       {
-        option: '--threadId [threadId]',
-        description: 'Returns the messages from a specific thread'
+        option: '--threadId [threadId]'
       },
       {
-        option: '--threaded',
-        description: 'Will only return the thread starter (first message) for each thread. This parameter is intended for apps which need to display message threads collapsed'
+        option: '--threaded'
       },
       {
-        option: '--limit [limit]',
-        description: 'Limits the messages returned'
+        option: '--limit [limit]'
       }
     ];
 

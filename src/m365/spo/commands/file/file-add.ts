@@ -349,44 +349,34 @@ class SpoFileAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the file should be uploaded to'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folder <folder>',
-        description: 'Site-relative or server-relative URL to the folder where the file should be uploaded'
+        option: '-f, --folder <folder>'
       },
       {
-        option: '-p, --path <path>',
-        description: 'Local path to the file to upload'
+        option: '-p, --path <path>'
       },
       {
-        option: '-c, --contentType [contentType]',
-        description: 'Content type name or ID to assign to the file'
+        option: '-c, --contentType [contentType]'
       },
       {
-        option: '--checkOut',
-        description: 'If versioning is enabled, this will check out the file first if it exists, upload the file, then check it in again'
+        option: '--checkOut'
       },
       {
-        option: '--checkInComment [checkInComment]',
-        description: 'Comment to set when checking the file in'
+        option: '--checkInComment [checkInComment]'
       },
       {
-        option: '--approve',
-        description: 'Will automatically approve the uploaded file'
+        option: '--approve'
       },
       {
-        option: '--approveComment [approveComment]',
-        description: 'Comment to set when approving the file'
+        option: '--approveComment [approveComment]'
       },
       {
-        option: '--publish',
-        description: 'Will automatically publish the uploaded file'
+        option: '--publish'
       },
       {
-        option: '--publishComment [publishComment]',
-        description: 'Comment to set when publishing the file'
+        option: '--publishComment [publishComment]'
       }
     ];
 

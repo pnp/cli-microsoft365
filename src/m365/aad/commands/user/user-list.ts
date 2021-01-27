@@ -83,8 +83,7 @@ class AadUserListCommand extends GraphItemsListCommand<any> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-p, --properties [properties]',
-        description: 'Comma-separated list of properties to retrieve'
+        option: '-p, --properties [properties]'
       }
     ];
 

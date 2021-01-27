@@ -53,16 +53,13 @@ class SpoAppPageSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the page to update is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --pageName <pageName>',
-        description: 'The name of the page to be updated, eg. page.aspx'
+        option: '-n, --pageName <pageName>'
       },
       {
-        option: '-d, --webPartData <webPartData>',
-        description: 'JSON string of the web part to update on the page'
+        option: '-d, --webPartData <webPartData>'
       }
     ];
 

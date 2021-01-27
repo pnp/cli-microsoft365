@@ -131,16 +131,13 @@ class AadAppRoleAssignmentListCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --appId [appId]',
-        description: 'Application (client) Id of the App Registration for which the configured app roles should be retrieved'
+        option: '-i, --appId [appId]'
       },
       {
-        option: '-n, --displayName [displayName]',
-        description: 'Display name of the application for which the configured app roles should be retrieved'
+        option: '-n, --displayName [displayName]'
       },
       {
-        option: '--objectId [objectId]',
-        description: 'ObjectId of the application for which the configured app roles should be retrieved'
+        option: '--objectId [objectId]'
       }
     ];
 

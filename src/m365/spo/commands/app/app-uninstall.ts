@@ -85,21 +85,17 @@ class SpoAppUninstallCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the app to uninstall'
+        option: '-i, --id <id>'
       },
       {
-        option: '-s, --siteUrl <siteUrl>',
-        description: 'Absolute URL of the site to uninstall the app from'
+        option: '-s, --siteUrl <siteUrl>'
       },
       {
         option: '--scope [scope]',
-        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
         autocomplete: ['tenant', 'sitecollection']
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming uninstalling the app'
+        option: '--confirm'
       }
     ];
 

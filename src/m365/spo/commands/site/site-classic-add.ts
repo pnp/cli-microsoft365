@@ -287,52 +287,40 @@ class SpoSiteClassicAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The absolute site url'
+        option: '-u, --url <url>'
       },
       {
-        option: '-t, --title <title>',
-        description: 'The site title'
+        option: '-t, --title <title>'
       },
       {
-        option: '--owner <owner>',
-        description: 'The account name of the site owner'
+        option: '--owner <owner>'
       },
       {
-        option: '-z, --timeZone <timeZone>',
-        description: 'Integer representing time zone to use for the site'
+        option: '-z, --timeZone <timeZone>'
       },
       {
-        option: '-l, --lcid [lcid]',
-        description: 'Integer representing time zone to use for the site'
+        option: '-l, --lcid [lcid]'
       },
       {
-        option: '-w, --webTemplate [webTemplate]',
-        description: 'Template to use for creating the site. Default STS#0'
+        option: '-w, --webTemplate [webTemplate]'
       },
       {
-        option: '--resourceQuota [resourceQuota]',
-        description: 'The quota for this site collection in Sandboxed Solutions units. Default 0'
+        option: '--resourceQuota [resourceQuota]'
       },
       {
-        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]',
-        description: 'The warning level for the resource quota. Default 0'
+        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
       },
       {
-        option: '--storageQuota [storageQuota]',
-        description: 'The storage quota for this site collection in megabytes. Default 100'
+        option: '--storageQuota [storageQuota]'
       },
       {
-        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]',
-        description: 'The warning level for the storage quota in megabytes. Default 100'
+        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
       },
       {
-        option: '--removeDeletedSite',
-        description: 'Set, to remove existing deleted site with the same URL from the Recycle Bin'
+        option: '--removeDeletedSite'
       },
       {
-        option: '--wait',
-        description: 'Wait for the site to be provisioned before completing the command'
+        option: '--wait'
       }
     ];
 

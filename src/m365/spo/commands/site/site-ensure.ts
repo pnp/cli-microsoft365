@@ -230,95 +230,73 @@ class SpoSiteEnsureCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site collection to ensure that it exists and is properly configured'
+        option: '-u, --url <url>'
       },
       {
         option: '--type [type]',
-        description: 'Type of sites to add. Allowed values TeamSite|CommunicationSite|ClassicSite, default TeamSite',
         autocomplete: ['TeamSite', 'CommunicationSite', 'ClassicSite']
       },
       {
-        option: '-t, --title <title>',
-        description: 'Site title'
+        option: '-t, --title <title>'
       },
       {
-        option: '-a, --alias [alias]',
-        description: 'Site alias, used in the URL and in the team site group e-mail (applies to type TeamSite)'
+        option: '-a, --alias [alias]'
       },
       {
-        option: '-z, --timeZone [timeZone]',
-        description: 'Integer representing time zone to use for the site (applies to type ClassicSite)'
+        option: '-z, --timeZone [timeZone]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Site description'
+        option: '-d, --description [description]'
       },
       {
-        option: '-l, --lcid [lcid]',
-        description: 'Site language in the LCID format, eg. 1033 for en-US. See https://support.microsoft.com/en-us/office/languages-supported-by-sharepoint-dfbf3652-2902-4809-be21-9080b6512fff for the list of supported languages'
+        option: '-l, --lcid [lcid]'
       },
       {
-        option: '--owners [owners]',
-        description: 'Comma-separated list of users to set as site owners'
+        option: '--owners [owners]'
       },
       {
-        option: '--isPublic',
-        description: 'Determines if the associated group is public or not (applies to type TeamSite)'
+        option: '--isPublic'
       },
       {
-        option: '-c, --classification [classification]',
-        description: 'Site classification (applies to type TeamSite, CommunicationSite)'
+        option: '-c, --classification [classification]'
       },
       {
         option: '--siteDesign [siteDesign]',
-        description: 'Type of communication site to create. Allowed values Topic|Showcase|Blank, default Topic. Specify either siteDesign or siteDesignId (applies to type CommunicationSite)',
         autocomplete: ['Topic', 'Showcase', 'Blank']
       },
       {
-        option: '--siteDesignId [siteDesignId]',
-        description: 'Id of the custom site design to use to create the site. Specify either siteDesign or siteDesignId (applies to type CommunicationSite)'
+        option: '--siteDesignId [siteDesignId]'
       },
       {
-        option: '--shareByEmailEnabled',
-        description: 'Determines whether it\'s allowed to share file with guests (applies to type CommunicationSite)'
+        option: '--shareByEmailEnabled'
       },
       {
-        option: '-w, --webTemplate [webTemplate]',
-        description: 'Template to use for creating the site. Default STS#0 (applies to type ClassicSite)'
+        option: '-w, --webTemplate [webTemplate]'
       },
       {
-        option: '--resourceQuota [resourceQuota]',
-        description: 'The quota for this site collection in Sandboxed Solutions units. Default 0 (applies to type ClassicSite)'
+        option: '--resourceQuota [resourceQuota]'
       },
       {
-        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]',
-        description: 'The warning level for the resource quota. Default 0 (applies to type ClassicSite)'
+        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
       },
       {
-        option: '--storageQuota [storageQuota]',
-        description: 'The storage quota for this site collection in megabytes. Default 100 (applies to type ClassicSite)'
+        option: '--storageQuota [storageQuota]'
       },
       {
-        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]',
-        description: 'The warning level for the storage quota in megabytes. Default 100 (applies to type ClassicSite)'
+        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
       },
       {
-        option: '--removeDeletedSite',
-        description: 'Set, to remove existing deleted site with the same URL from the Recycle Bin (applies to type ClassicSite)'
+        option: '--removeDeletedSite'
       },
       {
-        option: '--disableFlows [disableFlows]',
-        description: 'Set to true to disable using Microsoft Flow in this site collection'
+        option: '--disableFlows [disableFlows]'
       },
       {
         option: '--sharingCapability [sharingCapability]',
-        description: `The sharing capability for the Site. Allowed values ${this.sharingCapabilities.join('|')}.`,
         autocomplete: this.sharingCapabilities
       },
       {
-        option: '--wait',
-        description: 'Wait for the site to be provisioned before completing the command (applies to type ClassicSite)'
+        option: '--wait'
       }
     ];
 

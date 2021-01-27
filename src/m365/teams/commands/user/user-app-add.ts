@@ -54,12 +54,10 @@ class TeamsUserAppAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--appId <appId>',
-        description: 'The ID of the app to install'
+        option: '--appId <appId>'
       },
       {
-        option: '--userId <userId>',
-        description: 'The ID of the user to install the app for'
+        option: '--userId <userId>'
       }
     ];
 

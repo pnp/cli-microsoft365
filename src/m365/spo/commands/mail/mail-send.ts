@@ -103,36 +103,28 @@ class SpoMailSendCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site from which the e-mail will be sent'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--to <to>',
-        description: 'Comma-separated list of recipients\' e-mail addresses'
+        option: '--to <to>'
       },
       {
-        option: '--subject <subject>',
-        description: 'Subject of the e-mail'
+        option: '--subject <subject>'
       },
       {
-        option: '--body <body>',
-        description: 'Content of the e-mail'
+        option: '--body <body>'
       },
       {
-        option: '--from [from]',
-        description: 'Sender\'s e-mail address'
+        option: '--from [from]'
       },
       {
-        option: '--cc [cc]',
-        description: 'Comma-separated list of CC recipients'
+        option: '--cc [cc]'
       },
       {
-        option: '--bcc [bcc]',
-        description: 'Comma-separated list of BCC recipients'
+        option: '--bcc [bcc]'
       },
       {
-        option: '--additionalHeaders [additionalHeaders]',
-        description: 'JSON string with additional headers'
+        option: '--additionalHeaders [additionalHeaders]'
       }
     ];
 

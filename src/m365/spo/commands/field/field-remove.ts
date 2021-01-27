@@ -161,36 +161,28 @@ class SpoFieldRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the field to remove is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listTitle [listTitle]',
-        description: 'Title of the list where the field is located. Specify only one of listTitle, listId or listUrl'
+        option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '--listId [listId]',
-        description: 'ID of the list where the field is located. Specify only one of listTitle, listId or listUrl'
+        option: '--listId [listId]'
       },
       {
-        option: '--listUrl [listUrl]',
-        description: 'Server- or web-relative URL of the list where the field is located. Specify only one of listTitle, listId or listUrl'
+        option: '--listUrl [listUrl]'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the field to remove. Specify id, fieldTitle, or group'
+        option: '-i, --id [id]'
       },
       {
-        option: '-t, --fieldTitle [fieldTitle]',
-        description: 'The display name (case-sensitive) of the field to remove. Specify id, fieldTitle, or group'
+        option: '-t, --fieldTitle [fieldTitle]'
       },
       {
-        option: '-g, --group [group]',
-        description: 'Delete all fields from this group (case-sensitive). Specify id, fieldTitle, or group'
+        option: '-g, --group [group]'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the field'
+        option: '--confirm'
       }
     ];
 

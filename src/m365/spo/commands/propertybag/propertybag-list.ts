@@ -62,12 +62,10 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site from which the property bag value should be retrieved'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folder [folder]',
-        description: 'Site-relative URL of the folder from which to retrieve property bag value. Case-sensitive',
+        option: '-f, --folder [folder]'
       }
     ];
 

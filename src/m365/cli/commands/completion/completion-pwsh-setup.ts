@@ -100,8 +100,7 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-p, --profile <profile>',
-        description: 'Path to the PowerShell profile file'
+        option: '-p, --profile <profile>'
       }
     ];
 

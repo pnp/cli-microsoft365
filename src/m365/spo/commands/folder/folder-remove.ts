@@ -91,20 +91,16 @@ class SpoFolderRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the folder to be deleted is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folderUrl <folderUrl>',
-        description: 'Site-relative URL of the folder to delete'
+        option: '-f, --folderUrl <folderUrl>'
       },
       {
-        option: '--recycle',
-        description: 'Recycles the folder instead of actually deleting it'
+        option: '--recycle'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming deleting the folder'
+        option: '--confirm'
       }
     ];
 

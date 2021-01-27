@@ -94,28 +94,22 @@ class SpoListWebhookAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list to add the webhook to is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listId [listId]',
-        description: 'ID of the list to which the webhook which should be added. Specify either listId or listTitle but not both'
+        option: '-l, --listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list to which the webhook which should be added. Specify either listId or listTitle but not both'
+        option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-n, --notificationUrl <notificationUrl>',
-        description: 'The notification url'
+        option: '-n, --notificationUrl <notificationUrl>'
       },
       {
-        option: '-e, --expirationDateTime [expirationDateTime]',
-        description: 'The expiration date. Will be set to max (6 months from today) if not provided.'
+        option: '-e, --expirationDateTime [expirationDateTime]'
       },
       {
-        option: '-c, --clientState [clientState]',
-        description: 'A client state information that will be passed through notifications.'
+        option: '-c, --clientState [clientState]'
       }
     ];
 

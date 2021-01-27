@@ -91,12 +91,10 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--libraryUrl <libraryUrl>',
-        description: 'The server relative URL of the library to be removed as a central location for organization assets'
+        option: '--libraryUrl <libraryUrl>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the organization asset library'
+        option: '--confirm'
       }
     ];
 

@@ -58,16 +58,13 @@ class SpoFolderAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the folder will be created'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-p, --parentFolderUrl <parentFolderUrl>',
-        description: 'Site-relative URL of the parent folder'
+        option: '-p, --parentFolderUrl <parentFolderUrl>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'Name of the new folder to be created'
+        option: '-n, --name <name>'
       }
     ];
 

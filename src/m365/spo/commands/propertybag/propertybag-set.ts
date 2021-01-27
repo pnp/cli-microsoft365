@@ -90,20 +90,16 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site in which the property should be set'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-k, --key <key>',
-        description: 'Key of the property to be set. Case-sensitive'
+        option: '-k, --key <key>'
       },
       {
-        option: '-v, --value <value>',
-        description: 'Value of the property to be set'
+        option: '-v, --value <value>'
       },
       {
-        option: '-f, --folder [folder]',
-        description: 'Site-relative URL of the folder on which the property should be set',
+        option: '-f, --folder [folder]'
       }
     ];
 

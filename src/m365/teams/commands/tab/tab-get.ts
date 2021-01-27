@@ -168,28 +168,22 @@ class TeamsTabGetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--teamId [teamId]',
-        description: 'The ID of the Microsoft Teams team where the tab is located. Specify either teamId or teamName but not both'
+        option: '--teamId [teamId]'
       },
       {
-        option: '--teamName [teamName]',
-        description: 'The display name of the Microsoft Teams team where the tab is located. Specify either teamId or teamName but not both'
+        option: '--teamName [teamName]'
       },
       {
-        option: '--channelId [channelId]',
-        description: 'The ID of the Microsoft Teams channel where the tab is located. Specify either channelId or channelName but not both'
+        option: '--channelId [channelId]'
       },
       {
-        option: '--channelName [channelName]',
-        description: 'The display name of the Microsoft Teams channel where the tab is located. Specify either channelId or channelName but not both'
+        option: '--channelName [channelName]'
       },
       {
-        option: '--tabId [tabId]',
-        description: 'The ID of the Microsoft Teams tab. Specify either tabId or tabName but not both'
+        option: '--tabId [tabId]'
       },
       {
-        option: '--tabName [tabName]',
-        description: 'The display name of the Microsoft Teams tab. Specify either tabId or tabName but not both'
+        option: '--tabName [tabName]'
       }
     ];
 

@@ -69,16 +69,13 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the site design to grant rights on'
+        option: '-i, --id <id>'
       },
       {
-        option: '-p, --principals <principals>',
-        description: 'Comma-separated list of principals to grant view rights. Principals can be users or mail-enabled security groups in the form of "alias" or "alias@<domain name>.com"'
+        option: '-p, --principals <principals>'
       },
       {
         option: '-r, --rights <rights>',
-        description: 'Rights to grant to principals. Available values View',
         autocomplete: ['View']
       }
     ];

@@ -73,20 +73,16 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId [teamId]',
-        description: 'The ID of the team where the channel is located. Specify either teamId or teamName, but not both.'
+        option: '-i, --teamId [teamId]'
       },
       {
-        option: '--teamName [teamName]',
-        description: 'The name of the team where the channel is located. Specify either teamId or teamName, but not both.'
+        option: '--teamName [teamName]'
       },
       {
-        option: '-c, --channelId [channelId]',
-        description: 'The ID of the channel for which to list members. Specify either channelId or channelName, but not both.'
+        option: '-c, --channelId [channelId]'
       },
       {
-        option: '--channelName [channelName]',
-        description: 'The name of the channel for which to list members. Specify either channelId or channelName, but not both.'
+        option: '--channelName [channelName]'
       }
     ];
 

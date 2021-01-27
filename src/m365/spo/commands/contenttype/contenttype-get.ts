@@ -61,16 +61,13 @@ class SpoContentTypeGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the content type is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listTitle [listTitle]',
-        description: 'Title of the list where the content type is located (if it is a list content type)'
+        option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the content type to retrieve'
+        option: '-i, --id <id>'
       }
     ];
 

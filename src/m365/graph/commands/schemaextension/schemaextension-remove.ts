@@ -78,12 +78,10 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: `The unique identifier for the schema extension definition`
+        option: '-i, --id <id>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the specified schema extension'
+        option: '--confirm'
       }
     ];
 

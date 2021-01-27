@@ -88,21 +88,17 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site to which navigation should be modified'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-l, --location <location>',
-        description: 'Navigation type where the node should be added. Available options: QuickLaunch|TopNavigationBar',
         autocomplete: ['QuickLaunch', 'TopNavigationBar']
       },
       {
-        option: '-i, --id <id>',
-        description: 'ID of the node to remove'
+        option: '-i, --id <id>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the node'
+        option: '--confirm'
       }
     ];
 

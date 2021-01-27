@@ -76,8 +76,7 @@ class SpoThemeGetCommand extends SpoCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '-n, --name <name>',
-      description: 'The name of the theme to retrieve'
+      option: '-n, --name <name>'
     }];
 
     const parentOptions: CommandOption[] = super.options();

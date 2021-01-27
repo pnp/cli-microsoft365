@@ -88,16 +88,13 @@ class TodoListSetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id [id]',
-        description: `The ID of the list to update. Specify either id or name, not both`
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --name [name]',
-        description: `The display name of the list to update. Specify either id or name, not both`
+        option: '-n, --name [name]'
       },
       {
-        option: '--newName <newName>',
-        description: `The new name for the task list`
+        option: '--newName <newName>'
       }
     ];
 

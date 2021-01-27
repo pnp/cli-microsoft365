@@ -36,12 +36,10 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --newName <newName>',
-        description: 'New name for the project'
+        option: '-n, --newName <newName>'
       },
       {
-        option: '--generateNewId',
-        description: 'Generate a new solution ID for the project'
+        option: '--generateNewId'
       }
     ];
 

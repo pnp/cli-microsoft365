@@ -100,33 +100,26 @@ class SpoSiteDesignAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --title <title>',
-        description: 'The display name of the site design'
+        option: '-t, --title <title>'
       },
       {
         option: '-w, --webTemplate <webTemplate>',
-        description: 'Identifies which base template to add the design to. Allowed values TeamSite|CommunicationSite',
         autocomplete: ['TeamSite', 'CommunicationSite']
       },
       {
-        option: '-s, --siteScripts <siteScripts>',
-        description: 'Comma-separated list of site script IDs. The scripts will run in the order listed'
+        option: '-s, --siteScripts <siteScripts>'
       },
       {
-        option: '-d, --description [description]',
-        description: 'The display description of site design'
+        option: '-d, --description [description]'
       },
       {
-        option: '-m, --previewImageUrl [previewImageUrl]',
-        description: 'The URL of a preview image. If none is specified SharePoint will use a generic image'
+        option: '-m, --previewImageUrl [previewImageUrl]'
       },
       {
-        option: '-a, --previewImageAltText [previewImageAltText]',
-        description: 'The alt text description of the image for accessibility'
+        option: '-a, --previewImageAltText [previewImageAltText]'
       },
       {
-        option: '--isDefault',
-        description: 'Set if the site design is applied as the default site design'
+        option: '--isDefault'
       },
     ];
 

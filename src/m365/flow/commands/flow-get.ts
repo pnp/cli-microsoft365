@@ -59,16 +59,13 @@ class FlowGetCommand extends AzmgmtCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'The name of the Microsoft Flow to get information about'
+        option: '-n, --name <name>'
       },
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment for which to retrieve available Flows'
+        option: '-e, --environment <environment>'
       },
       {
-        option: '--asAdmin',
-        description: 'Set, to retrieve the Flow as admin'
+        option: '--asAdmin'
       }
     ];
 

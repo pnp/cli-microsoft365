@@ -63,12 +63,10 @@ class YammerUserGetCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --userId [userId]',
-        description: 'Retrieve a user by ID'
+        option: '-i, --userId [userId]'
       },
       {
-        option: '--email [email]',
-        description: 'Retrieve a user by e-mail'
+        option: '--email [email]'
       }
     ];
 

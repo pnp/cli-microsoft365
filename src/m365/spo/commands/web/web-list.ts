@@ -59,8 +59,7 @@ class SpoWebListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the parent site for which to retrieve the list of subsites'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

@@ -54,12 +54,10 @@ class TeamsAppInstallCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--appId <appId>',
-        description: 'The ID of the app to install'
+        option: '--appId <appId>'
       },
       {
-        option: '--teamId <teamId>',
-        description: 'The ID of the Microsoft Teams team to which to install the app'
+        option: '--teamId <teamId>'
       }
     ];
 

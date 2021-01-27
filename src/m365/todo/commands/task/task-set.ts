@@ -94,25 +94,20 @@ class TodoTaskSetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: `The id of the task to update`
+        option: '-i, --id <id>'
       },
       {
-        option: '-t, --title [title]',
-        description: `Sets the task title`
+        option: '-t, --title [title]'
       },
       {
         option: '-s, --status [status]',
-        description: `Set the task title. Allowed values are notStarted|inProgress|completed|waitingOnOthers|deferred`,
         autocomplete: ['notStarted', 'inProgress', 'completed', 'waitingOnOthers', 'deferred']
       },
       {
-        option: '--listName [listName]',
-        description: 'The name of the list in which the task exists. Specify either listName or listId but not both'
+        option: '--listName [listName]'
       },
       {
-        option: '--listId [listId]',
-        description: 'The id of the list in which the task exists. Specify either listName or listId but not both'
+        option: '--listId [listId]'
       }    
       
     ];

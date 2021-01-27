@@ -125,21 +125,17 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'Id (GUID) of the custom action to remove'
+        option: '-i, --id <id>'
       },
       {
-        option: '-u, --url <url>',
-        description: 'Url of the site or site collection to remove the custom action from'
+        option: '-u, --url <url>'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the custom action. Allowed values Site|Web|All. Default All',
         autocomplete: ['Site', 'Web', 'All']
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removal of a user custom action'
+        option: '--confirm'
       }
     ];
 

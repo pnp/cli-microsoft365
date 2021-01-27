@@ -81,20 +81,16 @@ class AadO365GroupUserAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --userName <userName>',
-        description: 'User\'s UPN (user principal name, eg. johndoe@example.com)'
+        option: '-n, --userName <userName>'
       },
       {
-        option: "-i, --groupId [groupId]",
-        description: "The ID of the Microsoft 365 Group to which to add the user"
+        option: "-i, --groupId [groupId]"
       },
       {
-        option: "--teamId [teamId]",
-        description: "The ID of the Teams team to which to add the user"
+        option: "--teamId [teamId]"
       },
       {
         option: '-r, --role [role]',
-        description: 'The role to be assigned to the new user: Owner|Member. Default Member',
         autocomplete: ['Owner', 'Member']
       }
     ];

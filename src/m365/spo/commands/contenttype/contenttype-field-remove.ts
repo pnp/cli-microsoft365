@@ -186,28 +186,22 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the content type is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listTitle [listTitle]',
-        description: 'Title of the list where the content type is located (if it is a list content type)'
+        option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '-i, --contentTypeId <contentTypeId>',
-        description: 'The ID of the content type to remove the column from'
+        option: '-i, --contentTypeId <contentTypeId>'
       },
       {
-        option: '-f, --fieldLinkId <fieldLinkId>',
-        description: 'The ID of the column to remove'
+        option: '-f, --fieldLinkId <fieldLinkId>'
       },
       {
-        option: '-c, --updateChildContentTypes',
-        description: 'Update child content types'
+        option: '-c, --updateChildContentTypes'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removal of a column from content type'
+        option: '--confirm'
       }
     ];
 

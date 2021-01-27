@@ -80,20 +80,16 @@ class TeamsTabRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "-i, --teamId <teamId>",
-        description: "The ID of the team where the tab exists"
+        option: "-i, --teamId <teamId>"
       },
       {
-        option: "-c, --channelId <channelId>",
-        description: "The ID of the channel to remove the tab from"
+        option: "-c, --channelId <channelId>"
       },
       {
-        option: "-t, --tabId <tabId>",
-        description: "The ID of the tab to remove"
+        option: "-t, --tabId <tabId>"
       },
       {
-        option: "--confirm",
-        description: "Don't prompt for confirmation"
+        option: "--confirm"
       }
     ];
 

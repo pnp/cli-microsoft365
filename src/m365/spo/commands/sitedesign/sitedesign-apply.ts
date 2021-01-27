@@ -74,16 +74,13 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the site design to apply'
+        option: '-i, --id <id>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site to apply the site design to'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--asTask',
-        description: 'Apply site design as task. Required for large site designs'
+        option: '--asTask'
       }
     ];
 

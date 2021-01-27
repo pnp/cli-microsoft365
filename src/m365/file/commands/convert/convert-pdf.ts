@@ -451,12 +451,10 @@ class FileConvertPdfCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-s, --sourceFile <sourceFile>',
-        description: 'Local path or full URL to the source file to be converted to PDF'
+        option: '-s, --sourceFile <sourceFile>'
       },
       {
-        option: '-t, --targetFile <targetFile>',
-        description: 'Local path or full URL to where the generated PDF file should be saved'
+        option: '-t, --targetFile <targetFile>'
       }
     ];
 

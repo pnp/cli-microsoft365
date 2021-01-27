@@ -63,20 +63,16 @@ class SpoPageColumnGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to get column information of'
+        option: '-n, --name <name>'
       },
       {
-        option: '-s, --section <section>',
-        description: 'ID of the section where the column is located'
+        option: '-s, --section <section>'
       },
       {
-        option: '-c, --column <column>',
-        description: 'ID of the column for which to retrieve more information'
+        option: '-c, --column <column>'
       }
     ];
 

@@ -70,36 +70,28 @@ class TeamsTabAddCommand extends GraphItemsListCommand<Tab> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the team to where the channel exists'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '-c, --channelId <channelId>',
-        description: 'The ID of the channel to add a tab to'
+        option: '-c, --channelId <channelId>'
       },
       {
-        option: '--appId <appId>',
-        description: 'The ID of the Teams app that contains the Tab'
+        option: '--appId <appId>'
       },
       {
-        option: '--appName <appName>',
-        description: 'The name of the Teams app that contains the Tab'
+        option: '--appName <appName>'
       },
       {
-        option: '--contentUrl <contentUrl>',
-        description: 'The URL used for rendering Tab contents'
+        option: '--contentUrl <contentUrl>'
       },
       {
-        option: '--entityId [entityId]',
-        description: 'A unique identifier for the Tab'
+        option: '--entityId [entityId]'
       },
       {
-        option: '--removeUrl [removeUrl]',
-        description: 'The URL displayed when a Tab is removed'
+        option: '--removeUrl [removeUrl]'
       },
       {
-        option: '--websiteUrl [websiteUrl]',
-        description: 'The URL for showing tab contents outside of Teams'
+        option: '--websiteUrl [websiteUrl]'
       }
     ];
 

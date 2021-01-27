@@ -94,20 +94,16 @@ class SpoUserRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the web to remove user'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'ID of the user to remove from web'
+        option: '-i, --id [id]'
       },
       {
-        option: '--loginName [loginName]',
-        description: 'Login name of the site user to remove'
+        option: '--loginName [loginName]'
       },
       {
-        option: '--confirm',
-        description: 'Do not prompt for confirmation before removing user from web'
+        option: '--confirm'
       }
     ];
 

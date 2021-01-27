@@ -90,12 +90,10 @@ class SpoSiteDesignRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'Site design ID'
+        option: '-i, --id <id>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the site design'
+        option: '--confirm'
       }
     ];
 

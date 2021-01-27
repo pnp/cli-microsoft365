@@ -129,20 +129,16 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the content type is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the content type to remove'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --name [name]',
-        description: 'The name of the content type to remove'
+        option: '-n, --name [name]'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removal of the content type'
+        option: '--confirm'
       }
     ];
 

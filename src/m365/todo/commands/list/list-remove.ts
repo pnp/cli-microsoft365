@@ -106,16 +106,13 @@ class TodoListRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name [name]',
-        description: `The name of the task list to remove. Specify either id or name but not both`
+        option: '-n, --name [name]'
       },
       {
-        option: '-i, --id [id]',
-        description: `The ID of the task list to remove. Specify either id or name but not both`
+        option: '-i, --id [id]'
       },
       {
-        option: '--confirm',
-        description: `Don't prompt for confirming removing the task list`
+        option: '--confirm'
       },
     ];
 

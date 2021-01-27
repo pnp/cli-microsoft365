@@ -90,12 +90,10 @@ class SpoPageGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to retrieve'
+        option: '-n, --name <name>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

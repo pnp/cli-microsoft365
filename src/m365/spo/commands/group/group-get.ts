@@ -68,16 +68,13 @@ class SpoUserGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the group is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'Id of the site group to get. Use either "id" or "name", but not both.'
+        option: '-i, --id [id]'
       },
       {
-        option: '--name [name]',
-        description: 'Name of the site group to get. Use either "id" or "name", but not both.'
+        option: '--name [name]'
       }
     ];
 

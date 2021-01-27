@@ -94,16 +94,13 @@ class SpoThemeSetCommand extends SpoCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '-n, --name <name>',
-      description: 'Name of the theme to add or update'
+      option: '-n, --name <name>'
     },
     {
-      option: '-p, --filePath <filePath>',
-      description: 'Absolute or relative path to the theme json file'
+      option: '-p, --filePath <filePath>'
     },
     {
-      option: '--isInverted',
-      description: 'Set to specify that the theme is inverted'
+      option: '--isInverted'
     }];
 
     const parentOptions: CommandOption[] = super.options();

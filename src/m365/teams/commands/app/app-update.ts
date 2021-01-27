@@ -57,12 +57,10 @@ class TeamsAppUpdateCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the app to update'
+        option: '-i, --id <id>'
       },
       {
-        option: '-p, --filePath <filePath>',
-        description: 'Absolute or relative path to the Teams manifest zip file to update in the app catalog'
+        option: '-p, --filePath <filePath>'
       }
     ];
 

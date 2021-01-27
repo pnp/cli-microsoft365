@@ -58,8 +58,7 @@ class TeamsAppPublishCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-p, --filePath <filePath>',
-        description: 'Absolute or relative path to the Teams manifest zip file to add to the app catalog'
+        option: '-p, --filePath <filePath>'
       }
     ];
 

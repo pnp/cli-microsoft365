@@ -316,58 +316,45 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the app'
+        option: '-n, --name <name>'
       },
       {
-        option: '--multitenant',
-        description: 'Specify, to make the app available to other tenants'
+        option: '--multitenant'
       },
       {
-        option: '-r, --redirectUris [redirectUris]',
-        description: 'Comma-separated list of redirect URIs. Requires platform to be specified'
+        option: '-r, --redirectUris [redirectUris]'
       },
       {
         option: '-p, --platform [platform]',
-        description: 'Platform for which the redirectUris should be configured. Allowed values spa, web, publicClient',
         autocomplete: AadAppAddCommand.aadApplicationPlatform
       },
       {
-        option: '--implicitFlow',
-        description: 'Specify, to indicate that the authorization endpoint should return ID and access tokens'
+        option: '--implicitFlow'
       },
       {
-        option: '-s, --withSecret',
-        description: 'When specified, will create for the app a non-expiring secret named Default'
+        option: '-s, --withSecret'
       },
       {
-        option: '--apisDelegated [apisDelegated]',
-        description: 'Comma-separated list of delegated permissions to register with the app'
+        option: '--apisDelegated [apisDelegated]'
       },
       {
-        option: '--apisApplication [apisApplication]',
-        description: 'Comma-separated list of application permissions to register with the app'
+        option: '--apisApplication [apisApplication]'
       },
       {
-        option: '-u, --uri [uri]',
-        description: 'Application ID URI'
+        option: '-u, --uri [uri]'
       },
       {
-        option: '--scopeName [scopeName]',
-        description: 'Name of the scope to add. Requires uri to be specified'
+        option: '--scopeName [scopeName]'
       },
       {
         option: '--scopeConsentBy [scopeConsentBy]',
-        description: 'Specifies if the scope can be consented only by admins or by admins and users. Allowed values admins, adminsAndUsers. Default admins',
         autocomplete: AadAppAddCommand.aadAppScopeConsentBy
       },
       {
-        option: '--scopeAdminConsentDisplayName [scopeAdminConsentDisplayName]',
-        description: 'Scope admin consent display name. Required when scopeName specified'
+        option: '--scopeAdminConsentDisplayName [scopeAdminConsentDisplayName]'
       },
       {
-        option: '--scopeAdminConsentDescription [scopeAdminConsentDescription]',
-        description: 'Scope admin consent description. Required when scopeName specified'
+        option: '--scopeAdminConsentDescription [scopeAdminConsentDescription]'
       }
     ];
 

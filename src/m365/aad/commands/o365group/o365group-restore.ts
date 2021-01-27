@@ -58,8 +58,7 @@ class AadO365GroupRestoreCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the Microsoft 365 Group to restore'
+        option: '-i, --id <id>'
       }
     ];
 

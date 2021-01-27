@@ -94,16 +94,13 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the site design to revoke rights from'
+        option: '-i, --id <id>'
       },
       {
-        option: '-p, --principals <principals>',
-        description: 'Comma-separated list of principals to revoke view rights from. Principals can be users or mail-enabled security groups in the form of "alias" or "alias@<domain name>.com"'
+        option: '-p, --principals <principals>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the site design'
+        option: '--confirm'
       }
     ];
 

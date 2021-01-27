@@ -106,12 +106,10 @@ class YammerGroupListCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--userId [userId]',
-        description: 'Returns the groups for a specific user'
+        option: '--userId [userId]'
       },
       {
-        option: '--limit [limit]',
-        description: 'Limits the groups returned'
+        option: '--limit [limit]'
       }
     ];
 

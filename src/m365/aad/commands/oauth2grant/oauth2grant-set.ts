@@ -56,12 +56,10 @@ class AadOAuth2GrantSetCommand extends AadCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --grantId <grantId>',
-        description: 'objectId of OAuth2 permission grant to update'
+        option: '-i, --grantId <grantId>'
       },
       {
-        option: '-s, --scope <scope>',
-        description: 'Permissions to grant'
+        option: '-s, --scope <scope>'
       }
     ];
 

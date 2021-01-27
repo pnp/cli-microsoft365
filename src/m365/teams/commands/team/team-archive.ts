@@ -59,12 +59,10 @@ class TeamsArchiveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Microsoft Teams team to archive'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--shouldSetSpoSiteReadOnlyForMembers',
-        description: 'Sets the permissions for team members to read-only on the SharePoint Online site associated with the team'
+        option: '--shouldSetSpoSiteReadOnlyForMembers'
       }
     ];
 

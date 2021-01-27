@@ -65,8 +65,7 @@ class TenantServiceReportHistoricalServiceStatusCommand extends Command {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-w, --workload [workload]',
-        description: 'Retrieve the historical service status for the particular service. If not provided, the historical service status of all services will be returned.'
+        option: '-w, --workload [workload]'
       }
     ];
 

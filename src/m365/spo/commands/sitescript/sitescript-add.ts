@@ -71,16 +71,13 @@ class SpoSiteScriptAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --title <title>',
-        description: 'Site script title'
+        option: '-t, --title <title>'
       },
       {
-        option: '-c, --content <content>',
-        description: 'JSON string containing the site script'
+        option: '-c, --content <content>'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Site script description'
+        option: '-d, --description [description]'
       }
     ];
 
