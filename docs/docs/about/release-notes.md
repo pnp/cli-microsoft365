@@ -49,6 +49,8 @@
 - fixed bug in 'spo app add' returning an object instead of just the app ID [#2080](https://github.com/pnp/cli-microsoft365/issues/2080)
 - fixed 'spo listitem get' doc [#2093](https://github.com/pnp/cli-microsoft365/issues/2093)
 - fixed bug in exporting flows [#2091](https://github.com/pnp/cli-microsoft365/issues/2091)
+- fixed logging output when using JMESPath queries [#2095](https://github.com/pnp/cli-microsoft365/issues/2095)
+- updated guidance for escaping quotes in bash [#2043](https://github.com/pnp/cli-microsoft365/issues/2043)
 
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
