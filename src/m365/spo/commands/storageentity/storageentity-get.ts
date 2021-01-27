@@ -59,8 +59,7 @@ class SpoStorageEntityGetCommand extends SpoCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '-k, --key <key>',
-      description: 'Name of the tenant property to retrieve'
+      option: '-k, --key <key>'
     }];
 
     const parentOptions: CommandOption[] = super.options();

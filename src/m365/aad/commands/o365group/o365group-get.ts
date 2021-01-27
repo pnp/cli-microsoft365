@@ -77,12 +77,10 @@ class AadO365GroupGetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the Microsoft 365 Group to retrieve information for'
+        option: '-i, --id <id>'
       },
       {
-        option: '--includeSiteUrl',
-        description: 'Set to retrieve the site URL for the group'
+        option: '--includeSiteUrl'
       }
     ];
 

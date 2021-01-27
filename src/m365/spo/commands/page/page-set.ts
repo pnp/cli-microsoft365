@@ -325,39 +325,31 @@ class SpoPageSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to update'
+        option: '-n, --name <name>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to update is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-l, --layoutType [layoutType]',
-        description: 'Layout of the page. Allowed values Article|Home',
         autocomplete: ['Article', 'Home']
       },
       {
         option: '-p, --promoteAs [promoteAs]',
-        description: 'Update the page purpose. Allowed values HomePage|NewsPage|Template',
         autocomplete: ['HomePage', 'NewsPage', 'Template']
       },
       {
         option: '--commentsEnabled [commentsEnabled]',
-        description: 'Set to true, to enable comments on the page. Allowed values true|false',
         autocomplete: ['true', 'false']
       },
       {
-        option: '--publish',
-        description: 'Set to publish the page'
+        option: '--publish'
       },
       {
-        option: '--publishMessage [publishMessage]',
-        description: 'Message to set when publishing the page'
+        option: '--publishMessage [publishMessage]'
       },
       {
-        option: '--description [description]',
-        description: 'The description to set for the page'
+        option: '--description [description]'
       }
     ];
 

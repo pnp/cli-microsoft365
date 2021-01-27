@@ -86,32 +86,25 @@ class SpoSiteGroupifyCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --siteUrl <siteUrl>',
-        description: 'URL of the site collection being connected to new Microsoft 365 Group'
+        option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '-a, --alias <alias>',
-        description: 'The email alias for the new Microsoft 365 Group that will be created'
+        option: '-a, --alias <alias>'
       },
       {
-        option: '-n, --displayName <displayName>',
-        description: 'The name of the new Microsoft 365 Group that will be created'
+        option: '-n, --displayName <displayName>'
       },
       {
-        option: '-d, --description [description]',
-        description: 'The group’s description'
+        option: '-d, --description [description]'
       },
       {
-        option: '-c, --classification [classification]',
-        description: 'The classification value, if classifications are set for the organization. If no value is provided, the default classification will be set, if one is configured'
+        option: '-c, --classification [classification]'
       },
       {
-        option: '--isPublic',
-        description: 'Determines the Microsoft 365 Group’s privacy setting. If set, the group will be public, otherwise it will be private'
+        option: '--isPublic'
       },
       {
-        option: '--keepOldHomepage',
-        description: 'For sites that already have a modern page set as homepage, set this option, to keep it as the homepage'
+        option: '--keepOldHomepage'
       },
     ];
 

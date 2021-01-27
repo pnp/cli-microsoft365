@@ -393,44 +393,34 @@ class SpoSiteSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the site collection to update'
+        option: '-u, --url <url>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the site collection to update (deprecated; id is automatically retrieved and does not need to be specified)'
+        option: '-i, --id [id]'
       },
       {
-        option: '--classification [classification]',
-        description: 'The new classification for the site collection'
+        option: '--classification [classification]'
       },
       {
-        option: '--disableFlows [disableFlows]',
-        description: 'Set to true to disable using Microsoft Flow in this site collection'
+        option: '--disableFlows [disableFlows]'
       },
       {
-        option: '--isPublic [isPublic]',
-        description: 'Set to true to make the group linked to the site public or to false to make it private'
+        option: '--isPublic [isPublic]'
       },
       {
-        option: '--owners [owners]',
-        description: 'Comma-separated list of users to add as site collection administrators'
+        option: '--owners [owners]'
       },
       {
-        option: '--shareByEmailEnabled [shareByEmailEnabled]',
-        description: 'Set to true to allow to share files with guests and to false to disallow it'
+        option: '--shareByEmailEnabled [shareByEmailEnabled]'
       },
       {
-        option: '--siteDesignId [siteDesignId]',
-        description: 'Id of the custom site design to apply to the site'
+        option: '--siteDesignId [siteDesignId]'
       },
       {
-        option: '--title [title]',
-        description: 'The new title for the site collection'
+        option: '--title [title]'
       },
       {
         option: '--sharingCapability [sharingCapability]',
-        description: `The sharing capability for the Site. Allowed values ${this.sharingCapabilities.join('|')}.`,
         autocomplete: this.sharingCapabilities
       }
     ];

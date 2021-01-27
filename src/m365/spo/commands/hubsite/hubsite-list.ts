@@ -167,8 +167,7 @@ class SpoHubSiteListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --includeAssociatedSites',
-        description: `Include the associated sites in the result (only in JSON output)`
+        option: '-i, --includeAssociatedSites'
       }
     ];
 

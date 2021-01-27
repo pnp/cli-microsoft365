@@ -72,24 +72,19 @@ class YammerMessageAddCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-b, --body <body>',
-        description: 'The text of the message body'
+        option: '-b, --body <body>'
       },
       {
-        option: '-r, --repliedToId [repliedToId]',
-        description: 'The message ID this message is in reply to. If this is set then groupId and networkId are inferred from it'
+        option: '-r, --repliedToId [repliedToId]'
       },
       {
-        option: '-d, --directToUserIds [directToUserIds]',
-        description: 'Send a private message to one or more users, specified by ID. Alternatively, you can use the Yammer network e-mail addresses instead of the IDs'
+        option: '-d, --directToUserIds [directToUserIds]'
       },
       {
-        option: '--groupId [groupId]',
-        description: 'Post the message to this group, specified by ID. If this is set then the networkId is inferred from it. A post without directToUserIds, repliedToId or groupId will default to All Company group'
+        option: '--groupId [groupId]'
       },
       {
-        option: '--networkId [networkId]',
-        description: 'Post a message in the "All Company" feed of this network, if repliedToId, directToUserIds and groupId are all omitted'
+        option: '--networkId [networkId]'
       }
     ];
 

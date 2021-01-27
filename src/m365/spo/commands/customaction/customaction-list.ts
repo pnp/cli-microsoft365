@@ -129,12 +129,10 @@ class SpoCustomActionListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'Url of the site (collection) to retrieve the custom action from'
+        option: '-u, --url <url>'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the custom action. Allowed values Site|Web|All. Default All',
         autocomplete: ['Site', 'Web', 'All']
       }
     ];

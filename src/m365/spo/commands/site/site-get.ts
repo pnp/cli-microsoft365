@@ -49,8 +49,7 @@ class SpoSiteGetCommand extends SpoCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '-u, --url <url>',
-      description: 'URL of the site collection to retrieve information for'
+      option: '-u, --url <url>'
     }];
 
     const parentOptions: CommandOption[] = super.options();

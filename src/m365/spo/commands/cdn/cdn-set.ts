@@ -152,17 +152,14 @@ class SpoCdnSetCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-e, --enabled <enabled>',
-        description: 'Set to true to enable CDN or to false to disable it. Valid values are true|false',
         autocomplete: ['true', 'false']
       },
       {
         option: '-t, --type [type]',
-        description: 'Type of CDN to manage. Public|Private|Both. Default Public',
         autocomplete: ['Public', 'Private', 'Both']
       },
       {
-        option: '--noDefaultOrigins',
-        description: 'Disable creation of default origins'
+        option: '--noDefaultOrigins'
       }
     ];
 

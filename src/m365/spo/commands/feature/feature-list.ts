@@ -60,12 +60,10 @@ class SpoFeatureListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site (collection) to retrieve the activated Features from'
+        option: '-u, --url <url>'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the Features to retrieve. Allowed values Site|Web. Default Web',
         autocomplete: ['Site', 'Web']
       }
     ];

@@ -64,8 +64,7 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--hideDefaultThemes <hideDefaultThemes>',
-        description: 'Set to true to hide default themes and to false to show them'
+        option: '--hideDefaultThemes <hideDefaultThemes>'
       }
     ];
 

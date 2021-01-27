@@ -77,12 +77,10 @@ class TeamsRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Teams team to remove'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the specified team'
+        option: '--confirm'
       }
     ];
 

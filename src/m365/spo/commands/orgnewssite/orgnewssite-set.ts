@@ -68,8 +68,7 @@ class SpoOrgNewsSiteSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the site to mark as an organizational news site'
+        option: '-u, --url <url>'
       }
     ];
 

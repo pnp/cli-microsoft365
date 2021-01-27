@@ -49,8 +49,7 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'The name of the environment to get information about'
+        option: '-n, --name <name>'
       }
     ];
 

@@ -96,16 +96,13 @@ class YammerMessageLikeSetCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--id <id>',
-        description: 'The id of the Yammer message'
+        option: '--id <id>'
       },
       {
-        option: '--enable [enable]',
-        description: 'Set to true to like a message. Set to false to unlike it. Default true'
+        option: '--enable [enable]'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirmation before unliking a message'
+        option: '--confirm'
       }
     ];
 

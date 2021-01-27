@@ -185,24 +185,19 @@ class SpoFileMoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the file is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-s, --sourceUrl <sourceUrl>',
-        description: 'Site-relative URL of the file to move'
+        option: '-s, --sourceUrl <sourceUrl>'
       },
       {
-        option: '-t, --targetUrl <targetUrl>',
-        description: 'Server-relative URL where to move the file'
+        option: '-t, --targetUrl <targetUrl>'
       },
       {
-        option: '--deleteIfAlreadyExists',
-        description: 'If a file already exists at the targetUrl, it will be moved to the recycle bin. If omitted, the move operation will be canceled if the file already exists at the targetUrl location'
+        option: '--deleteIfAlreadyExists'
       },
       {
-        option: '--allowSchemaMismatch',
-        description: 'Ignores any missing fields in the target document library and moves the file anyway'
+        option: '--allowSchemaMismatch'
       }
     ];
 

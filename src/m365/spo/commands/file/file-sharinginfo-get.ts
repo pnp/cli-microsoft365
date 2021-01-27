@@ -152,16 +152,13 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-w, --webUrl <webUrl>',
-        description: 'The URL of the site where the file is located'
+        option: '-w, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The UniqueId (Item Id) of the file for which to build the report. Specify either url or id but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '-u, --url [url]',
-        description: 'The server-relative URL of the file for which to build the report. Specify either url or id but not both'
+        option: '-u, --url [url]'
       }
     ];
 

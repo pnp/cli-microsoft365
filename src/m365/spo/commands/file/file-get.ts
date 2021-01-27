@@ -133,32 +133,25 @@ class SpoFileGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-w, --webUrl <webUrl>',
-        description: 'The URL of the site where the file is located'
+        option: '-w, --webUrl <webUrl>'
       },
       {
-        option: '-u, --url [url]',
-        description: 'The server-relative URL of the file to retrieve. Specify either url or id but not both'
+        option: '-u, --url [url]'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The UniqueId (GUID) of the file to retrieve. Specify either url or id but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '--asString',
-        description: 'Set to retrieve the contents of the specified file as string'
+        option: '--asString'
       },
       {
-        option: '--asListItem',
-        description: 'Set to retrieve the underlying list item'
+        option: '--asListItem'
       },
       {
-        option: '--asFile',
-        description: 'Set to save the file to the path specified in the path option'
+        option: '--asFile'
       },
       {
-        option: '-p, --path [path]',
-        description: 'The local path where to save the retrieved file. Must be specified when the --asFile option is used'
+        option: '-p, --path [path]'
       }
     ];
 

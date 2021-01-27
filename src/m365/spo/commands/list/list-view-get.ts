@@ -77,28 +77,22 @@ class SpoListViewGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--listId [listId]',
-        description: 'ID of the list where the view is located. Specify only one of listTitle, listId or listUrl'
+        option: '--listId [listId]'
       },
       {
-        option: '--listTitle [listTitle]',
-        description: 'Title of the list where the view is located. Specify only one of listTitle, listId or listUrl'
+        option: '--listTitle [listTitle]'
       },
       {
-        option: '--listUrl [listUrl]',
-        description: 'Server- or web-relative URL of the list where the view is located. Specify only one of listTitle, listId or listUrl'
+        option: '--listUrl [listUrl]'
       },
       {
-        option: '--viewId [viewId]',
-        description: 'ID of the view to get. Specify viewTitle or viewId but not both'
+        option: '--viewId [viewId]'
       },
       {
-        option: '--viewTitle [viewTitle]',
-        description: 'Title of the view to get. Specify viewTitle or viewId but not both'
+        option: '--viewTitle [viewTitle]'
       },
     ];
 

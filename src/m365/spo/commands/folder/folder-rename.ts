@@ -86,16 +86,13 @@ class SpoFolderRenameCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the folder to be renamed is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folderUrl <folderUrl>',
-        description: 'Site-relative URL of the folder (including the folder)'
+        option: '-f, --folderUrl <folderUrl>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'New name for the target folder'
+        option: '-n, --name <name>'
       }
     ];
 

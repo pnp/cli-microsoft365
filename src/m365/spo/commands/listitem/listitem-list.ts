@@ -132,36 +132,28 @@ class SpoListItemListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list from which to retrieve items is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [listId]',
-        description: 'ID of the list from which to retrieve items. Specify id or title but not both'
+        option: '-i, --id [listId]'
       },
       {
-        option: '-t, --title [listTitle]',
-        description: 'Title of the list from which to retrieve items. Specify id or title but not both'
+        option: '-t, --title [listTitle]'
       },
       {
-        option: '-s, --pageSize [pageSize]',
-        description: 'The number of items to retrieve per page request'
+        option: '-s, --pageSize [pageSize]'
       },
       {
-        option: '-n, --pageNumber [pageNumber]',
-        description: 'Page number to return if pageSize is specified (first page is indexed as value of 0)'
+        option: '-n, --pageNumber [pageNumber]'
       },
       {
-        option: '-q, --camlQuery [camlQuery]',
-        description: 'CAML query to use to retrieve items. Will ignore pageSize and pageNumber if specified'
+        option: '-q, --camlQuery [camlQuery]'
       },
       {
-        option: '-f, --fields [fields]',
-        description: 'Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested. Specify camlQuery or fields but not both'
+        option: '-f, --fields [fields]'
       },
       {
-        option: '-l, --filter [filter]',
-        description: 'OData filter to use to query the list of items with. Specify camlQuery or filter but not both'
+        option: '-l, --filter [filter]'
       },
     ];
 

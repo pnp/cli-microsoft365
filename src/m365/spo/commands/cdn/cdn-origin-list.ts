@@ -80,7 +80,6 @@ class SpoCdnOriginListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
       option: '-t, --type [type]',
-      description: 'Type of CDN to manage. Public|Private. Default Public',
       autocomplete: ['Public', 'Private']
     }];
 

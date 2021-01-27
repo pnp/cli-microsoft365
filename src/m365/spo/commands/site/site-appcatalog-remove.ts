@@ -76,8 +76,7 @@ class SpoSiteAppCatalogRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site collection containing the app catalog to disable'
+        option: '-u, --url <url>'
       }
     ];
 

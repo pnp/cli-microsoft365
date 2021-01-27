@@ -68,8 +68,7 @@ class SpoSiteDesignRightsListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the site design to get rights information from'
+        option: '-i, --id <id>'
       }
     ];
 

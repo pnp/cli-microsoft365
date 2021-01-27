@@ -54,8 +54,7 @@ class SpoHubSiteGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'Hub site ID'
+        option: '-i, --id <id>'
       }
     ];
 

@@ -194,29 +194,23 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--appId [appId]',
-        description: 'Application appId also known as clientId of the App Registration for which the configured scopes (app roles) should be deleted'
+        option: '--appId [appId]'
       },
       {
-        option: '--objectId [objectId]',
-        description: 'Application objectId of the App Registration for which the configured scopes (app roles) should be deleted'
+        option: '--objectId [objectId]'
       },
       {
-        option: '--displayName [displayName]',
-        description: 'Display name of the application for which the configured app roles should be retrieved'
+        option: '--displayName [displayName]'
       },
       {
         option: '-r, --resource <resource>',
-        description: 'Service principal name, appId or objectId that has the scopes (roles) ex. SharePoint',
         autocomplete: ['Microsoft Graph', 'SharePoint', 'OneNote', 'Exchange', 'Microsoft Forms', 'Azure Active Directory Graph', 'Skype for Business']
       },
       {
-        option: '-s, --scope <scope>',
-        description: 'Permissions known also as scopes and roles to grant the application with. If multiple permissions have to be deleted, they have to be comma separated ex. \'Sites.Read.All,Sites.ReadWrite.all\''
+        option: '-s, --scope <scope>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirmation'
+        option: '--confirm'
       }
     ];
 

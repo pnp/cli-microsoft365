@@ -77,8 +77,7 @@ class TeamsChannelAddCommand extends GraphCommand {
             'content-type': 'application/json;odata=nometadata'
           },
           data: {
-            displayName: args.options.name,
-            description: args.options.description || null
+            displayName: args.options.name
           },
           responseType: 'json'
         };
@@ -99,20 +98,16 @@ class TeamsChannelAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId [teamId]',
-        description: 'The ID of the team to add the channel to. Specify either teamId or teamName but not both'
+        option: '-i, --teamId [teamId]'
       },
       {
-        option: '--teamName [teamName]',
-        description: 'The display name of the team to add the channel to. Specify either teamId or teamName but not both'
+        option: '--teamName [teamName]'
       },
       {
-        option: '-n, --name <name>',
-        description: 'The name of the channel to add'
+        option: '-n, --name <name>'
       },
       {
-        option: '-d, --description [description]',
-        description: 'The description of the channel to add'
+        option: '-d, --description [description]'
       }
     ];
 

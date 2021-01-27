@@ -196,25 +196,20 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--appId [appId]',
-        description: 'Application appId also known as clientId of the App Registration to which the configured scopes (app roles) should be applied'
+        option: '--appId [appId]'
       },
       {
-        option: '--objectId [objectId]',
-        description: 'Application objectId of the App Registration to which the configured scopes (app roles) should be applied'
+        option: '--objectId [objectId]'
       },
       {
-        option: '--displayName [displayName]',
-        description: 'Application name of the App Registration to which the configured scopes (app roles) should be applied'
+        option: '--displayName [displayName]'
       },
       {
         option: '-r, --resource <resource>',
-        description: 'Service principal name, appId or objectId that has the scopes (roles) ex. SharePoint',
         autocomplete: ['Microsoft Graph', 'SharePoint', 'OneNote', 'Exchange', 'Microsoft Forms', 'Azure Active Directory Graph', 'Skype for Business']
       },
       {
-        option: '-s, --scope <scope>',
-        description: 'Permissions known also as scopes and roles to grant the application with. If multiple permissions have to be granted, they have to be comma separated ex. \'Sites.Read.All,Sites.ReadWrite.all\''
+        option: '-s, --scope <scope>'
       }
     ];
 

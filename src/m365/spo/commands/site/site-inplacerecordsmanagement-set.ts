@@ -66,12 +66,10 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --siteUrl <siteUrl>',
-        description: 'The URL of the site on which to activate or deactivate in-place records management'
+        option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '--enabled <enabled>',
-        description: 'Set to "true" to activate in-place records management and to "false" to deactivate it'
+        option: '--enabled <enabled>'
       }
     ];
 

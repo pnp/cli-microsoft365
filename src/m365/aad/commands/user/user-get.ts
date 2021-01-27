@@ -65,16 +65,13 @@ class AadUserGetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the user to retrieve information for. Specify id or userName but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --userName [userName]',
-        description: 'The name of the user to retrieve information for. Specify id or userName but not both'
+        option: '-n, --userName [userName]'
       },
       {
-        option: '-p, --properties [properties]',
-        description: 'Comma-separated list of properties to retrieve'
+        option: '-p, --properties [properties]'
       }
     ];
 

@@ -92,16 +92,13 @@ class SpoSiteListCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '--type [type]',
-        description: 'type of modern sites to list. Allowed values TeamSite|CommunicationSite, default TeamSite',
         autocomplete: ['TeamSite', 'CommunicationSite']
       },
       {
-        option: '-f, --filter [filter]',
-        description: 'filter to apply when retrieving sites'
+        option: '-f, --filter [filter]'
       },
       {
-        option: '--deleted',
-        description: 'use this switch to only return deleted sites'
+        option: '--deleted'
       }
     ];
 

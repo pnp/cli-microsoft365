@@ -155,28 +155,22 @@ class SpoContentTypeAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the content type should be created'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listTitle [listTitle]',
-        description: 'Title of the list where the content type should be created (if it should be created as a list content type)'
+        option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the content type. Determines the parent content type'
+        option: '-i, --id <id>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'The name of the content type'
+        option: '-n, --name <name>'
       },
       {
-        option: '-d, --description [description]',
-        description: 'The description of the content type'
+        option: '-d, --description [description]'
       },
       {
-        option: '-g, --group [group]',
-        description: 'The group with which the content type should be associated'
+        option: '-g, --group [group]'
       }
     ];
 

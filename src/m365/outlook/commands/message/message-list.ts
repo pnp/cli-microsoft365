@@ -103,12 +103,10 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
     const options: CommandOption[] = [
       {
         option: '--folderName [folderName]',
-        description: 'Name of the folder from which to list messages',
         autocomplete: Outlook.wellKnownFolderNames
       },
       {
         option: '--folderId [folderId]',
-        description: 'ID of the folder from which to list messages',
         autocomplete: Outlook.wellKnownFolderNames
       }
     ];

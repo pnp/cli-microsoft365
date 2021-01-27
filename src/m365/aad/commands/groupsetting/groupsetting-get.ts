@@ -51,8 +51,7 @@ class AadGroupSettingGetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the group setting to retrieve'
+        option: '-i, --id <id>'
       }
     ];
 

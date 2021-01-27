@@ -57,12 +57,10 @@ class SpoFolderListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the folders to list are located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-p, --parentFolderUrl <parentFolderUrl>',
-        description: 'Site-relative URL of the parent folder'
+        option: '-p, --parentFolderUrl <parentFolderUrl>'
       }
     ];
 

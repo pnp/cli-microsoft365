@@ -73,16 +73,13 @@ class AadSpGetCommand extends AadCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --appId [appId]',
-        description: 'ID of the application for which the service principal should be retrieved'
+        option: '-i, --appId [appId]'
       },
       {
-        option: '-n, --displayName [displayName]',
-        description: 'Display name of the application for which the service principal should be retrieved'
+        option: '-n, --displayName [displayName]'
       },
       {
-        option: '--objectId [objectId]',
-        description: 'ObjectId of the application for which the service principal should be retrieved'
+        option: '--objectId [objectId]'
       }
     ];
 

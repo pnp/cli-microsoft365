@@ -75,8 +75,7 @@ class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '-i, --grantId <grantId>',
-      description: 'ObjectId of the permission grant to revoke'
+      option: '-i, --grantId <grantId>'
     }];
 
     const parentOptions: CommandOption[] = super.options();

@@ -36,12 +36,10 @@ class AccessTokenGetCommand extends Command {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-r, --resource <resource>',
-        description: 'The resource for which to retrieve an access token'
+        option: '-r, --resource <resource>'
       },
       {
-        option: '--new',
-        description: 'Retrieve a new access token to ensure that it\'s valid for as long as possible'
+        option: '--new'
       }
     ];
 

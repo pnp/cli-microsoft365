@@ -61,12 +61,10 @@ class AadO365GroupRecycleBinItemCommand extends GraphItemsListCommand<Group> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-d, --displayName [displayName]',
-        description: 'Lists groups with displayName starting with the specified value'
+        option: '-d, --displayName [displayName]'
       },
       {
-        option: '-m, --mailNickname [mailNickname]',
-        description: 'Lists groups with mailNickname starting with the specified value'
+        option: '-m, --mailNickname [mailNickname]'
       }
     ];
 

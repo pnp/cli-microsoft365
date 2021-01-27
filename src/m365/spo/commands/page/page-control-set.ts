@@ -117,24 +117,19 @@ class SpoPageControlSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the control to update properties of'
+        option: '-i, --id <id>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page where the control is located'
+        option: '-n, --name <name>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--webPartData [webPartData]',
-        description: 'JSON string with web part data as retrieved from the web part maintenance mode. Specify webPartProperties or webPartData but not both'
+        option: '--webPartData [webPartData]'
       },
       {
-        option: '--webPartProperties [webPartProperties]',
-        description: 'JSON string with web part data as retrieved from the web part maintenance mode. Specify webPartProperties or webPartData but not both'
+        option: '--webPartProperties [webPartProperties]'
       }
     ];
 

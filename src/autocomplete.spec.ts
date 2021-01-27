@@ -31,8 +31,7 @@ class CommandWithOptions extends Command {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-l, --longOption <longOption>',
-        description: 'Long option'
+        option: '-l, --longOption <longOption>'
       }
     ];
 

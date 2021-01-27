@@ -125,16 +125,13 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-a, --all',
-        description: 'Specify, to get apps from your organization only'
+        option: '-a, --all'
       },
       {
-        option: '-i, --teamId [teamId]',
-        description: 'The ID of the team for which to list installed apps. Specify either teamId or teamName but not both'
+        option: '-i, --teamId [teamId]'
       },
       {
-        option: '-t --teamName [teamName]',
-        description: 'The display name of the team for which to list installed apps. Specify either teamId or teamName but not both'
+        option: '-t --teamName [teamName]'
       }
     ];
 

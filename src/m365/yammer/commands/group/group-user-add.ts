@@ -56,16 +56,13 @@ class YammerGroupUserAddCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--id <id>',
-        description: 'The ID of the group to add the user to'
+        option: '--id <id>'
       },
       {
-        option: '--userId [userId]',
-        description: 'ID of the user to add to the group. If not specified, adds the current user'
+        option: '--userId [userId]'
       },
       {
-        option: '--email [email]',
-        description: 'E-mail of the user to add to the group'
+        option: '--email [email]'
       }
     ];
 

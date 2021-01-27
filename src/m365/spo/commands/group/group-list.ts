@@ -55,8 +55,7 @@ class SpoGroupListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Url of the web to list the group within'
+        option: '-u, --webUrl <webUrl>'
       },
     ];
 

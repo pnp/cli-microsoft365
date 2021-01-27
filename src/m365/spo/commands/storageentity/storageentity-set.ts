@@ -88,24 +88,19 @@ class SpoStorageEntitySetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --appCatalogUrl <appCatalogUrl>',
-        description: 'URL of the app catalog site'
+        option: '-u, --appCatalogUrl <appCatalogUrl>'
       },
       {
-        option: '-k, --key <key>',
-        description: 'Name of the tenant property to retrieve'
+        option: '-k, --key <key>'
       },
       {
-        option: '-v, --value <value>',
-        description: 'Value to set for the property'
+        option: '-v, --value <value>'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Description to set for the property'
+        option: '-d, --description [description]'
       },
       {
-        option: '-c, --comment [comment]',
-        description: 'Comment to set for the property'
+        option: '-c, --comment [comment]'
       }
     ];
 

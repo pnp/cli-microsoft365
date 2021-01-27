@@ -92,16 +92,13 @@ class TodoTaskAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --title <title>',
-        description: `The title of the task`
+        option: '-t, --title <title>'
       },
       {
-        option: '--listName [listName]',
-        description: 'The name of the list in which to create the task. Specify either listName or listId but not both'
+        option: '--listName [listName]'
       },
       {
-        option: '--listId [listId]',
-        description: 'The id of the list in which to create the task. Specify either listName or listId but not both'
+        option: '--listId [listId]'
       }
     ];
 

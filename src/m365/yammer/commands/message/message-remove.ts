@@ -75,12 +75,10 @@ class YammerMessageRemoveCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--id <id>',
-        description: 'The id of the Yammer message'
+        option: '--id <id>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the Yammer message'
+        option: '--confirm'
       }
     ];
 

@@ -59,16 +59,13 @@ class FlowRunGetCommand extends AzmgmtCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'The name of the run to get information about'
+        option: '-n, --name <name>'
       },
       {
-        option: '-f, --flow <flow>',
-        description: 'The name of the Microsoft Flow for which to retrieve information'
+        option: '-f, --flow <flow>'
       },
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment where the Flow is located'
+        option: '-e, --environment <environment>'
       }
     ];
 

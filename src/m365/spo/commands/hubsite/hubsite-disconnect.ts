@@ -85,12 +85,10 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site collection to disconnect from its hub site'
+        option: '-u, --url <url>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming disconnecting from the hub site'
+        option: '--confirm'
       }
     ];
 

@@ -93,24 +93,19 @@ class SpoSiteScriptSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'Site script ID'
+        option: '-i, --id <id>'
       },
       {
-        option: '-t, --title [title]',
-        description: 'Site script title'
+        option: '-t, --title [title]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Site script description'
+        option: '-d, --description [description]'
       },
       {
-        option: '-v, --version [version]',
-        description: 'Site script version'
+        option: '-v, --version [version]'
       },
       {
-        option: '-c, --content [content]',
-        description: 'JSON string containing the site script'
+        option: '-c, --content [content]'
       }
     ];
 

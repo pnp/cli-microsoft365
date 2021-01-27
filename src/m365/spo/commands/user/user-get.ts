@@ -73,20 +73,16 @@ class SpoUserGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the web to list the user within'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'ID of the user to retrieve information for. Use either "email", "id" or "loginName", but not all.'
+        option: '-i, --id [id]'
       },
       {
-        option: '--email [email]',
-        description: 'Email address of user to retrieve information for. Use either "email", "id" or "loginName", but not all.'
+        option: '--email [email]'
       },
       {
-        option: '--loginName [loginName]',
-        description: 'Login name of the user to retrieve information for. Use either "email", "id" or "loginName", but not all.'
+        option: '--loginName [loginName]'
       }
     ];
 

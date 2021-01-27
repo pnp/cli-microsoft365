@@ -56,8 +56,7 @@ class TodoListAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: `The name of the task list to add`
+        option: '-n, --name <name>'
       }
     ];
 

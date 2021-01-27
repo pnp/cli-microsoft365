@@ -80,28 +80,22 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Teams team for which to update settings'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--allowAddRemoveApps [allowAddRemoveApps]',
-        description: 'Set to true to allow members to add and remove apps and to false to disallow it'
+        option: '--allowAddRemoveApps [allowAddRemoveApps]'
       },
       {
-        option: '--allowCreateUpdateChannels [allowCreateUpdateChannels]',
-        description: 'Set to true to allow members to create and update channels and to false to disallow it'
+        option: '--allowCreateUpdateChannels [allowCreateUpdateChannels]'
       },
       {
-        option: '--allowCreateUpdateRemoveConnectors [allowCreateUpdateRemoveConnectors]',
-        description: 'Set to true to allow members to create, update and remove connectors and to false to disallow it'
+        option: '--allowCreateUpdateRemoveConnectors [allowCreateUpdateRemoveConnectors]'
       },
       {
-        option: '--allowCreateUpdateRemoveTabs [allowCreateUpdateRemoveTabs]',
-        description: 'Set to true to allow members to create, update and remove tabs and to false to disallow it'
+        option: '--allowCreateUpdateRemoveTabs [allowCreateUpdateRemoveTabs]'
       },
       {
-        option: '--allowDeleteChannels [allowDeleteChannels]',
-        description: 'Set to true to allow members to create and update channels and to false to disallow it'
+        option: '--allowDeleteChannels [allowDeleteChannels]'
       }
     ];
 

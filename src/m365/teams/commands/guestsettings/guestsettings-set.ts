@@ -74,16 +74,13 @@ class TeamsGuestSettingsSetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Teams team for which to update settings'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--allowCreateUpdateChannels [allowCreateUpdateChannels]',
-        description: 'Set to true to allow guests to create and update channels and to false to disallow it'
+        option: '--allowCreateUpdateChannels [allowCreateUpdateChannels]'
       },
       {
-        option: '--allowDeleteChannels [allowDeleteChannels]',
-        description: 'Set to true to allow guests to create and update channels and to false to disallow it'
+        option: '--allowDeleteChannels [allowDeleteChannels]'
       }
     ];
 

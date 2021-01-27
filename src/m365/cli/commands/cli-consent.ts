@@ -51,7 +51,6 @@ class CliConsentCommand extends AnonymousCommand {
     const options: CommandOption[] = [
       {
         option: '-s, --service <service>',
-        description: 'Service for which to consent permissions. Allowed values: yammer',
         autocomplete: ['yammer']
       }
     ];

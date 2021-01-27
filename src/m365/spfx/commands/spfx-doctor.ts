@@ -666,7 +666,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
     const options: CommandOption[] = [
       {
         option: '-e, --env [env]',
-        description: 'Version of SharePoint for which to check compatibility: sp2016|sp2019|spo',
         autocomplete: ['sp2016', 'sp2019', 'spo']
       }
     ];

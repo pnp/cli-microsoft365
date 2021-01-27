@@ -36,8 +36,7 @@ class SpoSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the root SharePoint site collection to use in SPO commands'
+        option: '-u, --url <url>'
       }
     ];
 

@@ -91,29 +91,23 @@ class OutlookSendmailCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-s, --subject <subject>',
-        description: 'E-mail subject'
+        option: '-s, --subject <subject>'
       },
       {
-        option: '-t, --to <to>',
-        description: 'Comma-separated list of e-mails to send the message to'
+        option: '-t, --to <to>'
       },
       {
-        option: '--bodyContents [bodyContents]',
-        description: 'String containing the body of the e-mail to send'
+        option: '--bodyContents [bodyContents]'
       },
       {
-        option: '--bodyContentsFilePath [bodyContentsFilePath]',
-        description: 'Relative or absolute path to the file with e-mail body contents'
+        option: '--bodyContentsFilePath [bodyContentsFilePath]'
       },
       {
         option: '--bodyContentType [bodyContentType]',
-        description: 'Type of the body content. Available options: Text|HTML. Default Text',
         autocomplete: ['Text', 'HTML']
       },
       {
-        option: '--saveToSentItems [saveToSentItems]',
-        description: 'Save e-mail in the sent items folder. Default true'
+        option: '--saveToSentItems [saveToSentItems]'
       }
     ];
 

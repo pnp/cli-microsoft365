@@ -81,12 +81,10 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site collection to unregister as a hub site'
+        option: '-u, --url <url>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming unregistering the hub site'
+        option: '--confirm'
       }
     ];
 

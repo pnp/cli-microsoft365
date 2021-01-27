@@ -208,24 +208,19 @@ class SpoListItemAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the item should be added'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listId [listId]',
-        description: 'ID of the list where the item should be added. Specify listId or listTitle but not both'
+        option: '-l, --listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list where the item should be added. Specify listId or listTitle but not both'
+        option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-c, --contentType [contentType]',
-        description: 'The name or the ID of the content type to associate with the new item'
+        option: '-c, --contentType [contentType]'
       },
       {
-        option: '-f, --folder [folder]',
-        description: 'The list-relative URL of the folder where the item should be created'
+        option: '-f, --folder [folder]'
       },
     ];
 

@@ -80,12 +80,10 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the site to enable communication site features on'
+        option: '-u, --url <url>'
       },
       {
-        option: '-i, --designPackageId [designPackageId]',
-        description: 'The ID of the site design to apply when enabling communication site features'
+        option: '-i, --designPackageId [designPackageId]'
       }
     ];
 

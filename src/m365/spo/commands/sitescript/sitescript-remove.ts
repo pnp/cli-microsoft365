@@ -90,12 +90,10 @@ class SpoSiteScriptRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'Site script ID'
+        option: '-i, --id <id>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the site script'
+        option: '--confirm'
       }
     ];
 

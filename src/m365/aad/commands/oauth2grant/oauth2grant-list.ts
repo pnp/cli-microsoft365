@@ -56,8 +56,7 @@ class AadOAuth2GrantListCommand extends AadCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --clientId <clientId>',
-        description: 'objectId of the service principal for which the configured OAuth2 permission grants should be retrieved'
+        option: '-i, --clientId <clientId>'
       }
     ];
 

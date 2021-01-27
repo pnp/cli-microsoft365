@@ -254,28 +254,22 @@ class SpoListItemSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the item should be updated'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id <id>',
-        description: 'ID of the list item to update.'
+        option: '-i, --id <id>'
       },
       {
-        option: '-l, --listId [listId]',
-        description: 'ID of the list where the item should be updated. Specify listId or listTitle but not both'
+        option: '-l, --listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list where the item should be updated. Specify listId or listTitle but not both'
+        option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-c, --contentType [contentType]',
-        description: 'The name or the ID of the content type to associate with the updated item'
+        option: '-c, --contentType [contentType]'
       },
       {
-        option: '-s, --systemUpdate',
-        description: 'Update the item without updating the modified date and modified by fields'
+        option: '-s, --systemUpdate'
       }
     ];
 

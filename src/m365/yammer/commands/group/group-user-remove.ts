@@ -85,16 +85,13 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--id <id>',
-        description: 'The ID of the Yammer group'
+        option: '--id <id>'
       },
       {
-        option: '--userId [userId]',
-        description: 'ID of the user to remove from the group. If not specified, removes the current user'
+        option: '--userId [userId]'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirmation before removing the user from the group'
+        option: '--confirm'
       }
     ];
 

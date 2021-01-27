@@ -277,54 +277,42 @@ class SpoSiteClassicSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The absolute site url'
+        option: '-u, --url <url>'
       },
       {
-        option: '-t, --title [title]',
-        description: 'The site title'
+        option: '-t, --title [title]'
       },
       {
         option: '--sharing [sharing]',
-        description: 'Sharing capabilities for the site. Allowed values: Disabled|ExternalUserSharingOnly|ExternalUserAndGuestSharing|ExistingExternalUserSharingOnly',
         autocomplete: ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly']
       },
       {
-        option: '--resourceQuota [resourceQuota]',
-        description: 'The quota for this site collection in Sandboxed Solutions units'
+        option: '--resourceQuota [resourceQuota]'
       },
       {
-        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]',
-        description: 'The warning level for the resource quota'
+        option: '--resourceQuotaWarningLevel [resourceQuotaWarningLevel]'
       },
       {
-        option: '--storageQuota [storageQuota]',
-        description: 'The storage quota for this site collection in megabytes'
+        option: '--storageQuota [storageQuota]'
       },
       {
-        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]',
-        description: 'The warning level for the storage quota in megabytes'
+        option: '--storageQuotaWarningLevel [storageQuotaWarningLevel]'
       },
       {
-        option: '--allowSelfServiceUpgrade [allowSelfServiceUpgrade]',
-        description: 'Set to allow tenant administrators to upgrade the site collection'
+        option: '--allowSelfServiceUpgrade [allowSelfServiceUpgrade]'
       },
       {
-        option: '--owners [owners]',
-        description: 'Comma-separated list of users to add as site collection administrators'
+        option: '--owners [owners]'
       },
       {
         option: '--lockState [lockState]',
-        description: 'Sets site\'s lock state. Allowed values Unlock|NoAdditions|ReadOnly|NoAccess',
         autocomplete: ['Unlock', 'NoAdditions', 'ReadOnly', 'NoAccess']
       },
       {
-        option: '--noScriptSite [noScriptSite]',
-        description: 'Specifies if the site allows custom script or not'
+        option: '--noScriptSite [noScriptSite]'
       },
       {
-        option: '--wait',
-        description: 'Wait for the settings to be applied before completing the command'
+        option: '--wait'
       }
     ];
 

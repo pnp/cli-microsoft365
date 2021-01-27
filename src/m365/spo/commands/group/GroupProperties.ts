@@ -6,6 +6,5 @@ export interface GroupProperties {
   PrincipalType:number,
   AllowMembersEditMembership:boolean,
   AllowRequestToJoinLeave:boolean,
-  AutoAcceptRequestToJoinLeave:boolean,
-  Description:string
+  AutoAcceptRequestToJoinLeave:boolean
 }

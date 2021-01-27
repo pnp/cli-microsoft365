@@ -49,8 +49,7 @@ class AadOAuth2GrantRemoveCommand extends AadCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --grantId <grantId>',
-        description: 'objectId of OAuth2 permission grant to remove'
+        option: '-i, --grantId <grantId>'
       }
     ];
 

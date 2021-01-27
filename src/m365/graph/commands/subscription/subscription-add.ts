@@ -155,25 +155,20 @@ class GraphSubscriptionAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-r, --resource <resource>',
-        description: `The resource that will be monitored for changes`
+        option: '-r, --resource <resource>'
       },
       {
-        option: '-u, --notificationUrl <notificationUrl>',
-        description: 'The URL of the endpoint that will receive the notifications. This URL must use the HTTPS protocol'
+        option: '-u, --notificationUrl <notificationUrl>'
       },
       {
         option: '-c, --changeType <changeType>',
-        description: `The type of change in the subscribed resource that will raise a notification. The supported values are: created, updated, deleted. Multiple values can be combined using a comma-separated list`,
         autocomplete: ['created', 'updated', 'deleted']
       },
       {
-        option: '-e, --expirationDateTime [expirationDateTime]',
-        description: `The date and time when the webhook subscription expires. The time is in UTC, and can be an amount of time from subscription creation that varies for the resource subscribed to. If not specified, the maximum allowed expiration for the specified resource will be used`
+        option: '-e, --expirationDateTime [expirationDateTime]'
       },
       {
-        option: '-s, --clientState [clientState]',
-        description: `The value of the clientState property sent by the service in each notification. The maximum length is 128 characters`
+        option: '-s, --clientState [clientState]'
       }
     ];
 

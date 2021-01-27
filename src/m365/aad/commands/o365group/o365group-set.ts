@@ -226,32 +226,25 @@ class AadO365GroupSetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the Microsoft 365 Group to update'
+        option: '-i, --id <id>'
       },
       {
-        option: '-n, --displayName [displayName]',
-        description: 'Display name for the Microsoft 365 Group'
+        option: '-n, --displayName [displayName]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Description for the Microsoft 365 Group'
+        option: '-d, --description [description]'
       },
       {
-        option: '--owners [owners]',
-        description: 'Comma-separated list of Microsoft 365 Group owners to add'
+        option: '--owners [owners]'
       },
       {
-        option: '--members [members]',
-        description: 'Comma-separated list of Microsoft 365 Group members to add'
+        option: '--members [members]'
       },
       {
-        option: '--isPrivate [isPrivate]',
-        description: 'Set to true if the Microsoft 365 Group should be private and to false if it should be public (default)'
+        option: '--isPrivate [isPrivate]'
       },
       {
-        option: '-l, --logoPath [logoPath]',
-        description: 'Local path to the image file to use as group logo'
+        option: '-l, --logoPath [logoPath]'
       }
     ];
 

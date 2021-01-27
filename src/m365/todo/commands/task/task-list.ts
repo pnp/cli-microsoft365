@@ -95,12 +95,10 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--listName [listName]',
-        description: 'The name of the task list to return tasks from. Specify either listName or listId, not both'
+        option: '--listName [listName]'
       },
       {
-        option: '--listId [listId]',
-        description: 'The id of the task list to return tasks from. Specify either listName or listId, not both'
+        option: '--listId [listId]'
       }
     ];
 

@@ -96,12 +96,10 @@ class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'Absolute URL of the site to remove'
+        option: '-u, --url <url>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirmation'
+        option: '--confirm'
       }
     ];
 

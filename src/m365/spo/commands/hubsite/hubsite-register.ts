@@ -55,8 +55,7 @@ class SpoHubSiteRegisterCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site collection to register as a hub site'
+        option: '-u, --url <url>'
       }
     ];
 

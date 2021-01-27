@@ -54,12 +54,10 @@ class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Microsoft Teams team where the channel is located'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '-c, --channelId <channelId>',
-        description: 'The ID of the channel for which to list tabs'
+        option: '-c, --channelId <channelId>'
       }
     ];
 

@@ -67,8 +67,7 @@ class TenantServiceMessageListCommand extends Command {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-w, --workload [workload]	',
-        description: 'Retrieve service messages for the particular workload. If not provided, retrieves messages for all workloads'
+        option: '-w, --workload [workload]	'
       }
     ];
 

@@ -153,20 +153,16 @@ class AadSiteClassificationUpdateCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-c, --classifications [classifications]',
-        description: 'Comma-separated list of classifications'
+        option: '-c, --classifications [classifications]'
       },
       {
-        option: '-d, --defaultClassification [defaultClassification]',
-        description: 'Classification to use by default'
+        option: '-d, --defaultClassification [defaultClassification]'
       },
       {
-        option: '-u, --usageGuidelinesUrl [usageGuidelinesUrl]',
-        description: 'URL with usage guidelines for members'
+        option: '-u, --usageGuidelinesUrl [usageGuidelinesUrl]'
       },
       {
-        option: '-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]',
-        description: 'URL with usage guidelines for guests'
+        option: '-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]'
       }
     ];
 

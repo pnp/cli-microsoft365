@@ -74,8 +74,7 @@ class SpoHomeSiteSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --siteUrl <siteUrl>',
-        description: 'The URL of the site to set as Home Site'
+        option: '-u, --siteUrl <siteUrl>'
       }
     ];
 

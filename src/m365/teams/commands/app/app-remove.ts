@@ -76,12 +76,10 @@ class TeamsAppRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the Teams app to remove. Needs to be available in your organization\'s app catalog.'
+        option: '-i, --id <id>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the app'
+        option: '--confirm'
       }
     ];
 

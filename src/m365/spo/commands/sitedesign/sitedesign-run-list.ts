@@ -74,12 +74,10 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site for which to list applied site designs'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --siteDesignId [siteDesignId]',
-        description: 'The ID of the site design for which to display information'
+        option: '-i, --siteDesignId [siteDesignId]'
       }
     ];
 

@@ -64,8 +64,7 @@ class SpoSiteScriptGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'Site script ID'
+        option: '-i, --id <id>'
       }
     ];
 

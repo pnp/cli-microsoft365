@@ -77,20 +77,16 @@ class SpoListWebhookGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list to retrieve webhooks for is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listId [listId]',
-        description: 'ID of the list from which to retrieve the webhook. Specify either listId or listTitle but not both'
+        option: '-l, --listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list from which to retrieve the webhook. Specify either listId or listTitle but not both'
+        option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-i, --id [id]',
-        description: 'ID of the webhook to retrieve'
+        option: '-i, --id [id]'
       },
     ];
 

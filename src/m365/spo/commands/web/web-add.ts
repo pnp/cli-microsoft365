@@ -175,36 +175,28 @@ class SpoWebAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --title <title>',
-        description: 'Subsite title'
+        option: '-t, --title <title>'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Subsite description'
+        option: '-d, --description [description]'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Subsite relative url'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-w, --webTemplate <webTemplate>',
-        description: 'Subsite template, eg. STS#0 (Classic team site)'
+        option: '-w, --webTemplate <webTemplate>'
       },
       {
-        option: '-p, --parentWebUrl <parentWebUrl>',
-        description: 'URL of the parent site under which to create the subsite'
+        option: '-p, --parentWebUrl <parentWebUrl>'
       },
       {
-        option: '-l, --locale [locale]',
-        description: 'Subsite locale LCID, eg. 1033 for en-US. Default 1033'
+        option: '-l, --locale [locale]'
       },
       {
-        option: '--breakInheritance',
-        description: 'Set to not inherit permissions from the parent site'
+        option: '--breakInheritance'
       },
       {
-        option: '--inheritNavigation',
-        description: 'Set to inherit the navigation from the parent site'
+        option: '--inheritNavigation'
       }
     ];
 

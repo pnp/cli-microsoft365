@@ -101,8 +101,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removal of Knowledge Hub Site for your tenant'
+        option: '--confirm'
       }
     ];
 

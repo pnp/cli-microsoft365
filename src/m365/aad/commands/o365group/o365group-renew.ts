@@ -52,8 +52,7 @@ class AadO365GroupRenewCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the Microsoft 365 group to renew'
+        option: '-i, --id <id>'
       }
     ];
 

@@ -106,20 +106,16 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the list is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id <id>',
-        description: 'ID of the list item to be undeclared as a record.'
+        option: '-i, --id <id>'
       },
       {
-        option: '-l, --listId [listId]',
-        description: 'The ID of the list where the item is located. Specify listId or listTitle but not both'
+        option: '-l, --listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'The title of the list where the item is located. Specify listId or listTitle but not both'
+        option: '-t, --listTitle [listTitle]'
       }
     ];
 

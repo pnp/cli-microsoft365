@@ -57,12 +57,10 @@ class AadGroupSettingTemplateGetCommand extends GraphItemsListCommand<GroupSetti
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the settings template to retrieve. Specify the id or displayName but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --displayName [displayName]',
-        description: 'The display name of the settings template to retrieve. Specify the id or displayName but not both'
+        option: '-n, --displayName [displayName]'
       }
     ];
 

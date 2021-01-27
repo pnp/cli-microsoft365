@@ -88,28 +88,22 @@ class SpoFieldGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the field is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listTitle [listTitle]',
-        description: 'Title of the list where the field is located. Specify only one of listTitle, listId or listUrl'
+        option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '--listId [listId]',
-        description: 'ID of the list where the field is located. Specify only one of listTitle, listId or listUrl'
+        option: '--listId [listId]'
       },
       {
-        option: '--listUrl [listUrl]',
-        description: 'Server- or web-relative URL of the list where the field is located. Specify only one of listTitle, listId or listUrl'
+        option: '--listUrl [listUrl]'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the field to retrieve. Specify id or fieldTitle but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '--fieldTitle [fieldTitle]',
-        description: 'The display name (case-sensitive) of the field to retrieve. Specify id or fieldTitle but not both'
+        option: '--fieldTitle [fieldTitle]'
       }
     ];
 

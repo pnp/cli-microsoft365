@@ -331,42 +331,33 @@ class SpoPageAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to create'
+        option: '-n, --name <name>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page should be created'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-t, --title [title]',
-        description: 'Title of the page to create. If not specified, will use the page name as its title'
+        option: '-t, --title [title]'
       },
       {
         option: '-l, --layoutType [layoutType]',
-        description: 'Layout of the page. Allowed values Article|Home. Default Article',
         autocomplete: ['Article', 'Home']
       },
       {
         option: '-p, --promoteAs [promoteAs]',
-        description: 'Create the page for a specific purpose. Allowed values HomePage|NewsPage|Template',
         autocomplete: ['HomePage', 'NewsPage', 'Template']
       },
       {
-        option: '--commentsEnabled',
-        description: 'Set to enable comments on the page'
+        option: '--commentsEnabled'
       },
       {
-        option: '--publish',
-        description: 'Set to publish the page'
+        option: '--publish'
       },
       {
-        option: '--publishMessage [publishMessage]',
-        description: 'Message to set when publishing the page'
+        option: '--publishMessage [publishMessage]'
       },
       {
-        option: '--description [description]',
-        description: 'The description to set for the page'
+        option: '--description [description]'
       }
     ];
 

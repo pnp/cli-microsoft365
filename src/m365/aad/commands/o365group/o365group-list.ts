@@ -129,24 +129,19 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-d, --displayName [displayName]',
-        description: 'Retrieve only groups with displayName starting with the specified value'
+        option: '-d, --displayName [displayName]'
       },
       {
-        option: '-m, --mailNickname [displayName]',
-        description: 'Retrieve only groups with mailNickname starting with the specified value'
+        option: '-m, --mailNickname [displayName]'
       },
       {
-        option: '--includeSiteUrl',
-        description: 'Set to retrieve the site URL for each group'
+        option: '--includeSiteUrl'
       },
       {
-        option: '--deleted',
-        description: 'Set to only retrieve deleted groups'
+        option: '--deleted'
       },
       {
-        option: '--orphaned',
-        description: 'Set to only retrieve groups without owners'
+        option: '--orphaned'
       }
     ];
 

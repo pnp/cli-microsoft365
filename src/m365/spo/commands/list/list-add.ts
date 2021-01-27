@@ -262,303 +262,240 @@ class SpoListAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --title <title>',
-        description: 'The displayed title for the list'
+        option: '-t, --title <title>'
       },
       {
         option: '--baseTemplate <baseTemplate>',
-        description: `The list definition type on which the list is based. Allowed values ${this.listTemplateTypeMap.join('|')}. Default ${this.listTemplateTypeMap[0]}`,
         autocomplete: this.listTemplateTypeMap
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list should be added'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--description [description]',
-        description: 'The description for the list'
+        option: '--description [description]'
       },
       {
-        option: '--templateFeatureId [templateFeatureId]',
-        description: 'The globally unique identifier (GUID) of a template feature that is associated with the list'
+        option: '--templateFeatureId [templateFeatureId]'
       },
       {
-        option: '--schemaXml [schemaXml]',
-        description: 'The schema in Collaborative Application Markup Language (CAML) schemas that defines the list'
+        option: '--schemaXml [schemaXml]'
       },
       {
         option: '--allowDeletion [allowDeletion]',
-        description: 'Boolean value specifying whether the list can be deleted',
         autocomplete: ['true', 'false']
       },
       {
         option: '--allowEveryoneViewItems [allowEveryoneViewItems]',
-        description: 'Boolean value specifying whether everyone can view documents in the document library or attachments to items in the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--allowMultiResponses [allowMultiResponses]',
-        description: 'Boolean value specifying whether users are allowed to give multiple responses to the survey',
         autocomplete: ['true', 'false']
       },
       {
         option: '--contentTypesEnabled [contentTypesEnabled]',
-        description: 'Boolean value specifying whether content types are enabled for the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--crawlNonDefaultViews [crawlNonDefaultViews]',
-        description: 'Boolean value specifying whether to crawl non default views',
         autocomplete: ['true', 'false']
       },
       {
-        option: '--defaultContentApprovalWorkflowId [defaultContentApprovalWorkflowId]',
-        description: 'Value that specifies the default workflow identifier for content approval on the list (GUID)'
+        option: '--defaultContentApprovalWorkflowId [defaultContentApprovalWorkflowId]'
       },
       {
-        option: '--defaultDisplayFormUrl [defaultDisplayFormUrl]',
-        description: 'Value that specifies the location of the default display form for the list'
+        option: '--defaultDisplayFormUrl [defaultDisplayFormUrl]'
       },
       {
-        option: '--defaultEditFormUrl [defaultEditFormUrl]',
-        description: 'Value that specifies the URL of the edit form to use for list items in the list'
+        option: '--defaultEditFormUrl [defaultEditFormUrl]'
       },
       {
         option: '--direction [direction]',
-        description: 'Value that specifies the reading order of the list. Valid values are NONE|LTR|RTL',
         autocomplete: ['NONE', 'LTR', 'RTL']
       },
       {
         option: '--disableGridEditing [disableGridEditing]',
-        description: 'Property for assigning or retrieving grid editing on the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--draftVersionVisibility [draftVersionVisibility]',
-        description: `Value that specifies the minimum permission required to view minor versions and drafts within the list. Allowed values ${this.draftVisibilityTypeMap.join('|')}. Default ${this.draftVisibilityTypeMap[0]}`,
         autocomplete: this.draftVisibilityTypeMap
       },
       {
-        option: '--emailAlias [emailAlias]',
-        description: 'If e-mail notification is enabled, gets or sets the e-mail address to use to notify to the owner of an item when an assignment has changed or the item has been updated.'
+        option: '--emailAlias [emailAlias]'
       },
       {
         option: '--enableAssignToEmail [enableAssignToEmail]',
-        description: 'Boolean value specifying whether e-mail notification is enabled for the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enableAttachments [enableAttachments]',
-        description: 'Boolean value that specifies whether attachments can be added to items in the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enableDeployWithDependentList [enableDeployWithDependentList]',
-        description: ' Boolean value that specifies whether the list can be deployed with a dependent list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enableFolderCreation [enableFolderCreation]',
-        description: 'Boolean value that specifies whether folders can be created for the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enableMinorVersions [enableMinorVersions]',
-        description: 'Boolean value that specifies whether minor versions are enabled when versioning is enabled for the document library',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enableModeration [enableModeration]',
-        description: 'Boolean value that specifies whether Content Approval is enabled for the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enablePeopleSelector [enablePeopleSelector]',
-        description: 'Enable user selector on event list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enableResourceSelector [enableResourceSelector]',
-        description: 'Enables resource selector on an event list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enableSchemaCaching [enableSchemaCaching]',
-        description: 'Boolean value specifying whether schema caching is enabled for the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enableSyndication [enableSyndication]',
-        description: 'Boolean value that specifies whether RSS syndication is enabled for the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enableThrottling [enableThrottling]',
-        description: 'Indicates whether throttling for this list is enabled or not',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enableVersioning [enableVersioning]',
-        description: 'Boolean value that specifies whether versioning is enabled for the document library.',
         autocomplete: ['true', 'false']
       },
       {
         option: '--enforceDataValidation [enforceDataValidation]',
-        description: 'Value that indicates whether certain field properties are enforced when an item is added or updated',
         autocomplete: ['true', 'false']
       },
       {
         option: '--excludeFromOfflineClient [excludeFromOfflineClient]',
-        description: 'Value that indicates whether the list should be downloaded to the client during offline synchronization',
         autocomplete: ['true', 'false']
       },
       {
         option: '--fetchPropertyBagForListView [fetchPropertyBagForListView]',
-        description: 'Specifies whether property bag information, as part of the list schema JSON, is retrieved when the list is being rendered on the client',
         autocomplete: ['true', 'false']
       },
       {
         option: '--followable [followable]',
-        description: 'Can a list be followed in an activity feed?',
         autocomplete: ['true', 'false']
       },
       {
         option: '--forceCheckout [forceCheckout]',
-        description: 'Boolean value that specifies whether forced checkout is enabled for the document library',
         autocomplete: ['true', 'false']
       },
       {
         option: '--forceDefaultContentType [forceDefaultContentType]',
-        description: 'Specifies whether we want to return the default Document root content type',
         autocomplete: ['true', 'false']
       },
       {
         option: '--hidden [hidden]',
-        description: 'Boolean value that specifies whether the list is hidden',
         autocomplete: ['true', 'false']
       },
       {
         option: '--includedInMyFilesScope [includedInMyFilesScope]',
-        description: 'Specifies whether this list is accessible to an app principal that has been granted an OAuth scope that contains the string “myfiles” by a case-insensitive comparison when the current user is a site collection administrator of the personal site that contains the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--irmEnabled [irmEnabled]',
-        description: 'Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) is enabled for the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--irmExpire [irmExpire]',
-        description: 'Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) expiration is enabled for the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--irmReject [irmReject]',
-        description: 'Gets or sets a Boolean value that specifies whether Information Rights Management (IRM) rejection is enabled for the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--isApplicationList [isApplicationList]',
-        description: 'Indicates whether this list should be treated as a top level navigation object or not',
         autocomplete: ['true', 'false']
       },
       {
         option: '--listExperienceOptions [listExperienceOptions]',
-        description: `Gets or sets the list experience for the list. Allowed values ${this.listExperienceMap.join('|')}. Default ${this.listExperienceMap[0]}`,
         autocomplete: this.listExperienceMap
       },
       {
-        option: '--majorVersionLimit [majorVersionLimit]',
-        description: 'Gets or sets the maximum number of major versions allowed for an item in a document library that uses version control with major versions only.'
+        option: '--majorVersionLimit [majorVersionLimit]'
       },
       {
-        option: '--majorWithMinorVersionsLimit [majorWithMinorVersionsLimit]',
-        description: 'Gets or sets the maximum number of major versions that are allowed for an item in a document library that uses version control with both major and minor versions.'
+        option: '--majorWithMinorVersionsLimit [majorWithMinorVersionsLimit]'
       },
       {
         option: '--multipleDataList [multipleDataList]',
-        description: 'Gets or sets a Boolean value that specifies whether the list in a Meeting Workspace site contains data for multiple meeting instances within the site',
         autocomplete: ['true', 'false']
       },
       {
         option: '--navigateForFormsPages [navigateForFormsPages]',
-        description: 'Indicates whether to navigate for forms pages or use a modal dialog',
         autocomplete: ['true', 'false']
       },
       {
         option: '--needUpdateSiteClientTag [needUpdateSiteClientTag]',
-        description: 'A boolean value that determines whether to editing documents in this list should increment the ClientTag for the site. The tag is used to allow clients to cache JS/CSS/resources that are retrieved from the Content DB, including custom CSR templates.',
         autocomplete: ['true', 'false']
       },
       {
         option: '--noCrawl [noCrawl]',
-        description: 'Gets or sets a Boolean value specifying whether crawling is enabled for the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '--onQuickLaunch [onQuickLaunch]',
-        description: 'Gets or sets a Boolean value that specifies whether the list appears on the Quick Launch area of the home page',
         autocomplete: ['true', 'false']
       },
       {
         option: '--ordered [ordered]',
-        description: 'Gets or sets a Boolean value that specifies whether the option to allow users to reorder items in the list is available on the Edit View page for the list',
         autocomplete: ['true', 'false']
       },
       {
         option: '-parserDisabled [parserDisabled]',
-        description: 'Gets or sets a Boolean value that specifies whether the parser should be disabled',
         autocomplete: ['true', 'false']
       },
       {
         option: '--readOnlyUI [readOnlyUI]',
-        description: 'A boolean value that indicates whether the UI for this list should be presented in a read-only fashion. This will not affect security nor will it actually prevent changes to the list from occurring - it only affects the way the UI is displayed',
         autocomplete: ['true', 'false']
       },
       {
         option: '--readSecurity [readSecurity]',
-        description: 'Gets or sets the Read security setting for the list. Valid values are 1 (All users have Read access to all items)|2 (Users have Read access only to items that they create)',
         autocomplete: ['1', '2']
       },
       {
         option: '--requestAccessEnabled [requestAccessEnabled]',
-        description: 'Gets or sets a Boolean value that specifies whether the option to allow users to request access to the list is available',
         autocomplete: ['true', 'false']
       },
       {
         option: '--restrictUserUpdates [restrictUserUpdates]',
-        description: 'A boolean value that indicates whether the this list is a restricted one or not The value can\'t be changed if there are existing items in the list',
         autocomplete: ['true', 'false']
       },
       {
-        option: '--sendToLocationName [sendToLocationName]',
-        description: 'Gets or sets a file name to use when copying an item in the list to another document library.'
+        option: '--sendToLocationName [sendToLocationName]'
       },
       {
-        option: '--sendToLocationUrl [sendToLocationUrl]',
-        description: 'Gets or sets a URL to use when copying an item in the list to another document library'
+        option: '--sendToLocationUrl [sendToLocationUrl]'
       },
       {
         option: '--showUser [showUser]',
-        description: 'Gets or sets a Boolean value that specifies whether names of users are shown in the results of the survey',
         autocomplete: ['true', 'false']
       },
       {
         option: '--useFormsForDisplay [useFormsForDisplay]',
-        description: 'Indicates whether forms should be considered for display context or not',
         autocomplete: ['true', 'false']
       },
       {
-        option: '--validationFormula [validationFormula]',
-        description: 'Gets or sets a formula that is evaluated each time that a list item is added or updated.'
+        option: '--validationFormula [validationFormula]'
       },
       {
-        option: '--validationMessage [validationMessage]',
-        description: 'Gets or sets the message that is displayed when validation fails for a list item.'
+        option: '--validationMessage [validationMessage]'
       },
       {
         option: '--writeSecurity [writeSecurity]',
-        description: 'Gets or sets the Write security setting for the list. Valid values are 1 (All users can modify all items)|2 (Users can modify only items that they create)|4 (Users cannot modify any list item)',
         autocomplete: ['1', '2', '4']
       }
     ];

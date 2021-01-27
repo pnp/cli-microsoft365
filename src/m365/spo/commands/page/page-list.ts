@@ -61,8 +61,7 @@ class SpoPageListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site from which to retrieve available pages'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

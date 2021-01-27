@@ -97,8 +97,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--confirm',
-        description: 'Do not prompt for confirmation before removing the Home Site'
+        option: '--confirm'
       }
     ];
 

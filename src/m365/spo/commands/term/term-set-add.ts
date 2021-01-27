@@ -154,28 +154,22 @@ class SpoTermSetAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the term set to add'
+        option: '-n, --name <name>'
       },
       {
-        option: '--termGroupId [termGroupId]',
-        description: 'ID of the term group in which to create the term set. Specify termGroupId or termGroupName but not both'
+        option: '--termGroupId [termGroupId]'
       },
       {
-        option: '--termGroupName [termGroupName]',
-        description: 'Name of the term group in which to create the term set. Specify termGroupId or termGroupName but not both'
+        option: '--termGroupName [termGroupName]'
       },
       {
-        option: '-i, --id [id]',
-        description: 'ID of the term set to add'
+        option: '-i, --id [id]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Description of the term set to add'
+        option: '-d, --description [description]'
       },
       {
-        option: '--customProperties [customProperties]',
-        description: 'JSON string with key-value pairs representing custom properties to set on the term set'
+        option: '--customProperties [customProperties]'
       }
     ];
 

@@ -131,24 +131,19 @@ class YammerUserListCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-g, --groupId [groupId]',
-        description: 'Returns users within a given group'
+        option: '-g, --groupId [groupId]'
       },
       {
-        option: '-l, --letter [letter]',
-        description: 'Returns users with usernames beginning with the given character'
+        option: '-l, --letter [letter]'
       },
       {
-        option: '--reverse',
-        description: 'Returns users in reverse sorting order'
+        option: '--reverse'
       },
       {
-        option: '--limit [limit]',
-        description: 'Limits the users returned'
+        option: '--limit [limit]'
       },
       {
         option: '--sortBy [sortBy]',
-        description: 'Returns users sorted by a number of messages or followers, instead of the default behavior of sorting alphabetically. Allowed values are messages,followers',
         autocomplete: ['messages', 'followers']
       }
     ];

@@ -80,24 +80,19 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Teams team for which to update settings'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--allowGiphy [allowGiphy]',
-        description: 'Set to true to allow giphy and to false to disable it'
+        option: '--allowGiphy [allowGiphy]'
       },
       {
-        option: '--giphyContentRating [giphyContentRating]',
-        description: 'Settings to set content rating for giphy. Allowed values Strict|Moderate'
+        option: '--giphyContentRating [giphyContentRating]'
       },
       {
-        option: '--allowStickersAndMemes [allowStickersAndMemes]',
-        description: 'Set to true to allow stickers and memes and to false to disable them'
+        option: '--allowStickersAndMemes [allowStickersAndMemes]'
       },
       {
-        option: '--allowCustomMemes [allowCustomMemes]',
-        description: 'Set to true to allow custom memes and to false to disable them'
+        option: '--allowCustomMemes [allowCustomMemes]'
       }
     ];
 

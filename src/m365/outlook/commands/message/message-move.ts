@@ -117,27 +117,22 @@ class OutlookMessageMoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--messageId <messageId>',
-        description: 'ID of the message to move'
+        option: '--messageId <messageId>'
       },
       {
         option: '--sourceFolderName [sourceFolderName]',
-        description: 'Name of the folder to move the message from',
         autocomplete: Outlook.wellKnownFolderNames
       },
       {
         option: '--sourceFolderId [sourceFolderId]',
-        description: 'ID of the folder to move the message from',
         autocomplete: Outlook.wellKnownFolderNames
       },
       {
         option: '--targetFolderName [targetFolderName]',
-        description: 'Name of the folder to move the message to',
         autocomplete: Outlook.wellKnownFolderNames
       },
       {
         option: '--targetFolderId [targetFolderId]',
-        description: 'ID of the folder to move the message to',
         autocomplete: Outlook.wellKnownFolderNames
       }
     ];

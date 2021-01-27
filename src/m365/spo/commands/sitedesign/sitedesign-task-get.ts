@@ -60,8 +60,7 @@ class SpoSiteDesignTaskGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --taskId <taskId>',
-        description: 'The ID of the site design task to get information for'
+        option: '-i, --taskId <taskId>'
       }
     ];
 

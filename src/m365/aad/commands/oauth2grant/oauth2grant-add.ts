@@ -65,16 +65,13 @@ class AadOAuth2GrantAddCommand extends AadCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --clientId <clientId>',
-        description: 'objectId of the service principal for which permissions should be granted'
+        option: '-i, --clientId <clientId>'
       },
       {
-        option: '-r, --resourceId <resourceId>',
-        description: 'objectId of the AAD application to which permissions should be granted'
+        option: '-r, --resourceId <resourceId>'
       },
       {
-        option: '-s, --scope <scope>',
-        description: 'Permissions to grant'
+        option: '-s, --scope <scope>'
       }
     ];
 

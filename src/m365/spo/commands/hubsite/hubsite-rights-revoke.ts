@@ -106,16 +106,13 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the hub site to revoke rights on'
+        option: '-u, --url <url>'
       },
       {
-        option: '-p, --principals <principals>',
-        description: 'Comma-separated list of principals to revoke join rights. Principals can be users or mail-enabled security groups in the form of "alias" or "alias@<domain name>.com"'
+        option: '-p, --principals <principals>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming revoking rights'
+        option: '--confirm'
       }
     ];
 

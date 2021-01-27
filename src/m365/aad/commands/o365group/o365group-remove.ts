@@ -79,12 +79,10 @@ class AadO365GroupRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the Microsoft 365 Group to remove'
+        option: '-i, --id <id>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the group'
+        option: '--confirm'
       }
     ];
 

@@ -107,36 +107,28 @@ class SpoListLabelSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the list is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--label <label>',
-        description: 'The label to set on the list'
+        option: '--label <label>'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'The title of the list on which to set the label. Specify only one of listTitle, listId or listUrl'
+        option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-l, --listId [listId]',
-        description: 'The ID of the list on which to set the label. Specify only one of listTitle, listId or listUrl'
+        option: '-l, --listId [listId]'
       },
       {
-        option: '--listUrl [listUrl]',
-        description: 'Server- or web-relative URL of the list on which to set the label. Specify only one of listTitle, listId or listUrl'
+        option: '--listUrl [listUrl]'
       },
       {
-        option: '--syncToItems',
-        description: 'Specify, to set the label on all items in the list'
+        option: '--syncToItems'
       },
       {
-        option: '--blockDelete',
-        description: 'Specify, to disallow deleting items in the list'
+        option: '--blockDelete'
       },
       {
-        option: '--blockEdit',
-        description: 'Specify, to disallow editing items in the list'
+        option: '--blockEdit'
       }
     ];
 

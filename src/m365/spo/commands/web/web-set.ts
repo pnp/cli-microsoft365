@@ -118,48 +118,38 @@ class SpoWebSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the subsite to update'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-t, --title [title]',
-        description: 'New title for the subsite'
+        option: '-t, --title [title]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'New description for the subsite'
+        option: '-d, --description [description]'
       },
       {
-        option: '--siteLogoUrl [siteLogoUrl]',
-        description: 'New site logo URL for the subsite'
+        option: '--siteLogoUrl [siteLogoUrl]'
       },
       {
-        option: '--quickLaunchEnabled [quickLaunchEnabled]',
-        description: 'Set to true to enable quick launch and to false to disable it'
+        option: '--quickLaunchEnabled [quickLaunchEnabled]'
       },
       {
         option: '--headerLayout [headerLayout]',
-        description: 'Configures the site header. Allowed values standard|compact',
         autocomplete: ['standard', 'compact']
       },
       {
         option: '--headerEmphasis [headerEmphasis]',
-        description: 'Configures the site header background. Allowed values 0|1|2|3',
         autocomplete: ['0', '1', '2', '3']
       },
       {
         option: '--megaMenuEnabled [megaMenuEnabled]',
-        description: 'Set to \'true\' to change the menu style to megamenu. Set to \'false\' to use the cascading menu style',
         autocomplete: ['true', 'false']
       },
       {
         option: '--footerEnabled [footerEnabled]',
-        description: 'Set to \'true\' to enable footer and to \'false\' to disable it',
         autocomplete: ['true', 'false']
       },
       {
         option: '--searchScope [searchScope]',
-        description: 'Search scope to set in the site. Allowed values DefaultScope|Tenant|Hub|Site',
         autocomplete: SpoWebSetCommand.searchScopeOptions
       }
     ];

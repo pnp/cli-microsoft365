@@ -58,12 +58,10 @@ class SpoFileListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the folder from which to retrieve files is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folder <folder>',
-        description: 'The server- or site-relative URL of the folder from which to retrieve files'
+        option: '-f, --folder <folder>'
       }
     ];
 

@@ -108,17 +108,14 @@ class SpoCustomActionClearCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'Url of the site or site collection to clear the custom actions from'
+        option: '-u, --url <url>'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the custom action. Allowed values Site|Web|All. Default All',
         autocomplete: ['Site', 'Web', 'All']
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing all custom actions'
+        option: '--confirm'
       }
     ];
 

@@ -75,8 +75,7 @@ class SpoServicePrincipalPermissionRequestDenyCommand extends SpoCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '-i, --requestId <requestId>',
-      description: 'ID of the permission request to deny'
+      option: '-i, --requestId <requestId>'
     }];
 
     const parentOptions: CommandOption[] = super.options();

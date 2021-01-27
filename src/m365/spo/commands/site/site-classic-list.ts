@@ -87,16 +87,13 @@ class SiteClassicListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --webTemplate [webTemplate]',
-        description: 'type of classic sites to list.'
+        option: '-t, --webTemplate [webTemplate]'
       },
       {
-        option: '-f, --filter [filter]',
-        description: 'filter to apply when retrieving sites'
+        option: '-f, --filter [filter]'
       },
       {
-        option: '--includeOneDriveSites',
-        description: 'Set, if you also want to retrieve OneDrive sites'
+        option: '--includeOneDriveSites'
       }
     ];
 

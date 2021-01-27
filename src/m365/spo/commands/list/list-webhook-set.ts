@@ -85,28 +85,22 @@ class SpoListWebhookSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list which contains the webhook is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listId [listId]',
-        description: 'ID of the list which contains the webhook which should be updated. Specify either listId or listTitle but not both'
+        option: '-l, --listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list which contains the webhook which should be updated. Specify either listId or listTitle but not both'
+        option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-i, --id <id>',
-        description: 'ID of the webhook to update'
+        option: '-i, --id <id>'
       },
       {
-        option: '-n, --notificationUrl [notificationUrl]',
-        description: 'The new notification url'
+        option: '-n, --notificationUrl [notificationUrl]'
       },
       {
-        option: '-e, --expirationDateTime [expirationDateTime]',
-        description: 'The new expiration date'
+        option: '-e, --expirationDateTime [expirationDateTime]'
       }
     ];
 

@@ -68,12 +68,10 @@ class SpoNavigationNodeListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site for which to retrieve navigation'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-l, --location <location>',
-        description: 'Navigation type to retrieve. Available options: QuickLaunch|TopNavigationBar',
         autocomplete: ['QuickLaunch', 'TopNavigationBar']
       }
     ];

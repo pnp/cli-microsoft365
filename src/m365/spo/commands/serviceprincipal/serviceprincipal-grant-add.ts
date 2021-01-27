@@ -82,12 +82,10 @@ class SpoServicePrincipalGrantAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-r, --resource <resource>',
-        description: 'The name of the resource for which permissions should be granted'
+        option: '-r, --resource <resource>'
       },
       {
-        option: '-s, --scope <scope>',
-        description: 'The name of the permission that should be granted'
+        option: '-s, --scope <scope>'
       }
     ];
 

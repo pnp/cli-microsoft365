@@ -101,20 +101,16 @@ class SpoFieldAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the field should be created'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listTitle [listTitle]',
-        description: 'Title of the list where the field should be created (if it should be created as a list column)'
+        option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '-x, --xml <xml>',
-        description: 'CAML field definition'
+        option: '-x, --xml <xml>'
       },
       {
-        option: '--options [options]',
-        description: 'The options to use to add to the field. Allowed values: DefaultValue|AddToDefaultContentType|AddToNoContentType|AddToAllContentTypes|AddFieldInternalNameHint|AddFieldToDefaultView|AddFieldCheckDisplayName'
+        option: '--options [options]'
       }
     ];
 

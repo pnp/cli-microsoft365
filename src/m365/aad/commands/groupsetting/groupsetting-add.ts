@@ -112,8 +112,7 @@ class AadGroupSettingAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --templateId <templateId>',
-        description: 'The ID of the group setting template to use to create the group setting'
+        option: '-i, --templateId <templateId>'
       }
     ];
 

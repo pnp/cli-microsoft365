@@ -55,16 +55,13 @@ class FlowDisableCommand extends AzmgmtCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'The name of the Microsoft Flow to disable'
+        option: '-n, --name <name>'
       },
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment for which to disable Flow'
+        option: '-e, --environment <environment>'
       },
       {
-        option: '--asAdmin',
-        description: 'Set, to disable the Flow as admin'
+        option: '--asAdmin'
       }
     ];
 

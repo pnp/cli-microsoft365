@@ -96,20 +96,16 @@ class SpoTermListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--termGroupId [termGroupId]',
-        description: 'ID of the term group where the term set is located. Specify termGroupId or termGroupName but not both'
+        option: '--termGroupId [termGroupId]'
       },
       {
-        option: '--termGroupName [termGroupName]',
-        description: 'Name of the term group where the term set is located. Specify termGroupId or termGroupName but not both'
+        option: '--termGroupName [termGroupName]'
       },
       {
-        option: '--termSetId [termSetId]',
-        description: 'ID of the term set for which to retrieve terms. Specify termSetId or termSetName but not both'
+        option: '--termSetId [termSetId]'
       },
       {
-        option: '--termSetName [termSetName]',
-        description: 'Name of the term set for which to retrieve terms. Specify termSetId or termSetName but not both'
+        option: '--termSetName [termSetName]'
       }
     ];
 

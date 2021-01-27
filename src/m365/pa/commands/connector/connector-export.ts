@@ -174,16 +174,13 @@ class PaConnectorExportCommand extends AzmgmtCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment where the custom connector to export is located'
+        option: '-e, --environment <environment>'
       },
       {
-        option: '-c, --connector <connector>',
-        description: 'The name of the custom connector to export'
+        option: '-c, --connector <connector>'
       },
       {
-        option: '--outputFolder [outputFolder]',
-        description: 'Path where the folder with connector\'s files should be saved. If not specified, will create the connector\'s folder in the current folder.'
+        option: '--outputFolder [outputFolder]'
       }
     ];
 

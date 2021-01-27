@@ -56,8 +56,7 @@ class YammerNetworkListCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--includeSuspended',
-        description: 'Include the networks in which the user is suspended'
+        option: '--includeSuspended'
       }
     ];
 
