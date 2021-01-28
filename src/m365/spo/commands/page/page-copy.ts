@@ -77,14 +77,6 @@ class SpoPageCopyCommand extends SpoCommand {
 
     request
       .post<void>(requestOptions)
-      .catch((err: any): void => {
-        // The API returns a 400 when file already exists
-        if (err && err.response && err.response.status && err.response.status === 400) {
-          return;
-        }
-        // Throw the error if something else happened
-        throw err;
-      })
       .then((): Promise<ClientSidePageProperties> => {
         const requestOptions: any = {
           url: `${targetSiteUrl}/_api/sitepages/pages/GetByUrl('sitepages/${targetFullName}')`,
@@ -106,6 +98,7 @@ class SpoPageCopyCommand extends SpoCommand {
         cb();
       })
       .catch((err: any): void => {
+        // Return the error if something else happened
         return this.handleRejectedODataJsonPromise(err, logger, cb)
       });
   }
