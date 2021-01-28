@@ -140,6 +140,8 @@ nav:
       - connector:
         - connector export: 'cmd/pa/connector/connector-export.md'
         - connector list: 'cmd/pa/connector/connector-list.md'
+      - environment:
+        - environment list: 'cmd/pa/environment/environment-list.md'
       - pcf:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
       - solution:
@@ -537,7 +539,7 @@ nav:
         - report deviceusageuserdetail: 'cmd/yammer/report/report-deviceusageuserdetail.md'
         - report groupsactivitycounts: 'cmd/yammer/report/report-groupsactivitycounts.md'
         - report groupsactivitydetail: 'cmd/yammer/report/report-groupsactivitydetail.md'
-        - report groupsactivitygroupcounts: 'cmd/yammer/report/report-groupsactivitygroupcounts.md'        
+        - report groupsactivitygroupcounts: 'cmd/yammer/report/report-groupsactivitygroupcounts.md'
       - user:
         - user get: 'cmd/yammer/user/user-get.md'
         - user list: 'cmd/yammer/user/user-list.md'
