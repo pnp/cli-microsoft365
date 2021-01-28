@@ -14,7 +14,7 @@ const command: Command = require('./convert-pdf');
 describe(commands.CONVERT_PDF, () => {
   let log: string[];
   let logger: Logger;
-  let rmSyncStub: sinon.SinonStub;
+  let unlinkSyncStub: sinon.SinonStub;
   const mockPdfFile = 'pdf';
   let pdfConvertResponseStream: PassThrough;
   let pdfConvertWriteStream: PassThrough;
@@ -23,7 +23,7 @@ describe(commands.CONVERT_PDF, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
-    rmSyncStub = sinon.stub(fs, 'rmSync').callsFake(_ => { });
+    unlinkSyncStub = sinon.stub(fs, 'unlinkSync').callsFake(_ => { });
   });
 
   beforeEach(() => {
@@ -53,7 +53,7 @@ describe(commands.CONVERT_PDF, () => {
   });
 
   afterEach(() => {
-    rmSyncStub.resetHistory();
+    unlinkSyncStub.resetHistory();
     Utils.restore([
       request.delete,
       request.get,
@@ -70,7 +70,7 @@ describe(commands.CONVERT_PDF, () => {
     Utils.restore([
       auth.restoreAuth,
       appInsights.trackEvent,
-      fs.rmSync
+      fs.unlinkSync
     ]);
     auth.service.connected = false;
   });
@@ -159,7 +159,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -236,7 +236,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -313,7 +313,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -390,7 +390,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -459,7 +459,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -528,7 +528,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -597,7 +597,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -662,7 +662,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -727,7 +727,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -792,7 +792,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -857,7 +857,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -926,7 +926,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -997,7 +997,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -1128,7 +1128,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.calledOnce, 'Did not remove local file');
+          assert(unlinkSyncStub.calledOnce, 'Did not remove local file');
           done();
         }
         catch (e) {
@@ -1200,7 +1200,7 @@ describe(commands.CONVERT_PDF, () => {
       }, (err?: any) => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Drive not found')));
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -1274,7 +1274,7 @@ describe(commands.CONVERT_PDF, () => {
       }, (err?: any) => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Error: Request failed with status code 404')));
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -1357,7 +1357,7 @@ describe(commands.CONVERT_PDF, () => {
       }, (err?: any) => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Error: ENOENT: no such file or directory, open './foo/file.pdf'")));
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -1445,7 +1445,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.calledOnce, `Didn't remove the local file`);
+          assert(unlinkSyncStub.calledOnce, `Didn't remove the local file`);
           done();
         }
         catch (e) {
@@ -1526,7 +1526,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.calledOnce, `Didn't remove the local file`);
+          assert(unlinkSyncStub.calledOnce, `Didn't remove the local file`);
           done();
         }
         catch (e) {
@@ -1632,7 +1632,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.calledOnce, `Didn't remove the local file`);
+          assert(unlinkSyncStub.calledOnce, `Didn't remove the local file`);
           done();
         }
         catch (e) {
@@ -1701,7 +1701,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {
@@ -1821,8 +1821,8 @@ describe(commands.CONVERT_PDF, () => {
       });
 
       sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
-      Utils.restore(fs.rmSync);
-      rmSyncStub = sinon.stub(fs, 'rmSync').callsFake(_ => { throw 'An error has occurred'; });
+      Utils.restore(fs.unlinkSync);
+      unlinkSyncStub = sinon.stub(fs, 'unlinkSync').callsFake(_ => { throw 'An error has occurred'; });
 
       command.action(logger, {
         options: {
@@ -1834,7 +1834,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(err, 'An error has occurred');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.calledOnce, 'Did not remove local file');
+          assert(unlinkSyncStub.calledOnce, 'Did not remove local file');
           done();
         }
         catch (e) {
@@ -1914,7 +1914,7 @@ describe(commands.CONVERT_PDF, () => {
         try {
           assert.strictEqual(typeof err, 'undefined');
           assert.strictEqual(Buffer.from(pdfConvertWriteStream.read()).toString(), mockPdfFile, 'Invalid PDF contents');
-          assert(rmSyncStub.notCalled, 'Removed local file');
+          assert(unlinkSyncStub.notCalled, 'Removed local file');
           done();
         }
         catch (e) {

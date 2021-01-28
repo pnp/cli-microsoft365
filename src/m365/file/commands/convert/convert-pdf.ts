@@ -87,9 +87,7 @@ class FileConvertPdfCommand extends GraphCommand {
           }
 
           try {
-            fs.rmSync(localTargetFilePath, {
-              force: true
-            });
+            fs.unlinkSync(localTargetFilePath);
           }
           catch (e) {
             return cb(e);
