@@ -313,13 +313,7 @@ class SpoFileAddCommand extends SpoCommand {
 
         return Promise.resolve();
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr('DONE');
-        }
-
-        cb();
-      }, (err: any): void => {
+      .then(_ => cb(), (err: any): void => {
         if (isCheckedOut) {
           // in a case the command has done checkout
           // then have to rollback the checkout

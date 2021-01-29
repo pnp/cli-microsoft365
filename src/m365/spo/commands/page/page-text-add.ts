@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { isNumber } from 'util';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
@@ -94,12 +93,7 @@ class SpoPageTextAddCommand extends SpoCommand {
         // Save the Client Side Page with updated information
         return this.saveClientSidePage(page, logger, args, pageName, requestDigest);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-        cb();
-      })
+      .then(_ => cb())
       .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 

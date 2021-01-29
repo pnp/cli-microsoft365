@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -50,9 +49,6 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
           if (this.verbose) {
             if (customAction && customAction["odata.null"] === true) {
               logger.logToStderr(`Custom action with id ${args.options.id} not found`);
-            }
-            else {
-              logger.logToStderr(chalk.green('DONE'));
             }
           }
           cb();

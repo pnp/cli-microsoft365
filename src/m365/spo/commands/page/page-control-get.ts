@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -39,10 +38,6 @@ class SpoPageControlGetCommand extends SpoCommand {
           const isJSONOutput = args.options.output === 'json';
 
           logger.log(JSON.parse(JSON.stringify(Page.getControlsInformation(control, isJSONOutput))));
-
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
         }
         else {
           if (this.verbose) {

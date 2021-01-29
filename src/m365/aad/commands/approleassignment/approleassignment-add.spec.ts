@@ -142,9 +142,9 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } }, () => {
+    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'SharePoint', scope: 'Sites.Read.All' } }, (err?: any) => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -157,9 +157,9 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'intune', scope: 'Sites.Read.All' } }, () => {
+    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'intune', scope: 'Sites.Read.All' } }, (err?: any) => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -172,9 +172,9 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'exchange', scope: 'Sites.Read.All' } }, () => {
+    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'exchange', scope: 'Sites.Read.All' } }, (err?: any) => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -187,9 +187,9 @@ describe(commands.APPROLEASSIGNMENT_ADD, () => {
     getRequestStub();
     postRequestStub();
 
-    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scope: 'Sites.Read.All' } }, () => {
+    command.action(logger, { options: { debug: true, appId: '26e49d05-4227-4ace-ae52-9b8f08f37184', resource: 'fff194f1-7dce-4428-8301-1badb5518201', scope: 'Sites.Read.All' } }, (err?: any) => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].indexOf('DONE') !== 1, true);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {

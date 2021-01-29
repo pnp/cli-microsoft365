@@ -82,10 +82,6 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       return;
     }
 
-    if (this.verbose) {
-      logger.logToStderr('DONE');
-    }
-
     cb();
   }
 

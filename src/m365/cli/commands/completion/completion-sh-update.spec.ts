@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { autocomplete } from '../../../../autocomplete';
@@ -70,7 +69,7 @@ describe(commands.COMPLETION_SH_UPDATE, () => {
   it('build command completion (debug)', (done) => {
     command.action(logger, { options: { debug: true } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

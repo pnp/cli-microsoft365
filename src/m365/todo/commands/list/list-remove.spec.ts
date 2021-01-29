@@ -153,52 +153,6 @@ describe(commands.LIST_REMOVE, () => {
     });
   });
 
-  it('removes a To Do task list by name (verbose)', (done) => {
-    
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'FooList'`) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists",
-          "value": [
-            {
-              "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGllw==\"",
-              "displayName": "FooList",
-              "isOwner": true,
-              "isShared": false,
-              "wellknownListName": "none",
-              "id": "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA="
-            }
-          ]
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA=`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: false,
-        verbose: true,
-        name: "FooList"
-      }
-    } as any, () => {
-      try {
-        assert(log[log.length-1].indexOf('DONE') > -1);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('removes a To Do task list by id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'FooList'`) {

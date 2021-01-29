@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
@@ -42,14 +41,7 @@ class FlowDisableCommand extends AzmgmtCommand {
 
     request
       .post(requestOptions)
-      .then((): void => {
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {

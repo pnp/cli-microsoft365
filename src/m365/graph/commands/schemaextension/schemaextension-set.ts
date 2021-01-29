@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -106,13 +105,9 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
 
     request
       .patch(requestOptions)
-      .then((res: any): void => {
+      .then((): void => {
         if (this.debug) {
           logger.logToStderr("Schema extension successfully updated.");
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

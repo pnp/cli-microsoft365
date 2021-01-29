@@ -48,9 +48,7 @@ class YammerGroupUserAddCommand extends YammerCommand {
 
     request
       .post(requestOptions)
-      .then((res: any): void => {
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   };
 
   public options(): CommandOption[] {

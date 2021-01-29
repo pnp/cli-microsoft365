@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import { autocomplete } from '../../../../autocomplete';
@@ -75,18 +74,6 @@ describe(commands.COMPLETION_SH_SETUP, () => {
     command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(setupShCompletionStub.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('writes output in verbose mode', (done) => {
-    command.action(logger, { options: { verbose: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

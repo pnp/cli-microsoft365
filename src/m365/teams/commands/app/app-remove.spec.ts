@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,7 +12,6 @@ const command: Command = require('./app-remove');
 describe(commands.TEAMS_APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let requests: any[];
 
   before(() => {
@@ -36,7 +34,6 @@ describe(commands.TEAMS_APP_REMOVE, () => {
       }
     };
     requests = [];
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -116,9 +113,9 @@ describe(commands.TEAMS_APP_REMOVE, () => {
     command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip', id: `e3e29acb-8c79-412b-b746-e6c39ff4cd22`, confirm: true } }, () => {
       try {
         assert(removeTeamsAppCalled);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });

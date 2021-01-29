@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -61,10 +60,6 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
         }
         else {
           logger.log(res);
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

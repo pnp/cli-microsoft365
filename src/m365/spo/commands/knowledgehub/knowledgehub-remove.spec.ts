@@ -168,18 +168,9 @@ describe(commands.KNOWLEDGEHUB_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { debug: true } }, () => {
-      let doneResponse = false;
-      log.forEach(l => {
-        if (l &&
-          typeof l === 'string' &&
-          l.indexOf('DONE') > -1) {
-          doneResponse = true;
-        }
-      });
-
+    command.action(logger, { options: { debug: true } }, (err?: any) => {
       try {
-        assert(doneResponse);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {

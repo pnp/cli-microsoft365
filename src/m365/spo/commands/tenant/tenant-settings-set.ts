@@ -282,10 +282,6 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
           return;
         }
 
-        if (this.verbose) {
-          logger.logToStderr('DONE');
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }

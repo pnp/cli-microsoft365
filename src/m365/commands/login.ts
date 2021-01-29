@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import auth, { AuthType } from '../../Auth';
 import { Logger } from '../../cli';
@@ -45,12 +44,7 @@ class LoginCommand extends Command {
       logger.logToStderr(`Logging out from Microsoft 365...`);
     }
 
-    const logout: () => void = (): void => {
-      auth.service.logout();
-      if (this.verbose) {
-        logger.logToStderr(chalk.green('DONE'));
-      }
-    }
+    const logout: () => void = (): void => auth.service.logout();
 
     const login: () => void = (): void => {
       if (this.verbose) {
@@ -84,10 +78,6 @@ class LoginCommand extends Command {
       auth
         .ensureAccessToken(auth.defaultResource, logger, this.debug)
         .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
           auth.service.connected = true;
           cb();
         }, (rej: string): void => {

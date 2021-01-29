@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -37,10 +36,6 @@ class TeamsFunSettingsListCommand extends GraphCommand {
       .get<{ funSettings: any }>(requestOptions)
       .then((res: { funSettings: any }): void => {
         logger.log(res.funSettings);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   };

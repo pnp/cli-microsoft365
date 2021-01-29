@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -72,10 +71,6 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
         }
         else {
           logger.log(json.UniqueId);
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

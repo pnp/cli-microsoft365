@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { isNumber } from 'util';
 import { v4 } from 'uuid';
 import { Logger } from '../../../../cli';
@@ -276,12 +275,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-        cb();
-      })
+      .then(_ => cb())
       .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 

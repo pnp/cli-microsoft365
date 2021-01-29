@@ -1,5 +1,4 @@
 import * as assert from "assert";
-import * as chalk from 'chalk';
 import * as sinon from "sinon";
 import appInsights from "../../../../appInsights";
 import auth from "../../../../Auth";
@@ -13,7 +12,6 @@ const command: Command = require("./apppage-set");
 describe(commands.APPPAGE_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, "restoreAuth").callsFake(() => Promise.resolve());
@@ -34,7 +32,6 @@ describe(commands.APPPAGE_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -52,40 +49,6 @@ describe(commands.APPPAGE_SET, () => {
 
   it("has a description", () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it("updates the single-part app page", done => {
-    sinon.stub(request, "post").callsFake(opts => {
-      if (
-        (opts.url as string).indexOf(`_api/sitepages/Pages/UpdateFullPageApp`) > -1 &&
-        opts.data.webPartDataAsJson === "{}"
-      ) {
-        return Promise.resolve("Done");
-      }
-      return Promise.reject("Invalid request");
-    });
-    command.action(logger, 
-      {
-        options: {
-          debug: true,
-          pageName: "test-single",
-          webUrl: "https://contoso.sharepoint.com/",
-          webPartData: JSON.stringify({})
-        }
-      },
-      (err?: any) => {
-        if (err) {
-          done(err);
-          return;
-        }
-        try {
-          assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
   });
 
   it("fails to update the single-part app page if request is rejected", done => {

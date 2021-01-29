@@ -1,5 +1,4 @@
 import { AxiosResponse } from 'axios';
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -103,9 +102,6 @@ class FileConvertPdfCommand extends GraphCommand {
           this.handleRejectedODataJsonPromise(error, logger, cb)
         }
         else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
           cb();
         }
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));

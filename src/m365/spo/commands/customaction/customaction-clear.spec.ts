@@ -13,7 +13,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
   const defaultPostCallsStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
@@ -51,7 +50,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -92,24 +90,6 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should user custom actions cleared successfully (verbose) without prompting with confirmation argument', (done) => {
-    defaultPostCallsStub();
-
-    command.action(logger, { options: {
-      verbose: true,
-      url: 'https://contoso.sharepoint.com',
-      confirm: true
-    } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(sinon.match('DONE')));
         done();
       }
       catch (e) {

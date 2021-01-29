@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,7 +12,6 @@ const command: Command = require('./apppage-add');
 describe(commands.APPPAGE_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -34,7 +32,6 @@ describe(commands.APPPAGE_ADD, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -148,7 +145,6 @@ describe(commands.APPPAGE_ADD, () => {
     command.action(logger, { options: { debug: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: "{\"id\": \"e84a4f44-30d2-4962-b203-f8bf42114860\", \"instanceId\": \"15353e8b-cb55-4794-b871-4cd74abf78b4\", \"title\": \"Milestone Tracking\", \"description\": \"A tool used for tracking project milestones\", \"serverProcessedContent\": { \"htmlStrings\": {}, \"searchablePlainTexts\": {}, \"imageSources\": {}, \"links\": {} }, \"dataVersion\": \"1.0\", \"properties\": {\"description\": \"Milestone Tracking\"}}" } }, (err: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined')
-        assert(loggerLogToStderrSpy.calledWith(chalk.green("DONE")));
         done();
       }
       catch (e) {
@@ -246,7 +242,6 @@ describe(commands.APPPAGE_ADD, () => {
     command.action(logger, { options: { debug: true, addToQuickLaunch: true, title: 'test-single', webUrl: 'https://contoso.sharepoint.com/', webPartData: "{\"id\": \"e84a4f44-30d2-4962-b203-f8bf42114860\", \"instanceId\": \"15353e8b-cb55-4794-b871-4cd74abf78b4\", \"title\": \"Milestone Tracking\", \"description\": \"A tool used for tracking project milestones\", \"serverProcessedContent\": { \"htmlStrings\": {}, \"searchablePlainTexts\": {}, \"imageSources\": {}, \"links\": {} }, \"dataVersion\": \"1.0\", \"properties\": {\"description\": \"Milestone Tracking\"}}" } }, (err: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined')
-        assert(loggerLogToStderrSpy.calledWith(chalk.green("DONE")));
         done();
       }
       catch (e) {

@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -14,7 +13,6 @@ const command: Command = require('./orgassetslibrary-remove');
 describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -40,7 +38,6 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -140,39 +137,6 @@ describe(commands.ORGASSETSLIBRARY_REMOVE, () => {
     command.action(logger, { options: { libraryUrl: '/sites/branding/assets' } }, () => {
       try {
         assert(orgAssetLibRemoveCallIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('removes the Org Assets Library bypassing confirmation (debug)', (done) => {
-    let orgAssetLibRemoveCallIssued = false;
-
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="9" ObjectPathId="8" /><Method Name="RemoveFromOrgAssets" Id="10" ObjectPathId="8"><Parameters><Parameter Type="String">/sites/branding/assets</Parameter><Parameter Type="Guid">{00000000-0000-0000-0000-000000000000}</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-
-        orgAssetLibRemoveCallIssued = true;
-
-        return Promise.resolve(JSON.stringify(
-          [
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.19520.12061", "ErrorInfo": null, "TraceCorrelationId": "f4e1279f-100c-9000-7ea4-40fa74757476"
-            }, 9, {
-              "IsNull": false
-            }
-          ]
-        ));
-      }
-
-      return Promise.reject('Invalid request');
-    })
-
-    command.action(logger, { options: { libraryUrl: '/sites/branding/assets', debug: true, verbose: true, confirm: true } }, () => {
-      try {
-        assert(orgAssetLibRemoveCallIssued && loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
