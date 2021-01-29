@@ -589,6 +589,7 @@ nav:
     - Microsoft Teams:
       - 'Deploy a Microsoft Teams personal app and add it to users': 'sample-scripts/teams/install-personal-app.md'
       - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
+      - 'Export conversations from Microsoft Teams Channels': 'sample-scripts/teams/export-teams-conversations.md'
       - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
       - 'List app usage in Microsoft Teams': 'sample-scripts/teams/list-teams-app-usage.md'
       - 'Remove a Microsoft Teams personal app': 'sample-scripts/teams/remove-personal-app.md'
