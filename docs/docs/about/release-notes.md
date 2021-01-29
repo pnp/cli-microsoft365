@@ -51,6 +51,8 @@
 - fixed bug in exporting flows [#2091](https://github.com/pnp/cli-microsoft365/issues/2091)
 - fixed logging output when using JMESPath queries [#2095](https://github.com/pnp/cli-microsoft365/issues/2095)
 - updated guidance for escaping quotes in bash [#2043](https://github.com/pnp/cli-microsoft365/issues/2043)
+- replaces `rmSync` with `unlinkSync` in 'file convert pdf' [#2106](https://github.com/pnp/cli-microsoft365/issues/2106)
+- fixed escaping backslash in 'spo page get' [#2114](https://github.com/pnp/cli-microsoft365/issues/2114)
 
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 
