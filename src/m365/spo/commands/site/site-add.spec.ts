@@ -1,11 +1,10 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, {
-    CommandError
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -1374,7 +1373,7 @@ describe(commands.SITE_ADD, () => {
 
     command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com' } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -1417,7 +1416,7 @@ describe(commands.SITE_ADD, () => {
 
     command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', lcid: 1033, webTemplate: 'PUBLISHING#0', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -1913,7 +1912,7 @@ describe(commands.SITE_ADD, () => {
 
     command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -2101,7 +2100,7 @@ describe(commands.SITE_ADD, () => {
 
     command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', removeDeletedSite: true } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -2485,7 +2484,7 @@ describe(commands.SITE_ADD, () => {
 
     command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -2588,7 +2587,7 @@ describe(commands.SITE_ADD, () => {
 
     command.action(logger, { options: { debug: false, verbose: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team', title: 'Team', timeZone: 4, owners: 'admin@contoso.com', wait: true, removeDeletedSite: true } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -2812,7 +2811,7 @@ describe(commands.SITE_ADD, () => {
 
     command.action(logger, { options: { debug: true, type: 'ClassicSite', url: 'https://contoso.sharepoint.com/sites/team>', title: 'Team>', timeZone: 4, owners: 'admin@contoso.com>', lcid: 1033, webTemplate: 'PUBLISHING#0>', resourceQuota: 100, resourceQuotaWarningLevel: 90, storageQuota: 300, storageQuotaWarningLevel: 275 } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

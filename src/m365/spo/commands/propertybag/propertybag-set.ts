@@ -70,13 +70,7 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
       .then((identityResp: IdentityResponse): Promise<any> => {
         return this.setProperty(identityResp, args.options, logger);
       })
-      .then((res: any): void => {
-        if (this.verbose) {
-          logger.logToStderr('DONE');
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   private setProperty(identityResp: IdentityResponse, options: Options, logger: Logger): Promise<any> {

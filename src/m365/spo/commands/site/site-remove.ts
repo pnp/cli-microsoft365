@@ -70,13 +70,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
             return this.deleteGroupifiedSite(_groupId, logger);
           }
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {

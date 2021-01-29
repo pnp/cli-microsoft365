@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -104,13 +103,7 @@ class SpoPageControlSetCommand extends SpoCommand {
 
         return Page.save(args.options.name, args.options.webUrl, canvasContent, logger, this.debug, this.verbose);
       })
-      .then(() => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      })
+      .then(_ => cb())
       .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 

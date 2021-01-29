@@ -74,13 +74,7 @@ class SpoFolderRenameCommand extends SpoCommand {
           }, (err: any): void => { reject(err); });
         });
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr('DONE');
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

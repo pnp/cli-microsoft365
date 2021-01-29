@@ -14,7 +14,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   let defaultRequestsSuccessStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
@@ -53,7 +52,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -107,25 +105,6 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('sets the tenant settings (debug) successfully', (done) => {
-    defaultRequestsSuccessStub();
-
-    command.action(logger, {
-      options: {
-        verbose: true,
-        NotificationsInSharePointEnabled: true
-      }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith('DONE'));
         done();
       }
       catch (e) {

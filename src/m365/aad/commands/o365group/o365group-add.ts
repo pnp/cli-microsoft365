@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -176,11 +175,6 @@ class AadO365GroupAddCommand extends GraphCommand {
       })
       .then((): void => {
         logger.log(group);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }

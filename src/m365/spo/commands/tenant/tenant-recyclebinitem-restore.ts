@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
@@ -53,7 +52,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
         this.context = res;
 
         if (this.verbose) {
-          logger.log(`Restoring deleted site collection ${args.options.url}...`);
+          logger.logToStderr(`Restoring deleted site collection ${args.options.url}...`);
         }
 
         const requestOptions: any = {
@@ -87,13 +86,7 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
           }
         });
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.log(chalk.green('DONE'));
-        }
-
-        cb()
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

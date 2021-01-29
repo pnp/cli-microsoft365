@@ -12,7 +12,6 @@ const command: Command = require('./file-checkout');
 describe(commands.FILE_CHECKOUT, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let stubPostResponses: any = (getFileByServerRelativeUrlResp: any = null, getFileByIdResp: any = null) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
       if (getFileByServerRelativeUrlResp) {
@@ -54,7 +53,6 @@ describe(commands.FILE_CHECKOUT, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -172,28 +170,6 @@ describe(commands.FILE_CHECKOUT, () => {
     }, () => {
       try {
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://contoso.sharepoint.com/sites/project-x/_api/web/GetFileById(\'0CD891EF-AFCE-4E55-B836-FCE03286CCCF\')/checkout');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should call "DONE" when in verbose', (done) => {
-    stubPostResponses();
-
-    const actionId: string = '0CD891EF-AFCE-4E55-B836-FCE03286CCCF';
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        id: actionId,
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-      }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogToStderrSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {

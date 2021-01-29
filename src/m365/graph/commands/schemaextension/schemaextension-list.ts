@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -68,9 +67,6 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
             })));
           } else {
             logger.log(result);
-          }
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
           }
         }
         cb();

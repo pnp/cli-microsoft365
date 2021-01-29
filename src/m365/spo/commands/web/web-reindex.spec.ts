@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -157,7 +156,6 @@ describe(commands.WEB_REINDEX, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         assert.strictEqual(propertyName, 'vti_searchversion', 'Incorrect property stored in the property bag');
         assert.strictEqual(propertyValue, '2', 'Incorrect property value stored in the property bag');
         done();

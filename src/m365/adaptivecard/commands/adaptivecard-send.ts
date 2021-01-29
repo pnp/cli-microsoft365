@@ -1,5 +1,4 @@
 import type * as ACData from 'adaptivecards-templating';
-import * as chalk from 'chalk';
 import { Logger } from '../../../cli';
 import {
   CommandError,
@@ -87,10 +86,6 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
 
             logger.log(res);
           }
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

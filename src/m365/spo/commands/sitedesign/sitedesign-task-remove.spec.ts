@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -14,7 +13,6 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -39,7 +37,6 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -94,33 +91,7 @@ describe(commands.SITEDESIGN_TASK_REMOVE, () => {
     });
   });
 
-  it('removes the specified site design task without prompting for confirmation when confirm option specified (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.RemoveSiteDesignTask`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          taskId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b'
-        })) {
-        return Promise.resolve({
-          "odata.null": true
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: true, confirm: true, taskId: '0f27a016-d277-4bb4-b3c3-b5b040c9559b' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('prompts before removing the specified site design task when confirm option not passed', (done) => {
-
     command.action(logger, { options: { debug: false, taskId: 'b2307a39-e878-458b-bc90-03bc578531d6' } }, () => {
       let promptIssued = false;
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import {
@@ -319,13 +318,7 @@ class SpoPageAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

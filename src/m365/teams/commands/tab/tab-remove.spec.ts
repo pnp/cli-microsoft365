@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,7 +12,6 @@ const command: Command = require('./tab-remove');
 describe(commands.TEAMS_TAB_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -35,7 +33,6 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     promptOptions = undefined;
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
@@ -231,9 +228,9 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
         teamId: '00000000-0000-0000-0000-000000000000',
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(loggerLogToStderrSpy.called);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -260,8 +257,8 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
         tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         confirm: true
       }
-    }, () => {
-      assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+    }, (err?: any) => {
+      assert.strictEqual(typeof err, 'undefined');
       done();
     });
   });

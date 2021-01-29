@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -58,13 +57,7 @@ class TodoListSetCommand extends GraphCommand {
 
         return request.patch(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getListId(args: CommandArgs): Promise<string> {

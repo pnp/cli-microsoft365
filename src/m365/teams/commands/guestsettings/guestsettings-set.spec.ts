@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,7 +12,6 @@ const command: Command = require('./guestsettings-set');
 describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -34,7 +32,6 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -91,33 +88,6 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
     } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('sets the allowDeleteChannels setting to false', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/6703ac8a-c49b-4fd4-8223-28f0ac3a6402` &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          guestSettings: {
-            allowDeleteChannels: false
-          }
-        })) {
-        return Promise.resolve({});
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: { debug: true, teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402', allowDeleteChannels: 'false' }
-    } as any, (err?: any) => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -47,10 +46,6 @@ class SpoPageControlListCommand extends SpoCommand {
       .then((res: PageTemplateResponse): void => {
         if (res.value && res.value.length > 0) {
           logger.log(res.value);
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

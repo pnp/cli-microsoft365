@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -39,11 +38,6 @@ class SpoSiteDesignListCommand extends SpoCommand {
       })
       .then((res: { value: SiteDesign[] }): void => {
         logger.log(res.value);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

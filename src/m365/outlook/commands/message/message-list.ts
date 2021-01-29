@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as os from 'os';
 import { Logger } from '../../../../cli';
 import {
@@ -50,11 +49,6 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
       })
       .then((): void => {
         logger.log(this.items);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

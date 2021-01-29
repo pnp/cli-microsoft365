@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -59,10 +58,6 @@ class SpoPageControlListCommand extends SpoCommand {
         });
         // drop the information about original classes from clientsidepages.ts
         logger.log(JSON.parse(JSON.stringify(controls)));
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
 
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

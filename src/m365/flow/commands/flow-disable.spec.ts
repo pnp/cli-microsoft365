@@ -12,7 +12,6 @@ const command: Command = require('./flow-disable');
 describe(commands.FLOW_DISABLE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -33,7 +32,6 @@ describe(commands.FLOW_DISABLE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -70,7 +68,6 @@ describe(commands.FLOW_DISABLE, () => {
 
     command.action(logger, { options: { debug: true, name: '3989cb59-ce1a-4a5c-bb78-257c5c39381d', environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5' } }, () => {
       try {
-        assert.notStrictEqual(loggerLogToStderrSpy.lastCall.args[0].indexOf('DONE'), -1);
         assert.strictEqual(postStub.lastCall.args[0].url, 'https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5/flows/3989cb59-ce1a-4a5c-bb78-257c5c39381d/stop?api-version=2016-11-01');
         done();
       }

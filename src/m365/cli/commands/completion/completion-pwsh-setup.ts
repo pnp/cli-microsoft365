@@ -1,11 +1,10 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli';
 import {
-    CommandError, CommandOption
+  CommandError, CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import AnonymousCommand from '../../../base/AnonymousCommand';
@@ -86,10 +85,6 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
     const completionScriptPath: string = path.resolve(__dirname, '..', '..', '..', '..', '..', 'scripts', 'Register-CLIM365Completion.ps1');
     try {
       fs.appendFileSync(args.options.profile, os.EOL + completionScriptPath, 'utf8');
-
-      if (this.verbose) {
-        logger.logToStderr(chalk.green('DONE'));
-      }
       cb();
     }
     catch (e) {

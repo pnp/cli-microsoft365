@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -54,12 +53,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       })
       .then(() => this.ensureNoExistingSite(args.options.url, args.options.force, logger))
       .then(() => this.createAppCatalog(args.options, logger))
-      .then(() => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-        cb();
-      }, (err: CommandError): void => cb(err));
+      .then(_ => cb(), (err: CommandError): void => cb(err));
   }
 
   private ensureNoExistingSite(url: string, force: boolean, logger: Logger): Promise<void> {

@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,7 +12,6 @@ const command: Command = require('./contenttype-remove');
 describe(commands.CONTENTTYPE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -35,7 +33,6 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -66,27 +63,6 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
-
-  it('delete content type by id', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', confirm: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
 
   it('delete content type by id - prompt', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -182,37 +158,6 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       }
     });
   });
-
-  it('delete content type by name', (done) => {
-    const getCallbackStub = sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/availableContentTypes?$filter=(Name eq 'TestContentType')`) > -1) {
-        return Promise.resolve({ "value": [{ "Name": "TestContentType", "StringId": "0x0100558D85B7216F6A489A499DB361E1AE2F" }] });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    const postCallbackStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/contenttypes('0x0100558D85B7216F6A489A499DB361E1AE2F')`) > -1) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'TestContentType', confirm: true } }, () => {
-      try {
-        assert(getCallbackStub.called);
-        assert(postCallbackStub.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
 
   it('delete content type by name - prompt', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {

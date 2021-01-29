@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
-    CommandError, CommandOption
+  CommandError, CommandOption
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -64,11 +63,8 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
           }
           else {
             logger.log(json[json.length - 1]);
-
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
           }
+          
           cb();
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     };

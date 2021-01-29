@@ -61,9 +61,6 @@ class FlowRemoveCommand extends AzmgmtCommand {
             cb();
           }
           else {
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
             cb();
           }
         }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));

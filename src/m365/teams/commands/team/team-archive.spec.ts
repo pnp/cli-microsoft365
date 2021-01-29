@@ -13,7 +13,6 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -35,7 +34,6 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -178,31 +176,6 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
     } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, 'No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('archives a Microsoft Team (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/archive`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        teamId: 'f5dba91d-6494-4d5e-89a7-ad832f6946d6',
-        debug: true
-      }
-    } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

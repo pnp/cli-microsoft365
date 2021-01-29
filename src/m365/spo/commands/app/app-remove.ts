@@ -60,9 +60,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
 
           return request.post(requestOptions);
         })
-        .then((): void => {
-          cb();
-        }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
+        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
     };
 
     if (args.options.confirm) {

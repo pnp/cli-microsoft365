@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
@@ -12,7 +11,6 @@ const command: Command = require('./userprofile-set');
 describe(commands.USERPROFILE_SET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   const spoUrl = 'https://contoso.sharepoint.com';
 
   before(() => {
@@ -35,7 +33,6 @@ describe(commands.USERPROFILE_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -95,33 +92,6 @@ describe(commands.USERPROFILE_SET, () => {
     })
   });
 
-  it('updates single valued profile property (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`${spoUrl}/_api/SP.UserProfiles.PeopleManager/SetSingleValueProfileProperty`) > -1) {
-        return Promise.resolve({
-          "odata.null": true
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        userName: 'john.doe@mytenant.onmicrosoft.com',
-        propertyName: 'SPS-JobTitle',
-        propertyValue: 'Senior Developer',
-        debug: true
-      }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-        done();
-      } catch (e) {
-        done(e);
-      }
-    })
-  });
-
   it('updates multi valued profile property', (done) => {
     const postStub = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`${spoUrl}/_api/SP.UserProfiles.PeopleManager/SetMultiValuedProfileProperty`) > -1) {
@@ -148,33 +118,6 @@ describe(commands.USERPROFILE_SET, () => {
       try {
         const lastCall = postStub.lastCall.args[0];
         assert.strictEqual(JSON.stringify(lastCall.data), JSON.stringify(data));
-        done();
-      } catch (e) {
-        done(e);
-      }
-    })
-  });
-
-  it('updates multi valued profile property (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`${spoUrl}/_api/SP.UserProfiles.PeopleManager/SetMultiValuedProfileProperty`) > -1) {
-        return Promise.resolve({
-          "odata.null": true
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        userName: 'john.doe@mytenant.onmicrosoft.com',
-        propertyName: 'SPS-Skills',
-        propertyValue: 'CSS, HTML',
-        debug: true
-      }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       } catch (e) {
         done(e);

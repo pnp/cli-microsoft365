@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -67,13 +66,7 @@ class SpoUserProfileSetCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.debug) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-        
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

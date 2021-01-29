@@ -13,7 +13,6 @@ describe(commands.FOLDER_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let requests: any[];
   let promptOptions: any;
   let stubPostResponses: any;
@@ -52,7 +51,6 @@ describe(commands.FOLDER_REMOVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -130,28 +128,6 @@ describe(commands.FOLDER_REMOVE, () => {
       } }, () => {
       try {
         assert(loggerLogSpy.notCalled === true);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('removes the folder when prompt confirmed (verbose)', (done) => {
-    stubPostResponses();
-
-    Utils.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: 
-      { verbose: true, 
-        webUrl: 'https://contoso.sharepoint.com', 
-        folderUrl: '/Shared Documents/Folder1' 
-      } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.lastCall.calledWith('DONE'));
         done();
       }
       catch (e) {

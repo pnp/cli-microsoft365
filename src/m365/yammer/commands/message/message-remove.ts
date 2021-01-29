@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -43,13 +42,7 @@ class YammerMessageRemoveCommand extends YammerCommand {
 
       request
         .delete(requestOptions)
-        .then((res: any): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {

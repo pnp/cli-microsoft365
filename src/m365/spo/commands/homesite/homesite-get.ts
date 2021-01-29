@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -35,10 +34,6 @@ class SpoHomeSiteGetCommand extends SpoCommand {
       .then((res: { "odata.null"?: boolean }): void => {
         if (!res["odata.null"]) {
           logger.log(res);
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

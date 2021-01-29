@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
@@ -38,10 +37,6 @@ class SpoSiteScriptListCommand extends SpoCommand {
       .then((res: { value: any[] }): void => {
         if (res.value && res.value.length > 0) {
           logger.log(res.value);
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

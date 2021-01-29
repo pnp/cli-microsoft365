@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { isNumber } from 'util';
 import { Logger } from '../../../../cli';
 import {
@@ -107,14 +106,7 @@ class SpoPageSectionAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-
-      }, (err: any): void => {
+      .then(_ => cb(), (err: any): void => {
         this.handleRejectedODataJsonPromise(err, logger, cb)
       });
   }

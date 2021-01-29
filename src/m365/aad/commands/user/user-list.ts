@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
@@ -45,11 +44,6 @@ class AadUserListCommand extends GraphItemsListCommand<any> {
       .getAllItems(url, logger, true)
       .then((): void => {
         logger.log(this.items);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -14,7 +13,6 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   let log: any[];
   let logger: Logger;
   let promptOptions: any;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -40,7 +38,6 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
       }
     };
     promptOptions = undefined;
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -94,7 +91,6 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(svcListRequest.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -129,7 +125,6 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(svcListRequest.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

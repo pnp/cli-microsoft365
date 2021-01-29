@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -40,10 +39,6 @@ class TeamsMessagingSettingsListCommand extends GraphCommand {
       .get<Team>(requestOptions)
       .then((res: Team): void => {
         logger.log(res.messagingSettings);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

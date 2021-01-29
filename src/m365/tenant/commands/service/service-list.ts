@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command from '../../../../Command';
@@ -41,11 +40,6 @@ class TenantServiceListCommand extends Command {
       .get(requestOptions)
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

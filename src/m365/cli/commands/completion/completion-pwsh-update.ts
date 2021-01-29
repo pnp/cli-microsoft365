@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -24,10 +23,6 @@ class CliCompletionPwshUpdateCommand extends AnonymousCommand {
     }
 
     autocomplete.generateShCompletion();
-
-    if (this.debug) {
-      logger.logToStderr(chalk.green('DONE'));
-    }
 
     cb();
   }

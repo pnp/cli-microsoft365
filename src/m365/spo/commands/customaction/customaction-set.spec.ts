@@ -361,28 +361,6 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
   });
 
-  it('retrieves and prints the added user custom actions details when verbose specified', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
-        return Promise.resolve(undefined);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    defaultCommandOptions.verbose = true;
-
-    command.action(logger, { options: defaultCommandOptions } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(sinon.match('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('updateCustomAction called once when scope is Web', (done) => {
     const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {  
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {

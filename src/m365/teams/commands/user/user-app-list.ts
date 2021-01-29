@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -61,10 +60,6 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
               appId: i.appId
             };
           }));
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

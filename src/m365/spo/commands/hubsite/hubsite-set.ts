@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption,
@@ -86,11 +85,8 @@ class SpoHubSiteSetCommand extends SpoCommand {
           hubSite.SiteId = hubSite.SiteId.replace('/Guid(', '').replace(')/', '');
 
           logger.log(hubSite);
-
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
         }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }

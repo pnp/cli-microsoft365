@@ -1,5 +1,4 @@
 import { AxiosRequestConfig } from 'axios';
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption,
@@ -127,11 +126,6 @@ class SpoListContentTypeDefaultSetCommand extends SpoCommand {
       })
       .then(res => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, err => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

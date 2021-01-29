@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -78,11 +77,8 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
             delete output._ObjectType_;
 
             logger.log(output);
-
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
           }
+          
           cb();
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }

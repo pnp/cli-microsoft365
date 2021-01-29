@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -38,10 +37,6 @@ class SpoPageSectionGetCommand extends SpoCommand {
         const isJSONOutput = args.options.output === 'json';
         if (sections.length) {
           logger.log(Page.getSectionInformation(sections[0], isJSONOutput));
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

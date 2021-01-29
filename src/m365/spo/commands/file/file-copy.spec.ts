@@ -12,7 +12,6 @@ const command: Command = require('./file-copy');
 describe(commands.FILE_COPY, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
   let stubAllPostRequests: any = (
@@ -88,7 +87,6 @@ describe(commands.FILE_COPY, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
@@ -117,28 +115,6 @@ describe(commands.FILE_COPY, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should command complete successfully (verbose)', (done) => {
-    stubAllPostRequests();
-    stubAllGetRequests();
-
-    command.action(logger, {
-      options: {
-        verbose: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc'
-      }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.lastCall.args[0] === 'DONE');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should command complete successfully', (done) => {
     stubAllPostRequests();
     stubAllGetRequests();
@@ -149,9 +125,9 @@ describe(commands.FILE_COPY, () => {
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc'
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(loggerLogSpy.callCount === 0);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -160,7 +136,7 @@ describe(commands.FILE_COPY, () => {
     });
   });
 
-  it('should complete successfully in 4 tries. ', (done) => {
+  it('should complete successfully in 4 tries', (done) => {
     var counter = 4;
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/recycle()') > -1) {
@@ -188,14 +164,13 @@ describe(commands.FILE_COPY, () => {
 
     command.action(logger, {
       options: {
-        verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc'
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(loggerLogToStderrSpy.lastCall.args[0] === 'DONE');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -243,7 +218,7 @@ describe(commands.FILE_COPY, () => {
       }
     }, () => {
       try {
-        assert(loggerLogToStderrSpy.lastCall.calledWith('DONE'));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -269,7 +244,7 @@ describe(commands.FILE_COPY, () => {
       }
     }, () => {
       try {
-        assert(loggerLogToStderrSpy.lastCall.calledWith('DONE'));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

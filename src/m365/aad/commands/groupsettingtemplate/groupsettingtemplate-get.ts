@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -44,10 +43,6 @@ class AadGroupSettingTemplateGetCommand extends GraphItemsListCommand<GroupSetti
         else {
           cb(new CommandError(`Resource '${(args.options.id || args.options.displayName)}' does not exist.`));
           return;
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

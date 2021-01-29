@@ -13,7 +13,6 @@ describe(commands.WEB_REMOVE, () => {
   let log: any[];
   let requests: any[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -36,7 +35,6 @@ describe(commands.WEB_REMOVE, () => {
       }
     };
     requests = [];
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     promptOptions = undefined;
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
@@ -214,7 +212,6 @@ describe(commands.WEB_REMOVE, () => {
       });
       try {
         assert(correctRequestIssued);
-        assert(loggerLogToStderrSpy.calledWith(sinon.match('DONE')));
         done();
       }
       catch (e) {

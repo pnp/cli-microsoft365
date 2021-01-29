@@ -13,7 +13,6 @@ describe(commands.PLANNER_TASK_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -35,7 +34,6 @@ describe(commands.PLANNER_TASK_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -63,109 +61,6 @@ describe(commands.PLANNER_TASK_LIST, () => {
 
   it('defines correct properties for the default output', () => {
     assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'startDateTime', 'dueDateTime', 'completedDateTime']);
-  });
-
-  it('lists planner tasks of the current logged in user as a JSON result', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
-        return Promise.resolve({
-          "value": [
-            {
-              "planId": "IlGTfsb-PEWl5EYIx97I5WUAB8ni",
-              "bucketId": "fno1rNw2Vk2x7XwLQib9aWUAC2YS",
-              "title": "Northwind HR Training Video Part I",
-              "orderHint": "8586967557616915534",
-              "assigneePriority": "8586967557616915534",
-              "percentComplete": 50,
-              "startDateTime": "2017-09-08T00:00:00Z",
-              "createdDateTime": "2017-09-08T06:12:03.7860273Z",
-              "dueDateTime": "2018-09-03T00:00:00Z",
-              "hasDescription": false,
-              "previewType": "description",
-              "completedDateTime": null,
-              "completedBy": null,
-              "referenceCount": 1,
-              "checklistItemCount": 0,
-              "activeChecklistItemCount": 0,
-              "conversationThreadId": null,
-              "id": "102sl-tTCkyFHptTaFW5lGUACsAe",
-              "createdBy": {
-                "user": {
-                  "displayName": null,
-                  "id": "48d31887-5fad-4d73-a9f5-3c356e68a038"
-                }
-              },
-              "appliedCategories": {},
-              "assignments": {
-                "48d31887-5fad-4d73-a9f5-3c356e68a038": {
-                  "@odata.type": "#microsoft.graph.plannerAssignment",
-                  "assignedDateTime": "2017-09-08T06:12:03.7860273Z",
-                  "orderHint": "",
-                  "assignedBy": {
-                    "user": {
-                      "displayName": null,
-                      "id": "48d31887-5fad-4d73-a9f5-3c356e68a038"
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "planId": "Ey4oAJeTv0W6kx-kD4T-kGUAHEwE",
-              "bucketId": "XxJ8fhM6gE-2-ShejgmMWGUAEVtB",
-              "title": "Search Optimization",
-              "orderHint": "8586967558658533417",
-              "assigneePriority": "8586967558658533417",
-              "percentComplete": 0,
-              "startDateTime": "2017-09-03T00:00:00Z",
-              "createdDateTime": "2017-09-08T06:10:19.624239Z",
-              "dueDateTime": "2018-08-29T00:00:00Z",
-              "hasDescription": false,
-              "previewType": "automatic",
-              "completedDateTime": null,
-              "completedBy": null,
-              "referenceCount": 0,
-              "checklistItemCount": 0,
-              "activeChecklistItemCount": 0,
-              "conversationThreadId": null,
-              "id": "7aZeJUYK90OZiFq6H7Ug3mUACcdr",
-              "createdBy": {
-                "user": {
-                  "displayName": null,
-                  "id": "08fa38e4-cbfa-4488-94ed-c834da6539df"
-                }
-              },
-              "appliedCategories": {},
-              "assignments": {
-                "48d31887-5fad-4d73-a9f5-3c356e68a038": {
-                  "@odata.type": "#microsoft.graph.plannerAssignment",
-                  "assignedDateTime": "2017-09-08T06:10:19.624239Z",
-                  "orderHint": "",
-                  "assignedBy": {
-                    "user": {
-                      "displayName": null,
-                      "id": "08fa38e4-cbfa-4488-94ed-c834da6539df"
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: true, output: 'json' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('lists planner tasks of the current logged in user', (done) => {
@@ -263,111 +158,6 @@ describe(commands.PLANNER_TASK_LIST, () => {
     command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(loggerLogSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('lists planner tasks of the current logged in user (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/me/planner/tasks`) {
-        return Promise.resolve({
-          "value": [
-            {
-              "@odata.etag": "W/\"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBAXCc=\"",
-              "planId": "IlGTfsb-PEWl5EYIx97I5WUAB8ni",
-              "bucketId": "fno1rNw2Vk2x7XwLQib9aWUAC2YS",
-              "title": "Northwind HR Training Video Part I",
-              "orderHint": "8586967557616915534",
-              "assigneePriority": "8586967557616915534",
-              "percentComplete": 50,
-              "startDateTime": "2017-09-08T00:00:00Z",
-              "createdDateTime": "2017-09-08T06:12:03.7860273Z",
-              "dueDateTime": "2018-09-03T00:00:00Z",
-              "hasDescription": false,
-              "previewType": "description",
-              "completedDateTime": null,
-              "completedBy": null,
-              "referenceCount": 1,
-              "checklistItemCount": 0,
-              "activeChecklistItemCount": 0,
-              "conversationThreadId": null,
-              "id": "102sl-tTCkyFHptTaFW5lGUACsAe",
-              "createdBy": {
-                "user": {
-                  "displayName": null,
-                  "id": "48d31887-5fad-4d73-a9f5-3c356e68a038"
-                }
-              },
-              "appliedCategories": {},
-              "assignments": {
-                "48d31887-5fad-4d73-a9f5-3c356e68a038": {
-                  "@odata.type": "#microsoft.graph.plannerAssignment",
-                  "assignedDateTime": "2017-09-08T06:12:03.7860273Z",
-                  "orderHint": "",
-                  "assignedBy": {
-                    "user": {
-                      "displayName": null,
-                      "id": "48d31887-5fad-4d73-a9f5-3c356e68a038"
-                    }
-                  }
-                }
-              }
-            },
-            {
-              "@odata.etag": "W/\"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBAWCc=\"",
-              "planId": "Ey4oAJeTv0W6kx-kD4T-kGUAHEwE",
-              "bucketId": "XxJ8fhM6gE-2-ShejgmMWGUAEVtB",
-              "title": "Search Optimization",
-              "orderHint": "8586967558658533417",
-              "assigneePriority": "8586967558658533417",
-              "percentComplete": 0,
-              "startDateTime": "2017-09-03T00:00:00Z",
-              "createdDateTime": "2017-09-08T06:10:19.624239Z",
-              "dueDateTime": "2018-08-29T00:00:00Z",
-              "hasDescription": false,
-              "previewType": "automatic",
-              "completedDateTime": null,
-              "completedBy": null,
-              "referenceCount": 0,
-              "checklistItemCount": 0,
-              "activeChecklistItemCount": 0,
-              "conversationThreadId": null,
-              "id": "7aZeJUYK90OZiFq6H7Ug3mUACcdr",
-              "createdBy": {
-                "user": {
-                  "displayName": null,
-                  "id": "08fa38e4-cbfa-4488-94ed-c834da6539df"
-                }
-              },
-              "appliedCategories": {},
-              "assignments": {
-                "48d31887-5fad-4d73-a9f5-3c356e68a038": {
-                  "@odata.type": "#microsoft.graph.plannerAssignment",
-                  "assignedDateTime": "2017-09-08T06:10:19.624239Z",
-                  "orderHint": "",
-                  "assignedBy": {
-                    "user": {
-                      "displayName": null,
-                      "id": "08fa38e4-cbfa-4488-94ed-c834da6539df"
-                    }
-                  }
-                }
-              }
-            }
-          ]
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

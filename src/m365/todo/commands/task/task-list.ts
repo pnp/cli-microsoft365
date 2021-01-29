@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -82,10 +81,6 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
               lastModifiedDateTime: m.lastModifiedDateTime
             }
           }));
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -73,13 +72,7 @@ class TodoTaskRemoveCommand extends GraphCommand {
 
           return request.delete(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {

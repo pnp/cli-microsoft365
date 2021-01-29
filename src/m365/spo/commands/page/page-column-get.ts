@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -50,10 +49,6 @@ class SpoPageColumnGetCommand extends SpoCommand {
             }
             logger.log(column);
           }
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

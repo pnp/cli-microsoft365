@@ -325,13 +325,7 @@ class SpoSiteAddCommand extends SpoCommand {
           }
         });
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   private siteExistsInTheRecycleBin(url: string, logger: Logger): Promise<boolean> {

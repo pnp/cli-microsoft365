@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -102,13 +101,7 @@ class SpoWebSetCommand extends SpoCommand {
 
     request
       .patch(requestOptions)
-      .then((): void => {
-        if (this.debug) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public allowUnknownOptions(): boolean | undefined {

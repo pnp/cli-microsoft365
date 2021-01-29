@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -92,17 +91,8 @@ class SpoWebReindexCommand extends SpoCommand {
 
         return SpoPropertyBagBaseCommand.setProperty('vti_searchversion', searchVersion.toString(), args.options.webUrl, requestDigest, webIdentityResp, logger, this.debug);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => {
+      .then(_ => cb(), (err: any): void => {
         if (this.reindexedLists) {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
 
           cb();
         }
