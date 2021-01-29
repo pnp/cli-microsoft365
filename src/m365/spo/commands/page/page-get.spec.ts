@@ -7,6 +7,7 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
+import { markdownWp } from './page-get.mock';
 const command: Command = require('./page-get');
 
 describe(commands.PAGE_GET, () => {
@@ -749,6 +750,26 @@ describe(commands.PAGE_GET, () => {
           "title": "Home",
           "layoutType": "Home"
         }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('check if markdown web part content get processed correctly', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+        return Promise.resolve(markdownWp);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', output: 'json' } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(markdownWp));
         done();
       }
       catch (e) {
