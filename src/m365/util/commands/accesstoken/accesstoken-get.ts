@@ -25,8 +25,18 @@ class AccessTokenGetCommand extends Command {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    let resource: string = args.options.resource;
+    if (resource.toLowerCase() === 'sharepoint') {
+      if (auth.service.spoUrl) {
+        resource = auth.service.spoUrl;
+      }
+      else {
+        return cb(`SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`);
+      }
+    }
+
     auth
-      .ensureAccessToken(args.options.resource, logger, this.debug, args.options.new)
+      .ensureAccessToken(resource, logger, this.debug, args.options.new)
       .then((accessToken: string): void => {
         logger.log(accessToken);
         cb();
