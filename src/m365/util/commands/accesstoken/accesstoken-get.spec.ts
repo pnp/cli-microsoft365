@@ -40,6 +40,7 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
       auth.ensureAccessToken
     ]);
     auth.service.accessTokens = {};
+    auth.service.spoUrl = undefined;
   });
 
   after(() => {
@@ -76,12 +77,51 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
     });
   });
 
+  it('retrieves access token for SharePoint when sharepoint specified as the resource and SPO URL previously retrieved', (done) => {
+    const d: Date = new Date();
+    d.setMinutes(d.getMinutes() + 1);
+    auth.service.spoUrl = 'https://contoso.sharepoint.com';
+    auth.service.accessTokens['https://contoso.sharepoint.com'] = {
+      expiresOn: d.toString(),
+      value: 'ABC'
+    };
+
+    command.action(logger, { options: { debug: false, resource: 'sharepoint' } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith('ABC'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles error when retrieving access token', (done) => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: { debug: false, resource: 'https://graph.microsoft.com' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('returns error when sharepoint specified as resource and SPO URL not available', (done) => {
+    const d: Date = new Date();
+    d.setMinutes(d.getMinutes() + 1);
+    auth.service.accessTokens['https://contoso.sharepoint.com'] = {
+      expiresOn: d.toString(),
+      value: 'ABC'
+    };
+
+    command.action(logger, { options: { debug: false, resource: 'sharepoint' } }, (err?: any) => {
+      try {
+        assert.notStrictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
