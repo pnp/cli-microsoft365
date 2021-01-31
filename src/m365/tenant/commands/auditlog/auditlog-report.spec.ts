@@ -314,9 +314,9 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
         debug: false,
         contentType: 'Exchange'
       }
-    } as any, () => {
+    } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerLogSpy.args[0][0][0].Id, "fbcdc0c0-035c-43b7-9026-08d89e299188");
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -360,9 +360,9 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
         debug: false,
         contentType: 'Exchange'
       }
-    } as any, () => {
+    } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerLogSpy.args[0][0][0].Id, "fbcdc0c0-035c-43b7-9026-08d89e299188");
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -406,8 +406,9 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
         debug: true,
         contentType: 'Exchange'
       }
-    } as any, () => {
+    } as any, (err?: any) => {
       try {
+        console.log(err);
         assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }

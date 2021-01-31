@@ -95,8 +95,8 @@ class TenantAuditlogReportCommand extends Command {
     return this
       .startContentSubscriptionIfNotActive(args, logger)
       .then((): Promise<AuditContentList[]> => this.getAuditContentList(args, logger))
-      .then((auditContentLists: AuditContentList[]): Promise<any> => this.getBatchedPromises(auditContentLists, 10))
-      .then((batchedPromise: Promise<any>[]): Promise<void> => {
+      .then((auditContentLists: AuditContentList[]): Promise<Promise<AuditlogReport[]>[][]> => this.getBatchedPromises(auditContentLists, 10))
+      .then((batchedPromise: Promise<AuditlogReport[]>[][]): Promise<void> => {
         return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
           if (batchedPromise.length > 0) {
             this.getBatchedAuditlogData(logger, batchedPromise, 0, resolve, reject);
@@ -106,7 +106,7 @@ class TenantAuditlogReportCommand extends Command {
           }
         });
       })
-      .then((): AuditlogReport[] => { return this.completeAuditReports.flat(2) });
+      .then(_ => this.completeAuditReports);
   }
 
   private startContentSubscriptionIfNotActive(args: CommandArgs, logger: Logger): Promise<void> {
@@ -181,8 +181,8 @@ class TenantAuditlogReportCommand extends Command {
     return request.get<AuditContentList[]>(requestOptions)
   }
 
-  private getBatchedPromises(auditContentLists: AuditContentList[], batchSize: number): Promise<any> {
-    let batchedPromises: any = [];
+  private getBatchedPromises(auditContentLists: AuditContentList[], batchSize: number): Promise<Promise<AuditlogReport[]>[][]> {
+    const batchedPromises: Promise<AuditlogReport[]>[][] = [];
 
     for (let i: number = 0; i < auditContentLists.length; i += batchSize) {
       const promiseRequestBatch: Promise<AuditlogReport[]>[] = auditContentLists
@@ -195,15 +195,19 @@ class TenantAuditlogReportCommand extends Command {
     return Promise.resolve(batchedPromises);
   }
 
-  private getBatchedAuditlogData(logger: Logger, batchedPromiseList: any, batchNumber: number, resolve: () => void, reject: (err: any) => void): void {
+  private getBatchedAuditlogData(logger: Logger, batchedPromiseList: Promise<AuditlogReport[]>[][], batchNumber: number, resolve: () => void, reject: (err: any) => void): void {
     if (this.verbose) {
       logger.logToStderr(`Starting Batch : ${batchNumber}`);
     }
 
     Promise
       .all(batchedPromiseList[batchNumber])
-      .then((data: any) => {
-        this.completeAuditReports.push(data);
+      .then((data: AuditlogReport[][]) => {
+        data.forEach(d1 => {
+          d1.forEach(d2 => {
+            this.completeAuditReports.push(d2);
+          });
+        });
 
         if (batchNumber < batchedPromiseList.length - 1) {
           this.getBatchedAuditlogData(logger, batchedPromiseList, ++batchNumber, resolve, reject)
