@@ -60,7 +60,7 @@ interface FileUploadInfo {
 
 class SpoFileAddCommand extends SpoCommand {
   private readonly fileChunkingThreshold: number = 250 * 1024 * 1024;  // max 250 MB
-  private readonly fileChunkSize: number = 10 * 1024 * 1024;  // max fileChunkingThreshold
+  private readonly fileChunkSize: number = 250 * 1024 * 1024;  // max fileChunkingThreshold
   private readonly fileChunkRetryAttempts: number = 5;
 
   public get name(): string {
@@ -124,7 +124,7 @@ class SpoFileAddCommand extends SpoCommand {
         if (args.options.checkOut) {
           return this.fileCheckOut(fileName, args.options.webUrl, folderPath)
             .then((res: any) => {
-              // flag the file is checkedOut by the command 
+              // flag the file is checkedOut by the command
               // so in case of command failure we can try check it in
               isCheckedOut = true;
 
@@ -225,7 +225,8 @@ class SpoFileAddCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata',
             'content-length': bodyLength
-          }
+          },
+          maxBodyLength: this.fileChunkingThreshold
         };
 
         return request.post(requestOptions);
@@ -247,7 +248,7 @@ class SpoFileAddCommand extends SpoCommand {
         return Promise.resolve();
       })
       .then((): Promise<void> => {
-        // check if there are unknown options 
+        // check if there are unknown options
         // and map them as fields to update
         let fieldsToUpdate: FieldValue[] = this.mapUnknownOptionsAsFieldValue(args.options);
 
@@ -270,7 +271,7 @@ class SpoFileAddCommand extends SpoCommand {
         return Promise.resolve();
       })
       .then((): Promise<void> => {
-        // approve and publish cannot be used together 
+        // approve and publish cannot be used together
         // when approve is used it will automatically publish the file
         // so then no need to publish afterwards
         if (args.options.approve) {
