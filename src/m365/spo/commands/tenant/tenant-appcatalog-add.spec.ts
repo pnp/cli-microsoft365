@@ -132,7 +132,9 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     });
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
-        return Promise.resolve('https://contoso.sharepoint.com/sites/old-app-catalog');
+        return Promise.resolve({
+          stdout: 'https://contoso.sharepoint.com/sites/old-app-catalog'
+        });
       }
 
       if (command === spoSiteGetCommand) {
@@ -460,7 +462,9 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     });
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
-        return Promise.resolve('https://contoso.sharepoint.com/sites/old-app-catalog');
+        return Promise.resolve({
+          stdout: 'https://contoso.sharepoint.com/sites/old-app-catalog'
+        });
       }
 
       if (command === spoSiteGetCommand) {
@@ -488,7 +492,9 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
   it('handles error app catalog exists and no force used', (done) => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
-        return Promise.resolve('https://contoso.sharepoint.com/sites/old-app-catalog');
+        return Promise.resolve({
+          stdout: 'https://contoso.sharepoint.com/sites/old-app-catalog'
+        });
       }
 
       if (command === spoSiteGetCommand) {
@@ -775,7 +781,9 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
     });
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
-        return Promise.resolve('https://contoso.sharepoint.com/sites/old-app-catalog');
+        return Promise.resolve({
+          stdout: 'https://contoso.sharepoint.com/sites/old-app-catalog'
+        });
       }
 
       if (command === spoSiteGetCommand) {

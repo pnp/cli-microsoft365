@@ -1,5 +1,5 @@
 import * as chalk from 'chalk';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import SpoCommand from '../../../base/SpoCommand';
@@ -37,7 +37,8 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
 
     Cli
       .executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { _: [] } })
-      .then((appCatalogUrl: string): Promise<void> => {
+      .then((spoTenantAppCatalogUrlGetCommandOutput: CommandOutput): Promise<void> => {
+        const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
         if (!appCatalogUrl) {
           if (this.verbose) {
             logger.logToStderr('No app catalog URL found');
