@@ -764,11 +764,11 @@ export class Cli {
       }
 
       const filePath: string = value.substr(1);
-      if (!fs.existsSync(filePath)) {
-        throw `File ${filePath} specified in option ${option} does not exist`;
+      // if the file doesn't exist, leave as-is, if it exists replace with
+      // contents from the file
+      if (fs.existsSync(filePath)) {
+        args.options[option] = fs.readFileSync(filePath, 'utf-8');
       }
-
-      args.options[option] = fs.readFileSync(filePath, 'utf-8');
     });
   }
 }

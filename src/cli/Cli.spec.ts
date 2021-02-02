@@ -1179,21 +1179,37 @@ describe('Cli', () => {
       }, e => done(`Error: ${e}`));
   });
 
-  it(`returns error when the specified file in @ value doesn't exist`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+  it(`returns error when reading file contents failed`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw 'An error has occurred'; });
     cli
-    .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
-    .then(_ => {
+      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
+      .then(_ => {
         done('Promise completed while error expected');
       }, _ => {
         try {
-          assert(cliErrorStub.calledWith(chalk.red(`Error: File file.txt specified in option parameterX does not exist`)));
+          assert(cliErrorStub.calledWith(chalk.red(`Error: An error has occurred`)));
           done();
         }
         catch (e) {
           done(e);
         }
       });
+  });
+
+  it(`leaves the original value if the file specified in @ value doesn't exist`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    cli
+      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith('@file.txt'));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(`Error: ${e}`));
   });
 
   it(`logs output to console`, () => {
