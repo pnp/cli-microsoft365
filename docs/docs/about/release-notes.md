@@ -1,5 +1,13 @@
 # Release notes
 
+## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
+
+### Changes
+
+- fixed broken tests in 'tenant auditlog report' on Node@10 [#2125](https://github.com/pnp/cli-microsoft365/issues/2125)
+- fixed uploading large files [#2120](https://github.com/pnp/cli-microsoft365/issues/2120)
+- implemented browser-based login [#1979](https://github.com/pnp/cli-microsoft365/issues/1979)
+
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 
 ### New commands
