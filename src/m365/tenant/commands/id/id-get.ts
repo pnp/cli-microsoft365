@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TenantIdGetCommand extends Command {
   public get name(): string {
-    return `${commands.TENANT_ID_GET}`;
+    return commands.TENANT_ID_GET;
   }
 
   public get description(): string {

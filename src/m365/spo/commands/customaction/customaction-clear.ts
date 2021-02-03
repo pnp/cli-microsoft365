@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoCustomActionClearCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CUSTOMACTION_CLEAR}`;
+    return commands.CUSTOMACTION_CLEAR;
   }
 
   public get description(): string {

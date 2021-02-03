@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class TeamsReportUserActivityUserDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {
-    return `${commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL}`;
+    return commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL;
   }
 
   public get usageEndpoint(): string {

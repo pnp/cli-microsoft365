@@ -11,7 +11,7 @@ interface CommandArgs {
 
 class AadGroupSettingListCommand extends GraphItemsListCommand<GroupSetting> {
   public get name(): string {
-    return `${commands.GROUPSETTING_LIST}`;
+    return commands.GROUPSETTING_LIST;
   }
 
   public get description(): string {

@@ -32,7 +32,7 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return `${commands.TEAMS_MESSAGINGSETTINGS_SET}`;
+    return commands.TEAMS_MESSAGINGSETTINGS_SET;
   }
 
   public get description(): string {

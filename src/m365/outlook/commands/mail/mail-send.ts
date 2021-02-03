@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
 
 class OutlookSendmailCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.OUTLOOK_MAIL_SEND}`;
+    return commands.OUTLOOK_MAIL_SEND;
   }
 
   public get description(): string {

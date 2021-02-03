@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class TeamsMessageReplyListCommand extends GraphItemsListCommand<Reply>  {
   public get name(): string {
-    return `${commands.TEAMS_MESSAGE_REPLY_LIST}`;
+    return commands.TEAMS_MESSAGE_REPLY_LIST;
   }
 
   public get description(): string {

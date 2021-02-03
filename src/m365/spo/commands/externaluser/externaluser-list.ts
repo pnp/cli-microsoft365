@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
 
 class SpoExternalUserListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.EXTERNALUSER_LIST}`;
+    return commands.EXTERNALUSER_LIST;
   }
 
   public get description(): string {

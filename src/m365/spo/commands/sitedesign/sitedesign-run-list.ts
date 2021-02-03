@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignRunListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_RUN_LIST}`;
+    return commands.SITEDESIGN_RUN_LIST;
   }
 
   public get description(): string {

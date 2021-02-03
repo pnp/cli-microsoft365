@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class TeamsMemberSettingsListCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_MEMBERSETTINGS_LIST}`;
+    return commands.TEAMS_MEMBERSETTINGS_LIST;
   }
 
   public get description(): string {

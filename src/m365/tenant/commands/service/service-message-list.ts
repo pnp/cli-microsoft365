@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TenantServiceMessageListCommand extends Command {
   public get name(): string {
-    return `${commands.TENANT_SERVICE_MESSAGE_LIST}`;
+    return commands.TENANT_SERVICE_MESSAGE_LIST;
   }
 
   public get description(): string {

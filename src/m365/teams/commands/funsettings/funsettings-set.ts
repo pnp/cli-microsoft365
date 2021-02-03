@@ -27,7 +27,7 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return `${commands.TEAMS_FUNSETTINGS_SET}`;
+    return commands.TEAMS_FUNSETTINGS_SET;
   }
 
   public get description(): string {

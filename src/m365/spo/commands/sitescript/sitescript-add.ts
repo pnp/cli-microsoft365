@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteScriptAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITESCRIPT_ADD}`;
+    return commands.SITESCRIPT_ADD;
   }
 
   public get description(): string {

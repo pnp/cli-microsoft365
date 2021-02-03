@@ -12,7 +12,7 @@ interface CommandArgs {
 
 class SpoSiteDesignListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_LIST}`;
+    return commands.SITEDESIGN_LIST;
   }
 
   public get description(): string {

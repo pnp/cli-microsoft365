@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
 
 class YammerMessageGetCommand extends YammerCommand {
   public get name(): string {
-    return `${commands.YAMMER_MESSAGE_GET}`;
+    return commands.YAMMER_MESSAGE_GET;
   }
 
   public get description(): string {

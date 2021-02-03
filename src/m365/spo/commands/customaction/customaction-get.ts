@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoCustomActionGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CUSTOMACTION_GET}`;
+    return commands.CUSTOMACTION_GET;
   }
 
   public get description(): string {

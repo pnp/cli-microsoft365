@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignRightsGrantCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_RIGHTS_GRANT}`;
+    return commands.SITEDESIGN_RIGHTS_GRANT;
   }
 
   public get description(): string {

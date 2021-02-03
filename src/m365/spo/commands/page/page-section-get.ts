@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageSectionGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_SECTION_GET}`;
+    return commands.PAGE_SECTION_GET;
   }
 
   public get description(): string {

@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class AadGroupSettingAddCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.GROUPSETTING_ADD}`;
+    return commands.GROUPSETTING_ADD;
   }
 
   public get description(): string {

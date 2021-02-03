@@ -12,7 +12,7 @@ import { SPOWebAppServicePrincipalPermissionGrant } from './SPOWebAppServicePrin
 
 class SpoServicePrincipalGrantListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SERVICEPRINCIPAL_GRANT_LIST}`;
+    return commands.SERVICEPRINCIPAL_GRANT_LIST;
   }
 
   public get description(): string {

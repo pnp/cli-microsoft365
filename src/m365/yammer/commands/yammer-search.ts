@@ -104,7 +104,7 @@ class YammerSearchCommand extends YammerCommand {
   }
 
   public get name(): string {
-    return `${commands.YAMMER_SEARCH}`;
+    return commands.YAMMER_SEARCH;
   }
 
   public get description(): string {

@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class AadSiteClassificationDisableCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.SITECLASSIFICATION_DISABLE}`;
+    return commands.SITECLASSIFICATION_DISABLE;
   }
 
   public get description(): string {

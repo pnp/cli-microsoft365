@@ -24,7 +24,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteGroupifyCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITE_GROUPIFY}`;
+    return commands.SITE_GROUPIFY;
   }
 
   public get description(): string {

@@ -21,7 +21,7 @@ export interface Options extends GlobalOptions {
 
 class SpoSiteDesignApplyCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_APPLY}`;
+    return commands.SITEDESIGN_APPLY;
   }
 
   public get description(): string {

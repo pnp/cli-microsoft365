@@ -48,7 +48,7 @@ class TeamsTeamAddCommand extends GraphCommand {
   private pollingInterval: number = 30000;
 
   public get name(): string {
-    return `${commands.TEAMS_TEAM_ADD}`;
+    return commands.TEAMS_TEAM_ADD;
   }
 
   public get description(): string {

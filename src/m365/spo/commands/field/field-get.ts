@@ -24,7 +24,7 @@ interface Options extends GlobalOptions {
 
 class SpoFieldGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.FIELD_GET}`;
+    return commands.FIELD_GET;
   }
 
   public get description(): string {

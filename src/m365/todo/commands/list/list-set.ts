@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class TodoListSetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.LIST_SET}`;
+    return commands.LIST_SET;
   }
 
   public get description(): string {

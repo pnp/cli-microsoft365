@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoFeatureListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.FEATURE_LIST}`;
+    return commands.FEATURE_LIST;
   }
 
   public get description(): string {

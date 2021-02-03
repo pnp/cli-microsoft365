@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class TeamsAppUninstallCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_APP_UNINSTALL}`;
+    return commands.TEAMS_APP_UNINSTALL;
   }
 
   public get description(): string {

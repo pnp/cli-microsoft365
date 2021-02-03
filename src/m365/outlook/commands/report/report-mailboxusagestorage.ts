@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class OutlookReportMailboxUsageStorageCommand extends PeriodBasedReport {
   public get name(): string {
-    return `${commands.OUTLOOK_REPORT_MAILBOXUSAGESTORAGE}`;
+    return commands.OUTLOOK_REPORT_MAILBOXUSAGESTORAGE;
   }
 
   public get usageEndpoint(): string {

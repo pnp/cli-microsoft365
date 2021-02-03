@@ -25,7 +25,7 @@ export interface Options extends GlobalOptions {
 
 class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
   public get name(): string {
-    return `${commands.PROPERTYBAG_REMOVE}`;
+    return commands.PROPERTYBAG_REMOVE;
   }
 
   public get description(): string {

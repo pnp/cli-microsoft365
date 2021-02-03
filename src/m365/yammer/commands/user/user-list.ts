@@ -26,7 +26,7 @@ class YammerUserListCommand extends YammerCommand {
   }
 
   public get name(): string {
-    return `${commands.YAMMER_USER_LIST}`;
+    return commands.YAMMER_USER_LIST;
   }
 
   public get description(): string {

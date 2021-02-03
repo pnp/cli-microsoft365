@@ -23,7 +23,7 @@ class YammerGroupListCommand extends YammerCommand {
   }
 
   public get name(): string {
-    return `${commands.YAMMER_GROUP_LIST}`;
+    return commands.YAMMER_GROUP_LIST;
   }
 
   public get description(): string {

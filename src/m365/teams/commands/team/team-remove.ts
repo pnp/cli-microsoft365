@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class TeamsRemoveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_TEAM_REMOVE}`;
+    return commands.TEAMS_TEAM_REMOVE;
   }
 
   public get description(): string {

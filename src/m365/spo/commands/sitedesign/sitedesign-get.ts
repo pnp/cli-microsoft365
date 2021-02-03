@@ -22,7 +22,7 @@ class SpoSiteDesignGetCommand extends SpoCommand {
   private spoUrl: string = "";
 
   public get name(): string {
-    return `${commands.SITEDESIGN_GET}`;
+    return commands.SITEDESIGN_GET;
   }
 
   public get description(): string {
