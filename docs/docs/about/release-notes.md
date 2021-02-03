@@ -2,11 +2,19 @@
 
 ## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
 
+### New commands
+
+**SharePoint:**
+
+- [spo page copy](../cmd/spo/page/page-copy.md) - creates a copy of a modern page or template [#2088](https://github.com/pnp/cli-microsoft365/issues/2088)
+
 ### Changes
 
 - fixed broken tests in 'tenant auditlog report' on Node@10 [#2125](https://github.com/pnp/cli-microsoft365/issues/2125)
 - fixed uploading large files [#2120](https://github.com/pnp/cli-microsoft365/issues/2120)
 - implemented browser-based login [#1979](https://github.com/pnp/cli-microsoft365/issues/1979)
+- fixed bug in 'spo tenant appcatalog add' [#2129](https://github.com/pnp/cli-microsoft365/issues/2129)
+- changed the logic to keep original value if @-value is not a valid file path [#2134](https://github.com/pnp/cli-microsoft365/issues/2134)
 
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 
