@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoServicePrincipalGrantAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SERVICEPRINCIPAL_GRANT_ADD}`;
+    return commands.SERVICEPRINCIPAL_GRANT_ADD;
   }
 
   public get description(): string {

@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignRightsListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_RIGHTS_LIST}`;
+    return commands.SITEDESIGN_RIGHTS_LIST;
   }
 
   public get description(): string {

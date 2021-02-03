@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoAppPageAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.APPPAGE_ADD}`;
+    return commands.APPPAGE_ADD;
   }
 
   public getTelemetryProperties(args: CommandArgs): any {

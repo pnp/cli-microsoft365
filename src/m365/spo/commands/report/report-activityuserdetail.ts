@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class SpoReportActivityUserDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {
-    return `${commands.REPORT_ACTIVITYUSERDETAIL}`;
+    return commands.REPORT_ACTIVITYUSERDETAIL;
   }
 
   public get description(): string {

@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoNavigationNodeRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.NAVIGATION_NODE_REMOVE}`;
+    return commands.NAVIGATION_NODE_REMOVE;
   }
 
   public get description(): string {

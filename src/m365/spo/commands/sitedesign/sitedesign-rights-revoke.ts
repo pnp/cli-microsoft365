@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_RIGHTS_REVOKE}`;
+    return commands.SITEDESIGN_RIGHTS_REVOKE;
   }
 
   public get description(): string {

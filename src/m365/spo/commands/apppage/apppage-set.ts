@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoAppPageSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.APPPAGE_SET}`;
+    return commands.APPPAGE_SET;
   }
 
   public get description(): string {

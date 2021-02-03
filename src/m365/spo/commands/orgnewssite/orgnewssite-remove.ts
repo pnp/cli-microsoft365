@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.ORGNEWSSITE_REMOVE}`;
+    return commands.ORGNEWSSITE_REMOVE;
   }
 
   public get description(): string {

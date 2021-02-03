@@ -31,7 +31,7 @@ class TeamsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return `${commands.TEAMS_TEAM_SET}`;
+    return commands.TEAMS_TEAM_SET;
   }
 
   public get description(): string {

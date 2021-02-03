@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class AadUserListCommand extends GraphItemsListCommand<any> {
   public get name(): string {
-    return `${commands.USER_LIST}`;
+    return commands.USER_LIST;
   }
 
   public get description(): string {

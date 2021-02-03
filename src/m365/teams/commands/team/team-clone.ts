@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class TeamsCloneCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_TEAM_CLONE}`;
+    return commands.TEAMS_TEAM_CLONE;
   }
 
   public get description(): string {

@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class TodoTaskSetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TASK_SET}`;
+    return commands.TASK_SET;
   }
 
   public get description(): string {

@@ -32,7 +32,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageClientSideWebPartAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_CLIENTSIDEWEBPART_ADD}`;
+    return commands.PAGE_CLIENTSIDEWEBPART_ADD;
   }
 
   public get description(): string {

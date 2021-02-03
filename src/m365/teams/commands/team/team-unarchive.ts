@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class TeamsUnarchiveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_TEAM_UNARCHIVE}`;
+    return commands.TEAMS_TEAM_UNARCHIVE;
   }
 
   public get description(): string {

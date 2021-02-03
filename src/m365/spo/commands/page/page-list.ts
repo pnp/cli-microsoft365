@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_LIST}`;
+    return commands.PAGE_LIST;
   }
 
   public get description(): string {

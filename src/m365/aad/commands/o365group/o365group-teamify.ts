@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class AadO365GroupTeamifyCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.O365GROUP_TEAMIFY}`;
+    return commands.O365GROUP_TEAMIFY;
   }
 
   public get description(): string {

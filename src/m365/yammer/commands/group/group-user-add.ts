@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class YammerGroupUserAddCommand extends YammerCommand {
   public get name(): string {
-    return `${commands.YAMMER_GROUP_USER_ADD}`;
+    return commands.YAMMER_GROUP_USER_ADD;
   }
 
   public get description(): string {

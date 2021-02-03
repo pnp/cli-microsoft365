@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class AadGroupSettingTemplateGetCommand extends GraphItemsListCommand<GroupSettingTemplate> {
   public get name(): string {
-    return `${commands.GROUPSETTINGTEMPLATE_GET}`;
+    return commands.GROUPSETTINGTEMPLATE_GET;
   }
 
   public get description(): string {

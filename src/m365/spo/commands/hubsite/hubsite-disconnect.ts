@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteDisconnectCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_DISCONNECT}`;
+    return commands.HUBSITE_DISCONNECT;
   }
 
   public get description(): string {

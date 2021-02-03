@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TeamsListCommand extends GraphItemsListCommand<Team> {
   public get name(): string {
-    return `${commands.TEAMS_TEAM_LIST}`;
+    return commands.TEAMS_TEAM_LIST;
   }
 
   public get description(): string {

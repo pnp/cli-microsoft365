@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_REMOVE}`;
+    return commands.PAGE_REMOVE;
   }
 
   public get description(): string {

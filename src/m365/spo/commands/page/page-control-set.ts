@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageControlSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_CONTROL_SET}`;
+    return commands.PAGE_CONTROL_SET;
   }
 
   public get description(): string {

@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
 
 class LoginCommand extends Command {
   public get name(): string {
-    return `${commands.LOGIN}`;
+    return commands.LOGIN;
   }
 
   public get description(): string {

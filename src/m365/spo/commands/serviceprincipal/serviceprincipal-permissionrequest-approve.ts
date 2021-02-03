@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoServicePrincipalPermissionRequestApproveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE}`;
+    return commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE;
   }
 
   public get description(): string {

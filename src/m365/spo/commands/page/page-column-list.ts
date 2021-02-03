@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageColumnListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_COLUMN_LIST}`;
+    return commands.PAGE_COLUMN_LIST;
   }
 
   public get description(): string {

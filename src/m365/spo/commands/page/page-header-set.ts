@@ -31,7 +31,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageHeaderSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_HEADER_SET}`;
+    return commands.PAGE_HEADER_SET;
   }
 
   public get description(): string {

@@ -20,7 +20,7 @@ class SpoHubSiteListCommand extends SpoCommand {
   private batchSize: number = 30;
 
   public get name(): string {
-    return `${commands.HUBSITE_LIST}`;
+    return commands.HUBSITE_LIST;
   }
 
   public get description(): string {

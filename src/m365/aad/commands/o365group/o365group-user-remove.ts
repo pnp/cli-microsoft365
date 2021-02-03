@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class AadO365GroupUserRemoveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.O365GROUP_USER_REMOVE}`;
+    return commands.O365GROUP_USER_REMOVE;
   }
 
   public get description(): string {

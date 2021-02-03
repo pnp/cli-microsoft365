@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class AadUserGetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.USER_GET}`;
+    return commands.USER_GET;
   }
 
   public get description(): string {

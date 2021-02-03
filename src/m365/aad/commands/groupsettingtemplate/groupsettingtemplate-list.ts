@@ -10,7 +10,7 @@ interface CommandArgs {
 
 class AadGroupSettingTemplateListCommand extends GraphItemsListCommand<GroupSettingTemplate> {
   public get name(): string {
-    return `${commands.GROUPSETTINGTEMPLATE_LIST}`;
+    return commands.GROUPSETTINGTEMPLATE_LIST;
   }
 
   public get description(): string {

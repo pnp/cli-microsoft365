@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TeamsUserAppAddCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_USER_APP_ADD}`;
+    return commands.TEAMS_USER_APP_ADD;
   }
 
   public get description(): string {

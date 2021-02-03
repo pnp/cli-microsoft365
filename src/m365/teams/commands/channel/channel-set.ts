@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class TeamsChannelSetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_CHANNEL_SET}`;
+    return commands.TEAMS_CHANNEL_SET;
   }
   public get description(): string {
     return 'Updates properties of the specified channel in the given Microsoft Teams team';

@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class AadO365GroupUserAddCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.O365GROUP_USER_ADD}`;
+    return commands.O365GROUP_USER_ADD;
   }
 
   public get description(): string {

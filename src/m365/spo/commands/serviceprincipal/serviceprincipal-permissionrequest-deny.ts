@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoServicePrincipalPermissionRequestDenyCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY}`;
+    return commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY;
   }
 
   public alias(): string[] | undefined {

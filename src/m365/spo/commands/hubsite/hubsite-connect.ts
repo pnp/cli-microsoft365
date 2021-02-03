@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteConnectCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_CONNECT}`;
+    return commands.HUBSITE_CONNECT;
   }
 
   public get description(): string {

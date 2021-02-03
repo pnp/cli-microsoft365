@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class AccessTokenGetCommand extends Command {
   public get name(): string {
-    return `${commands.UTIL_ACCESSTOKEN_GET}`;
+    return commands.UTIL_ACCESSTOKEN_GET;
   }
 
   public get description(): string {

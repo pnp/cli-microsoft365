@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoStorageEntityRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.STORAGEENTITY_REMOVE}`;
+    return commands.STORAGEENTITY_REMOVE;
   }
 
   public get description(): string {

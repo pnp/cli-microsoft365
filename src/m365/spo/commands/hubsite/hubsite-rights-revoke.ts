@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteRightsRevokeCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_RIGHTS_REVOKE}`;
+    return commands.HUBSITE_RIGHTS_REVOKE;
   }
 
   public get description(): string {

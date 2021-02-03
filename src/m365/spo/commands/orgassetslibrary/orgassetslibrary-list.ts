@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoOrgNewsSiteListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.ORGASSETSLIBRARY_LIST}`;
+    return commands.ORGASSETSLIBRARY_LIST;
   }
 
   public get description(): string {

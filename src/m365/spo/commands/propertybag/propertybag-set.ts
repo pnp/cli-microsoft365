@@ -22,7 +22,7 @@ export interface Options extends GlobalOptions {
 
 class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
   public get name(): string {
-    return `${commands.PROPERTYBAG_SET}`;
+    return commands.PROPERTYBAG_SET;
   }
 
   public get description(): string {

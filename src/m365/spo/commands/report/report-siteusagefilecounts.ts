@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class SpoReportSiteUsageFileCountsCommand extends PeriodBasedReport {
   public get name(): string {
-    return `${commands.REPORT_SITEUSAGEFILECOUNTS}`;
+    return commands.REPORT_SITEUSAGEFILECOUNTS;
   }
 
   public get usageEndpoint(): string {

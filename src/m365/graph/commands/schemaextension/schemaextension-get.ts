@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class GraphSchemaExtensionGet extends GraphCommand {
   public get name(): string {
-    return `${commands.SCHEMAEXTENSION_GET}`;
+    return commands.SCHEMAEXTENSION_GET;
   }
 
   public get description(): string {

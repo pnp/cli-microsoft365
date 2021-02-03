@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoNavigationNodeListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.NAVIGATION_NODE_LIST}`;
+    return commands.NAVIGATION_NODE_LIST;
   }
 
   public get description(): string {

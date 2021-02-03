@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class TenantServiceReportHistoricalServiceStatusCommand extends Command {
   public get name(): string {
-    return `${commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS}`;
+    return commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS;
   }
 
   public get description(): string {

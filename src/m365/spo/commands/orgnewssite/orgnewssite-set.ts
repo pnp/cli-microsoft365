@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoOrgNewsSiteSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.ORGNEWSSITE_SET}`;
+    return commands.ORGNEWSSITE_SET;
   }
 
   public get description(): string {

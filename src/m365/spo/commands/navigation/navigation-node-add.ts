@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoNavigationNodeAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.NAVIGATION_NODE_ADD}`;
+    return commands.NAVIGATION_NODE_ADD;
   }
 
   public get description(): string {

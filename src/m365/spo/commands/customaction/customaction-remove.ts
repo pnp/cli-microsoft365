@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoCustomActionRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CUSTOMACTION_REMOVE}`;
+    return commands.CUSTOMACTION_REMOVE;
   }
 
   public get description(): string {

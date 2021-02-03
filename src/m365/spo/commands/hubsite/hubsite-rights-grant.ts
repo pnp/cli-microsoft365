@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteRightsGrantCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_RIGHTS_GRANT}`;
+    return commands.HUBSITE_RIGHTS_GRANT;
   }
 
   public get description(): string {

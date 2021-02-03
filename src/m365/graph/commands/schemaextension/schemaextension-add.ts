@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class GraphSchemaExtensionAdd extends GraphCommand {
   public get name(): string {
-    return `${commands.SCHEMAEXTENSION_ADD}`;
+    return commands.SCHEMAEXTENSION_ADD;
   }
 
   public get description(): string {

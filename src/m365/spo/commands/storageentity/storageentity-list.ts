@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class SpoStorageEntityListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.STORAGEENTITY_LIST}`;
+    return commands.STORAGEENTITY_LIST;
   }
 
   public get description(): string {

@@ -25,7 +25,7 @@ interface Options extends GlobalOptions {
 
 class SpoFieldRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.FIELD_REMOVE}`;
+    return commands.FIELD_REMOVE;
   }
 
   public get description(): string {

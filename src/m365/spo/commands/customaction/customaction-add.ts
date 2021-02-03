@@ -37,7 +37,7 @@ interface Options extends GlobalOptions {
 
 class SpoCustomActionAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CUSTOMACTION_ADD}`;
+    return commands.CUSTOMACTION_ADD;
   }
 
   public get description(): string {

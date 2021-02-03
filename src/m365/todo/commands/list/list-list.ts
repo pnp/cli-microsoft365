@@ -12,7 +12,7 @@ interface Options extends GlobalOptions { }
 
 class TodoListListCommand extends GraphItemsListCommand<ToDoList> {
   public get name(): string {
-    return `${commands.LIST_LIST}`;
+    return commands.LIST_LIST;
   }
 
   public get description(): string {

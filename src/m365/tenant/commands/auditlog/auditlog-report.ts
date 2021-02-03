@@ -52,7 +52,7 @@ class TenantAuditlogReportCommand extends Command {
   private completeAuditReports: AuditlogReport[] = [];
 
   public get name(): string {
-    return `${commands.TENANT_AUDITLOG_REPORT}`;
+    return commands.TENANT_AUDITLOG_REPORT;
   }
 
   public get description(): string {

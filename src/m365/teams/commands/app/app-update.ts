@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class TeamsAppUpdateCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_APP_UPDATE}`;
+    return commands.TEAMS_APP_UPDATE;
   }
 
   public get description(): string {

@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CONTENTTYPE_FIELD_REMOVE}`;
+    return commands.CONTENTTYPE_FIELD_REMOVE;
   }
 
   public get description(): string {

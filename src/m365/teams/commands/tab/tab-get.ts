@@ -29,7 +29,7 @@ class TeamsTabGetCommand extends GraphCommand {
   private channelId: string = "";
 
   public get name(): string {
-    return `${commands.TEAMS_TAB_GET}`;
+    return commands.TEAMS_TAB_GET;
   }
 
   public get description(): string {

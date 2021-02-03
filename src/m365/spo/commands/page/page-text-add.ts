@@ -28,7 +28,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageTextAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_TEXT_ADD}`;
+    return commands.PAGE_TEXT_ADD;
   }
 
   public get description(): string {

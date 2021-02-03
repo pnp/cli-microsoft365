@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class SpoContentTypeGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CONTENTTYPE_GET}`;
+    return commands.CONTENTTYPE_GET;
   }
 
   public get description(): string {

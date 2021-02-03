@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
 
 class SpoContentTypeAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CONTENTTYPE_ADD}`;
+    return commands.CONTENTTYPE_ADD;
   }
 
   public get description(): string {

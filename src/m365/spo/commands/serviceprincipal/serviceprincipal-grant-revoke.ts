@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SERVICEPRINCIPAL_GRANT_REVOKE}`;
+    return commands.SERVICEPRINCIPAL_GRANT_REVOKE;
   }
 
   public get description(): string {

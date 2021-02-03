@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoAppAddCommand extends SpoAppBaseCommand {
   public get name(): string {
-    return `${commands.APP_ADD}`;
+    return commands.APP_ADD;
   }
 
   public get description(): string {

@@ -30,7 +30,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_ADD}`;
+    return commands.PAGE_ADD;
   }
 
   public get description(): string {

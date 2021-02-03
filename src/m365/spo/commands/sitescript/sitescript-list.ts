@@ -6,7 +6,7 @@ import { ContextInfo } from '../../spo';
 
 class SpoSiteScriptListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITESCRIPT_LIST}`;
+    return commands.SITESCRIPT_LIST;
   }
 
   public get description(): string {

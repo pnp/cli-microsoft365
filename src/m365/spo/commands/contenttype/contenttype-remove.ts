@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class SpoContentTypeRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CONTENTTYPE_REMOVE}`;
+    return commands.CONTENTTYPE_REMOVE;
   }
 
   public get description(): string {

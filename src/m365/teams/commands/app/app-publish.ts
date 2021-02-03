@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TeamsAppPublishCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_APP_PUBLISH}`;
+    return commands.TEAMS_APP_PUBLISH;
   }
 
   public get description(): string {

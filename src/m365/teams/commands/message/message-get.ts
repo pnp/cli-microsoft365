@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class TeamsMessageGetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_MESSAGE_GET}`;
+    return commands.TEAMS_MESSAGE_GET;
   }
 
   public get description(): string {

@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteUnregisterCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_UNREGISTER}`;
+    return commands.HUBSITE_UNREGISTER;
   }
 
   public get description(): string {

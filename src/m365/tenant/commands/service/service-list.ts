@@ -7,7 +7,7 @@ import commands from '../../commands';
 
 class TenantServiceListCommand extends Command {
   public get name(): string {
-    return `${commands.TENANT_SERVICE_LIST}`;
+    return commands.TENANT_SERVICE_LIST;
   }
 
   public get description(): string {

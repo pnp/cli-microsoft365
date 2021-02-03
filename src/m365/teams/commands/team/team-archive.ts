@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TeamsArchiveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_TEAM_ARCHIVE}`;
+    return commands.TEAMS_TEAM_ARCHIVE;
   }
 
   public get description(): string {

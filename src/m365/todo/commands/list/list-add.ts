@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TodoListAddCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.LIST_ADD}`;
+    return commands.LIST_ADD;
   }
 
   public get description(): string {

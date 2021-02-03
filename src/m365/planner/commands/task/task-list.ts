@@ -10,7 +10,7 @@ interface CommandArgs {
 
 class GraphPlannerTaskListCommand extends GraphItemsListCommand<Task> {
   public get name(): string {
-    return `${commands.PLANNER_TASK_LIST}`;
+    return commands.PLANNER_TASK_LIST;
   }
 
   public get description(): string {

@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignTaskGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_TASK_GET}`;
+    return commands.SITEDESIGN_TASK_GET;
   }
 
   public get description(): string {

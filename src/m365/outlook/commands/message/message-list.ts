@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
   public get name(): string {
-    return `${commands.OUTLOOK_MESSAGE_LIST}`;
+    return commands.OUTLOOK_MESSAGE_LIST;
   }
 
   public get description(): string {

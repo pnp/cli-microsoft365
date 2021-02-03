@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class TodoListRemoveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.LIST_REMOVE}`;
+    return commands.LIST_REMOVE;
   }
 
   public get description(): string {

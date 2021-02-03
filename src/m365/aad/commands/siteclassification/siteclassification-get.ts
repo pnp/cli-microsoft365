@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class AadSiteClassificationGetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.SITECLASSIFICATION_GET}`;
+    return commands.SITECLASSIFICATION_GET;
   }
 
   public get description(): string {

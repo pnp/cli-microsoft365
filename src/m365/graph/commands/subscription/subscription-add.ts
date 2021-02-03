@@ -42,7 +42,7 @@ const SAFE_MINUTES_DELTA = 1;
 
 class GraphSubscriptionAddCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.SUBSCRIPTION_ADD}`;
+    return commands.SUBSCRIPTION_ADD;
   }
 
   public get description(): string {

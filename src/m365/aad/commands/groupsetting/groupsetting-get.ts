@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class AadGroupSettingGetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.GROUPSETTING_GET}`;
+    return commands.GROUPSETTING_GET;
   }
 
   public get description(): string {

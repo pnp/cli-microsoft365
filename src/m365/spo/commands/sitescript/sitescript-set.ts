@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteScriptSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITESCRIPT_SET}`;
+    return commands.SITESCRIPT_SET;
   }
 
   public get description(): string {

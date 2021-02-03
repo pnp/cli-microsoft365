@@ -40,7 +40,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
   }
 
   public get name(): string {
-    return `${commands.CONTENTTYPE_FIELD_SET}`;
+    return commands.CONTENTTYPE_FIELD_SET;
   }
 
   public get description(): string {

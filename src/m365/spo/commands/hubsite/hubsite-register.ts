@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteRegisterCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_REGISTER}`;
+    return commands.HUBSITE_REGISTER;
   }
 
   public get description(): string {

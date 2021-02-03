@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_TASK_REMOVE}`;
+    return commands.SITEDESIGN_TASK_REMOVE;
   }
 
   public get description(): string {

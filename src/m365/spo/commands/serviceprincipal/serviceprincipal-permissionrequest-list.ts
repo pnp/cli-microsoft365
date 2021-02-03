@@ -11,7 +11,7 @@ import { SPOWebAppServicePrincipalPermissionRequest } from './SPOWebAppServicePr
 
 class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST}`;
+    return commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST;
   }
 
   public get description(): string {

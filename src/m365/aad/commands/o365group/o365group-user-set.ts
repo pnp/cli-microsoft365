@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
 
 class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
   public get name(): string {
-    return `${commands.O365GROUP_USER_SET}`;
+    return commands.O365GROUP_USER_SET;
   }
 
   public get description(): string {

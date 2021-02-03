@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class CliConsentCommand extends AnonymousCommand {
   public get name(): string {
-    return `${commands.CONSENT}`;
+    return commands.CONSENT;
   }
 
   public get description(): string {

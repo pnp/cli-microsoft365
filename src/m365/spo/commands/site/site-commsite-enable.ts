@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteCommSiteEnableCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITE_COMMSITE_ENABLE}`;
+    return commands.SITE_COMMSITE_ENABLE;
   }
 
   public get description(): string {

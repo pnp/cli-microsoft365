@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteScriptRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITESCRIPT_REMOVE}`;
+    return commands.SITESCRIPT_REMOVE;
   }
 
   public get description(): string {

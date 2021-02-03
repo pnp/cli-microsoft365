@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class AadO365GroupRecycleBinItemCommand extends GraphItemsListCommand<Group> {
   public get name(): string {
-    return `${commands.O365GROUP_RECYCLEBINITEM_LIST}`;
+    return commands.O365GROUP_RECYCLEBINITEM_LIST;
   }
 
   public get description(): string {

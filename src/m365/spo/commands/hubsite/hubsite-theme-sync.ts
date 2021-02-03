@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteThemeSyncCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_THEME_SYNC}`;
+    return commands.HUBSITE_THEME_SYNC;
   }
 
   public get description(): string {
