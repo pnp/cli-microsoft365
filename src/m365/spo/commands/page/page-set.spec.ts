@@ -363,6 +363,56 @@ describe(commands.PAGE_SET, () => {
     });
   });
 
+  it('updates page title', (done) => {
+    Utils.restore([request.post]);
+
+    const newPageTitle = "updated title";
+    let responseData: any = {};
+    
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
+        return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "article",
+          Id: 1,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          LayoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        responseData = opts.data;
+        return Promise.resolve();
+      }
+      
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: newPageTitle } }, () => {
+      try {
+        assert.strictEqual(responseData.Title, newPageTitle);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('publishes page', (done) => {
     Utils.restore([request.post]);
     

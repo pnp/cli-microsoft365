@@ -26,6 +26,7 @@ interface Options extends GlobalOptions {
   publish: boolean;
   publishMessage?: string;
   description?: string;
+  title?: string;
 }
 
 class SpoPageSetCommand extends SpoCommand {
@@ -45,6 +46,7 @@ class SpoPageSetCommand extends SpoCommand {
     telemetryProps.publish = args.options.publish || false;
     telemetryProps.publishMessage = typeof args.options.publishMessage !== 'undefined';
     telemetryProps.description = typeof args.options.description !== 'undefined';
+    telemetryProps.title = typeof args.options.title !== 'undefined';
     return telemetryProps;
   }
 
@@ -56,7 +58,7 @@ class SpoPageSetCommand extends SpoCommand {
     let bannerImageUrl: string = '';
     let canvasContent1: string = '';
     let layoutWebpartsContent: string = '';
-    let pageTitle: string | null = null;
+    let pageTitle: string = args.options.title || "";
     let pageId: number | null = null;
     let pageDescription: string = args.options.description || "";
     let topicHeader: string = "";
@@ -77,7 +79,7 @@ class SpoPageSetCommand extends SpoCommand {
       })
       .then((res: ClientSidePageProperties): Promise<void> => {
         if (res) {
-          pageTitle = res.Title;
+          pageTitle = pageTitle || res.Title;
           pageId = res.Id;
 
           bannerImageUrl = res.BannerImageUrl;
@@ -358,6 +360,10 @@ class SpoPageSetCommand extends SpoCommand {
       {
         option: '--description [description]',
         description: 'The description to set for the page'
+      },
+      {
+        option: '--title [title]',
+        description: 'The title to set for the page'
       }
     ];
 

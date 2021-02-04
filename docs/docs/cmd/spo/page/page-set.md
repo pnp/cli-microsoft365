@@ -34,6 +34,9 @@ m365 spo page set [options]
 `--description [description]`
 : The description to set for the page
 
+`--title [title]`
+: The title to set for the page
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
