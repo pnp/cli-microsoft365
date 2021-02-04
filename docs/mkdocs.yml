@@ -141,6 +141,7 @@ nav:
         - connector export: 'cmd/pa/connector/connector-export.md'
         - connector list: 'cmd/pa/connector/connector-list.md'
       - environment:
+        - environment get: 'cmd/pa/environment/environment-get.md'
         - environment list: 'cmd/pa/environment/environment-list.md'
       - pcf:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
