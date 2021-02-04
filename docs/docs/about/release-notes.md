@@ -4,9 +4,14 @@
 
 ### New commands
 
+**Power Apps:**
+
+- [pa environment list](../cmd/pa/environment/environment-list.md) - lists Microsoft Power Apps environments in the current tenant [#2108](https://github.com/pnp/cli-microsoft365/issues/2108)
+
 **SharePoint:**
 
 - [spo page copy](../cmd/spo/page/page-copy.md) - creates a copy of a modern page or template [#2088](https://github.com/pnp/cli-microsoft365/issues/2088)
+- [spo site ensure](../cmd/spo/site/site-ensure.md) - ensures that the particular site collection exists and updates its properties if necessary [#1404](https://github.com/pnp/cli-microsoft365/issues/1404)
 
 ### Changes
 
@@ -15,6 +20,8 @@
 - implemented browser-based login [#1979](https://github.com/pnp/cli-microsoft365/issues/1979)
 - fixed bug in 'spo tenant appcatalog add' [#2129](https://github.com/pnp/cli-microsoft365/issues/2129)
 - changed the logic to keep original value if @-value is not a valid file path [#2134](https://github.com/pnp/cli-microsoft365/issues/2134)
+- removed 'description' property from command option [#2112](https://github.com/pnp/cli-microsoft365/issues/2112)
+- extended 'spo page set' with title [#2140](https://github.com/pnp/cli-microsoft365/issues/2140)
 
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 
