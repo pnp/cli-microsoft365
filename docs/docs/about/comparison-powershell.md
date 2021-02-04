@@ -715,7 +715,7 @@ Get-PowerAppConnection|Microsoft.PowerApps.PowerShell|
 Get-PowerAppConnectionRoleAssignment|Microsoft.PowerApps.PowerShell|
 Get-PowerAppConnector|Microsoft.PowerApps.PowerShell|
 Get-PowerAppConnectorRoleAssignment|Microsoft.PowerApps.PowerShell|
-Get-PowerAppEnvironment|Microsoft.PowerApps.PowerShell|[pa environment list](../cmd/pa/environment/environment-list.md)
+Get-PowerAppEnvironment|Microsoft.PowerApps.PowerShell|[pa environment list](../cmd/pa/environment/environment-list.md), [pa environment get](../cmd/pa/environment/environment-get.md)
 Get-PowerAppRoleAssignment|Microsoft.PowerApps.PowerShell|
 Get-PowerAppsNotification|Microsoft.PowerApps.PowerShell|
 Get-PowerAppVersion|Microsoft.PowerApps.PowerShell|
