@@ -18,7 +18,7 @@ describe(commands.PAGE_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
     auth.service.connected = true;
   });
@@ -41,7 +41,7 @@ describe(commands.PAGE_SET, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if (((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/article.aspx')/ListItemAllFields`) > -1 ||
-           (opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/article.aspx')/ListItemAllFields`) > -1) &&
+        (opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sitepages/article.aspx')/ListItemAllFields`) > -1) &&
         JSON.stringify(opts.data) === JSON.stringify({
           PageLayoutType: 'Article',
           PromotedState: 0,
@@ -72,7 +72,7 @@ describe(commands.PAGE_SET, () => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
         return Promise.resolve();
       }
-      
+
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
         return Promise.resolve();
       }
@@ -276,7 +276,7 @@ describe(commands.PAGE_SET, () => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
         return Promise.resolve();
       }
-      
+
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
         return Promise.resolve();
       }
@@ -297,7 +297,7 @@ describe(commands.PAGE_SET, () => {
 
   it('enables comments on the page', (done) => {
     Utils.restore([request.post]);
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
         return Promise.resolve();
@@ -322,7 +322,7 @@ describe(commands.PAGE_SET, () => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
         return Promise.resolve();
       }
-      
+
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
         return Promise.resolve();
       }
@@ -343,7 +343,7 @@ describe(commands.PAGE_SET, () => {
 
   it('disables comments on the page (debug)', (done) => {
     Utils.restore([request.post]);
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(true)`) > -1) {
         return Promise.resolve();
@@ -363,9 +363,59 @@ describe(commands.PAGE_SET, () => {
     });
   });
 
+  it('updates page title', (done) => {
+    Utils.restore([request.post]);
+
+    const newPageTitle = "updated title";
+    let responseData: any = {};
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields/SetCommentsDisabled(false)`) > -1) {
+        return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
+        return Promise.resolve({
+          Title: "article",
+          Id: 1,
+          TopicHeader: "TopicHeader",
+          AuthorByline: "AuthorByline",
+          Description: "Description",
+          BannerImageUrl: {
+            Description: '/_layouts/15/images/sitepagethumbnail.png',
+            Url: `https://contoso.sharepoint.com/_layouts/15/images/sitepagethumbnail.png`
+          },
+          CanvasContent1: "{}",
+          LayoutWebpartsContent: "{}"
+        });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
+        responseData = opts.data;
+        return Promise.resolve();
+      }
+
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePageAsDraft`) > -1) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', title: newPageTitle } }, () => {
+      try {
+        assert.strictEqual(responseData.Title, newPageTitle);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('publishes page', (done) => {
     Utils.restore([request.post]);
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/ListItemAllFields`) > -1) {
         return Promise.resolve();
@@ -411,8 +461,8 @@ describe(commands.PAGE_SET, () => {
 
   it('publishes page with a message (debug)', (done) => {
     Utils.restore([request.post]);
-    
-    sinon.stub(request, 'post').callsFake((opts) => {      
+
+    sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages/GetByUrl('sitepages/page.aspx')/checkoutpage`) > -1) {
         return Promise.resolve({
           Title: "article",
@@ -432,7 +482,7 @@ describe(commands.PAGE_SET, () => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages(1)/SavePage`) > -1) {
         return Promise.resolve();
       }
-      
+
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/CheckIn(comment=@a1,checkintype=@a2)?@a1='Initial%20version'&@a2=1`) > -1) {
         return Promise.resolve();
       }
@@ -453,7 +503,7 @@ describe(commands.PAGE_SET, () => {
 
   it('escapes special characters in user input', (done) => {
     Utils.restore([request.post]);
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`_api/web/getfilebyserverrelativeurl('/sites/team-a/sitepages/page.aspx')/Publish('Don%39t%20tell')`) > -1) {
         return Promise.resolve();
@@ -475,7 +525,7 @@ describe(commands.PAGE_SET, () => {
 
   it('correctly handles OData error when creating modern page', (done) => {
     Utils.restore([request.post]);
-    
+
     sinon.stub(request, 'post').callsFake((opts) => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
