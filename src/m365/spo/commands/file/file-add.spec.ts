@@ -705,7 +705,7 @@ describe(commands.FILE_ADD, () => {
         done(e);
       }
     });
-  });
+  }).timeout(10000); // increase timeout to allow processing chunks on Node@10
 
   it('should cancel chunck upload on files over 250 MB on error', (done) => {
     stubGetResponses();
