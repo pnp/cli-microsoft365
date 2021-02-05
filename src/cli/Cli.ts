@@ -10,8 +10,10 @@ import { Logger } from '.';
 import Command, { CommandError } from '../Command';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
+import configstore from '../configstore';
 import Utils from '../Utils';
 const packageJSON = require('../../package.json');
+const Configstore = require('configstore');
 
 export interface CommandOutput {
   stdout: string;
@@ -35,15 +37,20 @@ export class Cli {
   public currentCommandName: string | undefined;
   private optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
   private commandsFolder: string = '';
+  private showHelpOnFailure: boolean = false;
   private static instance: Cli;
+  private static conf: any;
 
   private constructor() {
+    Cli.conf = new Configstore(configstore.name);
   }
 
   public static getInstance(): Cli {
     if (!Cli.instance) {
       Cli.instance = new Cli();
     }
+
+    Cli.instance.showHelpOnFailure = Cli.conf.get(configstore.showHelpOnFailure) || false;
 
     return Cli.instance;
   }
@@ -145,7 +152,7 @@ export class Cli {
       Cli.loadOptionValuesFromFiles(optionsWithoutShorts);
     }
     catch (e) {
-      return this.closeWithError(e);
+      return this.closeWithError(e, Cli.getInstance().showHelpOnFailure);
     }
 
     const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
@@ -260,7 +267,7 @@ export class Cli {
           }
         }
         catch (e) {
-          this.closeWithError(e);
+          this.closeWithError(e, Cli.getInstance().showHelpOnFailure);
         }
       }
     });
