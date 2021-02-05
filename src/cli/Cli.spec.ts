@@ -1256,4 +1256,11 @@ describe('Cli', () => {
     (Cli as any).error('Message');
     assert(consoleErrorSpy.calledWith('Message'));
   });
+
+  it(`returns stored configuration value when available`, () => {
+    const config = cli.config;
+    sinon.stub(config, 'get').callsFake(key => 'value');
+    const actualValue = cli.getSettingWithDefaultValue('key', '');
+    assert.strictEqual(actualValue, 'value');
+  })
 });
