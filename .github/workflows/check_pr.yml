@@ -1,0 +1,98 @@
+name: Check PR
+
+on: pull_request
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        node: [14]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Cache node modules
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/node_modules
+          key: node_modules-${{ matrix.os }}-${{ matrix.node }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
+      - name: Restore dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Compress output
+        run: tar -cvf build.tar --exclude node_modules ./
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-${{ matrix.os }}-${{ matrix.node }}
+          path: build.tar
+  test:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        # node versions to run tests on
+        nodeRun: [14]
+        # node versions on which code was built and should be tested
+        nodeBuild: [14]
+        include:
+          - os: ubuntu-latest
+            nodeRun: 10
+            nodeBuild: 14
+          - os: ubuntu-latest
+            nodeRun: 12
+            nodeBuild: 14
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-${{ matrix.os }}-${{ matrix.nodeBuild }}
+      - name: Unpack build artifact
+        run: tar -xvf build.tar && rm build.tar
+      - name: Use Node.js ${{ matrix.nodeRun }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.nodeRun }}
+          registry-url: 'https://registry.npmjs.org'
+      - name: Cache node modules
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/node_modules
+          key: node_modules-${{ matrix.os }}-${{ matrix.nodeBuild }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
+      - name: Restore dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      - name: Test with coverage
+        # we run coverage only on Node@14 because older version report it incorrectly
+        if: matrix.nodeRun == 14
+        run: npm test
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
+      - name: Test without coverage
+        # we want to run tests on older Node versions to ensure that code works
+        if: matrix.nodeRun != 14
+        run: npm run test:nocov
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
+      - name: Compress output
+        if: matrix.nodeRun == 14 && always()
+        run: tar -cvf coverage.tar coverage
+      - uses: actions/upload-artifact@v2
+        if: matrix.nodeRun == 14 && always()
+        with:
+          name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
+          path: coverage.tar
+  

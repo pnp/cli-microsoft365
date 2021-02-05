@@ -10,14 +10,9 @@
 </h4>
 
 <p align="center">
-  <a href="https://app.circleci.com/pipelines/github/pnp/cli-microsoft365">
-    <img src="https://img.shields.io/circleci/build/github/pnp/cli-microsoft365/main?style=flat-square&token=PkAaAAWBp9rNYBYhA5YiBhezydqwgFKhm"
-      alt="CircleCI" />
-  </a>
-  
-  <a href="https://coveralls.io/github/pnp/cli-microsoft365?branch=main">
-    <img src="https://img.shields.io/coveralls/github/pnp/cli-microsoft365/main?style=flat-square"
-      alt="Coveralls"/>
+  <a href="https://github.com/pnp/cli-microsoft365/actions?query=workflow%3A%22Release+next%22">
+    <img src="https://github.com/pnp/cli-microsoft365/workflows/Release%20next/badge.svg"
+      alt="GitHub" />
   </a>
 
   <a href="https://twitter.com/climicrosoft365">

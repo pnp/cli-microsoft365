@@ -1,4 +1,9 @@
 {
   "exclude": ["**/*.spec.js", "**/*.mock.js", "**/clientsidepages.js"],
-  "reporter": ["lcov", "text", "text-summary"]
+  "reporter": ["lcov", "text", "text-summary"],
+  "check-coverage": true,
+  "branches": 100,
+  "functions": 100,
+  "lines": 100,
+  "statements": 100
 }
