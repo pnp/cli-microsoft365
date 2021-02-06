@@ -22,6 +22,9 @@
 - changed the logic to keep original value if @-value is not a valid file path [#2134](https://github.com/pnp/cli-microsoft365/issues/2134)
 - removed 'description' property from command option [#2112](https://github.com/pnp/cli-microsoft365/issues/2112)
 - extended 'spo page set' with title [#2140](https://github.com/pnp/cli-microsoft365/issues/2140)
+- moved 'DONE' out of the `commandAction` [#2045](https://github.com/pnp/cli-microsoft365/issues/2045)
+- simplified returning command name [#2123](https://github.com/pnp/cli-microsoft365/issues/2123)
+- extended 'util accesstoken get' with `sharepoint` as resource [#2096](https://github.com/pnp/cli-microsoft365/issues/2096)
 
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 
