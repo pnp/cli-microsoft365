@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    if: github.repository_owner == 'pnp'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -39,6 +40,7 @@ jobs:
           name: build-${{ matrix.os }}-${{ matrix.node }}
           path: build.tar
   test:
+    if: github.repository_owner == 'pnp'
     needs: build
     runs-on: ${{ matrix.os }}
     strategy:
@@ -98,6 +100,7 @@ jobs:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
           path: coverage.tar
   publish_next:
+    if: github.repository_owner == 'pnp'
     needs: test
     runs-on: ubuntu-latest
 
@@ -136,6 +139,7 @@ jobs:
           name: build-ubuntu-latest-14
           path: build.tar
   deploy_docs:
+    if: github.repository_owner == 'pnp'
     needs: publish_next
     runs-on: ubuntu-latest
 
@@ -149,6 +153,7 @@ jobs:
       - run: mkdocs gh-deploy --force -m "[ci skip]"
         working-directory: docs
   deploy_docker:
+    if: github.repository_owner == 'pnp'
     needs: publish_next
     runs-on: ubuntu-latest
 

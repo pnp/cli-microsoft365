@@ -4,6 +4,7 @@ on: pull_request
 
 jobs:
   build:
+    if: github.repository_owner == 'pnp'
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -37,6 +38,7 @@ jobs:
           name: build-${{ matrix.os }}-${{ matrix.node }}
           path: build.tar
   test:
+    if: github.repository_owner == 'pnp'
     needs: build
     runs-on: ${{ matrix.os }}
     strategy:
