@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -14,7 +13,6 @@ describe(commands.TASK_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -36,7 +34,6 @@ describe(commands.TASK_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -124,63 +121,6 @@ describe(commands.TASK_LIST, () => {
       }
     });
     assert.strictEqual(actual, true);
-  });
-
-  it('lists To Do tasks using listId (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/tasks`) > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('e1251b10-1ba4-49e3-b35a-933e3f21772b')/todo/lists('AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA%3D%3D')/tasks",
-          "value": [
-            {
-              "@odata.etag": "W/\"xMBBaLl1lk+dAn8KkjfXKQABF7wl/A==\"",
-              "importance": "normal",
-              "isReminderOn": false,
-              "status": "notStarted",
-              "title": "Stay healthy",
-              "createdDateTime": "2020-11-01T17:13:13.9582172Z",
-              "lastModifiedDateTime": "2020-11-01T17:13:15.1645231Z",
-              "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuPAAA=",
-              "body": {
-                "content": "",
-                "contentType": "text"
-              }
-            },
-            {
-              "@odata.etag": "W/\"xMBBaLl1lk+dAn8KkjfXKQABF7wl8w==\"",
-              "importance": "normal",
-              "isReminderOn": false,
-              "status": "notStarted",
-              "title": "Eat food",
-              "createdDateTime": "2020-11-01T17:13:10.7970391Z",
-              "lastModifiedDateTime": "2020-11-01T17:13:13.1037095Z",
-              "id": "AAMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MABGAAAAAAAw3-tXgryDSr5p162KnUPKBwDEwEFouXWWT50CfwqSN9cpAAEX8ECDAADEwEFouXWWT50CfwqSN9cpAAEX8GuOAAA=",
-              "body": {
-                "content": "",
-                "contentType": "text"
-              }
-            }
-          ]
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        listId: "AQMkAGYzNjMxYTU4LTJjZjYtNDlhMi1iMzQ2LWVmMTU3YmUzOGM5MAAuAAADMN-7V4K8g0q_adetip1DygEAxMBBaLl1lk_dAn8KkjfXKQABF-BAgwAAAA=="
-      }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWithExactly(chalk.green('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('lists To Do tasks using listId in JSON output mode', (done) => {

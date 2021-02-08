@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class AadGroupSettingTemplateGetCommand extends GraphItemsListCommand<GroupSettingTemplate> {
   public get name(): string {
-    return `${commands.GROUPSETTINGTEMPLATE_GET}`;
+    return commands.GROUPSETTINGTEMPLATE_GET;
   }
 
   public get description(): string {
@@ -44,10 +43,6 @@ class AadGroupSettingTemplateGetCommand extends GraphItemsListCommand<GroupSetti
         else {
           cb(new CommandError(`Resource '${(args.options.id || args.options.displayName)}' does not exist.`));
           return;
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

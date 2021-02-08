@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoAppPageAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.APPPAGE_ADD}`;
+    return commands.APPPAGE_ADD;
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -84,11 +83,6 @@ class SpoAppPageAddCommand extends SpoCommand {
       })
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

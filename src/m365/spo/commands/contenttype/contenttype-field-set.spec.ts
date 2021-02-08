@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -267,7 +266,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -538,7 +537,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -772,7 +771,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b', required: 'true', hidden: 'true' } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -996,7 +995,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', contentTypeId: '0x0100558D85B7216F6A489A499DB361E1AE2F', fieldId: '5ee2dd25-d941-455a-9bdb-7f2c54aed11b' } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandError
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -12,7 +11,7 @@ import { SPOWebAppServicePrincipalPermissionGrant } from './SPOWebAppServicePrin
 
 class SpoServicePrincipalGrantListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SERVICEPRINCIPAL_GRANT_LIST}`;
+    return commands.SERVICEPRINCIPAL_GRANT_LIST;
   }
 
   public get description(): string {
@@ -62,11 +61,8 @@ class SpoServicePrincipalGrantListCommand extends SpoCommand {
             delete r.ConsentType;
             return r;
           }));
-
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
         }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }

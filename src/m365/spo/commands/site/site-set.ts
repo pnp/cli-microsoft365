@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import Command, {
   CommandError, CommandOption,
@@ -83,13 +82,7 @@ class SpoSiteSetCommand extends SpoCommand {
       .then((): Promise<void> => this.updateSharedProperties(logger, args))
       .then((): Promise<void> => this.applySiteDesign(logger, args))
       .then((): Promise<void> => this.setSharingCapabilities(logger, args))
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => {
+      .then(_ => cb(), (err: any): void => {
         if (err instanceof CommandError) {
           err = (err as CommandError).message;
         }

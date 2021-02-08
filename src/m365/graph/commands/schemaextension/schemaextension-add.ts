@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class GraphSchemaExtensionAdd extends GraphCommand {
   public get name(): string {
-    return `${commands.SCHEMAEXTENSION_ADD}`;
+    return commands.SCHEMAEXTENSION_ADD;
   }
 
   public get description(): string {
@@ -58,11 +57,6 @@ class GraphSchemaExtensionAdd extends GraphCommand {
       .post(requestOptions)
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

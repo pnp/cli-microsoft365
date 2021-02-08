@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoNavigationNodeListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.NAVIGATION_NODE_LIST}`;
+    return commands.NAVIGATION_NODE_LIST;
   }
 
   public get description(): string {
@@ -56,10 +55,6 @@ class SpoNavigationNodeListCommand extends SpoCommand {
             Url: n.Url
           };
         }));
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
 
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -12,7 +11,7 @@ interface CommandArgs {
 
 class SpoSiteDesignListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_LIST}`;
+    return commands.SITEDESIGN_LIST;
   }
 
   public get description(): string {
@@ -39,11 +38,6 @@ class SpoSiteDesignListCommand extends SpoCommand {
       })
       .then((res: { value: SiteDesign[] }): void => {
         logger.log(res.value);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

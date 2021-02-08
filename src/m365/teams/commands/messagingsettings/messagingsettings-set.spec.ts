@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,7 +12,6 @@ const command: Command = require('./messagingsettings-set');
 describe(commands.TEAMS_MESSAGINGSETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -34,7 +32,6 @@ describe(commands.TEAMS_MESSAGINGSETTINGS_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -89,33 +86,6 @@ describe(commands.TEAMS_MESSAGINGSETTINGS_SET, () => {
     } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('sets the allowUserDeleteMessages setting to false', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          messagingSettings: {
-            allowUserDeleteMessages: false
-          }
-        })) {
-        return Promise.resolve({});
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: { debug: true, teamId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee', allowUserDeleteMessages: 'false' }
-    } as any, (err?: any) => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

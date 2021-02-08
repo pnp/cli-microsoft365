@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class AadO365GroupGetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.O365GROUP_GET}`;
+    return commands.O365GROUP_GET;
   }
 
   public get description(): string {
@@ -65,11 +64,6 @@ class AadO365GroupGetCommand extends GraphCommand {
         }
 
         logger.log(group);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ export interface Options extends GlobalOptions {
 
 class SpoSiteDesignApplyCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_APPLY}`;
+    return commands.SITEDESIGN_APPLY;
   }
 
   public get description(): string {
@@ -61,10 +60,6 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
         }
         else {
           logger.log(res);
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

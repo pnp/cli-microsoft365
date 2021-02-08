@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -24,7 +23,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteScriptSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITESCRIPT_SET}`;
+    return commands.SITESCRIPT_SET;
   }
 
   public get description(): string {
@@ -81,11 +80,6 @@ class SpoSiteScriptSetCommand extends SpoCommand {
       })
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

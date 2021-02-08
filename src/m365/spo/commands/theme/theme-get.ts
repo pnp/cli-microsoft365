@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -65,11 +64,6 @@ class SpoThemeGetCommand extends SpoCommand {
         const theme = json[6];
         delete theme._ObjectType_;
         logger.log(theme);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }

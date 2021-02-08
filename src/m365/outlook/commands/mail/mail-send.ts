@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -25,7 +24,7 @@ interface Options extends GlobalOptions {
 
 class OutlookSendmailCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.OUTLOOK_MAIL_SEND}`;
+    return commands.OUTLOOK_MAIL_SEND;
   }
 
   public get description(): string {
@@ -79,13 +78,7 @@ class OutlookSendmailCommand extends GraphCommand {
 
     request
       .post(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -19,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class SpoContentTypeRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CONTENTTYPE_REMOVE}`;
+    return commands.CONTENTTYPE_REMOVE;
   }
 
   public get description(): string {
@@ -98,11 +97,6 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
           if (res && res["odata.null"] === true) {
             cb(new CommandError(`Content type not found`));
             return;
-          }
-          else {
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
           }
 
           cb();

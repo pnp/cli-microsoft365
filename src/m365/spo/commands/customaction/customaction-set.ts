@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -39,7 +38,7 @@ interface Options extends GlobalOptions {
 
 class SpoCustomActionSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CUSTOMACTION_SET}`;
+    return commands.CUSTOMACTION_SET;
   }
 
   public get description(): string {
@@ -97,8 +96,6 @@ class SpoCustomActionSetCommand extends SpoCommand {
         if (this.verbose) {
           if (customAction && customAction["odata.null"] === true) {
             logger.logToStderr(`Custom action with id ${args.options.id} not found`);
-          } else {
-            logger.logToStderr(chalk.green('DONE'));
           }
         }
         cb();

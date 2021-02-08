@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as os from 'os';
 import { Logger } from '../../../../cli';
 import {
@@ -166,10 +165,6 @@ class AadAppRoleAssignmentAddCommand extends GraphCommand {
             principalDisplayName: result.principalDisplayName,
             resourceDisplayName: result.resourceDisplayName
           })));
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

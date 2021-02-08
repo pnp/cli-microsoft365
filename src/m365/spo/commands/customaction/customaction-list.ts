@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoCustomActionListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CUSTOMACTION_LIST}`;
+    return commands.CUSTOMACTION_LIST;
   }
 
   public get description(): string {

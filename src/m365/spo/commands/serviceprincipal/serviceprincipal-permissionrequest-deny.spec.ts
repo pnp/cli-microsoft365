@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -89,7 +88,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY, () => {
     });
     command.action(logger, { options: { debug: true, requestId: '4dc4c043-25ee-40f2-81d3-b3bf63da7538' } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

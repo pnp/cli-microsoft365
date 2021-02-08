@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoOrgNewsSiteSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.ORGNEWSSITE_SET}`;
+    return commands.ORGNEWSSITE_SET;
   }
 
   public get description(): string {
@@ -56,11 +55,7 @@ class SpoOrgNewsSiteSetCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-        }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }

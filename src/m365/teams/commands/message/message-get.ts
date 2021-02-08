@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class TeamsMessageGetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_MESSAGE_GET}`;
+    return commands.TEAMS_MESSAGE_GET;
   }
 
   public get description(): string {
@@ -41,11 +40,6 @@ class TeamsMessageGetCommand extends GraphCommand {
       .get(requestOptions)
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

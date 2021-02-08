@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandError, CommandOption
+  CommandError, CommandOption
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SERVICEPRINCIPAL_GRANT_REVOKE}`;
+    return commands.SERVICEPRINCIPAL_GRANT_REVOKE;
   }
 
   public get description(): string {
@@ -64,11 +63,7 @@ class SpoServicePrincipalGrantRevokeCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-        }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }

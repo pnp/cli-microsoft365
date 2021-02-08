@@ -19,7 +19,7 @@ interface DateTimeOptions extends GlobalOptions {
 
 class TeamsReportDirectroutingcallsCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_REPORT_DIRECTROUTINGCALLS}`;
+    return commands.TEAMS_REPORT_DIRECTROUTINGCALLS;
   }
 
   public get description(): string {

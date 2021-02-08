@@ -101,25 +101,6 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     });
   });
 
-  it('should user custom action removed successfully (verbose) without prompting with confirmation argument', (done) => {
-    defaultPostCallsStub();
-
-    command.action(logger, { options: {
-      verbose: true,
-      id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-      url: 'https://contoso.sharepoint.com',
-      confirm: true
-    } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(sinon.match('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should prompt before removing custom action when confirmation argument not passed', (done) => {
     command.action(logger, { options: { id: 'b2307a39-e878-458b-bc90-03bc578531d6', url: 'https://contoso.sharepoint.com'} }, () => {
       let promptIssued = false;

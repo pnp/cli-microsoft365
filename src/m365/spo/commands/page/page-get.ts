@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -19,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_GET}`;
+    return commands.PAGE_GET;
   }
 
   public get description(): string {
@@ -78,11 +77,6 @@ class SpoPageGetCommand extends SpoCommand {
 
         page = Object.assign(res, page);
         logger.log(page);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

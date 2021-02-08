@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandOption } from '../../../../Command';
@@ -17,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class TenantServiceMessageListCommand extends Command {
   public get name(): string {
-    return `${commands.TENANT_SERVICE_MESSAGE_LIST}`;
+    return commands.TENANT_SERVICE_MESSAGE_LIST;
   }
 
   public get description(): string {
@@ -55,11 +54,6 @@ class TenantServiceMessageListCommand extends Command {
         });
 
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

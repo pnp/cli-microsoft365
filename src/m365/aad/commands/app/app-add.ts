@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { v4 } from 'uuid';
 import { Logger } from '../../../../cli';
 import {
@@ -97,11 +96,6 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
         }
 
         logger.log(appInfo);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }

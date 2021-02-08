@@ -25,7 +25,7 @@ export interface Options extends GlobalOptions {
 
 class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
   public get name(): string {
-    return `${commands.PROPERTYBAG_REMOVE}`;
+    return commands.PROPERTYBAG_REMOVE;
   }
 
   public get description(): string {
@@ -61,13 +61,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
         .then((identityResp: IdentityResponse): Promise<any> => {
           return this.removeProperty(identityResp, args.options);
         })
-        .then((res: any): void => {
-          if (this.verbose) {
-            logger.logToStderr('DONE');
-          }
-
-          cb();
-        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {

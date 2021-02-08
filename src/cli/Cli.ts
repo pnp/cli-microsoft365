@@ -155,7 +155,15 @@ export class Cli {
 
     return Cli
       .executeCommand(this.commandToExecute.command, optionsWithoutShorts)
-      .then(_ => process.exit(0), err => this.closeWithError(err));
+      .then(_ => {
+        if (optionsWithoutShorts.options.verbose ||
+          optionsWithoutShorts.options.debug) {
+          const chalk: typeof Chalk = require('chalk');
+          Cli.error(chalk.green('DONE'));
+        }
+
+        process.exit(0);
+      }, err => this.closeWithError(err));
   }
 
   public static executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoServicePrincipalPermissionRequestDenyCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY}`;
+    return commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_DENY;
   }
 
   public alias(): string[] | undefined {
@@ -64,11 +63,7 @@ class SpoServicePrincipalPermissionRequestDenyCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-        }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }

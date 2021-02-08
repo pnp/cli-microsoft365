@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoAppAddCommand extends SpoAppBaseCommand {
   public get name(): string {
-    return `${commands.APP_ADD}`;
+    return commands.APP_ADD;
   }
 
   public get description(): string {
@@ -72,10 +71,6 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
         }
         else {
           logger.log(json.UniqueId);
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

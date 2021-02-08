@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -102,7 +101,7 @@ describe(commands.SITE_RENAME, () => {
 
     command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', verbose: true } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -188,7 +187,7 @@ describe(commands.SITE_RENAME, () => {
 
     command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressMarketplaceAppCheck: true, verbose: true } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -225,7 +224,7 @@ describe(commands.SITE_RENAME, () => {
 
     command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', suppressWorkflow2013Check: true, verbose: true } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -262,7 +261,7 @@ describe(commands.SITE_RENAME, () => {
 
     command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', newSiteTitle: "RenamedSite", suppressWorkflow2013Check: true, suppressMarketplaceAppCheck: true, verbose: true } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -360,7 +359,7 @@ describe(commands.SITE_RENAME, () => {
 
     command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', wait: true, debug: true, verbose: true } } as any, (err?: any) => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

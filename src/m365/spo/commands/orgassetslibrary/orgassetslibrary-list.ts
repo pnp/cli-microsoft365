@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandError, CommandOption
+  CommandError, CommandOption
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoOrgNewsSiteListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.ORGASSETSLIBRARY_LIST}`;
+    return commands.ORGASSETSLIBRARY_LIST;
   }
 
   public get description(): string {
@@ -75,11 +74,8 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
             }
 
             logger.log(orgAssets);
-
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
           }
+          
           cb();
         }
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));

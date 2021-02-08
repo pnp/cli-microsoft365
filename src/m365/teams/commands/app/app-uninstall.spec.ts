@@ -13,7 +13,6 @@ describe(commands.TEAMS_APP_UNINSTALL, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -35,7 +34,6 @@ describe(commands.TEAMS_APP_UNINSTALL, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -91,33 +89,6 @@ describe(commands.TEAMS_APP_UNINSTALL, () => {
     }, () => {
       try {
         assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('uninstalls an app from a Microsoft Teams team with confirmation (debug)', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/c527a470-a882-481c-981c-ee6efaba85c7/installedApps/YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
-        confirm: true
-      }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

@@ -1,5 +1,4 @@
 
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class TeamsCloneCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_TEAM_CLONE}`;
+    return commands.TEAMS_TEAM_CLONE;
   }
 
   public get description(): string {
@@ -66,13 +65,7 @@ class TeamsCloneCommand extends GraphCommand {
 
     request
       .post(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -165,29 +164,6 @@ describe(commands.FLOW_RUN_CANCEL, () => {
       catch (e) {
         done(e);
       }
-    });
-  });
-
-  it('cancels the specified Microsoft Flow without prompting when confirm specified (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72/runs/08585981115186985105550762687CU161/cancel?api-version=2016-11-01`) {
-        return Promise.resolve({ statusCode: 200 });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
-        flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        name: '08585981115186985105550762687CU161',
-        confirm: true
-      }
-    }, () => {
-      assert(loggerLogSpy.calledWith(chalk.green('DONE')));
-      done();
     });
   });
 

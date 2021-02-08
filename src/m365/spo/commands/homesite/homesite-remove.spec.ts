@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -14,7 +13,6 @@ const command: Command = require('./homesite-remove');
 describe(commands.HOMESITE_REMOVE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -42,7 +40,6 @@ describe(commands.HOMESITE_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -143,43 +140,6 @@ describe(commands.HOMESITE_REMOVE, () => {
     command.action(logger, { options: {} }, () => {
       try {
         assert(homeSiteRemoveCallIssued);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('removes the Home Site when prompt confirmed (debug)', (done) => {
-    let homeSiteRemoveCallIssued = false;
-
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="28" ObjectPathId="27" /><Method Name="RemoveSPHSite" Id="29" ObjectPathId="27" /></Actions><ObjectPaths><Constructor Id="27" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-
-        homeSiteRemoveCallIssued = true;
-
-        return Promise.resolve(JSON.stringify(
-          [
-            {
-              "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8929.1227", "ErrorInfo": null, "TraceCorrelationId": "e4f2e59e-c0a9-0000-3dd0-1d8ef12cc742"
-            }, 57, {
-              "IsNull": false
-            }, 58, "The Home site has been removed."
-          ]
-        ));
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    Utils.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(homeSiteRemoveCallIssued && loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

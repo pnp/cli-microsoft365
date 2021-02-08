@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -19,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class AadO365GroupTeamifyCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.O365GROUP_TEAMIFY}`;
+    return commands.O365GROUP_TEAMIFY;
   }
 
   public get description(): string {
@@ -43,13 +42,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
 
     request
       .post(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {

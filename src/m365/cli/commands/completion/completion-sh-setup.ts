@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { autocomplete } from '../../../../autocomplete';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -33,9 +32,6 @@ class CliCompletionShSetupCommand extends AnonymousCommand {
 
     logger.log('Command completion successfully registered. Restart your shell to load the completion');
 
-    if (this.verbose) {
-      logger.logToStderr(chalk.green('DONE'));
-    }
     cb();
   }
 }

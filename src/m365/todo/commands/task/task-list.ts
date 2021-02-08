@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
   public get name(): string {
-    return `${commands.TASK_LIST}`;
+    return commands.TASK_LIST;
   }
 
   public get description(): string {
@@ -82,10 +81,6 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
               lastModifiedDateTime: m.lastModifiedDateTime
             }
           }));
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

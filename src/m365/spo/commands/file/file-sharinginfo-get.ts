@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -114,10 +113,6 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
           });
 
           logger.log(fileSharingInfoCollection);
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

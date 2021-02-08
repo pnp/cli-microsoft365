@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -14,7 +13,6 @@ describe(commands.HOMESITE_GET, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -37,7 +35,6 @@ describe(commands.HOMESITE_GET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -87,32 +84,6 @@ describe(commands.HOMESITE_GET, () => {
           "Title": "Work @ Contoso",
           "Url": "https://contoso.sharepoint.com/sites/Work"
         }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('gets information about the Home Site (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === 'https://contoso.sharepoint.com/_api/SP.SPHSite/Details') {
-        return Promise.resolve({
-          "SiteId": "53ad95dc-5d2c-42a3-a63c-716f7b8014f5",
-          "WebId": "288ce497-483c-4cd5-b8a2-27b726d002e2",
-          "LogoUrl": "https://contoso.sharepoint.com/sites/Work/siteassets/work.png",
-          "Title": "Work @ Contoso",
-          "Url": "https://contoso.sharepoint.com/sites/Work"
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

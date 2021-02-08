@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoNavigationNodeRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.NAVIGATION_NODE_REMOVE}`;
+    return commands.NAVIGATION_NODE_REMOVE;
   }
 
   public get description(): string {
@@ -56,13 +55,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
 
           return request.delete(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
 
     if (args.options.confirm) {

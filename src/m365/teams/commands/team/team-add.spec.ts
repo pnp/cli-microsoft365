@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
@@ -15,7 +14,6 @@ describe(commands.TEAMS_TEAM_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -37,7 +35,6 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -161,7 +158,6 @@ describe(commands.TEAMS_TEAM_ADD, () => {
           description: 'Architecture Discussion'
         });
         assert(getRequestStub.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -216,7 +212,6 @@ describe(commands.TEAMS_TEAM_ADD, () => {
           description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
         });
         assert(getRequestStub.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -272,7 +267,6 @@ describe(commands.TEAMS_TEAM_ADD, () => {
           description: 'This is a sample engineering team, used to showcase the range of properties supported by this API'
         });
         assert(getRequestStub.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -328,7 +322,6 @@ describe(commands.TEAMS_TEAM_ADD, () => {
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
         });
         assert(getRequestStub.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -385,7 +378,6 @@ describe(commands.TEAMS_TEAM_ADD, () => {
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
         });
         assert(getRequestStub.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -485,7 +477,6 @@ describe(commands.TEAMS_TEAM_ADD, () => {
           displayName: 'Sample Classroom Team',
           description: 'This is a sample classroom team, used to showcase the range of properties supported by this API'
         });
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

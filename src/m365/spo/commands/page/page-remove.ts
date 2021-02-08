@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_REMOVE}`;
+    return commands.PAGE_REMOVE;
   }
 
   public get description(): string {
@@ -59,12 +58,7 @@ class SpoPageRemoveCommand extends SpoCommand {
 
           return request.post(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-          cb();
-        },
+        .then(_ => cb(),
           (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb)
         );
     };

@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class O365GroupReportActivityDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {
-    return `${commands.O365GROUP_REPORT_ACTIVITYDETAIL}`;
+    return commands.O365GROUP_REPORT_ACTIVITYDETAIL;
   }
 
   public get description(): string {

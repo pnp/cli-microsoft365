@@ -622,29 +622,6 @@ describe(commands.FILE_ADD, () => {
     });
   });
 
-  it('should call "DONE" when in verbose', (done) => {
-    stubPostResponses();
-    stubGetResponses();
-
-    command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
-        debug: true,
-        verbose: true
-      }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogToStderrSpy.lastCall.args[0], 'DONE');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('ignores global options when creating request data', (done) => {
     const postRequests: sinon.SinonStub = stubPostResponses();
     stubGetResponses();
@@ -821,32 +798,6 @@ describe(commands.FILE_ADD, () => {
     } as any, (err?: any) => {
       try {
         assert.strictEqual(err.message, 'readSync error');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should succeed updating list item metadata (verbose)', (done) => {
-    stubPostResponses();
-    stubGetResponses();
-
-    command.action(logger, {
-      options: {
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
-        folder: 'Shared%20Documents/t1',
-        path: 'C:\Users\Velin\Desktop\MS365.jpg',
-        contentType: 'Picture',
-        Title: 'abc',
-        publish: true,
-        verbose: true,
-        debug: true
-      }
-    }, () => {
-      try {
-        assert.strictEqual(loggerLogToStderrSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {

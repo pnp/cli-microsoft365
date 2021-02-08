@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandOption } from '../../../../Command';
@@ -53,7 +52,7 @@ class TenantAuditlogReportCommand extends Command {
   private completeAuditReports: AuditlogReport[] = [];
 
   public get name(): string {
-    return `${commands.TENANT_AUDITLOG_REPORT}`;
+    return commands.TENANT_AUDITLOG_REPORT;
   }
 
   public get description(): string {
@@ -82,11 +81,6 @@ class TenantAuditlogReportCommand extends Command {
       .getCompleteAuditReports(args, logger)
       .then((res: AuditlogReport[]): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

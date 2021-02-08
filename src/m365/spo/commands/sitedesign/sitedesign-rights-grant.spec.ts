@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -14,7 +13,6 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -38,7 +36,6 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -84,33 +81,6 @@ describe(commands.SITEDESIGN_RIGHTS_GRANT, () => {
     command.action(logger, { options: { debug: false, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('grants rights on the specified site design to the specified principal (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GrantSiteDesignRights`) > -1 &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          "id": "9b142c22-037f-4a7f-9017-e9d8c0e34b98",
-          "principalNames": ["PattiF"],
-          "grantedRights": "1"
-        })) {
-        return Promise.resolve({
-          "odata.null": true
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: true, id: '9b142c22-037f-4a7f-9017-e9d8c0e34b98', principals: 'PattiF', rights: 'View' } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

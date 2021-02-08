@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignTaskGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_TASK_GET}`;
+    return commands.SITEDESIGN_TASK_GET;
   }
 
   public get description(): string {
@@ -48,11 +47,6 @@ class SpoSiteDesignTaskGetCommand extends SpoCommand {
         if (!res["odata.null"]) {
           logger.log(res);
         }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

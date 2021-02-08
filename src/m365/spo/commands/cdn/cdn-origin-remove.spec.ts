@@ -210,18 +210,9 @@ describe(commands.CDN_ORIGIN_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { debug: true, origin: '*/cdn' } }, () => {
-      let doneResponse = false;
-      log.forEach(l => {
-        if (l &&
-          typeof l === 'string' &&
-          l.indexOf('DONE') > -1) {
-          doneResponse = true;
-        }
-      });
-
+    command.action(logger, { options: { debug: true, origin: '*/cdn' } }, (err?: any) => {
       try {
-        assert(doneResponse);
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {

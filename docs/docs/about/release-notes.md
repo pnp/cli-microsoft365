@@ -22,6 +22,9 @@
 - changed the logic to keep original value if @-value is not a valid file path [#2134](https://github.com/pnp/cli-microsoft365/issues/2134)
 - removed 'description' property from command option [#2112](https://github.com/pnp/cli-microsoft365/issues/2112)
 - extended 'spo page set' with title [#2140](https://github.com/pnp/cli-microsoft365/issues/2140)
+- moved 'DONE' out of the `commandAction` [#2045](https://github.com/pnp/cli-microsoft365/issues/2045)
+- simplified returning command name [#2123](https://github.com/pnp/cli-microsoft365/issues/2123)
+- extended 'util accesstoken get' with `sharepoint` as resource [#2096](https://github.com/pnp/cli-microsoft365/issues/2096)
 
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 
@@ -61,6 +64,7 @@
 - added wait-npm-publish script to CI/CD [#2053](https://github.com/pnp/cli-microsoft365/pull/2053)
 - added support for passing complex content from files [#2042](https://github.com/pnp/cli-microsoft365/issues/2042)
 - added support for adding page description to 'spo page add' and 'spo page set' [#2044](https://github.com/pnp/cli-microsoft365/issues/2044)
+- added new sample script for exporting a flow to Logic app [#2067](https://github.com/pnp/cli-microsoft365/issues/2067)
 - added new sample script for emptying the tenant recycle bin [#1142](https://github.com/pnp/cli-microsoft365/issues/1142)
 - updated sample script changing CLI command name to m365 [#2063](https://github.com/pnp/cli-microsoft365/issues/2063)
 - added new sample script 'Export all Flows in environment' [#2082](https://github.com/pnp/cli-microsoft365/pull/2082)

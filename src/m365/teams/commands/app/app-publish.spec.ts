@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
@@ -15,7 +14,6 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -37,7 +35,6 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -155,10 +152,9 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
     command.action(logger, { options: { debug: true, filePath: 'teamsapp.zip' } }, () => {
       try {
         assert(loggerLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });

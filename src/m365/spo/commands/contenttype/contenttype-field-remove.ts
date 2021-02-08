@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CONTENTTYPE_FIELD_REMOVE}`;
+    return commands.CONTENTTYPE_FIELD_REMOVE;
   }
 
   public get description(): string {
@@ -154,9 +153,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             cb(new CommandError(response.ErrorInfo.ErrorMessage));
             return;
           }
-          if (this.debug) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
+          
           cb();
         }, (error: any): void => {
           this.handleRejectedODataJsonPromise(error, logger, cb);

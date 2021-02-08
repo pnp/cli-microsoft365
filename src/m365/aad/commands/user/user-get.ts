@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class AadUserGetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.USER_GET}`;
+    return commands.USER_GET;
   }
 
   public get description(): string {
@@ -53,11 +52,6 @@ class AadUserGetCommand extends GraphCommand {
       .get(requestOptions)
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

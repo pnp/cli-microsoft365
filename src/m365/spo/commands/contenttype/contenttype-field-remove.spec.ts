@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -23,7 +22,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   const getStubCalls = (opts: any) => {
@@ -156,7 +154,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       cb({ continue: false });
     });
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).requestDigest = '';
     (command as any).webId = '';
     (command as any).siteId = '';
@@ -312,29 +309,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     });
   });
 
-  // WEB CT: with debug
-  it('removes the field link from web content type with debug', (done) => {
-    sinon.stub(request, 'get').callsFake(getStubCalls);
-    const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
-
-    command.action(logger, {
-      options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        updateChildContentTypes: false,
-        confirm: true,
-        debug: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert(postCallbackStub.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
   it('removes the field link from web content type with debug - prompt', (done) => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
@@ -361,34 +335,8 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       }
     });
   });
-  it('removes the field link from web content type with debug - prompt: confirmed', (done) => {
-    sinon.stub(request, 'get').callsFake(getStubCalls);
-    const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
-    Utils.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
-      options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        updateChildContentTypes: true,
-        confirm: false,
-        debug: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert(postCallbackStub.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('doesnt remove the field link from web content type with debug - prompt: declined', (done) => {
+  it(`doesn't remove the field link from web content type with debug - prompt: declined`, (done) => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     const postCallbackStub = sinon.stub(request, 'post').callsFake(postStubSuccCalls);
 
@@ -511,28 +459,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     });
   });
 
-  // WEB CT: with update child content types with debug
-  it('removes the field link from web content type with update child content types with debug', (done) => {
-    sinon.stub(request, 'get').callsFake(getStubCalls);
-    sinon.stub(request, 'post').callsFake(postStubSuccCalls);
-
-    command.action(logger, {
-      options: {
-        webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
-        updateChildContentTypes: true,
-        confirm: true,
-        debug: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
   it('removes the field link from web content type with update child content types with debug - prompt', (done) => {
     sinon.stub(request, 'get').callsFake(getStubCalls);
     sinon.stub(request, 'post').callsFake(postStubSuccCalls);
@@ -729,7 +655,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {
@@ -779,7 +704,6 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     } as any, (err?: any) => {
       try {
         assert(postCallbackStub.called);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

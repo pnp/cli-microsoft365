@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { AxiosRequestConfig } from 'axios';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -48,7 +47,7 @@ class TeamsTeamAddCommand extends GraphCommand {
   private pollingInterval: number = 30000;
 
   public get name(): string {
-    return `${commands.TEAMS_TEAM_ADD}`;
+    return commands.TEAMS_TEAM_ADD;
   }
 
   public get description(): string {
@@ -146,9 +145,6 @@ class TeamsTeamAddCommand extends GraphCommand {
       })
       .then((output: any) => {
         logger.log(output);
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => {
         this.handleRejectedODataJsonPromise(err, logger, cb)

@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -406,10 +405,9 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
         debug: true,
         contentType: 'Exchange'
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
-        console.log(err);
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -483,7 +481,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
       }
     } as any, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -520,7 +518,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
       }
     } as any, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -556,7 +554,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
       }
     } as any, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

@@ -13,7 +13,6 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -35,7 +34,6 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -195,35 +193,6 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
     } as any, () => {
       try {
         assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('creates a clone of a Microsoft Teams team with mandatory parameters (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/15d7a78e-fd77-4599-97a5-dbb6372846c5/clone`) {
-        return Promise.resolve({
-          "location": "/teams('f9526e6a-1d0d-4421-8882-88a70975a00c')/operations('6cf64f96-08c3-4173-9919-eaf7684aae9a')"
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamId: '15d7a78e-fd77-4599-97a5-dbb6372846c5',
-        displayName: "Library Assist",
-        partsToClone: "apps,tabs,settings,channels,members"
-      }
-    } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

@@ -486,6 +486,34 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
+  it(`writes DONE when executing command in verbose mode succeeded`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--verbose'])
+      .then(_ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.green('DONE')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`writes DONE when executing command in debug mode succeeded`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--debug'])
+      .then(_ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.green('DONE')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
   it('executes the specified command', (done) => {
     Cli
       .executeCommand(mockCommand, { options: { _: [] } })

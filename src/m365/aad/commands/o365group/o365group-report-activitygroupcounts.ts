@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class O365GroupReportActivityGroupCountsCommand extends PeriodBasedReport {
   public get name(): string {
-    return `${commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS}`;
+    return commands.O365GROUP_REPORT_ACTIVITYGROUPCOUNTS;
   }
 
   public get description(): string {

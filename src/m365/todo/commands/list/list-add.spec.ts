@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -92,41 +91,6 @@ describe(commands.LIST_ADD, () => {
           "wellknownListName": "none",
           "id": "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIgAAA="
         }));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('adds To Do task list (verbose)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists`) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists/$entity",
-          "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGlTQ==\"",
-          "displayName": "FooList",
-          "isOwner": true,
-          "isShared": false,
-          "wellknownListName": "none",
-          "id": "AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIgAAA="
-        });
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: false,
-        verbose: true,
-        name: "FooList"
-      }
-    } as any, () => {
-      try {
-        const expected = chalk.green('DONE');
-        assert.strictEqual(log.filter(l => l == expected).length, 1);
         done();
       }
       catch (e) {

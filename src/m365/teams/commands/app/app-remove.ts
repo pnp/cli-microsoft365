@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TeamsAppRemoveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_APP_REMOVE}`;
+    return commands.TEAMS_APP_REMOVE;
   }
 
   public get description(): string {
@@ -44,13 +43,7 @@ class TeamsAppRemoveCommand extends GraphCommand {
 
       request
         .delete(requestOptions)
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+        .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
     };
 
     if (args.options.confirm) {

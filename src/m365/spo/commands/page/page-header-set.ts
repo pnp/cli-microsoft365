@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -32,7 +31,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageHeaderSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_HEADER_SET}`;
+    return commands.PAGE_HEADER_SET;
   }
 
   public get description(): string {
@@ -320,13 +319,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getSiteId(siteUrl: string, verbose: boolean, logger: Logger): Promise<any> {

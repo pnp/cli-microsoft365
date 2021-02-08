@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -21,7 +20,7 @@ class SpoHubSiteListCommand extends SpoCommand {
   private batchSize: number = 30;
 
   public get name(): string {
-    return `${commands.HUBSITE_LIST}`;
+    return commands.HUBSITE_LIST;
   }
 
   public get description(): string {
@@ -115,11 +114,6 @@ class SpoHubSiteListCommand extends SpoCommand {
         };
 
         logger.log(hubSites);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

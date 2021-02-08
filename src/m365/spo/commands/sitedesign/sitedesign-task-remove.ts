@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_TASK_REMOVE}`;
+    return commands.SITEDESIGN_TASK_REMOVE;
   }
 
   public get description(): string {
@@ -51,12 +50,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
 
           return request.post(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
     if (args.options.confirm) {
       removeSiteDesignTask();

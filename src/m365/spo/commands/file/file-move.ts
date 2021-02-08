@@ -98,12 +98,7 @@ class SpoFileMoveCommand extends SpoCommand {
           }, progressPollInterval);
         });
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr('DONE');
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   /**

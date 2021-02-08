@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -27,7 +26,7 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return `${commands.TEAMS_FUNSETTINGS_SET}`;
+    return commands.TEAMS_FUNSETTINGS_SET;
   }
 
   public get description(): string {
@@ -68,13 +67,7 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
 
     request
       .patch(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   };
 
   public options(): CommandOption[] {

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption,
@@ -41,7 +40,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
   }
 
   public get name(): string {
-    return `${commands.CONTENTTYPE_FIELD_SET}`;
+    return commands.CONTENTTYPE_FIELD_SET;
   }
 
   public get description(): string {
@@ -228,16 +227,10 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
         }
         else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
           cb();
         }
       }, (error: any): void => {
         if (error === 'DONE') {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
           cb();
         }
         else {

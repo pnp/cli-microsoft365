@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class SpoSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SET}`;
+    return commands.SET;
   }
 
   public get description(): string {

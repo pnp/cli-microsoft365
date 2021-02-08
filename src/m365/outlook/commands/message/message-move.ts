@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as os from 'os';
 import { Logger } from '../../../../cli';
 import {
@@ -24,7 +23,7 @@ interface Options extends GlobalOptions {
 
 class OutlookMessageMoveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.OUTLOOK_MESSAGE_MOVE}`;
+    return commands.OUTLOOK_MESSAGE_MOVE;
   }
 
   public get description(): string {
@@ -69,13 +68,7 @@ class OutlookMessageMoveCommand extends GraphCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getFolderId(folderId: string | undefined, folderName: string | undefined): Promise<string> {

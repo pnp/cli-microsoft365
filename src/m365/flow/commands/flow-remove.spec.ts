@@ -236,7 +236,7 @@ describe(commands.FLOW_REMOVE, () => {
       }
     }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -262,7 +262,7 @@ describe(commands.FLOW_REMOVE, () => {
         confirm: true
       }
     }, () => {
-      assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+      assert(loggerLogToStderrSpy.called);
       done();
     });
   });
@@ -285,7 +285,7 @@ describe(commands.FLOW_REMOVE, () => {
         asAdmin: true
       }
     }, () => {
-      assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+      assert(loggerLogToStderrSpy.called);
       done();
     });
   });

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TeamsAppPublishCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_APP_PUBLISH}`;
+    return commands.TEAMS_APP_PUBLISH;
   }
 
   public get description(): string {
@@ -45,10 +44,6 @@ class TeamsAppPublishCommand extends GraphCommand {
       .then((res: { id: string; }): void => {
         if (res && res.id) {
           logger.log(res.id);
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

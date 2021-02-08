@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoStorageEntityRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.STORAGEENTITY_REMOVE}`;
+    return commands.STORAGEENTITY_REMOVE;
   }
 
   public get description(): string {
@@ -68,9 +67,6 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
             cb(new CommandError(response.ErrorInfo.ErrorMessage));
           }
           else {
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
             cb();
           }
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));

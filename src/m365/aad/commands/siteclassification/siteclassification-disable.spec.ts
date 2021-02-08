@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,7 +12,6 @@ const command: Command = require('./siteclassification-disable');
 describe(commands.SITECLASSIFICATION_DISABLE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -35,7 +33,6 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
       cb({ continue: false });
@@ -555,7 +552,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
     command.action(logger, { options: { debug: true, confirm: true } } as any, (err: any) => {
       try {
-        assert(deleteRequestIssued && loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(deleteRequestIssued);
         done();
       }
       catch (e) {

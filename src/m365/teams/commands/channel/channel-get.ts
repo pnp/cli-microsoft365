@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -23,7 +22,7 @@ class TeamsChannelGetCommand extends GraphCommand {
   private teamId: string = "";
 
   public get name(): string {
-    return `${commands.TEAMS_CHANNEL_GET}`;
+    return commands.TEAMS_CHANNEL_GET;
   }
 
   public get description(): string {
@@ -116,11 +115,6 @@ class TeamsChannelGetCommand extends GraphCommand {
       })
       .then((res: Channel): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

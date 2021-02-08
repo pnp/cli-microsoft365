@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -19,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
   public get name(): string {
-    return `${commands.TEAMS_USER_APP_LIST}`;
+    return commands.TEAMS_USER_APP_LIST;
   }
 
   public get description(): string {
@@ -61,10 +60,6 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
               appId: i.appId
             };
           }));
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();

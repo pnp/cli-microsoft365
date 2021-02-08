@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class TeamsMemberSettingsListCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_MEMBERSETTINGS_LIST}`;
+    return commands.TEAMS_MEMBERSETTINGS_LIST;
   }
 
   public get description(): string {
@@ -40,11 +39,6 @@ class TeamsMemberSettingsListCommand extends GraphCommand {
       .get<Team>(requestOptions)
       .then((res: Team): void => {
         logger.log(res.memberSettings);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

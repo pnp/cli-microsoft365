@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandOption } from '../../../../Command';
@@ -17,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class TenantServiceReportHistoricalServiceStatusCommand extends Command {
   public get name(): string {
-    return `${commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS}`;
+    return commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS;
   }
 
   public get description(): string {
@@ -54,10 +53,6 @@ class TenantServiceReportHistoricalServiceStatusCommand extends Command {
     request.get(requestOptions)
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

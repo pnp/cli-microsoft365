@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,7 +12,6 @@ const command: Command = require('./channel-remove');
 describe(commands.TEAMS_CHANNEL_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -35,7 +33,6 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     promptOptions = undefined;
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
@@ -251,37 +248,6 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
     });
   });
 
-  it('removes the specified channel by id when prompt confirmed (debug)', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {
-
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    Utils.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
-      options: {
-        debug: true,
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
-      }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('removes the specified channel by name when prompt confirmed (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'channelName'`) > -1) {
@@ -318,9 +284,9 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
         channelName: 'channelName',
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -328,29 +294,6 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
       }
     });
   });
-
-  it('removes the specified channel without prompting when confirmed specified (debug)', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
-        confirm: true
-      }
-    }, () => {
-      assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-      done();
-    });
-  });
-
   it('should handle Microsoft graph error response', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/d66b8110-fcad-49e8-8159-0d488ddb7656/channels/19%3Af3dcbb1674574677abcae89cb626f1e6%40thread.skype`) {

@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TodoListAddCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.LIST_ADD}`;
+    return commands.LIST_ADD;
   }
 
   public get description(): string {
@@ -44,11 +43,6 @@ class TodoListAddCommand extends GraphCommand {
       .post(requestOptions)
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

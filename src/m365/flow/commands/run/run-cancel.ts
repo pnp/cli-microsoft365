@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -44,13 +43,7 @@ class FlowRunCancelCommand extends AzmgmtCommand {
 
       request
         .post(requestOptions)
-        .then((): void => {
-          if (this.verbose) {
-            logger.log(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
 
     if (args.options.confirm) {

@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -14,7 +13,6 @@ const command: Command = require('./orgassetslibrary-add');
 describe(commands.ORGASSETSLIBRARY_ADD, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -39,7 +37,6 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -67,12 +64,8 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
   });
 
   it('adds a new library as org assets library (debug)', (done) => {
-    let orgAssetLibAddCallIssued = false;
-
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="AddToOrgAssetsLibAndCdnWithType" Id="11" ObjectPathId="8"><Parameters><Parameter Type="Enum">1</Parameter><Parameter Type="String">https://contoso.sharepoint.com/siteassets</Parameter><Parameter Type="Null" /><Parameter Type="Enum">1</Parameter></Parameters></Method></Actions><ObjectPaths><Constructor Id="8" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /></ObjectPaths></Request>`) {
-        orgAssetLibAddCallIssued = true;
-
         return Promise.resolve(JSON.stringify(
           [{
             "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.19708.12061", "ErrorInfo": null, "TraceCorrelationId": "a0a8309f-4039-a000-ea81-9b8297eb43e0"
@@ -83,10 +76,9 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets' } }, () => {
+    command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets' } }, (err?: any) => {
       try {
-        assert(orgAssetLibAddCallIssued && loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -115,8 +107,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
     command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public' } }, () => {
       try {
-        assert(orgAssetLibAddCallIssued && loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-
+        assert(orgAssetLibAddCallIssued);
         done();
       }
       catch (e) {
@@ -145,8 +136,7 @@ describe(commands.ORGASSETSLIBRARY_ADD, () => {
 
     command.action(logger, { options: { debug: true, libraryUrl: 'https://contoso.sharepoint.com/siteassets', cdnType: 'Public', thumbnailUrl: 'https://contoso.sharepoint.com/siteassets/logo.png' } }, () => {
       try {
-        assert(orgAssetLibAddCallIssued && loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
-
+        assert(orgAssetLibAddCallIssued);
         done();
       }
       catch (e) {

@@ -21,7 +21,7 @@ export interface Options extends GlobalOptions {
 
 class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
   public get name(): string {
-    return `${commands.PROPERTYBAG_GET}`;
+    return commands.PROPERTYBAG_GET;
   }
 
   public get description(): string {

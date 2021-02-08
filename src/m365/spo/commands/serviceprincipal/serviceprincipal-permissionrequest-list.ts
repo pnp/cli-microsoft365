@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandError
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -12,7 +11,7 @@ import { SPOWebAppServicePrincipalPermissionRequest } from './SPOWebAppServicePr
 
 class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST}`;
+    return commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_LIST;
   }
 
   public get description(): string {
@@ -65,11 +64,8 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
               Scope: r.Scope
             };
           }));
-
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
         }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }

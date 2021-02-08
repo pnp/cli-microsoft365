@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption } from '../../../../Command';
 import config from '../../../../config';
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteRightsGrantCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_RIGHTS_GRANT}`;
+    return commands.HUBSITE_RIGHTS_GRANT;
   }
 
   public get description(): string {
@@ -65,11 +64,7 @@ class SpoHubSiteRightsGrantCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-        }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
