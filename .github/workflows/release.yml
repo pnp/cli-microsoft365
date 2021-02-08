@@ -30,14 +30,13 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Compress output
+        run: tar -cvf build.tar --exclude node_modules ./
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
           name: build
-          path: |
-            .
-            !.git
-            !node_modules
+          path: build.tar
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -46,6 +45,8 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build
+      - name: Unpack build artifact
+        run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js 14
         uses: actions/setup-node@v1
         with:
@@ -63,11 +64,16 @@ jobs:
         run: npm ci
       - name: Test
         run: npm test
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
+      - name: Compress output
+        if: always()
+        run: tar -cvf coverage.tar coverage
       - uses: actions/upload-artifact@v2
-        if: ${{ always() }}
+        if: always()
         with:
           name: coverage
-          path: coverage
+          path: coverage.tar
   publish:
     needs: test
     runs-on: ubuntu-latest
@@ -76,6 +82,8 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build
+      - name: Unpack build artifact
+        run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js 14
         uses: actions/setup-node@v1
         with:
@@ -103,6 +111,8 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build
+      - name: Unpack build artifact
+        run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js 14
         uses: actions/setup-node@v1
         with:

@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest]
         node: [14]
 
     steps:
@@ -31,19 +31,19 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Compress output
+        run: tar -cvf build.tar --exclude node_modules ./
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
           name: build-${{ matrix.os }}-${{ matrix.node }}
-          path: |
-            .
-            !node_modules
+          path: build.tar
   test:
     needs: build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest]
         # node versions to run tests on
         nodeRun: [14]
         # node versions on which code was built and should be tested
@@ -60,6 +60,8 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build-${{ matrix.os }}-${{ matrix.nodeBuild }}
+      - name: Unpack build artifact
+        run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js ${{ matrix.nodeRun }}
         uses: actions/setup-node@v1
         with:
@@ -79,15 +81,22 @@ jobs:
         # we run coverage only on Node@14 because older version report it incorrectly
         if: matrix.nodeRun == 14
         run: npm test
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
       - name: Test without coverage
         # we want to run tests on older Node versions to ensure that code works
         if: matrix.nodeRun != 14
         run: npm run test:nocov
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
+      - name: Compress output
+        if: matrix.nodeRun == 14 && always()
+        run: tar -cvf coverage.tar coverage
       - uses: actions/upload-artifact@v2
         if: matrix.nodeRun == 14 && always()
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
-          path: coverage
+          path: coverage.tar
   publish_next:
     needs: test
     runs-on: ubuntu-latest
@@ -96,6 +105,8 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build-ubuntu-latest-14
+      - name: Unpack build artifact
+        run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js 14
         uses: actions/setup-node@v1
         with:
@@ -117,13 +128,13 @@ jobs:
         run: npm publish --tag next --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Compress output
+        run: tar -cvf build.tar --exclude node_modules ./
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
           name: build-ubuntu-latest-14
-          path: |
-            .
-            !node_modules
+          path: build.tar
   deploy_docs:
     needs: publish_next
     runs-on: ubuntu-latest
@@ -145,6 +156,8 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build-ubuntu-latest-14
+      - name: Unpack build artifact
+        run: tar -xvf build.tar && rm build.tar
       - name: Use Node.js 14
         uses: actions/setup-node@v1
         with:
@@ -164,7 +177,7 @@ jobs:
         run: |
           echo "::set-output name=version::$(node -p "require('./package.json').version")"
       - name: Wait for npm publish
-        run: node scripts/wait-npm-publish.js latest ${{ steps.package_version.outputs.version }}
+        run: node scripts/wait-npm-publish.js next ${{ steps.package_version.outputs.version }}
       - name: Build and push ${{ steps.package_version.outputs.version }}
         uses: docker/build-push-action@v2
         with:
