@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
         node: [14]
 
     steps:
@@ -32,8 +32,12 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      - name: Compress output
+      - name: Compress output (non-Windows)
+        if: matrix.os != 'windows-latest'
         run: tar -cvf build.tar --exclude node_modules ./
+      - name: Compress output (Windows)
+        if: matrix.os == 'windows-latest'
+        run: 7z a -ttar -xr!node_modules -r build.tar .
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
@@ -45,7 +49,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [macos-latest, windows-latest, ubuntu-latest]
         # node versions to run tests on
         nodeRun: [14]
         # node versions on which code was built and should be tested
@@ -59,11 +63,22 @@ jobs:
             nodeBuild: 14
 
     steps:
+      - name: Configure pagefile
+        if: matrix.os == 'windows-latest'
+        uses: al-cheb/configure-pagefile-action@v1.2
+        with:
+          minimum-size: 16GB
+          maximum-size: 16GB
+          disk-root: "C:"
       - uses: actions/download-artifact@v2
         with:
           name: build-${{ matrix.os }}-${{ matrix.nodeBuild }}
-      - name: Unpack build artifact
+      - name: Unpack build artifact (non-Windows)
+        if: matrix.os != 'windows-latest'
         run: tar -xvf build.tar && rm build.tar
+      - name: Unpack build artifact (Windows)
+        if: matrix.os == 'windows-latest'
+        run: 7z x build.tar && del build.tar
       - name: Use Node.js ${{ matrix.nodeRun }}
         uses: actions/setup-node@v1
         with:
@@ -83,17 +98,16 @@ jobs:
         # we run coverage only on Node@14 because older version report it incorrectly
         if: matrix.nodeRun == 14
         run: npm test
-        env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
       - name: Test without coverage
         # we want to run tests on older Node versions to ensure that code works
         if: matrix.nodeRun != 14
         run: npm run test:nocov
-        env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
-      - name: Compress output
-        if: matrix.nodeRun == 14 && always()
+      - name: Compress output (non-Windows)
+        if: matrix.nodeRun == 14 && matrix.os != 'windows-latest' && always()
         run: tar -cvf coverage.tar coverage
+      - name: Compress output (Windows)
+        if: matrix.nodeRun == 14 && matrix.os == 'windows-latest' && always()
+        run: 7z a -ttar -r coverage.tar coverage
       - uses: actions/upload-artifact@v2
         if: matrix.nodeRun == 14 && always()
         with:
