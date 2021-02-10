@@ -10,8 +10,8 @@ LABEL name="m365pnp/cli-microsoft365:${CLI_VERSION}" \
   Garry Trinder <garry.trinder@live.com>, \
   Albert-Jan Schot <appie@digiwijs.nl>, \
   Rabia Williams <rabiawilliams@gmail.com>, \
-  Mark Powney <mpowney@icloud.com>, \
-  Patrick Lamber <patrick@nubo.eu>" \
+  Patrick Lamber <patrick@nubo.eu> \
+  Arjun Menon <arjun.umenon@gmail.com>" \
   com.azure.dev.pipelines.agent.handler.node.path="/usr/bin/node"
 
 RUN apk add --no-cache \
