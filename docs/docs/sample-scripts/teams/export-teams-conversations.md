@@ -11,12 +11,11 @@ We utilize Teams during incidents and create channels for each. We would like to
 
 ### Solution
 
-This script uses Microsoft 365 CLI to export the conversations from Microsoft Teams Channels.
+This script uses CLI for Microsoft 365 to export the conversations from Microsoft Teams Channels. You don't need to be a tenant admin to export conversations but you still can only export conversations of Teams of which you are member.
 
 !!! notes
 
 - Commands m365 teams message list and reply list are based on an API that is currently in preview and is subject to change once the API reached general availability.
-- You can only retrieve a message from a Microsoft Teams team if you are a member of that team.
 
 ```powershell tab="PowerShell Core"
 function  Get-Teams {
@@ -49,44 +48,44 @@ function  Get-MessageReplies {
     return $messageReplies
 }
 
-$teamsCollection = [System.Collections.ArrayList]@()
-$teams = Get-Teams
-$teamsCount = $teams.Length
-Write-Host "$teamsCount Team/s found" -ForegroundColor Magenta
-foreach ($team in $teams) {
-    $channelsCollection = [System.Collections.ArrayList]@()
-    $channels = Get-Channels $team.id
-    $teamDisplayName = $team.displayName
-    $channelsCount = $channels.Length
-    Write-Host "    $channelsCount Channel/s found in Team $teamDisplayName" -ForegroundColor Blue
-    foreach ($channel in $channels) {
-        $channelDisplayName = $channel.displayName
-        Write-Host "        Collecting conversation details from Channel $channelDisplayName" -ForegroundColor Gray
-        $messages = Get-Messages $team.id $channel.id
-        $messagesCollection = [System.Collections.ArrayList]@()
-        foreach ($message in $messages) {
-            $messageReplies = Get-MessageReplies $team.id $channel.id $message.id
-            $messageDetails = $message
-            [void]$messageDetails.Add("replies", $messageReplies)
-            [void]$messagesCollection.Add($messageDetails)
+Try {
+    $teamsCollection = [System.Collections.ArrayList]@()
+    $teams = Get-Teams
+    foreach ($team in $teams) {
+        $channelsCollection = [System.Collections.ArrayList]@()
+        $channels = Get-Channels $team.id
+        $progressCountChannel = 0;
+        foreach ($channel in $channels) {
+            Write-Progress -Id 0 -Activity "Exporting Conversations" -Status "Team : $($team.displayName)" -CurrentOperation "Channel : $($channel.displayName)" -PercentComplete (($progressCountChannel / $channels.length) * 100)
+            $messages = Get-Messages $team.id $channel.id
+            $messagesCollection = [System.Collections.ArrayList]@()
+            foreach ($message in $messages) {
+                $messageReplies = Get-MessageReplies $team.id $channel.id $message.id
+                $messageDetails = $message
+                [void]$messageDetails.Add("replies", $messageReplies)
+                [void]$messagesCollection.Add($messageDetails)
+            }
+            $channelDetails = $channel
+            [void]$channelDetails.Add("messages", $messagesCollection)
+            [void]$channelsCollection.Add($channelDetails)
+            $progressCountChannel++
         }
-        $channelDetails = $channel
-        [void]$channelDetails.Add("messages", $messagesCollection)
-        [void]$channelsCollection.Add($channelDetails)
-        Write-Host "        Completed" -ForegroundColor DarkGray
+        $teamDetails = $team
+        [void]$teamDetails.Add("channels", $channelsCollection)
+        [void]$teamsCollection.Add($teamDetails)
     }
-    $teamDetails = $team
-    [void]$teamDetails.Add("channels", $channelsCollection)
-    [void]$teamsCollection.Add($teamDetails)
+    Write-Progress -Id 0 -Activity " " -Status " " -Completed
+    $output = @{}
+    [void]$output.Add("teams", $teamsCollection)
+    $executionDir = $PSScriptRoot
+    $outputFilePath = "$executionDir/$(get-date -f yyyyMMdd-HHmmss).json"
+    $output | ConvertTo-Json -Depth 10 | Out-File $outputFilePath 
+    Write-Host "Open $outputFilePath file to review your output" -F Green 
 }
-$output = @{}
-[void]$output.Add("teams", $teamsCollection)
-
-Write-Host "Creating output file" -ForegroundColor Green
-$executionDir = $PSScriptRoot
-$outputFilePath = "$executionDir/$(get-date -f yyyyMMdd-HHmmss).json"
-$output | ConvertTo-Json -Depth 10 | Out-File $outputFilePath
-Write-Host "Open $outputFilePath file to review your output" -ForegroundColor DarkGreen
+Catch {
+    $ErrorMessage = $_.Exception.Message
+    Write-Error $ErrorMessage
+}
 ```
 
 Keywords:
