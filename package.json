@@ -154,7 +154,7 @@
     "Williams, Rabia <rabiawilliams@gmail.com>"
   ],
   "dependencies": {
-    "adal-node": "^0.2.2",
+    "@azure/msal-node": "^1.0.1",
     "adaptive-expressions": "^4.11.1",
     "adaptivecards-templating": "^2.1.0",
     "applicationinsights": "^1.8.10",

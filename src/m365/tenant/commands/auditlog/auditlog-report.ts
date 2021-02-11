@@ -76,7 +76,7 @@ class TenantAuditlogReportCommand extends Command {
       logger.logToStderr(`Start retrieving Audit Log Report`);
     }
 
-    this.tenantId = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
+    this.tenantId = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
     this
       .getCompleteAuditReports(args, logger)
       .then((res: AuditlogReport[]): void => {

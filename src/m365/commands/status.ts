@@ -17,15 +17,14 @@ class StatusCommand extends Command {
     if (auth.service.connected) {
       if (this.debug) {
         logger.logToStderr({
-          connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].value),
+          connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
           authType: AuthType[auth.service.authType],
-          accessTokens: JSON.stringify(auth.service.accessTokens, null, 2),
-          refreshToken: auth.service.refreshToken
+          accessTokens: JSON.stringify(auth.service.accessTokens, null, 2)
         });
       }
       else {
         logger.log({
-          connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].value)
+          connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)
         });
       }
     }

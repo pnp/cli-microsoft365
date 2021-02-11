@@ -23,7 +23,7 @@ class LogoutCommand extends Command {
     }
 
     auth
-      .clearConnectionInfo()
+      .clearConnectionInfo(logger, this.debug)
       .then((): void => {
         logout();
       }, (error: any): void => {

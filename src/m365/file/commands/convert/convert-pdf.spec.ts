@@ -87,7 +87,7 @@ describe(commands.CONVERT_PDF, () => {
     before(() => {
       auth.service.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
-        value: '123.e30=.456' // {} simulating app-only auth
+        accessToken: '123.e30=.456' // {} simulating app-only auth
       }
     });
 
@@ -1848,7 +1848,7 @@ describe(commands.CONVERT_PDF, () => {
     before(() => {
       auth.service.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
-        value: '123.eyJ1cG4iOiJzdGV2ZUBjb250b3NvLmNvbSJ9.456' // {upn: "steve@contoso.com"}
+        accessToken: '123.eyJ1cG4iOiJzdGV2ZUBjb250b3NvLmNvbSJ9.456' // {upn: "steve@contoso.com"}
       }
     });
 
@@ -1927,7 +1927,7 @@ describe(commands.CONVERT_PDF, () => {
   it('returns error when unable to detect authentication type', (done) => {
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
-      value: '123.YQ==.456' // 'a' simulating invalid token
+      accessToken: '123.YQ==.456' // 'a' simulating invalid token
     };
 
     command.action(logger, {

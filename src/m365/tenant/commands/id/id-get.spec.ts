@@ -21,7 +21,7 @@ describe(commands.TENANT_ID_GET, () => {
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
-        value: 'abc'
+        accessToken: 'abc'
       };
     }
   });

@@ -1,12 +1,14 @@
 import * as assert from 'assert';
 import * as fs from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 import * as sinon from 'sinon';
-import { AuthType, Service, CertificateType } from '../Auth';
+import { AuthType, CertificateType, Service } from '../Auth';
 import Utils from '../Utils';
 import { FileTokenStorage } from './FileTokenStorage';
 
 describe('FileTokenStorage', () => {
-  const fileStorage = new FileTokenStorage();
+  const fileStorage = new FileTokenStorage(FileTokenStorage.connectionInfoFilePath());
 
   afterEach(() => {
     Utils.restore([
@@ -14,7 +16,11 @@ describe('FileTokenStorage', () => {
       fs.readFileSync,
       fs.writeFile
     ]);
-  })
+  });
+
+  it(`stores MSAL cache in the user's home directory`, () => {
+    assert.strictEqual(FileTokenStorage.msalCacheFilePath(), path.join(os.homedir(), '.cli-m365-msal.json'));
+  });
 
   it('fails retrieving connection info from file if the token file doesn\'t exist', (done) => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
@@ -41,7 +47,7 @@ describe('FileTokenStorage', () => {
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,
-      logout: () => {}
+      logout: () => { }
     };
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify(tokensFile));
@@ -66,7 +72,7 @@ describe('FileTokenStorage', () => {
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,
-      logout: () => {}
+      logout: () => { }
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => false);
@@ -92,7 +98,7 @@ describe('FileTokenStorage', () => {
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,
-      logout: () => {}
+      logout: () => { }
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
@@ -119,7 +125,7 @@ describe('FileTokenStorage', () => {
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,
-      logout: () => {}
+      logout: () => { }
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
@@ -146,7 +152,7 @@ describe('FileTokenStorage', () => {
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,
-      logout: () => {}
+      logout: () => { }
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
@@ -173,7 +179,7 @@ describe('FileTokenStorage', () => {
       authType: AuthType.DeviceCode,
       certificateType: CertificateType.Unknown,
       connected: false,
-      logout: () => {}
+      logout: () => { }
     };
     let actual: string = '';
     sinon.stub(fs, 'existsSync').callsFake(() => true);
@@ -277,7 +283,7 @@ describe('FileTokenStorage', () => {
         'abc': 'def'
       }
     }));
-    sinon.stub(fs, 'writeFile').callsFake(() => {}).callsArgWith(3, null);
+    sinon.stub(fs, 'writeFile').callsFake(() => { }).callsArgWith(3, null);
     fileStorage
       .remove()
       .then(() => {
@@ -299,7 +305,7 @@ describe('FileTokenStorage', () => {
         'abc': 'def'
       }
     }));
-    sinon.stub(fs, 'writeFile').callsFake(() => {}).callsArgWith(3, { message: 'An error has occurred' });
+    sinon.stub(fs, 'writeFile').callsFake(() => { }).callsArgWith(3, { message: 'An error has occurred' });
     fileStorage
       .remove()
       .then(() => {

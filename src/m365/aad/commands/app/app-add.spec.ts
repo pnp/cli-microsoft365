@@ -23,7 +23,7 @@ describe(commands.APP_ADD, () => {
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
         expiresOn: 'abc',
-        value: 'abc'
+        accessToken: 'abc'
       };
     }
   });

@@ -97,7 +97,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
           // directory. If we in the future extend the command with allowing
           // users to create AAD app in a different directory, we'll need to
           // adjust this
-          tenantId: Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].value)
+          tenantId: Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)
         };
         if (_appInfo.secret) {
           appInfo.secret = _appInfo.secret;

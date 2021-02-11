@@ -44,7 +44,7 @@ class FileConvertPdfCommand extends GraphCommand {
     let targetIsLocalFile: boolean = true;
     let error: any;
 
-    let isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[auth.defaultResource].value);
+    let isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[auth.defaultResource].accessToken);
     if (typeof isAppOnlyAuth === 'undefined') {
       return cb(new CommandError('Unable to determine authentication type'));
     }
