@@ -1,0 +1,29 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/core-build/serve.schema.json",
+  "port": 4321,
+  "https": true,
+  "serveConfigurations": {
+    "default": {
+      "pageUrl": "https://contoso.sharepoint.com/sites/mySite/SitePages/myPage.aspx",
+      "fieldCustomizers": {
+        "InternalFieldName": {
+          "id": "3c14858d-7115-4de9-a621-edf2981e852a",
+          "properties": {
+            "sampleText": "Value"
+          }
+        }
+      }
+    },
+    "helloWorld": {
+      "pageUrl": "https://contoso.sharepoint.com/sites/mySite/SitePages/myPage.aspx",
+      "fieldCustomizers": {
+        "InternalFieldName": {
+          "id": "3c14858d-7115-4de9-a621-edf2981e852a",
+          "properties": {
+            "sampleText": "Value"
+          }
+        }
+      }
+    }
+  }
+}
