@@ -80,23 +80,19 @@ class LoginCommand extends Command {
         .then((): void => {
           auth.service.connected = true;
           cb();
-        }, (rej: string): void => {
+        }, (rej: Error): void => {
           if (this.debug) {
             logger.logToStderr('Error:');
             logger.logToStderr(rej);
             logger.logToStderr('');
           }
 
-          if (rej !== 'Polling_Request_Cancelled') {
-            cb(new CommandError(rej));
-            return;
-          }
-          cb();
+          cb(new CommandError(rej.message));
         });
     }
 
     auth
-      .clearConnectionInfo()
+      .clearConnectionInfo(logger, this.debug)
       .then((): void => {
         logout();
         login();

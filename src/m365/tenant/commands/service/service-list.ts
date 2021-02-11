@@ -26,7 +26,7 @@ class TenantServiceListCommand extends Command {
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
     const statusEndpoint: string = 'ServiceComms/Services';
 
-    const tenantId = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
+    const tenantId = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
 
     const requestOptions: any = {
       url: `${serviceUrl}/${tenantId}/${statusEndpoint}`,

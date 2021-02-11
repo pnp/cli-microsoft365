@@ -28,7 +28,7 @@ class TenantIdGetCommand extends Command {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let domainName: string = args.options.domainName;
     if (!domainName) {
-      const userName: string = Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
+      const userName: string = Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
       domainName = userName.split('@')[1];
     }
 

@@ -1,11 +1,10 @@
-import { ErrorResponse } from 'adal-node';
 import * as http from 'http';
 import { IncomingMessage, ServerResponse } from 'http';
 import { AddressInfo } from 'net';
 import * as open from 'open';
 import { ParsedUrlQuery } from 'querystring';
 import * as url from "url";
-import { InteractiveAuthorizationCodeResponse, Service } from './Auth';
+import { InteractiveAuthorizationCodeResponse, Service, InteractiveAuthorizationErrorResponse } from './Auth';
 import { Logger } from './cli';
 
 export class AuthServer {
@@ -16,7 +15,7 @@ export class AuthServer {
   // assigned through this.initializeServer() hence !
   private resolve!: (error: InteractiveAuthorizationCodeResponse) => void;
   // assigned through this.initializeServer() hence !
-  private reject!: (error: ErrorResponse) => void;
+  private reject!: (error: InteractiveAuthorizationErrorResponse) => void;
   // assigned through this.initializeServer() hence !
   private logger!: Logger;
 
@@ -29,7 +28,7 @@ export class AuthServer {
     return this.httpServer;
   }
 
-  public initializeServer = (service: Service, resource: string, resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: ErrorResponse) => void, logger: Logger, debug: boolean = false) => {
+  public initializeServer = (service: Service, resource: string, resolve: (result: InteractiveAuthorizationCodeResponse) => void, reject: (error: InteractiveAuthorizationErrorResponse) => void, logger: Logger, debug: boolean = false) => {
     this.service = service;
     this.resolve = resolve;
     this.reject = reject;
@@ -54,17 +53,20 @@ export class AuthServer {
   }
 
   private openUrl(url: string) {
-    this.open(url).then(() => {
-      this.logger.logToStderr("To sign in, use the web browser that just has been opened. Please sign-in there.")
-    }).catch(() => {
-      const errorResponse: ErrorResponse = {
-        error: "Can't open the default browser",
-        errorDescription: "Was not able to open a browser instance. Try again later or use a different authentication method."
-      }
+    this
+      .open(url)
+      .then(_ => {
+        this.logger.logToStderr("To sign in, use the web browser that just has been opened. Please sign-in there.")
+      })
+      .catch(_ => {
+        const errorResponse: InteractiveAuthorizationErrorResponse = {
+          error: "Can't open the default browser",
+          errorDescription: "Was not able to open a browser instance. Try again later or use a different authentication method."
+        }
 
-      this.reject(errorResponse);
-      this.httpServer.close();
-    });
+        this.reject(errorResponse);
+        this.httpServer.close();
+      });
   }
 
   private httpRequest = (request: IncomingMessage, response: ServerResponse) => {
@@ -93,7 +95,7 @@ export class AuthServer {
     }
 
     if (hasError === true) {
-      const errorMessage: ErrorResponse = {
+      const errorMessage: InteractiveAuthorizationErrorResponse = {
         error: queryString.error as string,
         errorDescription: queryString.error_description as string
       }
@@ -108,7 +110,7 @@ export class AuthServer {
     }
 
     if (hasCode === false && hasError === false) {
-      const errorMessage: ErrorResponse = {
+      const errorMessage: InteractiveAuthorizationErrorResponse = {
         error: "invalid request",
         errorDescription: "An invalid request has been received by the HTTP server"
       }

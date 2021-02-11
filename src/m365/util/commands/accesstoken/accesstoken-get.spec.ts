@@ -63,7 +63,7 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
     d.setMinutes(d.getMinutes() + 1);
     auth.service.accessTokens['https://graph.microsoft.com'] = {
       expiresOn: d.toString(),
-      value: 'ABC'
+      accessToken: 'ABC'
     };
 
     command.action(logger, { options: { debug: false, resource: 'https://graph.microsoft.com' } }, () => {
@@ -83,7 +83,7 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
     auth.service.accessTokens['https://contoso.sharepoint.com'] = {
       expiresOn: d.toString(),
-      value: 'ABC'
+      accessToken: 'ABC'
     };
 
     command.action(logger, { options: { debug: false, resource: 'sharepoint' } }, () => {
@@ -116,7 +116,7 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
     d.setMinutes(d.getMinutes() + 1);
     auth.service.accessTokens['https://contoso.sharepoint.com'] = {
       expiresOn: d.toString(),
-      value: 'ABC'
+      accessToken: 'ABC'
     };
 
     command.action(logger, { options: { debug: false, resource: 'sharepoint' } }, (err?: any) => {

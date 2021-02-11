@@ -34,7 +34,7 @@ class TenantServiceMessageListCommand extends Command {
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
     const statusEndpoint: string = args.options.workload ? `ServiceComms/Messages?$filter=Workload eq '${encodeURIComponent(args.options.workload)}'` : 'ServiceComms/Messages';
-    const tenantId: string = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
+    const tenantId: string = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
 
     const requestOptions: any = {
       url: `${serviceUrl}/${tenantId}/${statusEndpoint}`,

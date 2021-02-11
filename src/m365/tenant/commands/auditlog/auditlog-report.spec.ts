@@ -239,7 +239,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
         expiresOn: 'abc',
-        value: 'abc'
+        accessToken: 'abc'
       };
     }
   });
