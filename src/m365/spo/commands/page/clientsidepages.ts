@@ -303,13 +303,21 @@ export class ClientSidePage {
 
     const unespace = (escaped: string): string => {
       const mapDict = [
-          [/\\/g, "\\\\"], [/&quot;/g, "\""], [/&#58;/g, ":"], [/&#123;/g, "{"], [/&#125;/g, "}"],
-          [/\\\\/g, "\\"], [/\\\?/g, "?"], [/\\\./g, "."], [/\\\[/g, "["], [/\\\]/g, "]"],
-          [/\\\(/g, "("], [/\\\)/g, ")"], [/\\\|/g, "|"], [/\\\+/g, "+"], [/\\\*/g, "*"],
-          [/\\\$/g, "$"],
+        [/\\\&quot;/g, `\\"`], [/\n/g, "\\n"], 
+        [/&quot;/g, "\""], [/&#58;/g, ":"], [/&#123;/g, "{"], [/&#125;/g, "}"],
+        [/\\\?/g, "?"], [/\\\./g, "."], [/\\\[/g, "["], [/\\\]/g, "]"],
+        [/\\\(/g, "("], [/\\\)/g, ")"], [/\\\|/g, "|"], [/\\\+/g, "+"], [/\\\*/g, "*"],
+        [/\\\$/g, "$"]
       ];
       return mapDict.reduce((r, m) => r.replace(m[0], m[1] as string), escaped);
-  };
+    };
+
+    console.log(``);
+    console.log(``);
+    console.log(escapedString);
+    console.log(``);
+    console.log(``);
+    console.log(unespace(escapedString));
 
     return JSON.parse(unespace(escapedString));
   }
@@ -621,6 +629,7 @@ export abstract class CanvasControl {
   public abstract toHtml(index: number): string;
 
   public fromHtml(html: string): void {
+    console.log(getAttrValueFromString(html, "data-sp-controldata"))
     this.controlData = ClientSidePage.escapedStringToJson<ClientSideControlData>(getAttrValueFromString(html, "data-sp-controldata"));
     this.dataVersion = getAttrValueFromString(html, "data-sp-canvasdataversion");
     this.controlType = this.controlData.controlType;

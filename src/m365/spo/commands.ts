@@ -175,6 +175,7 @@ export default {
   SITE_REMOVE: `${prefix} site remove`,
   SITE_RENAME: `${prefix} site rename`,
   SITE_SET: `${prefix} site set`,
+  SITE_CHROME_SET: `${prefix} site chrome set`,
   SITEDESIGN_ADD: `${prefix} sitedesign add`,
   SITEDESIGN_APPLY: `${prefix} sitedesign apply`,
   SITEDESIGN_GET: `${prefix} sitedesign get`,
