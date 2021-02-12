@@ -24,6 +24,10 @@ class PaEnvironmentGetCommand extends AzmgmtCommand {
     return 'Gets information about the specified Microsoft Power Apps environment';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['name', 'id', 'location', 'displayName', 'provisioningState', 'environmentSku', 'azureRegionHint', 'isDefault'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information about Microsoft Power Apps environment ${args.options.name}...`);
@@ -40,8 +44,13 @@ class PaEnvironmentGetCommand extends AzmgmtCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        logger.log(res);
+        res.displayName = res.properties.displayName;
+        res.provisioningState = res.properties.provisioningState;
+        res.environmentSku = res.properties.environmentSku;
+        res.azureRegionHint = res.properties.azureRegionHint;
+        res.isDefault = res.properties.isDefault;
 
+        logger.log(res);
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
