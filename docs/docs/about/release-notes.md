@@ -6,6 +6,7 @@
 
 **Power Apps:**
 
+- [pa environment get](../cmd/pa/environment/environment-get.md) - gets information about the specified Microsoft Power Apps environment [#2109](https://github.com/pnp/cli-microsoft365/issues/2109)
 - [pa environment list](../cmd/pa/environment/environment-list.md) - lists Microsoft Power Apps environments in the current tenant [#2108](https://github.com/pnp/cli-microsoft365/issues/2108)
 
 **SharePoint:**
@@ -25,6 +26,7 @@
 - moved 'DONE' out of the `commandAction` [#2045](https://github.com/pnp/cli-microsoft365/issues/2045)
 - simplified returning command name [#2123](https://github.com/pnp/cli-microsoft365/issues/2123)
 - extended 'util accesstoken get' with `sharepoint` as resource [#2096](https://github.com/pnp/cli-microsoft365/issues/2096)
+- updated command option in readme.md
 
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 

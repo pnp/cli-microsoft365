@@ -159,13 +159,13 @@ m365 spo site get --help
 Execute a command and output response as text.
 
 ```sh
-m365 spo site get --webUrl https://contoso.sharepoint.com
+m365 spo site get --url https://contoso.sharepoint.com
 ```
 
 Execute a command and output response as JSON using the global `--output` option.
 
 ```sh
-m365 spo site get --webUrl https://contoso.sharepoint.com --output json
+m365 spo site get --url https://contoso.sharepoint.com --output json
 ```
 
 Filter responses and return custom objects using [JMESPath](https://jmespath.org/) queries using the global `--query`  option.
