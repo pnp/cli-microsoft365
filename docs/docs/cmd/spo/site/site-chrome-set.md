@@ -11,7 +11,7 @@ m365 spo site chrome set [options]
 ## Options
 
 `-u, --url <url>`
-: URL of the site collection to retrieve information for
+: URL of the site collection to which you want to change the chrome header/footer
 
 `--headerLayout [headerLayout]`
 : Specifies the header layout to set on the site. Options: `Standard|Compact|Minimal|Extended`. Default `Standard`.
@@ -27,9 +27,6 @@ m365 spo site chrome set [options]
 
 `--footerEmphasis [footerEmphasis]`
 : Specifies the footer its background color to set. Options: `Lightest|Light|Dark|Darkest`. Default `Darkest`.
-
-`--disableMegaMenu`
-: Specify to disable the mega menu. This results in using the cascading navigation (classic experience).
 
 `--disableMegaMenu`
 : Specify to disable the mega menu. This results in using the cascading navigation (classic experience).
