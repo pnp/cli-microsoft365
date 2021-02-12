@@ -40,7 +40,21 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        logger.log(res);
+        if (args.options.output === 'text') {
+          logger.log({
+            name: res.name,
+            id: res.id,
+            location: res.location,
+            displayName: res.properties.displayName,
+            provisioningState: res.properties.provisioningState,
+            environmentSku: res.properties.environmentSku,
+            azureRegionHint: res.properties.azureRegionHint,
+            isDefault: res.properties.isDefault
+          });          
+        }
+        else {
+          logger.log(res);
+        }
 
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));

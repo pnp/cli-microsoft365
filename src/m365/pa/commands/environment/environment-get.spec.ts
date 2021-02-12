@@ -110,6 +110,43 @@ describe(commands.ENVIRONMENT_GET, () => {
     });
   });
 
+  it('retrieves information about the specified environment with text output', (done) => {
+    const env: any = { "name": "Default-d87a7535-dd31-4437-bfe1-95340acd55c5", "location": "europe", "type": "Microsoft.PowerApps/environments", "id": "/providers/Microsoft.PowerApps/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5", "properties": { "displayName": "Contoso (default)", "createdTime": "2018-03-22T20:20:46.08653Z", "createdBy": { "id": "SYSTEM", "displayName": "SYSTEM", "type": "NotSpecified" }, "provisioningState": "Succeeded", "creationType": "DefaultTenant", "environmentSku": "Default", "environmentType": "Production", "isDefault": true, "azureRegionHint": "westeurope", "runtimeEndpoints": { "microsoft.BusinessAppPlatform": "https://europe.api.bap.microsoft.com", "microsoft.CommonDataModel": "https://europe.api.cds.microsoft.com", "microsoft.PowerApps": "https://europe.api.powerapps.com", "microsoft.Flow": "https://europe.api.flow.microsoft.com" } } };
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5?api-version=2016-11-01`) > -1) {
+        if (opts.headers &&
+          opts.headers.accept &&
+          opts.headers.accept.indexOf('application/json') === 0) {
+          return Promise.resolve(env);
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5', output: 'text' } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(
+          {
+            name: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c5',
+            id: '/providers/Microsoft.PowerApps/environments/Default-d87a7535-dd31-4437-bfe1-95340acd55c5',
+            location: 'europe',
+            displayName: 'Contoso (default)',
+            provisioningState: 'Succeeded',
+            environmentSku: 'Default',
+            azureRegionHint: 'westeurope',
+            isDefault: true
+          }
+        ));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles no environment found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       return Promise.reject({
