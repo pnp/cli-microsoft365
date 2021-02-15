@@ -14,28 +14,28 @@ m365 spo site chrome set [options]
 : URL of the site collection to which you want to change the chrome header/footer
 
 `--headerLayout [headerLayout]`
-: Specifies the header layout to set on the site. Options: `Standard|Compact|Minimal|Extended`. Default `Standard`.
+: Specifies the header layout to set on the site. Options: `Standard|Compact|Minimal|Extended`.
 
 `--headerEmphasis [headerEmphasis]`
-: Specifies the header its background color to set. Options: `Lightest|Light|Dark|Darkest`. Default `Lightest`.
+: Specifies the header its background color to set. Options: `Lightest|Light|Dark|Darkest`.
 
 `--logoAlignment [logoAlignment]`
-: When using the `Extended` header, you can set the logo its position. Otherwise this setting will be ignored. Options: `Left|Center|Right`. Default `Left`.
+: When using the `Extended` header, you can set the logo its position. Otherwise this setting will be ignored. Options: `Left|Center|Right`.
 
 `--footerLayout [footerLayout]`
-: Specifies the footer layout to set on the site. Options: `Simple|Extended`. Default `Simple`.
+: Specifies the footer layout to set on the site. Options: `Simple|Extended`.
 
 `--footerEmphasis [footerEmphasis]`
-: Specifies the footer its background color to set. Options: `Lightest|Light|Dark|Darkest`. Default `Darkest`.
+: Specifies the footer its background color to set. Options: `Lightest|Light|Dark|Darkest`.
 
-`--disableMegaMenu`
-: Specify to disable the mega menu. This results in using the cascading navigation (classic experience).
+`--disableMegaMenu [disableMegaMenu]`
+: Specify to disable the mega menu. This results in using the cascading navigation (classic experience). Options: `true|false`.
 
-`--hideTitleInHeader`
-: Specify to hide the site title in the header.
+`--hideTitleInHeader [hideTitleInHeader]`
+: Specify to hide the site title in the header. Options: `true|false`.
 
-`--disableFooter`
-: Specify to disable the footer on the site.
+`--disableFooter [disableFooter]`
+: Specify to disable the footer on the site. Options: `true|false`.
 
 ## Examples
 
@@ -54,5 +54,5 @@ m365 spo site chrome set -u https://contoso.sharepoint.com/sites/project-x  --he
 Disable the footer on the site
 
 ```sh
-m365 spo site chrome set -u https://contoso.sharepoint.com/sites/project-x --footer
+m365 spo site chrome set -u https://contoso.sharepoint.com/sites/project-x --disableFooter true
 ```

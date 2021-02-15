@@ -7,25 +7,25 @@ import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 
-export enum HeaderLayout {
+enum HeaderLayout {
   Standard = 1,
   Compact,
   Minimal,
   Extended
 }
 
-export enum FooterLayout {
+enum FooterLayout {
   Simple = 1,
   Extended
 }
 
-export enum Alignment {
+enum Alignment {
   Left = 0,
   Center,
   Right
 }
 
-export enum Emphasis {
+enum Emphasis {
   Lightest = 0,
   Light,
   Dark,
@@ -44,12 +44,12 @@ interface Options extends GlobalOptions {
   logoAlignment?: Alignment;
   footerLayout?: FooterLayout;
   footerEmphasis?: Emphasis;
-  disableMegaMenu?: boolean;
-  hideTitleInHeader?: boolean;
-  disableFooter?: boolean;
+  disableMegaMenu?: string;
+  hideTitleInHeader?: string;
+  disableFooter?: string;
 }
 
-class SpoSiteChromeSet extends SpoCommand {
+class SpoSiteChromeSetCommand extends SpoCommand {
 
   public get name(): string {
     return commands.SITE_CHROME_SET;
@@ -61,43 +61,60 @@ class SpoSiteChromeSet extends SpoCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.headerLayout = typeof args.options.headerLayout !== 'undefined';
-    telemetryProps.headerEmphasis = typeof args.options.headerEmphasis !== 'undefined';
-    telemetryProps.disableMegaMenu = typeof args.options.disableMegaMenu !== 'undefined';
-    telemetryProps.hideTitleInHeader = typeof args.options.hideTitleInHeader !== 'undefined';
-    telemetryProps.logoAlignment = typeof args.options.logoAlignment !== 'undefined';
-    telemetryProps.disableFooter = typeof args.options.disableFooter !== 'undefined';
-    telemetryProps.footerLayout = typeof args.options.footerLayout !== 'undefined';
-    telemetryProps.footerEmphasis = typeof args.options.footerEmphasis !== 'undefined';
+    telemetryProps.headerLayout = args.options.headerLayout;
+    telemetryProps.headerEmphasis = args.options.headerEmphasis;
+    telemetryProps.disableMegaMenu = args.options.disableMegaMenu;
+    telemetryProps.hideTitleInHeader = args.options.hideTitleInHeader;
+    telemetryProps.logoAlignment = args.options.logoAlignment;
+    telemetryProps.disableFooter = args.options.disableFooter;
+    telemetryProps.footerLayout = args.options.footerLayout;
+    telemetryProps.footerEmphasis = args.options.footerEmphasis;
     return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
 
-    const headerLayout = args.options.headerLayout ? HeaderLayout[args.options.headerLayout] : HeaderLayout.Standard;
-    const headerEmphasis = args.options.headerEmphasis ? Emphasis[args.options.headerEmphasis] : Emphasis.Lightest;
-    const logoAlignment = args.options.logoAlignment ? Alignment[args.options.logoAlignment] : Alignment.Left;
-    const footerLayout = args.options.footerLayout ? FooterLayout[args.options.footerLayout] : FooterLayout.Simple;
-    const footerEmphasis = args.options.footerEmphasis ? Emphasis[args.options.footerEmphasis] : Emphasis.Darkest;
-    const hideTitleInHeader = !!args.options.hideTitleInHeader;
-    const disableMegaMenu = typeof args.options.disableMegaMenu !== 'undefined' ? args.options.disableMegaMenu : false;
-    const disableFooter = typeof args.options.disableFooter !== 'undefined' ? args.options.disableFooter : false;
+    const headerLayout = args.options.headerLayout ? HeaderLayout[args.options.headerLayout] : null;
+    const headerEmphasis = args.options.headerEmphasis ? Emphasis[args.options.headerEmphasis] : null;
+    const logoAlignment = args.options.logoAlignment ? Alignment[args.options.logoAlignment] : null;
+    const footerLayout = args.options.footerLayout ? FooterLayout[args.options.footerLayout] : null;
+    const footerEmphasis = args.options.footerEmphasis ? Emphasis[args.options.footerEmphasis] : null;
+    const hideTitleInHeader = typeof args.options.hideTitleInHeader !== "undefined" ? args.options.hideTitleInHeader.toLowerCase() === "true" : null;
+    const disableMegaMenu = typeof args.options.disableMegaMenu !== 'undefined' ? args.options.disableMegaMenu.toLowerCase() === "true" : null;
+    const disableFooter = typeof args.options.disableFooter !== 'undefined' ? args.options.disableFooter.toLowerCase() === "true" : null;
+
+    let body: any = {};
+    if (headerLayout !== null) {
+      body["headerLayout"] = headerLayout;
+    }
+    if (headerEmphasis !== null) {
+      body["headerEmphasis"] = headerEmphasis;
+    }
+    if (logoAlignment !== null) {
+      body["logoAlignment"] = logoAlignment;
+    }
+    if (footerLayout !== null) {
+      body["footerLayout"] = footerLayout;
+    }
+    if (footerEmphasis !== null) {
+      body["footerEmphasis"] = 3 - parseInt(footerEmphasis) // Footer is inverted;
+    }
+    if (hideTitleInHeader !== null) {
+      body["hideTitleInHeader"] = hideTitleInHeader;
+    }
+    if (disableMegaMenu !== null) {
+      body["megaMenuEnabled"] = !disableMegaMenu;
+    }
+    if (disableFooter !== null) {
+      body["footerEnabled"] = !disableFooter;
+    }
 
     const requestOptions: any = {
       url: `${args.options.url}/_api/web/SetChromeOptions`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
-      data: {
-        headerLayout,
-        headerEmphasis,
-        megaMenuEnabled: !disableMegaMenu,
-        footerEnabled: !disableFooter,
-        footerLayout,
-        footerEmphasis: 3 - (footerEmphasis as number), // Footer is inverted
-        hideTitleInHeader,
-        logoAlignment
-      },
+      data: body,
       responseType: 'json'
     };
 
@@ -132,13 +149,13 @@ class SpoSiteChromeSet extends SpoCommand {
         autocomplete: ['Lightest', 'Light', 'Dark', 'Darkest']
       },
       {
-        option: '--disableMegaMenu'
+        option: '--disableMegaMenu [disableMegaMenu]'
       },
       {
-        option: '--hideTitleInHeader'
+        option: '--hideTitleInHeader [hideTitleInHeader]'
       },
       {
-        option: '--disableFooter'
+        option: '--disableFooter [disableFooter]'
       }
     ];
 
@@ -176,4 +193,4 @@ class SpoSiteChromeSet extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteChromeSet();
+module.exports = new SpoSiteChromeSetCommand();

@@ -92,11 +92,7 @@ describe(commands.SITE_CHROME_SET, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test' } }, () => {
       try {
-        assert.strictEqual(data.headerLayout, 1);
-        assert.strictEqual(data.headerEmphasis, 0);
-        assert.strictEqual(data.logoAlignment, 0);
-        assert.strictEqual(data.footerLayout, 1);
-        assert.strictEqual(data.footerEmphasis, 0);
+        assert.strictEqual(Object.keys(data).length, 0);
         done();
       }
       catch (e) {
@@ -116,7 +112,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableMegaMenu: "true" } }, () => {
       try {
         assert.strictEqual(data.megaMenuEnabled, false);
         done();
@@ -138,7 +134,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableFooter: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', disableFooter: "true" } }, () => {
       try {
         assert.strictEqual(data.footerEnabled, false);
         done();
@@ -160,7 +156,7 @@ describe(commands.SITE_CHROME_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/test', hideTitleInHeader: "true" } }, () => {
       try {
         assert.strictEqual(data.hideTitleInHeader, true);
         done();
