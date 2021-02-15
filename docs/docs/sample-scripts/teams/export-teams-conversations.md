@@ -51,12 +51,14 @@ function  Get-MessageReplies {
 Try {
     $teamsCollection = [System.Collections.ArrayList]@()
     $teams = Get-Teams
+    $progressCountTeam = 1;
     foreach ($team in $teams) {
+        Write-Progress -Id 0 -Activity "Processing channels in Team : $($team.displayName)" -Status "Team $progressCountTeam of $($teams.length)" -PercentComplete (($progressCountTeam / $teams.length) * 100)
         $channelsCollection = [System.Collections.ArrayList]@()
         $channels = Get-Channels $team.id
-        $progressCountChannel = 0;
+        $progressCountChannel = 1;
         foreach ($channel in $channels) {
-            Write-Progress -Id 0 -Activity "Exporting Conversations" -Status "Team : $($team.displayName)" -CurrentOperation "Channel : $($channel.displayName)" -PercentComplete (($progressCountChannel / $channels.length) * 100)
+            Write-Progress -Id 1 -ParentId 0 -Activity "Processing messages in channel : $($channel.displayName)" -Status "Channel $progressCountChannel of $($channels.length)" -PercentComplete (($progressCountChannel / $channels.length) * 100)
             $messages = Get-Messages $team.id $channel.id
             $messagesCollection = [System.Collections.ArrayList]@()
             foreach ($message in $messages) {
@@ -73,8 +75,10 @@ Try {
         $teamDetails = $team
         [void]$teamDetails.Add("channels", $channelsCollection)
         [void]$teamsCollection.Add($teamDetails)
+        $progressCountTeam++
     }
     Write-Progress -Id 0 -Activity " " -Status " " -Completed
+    Write-Progress -Id 1 -Activity " " -Status " " -Completed
     $output = @{}
     [void]$output.Add("teams", $teamsCollection)
     $executionDir = $PSScriptRoot
