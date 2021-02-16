@@ -6,12 +6,14 @@
 
 **Power Apps:**
 
+- [pa app get](../cmd/pa/app/app-get.md) - gets information about the specified Microsoft Power App [#2110](https://github.com/pnp/cli-microsoft365/issues/2110)
 - [pa environment get](../cmd/pa/environment/environment-get.md) - gets information about the specified Microsoft Power Apps environment [#2109](https://github.com/pnp/cli-microsoft365/issues/2109)
 - [pa environment list](../cmd/pa/environment/environment-list.md) - lists Microsoft Power Apps environments in the current tenant [#2108](https://github.com/pnp/cli-microsoft365/issues/2108)
 
 **SharePoint:**
 
 - [spo page copy](../cmd/spo/page/page-copy.md) - creates a copy of a modern page or template [#2088](https://github.com/pnp/cli-microsoft365/issues/2088)
+- [spo site chrome set](../cmd/spo/site/site-chrome-set.md) - sets the chrome header and footer for the specified site [#2161](https://github.com/pnp/cli-microsoft365/issues/2161)
 - [spo site ensure](../cmd/spo/site/site-ensure.md) - ensures that the particular site collection exists and updates its properties if necessary [#1404](https://github.com/pnp/cli-microsoft365/issues/1404)
 
 ### Changes
@@ -27,6 +29,7 @@
 - simplified returning command name [#2123](https://github.com/pnp/cli-microsoft365/issues/2123)
 - extended 'util accesstoken get' with `sharepoint` as resource [#2096](https://github.com/pnp/cli-microsoft365/issues/2096)
 - updated command option in readme.md
+- improved `environment get` commands with text results [#2153](https://github.com/pnp/cli-microsoft365/issues/2153)
 
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 
