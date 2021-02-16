@@ -710,7 +710,7 @@ Get-FlowApprovalRequest|Microsoft.PowerApps.PowerShell|
 Get-FlowEnvironment|Microsoft.PowerApps.PowerShell|[flow environment list](../cmd/flow/environment/environment-list.md), [flow environment get](../cmd/flow/environment/environment-get.md)
 Get-FlowOwnerRole|Microsoft.PowerApps.PowerShell|
 Get-FlowRun|Microsoft.PowerApps.PowerShell|[flow run list](../cmd/flow/run/run-list.md), [flow run get](../cmd/flow/run/run-get.md)
-Get-PowerApp|Microsoft.PowerApps.PowerShell|
+Get-PowerApp|Microsoft.PowerApps.PowerShell|[pa app list](../cmd/pa/app/app-list.md), [pa app get](../cmd/pa/app/app-get.md)
 Get-PowerAppConnection|Microsoft.PowerApps.PowerShell|
 Get-PowerAppConnectionRoleAssignment|Microsoft.PowerApps.PowerShell|
 Get-PowerAppConnector|Microsoft.PowerApps.PowerShell|
