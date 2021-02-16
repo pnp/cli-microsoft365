@@ -42,7 +42,7 @@ foreach($team in $allTeams){
                 TabId = $tab.id
                 TabNameDisplayName = $tab.DisplayName
                 TeamsAppTabId = $tab.teamsAppTabId
-            } | out-null
+            }
         }
     }
 }
