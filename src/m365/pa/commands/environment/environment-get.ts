@@ -44,9 +44,6 @@ class PaEnvironmentGetCommand extends AzmgmtCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        res.name = res.name;
-        res.id = res.id;
-        res.location = res.location;
         res.displayName = res.properties.displayName;
         res.provisioningState = res.properties.provisioningState;
         res.environmentSku = res.properties.environmentSku;
