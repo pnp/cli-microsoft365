@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -24,6 +24,10 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
     return 'Gets information about the specified Microsoft Flow environment';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['name', 'id', 'location', 'displayName', 'provisioningState', 'environmentSku', 'azureRegionHint', 'isDefault'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Retrieving information about Microsoft Flow environment ${args.options.name}...`);
@@ -40,22 +44,16 @@ class FlowEnvironmentGetCommand extends AzmgmtCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        if (args.options.output === 'text') {
-          logger.log({
-            name: res.name,
-            id: res.id,
-            location: res.location,
-            displayName: res.properties.displayName,
-            provisioningState: res.properties.provisioningState,
-            environmentSku: res.properties.environmentSku,
-            azureRegionHint: res.properties.azureRegionHint,
-            isDefault: res.properties.isDefault
-          });          
-        }
-        else {
-          logger.log(res);
-        }
+        res.name = res.name;
+        res.id = res.id;
+        res.location = res.location;
+        res.displayName = res.properties.displayName;
+        res.provisioningState = res.properties.provisioningState;
+        res.environmentSku = res.properties.environmentSku;
+        res.azureRegionHint = res.properties.azureRegionHint;
+        res.isDefault = res.properties.isDefault;
 
+        logger.log(res);
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
