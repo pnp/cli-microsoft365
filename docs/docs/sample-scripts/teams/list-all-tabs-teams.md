@@ -22,7 +22,7 @@ Write-Host "Processing $teamCount teams..."
 $counter = 0
 foreach($team in $allTeams){
     $counter++
-    Write-Host "Processing $($team.id)... ($counter/$teamCount)"
+    Write-Host "Processing $($team.displayName)... ($counter/$teamCount)"
     $allChannels = m365 teams channel list --teamId $team.id -o json | ConvertFrom-Json
     
     #Loop through each Channel
@@ -42,7 +42,7 @@ foreach($team in $allTeams){
                 TabId = $tab.id
                 TabNameDisplayName = $tab.DisplayName
                 TeamsAppTabId = $tab.teamsAppTabId
-            }
+            } | out-null
         }
     }
 }
