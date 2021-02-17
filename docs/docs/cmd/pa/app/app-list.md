@@ -22,5 +22,5 @@ pa app list [options]
 List all apps
 
 ```sh
-pa app list
+m365 pa app list
 ```
