@@ -1265,6 +1265,40 @@ describe(commands.SITE_SET, () => {
     });
   });
 
+  it('correctly handles unsetting the logo from the specified site when no empty string is provided', (done) => {
+    let data: any = {};
+    
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/site?$select=GroupId,Id') {
+        return Promise.resolve({
+          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/siteiconmanager/setsitelogo') {
+        data = opts.data;
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: true } }, () => {
+      try {
+        assert.strictEqual(data.relativeLogoUrl, "");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles error when applying site design to the specified site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {

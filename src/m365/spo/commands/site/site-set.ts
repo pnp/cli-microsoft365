@@ -103,7 +103,12 @@ class SpoSiteSetCommand extends SpoCommand {
       logger.logToStderr(`Setting the site its logo...`);
     }
 
-    const logoUrl = args.options.siteLogoUrl ? Utils.getServerRelativePath(args.options.url, args.options.siteLogoUrl) : "";
+    let siteLogoUrl = args.options.siteLogoUrl.toString();
+    if (siteLogoUrl.toLowerCase() === "true") {
+      siteLogoUrl = "";
+    }
+    
+    const logoUrl = siteLogoUrl ? Utils.getServerRelativePath(args.options.url, siteLogoUrl) : "";
 
     const requestOptions: any = {
       url: `${args.options.url}/_api/siteiconmanager/setsitelogo`,
