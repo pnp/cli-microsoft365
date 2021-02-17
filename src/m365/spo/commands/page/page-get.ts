@@ -14,6 +14,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   name: string;
   webUrl: string;
+  metadataOnly?: boolean;
 }
 
 class SpoPageGetCommand extends SpoCommand {
@@ -56,23 +57,26 @@ class SpoPageGetCommand extends SpoCommand {
           return;
         }
 
-        const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
-        let numControls: number = 0;
-        clientSidePage.sections.forEach(s => {
-          s.columns.forEach(c => {
-            numControls += c.controls.length;
-          });
-        });
-
         let page: any = {
           commentsDisabled: res.ListItemAllFields.CommentsDisabled,
-          numSections: clientSidePage.sections.length,
-          numControls: numControls,
           title: res.ListItemAllFields.Title
         };
 
         if (res.ListItemAllFields.PageLayoutType) {
           page.layoutType = res.ListItemAllFields.PageLayoutType;
+        }
+
+        if (!args.options.metadataOnly) {
+          const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
+          let numControls: number = 0;
+          clientSidePage.sections.forEach(s => {
+            s.columns.forEach(c => {
+              numControls += c.controls.length;
+            });
+          });
+
+          page.numSections = clientSidePage.sections.length;
+          page.numControls = numControls;
         }
 
         page = Object.assign(res, page);
@@ -88,6 +92,9 @@ class SpoPageGetCommand extends SpoCommand {
       },
       {
         option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--metadataOnly'
       }
     ];
 

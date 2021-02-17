@@ -16,6 +16,9 @@ m365 spo page get [options]
 `-u, --webUrl <webUrl>`
 : URL of the site where the page to retrieve is located
 
+`--metadataOnly`
+: Specify to only retrieve the metadata without the section and control processing
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -28,4 +31,10 @@ Get information about the modern page with name _home.aspx_
 
 ```sh
 m365 spo page get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx
+```
+
+Get all the metadata from the modern page, without the section and control count information
+
+```sh
+m365 spo page get --webUrl https://contoso.sharepoint.com/sites/team-a --name home.aspx --metadataOnly
 ```
