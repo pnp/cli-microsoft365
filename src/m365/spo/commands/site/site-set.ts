@@ -32,6 +32,7 @@ export interface Options extends GlobalOptions {
   title?: string;
   url: string;
   sharingCapability?: string;
+  siteLogoUrl?: string;
 }
 
 class SpoSiteSetCommand extends SpoCommand {
@@ -57,6 +58,7 @@ class SpoSiteSetCommand extends SpoCommand {
     telemetryProps.title = typeof args.options.title === 'string';
     telemetryProps.siteDesignId = typeof args.options.siteDesignId !== undefined;
     telemetryProps.sharingCapabilities = args.options.sharingCapability;
+    telemetryProps.siteLogoUrl = typeof args.options.siteLogoUrl !== 'undefined';
     return telemetryProps;
   }
 
@@ -82,6 +84,7 @@ class SpoSiteSetCommand extends SpoCommand {
       .then((): Promise<void> => this.updateSharedProperties(logger, args))
       .then((): Promise<void> => this.applySiteDesign(logger, args))
       .then((): Promise<void> => this.setSharingCapabilities(logger, args))
+      .then((): Promise<void> => this.setLogo(logger, args))
       .then(_ => cb(), (err: any): void => {
         if (err instanceof CommandError) {
           err = (err as CommandError).message;
@@ -89,6 +92,31 @@ class SpoSiteSetCommand extends SpoCommand {
 
         this.handleRejectedPromise(err, logger, cb);
       });
+  }
+
+  private setLogo(logger: Logger, args: CommandArgs): Promise<void> {
+    if (typeof args.options.siteLogoUrl === 'undefined') {
+      return Promise.resolve();
+    }
+
+    if (this.debug) {
+      logger.logToStderr(`Setting the site its logo...`);
+    }
+
+    const logoUrl = args.options.siteLogoUrl ? Utils.getServerRelativePath(args.options.url, args.options.siteLogoUrl) : "";
+
+    const requestOptions: any = {
+      url: `${args.options.url}/_api/siteiconmanager/setsitelogo`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      data: {
+        relativeLogoUrl: logoUrl
+      },
+      responseType: 'json'
+    };
+
+    return request.post(requestOptions);
   }
 
   private updateSite(logger: Logger, args: CommandArgs): Promise<void> {
@@ -413,6 +441,9 @@ class SpoSiteSetCommand extends SpoCommand {
         option: '--title [title]'
       },
       {
+        option: '--siteLogoUrl [siteLogoUrl]'
+      },
+      {
         option: '--sharingCapability [sharingCapability]',
         autocomplete: this.sharingCapabilities
       }
@@ -435,8 +466,13 @@ class SpoSiteSetCommand extends SpoCommand {
       typeof args.options.owners === 'undefined' &&
       typeof args.options.shareByEmailEnabled === 'undefined' &&
       typeof args.options.siteDesignId === 'undefined' &&
-      typeof args.options.sharingCapability === 'undefined') {
+      typeof args.options.sharingCapability === 'undefined' &&
+      typeof args.options.siteLogoUrl === 'undefined') {
       return 'Specify at least one property to update';
+    }
+
+    if (typeof args.options.siteLogoUrl !== 'undefined' && typeof args.options.siteLogoUrl !== 'string') {
+      return `${args.options.siteLogoUrl} is not a valid value for the siteLogoUrl option. Specify the logo URL or an empty string "" to unset the logo.`;
     }
 
     if (typeof args.options.disableFlows === 'string' &&

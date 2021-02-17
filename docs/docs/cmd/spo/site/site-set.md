@@ -37,6 +37,9 @@ m365 spo site set [options]
 `--sharingCapability [sharingCapability]`
 : The sharing capability for the site. Allowed values:  `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
 
+`--siteLogoUrl [siteLogoUrl]`
+: Set the logo for the site collection. This can be an absolute or relative URL to a file on the current site collection.
+
 --8<-- "docs/cmd/_global.md"
 
 !!! important
@@ -104,4 +107,16 @@ Restrict external sharing to already available external users only
 
 ```sh
 m365 spo site set --url https://contoso.sharepoint.com/sites/sales --sharingCapability ExistingExternalUserSharingOnly
+```
+
+Set the logo on the site
+
+```sh
+m365 spo site set --url https://estruyfdev2.sharepoint.com/sites/sales --siteLogoUrl "/sites/sales/SiteAssets/parker-ms-1200.png"
+```
+
+Unset the logo on the site
+
+```sh
+m365 spo site set --url https://estruyfdev2.sharepoint.com/sites/sales --siteLogoUrl ""
 ```
