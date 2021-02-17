@@ -62,7 +62,7 @@ class SpoWebSetCommand extends SpoCommand {
     if (args.options.description) {
       payload.Description = args.options.description;
     }
-    if (args.options.siteLogoUrl) {
+    if (typeof args.options.siteLogoUrl !== 'undefined') {
       payload.SiteLogoUrl = args.options.siteLogoUrl;
     }
     if (typeof args.options.quickLaunchEnabled !== 'undefined') {
