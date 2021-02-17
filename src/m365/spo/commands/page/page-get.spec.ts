@@ -778,6 +778,26 @@ describe(commands.PAGE_GET, () => {
     });
   });
 
+  it('check if section and control HTML parsing gets skipped for metadata only mode', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
+        return Promise.resolve(markdownWp);
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', metadataOnly: true, output: 'json' } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(markdownWp));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('shows error when the specified page is a classic page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
@@ -897,6 +917,17 @@ describe(commands.PAGE_GET, () => {
     let containsOption = false;
     options.forEach(o => {
       if (o.option === '--debug') {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying metadataOnly flag', () => {
+    const options = command.options();
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option === '--metadataOnly') {
         containsOption = true;
       }
     });
