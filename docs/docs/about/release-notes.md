@@ -30,6 +30,8 @@
 - extended 'util accesstoken get' with `sharepoint` as resource [#2096](https://github.com/pnp/cli-microsoft365/issues/2096)
 - updated command option in readme.md
 - improved `environment get` commands with text results [#2153](https://github.com/pnp/cli-microsoft365/issues/2153)
+- extended 'spo web set' with the ability to reset the logo [#2177](https://github.com/pnp/cli-microsoft365/issues/2177)
+- added PowerShell examples to 'adaptivecard send' docs [#2167](https://github.com/pnp/cli-microsoft365/pull/2167)
 
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 
