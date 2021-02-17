@@ -5,7 +5,7 @@ Shows CLI for Microsoft 365 version
 ## Usage
 
 ```sh
-version [options]
+m365 version [options]
 ```
 
 ## Options
@@ -17,5 +17,5 @@ version [options]
 Show the version of CLI for Microsoft 365
 
 ```sh
-version
+m365 version
 ```
