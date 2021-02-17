@@ -83,7 +83,8 @@ Try {
     [void]$output.Add("teams", $teamsCollection)
     $executionDir = $PSScriptRoot
     $outputFilePath = "$executionDir/$(get-date -f yyyyMMdd-HHmmss).json"
-    $output | ConvertTo-Json -Depth 10 | Out-File $outputFilePath 
+    # ConvertTo-Json cuts off data when exporting to JSON if it nests too deep. The default value of Depth parameter is 2. Set your -Depth parameter whatever depth you need to preserve your data.
+    $output | ConvertTo-Json -Depth 100 | Out-File $outputFilePath 
     Write-Host "Open $outputFilePath file to review your output" -F Green 
 }
 Catch {
