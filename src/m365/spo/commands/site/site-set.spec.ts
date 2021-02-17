@@ -1186,7 +1186,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/logo', logo: "/sites/logo/SiteAssets/parker-ms-1200.png" } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "/sites/logo/SiteAssets/parker-ms-1200.png" } }, () => {
       try {
         assert.strictEqual(data.relativeLogoUrl, "/sites/logo/SiteAssets/parker-ms-1200.png");
         done();
@@ -1220,7 +1220,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/logo', logo: "https://contoso.sharepoint.com/sites/logo/SiteAssets/parker-ms-1200.png" } }, () => {
+    command.action(logger, { options: { debug: false, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "https://contoso.sharepoint.com/sites/logo/SiteAssets/parker-ms-1200.png" } }, () => {
       try {
         assert.strictEqual(data.relativeLogoUrl, "/sites/logo/SiteAssets/parker-ms-1200.png");
         done();
@@ -1254,7 +1254,7 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/logo', logo: "" } }, () => {
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/logo', siteLogoUrl: "" } }, () => {
       try {
         assert.strictEqual(data.relativeLogoUrl, "");
         done();

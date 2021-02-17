@@ -32,7 +32,7 @@ export interface Options extends GlobalOptions {
   title?: string;
   url: string;
   sharingCapability?: string;
-  logo?: string;
+  siteLogoUrl?: string;
 }
 
 class SpoSiteSetCommand extends SpoCommand {
@@ -58,7 +58,7 @@ class SpoSiteSetCommand extends SpoCommand {
     telemetryProps.title = typeof args.options.title === 'string';
     telemetryProps.siteDesignId = typeof args.options.siteDesignId !== undefined;
     telemetryProps.sharingCapabilities = args.options.sharingCapability;
-    telemetryProps.logo = typeof args.options.logo !== 'undefined';
+    telemetryProps.siteLogoUrl = typeof args.options.siteLogoUrl !== 'undefined';
     return telemetryProps;
   }
 
@@ -95,7 +95,7 @@ class SpoSiteSetCommand extends SpoCommand {
   }
 
   private setLogo(logger: Logger, args: CommandArgs): Promise<void> {
-    if (typeof args.options.logo === 'undefined') {
+    if (typeof args.options.siteLogoUrl === 'undefined') {
       return Promise.resolve();
     }
 
@@ -103,7 +103,7 @@ class SpoSiteSetCommand extends SpoCommand {
       logger.logToStderr(`Setting the site its logo...`);
     }
 
-    const logoUrl = args.options.logo ? Utils.getServerRelativePath(args.options.url, args.options.logo) : "";
+    const logoUrl = args.options.siteLogoUrl ? Utils.getServerRelativePath(args.options.url, args.options.siteLogoUrl) : "";
 
     const requestOptions: any = {
       url: `${args.options.url}/_api/siteiconmanager/setsitelogo`,
@@ -441,7 +441,7 @@ class SpoSiteSetCommand extends SpoCommand {
         option: '--title [title]'
       },
       {
-        option: '--logo [logo]'
+        option: '--siteLogoUrl [siteLogoUrl]'
       },
       {
         option: '--sharingCapability [sharingCapability]',
@@ -467,7 +467,7 @@ class SpoSiteSetCommand extends SpoCommand {
       typeof args.options.shareByEmailEnabled === 'undefined' &&
       typeof args.options.siteDesignId === 'undefined' &&
       typeof args.options.sharingCapability === 'undefined' &&
-      typeof args.options.logo === 'undefined') {
+      typeof args.options.siteLogoUrl === 'undefined') {
       return 'Specify at least one property to update';
     }
 
