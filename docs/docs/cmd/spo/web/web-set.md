@@ -20,7 +20,7 @@ m365 spo web set [options]
 : New description for the subsite
 
 `--siteLogoUrl [siteLogoUrl]`
-: New site logo URL for the subsite
+: New site logo URL for the subsite. Set to empty string to reset to default.
 
 `--quickLaunchEnabled [quickLaunchEnabled]`
 : Set to `true` to enable quick launch and to `false` to disable it

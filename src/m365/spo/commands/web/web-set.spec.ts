@@ -104,6 +104,28 @@ describe(commands.WEB_SET, () => {
     });
   });
 
+  it('unsets the site logo', (done) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (JSON.stringify(opts.data) === JSON.stringify({
+        SiteLogoUrl: ''
+      })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', siteLogoUrl: '' } }, () => {
+      try {
+        assert(loggerLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('disables quick launch', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (JSON.stringify(opts.data) === JSON.stringify({
