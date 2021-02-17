@@ -1442,7 +1442,7 @@ describe(commands.SITE_SET, () => {
     const options = command.options();
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--logo') > -1) {
+      if (o.option.indexOf('--siteLogoUrl') > -1) {
         containsOption = true;
       }
     });
