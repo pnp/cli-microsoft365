@@ -103,12 +103,7 @@ class SpoSiteSetCommand extends SpoCommand {
       logger.logToStderr(`Setting the site its logo...`);
     }
 
-    let siteLogoUrl = args.options.siteLogoUrl.toString();
-    if (siteLogoUrl.toLowerCase() === "true") {
-      siteLogoUrl = "";
-    }
-    
-    const logoUrl = siteLogoUrl ? Utils.getServerRelativePath(args.options.url, siteLogoUrl) : "";
+    const logoUrl = args.options.siteLogoUrl ? Utils.getServerRelativePath(args.options.url, args.options.siteLogoUrl) : "";
 
     const requestOptions: any = {
       url: `${args.options.url}/_api/siteiconmanager/setsitelogo`,
@@ -474,6 +469,10 @@ class SpoSiteSetCommand extends SpoCommand {
       typeof args.options.sharingCapability === 'undefined' &&
       typeof args.options.siteLogoUrl === 'undefined') {
       return 'Specify at least one property to update';
+    }
+
+    if (typeof args.options.siteLogoUrl !== 'undefined' && typeof args.options.siteLogoUrl !== 'string') {
+      return `${args.options.siteLogoUrl} is not a valid value for the siteLogoUrl option. Specify the logo URL or an empty string "" to unset the logo.`;
     }
 
     if (typeof args.options.disableFlows === 'string' &&
