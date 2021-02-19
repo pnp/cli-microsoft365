@@ -32,6 +32,13 @@
 - improved `environment get` commands with text results [#2153](https://github.com/pnp/cli-microsoft365/issues/2153)
 - extended 'spo web set' with the ability to reset the logo [#2177](https://github.com/pnp/cli-microsoft365/issues/2177)
 - added PowerShell examples to 'adaptivecard send' docs [#2167](https://github.com/pnp/cli-microsoft365/pull/2167)
+- added 'm365' prefix to sample in 'pa app list' docs [#2182](https://github.com/pnp/cli-microsoft365/pull/2182)
+- added 'm365' prefix in 'version' docs [#2183](https://github.com/pnp/cli-microsoft365/pull/2183)
+- added 'Export Teams conversations' sample script [#2104](https://github.com/pnp/cli-microsoft365/issues/2104)
+- extended test script with checking Node version [#2181](https://github.com/pnp/cli-microsoft365/issues/2181)
+- extended `spo site set` with setting site logo [#2175](https://github.com/pnp/cli-microsoft365/issues/2175)
+- extended `spo page get` with support for loading only metadata [#2184](https://github.com/pnp/cli-microsoft365/pull/2184)
+- fixed control and section parsing in 'spo page get' [#2179](https://github.com/pnp/cli-microsoft365/issues/2179)
 
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 
