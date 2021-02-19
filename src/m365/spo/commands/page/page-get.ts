@@ -1,11 +1,10 @@
 import { Logger } from '../../../../cli';
-import { CommandError, CommandOption } from '../../../../Command';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSidePage } from './clientsidepages';
 
 interface CommandArgs {
   options: Options;
@@ -41,7 +40,7 @@ class SpoPageGetCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
+      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$select=CanvasContent1&$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
       headers: {
         'content-type': 'application/json;charset=utf-8',
         accept: 'application/json;odata=nometadata'
@@ -49,38 +48,49 @@ class SpoPageGetCommand extends SpoCommand {
       responseType: 'json'
     };
 
+    let pageItemData: any = {};
+
     request
       .get(requestOptions)
-      .then((res: any): void => {
+      .then((res: any): Promise<{ CanvasContent1: string } | void> => {
         if (res.ListItemAllFields.ClientSideApplicationId !== 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec') {
-          cb(new CommandError(`Page ${args.options.name} is not a modern page.`));
-          return;
+          return Promise.reject(`Page ${args.options.name} is not a modern page.`);
         }
 
-        let page: any = {
-          commentsDisabled: res.ListItemAllFields.CommentsDisabled,
-          title: res.ListItemAllFields.Title
-        };
+        pageItemData = Object.assign({}, res);
+        pageItemData.commentsDisabled = res.ListItemAllFields.CommentsDisabled;
+        pageItemData.title = res.ListItemAllFields.Title
 
         if (res.ListItemAllFields.PageLayoutType) {
-          page.layoutType = res.ListItemAllFields.PageLayoutType;
+          pageItemData.layoutType = res.ListItemAllFields.PageLayoutType;
         }
 
-        if (!args.options.metadataOnly) {
-          const clientSidePage: ClientSidePage = ClientSidePage.fromHtml(res.ListItemAllFields.CanvasContent1);
-          let numControls: number = 0;
-          clientSidePage.sections.forEach(s => {
-            s.columns.forEach(c => {
-              numControls += c.controls.length;
-            });
-          });
-
-          page.numSections = clientSidePage.sections.length;
-          page.numControls = numControls;
+        if (args.options.metadataOnly) {
+          return Promise.resolve();
         }
 
-        page = Object.assign(res, page);
-        logger.log(page);
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/SitePages/Pages(${res.ListItemAllFields.Id})`,
+          headers: {
+            'content-type': 'application/json;charset=utf-8',
+            accept: 'application/json;odata=nometadata'
+          },
+          responseType: 'json'
+        };
+
+        return request.get<{ CanvasContent1: string }>(requestOptions);
+      })
+      .then((res: { CanvasContent1: string } | void) => {
+        if (res && res.CanvasContent1) {
+          const canvasData: any[] = JSON.parse(res.CanvasContent1);
+          if (canvasData && canvasData.length > 0) {
+            pageItemData.numControls = canvasData.length;
+            const sections = [...new Set(canvasData.filter(c => c.position).map(c => c.position.zoneIndex))];
+            pageItemData.numSections = sections.length;
+          }
+        }
+
+        logger.log(pageItemData);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

@@ -17,7 +17,7 @@ m365 spo page get [options]
 : URL of the site where the page to retrieve is located
 
 `--metadataOnly`
-: Specify to only retrieve the metadata without the section and control processing
+: Specify to only retrieve the metadata without the section and control information
 
 --8<-- "docs/cmd/_global.md"
 
