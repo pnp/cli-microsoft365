@@ -1,5 +1,5 @@
 
-export const markdownWp = {
+export const pageListItemMock = {
   "ListItemAllFields": {
     "CommentsDisabled": true,
     "FileSystemObjectType": 0,
@@ -62,8 +62,74 @@ export const markdownWp = {
   "UIVersionLabel": "6.0",
   "UniqueId": "52287a96-5d0b-4291-8bad-d01c015a07b0",
   "commentsDisabled": true,
-  "numSections": 2,
-  "numControls": 1,
   "title": "Environments",
   "layoutType": "Article"
+};
+
+
+
+export const sectionMock = {
+  "numSections": 2,
+  "numControls": 2,
+}
+
+export const controlsMock = {
+  CanvasContent1: `[{"id":"EMPTY_0","position":{"zoneIndex":0.5,"sectionIndex":1,"sectionFactor":12,"layoutIndex":1},"emphasis":{}},{"controlType":3,"displayMode":2,"id":"24fc9905-d571-4555-8bfc-c14f6f2eff48","position":{"controlIndex":1,"sectionIndex":1,"zoneIndex":1,"sectionFactor":12,"layoutIndex":1},"webPartId":"1ef5ed11-ce7b-44be-bc5e-4abd55101d16","emphasis":{},"addedFromPersistedData":true,"reservedHeight":600,"reservedWidth":1180,"webPartData":{"id":"1ef5ed11-ce7b-44be-bc5e-4abd55101d16","instanceId":"24fc9905-d571-4555-8bfc-c14f6f2eff48","title":"doctor-placeholder","description":"Use Markdown language to add and format text.","audiences":[],"serverProcessedContent":[null],"dataVersion":"2.0","properties":[]}}]`
+};
+
+
+export const classicPage = {
+  "ListItemAllFields": {
+    "CommentsDisabled": false,
+    "FileSystemObjectType": 0,
+    "Id": 1,
+    "ServerRedirectedEmbedUri": null,
+    "ServerRedirectedEmbedUrl": "",
+    "ContentTypeId": "0x0101080088E2A2ED69D0324A8981DD7FAC103494",
+    "FileLeafRef": "Home.aspx",
+    "ComplianceAssetId": null,
+    "WikiField": "<div class=\"ExternalClass1188FC9011E046D4BED9C05BAD4DA96E\">\r\n            <table id=\"layoutsTable\" style=\"width&#58;100%;\">\r\n                <tbody>\r\n                    <tr style=\"vertical-align&#58;top;\">\r\n            <td colspan=\"2\"><div class=\"ms-rte-layoutszone-outer\" style=\"width&#58;100%;\"><div class=\"ms-rte-layoutszone-inner\" style=\"word-wrap&#58;break-word;margin&#58;0px;border&#58;0px;\"><div class=\"ms-rtestate-read ms-rte-wpbox\"><div class=\"ms-rtestate-read f01b62ca-c190-410c-aef9-2499ab79436e\" id=\"div_f01b62ca-c190-410c-aef9-2499ab79436e\"></div>\n  <div class=\"ms-rtestate-read\" id=\"vid_f01b62ca-c190-410c-aef9-2499ab79436e\" style=\"display&#58;none;\"></div>\n</div>\n</div></div></td>\r\n                    </tr>\r\n                    <tr style=\"vertical-align&#58;top;\">\r\n            <td style=\"width&#58;49.95%;\"><div class=\"ms-rte-layoutszone-outer\" style=\"width&#58;100%;\"><div class=\"ms-rte-layoutszone-inner\" style=\"word-wrap&#58;break-word;margin&#58;0px;border&#58;0px;\"><div class=\"ms-rtestate-read ms-rte-wpbox\"><div class=\"ms-rtestate-read 837b046b-6a02-4770-9a25-3292d955e903\" id=\"div_837b046b-6a02-4770-9a25-3292d955e903\"></div>\n  <div class=\"ms-rtestate-read\" id=\"vid_837b046b-6a02-4770-9a25-3292d955e903\" style=\"display&#58;none;\"></div>\n</div>\n</div></div></td>\r\n            <td class=\"ms-wiki-columnSpacing\" style=\"width&#58;49.95%;\"><div class=\"ms-rte-layoutszone-outer\" style=\"width&#58;100%;\"><div class=\"ms-rte-layoutszone-inner\" style=\"word-wrap&#58;break-word;margin&#58;0px;border&#58;0px;\"><div class=\"ms-rtestate-read ms-rte-wpbox\"><div class=\"ms-rtestate-read f36dd97b-6f2b-437b-a169-26a97962074d\" id=\"div_f36dd97b-6f2b-437b-a169-26a97962074d\"></div>\n  <div class=\"ms-rtestate-read\" id=\"vid_f36dd97b-6f2b-437b-a169-26a97962074d\" style=\"display&#58;none;\"></div>\n</div>\n</div></div></td>\r\n                    </tr>\r\n                </tbody>\r\n            </table>\r\n            <span id=\"layoutsData\" style=\"display&#58;none;\">true,false,2</span></div>",
+    "Title": null,
+    "ClientSideApplicationId": null,
+    "PageLayoutType": null,
+    "CanvasContent1": null,
+    "BannerImageUrl": null,
+    "Description": null,
+    "PromotedState": null,
+    "FirstPublishedDate": null,
+    "LayoutWebpartsContent": null,
+    "AuthorsId": null,
+    "AuthorsStringId": null,
+    "OriginalSourceUrl": null,
+    "ID": 1,
+    "Created": "2018-03-19T17:52:56",
+    "AuthorId": 1073741823,
+    "Modified": "2018-03-24T07:14:28",
+    "EditorId": 1073741823,
+    "OData__CopySource": null,
+    "CheckoutUserId": null,
+    "OData__UIVersionString": "1.0",
+    "GUID": "19ac5510-bba6-427b-9c1b-a3329a3b0cad"
+  },
+  "CheckInComment": "",
+  "CheckOutType": 2,
+  "ContentTag": "{8F33F78C-9F39-48E2-B99D-01C2937A56BB},4,1",
+  "CustomizedPageStatus": 1,
+  "ETag": "\"{8F33F78C-9F39-48E2-B99D-01C2937A56BB},4\"",
+  "Exists": true,
+  "IrmEnabled": false,
+  "Length": "3356",
+  "Level": 1,
+  "LinkingUri": null,
+  "LinkingUrl": "",
+  "MajorVersion": 1,
+  "MinorVersion": 0,
+  "Name": "home.aspx",
+  "ServerRelativeUrl": "/sites/team-a/SitePages/home.aspx",
+  "TimeCreated": "2018-03-20T00:52:56Z",
+  "TimeLastModified": "2018-03-24T14:14:28Z",
+  "Title": null,
+  "UIVersion": 512,
+  "UIVersionLabel": "1.0",
+  "UniqueId": "8f33f78c-9f39-48e2-b99d-01c2937a56bb"
 };
