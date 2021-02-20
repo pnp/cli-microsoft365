@@ -83,6 +83,7 @@ class SpoPageGetCommand extends SpoCommand {
       .then((res: { CanvasContent1: string } | void) => {
         if (res && res.CanvasContent1) {
           const canvasData: any[] = JSON.parse(res.CanvasContent1);
+          pageItemData.CanvasContentJson = res.CanvasContent1;
           if (canvasData && canvasData.length > 0) {
             pageItemData.numControls = canvasData.length;
             const sections = [...new Set(canvasData.filter(c => c.position).map(c => c.position.zoneIndex))];
