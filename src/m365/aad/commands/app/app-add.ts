@@ -1,10 +1,12 @@
 import { v4 } from 'uuid';
+import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
 
@@ -29,6 +31,7 @@ interface AppInfo {
   appId: string;
   // objectId
   id: string;
+  tenantId: string;
   secret?: string;
 }
 
@@ -89,7 +92,12 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       .then((_appInfo: AppInfo): void => {
         const appInfo: any = {
           appId: _appInfo.appId,
-          objectId: _appInfo.id
+          objectId: _appInfo.id,
+          // based on the assumption that we're adding AAD app to the current
+          // directory. If we in the future extend the command with allowing
+          // users to create AAD app in a different directory, we'll need to
+          // adjust this
+          tenantId: Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].value)
         };
         if (_appInfo.secret) {
           appInfo.secret = _appInfo.secret;
