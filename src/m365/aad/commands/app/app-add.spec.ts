@@ -19,6 +19,13 @@ describe(commands.APP_ADD, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
+    auth.service.tenantId = '48526e9f-60c5-3000-31d7-aa1dc75ecf3c|908bel80-a04a-4422-b4a0-883d9847d110:c8e761e2-d528-34d1-8776-dc51157d619a&#xA;Tenant';
+    if (!auth.service.accessTokens[auth.defaultResource]) {
+      auth.service.accessTokens[auth.defaultResource] = {
+        expiresOn: 'abc',
+        value: 'abc'
+      };
+    }
   });
 
   beforeEach(() => {
@@ -149,7 +156,7 @@ describe(commands.APP_ADD, () => {
         assert(loggerLogSpy.calledWith({
           appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
           objectId: '5b31c38c-2584-42f0-aa47-657fb3a84230',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -248,7 +255,7 @@ describe(commands.APP_ADD, () => {
         assert(loggerLogSpy.calledWith({
           appId: '62f0f128-987f-47f2-827a-be50d0d894c7',
           objectId: '9b1e2c08-6e35-4134-a0ac-16ab154cd05a',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -357,7 +364,7 @@ describe(commands.APP_ADD, () => {
         assert(loggerLogSpy.calledWith({
           appId: 'd2941a3b-aad4-49e0-8a1d-b82de0b46067',
           objectId: 'ff520671-4810-4d25-a10f-e565fc62a5ec',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -464,7 +471,7 @@ describe(commands.APP_ADD, () => {
         assert(loggerLogSpy.calledWith({
           appId: '1ce0287c-9ccc-457e-a0cf-3ec5b734c092',
           objectId: 'f1bb2138-bff1-491e-b082-9f447f3742b8',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -577,7 +584,7 @@ describe(commands.APP_ADD, () => {
           appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
           objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
           secret: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -690,7 +697,7 @@ describe(commands.APP_ADD, () => {
           appId: '3c5bd51d-f1ac-4344-bd16-43396cadff14',
           objectId: '4d24b0c6-ad07-47c6-9bd8-9c167f9f758e',
           secret: 'VtJt.yG~V5pzbY2.xekx_0Xy_~9ozP_Ub5',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -850,7 +857,7 @@ describe(commands.APP_ADD, () => {
           appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
           objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
           secret: 'vP2K-_K-N6EI-E5z0yOTsz443grfM_pyvv',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -1019,7 +1026,7 @@ describe(commands.APP_ADD, () => {
           appId: 'dbfdad7a-5105-45fc-8290-eb0b0b24ac58',
           objectId: 'b63c4be1-9c78-40b7-8619-de7172eed8de',
           secret: 'vP2K-_K-N6EI-E5z0yOTsz443grfM_pyvv',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -1182,7 +1189,7 @@ describe(commands.APP_ADD, () => {
         assert(loggerLogSpy.calledWith({
           appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
           objectId: 'f51ff52f-8f04-4924-91d0-636349eed65c',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -1345,7 +1352,7 @@ describe(commands.APP_ADD, () => {
         assert(loggerLogSpy.calledWith({
           appId: 'c505d465-9e4e-4bb4-b653-7b36d77cc94a',
           objectId: 'f51ff52f-8f04-4924-91d0-636349eed65c',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -1455,7 +1462,7 @@ describe(commands.APP_ADD, () => {
         assert(loggerLogSpy.calledWith({
           appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
           objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -1565,7 +1572,7 @@ describe(commands.APP_ADD, () => {
         assert(loggerLogSpy.calledWith({
           appId: 'b08d9318-5612-4f87-9f94-7414ef6f0c8a',
           objectId: 'c0e63919-057c-4e6b-be6c-8662e7aec4eb',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -1693,7 +1700,7 @@ describe(commands.APP_ADD, () => {
         assert(loggerLogSpy.calledWith({
           appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
           objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
@@ -1821,7 +1828,7 @@ describe(commands.APP_ADD, () => {
         assert(loggerLogSpy.calledWith({
           appId: '13e11551-2967-4985-8c55-cd2aaa6b80ad',
           objectId: 'fe45ba27-a692-4b11-adf8-f4ec184ea3a5',
-          tenantId: 'e8954f17-a373-4b61-b54d-45c038fe3188'
+          tenantId: ''
         }));
         done();
       }
