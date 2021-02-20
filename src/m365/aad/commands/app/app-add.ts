@@ -252,7 +252,9 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
         logger.logToStderr(`Permission name: ${permissionName}`);
         logger.logToStderr(`Service principal name: ${servicePrincipalName}`);
       }
-      const servicePrincipal = this.items.find(sp => sp.servicePrincipalNames.indexOf(servicePrincipalName) > -1);
+      const servicePrincipal = this.items.find(sp => (
+        sp.servicePrincipalNames.indexOf(servicePrincipalName) > -1 ||
+        sp.servicePrincipalNames.indexOf(`${servicePrincipalName}/`) > -1));
       if (!servicePrincipal) {
         throw `Service principal ${servicePrincipalName} not found`;
       }

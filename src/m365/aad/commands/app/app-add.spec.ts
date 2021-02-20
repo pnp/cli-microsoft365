@@ -2404,6 +2404,153 @@ describe(commands.APP_ADD, () => {
     });
   });
 
+  it('creates AAD app reg for a web app with service principal name with trailing slash', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames,appId,oauth2PermissionScopes,appRoles') {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27",
+          "value": [
+            mocks.mockCrmSp
+          ]
+        });
+      }
+
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/servicePrincipals?$select=servicePrincipalNames%2cappId%2coauth2PermissionScopes%2cappRoles&$skiptoken=X%274453707402000100000035536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D61323963386536336638613235536572766963655072696E636970616C5F34623131646566352D626561622D343232382D383835622D6132396338653633663861320000000000000000000000%27') {
+        return Promise.resolve({
+          value: mocks.aadSp
+        });
+      }
+
+      return Promise.reject(`Invalid GET request: ${opts.url}`);
+    });
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg",
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000007-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "web": {
+            "redirectUris": [
+              "https://global.consent.azure-apim.net/redirect"
+            ]
+          }
+        })) {
+        return Promise.resolve({
+          "id": "1cd23c5f-2cb4-4bd0-a582-d5b00f578dcd",
+          "deletedDateTime": null,
+          "appId": "702e65ba-cacb-4a2f-aa5c-e6460967bc20",
+          "applicationTemplateId": null,
+          "createdDateTime": "2021-02-21T09:44:05.953701Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "m365404404.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [
+            {
+              "resourceAppId": "00000007-0000-0000-c000-000000000000",
+              "resourceAccess": [
+                {
+                  "id": "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4",
+                  "type": "Scope"
+                }
+              ]
+            }
+          ],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [
+              "https://global.consent.azure-apim.net/redirect"
+            ],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          },
+          "spa": {
+            "redirectUris": []
+          }
+
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        platform: 'web',
+        redirectUris: 'https://global.consent.azure-apim.net/redirect',
+        apisDelegated: 'https://admin.services.crm.dynamics.com/user_impersonation'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(loggerLogSpy.calledWith({
+          appId: '702e65ba-cacb-4a2f-aa5c-e6460967bc20',
+          objectId: '1cd23c5f-2cb4-4bd0-a582-d5b00f578dcd',
+          tenantId: ''
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('fails validation if specified platform value is not valid', () => {
     const actual = command.validate({ options: { name: 'My AAD app', platform: 'abc' } });
     assert.notStrictEqual(actual, true);
