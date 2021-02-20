@@ -40,7 +40,7 @@ class SpoPageGetCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$select=CanvasContent1&$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
+      url: `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId,ListItemAllFields/PageLayoutType,ListItemAllFields/CommentsDisabled`,
       headers: {
         'content-type': 'application/json;charset=utf-8',
         accept: 'application/json;odata=nometadata'
@@ -83,6 +83,7 @@ class SpoPageGetCommand extends SpoCommand {
       .then((res: { CanvasContent1: string } | void) => {
         if (res && res.CanvasContent1) {
           const canvasData: any[] = JSON.parse(res.CanvasContent1);
+          pageItemData.canvasContentJson = res.CanvasContent1;
           if (canvasData && canvasData.length > 0) {
             pageItemData.numControls = canvasData.length;
             const sections = [...new Set(canvasData.filter(c => c.position).map(c => c.position.zoneIndex))];

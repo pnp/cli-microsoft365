@@ -105,6 +105,7 @@ describe(commands.PAGE_GET, () => {
       try {
         assert(loggerLogSpy.calledWith({
           ...pageListItemMock,
+          canvasContentJson: controlsMock.CanvasContent1,
           ...sectionMock
         }));
         done();
@@ -132,6 +133,7 @@ describe(commands.PAGE_GET, () => {
       try {
         assert(loggerLogSpy.calledWith({
           ...pageListItemMock,
+          canvasContentJson: controlsMock.CanvasContent1,
           ...sectionMock
         }));
         done();
@@ -159,6 +161,7 @@ describe(commands.PAGE_GET, () => {
       try {
         assert(loggerLogSpy.calledWith({
           ...pageListItemMock,
+          canvasContentJson: controlsMock.CanvasContent1,
           ...sectionMock
         }));
         done();
