@@ -1643,6 +1643,10 @@ describe('Auth', () => {
     assert.strictEqual(Auth.getResourceFromUrl('https://contoso.sharepoint.com/sites/team-a'), 'https://contoso.sharepoint.com');
   });
 
+  it('correctly retrieves resource for https://api.bap.microsoft.com', () => {
+    assert.strictEqual(Auth.getResourceFromUrl('https://api.bap.microsoft.com'), 'https://management.azure.com/');
+  });
+
   it('returns undefined if access token is not set when determining auth type', () => {
     assert.strictEqual(Auth.isAppOnlyAuth(''), undefined);
   });
