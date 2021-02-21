@@ -1,13 +1,14 @@
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { ClientSideControl } from './ClientSideControl';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
-import { ClientSidePage, ClientSidePart } from './clientsidepages';
 import { Page } from './Page';
+import { PageControl } from './PageControl';
 
 interface CommandArgs {
   options: Options;
@@ -31,10 +32,24 @@ class SpoPageControlSetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    Page
-      .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
-      .then((clientSidePage: ClientSidePage): Promise<ClientSidePageProperties> => {
-        const control: ClientSidePart | null = clientSidePage.findControlById(args.options.id);
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/SitePages/Pages/GetByUrl('sitepages/${encodeURIComponent(args.options.name)}')`,
+      headers: {
+        'content-type': 'application/json;charset=utf-8',
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    request
+      .get<ClientSidePageProperties>(requestOptions)
+      .then((res: ClientSidePageProperties): Promise<ClientSidePageProperties> => {
+        if (!res.CanvasContent1) {
+          return Promise.reject(`Page ${args.options.name} doesn't contain canvas controls.`);
+        }
+
+        const canvasContent: PageControl[] = JSON.parse(res.CanvasContent1);
+        const control: PageControl | undefined = canvasContent.find(control => control.id.toLowerCase() === args.options.id.toLowerCase());
 
         if (!control) {
           return Promise.reject(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
@@ -54,7 +69,7 @@ class SpoPageControlSetCommand extends SpoCommand {
           logger.logToStderr(canvasContent);
         }
 
-        const canvasControl = canvasContent.find(c => c.id === args.options.id);
+        const canvasControl = canvasContent.find(c => c.id.toLowerCase() === args.options.id.toLowerCase());
         if (!canvasControl) {
           return Promise.reject(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
         }
