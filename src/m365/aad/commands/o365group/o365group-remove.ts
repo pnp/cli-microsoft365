@@ -71,15 +71,8 @@ class AadO365GroupRemoveCommand extends GraphCommand {
             if (this.verbose) {
               logger.logToStderr(chalk.green('DONE'));
             }
-  
             cb();
           }
-
-          /*if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();*/
         }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
 

@@ -16,6 +16,9 @@ m365 aad o365group remove [options]
 `--confirm`
 : Don't prompt for confirming removing the group
 
+`--skipRecycleBin`
+: Set to directly remove the group without moving it to the Recycle Bin
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
@@ -34,4 +37,10 @@ Remove group with id _28beab62-7540-4db1-a23f-29a6018a3848_ without prompting fo
 
 ```sh
 m365 aad o365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848 --confirm
+```
+
+Remove group with id _28beab62-7540-4db1-a23f-29a6018a3848_ without prompting for confirmation and without moving it to the Recycle Bin
+
+```sh
+m365 aad o365group remove --id 28beab62-7540-4db1-a23f-29a6018a3848 --confirm --skipRecycleBin
 ```
