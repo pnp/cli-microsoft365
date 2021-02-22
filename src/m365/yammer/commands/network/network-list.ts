@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
 
 class YammerNetworkListCommand extends YammerCommand {
   public get name(): string {
-    return `${commands.YAMMER_NETWORK_LIST}`;
+    return commands.YAMMER_NETWORK_LIST;
   }
 
   public get description(): string {
@@ -56,8 +56,7 @@ class YammerNetworkListCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--includeSuspended',
-        description: 'Include the networks in which the user is suspended'
+        option: '--includeSuspended'
       }
     ];
 

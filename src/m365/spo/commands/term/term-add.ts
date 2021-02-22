@@ -174,44 +174,34 @@ class SpoTermAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the term to add'
+        option: '-n, --name <name>'
       },
       {
-        option: '--termSetId [termSetId]',
-        description: 'ID of the term set in which to create the term. Specify termSetId or termSetName but not both'
+        option: '--termSetId [termSetId]'
       },
       {
-        option: '--termSetName [termSetName]',
-        description: 'Name of the term set in which to create the term. Specify termSetId or termSetName but not both'
+        option: '--termSetName [termSetName]'
       },
       {
-        option: '--termGroupId [termGroupId]',
-        description: 'ID of the term group to which the term set belongs. Specify termGroupId or termGroupName but not both'
+        option: '--termGroupId [termGroupId]'
       },
       {
-        option: '--termGroupName [termGroupName]',
-        description: 'Name of the term group to which the term set belongs. Specify termGroupId or termGroupName but not both'
+        option: '--termGroupName [termGroupName]'
       },
       {
-        option: '-i, --id [id]',
-        description: 'ID of the term to add'
+        option: '-i, --id [id]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Description of the term to add'
+        option: '-d, --description [description]'
       },
       {
-        option: '--parentTermId [parentTermId]',
-        description: 'ID of the term below which the term should be added'
+        option: '--parentTermId [parentTermId]'
       },
       {
-        option: '--customProperties [customProperties]',
-        description: 'JSON string with key-value pairs representing custom properties to set on the term'
+        option: '--customProperties [customProperties]'
       },
       {
-        option: '--localCustomProperties [localCustomProperties]',
-        description: 'JSON string with key-value pairs representing local custom properties to set on the term'
+        option: '--localCustomProperties [localCustomProperties]'
       }
     ];
 

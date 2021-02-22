@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -131,9 +130,6 @@ class SpoFieldSetCommand extends SpoCommand {
           return;
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
@@ -162,28 +158,22 @@ class SpoFieldSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the field is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--listId [listId]',
-        description: 'ID of the list where the field is located (if list column). Specify listTitle or listId but not both'
+        option: '--listId [listId]'
       },
       {
-        option: '--listTitle [listTitle]',
-        description: 'Title of the list where the field is located (if list column). Specify listTitle or listId but not both'
+        option: '--listTitle [listTitle]'
       },
       {
-        option: '-i|--id [id]',
-        description: 'ID of the field to update. Specify name or id but not both'
+        option: '-i|--id [id]'
       },
       {
-        option: '-n|--name [name]',
-        description: 'Title or internal name of the field to update. Specify name or id but not both'
+        option: '-n|--name [name]'
       },
       {
-        option: '--updateExistingLists',
-        description: 'Set, to push the update to existing lists. Otherwise, the changes will apply to new lists only'
+        option: '--updateExistingLists'
       }
     ];
 

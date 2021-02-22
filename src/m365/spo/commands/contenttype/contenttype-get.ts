@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class SpoContentTypeGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CONTENTTYPE_GET}`;
+    return commands.CONTENTTYPE_GET;
   }
 
   public get description(): string {
@@ -49,11 +48,6 @@ class SpoContentTypeGetCommand extends SpoCommand {
         }
 
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -61,16 +55,13 @@ class SpoContentTypeGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the content type is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listTitle [listTitle]',
-        description: 'Title of the list where the content type is located (if it is a list content type)'
+        option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the content type to retrieve'
+        option: '-i, --id <id>'
       }
     ];
 

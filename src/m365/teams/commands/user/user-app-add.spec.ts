@@ -13,7 +13,6 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -35,7 +34,6 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -109,33 +107,6 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
     } as any, () => {
       try {
         assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('adds app from the catalog for the specified user (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/users/c527a470-a882-481c-981c-ee6efaba85c7/teamwork/installedApps` &&
-        JSON.stringify(opts.data) === `{"teamsApp@odata.bind":"https://graph.microsoft.com/beta/appCatalogs/teamsApps/4440558e-8c73-4597-abc7-3644a64c4bce"}`) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        userId: 'c527a470-a882-481c-981c-ee6efaba85c7',
-        appId: '4440558e-8c73-4597-abc7-3644a64c4bce',
-        debug: true
-      }
-    } as any, () => {
-      try {
-        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

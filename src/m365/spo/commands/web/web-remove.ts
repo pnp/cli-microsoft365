@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -49,13 +48,7 @@ class SpoWebAddCommand extends SpoCommand {
 
       request
         .post(requestOptions)
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
@@ -81,12 +74,10 @@ class SpoWebAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the subsite to remove'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--confirm',
-        description: 'Do not prompt for confirmation before deleting the subsite'
+        option: '--confirm'
       }
     ];
 

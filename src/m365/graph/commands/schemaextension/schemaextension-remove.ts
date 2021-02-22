@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -47,13 +46,7 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
         };
 
       request.delete(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   };
   if (args.options.confirm) {
     removeSchemaExtension();
@@ -78,12 +71,10 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: `The unique identifier for the schema extension definition`
+        option: '-i, --id <id>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the specified schema extension'
+        option: '--confirm'
       }
     ];
 

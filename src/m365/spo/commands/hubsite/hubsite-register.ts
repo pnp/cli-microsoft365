@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -19,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteRegisterCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_REGISTER}`;
+    return commands.HUBSITE_REGISTER;
   }
 
   public get description(): string {
@@ -43,11 +42,6 @@ class SpoHubSiteRegisterCommand extends SpoCommand {
       })
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -55,8 +49,7 @@ class SpoHubSiteRegisterCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site collection to register as a hub site'
+        option: '-u, --url <url>'
       }
     ];
 

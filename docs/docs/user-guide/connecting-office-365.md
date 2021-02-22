@@ -98,6 +98,16 @@ openssl pkcs12 -in protected.pfx -out privateKeyWithPassphrase.pem -nodes
 
 At this point the `privateKeyWithPassphrase.pem` file can be used to log in the CLI for Microsoft 365 following the instructions above for logging in using a PEM certificate.
 
+#### Log in using a browser authentication
+
+Yet another way to log in to Microsoft 365 in the CLI for Microsoft 365 is by using a an interactive browser authentication. To use this authentication method, call the login command with the `authType` option set to `browser`:
+
+```sh
+m365 login --authType browser
+```
+
+This option is especially useful if you have conditional access policies configured in your tenant but you can also use it instead of the default device code flow.
+
 ### Check login status
 
 To see if you're logged in to Microsoft 365 and if so, with which account, use the `status` command.

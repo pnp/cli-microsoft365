@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
 
 class YammerMessageGetCommand extends YammerCommand {
   public get name(): string {
-    return `${commands.YAMMER_MESSAGE_GET}`;
+    return commands.YAMMER_MESSAGE_GET;
   }
 
   public get description(): string {
@@ -47,8 +47,7 @@ class YammerMessageGetCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--id <id>',
-        description: 'The id of the Yammer message'
+        option: '--id <id>'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteThemeSyncCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_THEME_SYNC}`;
+    return commands.HUBSITE_THEME_SYNC;
   }
 
   public get description(): string {
@@ -40,20 +39,13 @@ class SpoHubSiteThemeSyncCommand extends SpoCommand {
 
     request
       .post(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site to apply theme updates from the hub site to'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

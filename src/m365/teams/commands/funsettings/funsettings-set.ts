@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -27,7 +26,7 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return `${commands.TEAMS_FUNSETTINGS_SET}`;
+    return commands.TEAMS_FUNSETTINGS_SET;
   }
 
   public get description(): string {
@@ -68,36 +67,25 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
 
     request
       .patch(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   };
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Teams team for which to update settings'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--allowGiphy [allowGiphy]',
-        description: 'Set to true to allow giphy and to false to disable it'
+        option: '--allowGiphy [allowGiphy]'
       },
       {
-        option: '--giphyContentRating [giphyContentRating]',
-        description: 'Settings to set content rating for giphy. Allowed values Strict|Moderate'
+        option: '--giphyContentRating [giphyContentRating]'
       },
       {
-        option: '--allowStickersAndMemes [allowStickersAndMemes]',
-        description: 'Set to true to allow stickers and memes and to false to disable them'
+        option: '--allowStickersAndMemes [allowStickersAndMemes]'
       },
       {
-        option: '--allowCustomMemes [allowCustomMemes]',
-        description: 'Set to true to allow custom memes and to false to disable them'
+        option: '--allowCustomMemes [allowCustomMemes]'
       }
     ];
 

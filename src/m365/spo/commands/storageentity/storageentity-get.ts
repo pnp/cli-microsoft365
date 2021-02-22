@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class SpoStorageEntityGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.STORAGEENTITY_GET}`;
+    return commands.STORAGEENTITY_GET;
   }
 
   public get description(): string {
@@ -59,8 +59,7 @@ class SpoStorageEntityGetCommand extends SpoCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '-k, --key <key>',
-      description: 'Name of the tenant property to retrieve'
+      option: '-k, --key <key>'
     }];
 
     const parentOptions: CommandOption[] = super.options();

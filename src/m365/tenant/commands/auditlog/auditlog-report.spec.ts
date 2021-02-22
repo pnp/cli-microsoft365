@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -314,9 +313,9 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
         debug: false,
         contentType: 'Exchange'
       }
-    } as any, () => {
+    } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerLogSpy.args[0][0][0].Id, "fbcdc0c0-035c-43b7-9026-08d89e299188");
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -360,9 +359,9 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
         debug: false,
         contentType: 'Exchange'
       }
-    } as any, () => {
+    } as any, (err?: any) => {
       try {
-        assert.strictEqual(loggerLogSpy.args[0][0][0].Id, "fbcdc0c0-035c-43b7-9026-08d89e299188");
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -408,7 +407,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
       }
     } as any, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -482,7 +481,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
       }
     } as any, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -519,7 +518,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
       }
     } as any, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -555,7 +554,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
       }
     } as any, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

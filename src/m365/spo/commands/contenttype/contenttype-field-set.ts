@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption,
@@ -41,7 +40,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
   }
 
   public get name(): string {
-    return `${commands.CONTENTTYPE_FIELD_SET}`;
+    return commands.CONTENTTYPE_FIELD_SET;
   }
 
   public get description(): string {
@@ -228,16 +227,10 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
         }
         else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
           cb();
         }
       }, (error: any): void => {
         if (error === 'DONE') {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
           cb();
         }
         else {
@@ -397,24 +390,19 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the content type is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-c, --contentTypeId <contentTypeId>',
-        description: 'ID of the content type on which the field reference should be set'
+        option: '-c, --contentTypeId <contentTypeId>'
       },
       {
-        option: '-f, --fieldId <fieldId>',
-        description: 'ID of the field to which the reference should be set'
+        option: '-f, --fieldId <fieldId>'
       },
       {
-        option: '-r, --required [required]',
-        description: 'Set to true, if the field should be required or to false if it should be optional'
+        option: '-r, --required [required]'
       },
       {
-        option: '--hidden [hidden]',
-        description: 'Set to true, if the field should be hidden or to false if it should be visible'
+        option: '--hidden [hidden]'
       }
     ];
 

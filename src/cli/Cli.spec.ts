@@ -6,7 +6,7 @@ import * as markshell from 'markshell';
 import * as os from 'os';
 import * as path from 'path';
 import * as sinon from 'sinon';
-import { Cli } from '.';
+import { Cli, CommandOutput } from '.';
 import appInsights from '../appInsights';
 import Command, { CommandArgs, CommandError, CommandOption, CommandTypes } from '../Command';
 import AnonymousCommand from '../m365/base/AnonymousCommand';
@@ -25,12 +25,10 @@ class MockCommand extends AnonymousCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-x, --parameterX <parameterX>',
-        description: 'Required parameter'
+        option: '-x, --parameterX <parameterX>'
       },
       {
-        option: '-y, --parameterY [parameterY]',
-        description: 'Optional parameter'
+        option: '-y, --parameterY [parameterY]'
       }
     ];
     const parentOptions: CommandOption[] = super.options();
@@ -73,12 +71,10 @@ class MockCommandWithValidation extends AnonymousCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-x, --parameterX <parameterX>',
-        description: 'Required parameter'
+        option: '-x, --parameterX <parameterX>'
       },
       {
-        option: '-y, --parameterY [parameterY]',
-        description: 'Optional parameter'
+        option: '-y, --parameterY [parameterY]'
       }
     ];
     const parentOptions: CommandOption[] = super.options();
@@ -490,6 +486,34 @@ describe('Cli', () => {
       }, e => done(e));
   });
 
+  it(`writes DONE when executing command in verbose mode succeeded`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--verbose'])
+      .then(_ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.green('DONE')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
+  it(`writes DONE when executing command in debug mode succeeded`, (done) => {
+    cli
+      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--debug'])
+      .then(_ => {
+        try {
+          assert(cliErrorStub.calledWith(chalk.green('DONE')));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(e));
+  });
+
   it('executes the specified command', (done) => {
     Cli
       .executeCommand(mockCommand, { options: { _: [] } })
@@ -571,9 +595,9 @@ describe('Cli', () => {
     const commandWithOutput: MockCommandWithOutput = new MockCommandWithOutput();
     Cli
       .executeCommandWithOutput(commandWithOutput, { options: { _: [] } })
-      .then((output: string) => {
+      .then((output: CommandOutput) => {
         try {
-          assert.strictEqual(output, 'Command output');
+          assert.strictEqual(output.stdout, 'Command output');
           done();
         }
         catch (e) {
@@ -586,9 +610,9 @@ describe('Cli', () => {
     const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
     Cli
       .executeCommandWithOutput(commandWithOutput, { options: { _: [] } })
-      .then((output: string) => {
+      .then((output: CommandOutput) => {
         try {
-          assert.strictEqual(output, 'Raw output');
+          assert.strictEqual(output.stdout, 'Raw output');
           done();
         }
         catch (e) {
@@ -601,9 +625,10 @@ describe('Cli', () => {
     const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
     Cli
       .executeCommandWithOutput(commandWithOutput, { options: { _: [], debug: true } })
-      .then((output: string) => {
+      .then((output: CommandOutput) => {
         try {
-          assert.strictEqual(output, 'Debug output,Raw output');
+          assert.strictEqual(output.stdout, 'Raw output');
+          assert.strictEqual(output.stderr, 'Debug output');
           done();
         }
         catch (e) {
@@ -668,7 +693,7 @@ describe('Cli', () => {
         done('Command succeeded while expected fail');
       }, e => {
         try {
-          assert.strictEqual(e, 'Error');
+          assert.strictEqual(e.error, 'Error');
           done();
         }
         catch (e) {
@@ -1178,21 +1203,37 @@ describe('Cli', () => {
       }, e => done(`Error: ${e}`));
   });
 
-  it(`returns error when the specified file in @ value doesn't exist`, (done) => {
-    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+  it(`returns error when reading file contents failed`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw 'An error has occurred'; });
     cli
-    .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
-    .then(_ => {
+      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
+      .then(_ => {
         done('Promise completed while error expected');
       }, _ => {
         try {
-          assert(cliErrorStub.calledWith(chalk.red(`Error: File file.txt specified in option parameterX does not exist`)));
+          assert(cliErrorStub.calledWith(chalk.red(`Error: An error has occurred`)));
           done();
         }
         catch (e) {
           done(e);
         }
       });
+  });
+
+  it(`leaves the original value if the file specified in @ value doesn't exist`, (done) => {
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    cli
+      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
+      .then(_ => {
+        try {
+          assert(cliLogStub.calledWith('@file.txt'));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      }, e => done(`Error: ${e}`));
   });
 
   it(`logs output to console`, () => {

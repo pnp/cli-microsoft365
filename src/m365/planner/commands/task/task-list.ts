@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
@@ -11,7 +10,7 @@ interface CommandArgs {
 
 class GraphPlannerTaskListCommand extends GraphItemsListCommand<Task> {
   public get name(): string {
-    return `${commands.PLANNER_TASK_LIST}`;
+    return commands.PLANNER_TASK_LIST;
   }
 
   public get description(): string {
@@ -27,10 +26,6 @@ class GraphPlannerTaskListCommand extends GraphItemsListCommand<Task> {
       .getAllItems(`${this.resource}/v1.0/me/planner/tasks`, logger, true)
       .then((): void => {
         logger.log(this.items);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

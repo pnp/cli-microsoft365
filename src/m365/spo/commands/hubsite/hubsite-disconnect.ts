@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteDisconnectCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_DISCONNECT}`;
+    return commands.HUBSITE_DISCONNECT;
   }
 
   public get description(): string {
@@ -53,13 +52,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
 
           return request.post(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
@@ -85,12 +78,10 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site collection to disconnect from its hub site'
+        option: '-u, --url <url>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming disconnecting from the hub site'
+        option: '--confirm'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -32,7 +31,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageHeaderSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_HEADER_SET}`;
+    return commands.PAGE_HEADER_SET;
   }
 
   public get description(): string {
@@ -320,13 +319,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getSiteId(siteUrl: string, verbose: boolean, logger: Logger): Promise<any> {
@@ -380,59 +373,46 @@ class SpoPageHeaderSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --pageName <pageName>',
-        description: 'Name of the page to set the header for'
+        option: '-n, --pageName <pageName>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to update is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-t, --type [type]',
-        description: 'Type of header, allowed values None|Default|Custom. Default Default',
         autocomplete: ['None', 'Default', 'Custom']
       },
       {
-        option: '--imageUrl [imageUrl]',
-        description: 'Server-relative URL of the image to use in the header. Image must be stored in the same site collection as the page'
+        option: '--imageUrl [imageUrl]'
       },
       {
-        option: '--altText [altText]',
-        description: 'Header image alt text'
+        option: '--altText [altText]'
       },
       {
-        option: '-x, --translateX [translateX]',
-        description: 'X focal point of the header image'
+        option: '-x, --translateX [translateX]'
       },
       {
-        option: '-y, --translateY [translateY]',
-        description: 'Y focal point of the header image'
+        option: '-y, --translateY [translateY]'
       },
       {
         option: '--layout [layout]',
-        description: 'Layout to use in the header. Allowed values FullWidthImage|NoImage|ColorBlock|CutInShape. Default FullWidthImage',
         autocomplete: ['FullWidthImage', 'NoImage', 'ColorBlock', 'CutInShape']
       },
       {
         option: '--textAlignment [textAlignment]',
-        description: 'How to align text in the header. Allowed values Center|Left. Default Left',
         autocomplete: ['Left', 'Center']
       },
       {
-        option: '--showTopicHeader',
-        description: 'Set, to show the topic header'
+        option: '--showTopicHeader'
       },
       {
-        option: '--showPublishDate',
-        description: 'Set, to show the publishing date'
+        option: '--showPublishDate'
       },
       {
-        option: '--topicHeader [topicHeader]',
-        description: 'Text to show in the topic header, when showTopicHeader is set'
+        option: '--topicHeader [topicHeader]'
       },
       {
-        option: '--authors [authors]',
-        description: 'Comma-separated list of page authors to show in the header'
+        option: '--authors [authors]'
       }
     ];
 

@@ -1,5 +1,4 @@
-import * as chalk from 'chalk';
-import { Cli, Logger } from '../../../../cli';
+import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import SpoCommand from '../../../base/SpoCommand';
@@ -37,7 +36,8 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
 
     Cli
       .executeCommandWithOutput(spoTenantAppCatalogUrlGetCommand as Command, { options: { _: [] } })
-      .then((appCatalogUrl: string): Promise<void> => {
+      .then((spoTenantAppCatalogUrlGetCommandOutput: CommandOutput): Promise<void> => {
+        const appCatalogUrl: string | undefined = spoTenantAppCatalogUrlGetCommandOutput.stdout;
         if (!appCatalogUrl) {
           if (this.verbose) {
             logger.logToStderr('No app catalog URL found');
@@ -54,12 +54,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
       })
       .then(() => this.ensureNoExistingSite(args.options.url, args.options.force, logger))
       .then(() => this.createAppCatalog(args.options, logger))
-      .then(() => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-        cb();
-      }, (err: CommandError): void => cb(err));
+      .then(_ => cb(), (err: CommandError): void => cb(err));
   }
 
   private ensureNoExistingSite(url: string, force: boolean, logger: Logger): Promise<void> {
@@ -138,24 +133,19 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The absolute site url'
+        option: '-u, --url <url>'
       },
       {
-        option: '--owner <owner>',
-        description: 'The account name of the site owner'
+        option: '--owner <owner>'
       },
       {
-        option: '-z, --timeZone <timeZone>',
-        description: 'Integer representing time zone to use for the site'
+        option: '-z, --timeZone <timeZone>'
       },
       {
-        option: '--wait',
-        description: 'Wait for the site to be provisioned before completing the command'
+        option: '--wait'
       },
       {
-        option: '--force',
-        description: 'Force creating a new app catalog site if one already exists'
+        option: '--force'
       }
     ];
 

@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class SpoSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SET}`;
+    return commands.SET;
   }
 
   public get description(): string {
@@ -36,8 +36,7 @@ class SpoSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the root SharePoint site collection to use in SPO commands'
+        option: '-u, --url <url>'
       }
     ];
 

@@ -13,7 +13,6 @@ describe(commands.FILE_MOVE, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   let stubAllPostRequests: any = (
     recycleFile: any = null,
@@ -89,7 +88,6 @@ describe(commands.FILE_MOVE, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -116,28 +114,6 @@ describe(commands.FILE_MOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('should command complete successfully (verbose)', (done) => {
-    stubAllPostRequests();
-    stubAllGetRequests();
-
-    command.action(logger, {
-      options: {
-        verbose: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc'
-      }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.lastCall.args[0] === 'DONE');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should command complete successfully', (done) => {
     stubAllPostRequests();
     stubAllGetRequests();
@@ -159,7 +135,7 @@ describe(commands.FILE_MOVE, () => {
     });
   });
 
-  it('should complete successfully in 4 tries. ', (done) => {
+  it('should complete successfully in 4 tries', (done) => {
     var counter = 4;
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/recycle()') > -1) {
@@ -187,14 +163,13 @@ describe(commands.FILE_MOVE, () => {
 
     command.action(logger, {
       options: {
-        verbose: true,
         webUrl: 'https://contoso.sharepoint.com',
         sourceUrl: 'abc/abc.pdf',
         targetUrl: 'abc'
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(loggerLogToStderrSpy.lastCall.args[0] === 'DONE');
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -202,7 +177,6 @@ describe(commands.FILE_MOVE, () => {
       }
     });
   });
-
   it('should fail if source file not found', (done) => {
     stubAllPostRequests();
     const rejectFileExists = new Promise<any>((resolve, reject) => {
@@ -228,29 +202,6 @@ describe(commands.FILE_MOVE, () => {
     });
   });
 
-  it('should succeed when run with option --deleteIfAlreadyExists', (done) => {
-    stubAllPostRequests();
-    stubAllGetRequests();
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
-        sourceUrl: 'abc/abc.pdf',
-        targetUrl: 'abc',
-        deleteIfAlreadyExists: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert(loggerLogToStderrSpy.lastCall.calledWith('DONE'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('should succeed when run with option --deleteIfAlreadyExists and response 404', (done) => {
     const recycleFile404 = new Promise<any>((resolve, reject) => {
       return reject({ statusCode: 404 });
@@ -266,9 +217,9 @@ describe(commands.FILE_MOVE, () => {
         targetUrl: 'abc',
         deleteIfAlreadyExists: true
       }
-    }, () => {
+    }, (err?: any) => {
       try {
-        assert(loggerLogToStderrSpy.lastCall.calledWith('DONE'));
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -276,7 +227,6 @@ describe(commands.FILE_MOVE, () => {
       }
     });
   });
-
   it('should show error when recycleFile rejects with error', (done) => {
     const recycleFile = new Promise<any>((resolve, reject) => {
       return reject('abc');

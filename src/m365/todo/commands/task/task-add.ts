@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class TodoTaskAddCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TASK_ADD}`;
+    return commands.TASK_ADD;
   }
 
   public get description(): string {
@@ -56,10 +55,6 @@ class TodoTaskAddCommand extends GraphCommand {
       })
       .then((res): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -92,16 +87,13 @@ class TodoTaskAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --title <title>',
-        description: `The title of the task`
+        option: '-t, --title <title>'
       },
       {
-        option: '--listName [listName]',
-        description: 'The name of the list in which to create the task. Specify either listName or listId but not both'
+        option: '--listName [listName]'
       },
       {
-        option: '--listId [listId]',
-        description: 'The id of the list in which to create the task. Specify either listName or listId but not both'
+        option: '--listId [listId]'
       }
     ];
 

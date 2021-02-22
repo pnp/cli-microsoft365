@@ -76,8 +76,7 @@ class SpoSiteAppCatalogAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site collection where the app catalog should be added'
+        option: '-u, --url <url>'
       }
     ];
 

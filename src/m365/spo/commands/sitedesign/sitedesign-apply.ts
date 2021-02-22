@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ export interface Options extends GlobalOptions {
 
 class SpoSiteDesignApplyCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_APPLY}`;
+    return commands.SITEDESIGN_APPLY;
   }
 
   public get description(): string {
@@ -63,10 +62,6 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
           logger.log(res);
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -74,16 +69,13 @@ class SpoSiteDesignApplyCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the site design to apply'
+        option: '-i, --id <id>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site to apply the site design to'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--asTask',
-        description: 'Apply site design as task. Required for large site designs'
+        option: '--asTask'
       }
     ];
 

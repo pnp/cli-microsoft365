@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { isNumber } from 'util';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
@@ -29,7 +28,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageTextAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_TEXT_ADD}`;
+    return commands.PAGE_TEXT_ADD;
   }
 
   public get description(): string {
@@ -94,12 +93,7 @@ class SpoPageTextAddCommand extends SpoCommand {
         // Save the Client Side Page with updated information
         return this.saveClientSidePage(page, logger, args, pageName, requestDigest);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-        cb();
-      })
+      .then(_ => cb())
       .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
@@ -140,28 +134,22 @@ class SpoPageTextAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to add the text to is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --pageName <pageName>',
-        description: 'Name of the page to which add the text'
+        option: '-n, --pageName <pageName>'
       },
       {
-        option: '-t, --text <text>',
-        description: 'Text to add to the page'
+        option: '-t, --text <text>'
       },
       {
-        option: '--section [section]',
-        description: 'Number of the section to which the text should be added (1 or higher)'
+        option: '--section [section]'
       },
       {
-        option: '--column [column]',
-        description: 'Number of the column in which the text should be added (1 or higher)'
+        option: '--column [column]'
       },
       {
-        option: '--order [order]',
-        description: 'Order of the text in the column'
+        option: '--order [order]'
       }
     ];
 

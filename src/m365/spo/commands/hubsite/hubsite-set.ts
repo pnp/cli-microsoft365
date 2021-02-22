@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption,
@@ -86,11 +85,8 @@ class SpoHubSiteSetCommand extends SpoCommand {
           hubSite.SiteId = hubSite.SiteId.replace('/Guid(', '').replace(')/', '');
 
           logger.log(hubSite);
-
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
         }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
@@ -98,20 +94,16 @@ class SpoHubSiteSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the hub site to update'
+        option: '-i, --id <id>'
       },
       {
-        option: '-t, --title [title]',
-        description: 'The new title for the hub site'
+        option: '-t, --title [title]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'The new description for the hub site'
+        option: '-d, --description [description]'
       },
       {
-        option: '-l, --logoUrl [logoUrl]',
-        description: 'The URL of the new logo for the hub site'
+        option: '-l, --logoUrl [logoUrl]'
       }
     ];
 

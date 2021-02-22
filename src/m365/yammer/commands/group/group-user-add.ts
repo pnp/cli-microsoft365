@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class YammerGroupUserAddCommand extends YammerCommand {
   public get name(): string {
-    return `${commands.YAMMER_GROUP_USER_ADD}`;
+    return commands.YAMMER_GROUP_USER_ADD;
   }
 
   public get description(): string {
@@ -48,24 +48,19 @@ class YammerGroupUserAddCommand extends YammerCommand {
 
     request
       .post(requestOptions)
-      .then((res: any): void => {
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   };
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--id <id>',
-        description: 'The ID of the group to add the user to'
+        option: '--id <id>'
       },
       {
-        option: '--userId [userId]',
-        description: 'ID of the user to add to the group. If not specified, adds the current user'
+        option: '--userId [userId]'
       },
       {
-        option: '--email [email]',
-        description: 'E-mail of the user to add to the group'
+        option: '--email [email]'
       }
     ];
 

@@ -215,100 +215,76 @@ class SpoSearchCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-q, --queryText <queryText>',
-        description: 'Query to be executed in KQL format'
+        option: '-q, --queryText <queryText>'
       },
       {
-        option: '-p, --selectProperties [selectProperties]',
-        description: 'Comma-separated list of properties to retrieve. Will retrieve all properties if not specified and json output is requested.'
+        option: '-p, --selectProperties [selectProperties]'
       },
       {
-        option: '-u, --webUrl [webUrl]',
-        description: 'The web against which we want to execute the query. If the parameter is not defined, the query is executed against the web that\'s used when logging in to the SPO environment.'
+        option: '-u, --webUrl [webUrl]'
       },
       {
-        option: '--allResults',
-        description: 'Set, to get all results of the search query, instead of the number specified by the rowlimit (default: 10)'
+        option: '--allResults'
       },
       {
-        option: '--rowLimit [rowLimit]',
-        description: 'The number of rows to be returned. When the \'allResults\' option is used, the specified value will define the size of retrieved batches'
+        option: '--rowLimit [rowLimit]'
       },
       {
-        option: '--sourceId [sourceId]',
-        description: 'The identifier (GUID) of the result source to be used to run the query.'
+        option: '--sourceId [sourceId]'
       },
       {
-        option: '--trimDuplicates',
-        description: 'Set, to remove near duplicate items from the search results.'
+        option: '--trimDuplicates'
       },
       {
-        option: '--enableStemming',
-        description: 'Set, to enable stemming.'
+        option: '--enableStemming'
       },
       {
-        option: '--culture [culture]',
-        description: 'The locale for the query.'
+        option: '--culture [culture]'
       },
       {
-        option: '--refinementFilters [refinementFilters]',
-        description: 'The set of refinement filters used when issuing a refinement query.'
+        option: '--refinementFilters [refinementFilters]'
       },
       {
-        option: '--queryTemplate [queryTemplate]',
-        description: 'A string that contains the text that replaces the query text, as part of a query transformation.'
+        option: '--queryTemplate [queryTemplate]'
       },
       {
-        option: '--sortList [sortList]',
-        description: 'The list of properties by which the search results are ordered.'
+        option: '--sortList [sortList]'
       },
       {
-        option: '--rankingModelId [rankingModelId]',
-        description: 'The ID of the ranking model to use for the query.'
+        option: '--rankingModelId [rankingModelId]'
       },
       {
-        option: '--startRow [startRow]',
-        description: 'The first row that is included in the search results that are returned. You use this parameter when you want to implement paging for search results.'
+        option: '--startRow [startRow]'
       },
       {
-        option: '--properties [properties]',
-        description: 'Additional properties for the query.'
+        option: '--properties [properties]'
       },
       {
-        option: '--sourceName [sourceName]',
-        description: 'Specified the name of the result source to be used to run the query.'
+        option: '--sourceName [sourceName]'
       },
       {
-        option: '--refiners [refiners]',
-        description: 'The set of refiners to return in a search result.'
+        option: '--refiners [refiners]'
       },
       {
-        option: '--hiddenConstraints [hiddenConstraints]',
-        description: 'The additional query terms to append to the query.'
+        option: '--hiddenConstraints [hiddenConstraints]'
       },
       {
-        option: '--clientType [clientType]',
-        description: 'The type of the client that issued the query.'
+        option: '--clientType [clientType]'
       },
       {
-        option: '--enablePhonetic',
-        description: 'Set, to use the phonetic forms of the query terms to find matches. (Default = false).'
+        option: '--enablePhonetic'
       },
       {
-        option: '--processBestBets',
-        description: 'Set, to return best bet results for the query.'
+        option: '--processBestBets'
       },
       {
-        option: '--enableQueryRules',
-        description: 'Set, to enable query rules for the query. '
+        option: '--enableQueryRules'
       },
       {
-        option: '--processPersonalFavorites',
-        description: 'Set, to return personal favorites with the search results.'
+        option: '--processPersonalFavorites'
       },
       {
-        option: '--rawOutput',
-        description: 'Set, to return the unparsed, raw results of the REST call to the search API.'
+        option: '--rawOutput'
       }
     ];
 

@@ -141,16 +141,13 @@ class SpoTermGroupAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the term group to add'
+        option: '-n, --name <name>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'ID of the term group to add'
+        option: '-i, --id [id]'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Description of the term group to add'
+        option: '-d, --description [description]'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class AadGroupSettingTemplateGetCommand extends GraphItemsListCommand<GroupSettingTemplate> {
   public get name(): string {
-    return `${commands.GROUPSETTINGTEMPLATE_GET}`;
+    return commands.GROUPSETTINGTEMPLATE_GET;
   }
 
   public get description(): string {
@@ -46,10 +45,6 @@ class AadGroupSettingTemplateGetCommand extends GraphItemsListCommand<GroupSetti
           return;
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -57,12 +52,10 @@ class AadGroupSettingTemplateGetCommand extends GraphItemsListCommand<GroupSetti
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the settings template to retrieve. Specify the id or displayName but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --displayName [displayName]',
-        description: 'The display name of the settings template to retrieve. Specify the id or displayName but not both'
+        option: '-n, --displayName [displayName]'
       }
     ];
 

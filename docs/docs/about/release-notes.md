@@ -1,5 +1,45 @@
 # Release notes
 
+## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
+
+### New commands
+
+**Power Apps:**
+
+- [pa app get](../cmd/pa/app/app-get.md) - gets information about the specified Microsoft Power App [#2110](https://github.com/pnp/cli-microsoft365/issues/2110)
+- [pa environment get](../cmd/pa/environment/environment-get.md) - gets information about the specified Microsoft Power Apps environment [#2109](https://github.com/pnp/cli-microsoft365/issues/2109)
+- [pa environment list](../cmd/pa/environment/environment-list.md) - lists Microsoft Power Apps environments in the current tenant [#2108](https://github.com/pnp/cli-microsoft365/issues/2108)
+
+**SharePoint:**
+
+- [spo page copy](../cmd/spo/page/page-copy.md) - creates a copy of a modern page or template [#2088](https://github.com/pnp/cli-microsoft365/issues/2088)
+- [spo site chrome set](../cmd/spo/site/site-chrome-set.md) - sets the chrome header and footer for the specified site [#2161](https://github.com/pnp/cli-microsoft365/issues/2161)
+- [spo site ensure](../cmd/spo/site/site-ensure.md) - ensures that the particular site collection exists and updates its properties if necessary [#1404](https://github.com/pnp/cli-microsoft365/issues/1404)
+
+### Changes
+
+- fixed broken tests in 'tenant auditlog report' on Node@10 [#2125](https://github.com/pnp/cli-microsoft365/issues/2125)
+- fixed uploading large files [#2120](https://github.com/pnp/cli-microsoft365/issues/2120)
+- implemented browser-based login [#1979](https://github.com/pnp/cli-microsoft365/issues/1979)
+- fixed bug in 'spo tenant appcatalog add' [#2129](https://github.com/pnp/cli-microsoft365/issues/2129)
+- changed the logic to keep original value if @-value is not a valid file path [#2134](https://github.com/pnp/cli-microsoft365/issues/2134)
+- removed 'description' property from command option [#2112](https://github.com/pnp/cli-microsoft365/issues/2112)
+- extended 'spo page set' with title [#2140](https://github.com/pnp/cli-microsoft365/issues/2140)
+- moved 'DONE' out of the `commandAction` [#2045](https://github.com/pnp/cli-microsoft365/issues/2045)
+- simplified returning command name [#2123](https://github.com/pnp/cli-microsoft365/issues/2123)
+- extended 'util accesstoken get' with `sharepoint` as resource [#2096](https://github.com/pnp/cli-microsoft365/issues/2096)
+- updated command option in readme.md
+- improved `environment get` commands with text results [#2153](https://github.com/pnp/cli-microsoft365/issues/2153)
+- extended 'spo web set' with the ability to reset the logo [#2177](https://github.com/pnp/cli-microsoft365/issues/2177)
+- added PowerShell examples to 'adaptivecard send' docs [#2167](https://github.com/pnp/cli-microsoft365/pull/2167)
+- added 'm365' prefix to sample in 'pa app list' docs [#2182](https://github.com/pnp/cli-microsoft365/pull/2182)
+- added 'm365' prefix in 'version' docs [#2183](https://github.com/pnp/cli-microsoft365/pull/2183)
+- added 'Export Teams conversations' sample script [#2104](https://github.com/pnp/cli-microsoft365/issues/2104)
+- extended test script with checking Node version [#2181](https://github.com/pnp/cli-microsoft365/issues/2181)
+- extended `spo site set` with setting site logo [#2175](https://github.com/pnp/cli-microsoft365/issues/2175)
+- extended `spo page get` with support for loading only metadata [#2184](https://github.com/pnp/cli-microsoft365/pull/2184)
+- fixed control and section parsing in 'spo page get' [#2179](https://github.com/pnp/cli-microsoft365/issues/2179)
+
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 
 ### New commands
@@ -38,6 +78,7 @@
 - added wait-npm-publish script to CI/CD [#2053](https://github.com/pnp/cli-microsoft365/pull/2053)
 - added support for passing complex content from files [#2042](https://github.com/pnp/cli-microsoft365/issues/2042)
 - added support for adding page description to 'spo page add' and 'spo page set' [#2044](https://github.com/pnp/cli-microsoft365/issues/2044)
+- added new sample script for exporting a flow to Logic app [#2067](https://github.com/pnp/cli-microsoft365/issues/2067)
 - added new sample script for emptying the tenant recycle bin [#1142](https://github.com/pnp/cli-microsoft365/issues/1142)
 - updated sample script changing CLI command name to m365 [#2063](https://github.com/pnp/cli-microsoft365/issues/2063)
 - added new sample script 'Export all Flows in environment' [#2082](https://github.com/pnp/cli-microsoft365/pull/2082)
@@ -49,6 +90,10 @@
 - fixed bug in 'spo app add' returning an object instead of just the app ID [#2080](https://github.com/pnp/cli-microsoft365/issues/2080)
 - fixed 'spo listitem get' doc [#2093](https://github.com/pnp/cli-microsoft365/issues/2093)
 - fixed bug in exporting flows [#2091](https://github.com/pnp/cli-microsoft365/issues/2091)
+- fixed logging output when using JMESPath queries [#2095](https://github.com/pnp/cli-microsoft365/issues/2095)
+- updated guidance for escaping quotes in bash [#2043](https://github.com/pnp/cli-microsoft365/issues/2043)
+- replaces `rmSync` with `unlinkSync` in 'file convert pdf' [#2106](https://github.com/pnp/cli-microsoft365/issues/2106)
+- fixed escaping backslash in 'spo page get' [#2114](https://github.com/pnp/cli-microsoft365/issues/2114)
 
 ## [v3.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.4.0)
 

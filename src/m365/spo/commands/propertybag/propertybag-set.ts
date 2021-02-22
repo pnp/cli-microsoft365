@@ -22,7 +22,7 @@ export interface Options extends GlobalOptions {
 
 class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
   public get name(): string {
-    return `${commands.PROPERTYBAG_SET}`;
+    return commands.PROPERTYBAG_SET;
   }
 
   public get description(): string {
@@ -70,13 +70,7 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
       .then((identityResp: IdentityResponse): Promise<any> => {
         return this.setProperty(identityResp, args.options, logger);
       })
-      .then((res: any): void => {
-        if (this.verbose) {
-          logger.logToStderr('DONE');
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   private setProperty(identityResp: IdentityResponse, options: Options, logger: Logger): Promise<any> {
@@ -90,20 +84,16 @@ class SpoPropertyBagSetCommand extends SpoPropertyBagBaseCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site in which the property should be set'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-k, --key <key>',
-        description: 'Key of the property to be set. Case-sensitive'
+        option: '-k, --key <key>'
       },
       {
-        option: '-v, --value <value>',
-        description: 'Value of the property to be set'
+        option: '-v, --value <value>'
       },
       {
-        option: '-f, --folder [folder]',
-        description: 'Site-relative URL of the folder on which the property should be set',
+        option: '-f, --folder [folder]'
       }
     ];
 

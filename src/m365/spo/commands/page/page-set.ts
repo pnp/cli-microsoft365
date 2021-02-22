@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Auth } from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import {
@@ -26,11 +25,12 @@ interface Options extends GlobalOptions {
   publish: boolean;
   publishMessage?: string;
   description?: string;
+  title?: string;
 }
 
 class SpoPageSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_SET}`;
+    return commands.PAGE_SET;
   }
 
   public get description(): string {
@@ -45,6 +45,7 @@ class SpoPageSetCommand extends SpoCommand {
     telemetryProps.publish = args.options.publish || false;
     telemetryProps.publishMessage = typeof args.options.publishMessage !== 'undefined';
     telemetryProps.description = typeof args.options.description !== 'undefined';
+    telemetryProps.title = typeof args.options.title !== 'undefined';
     return telemetryProps;
   }
 
@@ -56,7 +57,7 @@ class SpoPageSetCommand extends SpoCommand {
     let bannerImageUrl: string = '';
     let canvasContent1: string = '';
     let layoutWebpartsContent: string = '';
-    let pageTitle: string | null = null;
+    let pageTitle: string = args.options.title || "";
     let pageId: number | null = null;
     let pageDescription: string = args.options.description || "";
     let topicHeader: string = "";
@@ -77,7 +78,7 @@ class SpoPageSetCommand extends SpoCommand {
       })
       .then((res: ClientSidePageProperties): Promise<void> => {
         if (res) {
-          pageTitle = res.Title;
+          pageTitle = pageTitle || res.Title;
           pageId = res.Id;
 
           bannerImageUrl = res.BannerImageUrl;
@@ -313,51 +314,40 @@ class SpoPageSetCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to update'
+        option: '-n, --name <name>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to update is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-l, --layoutType [layoutType]',
-        description: 'Layout of the page. Allowed values Article|Home',
         autocomplete: ['Article', 'Home']
       },
       {
         option: '-p, --promoteAs [promoteAs]',
-        description: 'Update the page purpose. Allowed values HomePage|NewsPage|Template',
         autocomplete: ['HomePage', 'NewsPage', 'Template']
       },
       {
         option: '--commentsEnabled [commentsEnabled]',
-        description: 'Set to true, to enable comments on the page. Allowed values true|false',
         autocomplete: ['true', 'false']
       },
       {
-        option: '--publish',
-        description: 'Set to publish the page'
+        option: '--publish'
       },
       {
-        option: '--publishMessage [publishMessage]',
-        description: 'Message to set when publishing the page'
+        option: '--publishMessage [publishMessage]'
       },
       {
-        option: '--description [description]',
-        description: 'The description to set for the page'
+        option: '--description [description]'
+      },
+      {
+        option: '--title [title]'
       }
     ];
 

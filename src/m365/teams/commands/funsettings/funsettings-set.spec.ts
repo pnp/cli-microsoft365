@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,7 +12,6 @@ const command: Command = require('./funsettings-set');
 describe(commands.TEAMS_FUNSETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -34,7 +32,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -297,35 +294,6 @@ describe(commands.TEAMS_FUNSETTINGS_SET, () => {
     } as any, (err?: any) => {
       try {
         assert.strictEqual(typeof err, 'undefined');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('sets fun settings of a Microsoft Teams team (debug)', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315`) {
-        return Promise.resolve({});
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamId: "02bd9fd6-8f93-4758-87c3-1fb73740a315",
-        allowGiphy: true,
-        giphyContentRating: "moderate",
-        allowStickersAndMemes: false,
-        allowCustomMemes: true
-      }
-    }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

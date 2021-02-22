@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandOption } from '../../../../Command';
@@ -53,7 +52,7 @@ class TenantAuditlogReportCommand extends Command {
   private completeAuditReports: AuditlogReport[] = [];
 
   public get name(): string {
-    return `${commands.TENANT_AUDITLOG_REPORT}`;
+    return commands.TENANT_AUDITLOG_REPORT;
   }
 
   public get description(): string {
@@ -82,11 +81,6 @@ class TenantAuditlogReportCommand extends Command {
       .getCompleteAuditReports(args, logger)
       .then((res: AuditlogReport[]): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -95,8 +89,8 @@ class TenantAuditlogReportCommand extends Command {
     return this
       .startContentSubscriptionIfNotActive(args, logger)
       .then((): Promise<AuditContentList[]> => this.getAuditContentList(args, logger))
-      .then((auditContentLists: AuditContentList[]): Promise<any> => this.getBatchedPromises(auditContentLists, 10))
-      .then((batchedPromise: Promise<any>[]): Promise<void> => {
+      .then((auditContentLists: AuditContentList[]): Promise<Promise<AuditlogReport[]>[][]> => this.getBatchedPromises(auditContentLists, 10))
+      .then((batchedPromise: Promise<AuditlogReport[]>[][]): Promise<void> => {
         return new Promise<void>((resolve: () => void, reject: (err: any) => void): void => {
           if (batchedPromise.length > 0) {
             this.getBatchedAuditlogData(logger, batchedPromise, 0, resolve, reject);
@@ -106,7 +100,7 @@ class TenantAuditlogReportCommand extends Command {
           }
         });
       })
-      .then((): AuditlogReport[] => { return this.completeAuditReports.flat(2) });
+      .then(_ => this.completeAuditReports);
   }
 
   private startContentSubscriptionIfNotActive(args: CommandArgs, logger: Logger): Promise<void> {
@@ -181,8 +175,8 @@ class TenantAuditlogReportCommand extends Command {
     return request.get<AuditContentList[]>(requestOptions)
   }
 
-  private getBatchedPromises(auditContentLists: AuditContentList[], batchSize: number): Promise<any> {
-    let batchedPromises: any = [];
+  private getBatchedPromises(auditContentLists: AuditContentList[], batchSize: number): Promise<Promise<AuditlogReport[]>[][]> {
+    const batchedPromises: Promise<AuditlogReport[]>[][] = [];
 
     for (let i: number = 0; i < auditContentLists.length; i += batchSize) {
       const promiseRequestBatch: Promise<AuditlogReport[]>[] = auditContentLists
@@ -195,15 +189,19 @@ class TenantAuditlogReportCommand extends Command {
     return Promise.resolve(batchedPromises);
   }
 
-  private getBatchedAuditlogData(logger: Logger, batchedPromiseList: any, batchNumber: number, resolve: () => void, reject: (err: any) => void): void {
+  private getBatchedAuditlogData(logger: Logger, batchedPromiseList: Promise<AuditlogReport[]>[][], batchNumber: number, resolve: () => void, reject: (err: any) => void): void {
     if (this.verbose) {
       logger.logToStderr(`Starting Batch : ${batchNumber}`);
     }
 
     Promise
       .all(batchedPromiseList[batchNumber])
-      .then((data: any) => {
-        this.completeAuditReports.push(data);
+      .then((data: AuditlogReport[][]) => {
+        data.forEach(d1 => {
+          d1.forEach(d2 => {
+            this.completeAuditReports.push(d2);
+          });
+        });
 
         if (batchNumber < batchedPromiseList.length - 1) {
           this.getBatchedAuditlogData(logger, batchedPromiseList, ++batchNumber, resolve, reject)
@@ -240,16 +238,13 @@ class TenantAuditlogReportCommand extends Command {
     const options: CommandOption[] = [
       {
         option: '-c, --contentType <contentType>',
-        description: `Audit content type of logs to be retrieved, should be one of the following: ${this.auditContentTypeLists.join(', ')}`,
         autocomplete: this.auditContentTypeLists
       },
       {
-        option: '-s, --startTime [startTime]',
-        description: 'Start time of logs to be retrieved. Start time and end time must both be specified (or both omitted) and must be less than or equal to 24 hours apart.'
+        option: '-s, --startTime [startTime]'
       },
       {
-        option: '-e, --endTime [endTime]',
-        description: 'End time of logs to be retrieved. Start time and end time must both be specified (or both omitted) and must be less than or equal to 24 hours apart.'
+        option: '-e, --endTime [endTime]'
       }
     ];
 

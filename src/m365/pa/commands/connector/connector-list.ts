@@ -58,8 +58,7 @@ class PaConnectorListCommand extends AzmgmtItemsListCommand<{ name: string; disp
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment for which to retrieve custom connectors'
+        option: '-e, --environment <environment>'
       }
     ];
 

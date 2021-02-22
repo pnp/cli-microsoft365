@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -19,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
   public get name(): string {
-    return `${commands.TEAMS_USER_APP_LIST}`;
+    return commands.TEAMS_USER_APP_LIST;
   }
 
   public get description(): string {
@@ -63,10 +62,6 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
           }));
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -90,12 +85,10 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--userId',
-        description: 'The ID of user to get the apps from. Specify userId or userName but not both.'
+        option: '--userId'
       },
       {
-        option: '--userName',
-        description: 'The UPN of user to get the apps from. Specify userId or userName but not both.'
+        option: '--userName'
       }
     ];
 

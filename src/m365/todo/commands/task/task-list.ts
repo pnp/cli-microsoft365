@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
   public get name(): string {
-    return `${commands.TASK_LIST}`;
+    return commands.TASK_LIST;
   }
 
   public get description(): string {
@@ -84,10 +83,6 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
           }));
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -95,12 +90,10 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--listName [listName]',
-        description: 'The name of the task list to return tasks from. Specify either listName or listId, not both'
+        option: '--listName [listName]'
       },
       {
-        option: '--listId [listId]',
-        description: 'The id of the task list to return tasks from. Specify either listName or listId, not both'
+        option: '--listId [listId]'
       }
     ];
 

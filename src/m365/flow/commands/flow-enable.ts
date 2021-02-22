@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import request from '../../../request';
@@ -42,29 +41,19 @@ class FlowEnableCommand extends AzmgmtCommand {
 
     request
       .post(requestOptions)
-      .then((): void => {
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'The name of the Microsoft Flow to enable'
+        option: '-n, --name <name>'
       },
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment for which to enable Flow'
+        option: '-e, --environment <environment>'
       },
       {
-        option: '--asAdmin',
-        description: 'Set, to enable the Flow as admin'
+        option: '--asAdmin'
       }
     ];
 

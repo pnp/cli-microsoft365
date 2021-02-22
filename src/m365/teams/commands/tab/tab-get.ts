@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -30,7 +29,7 @@ class TeamsTabGetCommand extends GraphCommand {
   private channelId: string = "";
 
   public get name(): string {
-    return `${commands.TEAMS_TAB_GET}`;
+    return commands.TEAMS_TAB_GET;
   }
 
   public get description(): string {
@@ -156,11 +155,6 @@ class TeamsTabGetCommand extends GraphCommand {
       })
       .then((res: Tab): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -168,28 +162,22 @@ class TeamsTabGetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--teamId [teamId]',
-        description: 'The ID of the Microsoft Teams team where the tab is located. Specify either teamId or teamName but not both'
+        option: '--teamId [teamId]'
       },
       {
-        option: '--teamName [teamName]',
-        description: 'The display name of the Microsoft Teams team where the tab is located. Specify either teamId or teamName but not both'
+        option: '--teamName [teamName]'
       },
       {
-        option: '--channelId [channelId]',
-        description: 'The ID of the Microsoft Teams channel where the tab is located. Specify either channelId or channelName but not both'
+        option: '--channelId [channelId]'
       },
       {
-        option: '--channelName [channelName]',
-        description: 'The display name of the Microsoft Teams channel where the tab is located. Specify either channelId or channelName but not both'
+        option: '--channelName [channelName]'
       },
       {
-        option: '--tabId [tabId]',
-        description: 'The ID of the Microsoft Teams tab. Specify either tabId or tabName but not both'
+        option: '--tabId [tabId]'
       },
       {
-        option: '--tabName [tabName]',
-        description: 'The display name of the Microsoft Teams tab. Specify either tabId or tabName but not both'
+        option: '--tabName [tabName]'
       }
     ];
 

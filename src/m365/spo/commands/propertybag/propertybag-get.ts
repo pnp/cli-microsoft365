@@ -21,7 +21,7 @@ export interface Options extends GlobalOptions {
 
 class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
   public get name(): string {
-    return `${commands.PROPERTYBAG_GET}`;
+    return commands.PROPERTYBAG_GET;
   }
 
   public get description(): string {
@@ -67,16 +67,13 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site from which the property bag value should be retrieved'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-k, --key <key>',
-        description: 'Key of the property for which the value should be retrieved. Case-sensitive'
+        option: '-k, --key <key>'
       },
       {
-        option: '-f, --folder [folder]',
-        description: 'Site-relative URL of the folder from which to retrieve property bag value. Case-sensitive',
+        option: '-f, --folder [folder]'
       }
     ];
 

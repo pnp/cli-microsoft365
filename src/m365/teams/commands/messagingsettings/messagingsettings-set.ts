@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -32,7 +31,7 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return `${commands.TEAMS_MESSAGINGSETTINGS_SET}`;
+    return commands.TEAMS_MESSAGINGSETTINGS_SET;
   }
 
   public get description(): string {
@@ -68,40 +67,28 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
 
     request
       .patch(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Microsoft Teams team for which to update messaging settings'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--allowUserEditMessages [allowUserEditMessages]',
-        description: 'Set to true to allow users to edit messages and to false to disallow it'
+        option: '--allowUserEditMessages [allowUserEditMessages]'
       },
       {
-        option: '--allowUserDeleteMessages [allowUserDeleteMessages]',
-        description: 'Set to true to allow users to delete messages and to false to disallow it'
+        option: '--allowUserDeleteMessages [allowUserDeleteMessages]'
       },
       {
-        option: '--allowOwnerDeleteMessages [allowOwnerDeleteMessages]',
-        description: 'Set to true to allow owner to delete messages and to false to disallow it'
+        option: '--allowOwnerDeleteMessages [allowOwnerDeleteMessages]'
       },
       {
-        option: '--allowTeamMentions [allowTeamMentions]',
-        description: 'Set to true to allow @team or @[team name] mentions and to false to disallow it'
+        option: '--allowTeamMentions [allowTeamMentions]'
       },
       {
-        option: '--allowChannelMentions [allowChannelMentions]',
-        description: 'Set to true to allow @channel or @[channel name] mentions and to false to disallow it'
+        option: '--allowChannelMentions [allowChannelMentions]'
       }
     ];
 

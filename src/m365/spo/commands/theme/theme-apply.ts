@@ -117,16 +117,13 @@ class SpoThemeApplyCommand extends SpoCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '-n, --name <name>',
-      description: 'Name of the theme to apply'
+      option: '-n, --name <name>'
     },
     {
-      option: '-u, --webUrl <webUrl>',
-      description: 'URL of the site to which the theme should be applied'
+      option: '-u, --webUrl <webUrl>'
     },
     {
-      option: '--sharePointTheme',
-      description: 'Set to specify if the supplied theme name is a standard SharePoint theme'
+      option: '--sharePointTheme'
     }];
 
     const parentOptions: CommandOption[] = super.options();

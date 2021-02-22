@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageColumnGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_COLUMN_GET}`;
+    return commands.PAGE_COLUMN_GET;
   }
 
   public get description(): string {
@@ -52,10 +51,6 @@ class SpoPageColumnGetCommand extends SpoCommand {
           }
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -63,20 +58,16 @@ class SpoPageColumnGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to get column information of'
+        option: '-n, --name <name>'
       },
       {
-        option: '-s, --section <section>',
-        description: 'ID of the section where the column is located'
+        option: '-s, --section <section>'
       },
       {
-        option: '-c, --column <column>',
-        description: 'ID of the column for which to retrieve more information'
+        option: '-c, --column <column>'
       }
     ];
 

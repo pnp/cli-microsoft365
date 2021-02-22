@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -73,12 +72,7 @@ class SpoListViewFieldSetCommand extends SpoCommand {
 
         return request.post(moveRequestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
 
   }
 
@@ -100,36 +94,28 @@ class SpoListViewFieldSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--listId [listId]',
-        description: 'ID of the list where the view is located. Specify `listTitle` or `listId` but not both'
+        option: '--listId [listId]'
       },
       {
-        option: '--listTitle [listTitle]',
-        description: 'Title of the list where the view is located. Specify `listTitle` or `listId` but not both'
+        option: '--listTitle [listTitle]'
       },
       {
-        option: '--viewId [viewId]',
-        description: 'ID of the view to update. Specify `viewTitle` or `viewId` but not both'
+        option: '--viewId [viewId]'
       },
       {
-        option: '--viewTitle [viewTitle]',
-        description: 'Title of the view to update. Specify `viewTitle` or `viewId` but not both'
+        option: '--viewTitle [viewTitle]'
       },
       {
-        option: '--fieldId [fieldId]',
-        description: 'ID of the field to update. Specify `fieldId` or `fieldTitle` but not both'
+        option: '--fieldId [fieldId]'
       },
       {
-        option: '--fieldTitle [fieldTitle]',
-        description: 'The case-sensitive internal name or display name of the field to update. Specify `fieldId` or `fieldTitle` but not both'
+        option: '--fieldTitle [fieldTitle]'
       },
       {
-        option: '--fieldPosition <fieldPosition>',
-        description: 'The zero-based index of the position to which to move the field'
+        option: '--fieldPosition <fieldPosition>'
       }
     ];
 

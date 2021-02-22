@@ -81,12 +81,10 @@ class SpoAppListCommand extends SpoAppBaseCommand {
     const options: CommandOption[] = [
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
         autocomplete: ['tenant', 'sitecollection']
       },
       {
-        option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: 'URL of the tenant or site collection app catalog. It must be specified when the scope is \'sitecollection\''
+        option: '-u, --appCatalogUrl [appCatalogUrl]'
       }
     ];
 

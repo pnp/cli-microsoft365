@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class TeamsRemoveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_TEAM_REMOVE}`;
+    return commands.TEAMS_TEAM_REMOVE;
   }
 
   public get description(): string {
@@ -45,13 +44,7 @@ class TeamsRemoveCommand extends GraphCommand {
 
       request
         .delete(requestOptions)
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -77,12 +70,10 @@ class TeamsRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Teams team to remove'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the specified team'
+        option: '--confirm'
       }
     ];
 

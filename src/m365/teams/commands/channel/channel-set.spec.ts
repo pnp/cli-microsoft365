@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -14,7 +13,6 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -36,7 +34,6 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -162,48 +159,6 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
     } as any, (err?: any) => {
       try {
         assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly patches channel updates for the Microsoft Teams team (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`channels?$filter=displayName eq 'Review'`) > -1) {
-        return Promise.resolve({
-          value:
-            [
-              {
-                "id": "19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype",
-                "displayName": "Review",
-                "description": "Updated by CLI"
-              }]
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
-    sinon.stub(request, 'patch').callsFake((opts) => {
-      if (((opts.url as string).indexOf(`channels/19:8a53185a51ac44a3aef27397c3dfebfc@thread.skype`) > -1) &&
-        JSON.stringify(opts.data) === JSON.stringify({ displayName: "New Review" })
-      ) {
-        return Promise.resolve({});
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        debug: true,
-        teamId: '00000000-0000-0000-0000-000000000000',
-        channelName: 'Review',
-        newChannelName: 'New Review'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
         done();
       }
       catch (e) {

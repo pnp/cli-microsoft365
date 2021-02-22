@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class AadSiteClassificationDisableCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.SITECLASSIFICATION_DISABLE}`;
+    return commands.SITECLASSIFICATION_DISABLE;
   }
 
   public get description(): string {
@@ -74,13 +73,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
 
           return request.delete(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
@@ -106,8 +99,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming disabling site classification'
+        option: '--confirm'
       }
     ];
 

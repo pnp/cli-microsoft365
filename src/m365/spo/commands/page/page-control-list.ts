@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageControlListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_CONTROL_LIST}`;
+    return commands.PAGE_CONTROL_LIST;
   }
 
   public get description(): string {
@@ -60,10 +59,6 @@ class SpoPageControlListCommand extends SpoCommand {
         // drop the information about original classes from clientsidepages.ts
         logger.log(JSON.parse(JSON.stringify(controls)));
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -84,12 +79,10 @@ class SpoPageControlListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to list controls of'
+        option: '-n, --name <name>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

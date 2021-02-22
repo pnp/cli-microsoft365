@@ -16,7 +16,7 @@ interface SpoContext {
 
 class SpoGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.GET}`;
+    return commands.GET;
   }
 
   public get description(): string {

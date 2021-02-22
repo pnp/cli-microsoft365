@@ -32,8 +32,7 @@ export default abstract class DateAndPeriodBasedReport extends PeriodBasedReport
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-d, --date [date]',
-        description: 'The date for which you would like to view the users who performed any activity. Supported date format is YYYY-MM-DD. Specify the date or period, but not both.'
+        option: '-d, --date [date]'
       }
     ];
 

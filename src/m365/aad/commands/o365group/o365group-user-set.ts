@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -24,7 +23,7 @@ interface Options extends GlobalOptions {
 
 class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
   public get name(): string {
-    return `${commands.O365GROUP_USER_SET}`;
+    return commands.O365GROUP_USER_SET;
   }
 
   public get description(): string {
@@ -122,13 +121,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
           }
         }
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getOwners(logger: Logger, groupId: string): Promise<void> {
@@ -151,20 +144,16 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "-i, --groupId [groupId]",
-        description: "The ID of the Microsoft 365 group for which to update user"
+        option: "-i, --groupId [groupId]"
       },
       {
-        option: "--teamId [teamId]",
-        description: "The ID of the Microsoft Teams team for which to update user"
+        option: "--teamId [teamId]"
       },
       {
-        option: '-n, --userName <userName>',
-        description: 'UPN of the user for whom to update the role (eg. johndoe@example.com)'
+        option: '-n, --userName <userName>'
       },
       {
         option: '-r, --role <role>',
-        description: 'Role to set for the given user in the specified Microsoft 365 Group or Microsoft Teams team. Allowed values: Owner|Member',
         autocomplete: ['Owner', 'Member']
       }
     ];

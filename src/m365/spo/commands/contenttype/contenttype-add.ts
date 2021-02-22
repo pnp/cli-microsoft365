@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
 import config from '../../../../config';
@@ -24,7 +23,7 @@ interface Options extends GlobalOptions {
 
 class SpoContentTypeAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CONTENTTYPE_ADD}`;
+    return commands.CONTENTTYPE_ADD;
   }
 
   public get description(): string {
@@ -76,11 +75,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-        }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
@@ -155,28 +150,22 @@ class SpoContentTypeAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the content type should be created'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listTitle [listTitle]',
-        description: 'Title of the list where the content type should be created (if it should be created as a list content type)'
+        option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the content type. Determines the parent content type'
+        option: '-i, --id <id>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'The name of the content type'
+        option: '-n, --name <name>'
       },
       {
-        option: '-d, --description [description]',
-        description: 'The description of the content type'
+        option: '-d, --description [description]'
       },
       {
-        option: '-g, --group [group]',
-        description: 'The group with which the content type should be associated'
+        option: '-g, --group [group]'
       }
     ];
 

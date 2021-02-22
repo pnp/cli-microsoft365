@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption,
@@ -61,12 +60,7 @@ class SpoFeatureEnableCommand extends SpoCommand {
 
     request
       .post(requestOptions)
-      .then((res: any): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public types(): CommandTypes {
@@ -78,21 +72,17 @@ class SpoFeatureEnableCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the site or web for which to enable the feature'
+        option: '-u, --url <url>'
       },
       {
-        option: '-f, --featureId <id>',
-        description: 'The ID of the feature to enable'
+        option: '-f, --featureId <id>'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the Feature to enable. Allowed values `Site|Web`. Default `Web`',
         autocomplete: ['Site', 'Web']
       },
       {
-        option: '--force',
-        description: 'Specifies whether to overwrite an existing feature with the same feature identifier. This parameter is ignored if there are no errors.'
+        option: '--force'
       }
     ];
 

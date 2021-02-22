@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TeamsAppPublishCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_APP_PUBLISH}`;
+    return commands.TEAMS_APP_PUBLISH;
   }
 
   public get description(): string {
@@ -47,10 +46,6 @@ class TeamsAppPublishCommand extends GraphCommand {
           logger.log(res.id);
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
   }
@@ -58,8 +53,7 @@ class TeamsAppPublishCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-p, --filePath <filePath>',
-        description: 'Absolute or relative path to the Teams manifest zip file to add to the app catalog'
+        option: '-p, --filePath <filePath>'
       }
     ];
 

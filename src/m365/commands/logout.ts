@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import auth from '../../Auth';
 import { Logger } from '../../cli';
 import Command, { CommandArgs, CommandError } from '../../Command';
@@ -20,9 +19,6 @@ class LogoutCommand extends Command {
 
     const logout: () => void = (): void => {
       auth.service.logout();
-      if (this.verbose) {
-        logger.logToStderr(chalk.green('DONE'));
-      }
       cb();
     }
 

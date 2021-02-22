@@ -80,37 +80,26 @@ class SpoFileCheckinCommand extends SpoCommand {
 
     request
       .post(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr('DONE');
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the file is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --fileUrl [fileUrl]',
-        description: 'The server-relative URL of the file to retrieve. Specify either fileUrl or id but not both'
+        option: '-f, --fileUrl [fileUrl]'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The UniqueId (GUID) of the file to retrieve. Specify either fileUrl or id but not both'
+        option: '-i, --id [id]'
       },
       {
         option: '-t, --type [type]',
-        description: 'Type of the check in. Available values Minor|Major|Overwrite. Default is Major',
         autocomplete: ['Minor', 'Major', 'Overwrite']
       },
       {
-        option: '--comment [comment]',
-        description: 'Comment to set when checking the file in. Its length must be less than 1024 letters. Default is empty string'
+        option: '--comment [comment]'
       }
     ];
 

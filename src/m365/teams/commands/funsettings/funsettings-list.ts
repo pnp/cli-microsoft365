@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -17,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class TeamsFunSettingsListCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_FUNSETTINGS_LIST}`;
+    return commands.TEAMS_FUNSETTINGS_LIST;
   }
 
   public get description(): string {
@@ -37,10 +36,6 @@ class TeamsFunSettingsListCommand extends GraphCommand {
       .get<{ funSettings: any }>(requestOptions)
       .then((res: { funSettings: any }): void => {
         logger.log(res.funSettings);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   };
@@ -48,8 +43,7 @@ class TeamsFunSettingsListCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the team for which to list fun settings'
+        option: '-i, --teamId <teamId>'
       },
     ];
 

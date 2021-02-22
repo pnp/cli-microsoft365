@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -60,11 +59,6 @@ class SpoKnowledgehubSetCommand extends SpoCommand {
         }
         else {
           logger.log(json[json.length - 1]);
-
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
           cb();
         }
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
@@ -74,8 +68,7 @@ class SpoKnowledgehubSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site to set as Knowledge Hub'
+        option: '-u, --url <url>'
       }
     ];
 

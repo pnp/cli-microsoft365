@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
   public get name(): string {
-    return `${commands.TEAMS_TAB_LIST}`;
+    return commands.TEAMS_TAB_LIST;
   }
 
   public get description(): string {
@@ -42,11 +41,6 @@ class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
         });
 
         logger.log(this.items);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -54,12 +48,10 @@ class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Microsoft Teams team where the channel is located'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '-c, --channelId <channelId>',
-        description: 'The ID of the channel for which to list tabs'
+        option: '-c, --channelId <channelId>'
       }
     ];
 

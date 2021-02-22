@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class TeamsChannelSetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_CHANNEL_SET}`;
+    return commands.TEAMS_CHANNEL_SET;
   }
   public get description(): string {
     return 'Updates properties of the specified channel in the given Microsoft Teams team';
@@ -67,32 +66,22 @@ class TeamsChannelSetCommand extends GraphCommand {
 
         return request.patch(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the team where the channel to update is located'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--channelName <channelName>',
-        description: 'The name of the channel to update'
+        option: '--channelName <channelName>'
       },
       {
-        option: '--newChannelName [newChannelName]',
-        description: 'The new name of the channel'
+        option: '--newChannelName [newChannelName]'
       },
       {
-        option: '--description [description]',
-        description: 'The description of the channel'
+        option: '--description [description]'
       }
     ];
 

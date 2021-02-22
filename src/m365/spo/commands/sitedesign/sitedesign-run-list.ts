@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignRunListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_RUN_LIST}`;
+    return commands.SITEDESIGN_RUN_LIST;
   }
 
   public get description(): string {
@@ -61,12 +60,8 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
             d.StartTime = new Date(parseInt(d.StartTime)).toLocaleString();
           });
         }
+
         logger.log(res.value);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -74,12 +69,10 @@ class SpoSiteDesignRunListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site for which to list applied site designs'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --siteDesignId [siteDesignId]',
-        description: 'The ID of the site design for which to display information'
+        option: '-i, --siteDesignId [siteDesignId]'
       }
     ];
 

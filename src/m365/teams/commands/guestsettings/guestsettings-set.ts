@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -26,7 +25,7 @@ class TeamsGuestSettingsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return `${commands.TEAMS_GUESTSETTINGS_SET}`;
+    return commands.TEAMS_GUESTSETTINGS_SET;
   }
 
   public get description(): string {
@@ -62,28 +61,19 @@ class TeamsGuestSettingsSetCommand extends GraphCommand {
 
     request
       .patch(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Teams team for which to update settings'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--allowCreateUpdateChannels [allowCreateUpdateChannels]',
-        description: 'Set to true to allow guests to create and update channels and to false to disallow it'
+        option: '--allowCreateUpdateChannels [allowCreateUpdateChannels]'
       },
       {
-        option: '--allowDeleteChannels [allowDeleteChannels]',
-        description: 'Set to true to allow guests to create and update channels and to false to disallow it'
+        option: '--allowDeleteChannels [allowDeleteChannels]'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CONTENTTYPE_FIELD_REMOVE}`;
+    return commands.CONTENTTYPE_FIELD_REMOVE;
   }
 
   public get description(): string {
@@ -154,9 +153,7 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
             cb(new CommandError(response.ErrorInfo.ErrorMessage));
             return;
           }
-          if (this.debug) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
+          
           cb();
         }, (error: any): void => {
           this.handleRejectedODataJsonPromise(error, logger, cb);
@@ -186,28 +183,22 @@ class SpoContentTypeFieldRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the content type is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listTitle [listTitle]',
-        description: 'Title of the list where the content type is located (if it is a list content type)'
+        option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '-i, --contentTypeId <contentTypeId>',
-        description: 'The ID of the content type to remove the column from'
+        option: '-i, --contentTypeId <contentTypeId>'
       },
       {
-        option: '-f, --fieldLinkId <fieldLinkId>',
-        description: 'The ID of the column to remove'
+        option: '-f, --fieldLinkId <fieldLinkId>'
       },
       {
-        option: '-c, --updateChildContentTypes',
-        description: 'Update child content types'
+        option: '-c, --updateChildContentTypes'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removal of a column from content type'
+        option: '--confirm'
       }
     ];
 

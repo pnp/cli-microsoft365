@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoAppPageSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.APPPAGE_SET}`;
+    return commands.APPPAGE_SET;
   }
 
   public get description(): string {
@@ -42,27 +41,22 @@ class SpoAppPageSetCommand extends SpoCommand {
       }
     };
 
-    request.post(requestOptions).then((res: any): void => {
-      if (this.verbose) {
-        logger.logToStderr(chalk.green('DONE'));
-      }
-      cb();
-    }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    request
+      .post(requestOptions)
+      .then(_ => cb(),
+        (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the page to update is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --pageName <pageName>',
-        description: 'The name of the page to be updated, eg. page.aspx'
+        option: '-n, --pageName <pageName>'
       },
       {
-        option: '-d, --webPartData <webPartData>',
-        description: 'JSON string of the web part to update on the page'
+        option: '-d, --webPartData <webPartData>'
       }
     ];
 

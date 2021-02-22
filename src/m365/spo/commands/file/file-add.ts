@@ -60,7 +60,7 @@ interface FileUploadInfo {
 
 class SpoFileAddCommand extends SpoCommand {
   private readonly fileChunkingThreshold: number = 250 * 1024 * 1024;  // max 250 MB
-  private readonly fileChunkSize: number = 10 * 1024 * 1024;  // max fileChunkingThreshold
+  private readonly fileChunkSize: number = 250 * 1024 * 1024;  // max fileChunkingThreshold
   private readonly fileChunkRetryAttempts: number = 5;
 
   public get name(): string {
@@ -124,7 +124,7 @@ class SpoFileAddCommand extends SpoCommand {
         if (args.options.checkOut) {
           return this.fileCheckOut(fileName, args.options.webUrl, folderPath)
             .then((res: any) => {
-              // flag the file is checkedOut by the command 
+              // flag the file is checkedOut by the command
               // so in case of command failure we can try check it in
               isCheckedOut = true;
 
@@ -225,7 +225,8 @@ class SpoFileAddCommand extends SpoCommand {
           headers: {
             'accept': 'application/json;odata=nometadata',
             'content-length': bodyLength
-          }
+          },
+          maxBodyLength: this.fileChunkingThreshold
         };
 
         return request.post(requestOptions);
@@ -247,7 +248,7 @@ class SpoFileAddCommand extends SpoCommand {
         return Promise.resolve();
       })
       .then((): Promise<void> => {
-        // check if there are unknown options 
+        // check if there are unknown options
         // and map them as fields to update
         let fieldsToUpdate: FieldValue[] = this.mapUnknownOptionsAsFieldValue(args.options);
 
@@ -270,7 +271,7 @@ class SpoFileAddCommand extends SpoCommand {
         return Promise.resolve();
       })
       .then((): Promise<void> => {
-        // approve and publish cannot be used together 
+        // approve and publish cannot be used together
         // when approve is used it will automatically publish the file
         // so then no need to publish afterwards
         if (args.options.approve) {
@@ -312,13 +313,7 @@ class SpoFileAddCommand extends SpoCommand {
 
         return Promise.resolve();
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr('DONE');
-        }
-
-        cb();
-      }, (err: any): void => {
+      .then(_ => cb(), (err: any): void => {
         if (isCheckedOut) {
           // in a case the command has done checkout
           // then have to rollback the checkout
@@ -348,44 +343,34 @@ class SpoFileAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the file should be uploaded to'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folder <folder>',
-        description: 'Site-relative or server-relative URL to the folder where the file should be uploaded'
+        option: '-f, --folder <folder>'
       },
       {
-        option: '-p, --path <path>',
-        description: 'Local path to the file to upload'
+        option: '-p, --path <path>'
       },
       {
-        option: '-c, --contentType [contentType]',
-        description: 'Content type name or ID to assign to the file'
+        option: '-c, --contentType [contentType]'
       },
       {
-        option: '--checkOut',
-        description: 'If versioning is enabled, this will check out the file first if it exists, upload the file, then check it in again'
+        option: '--checkOut'
       },
       {
-        option: '--checkInComment [checkInComment]',
-        description: 'Comment to set when checking the file in'
+        option: '--checkInComment [checkInComment]'
       },
       {
-        option: '--approve',
-        description: 'Will automatically approve the uploaded file'
+        option: '--approve'
       },
       {
-        option: '--approveComment [approveComment]',
-        description: 'Comment to set when approving the file'
+        option: '--approveComment [approveComment]'
       },
       {
-        option: '--publish',
-        description: 'Will automatically publish the uploaded file'
+        option: '--publish'
       },
       {
-        option: '--publishComment [publishComment]',
-        description: 'Comment to set when publishing the file'
+        option: '--publishComment [publishComment]'
       }
     ];
 

@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class GraphSchemaExtensionGet extends GraphCommand {
   public get name(): string {
-    return `${commands.SCHEMAEXTENSION_GET}`;
+    return commands.SCHEMAEXTENSION_GET;
   }
 
   public get description(): string {
@@ -41,13 +40,7 @@ class GraphSchemaExtensionGet extends GraphCommand {
 
       request.get(requestOptions)
       .then((res: any): void => {
-
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -55,8 +48,7 @@ class GraphSchemaExtensionGet extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: `The unique identifier for the schema extension definition`
+        option: '-i, --id <id>'
       }
     ];
 

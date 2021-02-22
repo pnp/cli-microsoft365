@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoAppPageAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.APPPAGE_ADD}`;
+    return commands.APPPAGE_ADD;
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -84,11 +83,6 @@ class SpoAppPageAddCommand extends SpoCommand {
       })
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -96,20 +90,16 @@ class SpoAppPageAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the page should be created'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-t, --title <title>',
-        description: 'The title of the page to be created'
+        option: '-t, --title <title>'
       },
       {
-        option: '-d, --webPartData <webPartData>',
-        description: 'JSON string of the web part to put on the page'
+        option: '-d, --webPartData <webPartData>'
       },
       {
-        option: '--addToQuickLaunch',
-        description: 'Set, to add the page to the quick launch'
+        option: '--addToQuickLaunch'
       }
     ];
 

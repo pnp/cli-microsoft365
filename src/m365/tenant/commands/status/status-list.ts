@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, { CommandOption } from '../../../../Command';
@@ -55,10 +54,6 @@ class TenantStatusListCommand extends Command {
       .get(requestOptions)
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -66,8 +61,7 @@ class TenantStatusListCommand extends Command {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-w, --workload [workload]',
-        description: 'Retrieve service status for the specified service. If not provided, will list the current service status of all services'
+        option: '-w, --workload [workload]'
       }
     ];
 

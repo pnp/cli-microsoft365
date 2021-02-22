@@ -86,20 +86,16 @@ class SpoListContentTypeAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listId [listId]',
-        description: 'ID of the list to which to add the content type. Specify listId or listTitle but not both'
+        option: '-l, --listId [listId]'
       },
       {
-        option: '-t, --listTitle [listTitle]',
-        description: 'Title of the list to which to add the content type. Specify listId or listTitle but not both'
+        option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-c, --contentTypeId <contentTypeId>',
-        description: 'ID of the content type to add to the list'
+        option: '-c, --contentTypeId <contentTypeId>'
       }
     ];
 

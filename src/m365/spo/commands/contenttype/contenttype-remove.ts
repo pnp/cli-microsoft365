@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -19,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class SpoContentTypeRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CONTENTTYPE_REMOVE}`;
+    return commands.CONTENTTYPE_REMOVE;
   }
 
   public get description(): string {
@@ -99,11 +98,6 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
             cb(new CommandError(`Content type not found`));
             return;
           }
-          else {
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
-          }
 
           cb();
         }, (err: any): void => {
@@ -129,20 +123,16 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the content type is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the content type to remove'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --name [name]',
-        description: 'The name of the content type to remove'
+        option: '-n, --name [name]'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removal of the content type'
+        option: '--confirm'
       }
     ];
 

@@ -317,6 +317,20 @@ describe(commands.LOGIN, () => {
     });
   });
 
+  it('logs in to Microsoft 365 using browser authentication', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
+
+    command.action(logger, { options: { debug: false, authType: 'browser' } }, () => {
+      try {
+        assert.strictEqual(auth.service.authType, AuthType.Browser, 'Incorrect authType set');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles error when clearing persisted auth information', (done) => {
     sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve('ABC'));
     Utils.restore(auth.clearConnectionInfo);

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteCommSiteEnableCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITE_COMMSITE_ENABLE}`;
+    return commands.SITE_COMMSITE_ENABLE;
   }
 
   public get description(): string {
@@ -68,11 +67,7 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-        }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
@@ -80,12 +75,10 @@ class SpoSiteCommSiteEnableCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the site to enable communication site features on'
+        option: '-u, --url <url>'
       },
       {
-        option: '-i, --designPackageId [designPackageId]',
-        description: 'The ID of the site design to apply when enabling communication site features'
+        option: '-i, --designPackageId [designPackageId]'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoNavigationNodeListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.NAVIGATION_NODE_LIST}`;
+    return commands.NAVIGATION_NODE_LIST;
   }
 
   public get description(): string {
@@ -57,10 +56,6 @@ class SpoNavigationNodeListCommand extends SpoCommand {
           };
         }));
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
@@ -68,12 +63,10 @@ class SpoNavigationNodeListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site for which to retrieve navigation'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-l, --location <location>',
-        description: 'Navigation type to retrieve. Available options: QuickLaunch|TopNavigationBar',
         autocomplete: ['QuickLaunch', 'TopNavigationBar']
       }
     ];

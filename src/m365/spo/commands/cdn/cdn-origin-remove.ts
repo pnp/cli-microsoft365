@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -76,9 +75,6 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
             cb(new CommandError(response.ErrorInfo.ErrorMessage));
           }
           else {
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
             cb();
           }
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
@@ -111,16 +107,13 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-t, --type [type]',
-        description: 'Type of CDN to manage. Public|Private. Default Public',
         autocomplete: ['Public', 'Private']
       },
       {
-        option: '-r, --origin <origin>',
-        description: 'Origin to remove from the current CDN configuration'
+        option: '-r, --origin <origin>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removal of a tenant property'
+        option: '--confirm'
       }
     ];
 

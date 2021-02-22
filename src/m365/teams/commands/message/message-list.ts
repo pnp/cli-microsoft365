@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
   public get name(): string {
-    return `${commands.TEAMS_MESSAGE_LIST}`;
+    return commands.TEAMS_MESSAGE_LIST;
   }
 
   public get description(): string {
@@ -46,10 +45,6 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
         }
 
         logger.log(this.items);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -57,16 +52,13 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the team where the channel is located'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '-c, --channelId <channelId>',
-        description: 'The ID of the channel for which to list messages'
+        option: '-c, --channelId <channelId>'
       },
       {
-        option: '-s, --since [since]',
-        description: 'Date (ISO standard, dash separator) to get delta of messages from (in last 8 months)'
+        option: '-s, --since [since]'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -73,9 +72,6 @@ class SpoCdnOriginAddCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
         }
         else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
           cb();
         }
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
@@ -85,12 +81,10 @@ class SpoCdnOriginAddCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-t, --type [type]',
-        description: 'Type of CDN to manage. Public|Private. Default Public',
         autocomplete: ['Public', 'Private']
       },
       {
-        option: '-r, --origin <origin>',
-        description: 'Origin to add to the current CDN configuration'
+        option: '-r, --origin <origin>'
       }
     ];
 

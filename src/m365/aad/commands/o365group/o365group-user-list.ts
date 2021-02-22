@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   public get name(): string {
-    return `${commands.O365GROUP_USER_LIST}`;
+    return commands.O365GROUP_USER_LIST;
   }
 
   public get description(): string {
@@ -100,17 +100,13 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "-i, --groupId [groupId]",
-        description: "The ID of the Microsoft 365 group for which to list users"
+        option: "-i, --groupId [groupId]"
       },
       {
-        option: "--teamId [teamId]",
-        description: "The ID of the Microsoft Teams team for which to list users"
+        option: "--teamId [teamId]"
       },
       {
         option: "-r, --role [type]",
-        description:
-          "Filter the results to only users with the given role: Owner|Member|Guest",
         autocomplete: ["Owner", "Member", "Guest"]
       }
     ];

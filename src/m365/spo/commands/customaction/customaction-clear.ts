@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoCustomActionClearCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CUSTOMACTION_CLEAR}`;
+    return commands.CUSTOMACTION_CLEAR;
   }
 
   public get description(): string {
@@ -43,12 +43,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
 
         return this.clearAllScopes(args.options);
       })()
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-          cb();
-        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
@@ -108,17 +103,14 @@ class SpoCustomActionClearCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'Url of the site or site collection to clear the custom actions from'
+        option: '-u, --url <url>'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the custom action. Allowed values Site|Web|All. Default All',
         autocomplete: ['Site', 'Web', 'All']
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing all custom actions'
+        option: '--confirm'
       }
     ];
 

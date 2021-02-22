@@ -12,7 +12,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   webUrl: string;
 }
 
@@ -45,8 +45,7 @@ class SpoWebGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site for which to retrieve the information'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

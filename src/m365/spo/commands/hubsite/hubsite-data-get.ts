@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -19,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteDataGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_DATA_GET}`;
+    return commands.HUBSITE_DATA_GET;
   }
 
   public get description(): string {
@@ -59,10 +58,6 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
           }
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -70,12 +65,10 @@ class SpoHubSiteDataGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site for which to retrieve hub site data'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --forceRefresh',
-        description: `Set, to refresh the server cache with the latest updates`
+        option: '-f, --forceRefresh'
       }
     ];
 

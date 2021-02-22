@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignRightsGrantCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_RIGHTS_GRANT}`;
+    return commands.SITEDESIGN_RIGHTS_GRANT;
   }
 
   public get description(): string {
@@ -57,28 +56,19 @@ class SpoSiteDesignRightsGrantCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the site design to grant rights on'
+        option: '-i, --id <id>'
       },
       {
-        option: '-p, --principals <principals>',
-        description: 'Comma-separated list of principals to grant view rights. Principals can be users or mail-enabled security groups in the form of "alias" or "alias@<domain name>.com"'
+        option: '-p, --principals <principals>'
       },
       {
         option: '-r, --rights <rights>',
-        description: 'Rights to grant to principals. Available values View',
         autocomplete: ['View']
       }
     ];

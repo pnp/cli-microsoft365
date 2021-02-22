@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -13,7 +12,6 @@ const command: Command = require('./user-app-remove');
 describe(commands.TEAMS_USER_APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -35,7 +33,6 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       promptOptions = options;
@@ -142,9 +139,9 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
         debug: true,
         confirm: true
       }
-    } as any, () => {
+    } as any, (err?: any) => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {
@@ -171,9 +168,9 @@ describe(commands.TEAMS_USER_APP_REMOVE, () => {
         appId: 'YzUyN2E0NzAtYTg4Mi00ODFjLTk4MWMtZWU2ZWZhYmE4NWM3IyM0ZDFlYTA0Ny1mMTk2LTQ1MGQtYjJlOS0wZDI4NTViYTA1YTY=',
         debug: true
       }
-    } as any, () => {
+    } as any, (err?: any) => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(chalk.green('DONE')));
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {

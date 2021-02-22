@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class TodoTaskRemoveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TASK_REMOVE}`;
+    return commands.TASK_REMOVE;
   }
 
   public get description(): string {
@@ -73,13 +72,7 @@ class TodoTaskRemoveCommand extends GraphCommand {
 
           return request.delete(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -108,20 +101,16 @@ class TodoTaskRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: `The id of the task to remove`
+        option: '-i, --id <id>'
       },
       {
-        option: '--listName [listName]',
-        description: `The name of the task list in which the task exists. Specify either 'listId' or 'listName', not both`
+        option: '--listName [listName]'
       },
       {
-        option: '--listId [listId]',
-        description: `The id of the task list in which the task exists. Specify either 'listId' or 'listName', not both`
+        option: '--listId [listId]'
       },
       {
-        option: '--confirm',
-        description: `Don't prompt for confirmation`
+        option: '--confirm'
       },
     ];
 

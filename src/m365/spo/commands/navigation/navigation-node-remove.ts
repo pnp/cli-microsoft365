@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoNavigationNodeRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.NAVIGATION_NODE_REMOVE}`;
+    return commands.NAVIGATION_NODE_REMOVE;
   }
 
   public get description(): string {
@@ -56,13 +55,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
 
           return request.delete(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -88,21 +81,17 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site to which navigation should be modified'
+        option: '-u, --webUrl <webUrl>'
       },
       {
         option: '-l, --location <location>',
-        description: 'Navigation type where the node should be added. Available options: QuickLaunch|TopNavigationBar',
         autocomplete: ['QuickLaunch', 'TopNavigationBar']
       },
       {
-        option: '-i, --id <id>',
-        description: 'ID of the node to remove'
+        option: '-i, --id <id>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the node'
+        option: '--confirm'
       }
     ];
 

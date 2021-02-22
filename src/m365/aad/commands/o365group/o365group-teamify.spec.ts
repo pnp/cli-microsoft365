@@ -12,7 +12,6 @@ const command: Command = require('./o365group-teamify');
 describe(commands.O365GROUP_TEAMIFY, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -33,7 +32,6 @@ describe(commands.O365GROUP_TEAMIFY, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     (command as any).items = [];
   });
 
@@ -85,28 +83,6 @@ describe(commands.O365GROUP_TEAMIFY, () => {
         assert.strictEqual(requestStub.lastCall.args[0].url, 'https://graph.microsoft.com/beta/teams');
         assert.strictEqual(requestStub.lastCall.args[0].data["template@odata.bind"], 'https://graph.microsoft.com/beta/teamsTemplates(\'standard\')');
         assert.strictEqual(requestStub.lastCall.args[0].data["group@odata.bind"], `https://graph.microsoft.com/v1.0/groups('8231f9f2-701f-4c6e-93ce-ecb563e3c1ee')`);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('o365group timify success (debug)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/teams`) {
-        return Promise.resolve({});
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: { debug: true, groupId: '8231f9f2-701f-4c6e-93ce-ecb563e3c1ee' }
-    }, () => {
-      try {
-        assert.notStrictEqual(loggerLogToStderrSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
       catch (e) {

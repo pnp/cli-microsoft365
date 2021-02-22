@@ -103,20 +103,16 @@ class SpoGroupRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Url of the web to remove the group from'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--id [id]',
-        description: 'ID of the group to remove. Use ID or name but not both'
+        option: '--id [id]'
       },
       {
-        option: '--name [name]',
-        description: 'Name of the group to remove. Use ID or name but not both'
+        option: '--name [name]'
       },
       {
-        option: '--confirm',
-        description: 'Confirm removal of the group'
+        option: '--confirm'
       }
     ];
 

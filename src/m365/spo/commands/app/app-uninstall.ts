@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -53,13 +52,7 @@ class SpoAppUninstallCommand extends SpoCommand {
 
       request
         .post(requestOptions)
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
+        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -85,21 +78,17 @@ class SpoAppUninstallCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the app to uninstall'
+        option: '-i, --id <id>'
       },
       {
-        option: '-s, --siteUrl <siteUrl>',
-        description: 'Absolute URL of the site to uninstall the app from'
+        option: '-s, --siteUrl <siteUrl>'
       },
       {
         option: '--scope [scope]',
-        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
         autocomplete: ['tenant', 'sitecollection']
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming uninstalling the app'
+        option: '--confirm'
       }
     ];
 

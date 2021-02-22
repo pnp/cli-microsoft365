@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -25,7 +24,7 @@ interface Options extends GlobalOptions {
 
 class OutlookSendmailCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.OUTLOOK_MAIL_SEND}`;
+    return commands.OUTLOOK_MAIL_SEND;
   }
 
   public get description(): string {
@@ -79,41 +78,29 @@ class OutlookSendmailCommand extends GraphCommand {
 
     request
       .post(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-s, --subject <subject>',
-        description: 'E-mail subject'
+        option: '-s, --subject <subject>'
       },
       {
-        option: '-t, --to <to>',
-        description: 'Comma-separated list of e-mails to send the message to'
+        option: '-t, --to <to>'
       },
       {
-        option: '--bodyContents [bodyContents]',
-        description: 'String containing the body of the e-mail to send'
+        option: '--bodyContents [bodyContents]'
       },
       {
-        option: '--bodyContentsFilePath [bodyContentsFilePath]',
-        description: 'Relative or absolute path to the file with e-mail body contents'
+        option: '--bodyContentsFilePath [bodyContentsFilePath]'
       },
       {
         option: '--bodyContentType [bodyContentType]',
-        description: 'Type of the body content. Available options: Text|HTML. Default Text',
         autocomplete: ['Text', 'HTML']
       },
       {
-        option: '--saveToSentItems [saveToSentItems]',
-        description: 'Save e-mail in the sent items folder. Default true'
+        option: '--saveToSentItems [saveToSentItems]'
       }
     ];
 

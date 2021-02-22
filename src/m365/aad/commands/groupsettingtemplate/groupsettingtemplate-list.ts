@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
@@ -11,7 +10,7 @@ interface CommandArgs {
 
 class AadGroupSettingTemplateListCommand extends GraphItemsListCommand<GroupSettingTemplate> {
   public get name(): string {
-    return `${commands.GROUPSETTINGTEMPLATE_LIST}`;
+    return commands.GROUPSETTINGTEMPLATE_LIST;
   }
 
   public get description(): string {
@@ -27,11 +26,6 @@ class AadGroupSettingTemplateListCommand extends GraphItemsListCommand<GroupSett
       .getAllItems(`${this.resource}/v1.0/groupSettingTemplates`, logger, true)
       .then((): void => {
         logger.log(this.items);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }

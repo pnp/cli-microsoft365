@@ -11,6 +11,13 @@ class Request {
   private _debug: boolean = false;
 
   public set debug(debug: boolean) {
+    // if the value to set is the same as current value return early to avoid
+    // instantiating interceptors multiple times. This can happen when calling
+    // one command from another
+    if (this._debug === debug) {
+      return;
+    }
+
     this._debug = debug;
 
     if (this._debug) {

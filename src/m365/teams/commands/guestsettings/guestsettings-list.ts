@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class TeamsGuestSettingsListCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_GUESTSETTINGS_LIST}`;
+    return commands.TEAMS_GUESTSETTINGS_LIST;
   }
 
   public get description(): string {
@@ -40,10 +39,6 @@ class TeamsGuestSettingsListCommand extends GraphCommand {
       .get<Team>(requestOptions)
       .then((res: Team): void => {
         logger.log(res.guestSettings);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -51,8 +46,7 @@ class TeamsGuestSettingsListCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the team for which to get the guest settings'
+        option: '-i, --teamId <teamId>'
       }
     ];
 

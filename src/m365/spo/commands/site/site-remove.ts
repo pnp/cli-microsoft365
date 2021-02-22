@@ -70,13 +70,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
             return this.deleteGroupifiedSite(_groupId, logger);
           }
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+        .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
 
     if (args.options.confirm) {
@@ -277,24 +271,19 @@ class SpoSiteRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site to remove'
+        option: '-u, --url <url>'
       },
       {
-        option: '--skipRecycleBin',
-        description: 'Set to directly remove the site without moving it to the Recycle Bin'
+        option: '--skipRecycleBin'
       },
       {
-        option: '--fromRecycleBin',
-        description: 'Set to remove the site from the Recycle Bin'
+        option: '--fromRecycleBin'
       },
       {
-        option: '--wait',
-        description: 'Wait for the site to be removed before completing the command'
+        option: '--wait'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the site'
+        option: '--confirm'
       }
     ];
 

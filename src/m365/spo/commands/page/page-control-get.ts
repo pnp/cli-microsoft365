@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageControlGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_CONTROL_GET}`;
+    return commands.PAGE_CONTROL_GET;
   }
 
   public get description(): string {
@@ -39,10 +38,6 @@ class SpoPageControlGetCommand extends SpoCommand {
           const isJSONOutput = args.options.output === 'json';
 
           logger.log(JSON.parse(JSON.stringify(Page.getControlsInformation(control, isJSONOutput))));
-
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
         }
         else {
           if (this.verbose) {
@@ -57,16 +52,13 @@ class SpoPageControlGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the control to retrieve information for'
+        option: '-i, --id <id>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page where the control is located'
+        option: '-n, --name <name>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

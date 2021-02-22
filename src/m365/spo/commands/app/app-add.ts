@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoAppAddCommand extends SpoAppBaseCommand {
   public get name(): string {
-    return `${commands.APP_ADD}`;
+    return commands.APP_ADD;
   }
 
   public get description(): string {
@@ -74,10 +73,6 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
           logger.log(json.UniqueId);
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
   }
@@ -85,21 +80,17 @@ class SpoAppAddCommand extends SpoAppBaseCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-p, --filePath <filePath>',
-        description: 'Absolute or relative path to the solution package file to add to the app catalog'
+        option: '-p, --filePath <filePath>'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
         autocomplete: ['tenant', 'sitecollection']
       },
       {
-        option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: 'The URL of the app catalog where the solution package will be added. It must be specified when the scope is \'sitecollection\'',
+        option: '-u, --appCatalogUrl [appCatalogUrl]'
       },
       {
-        option: '--overwrite [overwrite]',
-        description: 'Set to overwrite the existing package file'
+        option: '--overwrite [overwrite]'
       }
     ];
 

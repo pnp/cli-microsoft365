@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as os from 'os';
 import { Logger } from '../../../../cli';
 import {
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
   public get name(): string {
-    return `${commands.OUTLOOK_MESSAGE_LIST}`;
+    return commands.OUTLOOK_MESSAGE_LIST;
   }
 
   public get description(): string {
@@ -50,11 +49,6 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
       })
       .then((): void => {
         logger.log(this.items);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -103,12 +97,10 @@ class OutlookMessageListCommand extends GraphItemsListCommand<Message> {
     const options: CommandOption[] = [
       {
         option: '--folderName [folderName]',
-        description: 'Name of the folder from which to list messages',
         autocomplete: Outlook.wellKnownFolderNames
       },
       {
         option: '--folderId [folderId]',
-        description: 'ID of the folder from which to list messages',
         autocomplete: Outlook.wellKnownFolderNames
       }
     ];

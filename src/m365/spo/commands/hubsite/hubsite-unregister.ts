@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteUnregisterCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_UNREGISTER}`;
+    return commands.HUBSITE_UNREGISTER;
   }
 
   public get description(): string {
@@ -49,13 +48,7 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
 
           return request.post(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -81,12 +74,10 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site collection to unregister as a hub site'
+        option: '-u, --url <url>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming unregistering the hub site'
+        option: '--confirm'
       }
     ];
 

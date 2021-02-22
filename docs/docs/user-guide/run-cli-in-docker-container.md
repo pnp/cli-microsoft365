@@ -59,13 +59,13 @@ In scenarios where you may already have a script that uses the CLI for Microsoft
 For example, lets say we have a script called `test.sh` and we want to execute that script inside the container. We can do this by mapping the current working directory on our host machine to the working directory in the container `(-v)`, pass `bash` as the shell we want to use and the name of the file that we want to execute as additional arguments.
 
 ```
-docker run -it -v ${PWD}:/home/cli-microsoft365/scripts cli-microsoft365:latest bash scripts/test.sh
+docker run -it -v ${PWD}:/home/cli-microsoft365/scripts m365pnp/cli-microsoft365:latest bash scripts/test.sh
 ```
 
 Alternatively, if we want to execute a PowerShell script, you can do this in the same way.
 
 ```
-docker run -it -v ${PWD}:/home/cli-microsoft365/scripts cli-microsoft365:latest pwsh scripts/test.ps1
+docker run -it -v ${PWD}:/home/cli-microsoft365/scripts m365pnp/cli-microsoft365:latest pwsh scripts/test.ps1
 ```
 
 !!! info

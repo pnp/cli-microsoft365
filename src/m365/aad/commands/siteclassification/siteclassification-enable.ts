@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class AadSiteClassificationEnableCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.SITECLASSIFICATION_ENABLE}`;
+    return commands.SITECLASSIFICATION_ENABLE;
   }
 
   public get description(): string {
@@ -124,32 +123,22 @@ class AadSiteClassificationEnableCommand extends GraphCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-c, --classifications <classifications>',
-        description: 'Comma-separated list of classifications to enable in the tenant'
+        option: '-c, --classifications <classifications>'
       },
       {
-        option: '-d, --defaultClassification <defaultClassification>',
-        description: 'Classification to use by default'
+        option: '-d, --defaultClassification <defaultClassification>'
       },
       {
-        option: '-u, --usageGuidelinesUrl [usageGuidelinesUrl]',
-        description: 'URL with usage guidelines for members'
+        option: '-u, --usageGuidelinesUrl [usageGuidelinesUrl]'
       },
       {
-        option: '-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]',
-        description: 'URL with usage guidelines for guests'
+        option: '-g, --guestUsageGuidelinesUrl [guestUsageGuidelinesUrl]'
       }
     ];
 

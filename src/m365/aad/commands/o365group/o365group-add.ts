@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../../../../cli';
@@ -176,11 +175,6 @@ class AadO365GroupAddCommand extends GraphCommand {
       })
       .then((): void => {
         logger.log(group);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
@@ -218,32 +212,25 @@ class AadO365GroupAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --displayName <displayName>',
-        description: 'Display name for the Microsoft 365 Group'
+        option: '-n, --displayName <displayName>'
       },
       {
-        option: '-d, --description <description>',
-        description: 'Description for the Microsoft 365 Group'
+        option: '-d, --description <description>'
       },
       {
-        option: '-m, --mailNickname <mailNickname>',
-        description: 'Name to use in the group e-mail (part before the @)'
+        option: '-m, --mailNickname <mailNickname>'
       },
       {
-        option: '--owners [owners]',
-        description: 'Comma-separated list of Microsoft 365 Group owners'
+        option: '--owners [owners]'
       },
       {
-        option: '--members [members]',
-        description: 'Comma-separated list of Microsoft 365 Group members'
+        option: '--members [members]'
       },
       {
-        option: '--isPrivate [isPrivate]',
-        description: 'Set to true if the Microsoft 365 Group should be private and to false if it should be public (default)'
+        option: '--isPrivate [isPrivate]'
       },
       {
-        option: '-l, --logoPath [logoPath]',
-        description: 'Local path to the image file to use as group logo'
+        option: '-l, --logoPath [logoPath]'
       }
     ];
 

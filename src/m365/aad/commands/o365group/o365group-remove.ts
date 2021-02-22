@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -62,15 +61,9 @@ class AadO365GroupRemoveCommand extends GraphCommand {
             request
             .delete(requestOptions2)
             .then((): void => {
-              if (this.verbose) {
-                logger.logToStderr(chalk.green('DONE'));
-              }
               cb();
              })
           } else {
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
             cb();
           }
         }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
@@ -98,16 +91,13 @@ class AadO365GroupRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the Microsoft 365 Group to remove'
+        option: '-i, --id <id>'
       },
       {
         option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the group'
       },
       {
         option: '--skipRecycleBin',
-        description: 'Set to directly remove the group without moving it to the Recycle Bin'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError
@@ -57,9 +56,6 @@ class SpoKnowledgehubGetCommand extends SpoCommand {
           const result: string = !json[json.length - 1] ? '' : json[json.length - 1];
           logger.log(result);
 
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
           cb();
         }
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));

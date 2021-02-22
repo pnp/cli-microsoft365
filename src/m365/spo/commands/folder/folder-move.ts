@@ -76,32 +76,22 @@ class SpoFolderMoveCommand extends SpoCommand {
           }, progressPollInterval);
         });
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr('DONE');
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the folder is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-s, --sourceUrl <sourceUrl>',
-        description: 'Site-relative URL of the folder to move'
+        option: '-s, --sourceUrl <sourceUrl>'
       },
       {
-        option: '-t, --targetUrl <targetUrl>',
-        description: 'Server-relative URL where to move the folder'
+        option: '-t, --targetUrl <targetUrl>'
       },
       {
-        option: '--allowSchemaMismatch',
-        description: 'Ignores any missing fields in the target and moves folder'
+        option: '--allowSchemaMismatch'
       }
     ];
 

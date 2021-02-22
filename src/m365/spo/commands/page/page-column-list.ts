@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageColumnListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_COLUMN_LIST}`;
+    return commands.PAGE_COLUMN_LIST;
   }
 
   public get description(): string {
@@ -44,10 +43,6 @@ class SpoPageColumnListCommand extends SpoCommand {
           }));
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -55,16 +50,13 @@ class SpoPageColumnListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to list columns of'
+        option: '-n, --name <name>'
       },
       {
-        option: '-s, --section <sectionId>',
-        description: 'ID of the section for which to list columns'
+        option: '-s, --section <sectionId>'
       }
     ];
 

@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class SpoStorageEntityListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.STORAGEENTITY_LIST}`;
+    return commands.STORAGEENTITY_LIST;
   }
 
   public get description(): string {
@@ -79,8 +79,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [{
-      option: '-u, --appCatalogUrl <appCatalogUrl>',
-      description: 'URL of the app catalog site'
+      option: '-u, --appCatalogUrl <appCatalogUrl>'
     }];
 
     const parentOptions: CommandOption[] = super.options();

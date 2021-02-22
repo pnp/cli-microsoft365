@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from "../../../../cli";
 import {
   CommandOption, CommandTypes
@@ -61,12 +60,7 @@ class SpoFeatureDisableCommand extends SpoCommand {
 
     request
       .post(requestOptions)
-      .then((res: any): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
 
   }
 
@@ -79,21 +73,17 @@ class SpoFeatureDisableCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the site or web for which to disable the feature'
+        option: '-u, --url <url>'
       },
       {
-        option: '-f, --featureId <id>',
-        description: 'The ID of the feature to disable'
+        option: '-f, --featureId <id>'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the Feature to disable. Allowed values `Site|Web`. Default `Web`',
         autocomplete: ['Site', 'Web']
       },
       {
-        option: '--force',
-        description: 'Specifies whether to continue if an error occurs when disabling the feature'
+        option: '--force'
       }
     ];
 

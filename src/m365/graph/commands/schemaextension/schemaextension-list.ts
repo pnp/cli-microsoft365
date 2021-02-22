@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -69,9 +68,6 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
           } else {
             logger.log(result);
           }
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
         }
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
@@ -102,20 +98,16 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
     const options: CommandOption[] = [
       {
         option: '-s, --status [status]',
-        description: 'The status to filter on. Available values are Available, InDevelopment, Deprecated',
         autocomplete: ['Available', 'InDevelopment', 'Deprecated']
       },
       {
-        option: '--owner [owner]',
-        description: 'The id of the owner to filter on'
+        option: '--owner [owner]'
       },
       {
-        option: '-p, --pageSize [pageSize]',
-        description: 'Number of objects to return'
+        option: '-p, --pageSize [pageSize]'
       },
       {
-        option: '-n, --pageNumber [pageNumber]',
-        description: 'Page number to return if pageSize is specified (first page is indexed as value of 0)'
+        option: '-n, --pageNumber [pageNumber]'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class TodoListRemoveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.LIST_REMOVE}`;
+    return commands.LIST_REMOVE;
   }
 
   public get description(): string {
@@ -71,13 +70,7 @@ class TodoListRemoveCommand extends GraphCommand {
 
           return request.delete(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -106,16 +99,13 @@ class TodoListRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name [name]',
-        description: `The name of the task list to remove. Specify either id or name but not both`
+        option: '-n, --name [name]'
       },
       {
-        option: '-i, --id [id]',
-        description: `The ID of the task list to remove. Specify either id or name but not both`
+        option: '-i, --id [id]'
       },
       {
-        option: '--confirm',
-        description: `Don't prompt for confirming removing the task list`
+        option: '--confirm'
       },
     ];
 

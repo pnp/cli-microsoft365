@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -44,13 +43,7 @@ class FlowRunCancelCommand extends AzmgmtCommand {
 
       request
         .post(requestOptions)
-        .then((): void => {
-          if (this.verbose) {
-            logger.log(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -76,20 +69,16 @@ class FlowRunCancelCommand extends AzmgmtCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'The name of the run to cancel'
+        option: '-n, --name <name>'
       },
       {
-        option: '-f, --flow <flow>',
-        description: 'The name of the flow to cancel the run for'
+        option: '-f, --flow <flow>'
       },
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment where the flow is located'
+        option: '-e, --environment <environment>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming cancelling the flow run'
+        option: '--confirm'
       }
     ];
 

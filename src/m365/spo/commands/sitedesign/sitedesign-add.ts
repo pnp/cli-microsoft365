@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -26,7 +25,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_ADD}`;
+    return commands.SITEDESIGN_ADD;
   }
 
   public get description(): string {
@@ -88,11 +87,6 @@ class SpoSiteDesignAddCommand extends SpoCommand {
       })
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -100,33 +94,26 @@ class SpoSiteDesignAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --title <title>',
-        description: 'The display name of the site design'
+        option: '-t, --title <title>'
       },
       {
         option: '-w, --webTemplate <webTemplate>',
-        description: 'Identifies which base template to add the design to. Allowed values TeamSite|CommunicationSite',
         autocomplete: ['TeamSite', 'CommunicationSite']
       },
       {
-        option: '-s, --siteScripts <siteScripts>',
-        description: 'Comma-separated list of site script IDs. The scripts will run in the order listed'
+        option: '-s, --siteScripts <siteScripts>'
       },
       {
-        option: '-d, --description [description]',
-        description: 'The display description of site design'
+        option: '-d, --description [description]'
       },
       {
-        option: '-m, --previewImageUrl [previewImageUrl]',
-        description: 'The URL of a preview image. If none is specified SharePoint will use a generic image'
+        option: '-m, --previewImageUrl [previewImageUrl]'
       },
       {
-        option: '-a, --previewImageAltText [previewImageAltText]',
-        description: 'The alt text description of the image for accessibility'
+        option: '-a, --previewImageAltText [previewImageAltText]'
       },
       {
-        option: '--isDefault',
-        description: 'Set if the site design is applied as the default site design'
+        option: '--isDefault'
       },
     ];
 

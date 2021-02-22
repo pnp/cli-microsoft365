@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class TeamsMessageReplyListCommand extends GraphItemsListCommand<Reply>  {
   public get name(): string {
-    return `${commands.TEAMS_MESSAGE_REPLY_LIST}`;
+    return commands.TEAMS_MESSAGE_REPLY_LIST;
   }
 
   public get description(): string {
@@ -45,10 +44,6 @@ class TeamsMessageReplyListCommand extends GraphItemsListCommand<Reply>  {
         }
 
         logger.log(this.items);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -56,16 +51,13 @@ class TeamsMessageReplyListCommand extends GraphItemsListCommand<Reply>  {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the team where the channel is located'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '-c, --channelId <channelId>',
-        description: 'The ID of the channel that contains the message'
+        option: '-c, --channelId <channelId>'
       },
       {
-        option: '-m, --messageId <messageId>',
-        description: 'The ID of the message to retrieve replies for'
+        option: '-m, --messageId <messageId>'
       }
     ];
 

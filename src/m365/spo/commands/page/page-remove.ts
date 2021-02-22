@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_REMOVE}`;
+    return commands.PAGE_REMOVE;
   }
 
   public get description(): string {
@@ -59,12 +58,7 @@ class SpoPageRemoveCommand extends SpoCommand {
 
           return request.post(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-          cb();
-        },
+        .then(_ => cb(),
           (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb)
         );
     };
@@ -95,16 +89,13 @@ class SpoPageRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page to remove'
+        option: '-n, --name <name>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site from which the page should be removed'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--confirm',
-        description: `Don't prompt before removing the page`
+        option: '--confirm'
       }
     ];
 

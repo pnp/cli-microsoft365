@@ -57,8 +57,7 @@ class SpoUserListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the web to list the users from'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

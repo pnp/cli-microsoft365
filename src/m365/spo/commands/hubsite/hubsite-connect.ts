@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteConnectCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_CONNECT}`;
+    return commands.HUBSITE_CONNECT;
   }
 
   public get description(): string {
@@ -43,24 +42,16 @@ class SpoHubSiteConnectCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the site collection to connect to the hub site'
+        option: '-u, --url <url>'
       },
       {
-        option: '-i, --hubSiteId <hubSiteId>',
-        description: 'The ID of the hub site to which to connect the site collection'
+        option: '-i, --hubSiteId <hubSiteId>'
       }
     ];
 

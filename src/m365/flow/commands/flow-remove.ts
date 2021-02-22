@@ -61,9 +61,6 @@ class FlowRemoveCommand extends AzmgmtCommand {
             cb();
           }
           else {
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
             cb();
           }
         }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
@@ -91,20 +88,16 @@ class FlowRemoveCommand extends AzmgmtCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'The name of the Microsoft Flow to remove'
+        option: '-n, --name <name>'
       },
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment to which the Flow belongs'
+        option: '-e, --environment <environment>'
       },
       {
-        option: '--asAdmin',
-        description: 'Set, to remove the Flow as admin'
+        option: '--asAdmin'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirmation'
+        option: '--confirm'
       },
     ];
 

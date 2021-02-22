@@ -9,7 +9,6 @@ import request from './request';
 
 export interface CommandOption {
   option: string;
-  description: string;
   autocomplete?: string[]
 }
 
@@ -142,21 +141,17 @@ export default abstract class Command {
   public options(): CommandOption[] {
     return [
       {
-        option: '--query [query]',
-        description: 'JMESPath query string. See http://jmespath.org/ for more information and examples'
+        option: '--query [query]'
       },
       {
         option: '-o, --output [output]',
-        description: 'Output type. json|text. Default text',
         autocomplete: ['json', 'text']
       },
       {
-        option: '--verbose',
-        description: 'Runs command with verbose logging'
+        option: '--verbose'
       },
       {
-        option: '--debug',
-        description: 'Runs command with debug logging'
+        option: '--debug'
       }
     ];
   }

@@ -59,12 +59,10 @@ class SpoFolderGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'The URL of the site where the folder is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-f, --folderUrl <folderUrl>',
-        description: 'Site-relative URL of the folder'
+        option: '-f, --folderUrl <folderUrl>'
       }
     ];
 

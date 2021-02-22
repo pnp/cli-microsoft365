@@ -89,16 +89,13 @@ class PaPcfInitCommand extends AnonymousCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--namespace <namespace>',
-        description: 'The namespace for the component.'
+        option: '--namespace <namespace>'
       },
       {
-        option: '--name <name>',
-        description: 'The name for the component.',
+        option: '--name <name>'
       },
       {
         option: '--template <template>',
-        description: 'Choose a template for the component. Field|Dataset.',
         autocomplete: ['Field', 'Dataset']
       }
     ];

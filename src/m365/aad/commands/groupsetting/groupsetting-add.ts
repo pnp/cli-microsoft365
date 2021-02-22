@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class AadGroupSettingAddCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.GROUPSETTING_ADD}`;
+    return commands.GROUPSETTING_ADD;
   }
 
   public get description(): string {
@@ -70,11 +69,6 @@ class AadGroupSettingAddCommand extends GraphCommand {
       })
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -112,8 +106,7 @@ class AadGroupSettingAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --templateId <templateId>',
-        description: 'The ID of the group setting template to use to create the group setting'
+        option: '-i, --templateId <templateId>'
       }
     ];
 

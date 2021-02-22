@@ -93,20 +93,16 @@ class SpoListRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list to remove is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the list to remove. Specify either id or title but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '-t, --title [title]',
-        description: 'Title of the list to remove. Specify either id or title but not both'
+        option: '-t, --title [title]'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the list'
+        option: '--confirm'
       }
     ];
 

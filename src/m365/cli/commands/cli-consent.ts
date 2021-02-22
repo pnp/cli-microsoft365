@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class CliConsentCommand extends AnonymousCommand {
   public get name(): string {
-    return `${commands.CONSENT}`;
+    return commands.CONSENT;
   }
 
   public get description(): string {
@@ -51,7 +51,6 @@ class CliConsentCommand extends AnonymousCommand {
     const options: CommandOption[] = [
       {
         option: '-s, --service <service>',
-        description: 'Service for which to consent permissions. Allowed values: yammer',
         autocomplete: ['yammer']
       }
     ];

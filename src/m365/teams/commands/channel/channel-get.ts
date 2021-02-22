@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -23,7 +22,7 @@ class TeamsChannelGetCommand extends GraphCommand {
   private teamId: string = "";
 
   public get name(): string {
-    return `${commands.TEAMS_CHANNEL_GET}`;
+    return commands.TEAMS_CHANNEL_GET;
   }
 
   public get description(): string {
@@ -116,11 +115,6 @@ class TeamsChannelGetCommand extends GraphCommand {
       })
       .then((res: Channel): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -128,20 +122,16 @@ class TeamsChannelGetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId [teamId]',
-        description: 'The ID of the team to which the channel belongs to. Specify either teamId or teamName but not both'
+        option: '-i, --teamId [teamId]'
       },
       {
-        option: '--teamName [teamName]',
-        description: 'The display name of the team to which the channel belongs to. Specify either teamId or teamName but not both'
+        option: '--teamName [teamName]'
       },
       {
-        option: '-c, --channelId [channelId]',
-        description: 'The ID of the channel for which to retrieve more information. Specify either channelId or channelName but not both'
+        option: '-c, --channelId [channelId]'
       },
       {
-        option: '--channelName [channelName]',
-        description: 'The display name of the channel for which to retrieve more information. Specify either channelId or channelName but not both'
+        option: '--channelName [channelName]'
       }
     ];
 

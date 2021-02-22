@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class YammerUserGetCommand extends YammerCommand {
   public get name(): string {
-    return `${commands.YAMMER_USER_GET}`;
+    return commands.YAMMER_USER_GET;
   }
 
   public get description(): string {
@@ -63,12 +63,10 @@ class YammerUserGetCommand extends YammerCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --userId [userId]',
-        description: 'Retrieve a user by ID'
+        option: '-i, --userId [userId]'
       },
       {
-        option: '--email [email]',
-        description: 'Retrieve a user by e-mail'
+        option: '--email [email]'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.ORGNEWSSITE_REMOVE}`;
+    return commands.ORGNEWSSITE_REMOVE;
   }
 
   public get description(): string {
@@ -65,9 +64,6 @@ class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
             return;
           }
           else {
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
             cb();
           }
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
@@ -96,12 +92,10 @@ class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'Absolute URL of the site to remove'
+        option: '-u, --url <url>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirmation'
+        option: '--confirm'
       }
     ];
 

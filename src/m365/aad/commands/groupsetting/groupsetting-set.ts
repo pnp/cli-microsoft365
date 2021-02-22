@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -20,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class AadGroupSettingSetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.GROUPSETTING_SET}`;
+    return commands.GROUPSETTING_SET;
   }
 
   public get description(): string {
@@ -63,13 +62,7 @@ class AadGroupSettingSetCommand extends GraphCommand {
 
         return request.patch(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   private getGroupSettingValues(options: any, groupSetting: GroupSetting): { name: string; value: string }[] {
@@ -105,8 +98,7 @@ class AadGroupSettingSetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the group setting to update'
+        option: '-i, --id <id>'
       }
     ];
 

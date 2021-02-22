@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -24,7 +23,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageControlSetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_CONTROL_SET}`;
+    return commands.PAGE_CONTROL_SET;
   }
 
   public get description(): string {
@@ -104,37 +103,26 @@ class SpoPageControlSetCommand extends SpoCommand {
 
         return Page.save(args.options.name, args.options.webUrl, canvasContent, logger, this.debug, this.verbose);
       })
-      .then(() => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      })
+      .then(_ => cb())
       .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the control to update properties of'
+        option: '-i, --id <id>'
       },
       {
-        option: '-n, --name <name>',
-        description: 'Name of the page where the control is located'
+        option: '-n, --name <name>'
       },
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--webPartData [webPartData]',
-        description: 'JSON string with web part data as retrieved from the web part maintenance mode. Specify webPartProperties or webPartData but not both'
+        option: '--webPartData [webPartData]'
       },
       {
-        option: '--webPartProperties [webPartProperties]',
-        description: 'JSON string with web part data as retrieved from the web part maintenance mode. Specify webPartProperties or webPartData but not both'
+        option: '--webPartProperties [webPartProperties]'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoCustomActionRemoveCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CUSTOMACTION_REMOVE}`;
+    return commands.CUSTOMACTION_REMOVE;
   }
 
   public get description(): string {
@@ -50,9 +49,6 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
           if (this.verbose) {
             if (customAction && customAction["odata.null"] === true) {
               logger.logToStderr(`Custom action with id ${args.options.id} not found`);
-            }
-            else {
-              logger.logToStderr(chalk.green('DONE'));
             }
           }
           cb();
@@ -125,21 +121,17 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'Id (GUID) of the custom action to remove'
+        option: '-i, --id <id>'
       },
       {
-        option: '-u, --url <url>',
-        description: 'Url of the site or site collection to remove the custom action from'
+        option: '-u, --url <url>'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the custom action. Allowed values Site|Web|All. Default All',
         autocomplete: ['Site', 'Web', 'All']
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removal of a user custom action'
+        option: '--confirm'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
@@ -88,13 +87,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
             }
           });
         })
-        .then(() => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb()
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -120,16 +113,13 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'URL of the site to remove'
+        option: '-u, --url <url>'
       },
       {
-        option: '--wait',
-        description: 'Wait for the site collection to be removed before completing the command'
+        option: '--wait'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the deleted site collection'
+        option: '--confirm'
       }
     ];
 

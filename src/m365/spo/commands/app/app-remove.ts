@@ -60,9 +60,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
 
           return request.post(requestOptions);
         })
-        .then((): void => {
-          cb();
-        }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
+        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -88,21 +86,17 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the app to remove. Needs to be available in the tenant app catalog.'
+        option: '-i, --id <id>'
       },
       {
-        option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: 'URL of the tenant or site collection app catalog. It must be specified when the scope is \'sitecollection\''
+        option: '-u, --appCatalogUrl [appCatalogUrl]'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
         autocomplete: ['tenant', 'sitecollection']
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the app'
+        option: '--confirm'
       }
     ];
 

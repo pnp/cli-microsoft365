@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
-    CommandError, CommandOption
+  CommandError, CommandOption
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -66,10 +65,6 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
           }
           else {
             logger.log(json[json.length - 1]);
-
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
             cb();
           }
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
@@ -101,8 +96,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removal of Knowledge Hub Site for your tenant'
+        option: '--confirm'
       }
     ];
 

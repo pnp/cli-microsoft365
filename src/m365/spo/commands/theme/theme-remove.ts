@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -54,13 +53,7 @@ class SpoThemeRemoveCommand extends SpoCommand {
 
           return request.post(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     }
 
     if (args.options.confirm) {
@@ -86,12 +79,10 @@ class SpoThemeRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>',
-        description: 'Name of the theme to remove'
+        option: '-n, --name <name>'
       },
       {
-        option: '--confirm',
-        description: 'Do not prompt for confirmation before removing theme'
+        option: '--confirm'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class AadUserGetCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.USER_GET}`;
+    return commands.USER_GET;
   }
 
   public get description(): string {
@@ -53,11 +52,6 @@ class AadUserGetCommand extends GraphCommand {
       .get(requestOptions)
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -65,16 +59,13 @@ class AadUserGetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the user to retrieve information for. Specify id or userName but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --userName [userName]',
-        description: 'The name of the user to retrieve information for. Specify id or userName but not both'
+        option: '-n, --userName [userName]'
       },
       {
-        option: '-p, --properties [properties]',
-        description: 'Comma-separated list of properties to retrieve'
+        option: '-p, --properties [properties]'
       }
     ];
 

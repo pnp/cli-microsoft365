@@ -93,20 +93,16 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id [id]',
-        description: 'ID of the app to retrieve information for. Specify the id or the name but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --name [name]',
-        description: 'Name of the app to retrieve information for. Specify the id or the name but not both'
+        option: '-n, --name [name]'
       },
       {
-        option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: 'URL of the tenant or site collection app catalog. It must be specified when the scope is \'sitecollection\''
+        option: '-u, --appCatalogUrl [appCatalogUrl]'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
         autocomplete: ['tenant', 'sitecollection']
       }
     ];

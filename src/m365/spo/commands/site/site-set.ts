@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import Command, {
   CommandError, CommandOption,
@@ -23,7 +22,7 @@ interface CommandArgs {
   options: Options;
 }
 
-interface Options extends GlobalOptions {
+export interface Options extends GlobalOptions {
   classification?: string;
   disableFlows?: string;
   isPublic?: string;
@@ -33,6 +32,7 @@ interface Options extends GlobalOptions {
   title?: string;
   url: string;
   sharingCapability?: string;
+  siteLogoUrl?: string;
 }
 
 class SpoSiteSetCommand extends SpoCommand {
@@ -58,6 +58,7 @@ class SpoSiteSetCommand extends SpoCommand {
     telemetryProps.title = typeof args.options.title === 'string';
     telemetryProps.siteDesignId = typeof args.options.siteDesignId !== undefined;
     telemetryProps.sharingCapabilities = args.options.sharingCapability;
+    telemetryProps.siteLogoUrl = typeof args.options.siteLogoUrl !== 'undefined';
     return telemetryProps;
   }
 
@@ -83,19 +84,39 @@ class SpoSiteSetCommand extends SpoCommand {
       .then((): Promise<void> => this.updateSharedProperties(logger, args))
       .then((): Promise<void> => this.applySiteDesign(logger, args))
       .then((): Promise<void> => this.setSharingCapabilities(logger, args))
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => {
+      .then((): Promise<void> => this.setLogo(logger, args))
+      .then(_ => cb(), (err: any): void => {
         if (err instanceof CommandError) {
           err = (err as CommandError).message;
         }
 
         this.handleRejectedPromise(err, logger, cb);
       });
+  }
+
+  private setLogo(logger: Logger, args: CommandArgs): Promise<void> {
+    if (typeof args.options.siteLogoUrl === 'undefined') {
+      return Promise.resolve();
+    }
+
+    if (this.debug) {
+      logger.logToStderr(`Setting the site its logo...`);
+    }
+
+    const logoUrl = args.options.siteLogoUrl ? Utils.getServerRelativePath(args.options.url, args.options.siteLogoUrl) : "";
+
+    const requestOptions: any = {
+      url: `${args.options.url}/_api/siteiconmanager/setsitelogo`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      data: {
+        relativeLogoUrl: logoUrl
+      },
+      responseType: 'json'
+    };
+
+    return request.post(requestOptions);
   }
 
   private updateSite(logger: Logger, args: CommandArgs): Promise<void> {
@@ -393,44 +414,37 @@ class SpoSiteSetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the site collection to update'
+        option: '-u, --url <url>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the site collection to update (deprecated; id is automatically retrieved and does not need to be specified)'
+        option: '-i, --id [id]'
       },
       {
-        option: '--classification [classification]',
-        description: 'The new classification for the site collection'
+        option: '--classification [classification]'
       },
       {
-        option: '--disableFlows [disableFlows]',
-        description: 'Set to true to disable using Microsoft Flow in this site collection'
+        option: '--disableFlows [disableFlows]'
       },
       {
-        option: '--isPublic [isPublic]',
-        description: 'Set to true to make the group linked to the site public or to false to make it private'
+        option: '--isPublic [isPublic]'
       },
       {
-        option: '--owners [owners]',
-        description: 'Comma-separated list of users to add as site collection administrators'
+        option: '--owners [owners]'
       },
       {
-        option: '--shareByEmailEnabled [shareByEmailEnabled]',
-        description: 'Set to true to allow to share files with guests and to false to disallow it'
+        option: '--shareByEmailEnabled [shareByEmailEnabled]'
       },
       {
-        option: '--siteDesignId [siteDesignId]',
-        description: 'Id of the custom site design to apply to the site'
+        option: '--siteDesignId [siteDesignId]'
       },
       {
-        option: '--title [title]',
-        description: 'The new title for the site collection'
+        option: '--title [title]'
+      },
+      {
+        option: '--siteLogoUrl [siteLogoUrl]'
       },
       {
         option: '--sharingCapability [sharingCapability]',
-        description: `The sharing capability for the Site. Allowed values ${this.sharingCapabilities.join('|')}.`,
         autocomplete: this.sharingCapabilities
       }
     ];
@@ -452,8 +466,13 @@ class SpoSiteSetCommand extends SpoCommand {
       typeof args.options.owners === 'undefined' &&
       typeof args.options.shareByEmailEnabled === 'undefined' &&
       typeof args.options.siteDesignId === 'undefined' &&
-      typeof args.options.sharingCapability === 'undefined') {
+      typeof args.options.sharingCapability === 'undefined' &&
+      typeof args.options.siteLogoUrl === 'undefined') {
       return 'Specify at least one property to update';
+    }
+
+    if (typeof args.options.siteLogoUrl !== 'undefined' && typeof args.options.siteLogoUrl !== 'string') {
+      return `${args.options.siteLogoUrl} is not a valid value for the siteLogoUrl option. Specify the logo URL or an empty string "" to unset the logo.`;
     }
 
     if (typeof args.options.disableFlows === 'string' &&

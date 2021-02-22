@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -106,13 +105,9 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
 
     request
       .patch(requestOptions)
-      .then((res: any): void => {
+      .then((): void => {
         if (this.debug) {
           logger.logToStderr("Schema extension successfully updated.");
-        }
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
         }
 
         cb();
@@ -122,28 +117,22 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: `The unique identifier for the schema extension definition`
+        option: '-i, --id <id>'
       },
       {
-        option: '--owner <owner>',
-        description: `The ID of the Azure AD application that is the owner of the schema extension`
+        option: '--owner <owner>'
       },
       {
-        option: '-d, --description [description]',
-        description: 'Description of the schema extension'
+        option: '-d, --description [description]'
       },
       {
-        option: '-s, --status [status]',
-        description: `The lifecycle state of the schema extension. Accepted values are 'Available' or 'Deprecated'`
+        option: '-s, --status [status]'
       },
       {
-        option: '-t, --targetTypes [targetTypes]',
-        description: `Comma-separated list of Microsoft Graph resource types the schema extension targets`
+        option: '-t, --targetTypes [targetTypes]'
       },
       {
-        option: '-p, --properties [properties]',
-        description: `The collection of property names and types that make up the schema extension definition formatted as a JSON string`
+        option: '-p, --properties [properties]'
       }
     ];
 

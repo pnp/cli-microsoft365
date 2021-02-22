@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -61,13 +60,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
 
           return request.post(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
+        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
     }
 
     if (args.options.confirm) {
@@ -93,21 +86,17 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'ID of the app to retract. Needs to be available in the app catalog.'
+        option: '-i, --id <id>'
       },
       {
-        option: '-u, --appCatalogUrl [appCatalogUrl]',
-        description: 'URL of the tenant or site collection app catalog. It must be specified when the scope is \'sitecollection\''
+        option: '-u, --appCatalogUrl [appCatalogUrl]'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the app catalog: tenant|sitecollection. Default tenant',
         autocomplete: ['tenant', 'sitecollection']
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming retracting the app from the tenant app catalog'
+        option: '--confirm'
       }
     ];
 

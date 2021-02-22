@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoCustomActionGetCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.CUSTOMACTION_GET}`;
+    return commands.CUSTOMACTION_GET;
   }
 
   public get description(): string {
@@ -131,16 +131,13 @@ class SpoCustomActionGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'Id (Guid) of the custom action to retrieve'
+        option: '-i, --id <id>'
       },
       {
-        option: '-u, --url <url>',
-        description: 'Url of the site (collection) to retrieve the custom action from'
+        option: '-u, --url <url>'
       },
       {
         option: '-s, --scope [scope]',
-        description: 'Scope of the custom action. Allowed values Site|Web|All. Default All',
         autocomplete: ['Site', 'Web', 'All']
       }
     ];

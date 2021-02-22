@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -19,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TeamsUserAppRemoveCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_USER_APP_REMOVE}`;
+    return commands.TEAMS_USER_APP_REMOVE;
   }
 
   public get description(): string {
@@ -46,13 +45,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
 
       request
         .delete(requestOptions)
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+        .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
     }
 
     if (args.options.confirm) {
@@ -81,16 +74,13 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--appId <appId>',
-        description: 'The unique id of the app instance installed for the user'
+        option: '--appId <appId>'
       },
       {
-        option: '--userId <userId>',
-        description: 'The ID of the user to uninstall the app for'
+        option: '--userId <userId>'
       },
       {
-        option: '--confirm',
-        description: 'Confirm removal of app for user'
+        option: '--confirm'
       }
     ];
 

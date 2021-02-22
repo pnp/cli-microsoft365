@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -71,13 +70,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
 
             return request.delete(requestOptions);
           })
-          .then((): void => {
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
-
-            cb();
-          }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+          .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
       }
 
       if (args.options.channelId) {
@@ -91,13 +84,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
 
         request
           .delete(requestOptions)
-          .then((): void => {
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
-
-            cb();
-          }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+          .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
       }
     };
 
@@ -125,20 +112,16 @@ class TeamsChannelRemoveCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-c, --channelId [channelId]',
-        description: 'The ID of the channel to remove'
+        option: '-c, --channelId [channelId]'
       },
       {
-        option: '-n, --channelName [channelName]',
-        description: 'The name of the channel to remove. Specify channelId or channelName but not both'
+        option: '-n, --channelName [channelName]'
       },
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the team to which the channel to remove belongs'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirmation'
+        option: '--confirm'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -32,7 +31,7 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return `${commands.TEAMS_MEMBERSETTINGS_SET}`;
+    return commands.TEAMS_MEMBERSETTINGS_SET;
   }
 
   public get description(): string {
@@ -68,40 +67,28 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
 
     request
       .patch(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --teamId <teamId>',
-        description: 'The ID of the Teams team for which to update settings'
+        option: '-i, --teamId <teamId>'
       },
       {
-        option: '--allowAddRemoveApps [allowAddRemoveApps]',
-        description: 'Set to true to allow members to add and remove apps and to false to disallow it'
+        option: '--allowAddRemoveApps [allowAddRemoveApps]'
       },
       {
-        option: '--allowCreateUpdateChannels [allowCreateUpdateChannels]',
-        description: 'Set to true to allow members to create and update channels and to false to disallow it'
+        option: '--allowCreateUpdateChannels [allowCreateUpdateChannels]'
       },
       {
-        option: '--allowCreateUpdateRemoveConnectors [allowCreateUpdateRemoveConnectors]',
-        description: 'Set to true to allow members to create, update and remove connectors and to false to disallow it'
+        option: '--allowCreateUpdateRemoveConnectors [allowCreateUpdateRemoveConnectors]'
       },
       {
-        option: '--allowCreateUpdateRemoveTabs [allowCreateUpdateRemoveTabs]',
-        description: 'Set to true to allow members to create, update and remove tabs and to false to disallow it'
+        option: '--allowCreateUpdateRemoveTabs [allowCreateUpdateRemoveTabs]'
       },
       {
-        option: '--allowDeleteChannels [allowDeleteChannels]',
-        description: 'Set to true to allow members to create and update channels and to false to disallow it'
+        option: '--allowDeleteChannels [allowDeleteChannels]'
       }
     ];
 

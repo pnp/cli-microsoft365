@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoFieldAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.FIELD_ADD}`;
+    return commands.FIELD_ADD;
   }
 
   public get description(): string {
@@ -52,11 +51,6 @@ class SpoFieldAddCommand extends SpoCommand {
       })
       .then((res: any): void => {
         logger.log(res);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -101,20 +95,16 @@ class SpoFieldAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'Absolute URL of the site where the field should be created'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-l, --listTitle [listTitle]',
-        description: 'Title of the list where the field should be created (if it should be created as a list column)'
+        option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '-x, --xml <xml>',
-        description: 'CAML field definition'
+        option: '-x, --xml <xml>'
       },
       {
-        option: '--options [options]',
-        description: 'The options to use to add to the field. Allowed values: DefaultValue|AddToDefaultContentType|AddToNoContentType|AddToAllContentTypes|AddFieldInternalNameHint|AddFieldToDefaultView|AddFieldCheckDisplayName'
+        option: '--options [options]'
       }
     ];
 

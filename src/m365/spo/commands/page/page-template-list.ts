@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageControlListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_TEMPLATE_LIST}`;
+    return commands.PAGE_TEMPLATE_LIST;
   }
 
   public get description(): string {
@@ -49,10 +48,6 @@ class SpoPageControlListCommand extends SpoCommand {
           logger.log(res.value);
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       })
       .catch((err: any): void => {
@@ -70,8 +65,7 @@ class SpoPageControlListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the page to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

@@ -58,8 +58,7 @@ class ListListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the lists to retrieve are located'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

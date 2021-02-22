@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption } from '../../../../Command';
 import config from '../../../../config';
@@ -21,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class SpoHubSiteRightsGrantCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.HUBSITE_RIGHTS_GRANT}`;
+    return commands.HUBSITE_RIGHTS_GRANT;
   }
 
   public get description(): string {
@@ -65,11 +64,7 @@ class SpoHubSiteRightsGrantCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-        }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
@@ -77,16 +72,13 @@ class SpoHubSiteRightsGrantCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --url <url>',
-        description: 'The URL of the hub site to grant rights on'
+        option: '-u, --url <url>'
       },
       {
-        option: '-p, --principals <principals>',
-        description: 'Comma-separated list of principals to grant join rights. Principals can be users or mail-enabled security groups in the form of "alias" or "alias@<domain name>.com"'
+        option: '-p, --principals <principals>'
       },
       {
         option: '-r, --rights <rights>',
-        description: 'Rights to grant to principals. Available values Join',
         autocomplete: ['Join']
       }
     ];

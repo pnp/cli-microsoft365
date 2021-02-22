@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandOption
@@ -22,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SITEDESIGN_RIGHTS_REVOKE}`;
+    return commands.SITEDESIGN_RIGHTS_REVOKE;
   }
 
   public get description(): string {
@@ -62,13 +61,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
 
           return request.post(requestOptions);
         })
-        .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -94,16 +87,13 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The ID of the site design to revoke rights from'
+        option: '-i, --id <id>'
       },
       {
-        option: '-p, --principals <principals>',
-        description: 'Comma-separated list of principals to revoke view rights from. Principals can be users or mail-enabled security groups in the form of "alias" or "alias@<domain name>.com"'
+        option: '-p, --principals <principals>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the site design'
+        option: '--confirm'
       }
     ];
 

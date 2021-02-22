@@ -85,12 +85,10 @@ class SpoTermGroupGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id [id]',
-        description: 'ID of the term group to retrieve. Specify name or id but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '-n, --name [name]',
-        description: 'Name of the term group to retrieve. Specify name or id but not both'
+        option: '-n, --name [name]'
       }
     ];
 

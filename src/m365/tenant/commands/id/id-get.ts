@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TenantIdGetCommand extends Command {
   public get name(): string {
-    return `${commands.TENANT_ID_GET}`;
+    return commands.TENANT_ID_GET;
   }
 
   public get description(): string {
@@ -61,8 +61,7 @@ class TenantIdGetCommand extends Command {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-d, --domainName [domainName]',
-        description: 'The domain name for which to retrieve the Microsoft 365 tenant ID'
+        option: '-d, --domainName [domainName]'
       }
     ];
 

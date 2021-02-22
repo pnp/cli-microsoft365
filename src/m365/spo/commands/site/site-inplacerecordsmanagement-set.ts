@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -54,24 +53,16 @@ class SpoSiteInPlaceRecordsManagementSetCommand extends SpoCommand {
 
     request
       .post(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --siteUrl <siteUrl>',
-        description: 'The URL of the site on which to activate or deactivate in-place records management'
+        option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '--enabled <enabled>',
-        description: 'Set to "true" to activate in-place records management and to "false" to deactivate it'
+        option: '--enabled <enabled>'
       }
     ];
 

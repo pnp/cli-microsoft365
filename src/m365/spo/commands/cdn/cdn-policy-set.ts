@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -85,11 +84,7 @@ class SpoCdnPolicySetCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-        }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
@@ -98,17 +93,14 @@ class SpoCdnPolicySetCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-t, --type [type]',
-        description: 'Type of CDN to manage. Public|Private. Default Public',
         autocomplete: ['Public', 'Private']
       },
       {
         option: '-p, --policy <policy>',
-        description: 'CDN policy to configure. IncludeFileExtensions|ExcludeRestrictedSiteClassifications',
         autocomplete: ['IncludeFileExtensions', 'ExcludeRestrictedSiteClassifications']
       },
       {
-        option: '-v, --value <value>',
-        description: 'Value for the policy to configure'
+        option: '-v, --value <value>'
       }
     ];
 

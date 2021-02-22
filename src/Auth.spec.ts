@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as sinon from 'sinon';
-import { Auth, AuthType, Service, CertificateType } from './Auth';
+import { Auth, AuthType, Service, CertificateType, InteractiveAuthorizationCodeResponse } from './Auth';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import { Logger } from './cli';
@@ -13,6 +13,8 @@ import Utils from './Utils';
 // if this is not included
 import 'adal-node';
 import 'node-forge';
+import { ErrorResponse } from 'adal-node';
+import authServer from './AuthServer';
 
 class MockTokenStorage implements TokenStorage {
   public get(): Promise<string> {
@@ -40,17 +42,28 @@ describe('Auth', () => {
   }
   const loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   let readFileSyncStub: sinon.SinonStub;
-
+  let initializeServerStub: sinon.SinonStub;
+  
+  const httpServerResponse = <InteractiveAuthorizationCodeResponse>{
+    code: "secretCode",
+    redirectUri: "https://localhost:666"
+  };
+  
   beforeEach(() => {
     log = [];
     auth = new Auth();
     auth.service.appId = '9bc3ab49-b65d-410a-85ad-de819febfddc';
     auth.service.tenant = '9bc3ab49-b65d-410a-85ad-de819febfddd';
+    (auth as any)._authServer = authServer;
     readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake(() => 'certificate');
+    initializeServerStub = sinon.stub((auth as any)._authServer, 'initializeServer').callsFake((service: Service, resource: string, resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: ErrorResponse) => void, logger: Logger, debug: boolean = false) => { 
+      resolve(httpServerResponse); 
+    });
   });
 
   afterEach(() => {
     readFileSyncStub.restore();
+    initializeServerStub.restore();
     Utils.restore([
       request.get
     ]);
@@ -483,6 +496,189 @@ describe('Auth', () => {
     }, (err) => {
       try {
         assert(loggerLogToStderrSpy.calledWith({ error_description: 'An error has occurred' }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses browser auth and retrieves a successful response', (done) => {
+    const acquireTokenWithAuthorizationCode = sinon.stub((auth as any).authCtx, 'acquireTokenWithAuthorizationCode').callsArgWith(5, undefined, {});
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.service.authType = AuthType.Browser;
+    auth.ensureAccessToken(resource, logger, false).then((accessToken) => {
+      try {
+        assert(acquireTokenWithAuthorizationCode.called);
+        const args = acquireTokenWithAuthorizationCode.args[0];
+        assert(args[0].toString() === httpServerResponse.code, "Code is handled properly");    
+        assert(args[1].toString() === httpServerResponse.redirectUri, "RedirectURI should be passed");  
+        assert(args[3].toString() === auth.service.appId, "App id should be passed");    
+        assert(args[4].toString() === '', "Secret should not be passed");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('uses browser auth and retrieves a successful response (debug)', (done) => {
+    const acquireTokenWithAuthorizationCode = sinon.stub((auth as any).authCtx, 'acquireTokenWithAuthorizationCode').callsArgWith(5, undefined, {});
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.service.authType = AuthType.Browser;
+    auth.ensureAccessToken(resource, logger, true).then((accessToken) => {
+      try {
+        assert(acquireTokenWithAuthorizationCode.called);
+        const args = acquireTokenWithAuthorizationCode.args[0];
+        assert(args[0].toString() === httpServerResponse.code, "Code is handled properly");    
+        assert(args[1].toString() === httpServerResponse.redirectUri, "RedirectURI should be passed");  
+        assert(args[3].toString() === auth.service.appId, "App id should be passed");    
+        assert(args[4].toString() === '', "Secret should not be passed");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
+  it('uses browser auth and retrieves an unsuccessful response', (done) => {
+    const error = <ErrorResponse>{
+      error: "shortError",
+      errorDescription: "errorHasOccurred"
+    };
+    const acquireTokenWithAuthorizationCode = sinon.stub((auth as any).authCtx, 'acquireTokenWithAuthorizationCode').callsArgWith(5, undefined, {});
+    
+    initializeServerStub.restore();
+    initializeServerStub = sinon.stub((auth as any)._authServer, 'initializeServer').callsFake((service: Service, resource: string, resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: ErrorResponse) => void, logger: Logger, debug: boolean = false) => { 
+      reject(error); 
+    });
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.service.authType = AuthType.Browser;
+    auth.ensureAccessToken(resource, logger, false).then(() => {
+      assert.fail("Should not be called");
+      done();
+    }, (err) => {
+      try {
+        assert(acquireTokenWithAuthorizationCode.notCalled);
+        assert(err === error.errorDescription);
+        done();
+      }
+      catch (e) {
+        done (e);
+      }
+    });
+  });
+
+  it('uses browser auth and retrieves an unsuccessful response (debug)', (done) => {
+    const error = <ErrorResponse>{
+      error: "shortError",
+      errorDescription: "errorHasOccurred"
+    };
+    const acquireTokenWithAuthorizationCode = sinon.stub((auth as any).authCtx, 'acquireTokenWithAuthorizationCode').callsArgWith(5, undefined, {});
+    
+    initializeServerStub.restore();
+    initializeServerStub = sinon.stub((auth as any)._authServer, 'initializeServer').callsFake((service: Service, resource: string, resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: ErrorResponse) => void, logger: Logger, debug: boolean = false) => { 
+      reject(error); 
+    });
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.service.authType = AuthType.Browser;
+    auth.ensureAccessToken(resource, logger, true).then(() => {
+      assert.fail("Should not be called");
+      done();
+    }, (err) => {
+      try {
+        assert(acquireTokenWithAuthorizationCode.notCalled);
+        assert(err === error.errorDescription);
+        done();
+      }
+      catch (e) {
+        done (e);
+      }
+    });
+  });
+
+  it('uses browser auth and retrieves an unsuccessful response', (done) => {
+    const error = <ErrorResponse>{
+      error: "shortError"
+    };
+    const acquireTokenWithAuthorizationCode = sinon.stub((auth as any).authCtx, 'acquireTokenWithAuthorizationCode').callsArgWith(5, undefined, {});
+    
+    initializeServerStub.restore();
+    initializeServerStub = sinon.stub((auth as any)._authServer, 'initializeServer').callsFake((service: Service, resource: string, resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: ErrorResponse) => void, logger: Logger, debug: boolean = false) => { 
+      reject(error); 
+    });
+    sinon.stub(auth as any, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.service.authType = AuthType.Browser;
+    auth.ensureAccessToken(resource, logger, false).then(() => {
+      assert.fail("Should not be called");
+      done();
+    }, (err) => {
+      try {
+        assert(acquireTokenWithAuthorizationCode.notCalled);
+        assert(err === error.error);
+        done();
+      }
+      catch (e) {
+        done (e);
+      }
+    });
+  });
+
+  it('uses browser auth and retrieves retrieving a token but acquisition failed', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithAuthorizationCode').callsArgWith(5, { message: 'An error has occurred' }, undefined);
+
+    auth.service.authType = AuthType.Browser;
+    auth.ensureAccessToken(resource, logger).then((accessToken) => {
+      assert.fail('Got access token');
+    }, (err) => {
+      try {
+        assert.strictEqual(err, 'An error has occurred');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uses browser auth and retrieves retrieving a token but acquisition failed (debug)', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithAuthorizationCode').callsArgWith(5, { message: 'An error has occurred' }, undefined);
+
+    auth.service.authType = AuthType.Browser;
+    auth.ensureAccessToken(resource, logger, true).then((accessToken) => {
+      assert.fail('Got access token');
+    }, (err) => {
+      try {
+        assert.strictEqual(err, 'An error has occurred');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('logs error when retrieving token using brwoser auth failed (debug)', (done) => {
+    sinon.stub((auth as any).authCtx, 'acquireTokenWithAuthorizationCode').callsArgWith(5, { message: 'An error has occurred' }, { errorDescription: 'An error has occurred' });
+
+    auth.service.authType = AuthType.Browser;
+    auth.ensureAccessToken(resource, logger, true).then((accessToken) => {
+      assert.fail('Got access token');
+    }, (err) => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith({ errorDescription: 'An error has occurred' }));
         done();
       }
       catch (e) {

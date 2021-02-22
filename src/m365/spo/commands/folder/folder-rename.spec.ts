@@ -15,7 +15,6 @@ describe(commands.FOLDER_RENAME, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
   let stubAllPostRequests: any;
 
   before(() => {
@@ -101,7 +100,6 @@ describe(commands.FOLDER_RENAME, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -142,26 +140,6 @@ describe(commands.FOLDER_RENAME, () => {
       try {
         const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="MoveTo" Id="32" ObjectPathId="26"><Parameters><Parameter Type="String">/sites/abc/Shared Documents/test1</Parameter></Parameters></Method></Actions><ObjectPaths><Identity Id="26" Name="${folderObjectIdentity}" /></ObjectPaths></Request>`;
         assert.strictEqual(requestStub.lastCall.args[0].data, bodyPayload);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should display done when folder removed (verbose)', (done) => {
-    stubAllPostRequests();
-    const options: Object = {
-      webUrl: 'https://contoso.sharepoint.com/sites/abc',
-      folderUrl: '/Shared Documents/Test2',
-      name: 'test1',
-      verbose: true
-    }
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert.strictEqual(loggerLogToStderrSpy.lastCall.args[0], 'DONE');
         done();
       }
       catch (e) {

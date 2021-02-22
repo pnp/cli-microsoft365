@@ -96,12 +96,10 @@ class PaSolutionInitCommand extends AnonymousCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--publisherName <publisherName>',
-        description: 'Name of the CDS solution publisher.'
+        option: '--publisherName <publisherName>'
       },
       {
-        option: '--publisherPrefix <publisherPrefix>',
-        description: 'Customization prefix value for the CDS solution publisher.',
+        option: '--publisherPrefix <publisherPrefix>'
       }
     ];
 

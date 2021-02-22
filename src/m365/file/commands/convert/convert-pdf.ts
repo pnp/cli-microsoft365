@@ -1,5 +1,4 @@
 import { AxiosResponse } from 'axios';
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
@@ -87,9 +86,7 @@ class FileConvertPdfCommand extends GraphCommand {
           }
 
           try {
-            fs.rmSync(localTargetFilePath, {
-              force: true
-            });
+            fs.unlinkSync(localTargetFilePath);
           }
           catch (e) {
             return cb(e);
@@ -105,9 +102,6 @@ class FileConvertPdfCommand extends GraphCommand {
           this.handleRejectedODataJsonPromise(error, logger, cb)
         }
         else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
           cb();
         }
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
@@ -453,12 +447,10 @@ class FileConvertPdfCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-s, --sourceFile <sourceFile>',
-        description: 'Local path or full URL to the source file to be converted to PDF'
+        option: '-s, --sourceFile <sourceFile>'
       },
       {
-        option: '-t, --targetFile <targetFile>',
-        description: 'Local path or full URL to where the generated PDF file should be saved'
+        option: '-t, --targetFile <targetFile>'
       }
     ];
 

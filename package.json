@@ -1,6 +1,6 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -21,8 +21,8 @@
     "build": "tsc -p . && node scripts/copy-files.js",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./dist",
-    "test": "c8 mocha \"dist/**/*.spec.js\"",
-    "test:dev": "c8 mocha \"dist/**/Cli.spec.js\""
+    "test": "node scripts/check-version.js && c8 mocha \"dist/**/*.spec.js\" --timeout 10000",
+    "test:nocov": "mocha \"dist/**/*.spec.js\" --timeout 10000"
   },
   "keywords": [
     "office 365",
@@ -72,6 +72,11 @@
       "name": "Patrick Lamber",
       "email": "patrick@nubo.eu",
       "web": "https://www.nubo.eu/"
+    },
+    {
+      "name": "Arjun Menon",
+      "email": "arjun.umenon@gmail.com",
+      "web": "https://arjunumenon.com/"
     }
   ],
   "contributors": [
@@ -89,6 +94,7 @@
     "Connell, Andrew <me@andrewconnell.com>",
     "Deshpande, Vardhaman <vardhaman.rd@gmail.com>",
     "Ford, Lee <fordyman@gmail.com>",
+    "Freese, Luise <49960482+LuiseFreese@users.noreply.github.com>",
     "Georgiev, Velin <velin.georgiev@gmail.com>",
     "Ghuge, Pramod <pramod7@gmail.com>",
     "Gölles, Thomas <thomy@outlook.at>",
@@ -98,6 +104,7 @@
     "Högberg, Joakim <joakim.hogberg@bravero.se>",
     "Hvam, Allan <ahp@delegate.dk>",
     "Jaakke, Robert <robert.jaakke@mavention.nl>",
+    "John Rafael <dragonwood0@protonmail.com>",
     "Kailasam, Balamurugan <kshsbala@engineer.com>",
     "Kasireddy, Prasad <prasad.gietcse@gmail.com>",
     "Keijzers, Paul <KbWorks@users.noreply.github.com>",
@@ -137,6 +144,7 @@
     "Svenson, Mikael <miksvenson@gmail.com>",
     "Tane, Peter <peter.tane@gmail.come>",
     "Tatti, Anoop <anoop@live.co.uk>",
+    "Thorild, Fredrik <fredrik.thorild@sogeti.com>",
     "Trinder, Garry <garry.trinder@live.com>",
     "Vaghasia, Siddharth <siddh.vaghasia@gmail.com>",
     "van Hunen, Erwin <erwin.van.hunen@outlook.com>",
@@ -148,7 +156,7 @@
   "dependencies": {
     "adal-node": "^0.2.1",
     "adaptivecards-templating": "^1.4.0",
-    "applicationinsights": "^1.8.8",
+    "applicationinsights": "^1.8.9",
     "axios": "^0.21.1",
     "easy-table": "^1.1.1",
     "inquirer": "^7.3.3",
@@ -158,10 +166,11 @@
     "minimist": "^1.2.5",
     "node-forge": "^0.10.0",
     "omelette": "^0.4.15",
+    "open": "^7.3.1",
     "semver": "^7.3.4",
     "strip-json-comments": "^3.1.1",
     "typescript": "^4.1.3",
-    "update-notifier": "^5.0.1",
+    "update-notifier": "^5.1.0",
     "uuid": "^8.3.2",
     "xmldom": "^0.4.0"
   },
@@ -172,8 +181,8 @@
     "@types/json-to-ast": "^2.1.1",
     "@types/minimist": "^1.2.1",
     "@types/mocha": "^8.2.0",
-    "@types/node": "^14.14.20",
-    "@types/node-forge": "^0.9.5",
+    "@types/node": "^14.14.22",
+    "@types/node-forge": "^0.9.7",
     "@types/semver": "^7.3.4",
     "@types/sinon": "^9.0.10",
     "@types/update-notifier": "^5.0.0",
@@ -183,6 +192,6 @@
     "coveralls": "^3.1.0",
     "mocha": "^8.2.1",
     "rimraf": "^3.0.2",
-    "sinon": "^9.2.2"
+    "sinon": "^9.2.4"
   }
 }

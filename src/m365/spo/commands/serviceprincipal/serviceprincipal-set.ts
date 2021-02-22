@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -78,11 +77,8 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
             delete output._ObjectType_;
 
             logger.log(output);
-
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
           }
+          
           cb();
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
@@ -121,12 +117,10 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-e, --enabled <enabled>',
-        description: 'Set to true to enable the service principal or to false to disable it. Valid values are true|false',
         autocomplete: ['true', 'false']
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming enabling/disabling the service principal'
+        option: '--confirm'
       }
     ];
 

@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -124,11 +123,6 @@ class SpoSiteRenameCommand extends SpoCommand {
         });
       }).then((): void => {
         logger.log(this.operationData);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb()
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -171,28 +165,22 @@ class SpoSiteRenameCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --siteUrl <siteUrl>',
-        description: 'The URL of the site to rename'
+        option: '-u, --siteUrl <siteUrl>'
       },
       {
-        option: '--newSiteUrl <newSiteUrl>',
-        description: 'New URL for the site collection'
+        option: '--newSiteUrl <newSiteUrl>'
       },
       {
-        option: '--newSiteTitle [newSiteTitle]',
-        description: 'New title for the site'
+        option: '--newSiteTitle [newSiteTitle]'
       },
       {
-        option: '--suppressMarketplaceAppCheck',
-        description: 'Suppress marketplace app check'
+        option: '--suppressMarketplaceAppCheck'
       },
       {
-        option: '--suppressWorkflow2013Check',
-        description: 'Suppress 2013 workflow check'
+        option: '--suppressWorkflow2013Check'
       },
       {
-        option: '--wait',
-        description: 'Wait for the job to complete'
+        option: '--wait'
       }
     ];
 

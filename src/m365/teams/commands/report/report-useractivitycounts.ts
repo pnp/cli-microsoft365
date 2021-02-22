@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class TeamsReportUserActivityCountsCommand extends PeriodBasedReport {
   public get name(): string {
-    return `${commands.TEAMS_REPORT_USERACTIVITYCOUNTS}`;
+    return commands.TEAMS_REPORT_USERACTIVITYCOUNTS;
   }
 
   public get description(): string {

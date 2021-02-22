@@ -70,16 +70,13 @@ class ListGetCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list to retrieve is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'ID of the list to retrieve information for. Specify either id or title but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '-t, --title [title]',
-        description: 'Title of the list to retrieve information for. Specify either id or title but not both'
+        option: '-t, --title [title]'
       }
     ];
 

@@ -59,16 +59,13 @@ class MockCommand1 extends Command {
   public options(): CommandOption[] {
     return [
       {
-        option: '--debug',
-        description: 'Runs command with debug logging'
+        option: '--debug'
       },
       {
-        option: '--option1 [option1]',
-        description: 'Some option'
+        option: '--option1 [option1]'
       },
       {
-        option: '--option2 [option2]',
-        description: 'Some other option'
+        option: '--option2 [option2]'
       }
     ];
   }
@@ -121,12 +118,10 @@ class MockCommand3 extends Command {
   public options(): CommandOption[] {
     return [
       {
-        option: '--debug',
-        description: 'Runs command with debug logging'
+        option: '--debug'
       },
       {
-        option: '--option1 [option1]',
-        description: 'Some option'
+        option: '--option1 [option1]'
       }
     ];
   }

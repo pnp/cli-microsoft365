@@ -94,28 +94,22 @@ class SpoListViewRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site where the list is located'
+        option: '-u, --webUrl <webUrl>'
       },
       {
-        option: '--listId [listId]',
-        description: 'ID of the list from which to remove the view. Specify listId or listTitle but not both'
+        option: '--listId [listId]'
       },
       {
-        option: '--listTitle [listTitle]',
-        description: 'Title of the list from which to remove the view. Specify listId or listTitle but not both'
+        option: '--listTitle [listTitle]'
       },
       {
-        option: '--viewId [viewId]',
-        description: 'ID of the view to remove. Specify viewId or viewTitle but not both'
+        option: '--viewId [viewId]'
       },
       {
-        option: '--viewTitle [viewTitle]',
-        description: 'ID of the view to remove. Specify viewId or viewTitle but not both'
+        option: '--viewTitle [viewTitle]'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the view from the list'
+        option: '--confirm'
       }
     ];
 

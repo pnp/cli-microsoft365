@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -53,28 +52,19 @@ class AadOAuth2GrantAddCommand extends AadCommand {
 
     request
       .post<void>(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+      .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --clientId <clientId>',
-        description: 'objectId of the service principal for which permissions should be granted'
+        option: '-i, --clientId <clientId>'
       },
       {
-        option: '-r, --resourceId <resourceId>',
-        description: 'objectId of the AAD application to which permissions should be granted'
+        option: '-r, --resourceId <resourceId>'
       },
       {
-        option: '-s, --scope <scope>',
-        description: 'Permissions to grant'
+        option: '-s, --scope <scope>'
       }
     ];
 

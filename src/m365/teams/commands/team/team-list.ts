@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -19,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TeamsListCommand extends GraphItemsListCommand<Team> {
   public get name(): string {
-    return `${commands.TEAMS_TEAM_LIST}`;
+    return commands.TEAMS_TEAM_LIST;
   }
 
   public get description(): string {
@@ -52,11 +51,6 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
         }
 
         logger.log(this.items);
-
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -100,8 +94,7 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-j, --joined',
-        description: 'Retrieve only joined teams'
+        option: '-j, --joined'
       }
     ];
 

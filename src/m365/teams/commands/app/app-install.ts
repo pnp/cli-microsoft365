@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TeamsAppInstallCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.TEAMS_APP_INSTALL}`;
+    return commands.TEAMS_APP_INSTALL;
   }
 
   public get description(): string {
@@ -42,24 +41,16 @@ class TeamsAppInstallCommand extends GraphCommand {
 
     request
       .post(requestOptions)
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+      .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--appId <appId>',
-        description: 'The ID of the app to install'
+        option: '--appId <appId>'
       },
       {
-        option: '--teamId <teamId>',
-        description: 'The ID of the Microsoft Teams team to which to install the app'
+        option: '--teamId <teamId>'
       }
     ];
 

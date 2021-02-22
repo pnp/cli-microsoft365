@@ -1,7 +1,6 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
-    CommandError, CommandOption
+  CommandError, CommandOption
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class SpoServicePrincipalGrantAddCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.SERVICEPRINCIPAL_GRANT_ADD}`;
+    return commands.SERVICEPRINCIPAL_GRANT_ADD;
   }
 
   public get description(): string {
@@ -70,11 +69,8 @@ class SpoServicePrincipalGrantAddCommand extends SpoCommand {
           const result: SPOWebAppServicePrincipalPermissionGrant = json[json.length - 1];
           delete result._ObjectType_;
           logger.log(result);
-
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
         }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
@@ -82,12 +78,10 @@ class SpoServicePrincipalGrantAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-r, --resource <resource>',
-        description: 'The name of the resource for which permissions should be granted'
+        option: '-r, --resource <resource>'
       },
       {
-        option: '-s, --scope <scope>',
-        description: 'The name of the permission that should be granted'
+        option: '-s, --scope <scope>'
       }
     ];
 

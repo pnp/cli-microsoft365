@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -18,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class SpoPageListCommand extends SpoCommand {
   public get name(): string {
-    return `${commands.PAGE_LIST}`;
+    return commands.PAGE_LIST;
   }
 
   public get description(): string {
@@ -50,10 +49,6 @@ class SpoPageListCommand extends SpoCommand {
           logger.log(clientSidePages);
         }
 
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -61,8 +56,7 @@ class SpoPageListCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-u, --webUrl <webUrl>',
-        description: 'URL of the site from which to retrieve available pages'
+        option: '-u, --webUrl <webUrl>'
       }
     ];
 

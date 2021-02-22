@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -23,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class AadO365GroupUserAddCommand extends GraphCommand {
   public get name(): string {
-    return `${commands.O365GROUP_USER_ADD}`;
+    return commands.O365GROUP_USER_ADD;
   }
 
   public get description(): string {
@@ -69,32 +68,22 @@ class AadO365GroupUserAddCommand extends GraphCommand {
 
         return request.post(requestOptions);
       })
-      .then((): void => {
-        if (this.verbose) {
-          logger.logToStderr(chalk.green('DONE'));
-        }
-
-        cb();
-      }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --userName <userName>',
-        description: 'User\'s UPN (user principal name, eg. johndoe@example.com)'
+        option: '-n, --userName <userName>'
       },
       {
-        option: "-i, --groupId [groupId]",
-        description: "The ID of the Microsoft 365 Group to which to add the user"
+        option: "-i, --groupId [groupId]"
       },
       {
-        option: "--teamId [teamId]",
-        description: "The ID of the Teams team to which to add the user"
+        option: "--teamId [teamId]"
       },
       {
         option: '-r, --role [role]',
-        description: 'The role to be assigned to the new user: Owner|Member. Default Member',
         autocomplete: ['Owner', 'Member']
       }
     ];

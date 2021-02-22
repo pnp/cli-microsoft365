@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Cli, Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -59,11 +58,8 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
           }
           else {
             logger.log(json[json.length - 1]);
-
-            if (this.verbose) {
-              logger.logToStderr(chalk.green('DONE'));
-            }
           }
+          
           cb();
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     };
@@ -91,12 +87,10 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--libraryUrl <libraryUrl>',
-        description: 'The server relative URL of the library to be removed as a central location for organization assets'
+        option: '--libraryUrl <libraryUrl>'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the organization asset library'
+        option: '--confirm'
       }
     ];
 

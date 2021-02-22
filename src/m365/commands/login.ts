@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import * as fs from 'fs';
 import auth, { AuthType } from '../../Auth';
 import { Logger } from '../../cli';
@@ -26,7 +25,7 @@ interface Options extends GlobalOptions {
 
 class LoginCommand extends Command {
   public get name(): string {
-    return `${commands.LOGIN}`;
+    return commands.LOGIN;
   }
 
   public get description(): string {
@@ -45,12 +44,7 @@ class LoginCommand extends Command {
       logger.logToStderr(`Logging out from Microsoft 365...`);
     }
 
-    const logout: () => void = (): void => {
-      auth.service.logout();
-      if (this.verbose) {
-        logger.logToStderr(chalk.green('DONE'));
-      }
-    }
+    const logout: () => void = (): void => auth.service.logout();
 
     const login: () => void = (): void => {
       if (this.verbose) {
@@ -75,16 +69,15 @@ class LoginCommand extends Command {
         case 'identity':
           auth.service.authType = AuthType.Identity;
           auth.service.userName = args.options.userName;
-          break;
+          break;        
+        case 'browser':
+            auth.service.authType = AuthType.Browser;
+            break;
       }
 
       auth
         .ensureAccessToken(auth.defaultResource, logger, this.debug)
         .then((): void => {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-
           auth.service.connected = true;
           cb();
         }, (rej: string): void => {
@@ -132,36 +125,28 @@ class LoginCommand extends Command {
     const options: CommandOption[] = [
       {
         option: '-t, --authType [authType]',
-        description: 'The type of authentication to use. Allowed values certificate|deviceCode|password|identity. Default deviceCode',
-        autocomplete: ['certificate', 'deviceCode', 'password', 'identity']
+        autocomplete: ['certificate', 'deviceCode', 'password', 'identity', 'browser']
       },
       {
-        option: '-u, --userName [userName]',
-        description: 'Name of the user to authenticate. Required when authType is set to password'
+        option: '-u, --userName [userName]'
       },
       {
-        option: '-p, --password [password]',
-        description: 'Password for the user or the certificate. Required when `authType` is set to `password`, or when `authType` is set to `certificate` and the provided certificate requires a password to open'
+        option: '-p, --password [password]'
       },
       {
-        option: '-c, --certificateFile [certificateFile]',
-        description: 'Path to the file with certificate private key. When `authType` is set to `certificate`, specify either `certificateFile` or `certificateBase64Encoded`'
+        option: '-c, --certificateFile [certificateFile]'
       },
       {
-        option: '--certificateBase64Encoded [certificateBase64Encoded]',
-        description: 'Base64-encoded string with certificate private key. When `authType` is set to `certificate`, specify either `certificateFile` or `certificateBase64Encoded`'
+        option: '--certificateBase64Encoded [certificateBase64Encoded]'
       },
       {
-        option: '--thumbprint [thumbprint]',
-        description: 'Certificate thumbprint. If not specified, and `authType` is set to `certificate`, it will be automatically calculated based on the specified certificate'
+        option: '--thumbprint [thumbprint]'
       },
       {
-        option: '--appId [appId]',
-        description: 'App ID of the Azure AD application to use for authentication. If not specified, use the app specified in the CLIMICROSOFT365_AADAPPID environment variable. If the environment variable is not defined, use the multitenant PnP Management Shell app'
+        option: '--appId [appId]'
       },
       {
-        option: '--tenant [tenant]',
-        description: `ID of the tenant from which accounts should be able to authenticate. Use common or organization if the app is multitenant. If not specified, use the tenant specified in the CLIMICROSOFT365_TENANT environment variable. If the environment variable is not defined, use 'common' as the tenant identifier`
+        option: '--tenant [tenant]'
       }
     ];
 

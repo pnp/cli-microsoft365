@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandError, CommandOption
@@ -67,11 +66,7 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
           return;
         }
-        else {
-          if (this.verbose) {
-            logger.logToStderr(chalk.green('DONE'));
-          }
-        }
+        
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
@@ -88,16 +83,13 @@ class SpoOrgAssetsLibraryAddCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--libraryUrl <libraryUrl>',
-        description: 'The URL of the library to promote'
+        option: '--libraryUrl <libraryUrl>'
       },
       {
-        option: '--thumbnailUrl [thumbnailUrl]',
-        description: 'The URL of the thumbnail to render'
+        option: '--thumbnailUrl [thumbnailUrl]'
       },
       {
         option: '--cdnType [cdnType]',
-        description: 'Specifies the CDN type. Public,Private. Default is Private',
         autocomplete: ['Public', 'Private']
       }
     ];

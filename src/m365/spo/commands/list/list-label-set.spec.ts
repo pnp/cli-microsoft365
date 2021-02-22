@@ -12,7 +12,6 @@ const command: Command = require('./list-label-set');
 describe(commands.LIST_LABEL_SET, () => {
   let log: any[];
   let logger: Logger;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -33,7 +32,6 @@ describe(commands.LIST_LABEL_SET, () => {
         log.push(msg);
       }
     };
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -202,39 +200,6 @@ describe(commands.LIST_LABEL_SET, () => {
         assert.strictEqual(lastCall.data.blockDelete, false);
         assert.strictEqual(lastCall.data.blockEdit, false);
         assert.strictEqual(lastCall.data.syncToItems, false);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('should set label for list using listUrl option (verbose)', (done) => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) > -1) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, {
-      options: {
-        verbose: true,
-        webUrl: 'https://contoso.sharepoint.com/sites/team1',
-        listUrl: 'MyLibrary',
-        label: 'abc'
-      }
-    }, () => {
-      try {
-        const lastCall = postStub.lastCall.args[0];
-        assert.strictEqual(lastCall.data.listUrl, 'https://contoso.sharepoint.com/sites/team1/MyLibrary');
-        assert.strictEqual(lastCall.data.complianceTagValue, 'abc');
-        assert.strictEqual(lastCall.data.blockDelete, false);
-        assert.strictEqual(lastCall.data.blockEdit, false);
-        assert.strictEqual(lastCall.data.syncToItems, false);
-        assert.notStrictEqual(loggerLogToStderrSpy.lastCall.args[0].indexOf('DONE'), -1);
         done();
       }
       catch (e) {

@@ -1,5 +1,4 @@
 import * as assert from 'assert';
-import * as chalk from 'chalk';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -14,7 +13,7 @@ const command: Command = require('./tenant-recyclebinitem-restore');
 describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   let log: any[];
   let logger: Logger;
-  let loggerSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -40,7 +39,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
         log.push(msg);
       }
     };
-    loggerSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -122,7 +121,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogToStderrSpy.notCalled);
         done();
       }
       catch (e) {
@@ -163,7 +162,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
     command.action(logger, { options: { verbose: true, url: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -204,7 +203,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
     command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/hr' } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -245,7 +244,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogToStderrSpy.notCalled);
         done();
       }
       catch (e) {
@@ -302,7 +301,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, () => {
       try {
-        assert(loggerSpy.notCalled);
+        assert(loggerLogToStderrSpy.notCalled);
         done();
       }
       catch (e) {
@@ -359,7 +358,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
     command.action(logger, { options: { verbose: true, url: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {
@@ -416,7 +415,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
 
     command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/hr', wait: true } }, () => {
       try {
-        assert(loggerSpy.calledWith(chalk.green('DONE')));
+        assert(loggerLogToStderrSpy.called);
         done();
       }
       catch (e) {

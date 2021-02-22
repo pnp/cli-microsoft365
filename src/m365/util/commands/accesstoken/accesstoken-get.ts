@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class AccessTokenGetCommand extends Command {
   public get name(): string {
-    return `${commands.UTIL_ACCESSTOKEN_GET}`;
+    return commands.UTIL_ACCESSTOKEN_GET;
   }
 
   public get description(): string {
@@ -25,8 +25,18 @@ class AccessTokenGetCommand extends Command {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    let resource: string = args.options.resource;
+    if (resource.toLowerCase() === 'sharepoint') {
+      if (auth.service.spoUrl) {
+        resource = auth.service.spoUrl;
+      }
+      else {
+        return cb(`SharePoint URL undefined. Use the 'm365 spo set --url https://contoso.sharepoint.com' command to set the URL`);
+      }
+    }
+
     auth
-      .ensureAccessToken(args.options.resource, logger, this.debug, args.options.new)
+      .ensureAccessToken(resource, logger, this.debug, args.options.new)
       .then((accessToken: string): void => {
         logger.log(accessToken);
         cb();
@@ -36,12 +46,10 @@ class AccessTokenGetCommand extends Command {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-r, --resource <resource>',
-        description: 'The resource for which to retrieve an access token'
+        option: '-r, --resource <resource>'
       },
       {
-        option: '--new',
-        description: 'Retrieve a new access token to ensure that it\'s valid for as long as possible'
+        option: '--new'
       }
     ];
 

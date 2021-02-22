@@ -173,36 +173,28 @@ class FlowExportCommand extends AzmgmtCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --id <id>',
-        description: 'The id of the Microsoft Flow to export'
+        option: '-i, --id <id>'
       },
       {
-        option: '-e, --environment <environment>',
-        description: 'The name of the environment from which to export the Flow from'
+        option: '-e, --environment <environment>'
       },
       {
-        option: '-n, --packageDisplayName [packageDisplayName]',
-        description: 'The display name to use in the exported package'
+        option: '-n, --packageDisplayName [packageDisplayName]'
       },
       {
-        option: '-d, --packageDescription [packageDescription]',
-        description: 'The description to use in the exported package'
+        option: '-d, --packageDescription [packageDescription]'
       },
       {
-        option: '-c, --packageCreatedBy [packageCreatedBy]',
-        description: 'The name of the person to be used as the creator of the exported package'
+        option: '-c, --packageCreatedBy [packageCreatedBy]'
       },
       {
-        option: '-s, --packageSourceEnvironment [packageSourceEnvironment]',
-        description: 'The name of the source environment from which the exported package was taken'
+        option: '-s, --packageSourceEnvironment [packageSourceEnvironment]'
       },
       {
-        option: '-f, --format [format]',
-        description: 'The format to export the Flow to json|zip. Default json'
+        option: '-f, --format [format]'
       },
       {
-        option: '-p, --path [path]',
-        description: 'The path to save the exported package to'
+        option: '-p, --path [path]'
       },
 
     ];

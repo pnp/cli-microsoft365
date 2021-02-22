@@ -111,24 +111,19 @@ class SpoFileRemoveCommand extends SpoCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-w, --webUrl <webUrl>',
-        description: 'URL of the site where the file to remove is located'
+        option: '-w, --webUrl <webUrl>'
       },
       {
-        option: '-i, --id [id]',
-        description: 'The ID of the file to remove. Specify either id or url but not both'
+        option: '-i, --id [id]'
       },
       {
-        option: '-u, --url [url]',
-        description: 'The server- or site-relative url of the file to remove. Specify either id or url but not both'
+        option: '-u, --url [url]'
       },
       {
-        option: '--recycle',
-        description: 'Recycle the file instead of actually deleting it'
+        option: '--recycle'
       },
       {
-        option: '--confirm',
-        description: 'Don\'t prompt for confirming removing the file'
+        option: '--confirm'
       }
     ];
 
