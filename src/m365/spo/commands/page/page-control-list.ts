@@ -3,10 +3,11 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSidePage, ClientSidePart } from './clientsidepages';
-import { Page } from './Page';
+import { Control } from './canvasContent';
+import { ClientSidePageProperties } from './ClientSidePageProperties';
 
 interface CommandArgs {
   options: Options;
@@ -31,32 +32,36 @@ class SpoPageControlListCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    Page
-      .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
-      .then((clientSidePage: ClientSidePage): void => {
-        let controls: ClientSidePart[] = [];
-        clientSidePage.sections.forEach(s => {
-          s.columns.forEach(c => {
-            controls = controls.concat(c.controls);
-          });
-        });
-        // remove the column property to be able to serialize the array to JSON
-        controls.forEach(c => delete c.column);
+    let pageName: string = args.options.name;
+    if (args.options.name.indexOf('.aspx') < 0) {
+      pageName += '.aspx';
+    }
 
-        // remove the dynamicDataValues and dynamicDataPaths properties if they are null
-        controls.forEach(c => {
-          if (!c.dynamicDataPaths) {
-            delete c.dynamicDataPaths
-          }
-          if (!c.dynamicDataValues) {
-            delete c.dynamicDataValues
-          }
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/SitePages/Pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    request
+      .get<ClientSidePageProperties>(requestOptions)
+      .then((clientSidePage: ClientSidePageProperties): void => {
+        const canvasData: Control[] = JSON.parse(clientSidePage.CanvasContent1);
+        let controls: any[] = canvasData.filter(c => c.position).map(c => {
+          return {
+            controlType: c.controlType,
+            order: c.position.sectionIndex,
+            id: c.id,
+            controlData: {
+              ...c
+            },
+            ...c.webPartData || {},
+            type: SpoPageControlListCommand.getControlTypeDisplayName(c.controlType || 0)
+          };
         });
 
-        controls.forEach(c => {
-          (c as any).type = SpoPageControlListCommand.getControlTypeDisplayName((c as any).controlType);
-        });
-        // drop the information about original classes from clientsidepages.ts
         logger.log(JSON.parse(JSON.stringify(controls)));
 
         cb();
