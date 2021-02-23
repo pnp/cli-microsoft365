@@ -71,8 +71,8 @@ enum SharePointVersion {
 }
 
 interface SpfxVersionPrerequisites {
+  gulp: VersionCheck;
   node: VersionCheck;
-  npm: VersionCheck;
   react: VersionCheck;
   sp: SharePointVersion
 }
@@ -82,13 +82,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
     [version: string]: SpfxVersionPrerequisites
   } = {
       '1.0.0': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^6.0.0',
           fix: 'Install Node.js v6'
-        },
-        npm: {
-          range: '^3.0.0',
-          fix: 'npm i -g npm@3'
         },
         react: {
           range: '^15',
@@ -97,13 +97,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.All
       },
       '1.1.0': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^6.0.0',
           fix: 'Install Node.js v6'
-        },
-        npm: {
-          range: '^3.0.0 || ^4.0.0',
-          fix: 'npm i -g npm@4'
         },
         react: {
           range: '^15',
@@ -112,13 +112,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.All
       },
       '1.2.0': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^6.0.0',
           fix: 'Install Node.js v6'
-        },
-        npm: {
-          range: '^3.0.0 || ^4.0.0',
-          fix: 'npm i -g npm@4'
         },
         react: {
           range: '^15',
@@ -127,13 +127,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SP2019 | SharePointVersion.SPO
       },
       '1.4.0': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^6.0.0',
           fix: 'Install Node.js v6'
-        },
-        npm: {
-          range: '^3.0.0 || ^4.0.0',
-          fix: 'npm i -g npm@4'
         },
         react: {
           range: '^15',
@@ -142,13 +142,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SP2019 | SharePointVersion.SPO
       },
       '1.4.1': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^6.0.0 || ^8.0.0',
           fix: 'Install Node.js v8'
-        },
-        npm: {
-          range: '^3.0.0 || ^4.0.0',
-          fix: 'npm i -g npm@4'
         },
         react: {
           range: '^15',
@@ -157,13 +157,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SP2019 | SharePointVersion.SPO
       },
       '1.5.0': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^6.0.0 || ^8.0.0',
           fix: 'Install Node.js v8'
-        },
-        npm: {
-          range: '^3.0.0',
-          fix: 'npm i -g npm@3'
         },
         react: {
           range: '^15',
@@ -172,13 +172,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SPO
       },
       '1.5.1': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^6.0.0 || ^8.0.0',
           fix: 'Install Node.js v8'
-        },
-        npm: {
-          range: '^5.0.0',
-          fix: 'npm i -g npm@5'
         },
         react: {
           range: '^15',
@@ -187,13 +187,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SPO
       },
       '1.6.0': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^6.0.0 || ^8.0.0',
           fix: 'Install Node.js v8'
-        },
-        npm: {
-          range: '^5.0.0',
-          fix: 'npm i -g npm@5'
         },
         react: {
           range: '^15',
@@ -202,13 +202,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SPO
       },
       '1.7.0': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^8.0.0',
           fix: 'Install Node.js v8'
-        },
-        npm: {
-          range: '^5.0.0 || ^6.0.0',
-          fix: 'npm i -g npm@6'
         },
         react: {
           range: '16.3.2',
@@ -217,13 +217,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SPO
       },
       '1.7.1': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^8.0.0',
           fix: 'Install Node.js v8'
-        },
-        npm: {
-          range: '^5.0.0 || ^6.0.0',
-          fix: 'npm i -g npm@6'
         },
         react: {
           range: '16.3.2',
@@ -232,13 +232,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SPO
       },
       '1.8.0': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^8.0.0',
           fix: 'Install Node.js v8'
-        },
-        npm: {
-          range: '^5.0.0 || ^6.0.0',
-          fix: 'npm i -g npm@6'
         },
         react: {
           range: '16.7.0',
@@ -247,13 +247,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SPO
       },
       '1.8.1': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^8.0.0',
           fix: 'Install Node.js v8'
-        },
-        npm: {
-          range: '^5.0.0 || ^6.0.0',
-          fix: 'npm i -g npm@6'
         },
         react: {
           range: '16.7.0',
@@ -262,13 +262,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SPO
       },
       '1.8.2': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^8.0.0 || ^10.0.0',
           fix: 'Install Node.js v10'
-        },
-        npm: {
-          range: '^5.0.0 || ^6.0.0',
-          fix: 'npm i -g npm@6'
         },
         react: {
           range: '16.7.0',
@@ -277,13 +277,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SPO
       },
       '1.9.0': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^8.0.0 || ^10.0.0',
           fix: 'Install Node.js v10'
-        },
-        npm: {
-          range: '^5.0.0 || ^6.0.0',
-          fix: 'npm i -g npm@6'
         },
         react: {
           range: '16.8.5',
@@ -292,13 +292,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SPO
       },
       '1.9.1': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^10.0.0',
           fix: 'Install Node.js v10'
-        },
-        npm: {
-          range: '^5.0.0 || ^6.0.0',
-          fix: 'npm i -g npm@6'
         },
         react: {
           range: '16.8.5',
@@ -307,13 +307,13 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SPO
       },
       '1.10.0': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^10.0.0',
           fix: 'Install Node.js v10'
-        },
-        npm: {
-          range: '^5.0.0 || ^6.0.0',
-          fix: 'npm i -g npm@6'
         },
         react: {
           range: '16.8.5',
@@ -322,17 +322,32 @@ class SpfxDoctorCommand extends AnonymousCommand {
         sp: SharePointVersion.SPO
       },
       '1.11.0': {
+        gulp: {
+          range: '^3.0.0',
+          fix: 'npm i -g gulp@3'
+        },
         node: {
           range: '^10.0.0',
           fix: 'Install Node.js v10'
         },
-        npm: {
-          range: '^5.0.0 || ^6.0.0',
-          fix: 'npm i -g npm@6'
-        },
         react: {
           range: '16.8.5',
           fix: 'npm i react@16.8.5'
+        },
+        sp: SharePointVersion.SPO
+      },
+      '1.12.0': {
+        gulp: {
+          range: '^4.0.0',
+          fix: 'npm i -g gulp@4'
+        },
+        node: {
+          range: '^12.0.0',
+          fix: 'Install Node.js v12'
+        },
+        react: {
+          range: '16.9.0',
+          fix: 'npm i react@16.9.0'
         },
         sp: SharePointVersion.SPO
       }
@@ -377,9 +392,8 @@ class SpfxDoctorCommand extends AnonymousCommand {
       })
       .then(_ => this.checkSharePointCompatibility(spfxVersion, prerequisites, args, fixes, logger))
       .then(_ => this.checkNodeVersion(prerequisites, fixes, logger))
-      .then(_ => this.checkNpmVersion(prerequisites, fixes, logger))
       .then(_ => this.checkYo(fixes, logger))
-      .then(_ => this.checkGulp(fixes, logger))
+      .then(_ => this.checkGulp(prerequisites, fixes, logger))
       .then(_ => this.checkReact(prerequisites, fixes, logger))
       .then(_ => this.checkTypeScript(fixes, logger))
       .then(_ => {
@@ -435,17 +449,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
       });
   }
 
-  private checkNpmVersion(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
-    return this
-      .getNpmVersion()
-      .then((npmVersion: string): void => {
-        this.checkStatus('npm', npmVersion, prerequisites.npm, OptionalOrRequired.Required, fixes, logger);
-      }, (error: string): Promise<void> => {
-        logger.log(this.getStatus(CheckStatus.Failure, error));
-        return Promise.reject(error);
-      });
-  }
-
   private checkYo(fixes: string[], logger: Logger): Promise<void> {
     return this
       .getPackageVersion('yo', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger)
@@ -460,12 +463,12 @@ class SpfxDoctorCommand extends AnonymousCommand {
       });
   }
 
-  private checkGulp(fixes: string[], logger: Logger): Promise<void> {
+  private checkGulp(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
     return this
       .getPackageVersion('gulp', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger)
       .then((gulpVersion: string): void => {
         if (gulpVersion) {
-          logger.log(this.getStatus(CheckStatus.Success, `gulp v${gulpVersion}`));
+          this.checkStatus('gulp', gulpVersion, prerequisites.gulp, OptionalOrRequired.Required, fixes, logger);
         }
         else {
           logger.log(this.getStatus(CheckStatus.Failure, `gulp not found`));
@@ -619,18 +622,6 @@ class SpfxDoctorCommand extends AnonymousCommand {
 
   private getNodeVersion(): string {
     return process.version.substr(1);
-  }
-
-  private getNpmVersion(): Promise<string> {
-    return new Promise<string>((resolve: (version: string) => void, reject: (error: string) => void): void => {
-      child_process.execFile(/^win/.test(process.platform) ? 'npm.logger' : 'npm', ['-v'], (err: child_process.ExecException | null, stdout: string, stderr: string): void => {
-        if (err) {
-          return reject('npm not found');
-        }
-
-        resolve(stdout.trim());
-      });
-    });
   }
 
   private checkStatus(what: string, versionFound: string, versionCheck: VersionCheck, optionalOrRequired: OptionalOrRequired, fixes: string[], logger: Logger): void {

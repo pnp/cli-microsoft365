@@ -160,7 +160,7 @@ nav:
         - report activityusercounts: 'cmd/skype/report/report-activityusercounts.md'
         - report activityuserdetail: 'cmd/skype/report/report-activityuserdetail.md'
     - SharePoint Framework (spfx):
-      - doctor: 'cmd/spfx/doctor.md'
+      - doctor: 'cmd/spfx/spfx-doctor.md'
       - project:
         - project externalize: 'cmd/spfx/project/project-externalize.md'
         - project rename: 'cmd/spfx/project/project-rename.md'
