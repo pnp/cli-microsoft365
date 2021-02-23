@@ -452,7 +452,7 @@ class SpoFileAddCommand extends SpoCommand {
     let fd: number = 0;
     try {
       fd = fs.openSync(info.FilePath, 'r');
-      const fileBuffer: Buffer = Buffer.alloc(this.fileChunkSize);
+      let fileBuffer: Buffer = Buffer.alloc(this.fileChunkSize);
       const readCount: number = fs.readSync(fd, fileBuffer, 0, this.fileChunkSize, info.Position);
       fs.closeSync(fd);
       fd = 0;
@@ -460,6 +460,10 @@ class SpoFileAddCommand extends SpoCommand {
       const offset: number = info.Position;
       info.Position += readCount;
       const isLastChunk: boolean = info.Position >= info.Size;
+      if (isLastChunk) {
+        // trim buffer for last chunk
+        fileBuffer = fileBuffer.slice(0, readCount)
+      }
 
       const requestOptions: any = {
         url: `${info.WebUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(info.FolderPath)}')/Files('${encodeURIComponent(info.Name)}')/${isLastChunk ? 'Finish' : 'Continue'}Upload(uploadId=guid'${info.Id}',fileOffset=${offset})`,
@@ -467,7 +471,8 @@ class SpoFileAddCommand extends SpoCommand {
         headers: {
           'accept': 'application/json;odata=nometadata',
           'content-length': readCount
-        }
+        },
+        maxBodyLength: this.fileChunkingThreshold
       };
 
       request
