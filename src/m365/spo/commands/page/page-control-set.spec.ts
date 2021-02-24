@@ -277,6 +277,39 @@ describe(commands.PAGE_CONTROL_SET, () => {
     });
   });
 
+  it('correctly page save when page extension is not provided', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+        return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
+      const savePagePostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`;
+
+      if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
+        return Promise.resolve(mockPageData);
+      }
+
+      if ((opts.url as string).indexOf(savePagePostUrl) > -1) {
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, (err?: any) => {
+      try {
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles OData error when retrieving pages', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
