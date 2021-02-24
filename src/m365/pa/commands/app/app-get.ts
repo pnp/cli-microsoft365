@@ -3,6 +3,7 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import Utils from '../../../../Utils';
 import request from '../../../../request';
 import AzmgmtCommand from '../../../base/AzmgmtCommand';
 import commands from '../../commands';
@@ -33,8 +34,18 @@ class PaAppGetCommand extends AzmgmtCommand {
       logger.logToStderr(`Retrieving information about Microsoft Power App ${args.options.name}...`);
     }
 
+    let requestUrl: string = '';
+    const isValidGuid: boolean = Utils.isValidGuid(args.options.name);
+    if (isValidGuid) {
+      requestUrl = `${this.resource}providers/MicrosoftPowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`
+    }
+    else {
+      requestUrl = `${this.resource}providers/Microsoft.PowerApps/apps?api-version=2016-11-01`
+    }
+
     const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+      url: requestUrl,
+      //url: `${this.resource}providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },
@@ -44,12 +55,32 @@ class PaAppGetCommand extends AzmgmtCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        res.displayName = res.properties.displayName;
-        res.description = res.properties.description || '';
-        res.appVersion = res.properties.appVersion;
-        res.owner = res.properties.owner.email || '';
+        if (isValidGuid){
+          res.displayName = res.properties.displayName;
+          res.description = res.properties.description || '';
+          res.appVersion = res.properties.appVersion;
+          res.owner = res.properties.owner.email || '';
 
-        logger.log(res);
+          logger.log(res);
+        } else {
+          if (res.value.length > 0) {
+            let app = res.value.find((a: any)=> {
+              return a.properties.displayName == args.options.name;
+            });
+            if (!!app) {
+              app.displayName = app.properties.displayName;
+              app.description = app.properties.description || '';
+              app.appVersion = app.properties.appVersion;
+              app.owner = app.properties.owner.email || '';
+              logger.log(app);
+            }
+
+            //res.value.forEach((a: any) => {
+            //  a.displayName = a.properties.displayName;
+            //});
+            //logger.log(this.items);
+          } 
+        }
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
