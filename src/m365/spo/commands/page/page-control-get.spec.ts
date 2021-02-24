@@ -244,6 +244,26 @@ describe(commands.PAGE_CONTROL_GET, () => {
     });
   });
 
+  it('correctly handles control not found on a page when CanvasContent1 is not defined', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+        return Promise.resolve({ CanvasContent1: null });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith('Control with ID 3ede60d3-dc2c-438b-b5bf-cc40bb2351e6 not found on page home.aspx'));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles page not found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       return Promise.reject({

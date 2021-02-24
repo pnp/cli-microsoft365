@@ -48,7 +48,7 @@ class SpoPageControlGetCommand extends SpoCommand {
     request
       .get<ClientSidePageProperties>(requestOptions)
       .then((clientSidePage: ClientSidePageProperties): void => {
-        const canvasData: Control[] = JSON.parse(clientSidePage.CanvasContent1);
+        const canvasData: Control[] = clientSidePage.CanvasContent1 ? JSON.parse(clientSidePage.CanvasContent1) : [];
         const control: Control | undefined = canvasData.find(c => c.id?.toLowerCase() ===  args.options.id.toLowerCase());
 
         if (control) {
