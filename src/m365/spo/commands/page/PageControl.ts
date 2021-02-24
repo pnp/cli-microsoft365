@@ -2,7 +2,7 @@
 export interface PageControl {
   id: string;
   position: Position;
-  emphasis: Emphasis;
+  emphasis: any;
   controlType?: number;
   displayMode?: number;
   webPartId?: string;
@@ -21,9 +21,6 @@ export interface WebPartData {
   serverProcessedContent: null[];
   dataVersion: string;
   properties: any[];
-}
-
-export interface Emphasis {
 }
 
 export interface Position {

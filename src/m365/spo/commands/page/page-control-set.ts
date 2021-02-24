@@ -32,10 +32,14 @@ class SpoPageControlSetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    let pageName: string = args.options.pageName;
+    if (args.options.pageName.indexOf('.aspx') < 0) {
+      pageName += '.aspx';
+    }
+
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/SitePages/Pages/GetByUrl('sitepages/${encodeURIComponent(args.options.name)}')`,
+      url: `${args.options.webUrl}/_api/SitePages/Pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')`,
       headers: {
-        'content-type': 'application/json;charset=utf-8',
         accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
@@ -45,14 +49,14 @@ class SpoPageControlSetCommand extends SpoCommand {
       .get<ClientSidePageProperties>(requestOptions)
       .then((res: ClientSidePageProperties): Promise<ClientSidePageProperties> => {
         if (!res.CanvasContent1) {
-          return Promise.reject(`Page ${args.options.name} doesn't contain canvas controls.`);
+          return Promise.reject(`Page ${pageName} doesn't contain canvas controls.`);
         }
 
         const canvasContent: PageControl[] = JSON.parse(res.CanvasContent1);
         const control: PageControl | undefined = canvasContent.find(control => control.id.toLowerCase() === args.options.id.toLowerCase());
 
         if (!control) {
-          return Promise.reject(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
+          return Promise.reject(`Control with ID ${args.options.id} not found on page ${pageName}`);
         }
 
         if (this.verbose) {
@@ -60,7 +64,7 @@ class SpoPageControlSetCommand extends SpoCommand {
         }
 
         // Check out the page
-        return Page.checkout(args.options.name, args.options.webUrl, logger, this.debug, this.verbose);
+        return Page.checkout(pageName, args.options.webUrl, logger, this.debug, this.verbose);
       })
       .then((page: ClientSidePageProperties) => {
         // Update the web part data
@@ -71,7 +75,7 @@ class SpoPageControlSetCommand extends SpoCommand {
 
         const canvasControl = canvasContent.find(c => c.id.toLowerCase() === args.options.id.toLowerCase());
         if (!canvasControl) {
-          return Promise.reject(`Control with ID ${args.options.id} not found on page ${args.options.name}`);
+          return Promise.reject(`Control with ID ${args.options.id} not found on page ${pageName}`);
         }
 
         if (args.options.webPartData) {
@@ -116,7 +120,7 @@ class SpoPageControlSetCommand extends SpoCommand {
           }
         }
 
-        return Page.save(args.options.name, args.options.webUrl, canvasContent, logger, this.debug, this.verbose);
+        return Page.save(pageName, args.options.webUrl, canvasContent, logger, this.debug, this.verbose);
       })
       .then(_ => cb())
       .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
