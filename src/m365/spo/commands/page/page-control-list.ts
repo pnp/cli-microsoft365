@@ -48,7 +48,7 @@ class SpoPageControlListCommand extends SpoCommand {
     request
       .get<ClientSidePageProperties>(requestOptions)
       .then((clientSidePage: ClientSidePageProperties): void => {
-        const canvasData: Control[] = JSON.parse(clientSidePage.CanvasContent1);
+        const canvasData: Control[] = clientSidePage.CanvasContent1 ? JSON.parse(clientSidePage.CanvasContent1) : [];
         let controls: any[] = canvasData.filter(c => c.position).map(c => {
           return {
             controlType: c.controlType,

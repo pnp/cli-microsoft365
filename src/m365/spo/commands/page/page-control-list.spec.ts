@@ -165,6 +165,22 @@ describe(commands.PAGE_CONTROL_LIST, () => {
     });
   });
 
+  it('correctly handles page when CanvasContent1 is not defined', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.resolve({ CanvasContent1: null });
+    });
+
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, (err?: any) => {
+      try {
+        assert([]);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles page not found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       return Promise.reject({ error: {
