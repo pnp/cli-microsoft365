@@ -48,8 +48,7 @@ class AadO365GroupRemoveCommand extends GraphCommand {
 
       request
         .delete(requestOptions)
-        .then((): void => {
-
+        .then((): Promise<void> => {
           if (args.options.skipRecycleBin) {
             const requestOptions2: any = {
               url: `${this.resource}/v1.0/directory/deletedItems/${args.options.id}`,
@@ -57,16 +56,13 @@ class AadO365GroupRemoveCommand extends GraphCommand {
                 'accept': 'application/json;odata.metadata=none'
               },
             };
-
-            request
-            .delete(requestOptions2)
-            .then((): void => {
-              cb();
-             })
-          } else {
-            cb();
+            return request.delete(requestOptions2);
           }
-        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+          else {
+            return Promise.resolve();
+          }
+        })
+        .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
 
     if (args.options.confirm) {
