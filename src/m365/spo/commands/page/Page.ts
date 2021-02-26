@@ -78,44 +78,6 @@ export class Page {
     });
   }
 
-  public static save(name: string, webUrl: string, canvasContent: any, logger: Logger, debug: boolean, verbose: boolean): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (verbose) {
-        logger.log(`Saving ${name} page...`);
-      }
-
-      if (!canvasContent) {
-        reject('No canvas content was provided');
-        return;
-      }
-
-      const pageName: string = this.getPageNameWithExtension(name);
-      const requestOptions: any = {
-        url: `${webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')/savepage`,
-        headers: {
-          'accept': 'application/json;odata=nometadata',
-          'content-type': 'application/json;odata=nometadata'
-        },
-        data: {
-          CanvasContent1: JSON.stringify(canvasContent)
-        },
-        responseType: 'json'
-      };
-
-      request
-        .post(requestOptions)
-        .then((res: any) => {
-          if (verbose) {
-            logger.log(res);
-          }
-
-          resolve();
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
-  }
-
   public static getControlsInformation(control: ClientSidePart, isJSONOutput: boolean): ClientSidePart {
     // remove the column property to be able to serialize the object to JSON
     delete control.column;
