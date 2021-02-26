@@ -80,10 +80,6 @@ export class Page {
 
   public static save(name: string, webUrl: string, canvasContent: any, logger: Logger, debug: boolean, verbose: boolean): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (verbose) {
-        logger.log(`Saving ${name} page...`);
-      }
-
       if (!canvasContent) {
         reject('No canvas content was provided');
         return;
@@ -105,10 +101,6 @@ export class Page {
       request
         .post(requestOptions)
         .then((res: any) => {
-          if (verbose) {
-            logger.log(res);
-          }
-
           resolve();
         }, (error: any): void => {
           reject(error);
