@@ -39,6 +39,7 @@ export default {
   TEAMS_TEAM_ADD: `${prefix} team add`,
   TEAMS_TEAM_ARCHIVE: `${prefix} team archive`,
   TEAMS_TEAM_CLONE: `${prefix} team clone`,
+  TEAMS_TEAM_GET: `${prefix} team get`,
   TEAMS_TEAM_LIST: `${prefix} team list`,
   TEAMS_TEAM_REMOVE: `${prefix} team remove`,
   TEAMS_TEAM_SET: `${prefix} team set`,
