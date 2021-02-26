@@ -68,6 +68,8 @@ class SpoPageSetCommand extends SpoCommand {
       pageName += '.aspx';
     }
     const serverRelativeFileUrl: string = `${Utils.getServerRelativeSiteUrl(args.options.webUrl)}/sitepages/${pageName}`;
+    
+    const needsToSavePage = !!args.options.title || !!args.options.description;
 
     this
       .getRequestDigest(args.options.webUrl)
@@ -208,6 +210,11 @@ class SpoPageSetCommand extends SpoCommand {
           }
           if (authorByline) {
             pageData.AuthorByline = authorByline;
+          }
+
+          // Needs to be at the end, as the data is still needed in the last step
+          if (!needsToSavePage) {
+            return Promise.resolve();
           }
         }
         else {
