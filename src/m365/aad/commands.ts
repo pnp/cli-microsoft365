@@ -34,6 +34,7 @@ export default {
   OAUTH2GRANT_LIST: `${prefix} oauth2grant list`,
   OAUTH2GRANT_REMOVE: `${prefix} oauth2grant remove`,
   OAUTH2GRANT_SET: `${prefix} oauth2grant set`,
+  POLICY_LIST: `${prefix} policy list`,
   SITECLASSIFICATION_DISABLE: `${prefix} siteclassification disable`,
   SITECLASSIFICATION_ENABLE: `${prefix} siteclassification enable`,
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
