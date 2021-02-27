@@ -39,6 +39,14 @@
 - extended `spo site set` with setting site logo [#2175](https://github.com/pnp/cli-microsoft365/issues/2175)
 - extended `spo page get` with support for loading only metadata [#2184](https://github.com/pnp/cli-microsoft365/pull/2184)
 - fixed control and section parsing in 'spo page get' [#2179](https://github.com/pnp/cli-microsoft365/issues/2179)
+- fixed bug in uploading large files [#2199](https://github.com/pnp/cli-microsoft365/issues/2199)
+- extended `aad app add` with returning tenantId [#2187](https://github.com/pnp/cli-microsoft365/issues/2187)
+- extended output of `spo page get` with canvasContentJson [#2193](https://github.com/pnp/cli-microsoft365/issues/2193)
+- fixed looking up service principals with trailing slash in `aad app add` [#2188](https://github.com/pnp/cli-microsoft365/issues/2188)
+- changed `spo page control list` to use the pages API [#2198](https://github.com/pnp/cli-microsoft365/issues/2198)
+- fixed issue with character encoding in `spo page control set` [#2195](https://github.com/pnp/cli-microsoft365/issues/2195)
+- fixed issue with character encoding in `spo page control get` [#2202](https://github.com/pnp/cli-microsoft365/issues/2202)
+- extended `spo page control list` with empty CanvasContent1 check [#2204](https://github.com/pnp/cli-microsoft365/issues/2204)
 
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 

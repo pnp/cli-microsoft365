@@ -3,11 +3,13 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
+import request from '../../../../request';
 import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSidePage, ClientSidePart } from './clientsidepages';
-import { Page } from './Page';
+import { Control } from './canvasContent';
+import { ClientSidePageProperties } from './ClientSidePageProperties';
+import { getControlTypeDisplayName } from './pageMethods';
 
 interface CommandArgs {
   options: Options;
@@ -29,15 +31,38 @@ class SpoPageControlGetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    Page
-      .getPage(args.options.name, args.options.webUrl, logger, this.debug, this.verbose)
-      .then((clientSidePage: ClientSidePage): void => {
-        const control: ClientSidePart | null = clientSidePage.findControlById(args.options.id);
+    let pageName: string = args.options.name;
+    if (args.options.name.indexOf('.aspx') < 0) {
+      pageName += '.aspx';
+    }
+
+    const requestOptions: any = {
+      url: `${args.options.webUrl}/_api/SitePages/Pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')`,
+      headers: {
+        accept: 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+
+    request
+      .get<ClientSidePageProperties>(requestOptions)
+      .then((clientSidePage: ClientSidePageProperties): void => {
+        const canvasData: Control[] = clientSidePage.CanvasContent1 ? JSON.parse(clientSidePage.CanvasContent1) : [];
+        const control: Control | undefined = canvasData.find(c => c.id?.toLowerCase() === args.options.id.toLowerCase());
 
         if (control) {
-          const isJSONOutput = args.options.output === 'json';
+          const controlData = {
+            controlType: control.controlType,
+            order: control.position.sectionIndex,
+            id: control.id,
+            controlData: {
+              ...control
+            },
+            type: getControlTypeDisplayName(control.controlType || 0),
+            ...control.webPartData || {}
+          }
 
-          logger.log(JSON.parse(JSON.stringify(Page.getControlsInformation(control, isJSONOutput))));
+          logger.log(controlData);
         }
         else {
           if (this.verbose) {

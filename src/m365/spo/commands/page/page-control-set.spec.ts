@@ -8,7 +8,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
 import { ClientSidePage } from './clientsidepages';
-import { mockPage, mockPageData, mockPageDataFail } from './page-control-set.mock';
+import { CanvasContent, mockPageData, mockPageDataFail } from './page-control-set.mock';
 const command: Command = require('./page-control-set');
 
 describe(commands.PAGE_CONTROL_SET, () => {
@@ -66,8 +66,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly handles control not found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(mockPage);
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+        return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
       }
 
       return Promise.reject('Invalid request');
@@ -83,10 +83,29 @@ describe(commands.PAGE_CONTROL_SET, () => {
     });
   });
 
+  it('correctly handles control page with no Canvas Control content', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '3ede60d3-dc2c-438b-b5bf-cc40bb2351e6' } }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Page home.aspx doesn't contain canvas controls.")));
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('correctly handles control found and handles error on page checkout error', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(mockPage);
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+        return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
       }
 
       return Promise.reject('Invalid request');
@@ -108,8 +127,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly handles control found and handles page checkout correctly when no data is provided', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(mockPage);
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+        return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
       }
 
       return Promise.reject('Invalid request');
@@ -137,8 +156,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly handles control not found after the page has been checked out', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(mockPage);
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+        return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
       }
 
       return Promise.reject('Invalid request');
@@ -166,8 +185,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly handles control found and handles page checkout', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(mockPage);
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+        return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
       }
 
       return Promise.reject('Invalid request');
@@ -194,8 +213,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly page save with webPartData', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(mockPage);
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+        return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
       }
 
       return Promise.reject('Invalid request');
@@ -227,8 +246,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
 
   it('correctly page save with webPartProperties', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/_api/web/getfilebyserverrelativeurl('/sites/team-a/SitePages/home.aspx')`) > -1) {
-        return Promise.resolve(mockPage);
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+        return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
       }
 
       return Promise.reject('Invalid request');
@@ -250,6 +269,39 @@ describe(commands.PAGE_CONTROL_SET, () => {
     });
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, (err?: any) => {
+      try {
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly page save when page extension is not provided', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
+        return Promise.resolve({ CanvasContent1: JSON.stringify([CanvasContent]) });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'post').callsFake((opts) => {
+      const checkOutPostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/checkoutpage`;
+      const savePagePostUrl = `_api/sitepages/pages/GetByUrl('sitepages/home.aspx')/savepage`;
+
+      if ((opts.url as string).indexOf(checkOutPostUrl) > -1) {
+        return Promise.resolve(mockPageData);
+      }
+
+      if ((opts.url as string).indexOf(savePagePostUrl) > -1) {
+        return Promise.resolve({});
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, (err?: any) => {
       try {
         done();
       } catch (e) {
