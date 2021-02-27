@@ -530,7 +530,7 @@
 
 **SharePoint Framework:**
 
-- [spfx doctor](../cmd/spfx/doctor.md) - verifies environment configuration for using the specific version of the SharePoint Framework [#1353](https://github.com/pnp/cli-microsoft365/issues/1353)
+- [spfx doctor](../cmd/spfx/spfx-doctor.md) - verifies environment configuration for using the specific version of the SharePoint Framework [#1353](https://github.com/pnp/cli-microsoft365/issues/1353)
 
 **Skype:**
 

@@ -58,6 +58,8 @@ nav:
         - oauth2grant list: 'cmd/aad/oauth2grant/oauth2grant-list.md'
         - oauth2grant remove: 'cmd/aad/oauth2grant/oauth2grant-remove.md'
         - oauth2grant set: 'cmd/aad/oauth2grant/oauth2grant-set.md'
+      - policy:
+        - policy list: 'cmd/aad/policy/policy-list.md'
       - siteclassification:
         - siteclassification disable: 'cmd/aad/siteclassification/siteclassification-disable.md'
         - siteclassification enable: 'cmd/aad/siteclassification/siteclassification-enable.md'
