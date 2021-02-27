@@ -47,6 +47,9 @@
 - fixed issue with character encoding in `spo page control set` [#2195](https://github.com/pnp/cli-microsoft365/issues/2195)
 - fixed issue with character encoding in `spo page control get` [#2202](https://github.com/pnp/cli-microsoft365/issues/2202)
 - extended `spo page control list` with empty CanvasContent1 check [#2204](https://github.com/pnp/cli-microsoft365/issues/2204)
+- added the `List all tabs in Teams` sample script [#2075](https://github.com/pnp/cli-microsoft365/issues/2075)
+- extended `aad o365group get` with `teams team get` alias [#2214](https://github.com/pnp/cli-microsoft365/issues/2214)
+- added the `List all sites' owners` sample script [#2168](https://github.com/pnp/cli-microsoft365/issues/2168)
 
 ## [v3.5.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.5.0)
 
