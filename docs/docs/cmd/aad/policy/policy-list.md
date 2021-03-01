@@ -11,9 +11,9 @@ m365 aad policy list [options]
 ## Options
 
 `-p, --policyType [policyType]`
-: The type of policies to return. Allowed values `activityBasedTimeout`,`claimsMapping`,`homeRealmDiscovery`,`tokenLifetime`,`tokenIssuance`,`identitySecurityDefaultsEnforcement`. If omitted, all policies are returned
+: The type of policies to return. Allowed values `activityBasedTimeout`,`claimsMapping`,`homeRealmDiscovery`,`tokenLifetime`,`tokenIssuance`. If omitted, all policies are returned
 
---8<-- "docs/cmd/_global.md"
+--8<-- "docs/cmd/\_global.md"
 
 ## Examples
 
