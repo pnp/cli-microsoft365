@@ -1,5 +1,12 @@
 # Release notes
 
+## [v3.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.7.0)
+
+### Changes
+
+- added conditionally saving page in 'spo page set' [#2211](https://github.com/pnp/cli-microsoft365/issues/2211)
+- fixed issue in `spo page control set` discarding data on save [#2216](https://github.com/pnp/cli-microsoft365/issues/2216)
+
 ## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
 
 ### New commands
