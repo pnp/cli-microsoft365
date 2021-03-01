@@ -135,7 +135,9 @@ for workLoad in $(echo $workLoads | jq -r '.[].Workload'); do
             addingWorkload=$(echo $workLoads | jq -r '.[] | select(.Workload == "'"$workLoad"'")')
             
             #Add outage information to SharePoint List
-            addedRecord=$(m365 spo listitem add --webUrl $webURL --listTitle "$listName" --contentType Item --Title "$(echo $addingWorkload | jq -r '.WorkloadDisplayName')" --Workload "$(echo $addingWorkload | jq -r '.Workload')" --FirstIdentifiedDate "$(date -d "$(echo $addingWorkload | jq -r '.StatusTime')" '+%m/%d/%Y %H:%M:%S')" --WorkflowJSONData "$(echo $addingWorkload | jq -r '.')")
+            epochTimeDate=$(date -d "$(echo $addingWorkload | jq -r '.StatusTime')" +%s)
+            formattedDate=$(date -d @$(echo $epochTimeDate) '+%m/%d/%Y %H:%M:%S')
+            addedRecord=$(m365 spo listitem add --webUrl $webURL --listTitle "$listName" --contentType Item --Title "$(echo $addingWorkload | jq -r '.WorkloadDisplayName')" --Workload "$(echo $addingWorkload | jq -r '.Workload')" --FirstIdentifiedDate "$(echo $formattedDate)" --WorkflowJSONData "$(echo $addingWorkload | jq -r '.')")
             
             #Send notification using CLI Commands
             m365 outlook mail send --to $notifyEmail --subject "Outage Reported in $(echo $addingWorkload | jq -r '.WorkloadDisplayName')" --bodyContents "An outage has been reported for the Service : $(echo $addingWorkload | jq -r '.WorkloadDisplayName') <a href='$webURL/Lists/$listName'>Access the Health Status List</a>" --bodyContentType HTML --saveToSentItems false
