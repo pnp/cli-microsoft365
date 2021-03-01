@@ -48,25 +48,24 @@ class AadPolicyListCommand extends GraphItemsListCommand<any> {
     else {
       const policyTypes: string[] = ['activityBasedTimeout', 'claimsMapping', 'homeRealmDiscovery', 'tokenLifetime', 'tokenIssuance'];
       let promiseCalls: any[] = [];
-
       policyTypes.forEach((policyType) => {
         let endpoint = this.getPolicyEndPoint[policyType];
         const url: string = `${this.resource}/v1.0/policies/${endpoint}`;
-
         promiseCalls.push(
           ((): Promise<any[]> => {
             return this.getPolicies(url);
           })()
         );
       });
-
       Promise.all(promiseCalls)
         .then(((results) => {
-          let test: any[] = [];
-          results.forEach((items: any[]) => {
-            test = test.concat(items);
+          let allPolicies: any[] = [];
+          results.forEach((policies: any[]) => {
+            allPolicies = allPolicies.concat(policies);
           });
-          logger.log(test);
+          if (allPolicies && allPolicies.length > 0) {
+            logger.log(allPolicies);
+          }
           cb();
         }))
         .catch(err => {
