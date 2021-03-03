@@ -203,12 +203,12 @@ describe(commands.POLICY_LIST, () => {
 
   it('correctly handles API OData error for all policies', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      return Promise.reject("Resource not found for the segment 'foo'.");
+      return Promise.reject("An error has occurred.");
     });
 
     command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Resource not found for the segment 'foo'.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
       }
       catch (e) {
@@ -219,12 +219,12 @@ describe(commands.POLICY_LIST, () => {
 
   it('correctly handles API OData error for specified policies', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      return Promise.reject("Resource not found for the segment 'foo'.");
+      return Promise.reject("An error has occurred.");
     });
 
     command.action(logger, { options: { debug: false, policyType: "foo" } } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Resource not found for the segment 'foo'.")));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("An error has occurred.")));
         done();
       }
       catch (e) {
