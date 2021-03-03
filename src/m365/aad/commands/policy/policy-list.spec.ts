@@ -59,20 +59,20 @@ describe(commands.POLICY_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves only the specified policies', (done) => {
+  it('retrieves the specified policies', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/tokenLifetimePolicies`) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/tokenLifetimePolicies",
           "value": [
             {
-              "id": "a457c42c-0f2e-4a25-be2a-545e840add1f",
-              "deletedDateTime": null,
-              "definition": [
-                "{\"TokenLifetimePolicy\":{\"Version\":1,\"AccessTokenLifetime\":\"8:00:00\"}}"
+              id: 'a457c42c-0f2e-4a25-be2a-545e840add1f',
+              deletedDateTime: null,
+              definition: [
+                '{"TokenLifetimePolicy":{"Version":1,"AccessTokenLifetime":"8:00:00"}}'
               ],
-              "displayName": "TokenLifetimePolicy1",
-              "isOrganizationDefault": true
+              displayName: 'TokenLifetimePolicy1',
+              isOrganizationDefault: true
             }
           ]
         });
@@ -90,13 +90,13 @@ describe(commands.POLICY_LIST, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
-            "id": "a457c42c-0f2e-4a25-be2a-545e840add1f",
-            "deletedDateTime": null,
-            "definition": [
-              "{\"TokenLifetimePolicy\":{\"Version\":1,\"AccessTokenLifetime\":\"8:00:00\"}}"
+            id: 'a457c42c-0f2e-4a25-be2a-545e840add1f',
+            deletedDateTime: null,
+            definition: [
+              '{"TokenLifetimePolicy":{"Version":1,"AccessTokenLifetime":"8:00:00"}}'
             ],
-            "displayName": "TokenLifetimePolicy1",
-            "isOrganizationDefault": true
+            displayName: 'TokenLifetimePolicy1',
+            isOrganizationDefault: true
           }
         ]));
         done();
@@ -105,6 +105,160 @@ describe(commands.POLICY_LIST, () => {
         done(e);
       }
     });
+  });
+
+  it('retrieves all the policies', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/policies/activityBasedTimeoutPolicies`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/activityBasedTimeoutPolicies",
+          "value": []
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/policies/claimsMappingPolicies`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/claimsMappingPolicies",
+          "value": []
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/policies/homeRealmDiscoveryPolicies`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/homeRealmDiscoveryPolicies",
+          "value": []
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/policies/tokenLifetimePolicies`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/tokenLifetimePolicies",
+          "value": [
+            {
+              id: 'a457c42c-0f2e-4a25-be2a-545e840add1f',
+              deletedDateTime: null,
+              definition: [
+                '{"TokenLifetimePolicy":{"Version":1,"AccessTokenLifetime":"8:00:00"}}'
+              ],
+              displayName: 'TokenLifetimePolicy1',
+              isOrganizationDefault: true
+            }
+          ]
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/policies/tokenIssuancePolicies`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/tokenIssuancePolicies",
+          "value": [
+            {
+              id: '457c8ef6-7a9c-4c9c-ba05-a12b7654c95a',
+              deletedDateTime: null,
+              definition: [
+                '{ "TokenIssuancePolicy":{"TokenResponseSigningPolicy":"TokenOnly","SamlTokenVersion":"1.1","SigningAlgorithm":"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256","Version":1}}'
+              ],
+              displayName: 'TokenIssuancePolicy1',
+              isOrganizationDefault: true
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith([
+          {
+            id: 'a457c42c-0f2e-4a25-be2a-545e840add1f',
+            deletedDateTime: null,
+            definition: [
+              '{"TokenLifetimePolicy":{"Version":1,"AccessTokenLifetime":"8:00:00"}}'
+            ],
+            displayName: 'TokenLifetimePolicy1',
+            isOrganizationDefault: true
+          },
+          {
+            id: '457c8ef6-7a9c-4c9c-ba05-a12b7654c95a',
+            deletedDateTime: null,
+            definition: [
+              '{ "TokenIssuancePolicy":{"TokenResponseSigningPolicy":"TokenOnly","SamlTokenVersion":"1.1","SigningAlgorithm":"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256","Version":1}}'
+            ],
+            displayName: 'TokenIssuancePolicy1',
+            isOrganizationDefault: true
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('accepts policy type to be activityBasedTimeout', () => {
+    const actual = command.validate({
+      options:
+      {
+        policyType: "activityBasedTimeout"
+      }
+    });
+    assert.strictEqual(actual, true);
+  });
+
+  it('accepts policy type to be claimsMapping', () => {
+    const actual = command.validate({
+      options:
+      {
+        policyType: "claimsMapping"
+      }
+    });
+    assert.strictEqual(actual, true);
+  });
+
+  it('accepts policy type to be homeRealmDiscovery', () => {
+    const actual = command.validate({
+      options:
+      {
+        policyType: "homeRealmDiscovery"
+      }
+    });
+    assert.strictEqual(actual, true);
+  });
+
+  it('accepts policy type to be tokenLifetime', () => {
+    const actual = command.validate({
+      options:
+      {
+        policyType: "tokenLifetime"
+      }
+    });
+    assert.strictEqual(actual, true);
+  });
+
+  it('accepts policy type to be tokenIssuance', () => {
+    const actual = command.validate({
+      options:
+      {
+        policyType: "tokenIssuance"
+      }
+    });
+    assert.strictEqual(actual, true);
+  });
+
+  it('rejects invalid policy type', () => {
+    const policyType = 'foo';
+    const actual = command.validate({
+      options: {
+        policyType: policyType
+      }
+    });
+    assert.strictEqual(actual, `${policyType} is not a valid policyType. Allowed values are activityBasedTimeout|claimsMapping|homeRealmDiscovery|tokenLifetime|tokenIssuance`);
   });
 
   it('supports debug mode', () => {
