@@ -351,6 +351,7 @@ nav:
         - serviceprincipal set: 'cmd/spo/serviceprincipal/serviceprincipal-set.md'
       - site:
         - site add: 'cmd/spo/site/site-add.md'
+        - site add: 'cmd/spo/site/site-apppermission-list.md'
         - site ensure: 'cmd/spo/site/site-ensure.md'
         - site get: 'cmd/spo/site/site-get.md'
         - site groupify: 'cmd/spo/site/site-groupify.md'
