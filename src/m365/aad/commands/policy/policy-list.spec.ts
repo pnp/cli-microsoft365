@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
-import Command from '../../../../Command';
+import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
@@ -201,7 +201,33 @@ describe(commands.POLICY_LIST, () => {
     });
   });
 
-  it('accepts policy type to be activityBasedTimeout', () => {
+  it('correctly handles API OData error for specified policies', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.reject({
+        "error": {
+          "code": "BadRequest",
+          "message": "Resource not found for the segment 'foo'.",
+          "innerError": {
+            "date": "2021-03-03T16:18:02",
+            "request-id": "0dd70174-a89f-4aec-bdff-7734b8197c07",
+            "client-request-id": "0dd70174-a89f-4aec-bdff-7734b8197c07"
+          }
+        }
+      });
+    });
+
+    command.action(logger, { options: { debug: false, policyType: "foo" } } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('accepts policyType to be activityBasedTimeout', () => {
     const actual = command.validate({
       options:
       {
@@ -211,7 +237,7 @@ describe(commands.POLICY_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policy type to be claimsMapping', () => {
+  it('accepts policyType to be claimsMapping', () => {
     const actual = command.validate({
       options:
       {
@@ -221,7 +247,7 @@ describe(commands.POLICY_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policy type to be homeRealmDiscovery', () => {
+  it('accepts policyType to be homeRealmDiscovery', () => {
     const actual = command.validate({
       options:
       {
@@ -231,7 +257,7 @@ describe(commands.POLICY_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policy type to be tokenLifetime', () => {
+  it('accepts policyType to be tokenLifetime', () => {
     const actual = command.validate({
       options:
       {
@@ -241,7 +267,7 @@ describe(commands.POLICY_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('accepts policy type to be tokenIssuance', () => {
+  it('accepts policyType to be tokenIssuance', () => {
     const actual = command.validate({
       options:
       {
@@ -251,7 +277,7 @@ describe(commands.POLICY_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('rejects invalid policy type', () => {
+  it('rejects invalid policyType', () => {
     const policyType = 'foo';
     const actual = command.validate({
       options: {
