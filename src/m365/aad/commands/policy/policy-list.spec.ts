@@ -107,7 +107,7 @@ describe(commands.POLICY_LIST, () => {
     });
   });
 
-  it('retrieves all the policies', (done) => {
+  it('retrieves all policies', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/activityBasedTimeoutPolicies`) {
         return Promise.resolve({
@@ -193,6 +193,22 @@ describe(commands.POLICY_LIST, () => {
             isOrganizationDefault: true
           }
         ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles API OData error for all policies', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      return Promise.reject("Resource not found for the segment 'foo'.");
+    });
+
+    command.action(logger, { options: { debug: false } } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Resource not found for the segment 'foo'.")));
         done();
       }
       catch (e) {
