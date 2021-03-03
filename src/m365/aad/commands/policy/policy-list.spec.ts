@@ -203,22 +203,12 @@ describe(commands.POLICY_LIST, () => {
 
   it('correctly handles API OData error for specified policies', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      return Promise.reject({
-        "error": {
-          "code": "BadRequest",
-          "message": "Resource not found for the segment 'foo'.",
-          "innerError": {
-            "date": "2021-03-03T16:18:02",
-            "request-id": "0dd70174-a89f-4aec-bdff-7734b8197c07",
-            "client-request-id": "0dd70174-a89f-4aec-bdff-7734b8197c07"
-          }
-        }
-      });
+      return Promise.reject("Resource not found for the segment 'foo'.");
     });
 
     command.action(logger, { options: { debug: false, policyType: "foo" } } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Resource not found for the segment 'foo'.")));
         done();
       }
       catch (e) {
