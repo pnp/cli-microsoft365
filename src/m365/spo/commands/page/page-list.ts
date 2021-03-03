@@ -25,7 +25,7 @@ class SpoPageListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['Name', 'Title'];
+    return ['FileName', 'Title'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -34,7 +34,7 @@ class SpoPageListCommand extends SpoCommand {
     }
 
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`,
+      url: `${args.options.webUrl}/_api/sitepages/pages?$orderby=Title`,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -45,8 +45,7 @@ class SpoPageListCommand extends SpoCommand {
       .get<{ value: any[] }>(requestOptions)
       .then((res: { value: any[] }): void => {
         if (res.value && res.value.length > 0) {
-          const clientSidePages: any[] = res.value.filter(p => p.ListItemAllFields.ClientSideApplicationId === 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec');
-          logger.log(clientSidePages);
+          logger.log(res.value);
         }
 
         cb();
