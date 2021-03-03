@@ -2,6 +2,12 @@
 
 ## [v3.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.7.0)
 
+### New commands
+
+**SharePoint:**
+
+- [spo site apppermission list](../cmd/spo/site/site-apppermission-list.md) - lists application permissions for a site [#2206](https://github.com/pnp/cli-microsoft365/issues/2206)
+
 ### Changes
 
 - added conditionally saving page in 'spo page set' [#2211](https://github.com/pnp/cli-microsoft365/issues/2211)
