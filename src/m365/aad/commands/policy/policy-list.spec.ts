@@ -59,6 +59,69 @@ describe(commands.POLICY_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('retrieves the specified policy', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/policies/authorizationPolicy`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/authorizationPolicy/$entity",
+          "@odata.id": "https://graph.microsoft.com/v2/b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923/authorizationPolicy/authorizationPolicy",
+          "id": "authorizationPolicy",
+          "allowInvitesFrom": "everyone",
+          "allowedToSignUpEmailBasedSubscriptions": true,
+          "allowedToUseSSPR": true,
+          "allowEmailVerifiedUsersToJoinOrganization": true,
+          "blockMsolPowerShell": null,
+          "displayName": "Authorization Policy",
+          "description": "Used to manage authorization related settings across the company.",
+          "defaultUserRolePermissions": {
+            "allowedToCreateApps": true,
+            "allowedToCreateSecurityGroups": true,
+            "allowedToReadOtherUsers": true,
+            "permissionGrantPoliciesAssigned": [
+              "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
+            ]
+          }
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        policyType: "authorization"
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/authorizationPolicy/$entity",
+          "@odata.id": "https://graph.microsoft.com/v2/b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923/authorizationPolicy/authorizationPolicy",
+          "id": "authorizationPolicy",
+          "allowInvitesFrom": "everyone",
+          "allowedToSignUpEmailBasedSubscriptions": true,
+          "allowedToUseSSPR": true,
+          "allowEmailVerifiedUsersToJoinOrganization": true,
+          "blockMsolPowerShell": null,
+          "displayName": "Authorization Policy",
+          "description": "Used to manage authorization related settings across the company.",
+          "defaultUserRolePermissions": {
+            "allowedToCreateApps": true,
+            "allowedToCreateSecurityGroups": true,
+            "allowedToReadOtherUsers": true,
+            "permissionGrantPoliciesAssigned": [
+              "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
+            ]
+          }
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('retrieves the specified policies', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/tokenLifetimePolicies`) {
@@ -113,6 +176,29 @@ describe(commands.POLICY_LIST, () => {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/activityBasedTimeoutPolicies",
           "value": []
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/policies/authorizationPolicy`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/authorizationPolicy/$entity",
+          "@odata.id": "https://graph.microsoft.com/v2/b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923/authorizationPolicy/authorizationPolicy",
+          "id": "authorizationPolicy",
+          "allowInvitesFrom": "everyone",
+          "allowedToSignUpEmailBasedSubscriptions": true,
+          "allowedToUseSSPR": true,
+          "allowEmailVerifiedUsersToJoinOrganization": true,
+          "blockMsolPowerShell": null,
+          "displayName": "Authorization Policy",
+          "description": "Used to manage authorization related settings across the company.",
+          "defaultUserRolePermissions": {
+            "allowedToCreateApps": true,
+            "allowedToCreateSecurityGroups": true,
+            "allowedToReadOtherUsers": true,
+            "permissionGrantPoliciesAssigned": [
+              "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
+            ]
+          }
         });
       }
 
@@ -175,13 +261,24 @@ describe(commands.POLICY_LIST, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
-            id: 'a457c42c-0f2e-4a25-be2a-545e840add1f',
-            deletedDateTime: null,
-            definition: [
-              '{"TokenLifetimePolicy":{"Version":1,"AccessTokenLifetime":"8:00:00"}}'
-            ],
-            displayName: 'TokenLifetimePolicy1',
-            isOrganizationDefault: true
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/authorizationPolicy/$entity",
+            "@odata.id": "https://graph.microsoft.com/v2/b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923/authorizationPolicy/authorizationPolicy",
+            "id": "authorizationPolicy",
+            "allowInvitesFrom": "everyone",
+            "allowedToSignUpEmailBasedSubscriptions": true,
+            "allowedToUseSSPR": true,
+            "allowEmailVerifiedUsersToJoinOrganization": true,
+            "blockMsolPowerShell": null,
+            "displayName": "Authorization Policy",
+            "description": "Used to manage authorization related settings across the company.",
+            "defaultUserRolePermissions": {
+              "allowedToCreateApps": true,
+              "allowedToCreateSecurityGroups": true,
+              "allowedToReadOtherUsers": true,
+              "permissionGrantPoliciesAssigned": [
+                "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
+              ]
+            }
           },
           {
             id: '457c8ef6-7a9c-4c9c-ba05-a12b7654c95a',
@@ -190,6 +287,15 @@ describe(commands.POLICY_LIST, () => {
               '{ "TokenIssuancePolicy":{"TokenResponseSigningPolicy":"TokenOnly","SamlTokenVersion":"1.1","SigningAlgorithm":"http://www.w3.org/2001/04/xmldsig-more#rsa-sha256","Version":1}}'
             ],
             displayName: 'TokenIssuancePolicy1',
+            isOrganizationDefault: true
+          },
+          {
+            id: 'a457c42c-0f2e-4a25-be2a-545e840add1f',
+            deletedDateTime: null,
+            definition: [
+              '{"TokenLifetimePolicy":{"Version":1,"AccessTokenLifetime":"8:00:00"}}'
+            ],
+            displayName: 'TokenLifetimePolicy1',
             isOrganizationDefault: true
           }
         ]));
@@ -243,6 +349,16 @@ describe(commands.POLICY_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('accepts policyType to be authorization', () => {
+    const actual = command.validate({
+      options:
+      {
+        policyType: "authorization"
+      }
+    });
+    assert.strictEqual(actual, true);
+  });
+
   it('accepts policyType to be claimsMapping', () => {
     const actual = command.validate({
       options:
@@ -290,7 +406,7 @@ describe(commands.POLICY_LIST, () => {
         policyType: policyType
       }
     });
-    assert.strictEqual(actual, `${policyType} is not a valid policyType. Allowed values are activityBasedTimeout|claimsMapping|homeRealmDiscovery|tokenLifetime|tokenIssuance`);
+    assert.strictEqual(actual, `${policyType} is not a valid policyType. Allowed values are activityBasedTimeout|authorization|claimsMapping|homeRealmDiscovery|tokenLifetime|tokenIssuance`);
   });
 
   it('supports debug mode', () => {

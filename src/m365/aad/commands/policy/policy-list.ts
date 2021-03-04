@@ -35,32 +35,54 @@ class AadPolicyListCommand extends GraphItemsListCommand<any> {
     if (policyType && policyType !== "all") {
       let endpoint = this.getPolicyEndPoint[policyType];
       const url: string = `${this.resource}/v1.0/policies/${endpoint}`;
-      ((): Promise<any[]> => {
-        return this.getPolicies(url);
-      })()
-        .then((policies: any[]): void => {
-          if (policies && policies.length > 0) {
-            logger.log(policies);
-          }
-          cb();
-        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      if (endpoint === "authorizationPolicy") {
+        ((): Promise<any> => {
+          return this.getPolicy(url);
+        })()
+          .then((policy: any): void => {
+            if (policy) {
+              logger.log(policy);
+            }
+            cb();
+          }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      }
+      else {
+        ((): Promise<any[]> => {
+          return this.getPolicies(url);
+        })()
+          .then((policies: any[]): void => {
+            if (policies && policies.length > 0) {
+              logger.log(policies);
+            }
+            cb();
+          }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      }
     }
     else {
-      const policyTypes: string[] = ['activityBasedTimeout', 'claimsMapping', 'homeRealmDiscovery', 'tokenLifetime', 'tokenIssuance'];
+      const policyTypes: string[] = ['activityBasedTimeout', 'authorization', 'claimsMapping', 'homeRealmDiscovery', 'tokenIssuance', 'tokenLifetime'];
       let promiseCalls: any[] = [];
       policyTypes.forEach((policyType) => {
         let endpoint = this.getPolicyEndPoint[policyType];
         const url: string = `${this.resource}/v1.0/policies/${endpoint}`;
-        promiseCalls.push(
-          ((): Promise<any[]> => {
-            return this.getPolicies(url);
-          })()
-        );
+        if (endpoint === "authorizationPolicy") {
+          promiseCalls.push(
+            ((): Promise<any> => {
+              return this.getPolicy(url);
+            })()
+          );
+        }
+        else {
+          promiseCalls.push(
+            ((): Promise<any[]> => {
+              return this.getPolicies(url);
+            })()
+          );
+        }
       });
       Promise.all(promiseCalls)
         .then(((results) => {
-          let allPolicies: any[] = [];
-          results.forEach((policies: any[]) => {
+          let allPolicies: any = [];
+          results.forEach((policies: any) => {
             allPolicies = allPolicies.concat(policies);
           });
           if (allPolicies && allPolicies.length > 0) {
@@ -76,10 +98,11 @@ class AadPolicyListCommand extends GraphItemsListCommand<any> {
 
   private getPolicyEndPoint: { [key: string]: string } = {
     activityBasedTimeout: "activityBasedTimeoutPolicies",
+    authorization: "authorizationPolicy",
     claimsMapping: "claimsMappingPolicies",
     homeRealmDiscovery: "homeRealmDiscoveryPolicies",
-    tokenLifetime: "tokenLifetimePolicies",
-    tokenIssuance: "tokenIssuancePolicies"
+    tokenIssuance: "tokenIssuancePolicies",
+    tokenLifetime: "tokenLifetimePolicies"
   }
 
   private getPolicies(url: string): Promise<any[]> {
@@ -91,7 +114,7 @@ class AadPolicyListCommand extends GraphItemsListCommand<any> {
       responseType: 'json'
     };
 
-    return new Promise<any[]>((resolve: (list: any[]) => void, reject: (error: any) => void): void => {
+    return new Promise<any[]>((resolve: (policies: any[]) => void, reject: (error: any) => void): void => {
       request
         .get<{ value: any[]; }>(requestOptions)
         .then((response: { value: any[] }) => {
@@ -103,11 +126,32 @@ class AadPolicyListCommand extends GraphItemsListCommand<any> {
     });
   }
 
+  private getPolicy(url: string): Promise<any> {
+    const requestOptions: any = {
+      url: url,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    return new Promise<any>((resolve: (policy: any) => void, reject: (error: any) => void): void => {
+      request
+        .get<any>(requestOptions)
+        .then((response: any): void => {
+          resolve(response);
+        })
+        .catch((error: any) => {
+          reject(error);
+        });
+    });
+  }
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
         option: '-p, --policyType [policyType]',
-        autocomplete: ['activityBasedTimeout', 'claimsMapping', 'homeRealmDiscovery', 'tokenLifetime', 'tokenIssuance']
+        autocomplete: ['activityBasedTimeout', 'authorization', 'claimsMapping', 'homeRealmDiscovery', 'tokenIssuance', 'tokenLifetime']
       }
     ];
 
@@ -119,11 +163,12 @@ class AadPolicyListCommand extends GraphItemsListCommand<any> {
     if (args.options.policyType) {
       const policyType: string = args.options.policyType.toLowerCase()
       if (policyType !== 'activitybasedtimeout' &&
+        policyType !== 'authorization' &&
         policyType !== 'claimsmapping' &&
         policyType !== 'homerealmdiscovery' &&
-        policyType !== 'tokenlifetime' &&
-        policyType !== 'tokenissuance') {
-        return `${policyType} is not a valid policyType. Allowed values are activityBasedTimeout|claimsMapping|homeRealmDiscovery|tokenLifetime|tokenIssuance`;
+        policyType !== 'tokenissuance' &&
+        policyType !== 'tokenlifetime') {
+        return `${policyType} is not a valid policyType. Allowed values are activityBasedTimeout|authorization|claimsMapping|homeRealmDiscovery|tokenLifetime|tokenIssuance`;
       }
     }
 
