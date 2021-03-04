@@ -35,7 +35,7 @@ class AadPolicyListCommand extends GraphItemsListCommand<any> {
     if (policyType && policyType !== "all") {
       let endpoint = this.getPolicyEndPoint[policyType];
       const url: string = `${this.resource}/v1.0/policies/${endpoint}`;
-      if (endpoint === "authorizationPolicy") {
+      if (endpoint === "authorizationPolicy" || endpoint === "identitySecurityDefaultsEnforcementPolicy") {
         ((): Promise<any> => {
           return this.getPolicy(url);
         })()
@@ -59,12 +59,12 @@ class AadPolicyListCommand extends GraphItemsListCommand<any> {
       }
     }
     else {
-      const policyTypes: string[] = ['activityBasedTimeout', 'authorization', 'claimsMapping', 'homeRealmDiscovery', 'tokenIssuance', 'tokenLifetime'];
+      const policyTypes: string[] = ['activityBasedTimeout', 'authorization', 'claimsMapping', 'homeRealmDiscovery', 'identitySecurityDefaultsEnforcement', 'tokenIssuance', 'tokenLifetime'];
       let promiseCalls: any[] = [];
       policyTypes.forEach((policyType) => {
         let endpoint = this.getPolicyEndPoint[policyType];
         const url: string = `${this.resource}/v1.0/policies/${endpoint}`;
-        if (endpoint === "authorizationPolicy") {
+        if (endpoint === "authorizationPolicy" || endpoint === "identitySecurityDefaultsEnforcementPolicy") {
           promiseCalls.push(
             ((): Promise<any> => {
               return this.getPolicy(url);
@@ -101,6 +101,7 @@ class AadPolicyListCommand extends GraphItemsListCommand<any> {
     authorization: "authorizationPolicy",
     claimsMapping: "claimsMappingPolicies",
     homeRealmDiscovery: "homeRealmDiscoveryPolicies",
+    identitySecurityDefaultsEnforcement: "identitySecurityDefaultsEnforcementPolicy",
     tokenIssuance: "tokenIssuancePolicies",
     tokenLifetime: "tokenLifetimePolicies"
   }
@@ -151,7 +152,7 @@ class AadPolicyListCommand extends GraphItemsListCommand<any> {
     const options: CommandOption[] = [
       {
         option: '-p, --policyType [policyType]',
-        autocomplete: ['activityBasedTimeout', 'authorization', 'claimsMapping', 'homeRealmDiscovery', 'tokenIssuance', 'tokenLifetime']
+        autocomplete: ['activityBasedTimeout', 'authorization', 'claimsMapping', 'homeRealmDiscovery', 'identitySecurityDefaultsEnforcement', 'tokenIssuance', 'tokenLifetime']
       }
     ];
 
@@ -166,9 +167,10 @@ class AadPolicyListCommand extends GraphItemsListCommand<any> {
         policyType !== 'authorization' &&
         policyType !== 'claimsmapping' &&
         policyType !== 'homerealmdiscovery' &&
+        policyType !== 'identitysecuritydefaultsenforcement' &&
         policyType !== 'tokenissuance' &&
         policyType !== 'tokenlifetime') {
-        return `${policyType} is not a valid policyType. Allowed values are activityBasedTimeout|authorization|claimsMapping|homeRealmDiscovery|tokenLifetime|tokenIssuance`;
+        return `${policyType} is not a valid policyType. Allowed values are activityBasedTimeout|authorization|claimsMapping|identitySecurityDefaultsEnforcement|homeRealmDiscovery|tokenIssuance|tokenLifetime`;
       }
     }
 

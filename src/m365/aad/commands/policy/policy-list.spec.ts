@@ -216,6 +216,16 @@ describe(commands.POLICY_LIST, () => {
         });
       }
 
+      if (opts.url === `https://graph.microsoft.com/v1.0/policies/identitySecurityDefaultsEnforcementPolicy`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/identitySecurityDefaultsEnforcementPolicy/$entity",
+          "id": "00000000-0000-0000-0000-000000000005",
+          "displayName": "Security Defaults",
+          "description": "Security defaults is a set of basic identity security mechanisms recommended by Microsoft. When enabled, these recommendations will be automatically enforced in your organization. Administrators and users will be better protected from common identity related attacks.",
+          "isEnabled": false
+        });
+      }
+
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/tokenLifetimePolicies`) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/tokenLifetimePolicies",
@@ -279,6 +289,13 @@ describe(commands.POLICY_LIST, () => {
                 "ManagePermissionGrantsForSelf.microsoft-user-default-legacy"
               ]
             }
+          },
+          {
+            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#policies/identitySecurityDefaultsEnforcementPolicy/$entity",
+            "id": "00000000-0000-0000-0000-000000000005",
+            "displayName": "Security Defaults",
+            "description": "Security defaults is a set of basic identity security mechanisms recommended by Microsoft. When enabled, these recommendations will be automatically enforced in your organization. Administrators and users will be better protected from common identity related attacks.",
+            "isEnabled": false
           },
           {
             id: '457c8ef6-7a9c-4c9c-ba05-a12b7654c95a',
@@ -379,6 +396,16 @@ describe(commands.POLICY_LIST, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('accepts policyType to be identitySecurityDefaultsEnforcement', () => {
+    const actual = command.validate({
+      options:
+      {
+        policyType: "identitySecurityDefaultsEnforcement"
+      }
+    });
+    assert.strictEqual(actual, true);
+  });
+
   it('accepts policyType to be tokenLifetime', () => {
     const actual = command.validate({
       options:
@@ -406,7 +433,7 @@ describe(commands.POLICY_LIST, () => {
         policyType: policyType
       }
     });
-    assert.strictEqual(actual, `${policyType} is not a valid policyType. Allowed values are activityBasedTimeout|authorization|claimsMapping|homeRealmDiscovery|tokenLifetime|tokenIssuance`);
+    assert.strictEqual(actual, `${policyType} is not a valid policyType. Allowed values are activityBasedTimeout|authorization|claimsMapping|identitySecurityDefaultsEnforcement|homeRealmDiscovery|tokenIssuance|tokenLifetime`);
   });
 
   it('supports debug mode', () => {
