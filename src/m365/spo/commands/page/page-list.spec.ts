@@ -7,7 +7,7 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
-import { mockPageListData } from './page-list.mock';
+import { fileApiListData, mockPageListData, mockPagesListOutput } from './page-list.mock';
 const command: Command = require('./page-list');
 
 describe(commands.PAGE_LIST, () => {
@@ -60,7 +60,7 @@ describe(commands.PAGE_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['FileName', 'Title']);
+    assert.deepStrictEqual(command.defaultProperties(), ['Name', 'FileName', 'Title']);
   });
 
   it('lists all modern pages', (done) => {
@@ -69,12 +69,16 @@ describe(commands.PAGE_LIST, () => {
         return Promise.resolve({ value: mockPageListData });
       }
 
+      if ((opts.url as string).indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
+        return Promise.resolve({ value: fileApiListData });
+      }
+
       return Promise.reject('Invalid request');
     });
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(mockPageListData));
+        assert(loggerLogSpy.calledWith(mockPagesListOutput));
         done();
       }
       catch (e) {
@@ -89,12 +93,16 @@ describe(commands.PAGE_LIST, () => {
         return Promise.resolve({ value: mockPageListData });
       }
 
+      if ((opts.url as string).indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
+        return Promise.resolve({ value: fileApiListData });
+      }
+
       return Promise.reject('Invalid request');
     });
 
     command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(mockPageListData));
+        assert(loggerLogSpy.calledWith(mockPagesListOutput));
         done();
       }
       catch (e) {
@@ -106,6 +114,10 @@ describe(commands.PAGE_LIST, () => {
   it('correctly handles no modern pages', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/sitepages/pages?$orderby=Title`) > -1) {
+        return Promise.resolve({ value: [] });
+      }
+
+      if ((opts.url as string).indexOf(`/_api/web/lists/SitePages/rootfolder/files?$expand=ListItemAllFields/ClientSideApplicationId&$orderby=Name`) > -1) {
         return Promise.resolve({ value: [] });
       }
 

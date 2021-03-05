@@ -292,3 +292,89 @@ export const mockPageListData = [
     "LayoutWebpartsContent": null
   }
 ];
+
+
+export const fileApiListData = [
+  {
+    "ListItemAllFields": {
+      "FileSystemObjectType": 0,
+      "Id": 297,
+      "ServerRedirectedEmbedUri": null,
+      "ServerRedirectedEmbedUrl": "",
+      "ContentTypeId": "0x0101009D1CB255DA76424F860D91F20E6C411800C1D2FC2235A3EE48BCF467145E4618A9",
+      "ComplianceAssetId": null,
+      "WikiField": null,
+      "Title": "Home",
+      "ClientSideApplicationId": "b6917cb1-93a0-4b97-a84d-7cf49975d4ec",
+      "CanvasContent1": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;controlType&quot;&#58;3,&quot;displayMode&quot;&#58;2,&quot;id&quot;&#58;&quot;fd5034a3-0b1c-4aad-aa79-76de18af7198&quot;,&quot;position&quot;&#58;&#123;&quot;controlIndex&quot;&#58;1,&quot;sectionIndex&quot;&#58;1,&quot;zoneIndex&quot;&#58;1,&quot;sectionFactor&quot;&#58;12,&quot;layoutIndex&quot;&#58;1&#125;,&quot;webPartId&quot;&#58;&quot;1ef5ed11-ce7b-44be-bc5e-4abd55101d16&quot;,&quot;emphasis&quot;&#58;&#123;&#125;&#125;\"><div data-sp-webpart=\"\" data-sp-webpartdataversion=\"2.0\" data-sp-webpartdata=\"&#123;&quot;dataVersion&quot;&#58;&quot;2.0&quot;,&quot;description&quot;&#58;&quot;Use Markdown language to add and format text.&quot;,&quot;id&quot;&#58;&quot;1ef5ed11-ce7b-44be-bc5e-4abd55101d16&quot;,&quot;instanceId&quot;&#58;&quot;fd5034a3-0b1c-4aad-aa79-76de18af7198&quot;,&quot;properties&quot;&#58;&#123;&quot;displayPreview&quot;&#58;true,&quot;lineWrapping&quot;&#58;true,&quot;miniMap&quot;&#58;&#123;&quot;enabled&quot;&#58;false&#125;,&quot;previewState&quot;&#58;&quot;Show&quot;,&quot;theme&quot;&#58;&quot;Base16Light&quot;&#125;,&quot;title&quot;&#58;&quot;doctor-placeholder&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;searchablePlainTexts&quot;&#58;&#123;&quot;code&quot;&#58;&quot;\\n&amp;lt;p id=&amp;quot;logo&amp;quot; style=&amp;quot;text-align&#58;center&amp;quot;&amp;gt;&amp;lt;img style=&amp;quot;height&#58;200px&amp;quot; src=&amp;quot;https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/Shared%20Documents/assets/doctor.png&amp;quot; alt=&amp;quot;Doctor&amp;quot; /&amp;gt;&amp;lt;/p&amp;gt;\\n\\n## Maintain your documenation on SharePoint without pain\\n\\nWelcome to the static page created by `Doctor`!\\n\\n![Running doctor](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/Shared%20Documents/assets/doctor1.png)\\n\\n## Navigation\\n\\n- [Home](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/home.aspx)\\n- [Documentation](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/documentation.aspx)\\n  - [Options](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/options.aspx)\\n  - [Installation](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/installation.aspx)\\n  - [Page Creation](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/page-creation.aspx)\\n  - [Commands](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/commands.aspx)&quot;&#125;,&quot;htmlStrings&quot;&#58;&#123;&quot;html&quot;&#58;&quot;&lt;p id=\\&quot;logo\\&quot; style=\\&quot;text-align&#58;center\\&quot;&gt;&lt;img style=\\&quot;height&#58;200px\\&quot; src=\\&quot;https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/Shared%20Documents/assets/doctor.png\\&quot; alt=\\&quot;Doctor\\&quot;/&gt;&lt;/p&gt;\\n&lt;h2&gt;Maintain your documenation on SharePoint without pain&lt;/h2&gt;\\n&lt;p&gt;Welcome to the static page created by &lt;code&gt;Doctor&lt;/code&gt;!&lt;/p&gt;\\n&lt;p&gt;&lt;img src=\\&quot;https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/Shared%20Documents/assets/doctor1.png\\&quot; alt=\\&quot;Running doctor\\&quot;/&gt;&lt;/p&gt;\\n&lt;h2&gt;Navigation&lt;/h2&gt;\\n&lt;ul&gt;\\n&lt;li&gt;&lt;a href=\\&quot;https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/home.aspx\\&quot;&gt;Home&lt;/a&gt;&lt;/li&gt;\\n&lt;li&gt;&lt;a href=\\&quot;https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/documentation.aspx\\&quot;&gt;Documentation&lt;/a&gt;\\n&lt;ul&gt;\\n&lt;li&gt;&lt;a href=\\&quot;https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/options.aspx\\&quot;&gt;Options&lt;/a&gt;&lt;/li&gt;\\n&lt;li&gt;&lt;a href=\\&quot;https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/installation.aspx\\&quot;&gt;Installation&lt;/a&gt;&lt;/li&gt;\\n&lt;li&gt;&lt;a href=\\&quot;https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/page-creation.aspx\\&quot;&gt;Page Creation&lt;/a&gt;&lt;/li&gt;\\n&lt;li&gt;&lt;a href=\\&quot;https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/commands.aspx\\&quot;&gt;Commands&lt;/a&gt;&lt;/li&gt;\\n&lt;/ul&gt;\\n&lt;/li&gt;\\n&lt;/ul&gt;\\n&lt;style&gt;.hljs&#123;display&#58;block;overflow-x&#58;auto;padding&#58;.5em;color&#58;#333;background&#58;#f8f8f8&#125;.hljs-comment,.hljs-quote&#123;color&#58;#998;font-style&#58;italic&#125;.hljs-keyword,.hljs-selector-tag,.hljs-subst&#123;color&#58;#333;font-weight&#58;700&#125;.hljs-literal,.hljs-number,.hljs-tag .hljs-attr,.hljs-template-variable,.hljs-variable&#123;color&#58;teal&#125;.hljs-doctag,.hljs-string&#123;color&#58;#d14&#125;.hljs-section,.hljs-selector-id,.hljs-title&#123;color&#58;#900;font-weight&#58;700&#125;.hljs-subst&#123;font-weight&#58;400&#125;.hljs-class .hljs-title,.hljs-type&#123;color&#58;#458;font-weight&#58;700&#125;.hljs-attribute,.hljs-name,.hljs-tag&#123;color&#58;navy;font-weight&#58;400&#125;.hljs-link,.hljs-regexp&#123;color&#58;#009926&#125;.hljs-bullet,.hljs-symbol&#123;color&#58;#990073&#125;.hljs-built_in,.hljs-builtin-name&#123;color&#58;#0086b3&#125;.hljs-meta&#123;color&#58;#999;font-weight&#58;700&#125;.hljs-deletion&#123;background&#58;#fdd&#125;.hljs-addition&#123;background&#58;#dfd&#125;.hljs-emphasis&#123;font-style&#58;italic&#125;.hljs-strong&#123;font-weight&#58;700&#125; .callout&#123;padding&#58;1rem;border&#58;1px solid #eaeaea;border-radius&#58;15px&#125;.callout-content&gt;&#58;last-child&#123;margin-bottom&#58;0&#125;.callout h5&#123;font-weight&#58;700;margin&#58;0 0 .5rem 0&#125;.callout .callout-icon svg&#123;display&#58;inline-block;vertical-align&#58;middle;margin-right&#58;.2em&#125;.callout-note&#123;background-color&#58;#e1dfdd;color&#58;#000&#125;.callout-tip&#123;background-color&#58;#bad80a;color&#58;#000&#125;.callout-info&#123;background-color&#58;#00b7c3;color&#58;#000&#125;.callout-caution&#123;background-color&#58;#fa4;color&#58;#000&#125;.callout-danger&#123;background-color&#58;#d13438;color&#58;#000&#125;&lt;/style&gt;&quot;&#125;&#125;&#125;\"><div data-sp-componentid=\"\">1ef5ed11-ce7b-44be-bc5e-4abd55101d16</div><div data-sp-htmlproperties=\"\"><div data-sp-prop-name=\"html\"><p id=\"logo\" style=\"text-align&#58;center;\"><img style=\"height&#58;200px;\" src=\"/sites/Doctor/Shared%20Documents/assets/doctor.png\" alt=\"Doctor\" /></p>\n<h2>Maintain your documenation on SharePoint without pain</h2>\n<p>Welcome to the static page created by <code>Doctor</code>!</p>\n<p><img src=\"/sites/Doctor/Shared%20Documents/assets/doctor1.png\" alt=\"Running doctor\" /></p>\n<h2>Navigation</h2>\n<ul>\n<li><a href=\"/sites/Doctor/sitepages/home.aspx\">Home</a></li>\n<li><a href=\"/sites/Doctor/sitepages/doctor/documentation.aspx\">Documentation</a>\n<ul>\n<li><a href=\"/sites/Doctor/sitepages/doctor/options.aspx\">Options</a></li>\n<li><a href=\"/sites/Doctor/sitepages/doctor/installation.aspx\">Installation</a></li>\n<li><a href=\"/sites/Doctor/sitepages/doctor/page-creation.aspx\">Page Creation</a></li>\n<li><a href=\"/sites/Doctor/sitepages/doctor/commands.aspx\">Commands</a></li>\n</ul>\n</li>\n</ul>\n<style>\r\n.ExternalClass .hljs {\ndisplay:block;\noverflow-x:auto;\npadding:.5em;\ncolor:#333;\nbackground:#f8f8f8;\n}\n\n.ExternalClass .hljs-comment, .ExternalClass .hljs-quote {\ncolor:#998;\nfont-style:italic;\n}\n\n.ExternalClass .hljs-keyword, .ExternalClass .hljs-selector-tag, .ExternalClass .hljs-subst {\ncolor:#333;\nfont-weight:700;\n}\n\n.ExternalClass .hljs-literal, .ExternalClass .hljs-number, .ExternalClass .hljs-tag .hljs-attr, .ExternalClass .hljs-template-variable, .ExternalClass .hljs-variable {\ncolor:teal;\n}\n\n.ExternalClass .hljs-doctag, .ExternalClass .hljs-string {\ncolor:#d14;\n}\n\n.ExternalClass .hljs-section, .ExternalClass .hljs-selector-id, .ExternalClass .hljs-title {\ncolor:#900;\nfont-weight:700;\n}\n\n.ExternalClass .hljs-subst {\nfont-weight:400;\n}\n\n.ExternalClass .hljs-class .hljs-title, .ExternalClass .hljs-type {\ncolor:#458;\nfont-weight:700;\n}\n\n.ExternalClass .hljs-attribute, .ExternalClass .hljs-name, .ExternalClass .hljs-tag {\ncolor:navy;\nfont-weight:400;\n}\n\n.ExternalClass .hljs-link, .ExternalClass .hljs-regexp {\ncolor:#009926;\n}\n\n.ExternalClass .hljs-bullet, .ExternalClass .hljs-symbol {\ncolor:#990073;\n}\n\n.ExternalClass .hljs-built_in, .ExternalClass .hljs-builtin-name {\ncolor:#0086b3;\n}\n\n.ExternalClass .hljs-meta {\ncolor:#999;\nfont-weight:700;\n}\n\n.ExternalClass .hljs-deletion {\nbackground:#fdd;\n}\n\n.ExternalClass .hljs-addition {\nbackground:#dfd;\n}\n\n.ExternalClass .hljs-emphasis {\nfont-style:italic;\n}\n\n.ExternalClass .hljs-strong {\nfont-weight:700;\n}\n\n.ExternalClass .callout {\npadding:1rem;\nborder:1px solid #eaeaea;\nborder-radius:15px;\n}\n\n.ExternalClass .callout-content>:last-child {\nmargin-bottom:0;\n}\n\n.ExternalClass .callout h5 {\nfont-weight:700;\nmargin:0 0 .5rem 0;\n}\n\n.ExternalClass .callout .callout-icon svg {\ndisplay:inline-block;\nvertical-align:middle;\nmargin-right:.2em;\n}\n\n.ExternalClass .callout-note {\nbackground-color:#e1dfdd;\ncolor:#000;\n}\n\n.ExternalClass .callout-tip {\nbackground-color:#bad80a;\ncolor:#000;\n}\n\n.ExternalClass .callout-info {\nbackground-color:#00b7c3;\ncolor:#000;\n}\n\n.ExternalClass .callout-caution {\nbackground-color:#fa4;\ncolor:#000;\n}\n\n.ExternalClass .callout-danger {\nbackground-color:#d13438;\ncolor:#000;\n}\n</style></div><div data-sp-prop-name=\"code\" data-sp-searchableplaintext=\"true\">\n&lt;p id=&quot;logo&quot; style=&quot;text-align&#58;center&quot;&gt;&lt;img style=&quot;height&#58;200px&quot; src=&quot;https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/Shared%20Documents/assets/doctor.png&quot; alt=&quot;Doctor&quot; /&gt;&lt;/p&gt;\n\n## Maintain your documenation on SharePoint without pain\n\nWelcome to the static page created by `Doctor`!\n\n![Running doctor](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/Shared%20Documents/assets/doctor1.png)\n\n## Navigation\n\n- [Home](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/home.aspx)\n- [Documentation](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/documentation.aspx)\n  - [Options](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/options.aspx)\n  - [Installation](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/installation.aspx)\n  - [Page Creation](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/page-creation.aspx)\n  - [Commands](https&#58;//struyfconsultingdev.sharepoint.com/sites/Doctor/sitepages/doctor/commands.aspx)</div></div></div></div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.0\" data-sp-controldata=\"&#123;&quot;controlType&quot;&#58;0,&quot;pageSettingsSlice&quot;&#58;&#123;&quot;isDefaultDescription&quot;&#58;true,&quot;isDefaultThumbnail&quot;&#58;true&#125;&#125;\"></div></div>",
+      "BannerImageUrl": {
+        "Description": "https://struyfconsultingdev.sharepoint.com/_layouts/15/images/sitepagethumbnail.png",
+        "Url": "https://struyfconsultingdev.sharepoint.com/_layouts/15/images/sitepagethumbnail.png"
+      },
+      "Description": "The Doctor documentation homepage",
+      "PromotedState": 0,
+      "FirstPublishedDate": null,
+      "LayoutWebpartsContent": "<div><div data-sp-canvascontrol=\"\" data-sp-canvasdataversion=\"1.4\" data-sp-controldata=\"&#123;&quot;id&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;instanceId&quot;&#58;&quot;cbe7b0a9-3504-44dd-a3a3-0e5cacd07788&quot;,&quot;title&quot;&#58;&quot;Title Region&quot;,&quot;description&quot;&#58;&quot;Title Region Description&quot;,&quot;serverProcessedContent&quot;&#58;&#123;&quot;htmlStrings&quot;&#58;&#123;&#125;,&quot;searchablePlainTexts&quot;&#58;&#123;&#125;,&quot;imageSources&quot;&#58;&#123;&quot;imageSource&quot;&#58;&quot;/sites/Doctor/Shared Documents/assets/doctor.png&quot;&#125;,&quot;links&quot;&#58;&#123;&#125;,&quot;customMetadata&quot;&#58;&#123;&quot;imageSource&quot;&#58;&#123;&quot;siteId&quot;&#58;&quot;ad7e6c7a-9f62-4938-bfa3-44283ac0f493&quot;,&quot;webId&quot;&#58;&quot;84244edb-2564-470e-9376-0575ec0512b7&quot;,&quot;listId&quot;&#58;&quot;57eb410e-a255-4b04-8b66-f038c2103105&quot;,&quot;uniqueId&quot;&#58;&quot;9b12468a-c2f5-4934-a985-f27c6b33bf51&quot;&#125;&#125;&#125;,&quot;dataVersion&quot;&#58;&quot;1.4&quot;,&quot;properties&quot;&#58;&#123;&quot;title&quot;&#58;&quot;Home&quot;,&quot;imageSourceType&quot;&#58;2,&quot;layoutType&quot;&#58;&quot;FullWidthImage&quot;,&quot;textAlignment&quot;&#58;&quot;Left&quot;,&quot;showTopicHeader&quot;&#58;true,&quot;showPublishDate&quot;&#58;true,&quot;topicHeader&quot;&#58;&quot;Doctor&quot;,&quot;authors&quot;&#58;[],&quot;altText&quot;&#58;&quot;&quot;,&quot;webId&quot;&#58;&quot;84244edb-2564-470e-9376-0575ec0512b7&quot;,&quot;siteId&quot;&#58;&quot;ad7e6c7a-9f62-4938-bfa3-44283ac0f493&quot;,&quot;listId&quot;&#58;&quot;57eb410e-a255-4b04-8b66-f038c2103105&quot;,&quot;uniqueId&quot;&#58;&quot;9b12468a-c2f5-4934-a985-f27c6b33bf51&quot;,&quot;translateX&quot;&#58;55.23,&quot;translateY&quot;&#58;13.23&#125;&#125;\"></div></div>",
+      "OData__AuthorBylineId": null,
+      "_AuthorBylineStringId": null,
+      "OData__TopicHeader": "Doctor",
+      "OData__SPSitePageFlags": null,
+      "OData__OriginalSourceUrl": null,
+      "OData__OriginalSourceSiteId": null,
+      "OData__OriginalSourceWebId": null,
+      "OData__OriginalSourceListId": null,
+      "OData__OriginalSourceItemId": null,
+      "Category": null,
+      "SingleLineText": null,
+      "OData__SPTranslatedLanguages": [
+        "nl-nl",
+        "fr-fr"
+      ],
+      "OData__SPTranslationLanguage": null,
+      "OData__SPTranslationSourceItemId": null,
+      "OData__SPIsTranslation": null,
+      "ID": 297,
+      "Created": "2021-03-05T04:32:47",
+      "AuthorId": 6,
+      "Modified": "2021-03-05T04:33:02",
+      "EditorId": 6,
+      "OData__CopySource": null,
+      "CheckoutUserId": null,
+      "OData__UIVersionString": "1.0",
+      "GUID": "3385c3f1-7199-44fc-a6eb-c3ff1ca874f5"
+    },
+    "CheckInComment": "",
+    "CheckOutType": 2,
+    "ContentTag": "{44F0126B-3385-44B3-98F9-DBBB62B020C3},19,12",
+    "CustomizedPageStatus": 2,
+    "ETag": "\"{44F0126B-3385-44B3-98F9-DBBB62B020C3},19\"",
+    "Exists": true,
+    "IrmEnabled": false,
+    "Length": "17993",
+    "Level": 1,
+    "LinkingUri": null,
+    "LinkingUrl": "",
+    "MajorVersion": 1,
+    "MinorVersion": 0,
+    "Name": "home.aspx",
+    "ServerRelativeUrl": "/sites/Doctor/SitePages/home.aspx",
+    "TimeCreated": "2021-03-05T12:32:47Z",
+    "TimeLastModified": "2021-03-05T12:33:02Z",
+    "Title": "Home",
+    "UIVersion": 512,
+    "UIVersionLabel": "1.0",
+    "UniqueId": "44f0126b-3385-44b3-98f9-dbbb62b020c3"
+  }
+];
+
+export const mockPagesListOutput = mockPageListData.map(p => {
+  const clientSidePage = fileApiListData.find(cp => cp && cp.ListItemAllFields && cp.ListItemAllFields.Id === p.Id);
+  if (clientSidePage) {
+    return {
+      ...clientSidePage,
+      ...p
+    }
+  }
+
+  return p;
+});
