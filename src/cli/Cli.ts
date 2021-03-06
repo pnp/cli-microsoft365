@@ -10,10 +10,11 @@ import { Logger } from '.';
 import Command, { CommandError } from '../Command';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
-import configstore from '../configstore';
+import config from '../config';
 import Utils from '../Utils';
+import configstoreOptions from '../configstoreOptions';
+import * as Configstore from 'configstore';
 const packageJSON = require('../../package.json');
-const Configstore = require('configstore');
 
 export interface CommandOutput {
   stdout: string;
@@ -37,20 +38,17 @@ export class Cli {
   public currentCommandName: string | undefined;
   private optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
   private commandsFolder: string = '';
-  private showHelpOnFailure: boolean = false;
   private static instance: Cli;
-  private static conf: any;
+  private static conf: Configstore;
 
   private constructor() {
-    Cli.conf = new Configstore(configstore.name);
+    
   }
 
   public static getInstance(): Cli {
     if (!Cli.instance) {
       Cli.instance = new Cli();
     }
-
-    Cli.instance.showHelpOnFailure = Cli.conf.get(configstore.showHelpOnFailure) || false;
 
     return Cli.instance;
   }
@@ -132,7 +130,11 @@ export class Cli {
         }
 
         if (!matches) {
-          return this.closeWithError(`Invalid option: '${optionFromArgs}'${os.EOL}`, true);
+          if (!Cli.conf) {
+            Cli.conf = new Configstore(config.configstoreName);
+          }
+
+          return this.closeWithError(`Invalid option: '${optionFromArgs}'${os.EOL}`, Cli.conf.get(configstoreOptions.showHelpOnFailure) || true);
         }
       }
     }
@@ -142,7 +144,11 @@ export class Cli {
     for (let i = 0; i < this.commandToExecute.options.length; i++) {
       if (this.commandToExecute.options[i].required &&
         typeof this.optionsFromArgs.options[this.commandToExecute.options[i].name] === 'undefined') {
-        return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, true);
+          if (!Cli.conf) {
+            Cli.conf = new Configstore(config.configstoreName);
+          }
+          
+          return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, Cli.conf.get(configstoreOptions.showHelpOnFailure) || true);
       }
     }
 
@@ -152,25 +158,31 @@ export class Cli {
       Cli.loadOptionValuesFromFiles(optionsWithoutShorts);
     }
     catch (e) {
-      return this.closeWithError(e, Cli.getInstance().showHelpOnFailure);
+      if (!Cli.conf) {
+        Cli.conf = new Configstore(config.configstoreName);
+      }
+
+      return this.closeWithError(e, Cli.conf.get(configstoreOptions.showHelpOnFailure) || false);
     }
 
     const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
     if (typeof validationResult === 'string') {
-      return this.closeWithError(validationResult, true);
+      if (!Cli.conf) {
+        Cli.conf = new Configstore(config.configstoreName);
+      }
+
+      return this.closeWithError(validationResult, Cli.conf.get(configstoreOptions.showHelpOnFailure) || true);
     }
 
     return Cli
       .executeCommand(this.commandToExecute.command, optionsWithoutShorts)
-      .then(_ => {
-        if (optionsWithoutShorts.options.verbose ||
-          optionsWithoutShorts.options.debug) {
-          const chalk: typeof Chalk = require('chalk');
-          Cli.error(chalk.green('DONE'));
+      .then(_ => process.exit(0), err => {
+        if (!Cli.conf) {
+          Cli.conf = new Configstore(config.configstoreName);
         }
 
-        process.exit(0);
-      }, err => this.closeWithError(err));
+        this.closeWithError(err, Cli.conf.get(configstoreOptions.showHelpOnFailure) || false)
+      });
   }
 
   public static executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
@@ -267,7 +279,11 @@ export class Cli {
           }
         }
         catch (e) {
-          this.closeWithError(e, Cli.getInstance().showHelpOnFailure);
+          if (!Cli.conf) {
+            Cli.conf = new Configstore(config.configstoreName);
+          }
+
+          this.closeWithError(e, Cli.conf.get(configstoreOptions.showHelpOnFailure) || false);
         }
       }
     });

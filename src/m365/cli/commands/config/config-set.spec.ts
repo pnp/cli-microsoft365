@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import { Logger } from '../../../../cli';
 import Command from '../../../../Command';
 import commands from '../../commands';
-import configstore from '../../../../configstore';
+import configstore from '../../../../configstoreOptions';
 const command: Command = require('./config-set');
 
 describe(commands.CONFIG_SET, () => {

@@ -13,6 +13,8 @@ import AnonymousCommand from '../m365/base/AnonymousCommand';
 import Utils from '../Utils';
 import { Logger } from './Logger';
 import Table = require('easy-table');
+import config from '../config';
+import * as Configstore from 'configstore';
 const packageJSON = require('../../package.json');
 
 class MockCommand extends AnonymousCommand {
@@ -231,9 +233,13 @@ describe('Cli', () => {
           done();
         }
         catch (e) {
+          assert(cliErrorStub.calledWith(chalk.red(e), false));
           done(e);
         }
-      }, e => done(e));
+      }, e => {
+        assert(cliErrorStub.calledWith(chalk.red(e), false));
+        done(e)
+      });
   });
 
   it('shows generic help when help command and no command name specified', (done) => {
@@ -414,13 +420,19 @@ describe('Cli', () => {
       .execute(rootFolder, ['cli', 'mock'])
       .then(_ => {
         try {
+          const cli: Cli = Cli.getInstance();
+          (cli as any).conf = new Configstore(config.configstoreName);
           assert(cliErrorStub.calledWith(chalk.red(`Error: Required option parameterX not specified`)));
           done();
         }
         catch (e) {
           done(e);
         }
-      }, e => done(e));
+      }, e => {
+        const cli: Cli = Cli.getInstance();
+          (cli as any).conf = new Configstore(config.configstoreName);
+        done(e)
+      });
   });
 
   it(`calls command's validation method when defined`, (done) => {
@@ -478,34 +490,6 @@ describe('Cli', () => {
       .then(_ => {
         try {
           assert(mockCommandActionSpy.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it(`writes DONE when executing command in verbose mode succeeded`, (done) => {
-    cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--verbose'])
-      .then(_ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.green('DONE')));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it(`writes DONE when executing command in debug mode succeeded`, (done) => {
-    cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '123', '--debug'])
-      .then(_ => {
-        try {
-          assert(cliErrorStub.calledWith(chalk.green('DONE')));
           done();
         }
         catch (e) {
@@ -676,6 +660,8 @@ describe('Cli', () => {
         done('Command succeeded while expected fail');
       }, e => {
         try {
+          const cli: Cli = Cli.getInstance();
+          (cli as any).conf = new Configstore(config.configstoreName);
           assert.strictEqual(e, 'Error');
           done();
         }
@@ -693,6 +679,8 @@ describe('Cli', () => {
         done('Command succeeded while expected fail');
       }, e => {
         try {
+          const cli: Cli = Cli.getInstance();
+          (cli as any).conf = new Configstore(config.configstoreName);
           assert.strictEqual(e.error, 'Error');
           done();
         }
@@ -729,6 +717,7 @@ describe('Cli', () => {
     }
 
     try {
+      (cli as any).conf = new Configstore(config.configstoreName);
       assert(cliStub.calledWith('Error'));
       done();
     }
@@ -746,6 +735,8 @@ describe('Cli', () => {
       done();
     }
     catch (e) {
+      const cli: Cli = Cli.getInstance();
+          (cli as any).conf = new Configstore(config.configstoreName);
       done(e);
     }
   });
@@ -762,6 +753,8 @@ describe('Cli', () => {
       done();
     }
     catch (e) {
+      const cli: Cli = Cli.getInstance();
+          (cli as any).conf = new Configstore(config.configstoreName);
       done(e);
     }
   });
@@ -778,6 +771,8 @@ describe('Cli', () => {
       done();
     }
     catch (e) {
+      const cli: Cli = Cli.getInstance();
+          (cli as any).conf = new Configstore(config.configstoreName);
       done(e);
     }
   });
@@ -794,6 +789,8 @@ describe('Cli', () => {
       done();
     }
     catch (e) {
+      const cli: Cli = Cli.getInstance();
+          (cli as any).conf = new Configstore(config.configstoreName);
       done(e);
     }
   });
@@ -1026,10 +1023,13 @@ describe('Cli', () => {
       done();
     }
     catch (e) {
+      const cli: Cli = Cli.getInstance();
+      (cli as any).conf = new Configstore(config.configstoreName);
       done(e);
     }
     finally {
       (cli as any).commandToExecute = undefined;
+      (cli as any).conf = new Configstore(config.configstoreName);
     }
   });
 
@@ -1062,6 +1062,8 @@ describe('Cli', () => {
       done();
     }
     catch (e) {
+      const cli: Cli = Cli.getInstance();
+      (cli as any).conf = new Configstore(config.configstoreName);
       done(e);
     }
     finally {

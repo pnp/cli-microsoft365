@@ -11,7 +11,7 @@ m365 cli config set [options]
 ## Options
 
 `-k, --key <key>`
-: Config key to . Allowed values: `showHelpOnFailure`
+: Config key to specify. Allowed values: `showHelpOnFailure`
 
 `-v, --value <value>`
 : Config value to set
