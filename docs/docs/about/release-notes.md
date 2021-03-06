@@ -13,6 +13,8 @@
 - added conditionally saving page in 'spo page set' [#2211](https://github.com/pnp/cli-microsoft365/issues/2211)
 - fixed issue in `spo page control set` discarding data on save [#2216](https://github.com/pnp/cli-microsoft365/issues/2216)
 - added missing `includeOndriveSites` option to `spo site classic list` docs [#2234](https://github.com/pnp/cli-microsoft365/issues/2234)
+- added Remote Development container [#1832](https://github.com/pnp/cli-microsoft365/issues/1832)
+- moved `spo page list` to use pages API [#2241](https://github.com/pnp/cli-microsoft365/issues/2241)
 
 ## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
 
