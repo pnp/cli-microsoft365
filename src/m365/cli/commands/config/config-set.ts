@@ -27,6 +27,13 @@ class CliConfigSetCommand extends AnonymousCommand {
     return 'Manage global configuration settings about the CLI for Microsoft 365';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.key = args.options.key;
+    telemetryProps.value = args.options.value;
+    return telemetryProps;
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let value: any = undefined;
     const conf = new Configstore(config.configstoreName);
