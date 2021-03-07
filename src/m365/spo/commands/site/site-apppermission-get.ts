@@ -16,7 +16,6 @@ interface Options extends GlobalOptions {
   permissionId: string
 }
 
-
 class SpoSiteApppermissionGetCommand extends GraphCommand {
   public get name(): string {
     return commands.SITE_APPPERMISSION_GET;
