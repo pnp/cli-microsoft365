@@ -1,6 +1,6 @@
 # pa connector export
 
-Exports the specified power automate or power apps custom connector
+Exports the specified Power Automate or Power Apps custom connector
 
 ## Usage
 

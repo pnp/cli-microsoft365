@@ -81,25 +81,7 @@ nav:
         - completion sh update: 'cmd/cli/completion/completion-sh-update.md'
     - File (file):
       - convert:
-        - convert pdf: 'cmd/file/convert/convert-pdf.md'
-    - Microsoft Flow (flow):
-      - disable: 'cmd/flow/flow-disable.md'
-      - enable: 'cmd/flow/flow-enable.md'
-      - export: 'cmd/flow/flow-export.md'
-      - get: 'cmd/flow/flow-get.md'
-      - list: 'cmd/flow/flow-list.md'
-      - remove: 'cmd/flow/flow-remove.md'
-      - connector:
-        - connector export: 'cmd/pa/connector/connector-export.md'
-        - connector list: 'cmd/pa/connector/connector-list.md'
-      - environment:
-        - environment get: 'cmd/flow/environment/environment-get.md'
-        - environment list: 'cmd/flow/environment/environment-list.md'
-      - run:
-        - run cancel: 'cmd/flow/run/run-cancel.md'
-        - run get: 'cmd/flow/run/run-get.md'
-        - run list: 'cmd/flow/run/run-list.md'
-        - run resubmit: 'cmd/flow/run/run-resubmit.md'
+        - convert pdf: 'cmd/file/convert/convert-pdf.md'   
     - Microsoft Graph (graph):
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
@@ -136,7 +118,10 @@ nav:
         - report mailboxusagemailboxcount: 'cmd/outlook/report/report-mailboxusagemailboxcount.md'
         - report mailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md'
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
-    - PowerApps (pa):
+    - Microsoft Planner (planner):
+      - task:
+        - task list: 'cmd/planner/task/task-list.md'
+    - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
         - app list: 'cmd/pa/app/app-list.md'
@@ -150,10 +135,25 @@ nav:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
       - solution:
         - solution init: 'cmd/pa/solution/solution-init.md'
-        - solution reference add: 'cmd/pa/solution/solution-reference-add.md'
-    - Microsoft Planner (planner):
-      - task:
-        - task list: 'cmd/planner/task/task-list.md'
+        - solution reference add: 'cmd/pa/solution/solution-reference-add.md'        
+    - Power Automate (flow):
+      - disable: 'cmd/flow/flow-disable.md'
+      - enable: 'cmd/flow/flow-enable.md'
+      - export: 'cmd/flow/flow-export.md'
+      - get: 'cmd/flow/flow-get.md'
+      - list: 'cmd/flow/flow-list.md'
+      - remove: 'cmd/flow/flow-remove.md'
+      - connector:
+        - connector export: 'cmd/pa/connector/connector-export.md'
+        - connector list: 'cmd/pa/connector/connector-list.md'
+      - environment:
+        - environment get: 'cmd/flow/environment/environment-get.md'
+        - environment list: 'cmd/flow/environment/environment-list.md'
+      - run:
+        - run cancel: 'cmd/flow/run/run-cancel.md'
+        - run get: 'cmd/flow/run/run-get.md'
+        - run list: 'cmd/flow/run/run-list.md'
+        - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Skype (skype):
       - report:
         - report activitycounts: 'cmd/skype/report/report-activitycounts.md'

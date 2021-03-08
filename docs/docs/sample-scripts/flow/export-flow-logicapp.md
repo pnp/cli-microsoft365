@@ -1,14 +1,14 @@
-# Export a single Flow to a Logic App
+# Export a single flow to a Logic App
 
 Author: [Albert-Jan Schot](https://www.cloudappie.nl/cli-m365-exportflow/)
 
 !!!
 
-Want to upgrade one of your Flows to a Logic App? Missing the option in the UI? Or just looking at an easy way to do it programmatically?
+Want to upgrade one of your Power Automate flows to a Logic App? Missing the option in the UI? Or just looking at an easy way to do it programmatically?
 
 By combining the CLI for Microsoft 365 and PowerShell we can make this task easy and repeatable.
 
-This script will export the flow *Your sample test flow*, make sure to pass the correct name in the script, and your Flow will be exported right away.
+This script will export the Power Automate flow *Your sample test flow*, make sure to pass the correct name in the script, and your flow will be exported right away.
 !!!
 
 ```powershell tab="PowerShell Core"

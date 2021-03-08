@@ -1,6 +1,6 @@
 # pa environment get
 
-Gets information about the specified Microsoft Power Apps environment
+Gets information about the specified Power Apps environment
 
 ## Usage
 
@@ -24,7 +24,7 @@ If the environment with the name you specified doesn't exist, you will get the `
 
 ## Examples
 
-Get information about the Microsoft Power Apps environment named _Default-d87a7535-dd31-4437-bfe1-95340acd55c5_
+Get information about the Power Apps environment named _Default-d87a7535-dd31-4437-bfe1-95340acd55c5_
 
 ```sh
 m365 pa environment get --name Default-d87a7535-dd31-4437-bfe1-95340acd55c5
