@@ -8,5 +8,6 @@ export default {
   COMPLETION_SH_UPDATE: `${prefix} completion sh update`,
   CONFIG_SET: `${prefix} config set`,
   CONSENT: `${prefix} consent`,
+  ISSUE: `${prefix} issue`,
   RECONSENT: `${prefix} reconsent`
 };
