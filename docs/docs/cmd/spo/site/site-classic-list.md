@@ -16,6 +16,9 @@ m365 spo site classic list [options]
 `-f, --filter [filter]`
 : filter to apply when retrieving sites
 
+`--includeOneDriveSites`
+: include OneDrive sites in the result when retrieving sites
+
 --8<-- "docs/cmd/_global.md"
 
 !!! important
@@ -53,4 +56,10 @@ List all classic project sites that contain _project_ in the URL
 
 ```sh
 m365 spo site classic list --webTemplate PROJECTSITE#0 --filter "Url -like 'project'"
+```
+
+List only OneDrive sites
+
+```sh
+m365 spo site classic list --includeOneDriveSites --webTemplate "SPSPERS#10"
 ```

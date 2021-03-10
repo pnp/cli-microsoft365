@@ -121,9 +121,12 @@ describe(commands.TEAMS_REPORT_DIRECTROUTINGCALLS, () => {
   });
 
   it('passes validation on valid fromDateTime', () => {
+    const validfromDateTime: any = new Date();
+    //fromDateTime should be less than 90 days ago for passing validation
+    validfromDateTime.setDate(validfromDateTime.getDate() - 70);
     const actual = command.validate({
       options: {
-        fromDateTime: '2020-12-01'
+        fromDateTime: validfromDateTime.toISOString().substr(0, 10)
       }
     });
     assert.strictEqual(actual, true);

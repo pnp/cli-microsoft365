@@ -124,6 +124,12 @@ export const CanvasContent = {
 
 
 export const mockPageData = {
+  "AuthorByline": "value",
+  "BannerImageUrl": "value",
+  "Description": "value",
+  "Title": "value",
+  "TopicHeader": "value",
+  "LayoutWebpartsContent": "value",
   "CanvasContent1": JSON.stringify([{ ...CanvasContent }])
 };
 

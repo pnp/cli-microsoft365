@@ -4,6 +4,7 @@ import Utils from '../../../../Utils';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
 import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './clientsidepages';
 import { PageItem } from './PageItem';
+import { getControlTypeDisplayName } from './pageMethods';
 
 export class Page {
   public static getPage(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
@@ -77,63 +78,12 @@ export class Page {
     });
   }
 
-  public static save(name: string, webUrl: string, canvasContent: any, logger: Logger, debug: boolean, verbose: boolean): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
-      if (verbose) {
-        logger.log(`Saving ${name} page...`);
-      }
-
-      if (!canvasContent) {
-        reject('No canvas content was provided');
-        return;
-      }
-
-      const pageName: string = this.getPageNameWithExtension(name);
-      const requestOptions: any = {
-        url: `${webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')/savepage`,
-        headers: {
-          'accept': 'application/json;odata=nometadata',
-          'content-type': 'application/json;odata=nometadata'
-        },
-        data: {
-          CanvasContent1: JSON.stringify(canvasContent)
-        },
-        responseType: 'json'
-      };
-
-      request
-        .post(requestOptions)
-        .then((res: any) => {
-          if (verbose) {
-            logger.log(res);
-          }
-
-          resolve();
-        }, (error: any): void => {
-          reject(error);
-        });
-    });
-  }
-
-  public static getControlTypeDisplayName(controlType: number): string {
-    switch (controlType) {
-      case 0:
-        return 'Empty column';
-      case 3:
-        return 'Client-side web part';
-      case 4:
-        return 'Client-side text';
-      default:
-        return '' + controlType;
-    }
-  }
-
   public static getControlsInformation(control: ClientSidePart, isJSONOutput: boolean): ClientSidePart {
     // remove the column property to be able to serialize the object to JSON
     delete control.column;
 
     if (!isJSONOutput) {
-      (control as any).controlType = this.getControlTypeDisplayName((control as any).controlType);
+      (control as any).controlType = getControlTypeDisplayName((control as any).controlType);
     }
 
     if (!control.dynamicDataPaths) {
@@ -173,7 +123,7 @@ export class Page {
     if (pageName.indexOf('.aspx') < 0) {
       pageName += '.aspx';
     }
-    
+
     return pageName;
   }
 }

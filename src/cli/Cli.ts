@@ -1,4 +1,5 @@
 import type * as Chalk from 'chalk';
+import type * as Configstore from 'configstore';
 import * as fs from 'fs';
 import type { Inquirer } from 'inquirer';
 import type * as JMESPath from 'jmespath';
@@ -8,9 +9,11 @@ import * as os from 'os';
 import * as path from 'path';
 import { Logger } from '.';
 import Command, { CommandError } from '../Command';
+import config from '../config';
+import { settingsNames } from '../settingsNames';
+import Utils from '../Utils';
 import { CommandInfo } from './CommandInfo';
 import { CommandOptionInfo } from './CommandOptionInfo';
-import Utils from '../Utils';
 const packageJSON = require('../../package.json');
 
 export interface CommandOutput {
@@ -36,6 +39,26 @@ export class Cli {
   private optionsFromArgs: { options: minimist.ParsedArgs } | undefined;
   private commandsFolder: string = '';
   private static instance: Cli;
+
+  private _config: Configstore | undefined;
+  public get config(): Configstore {
+    if (!this._config) {
+      const configStore: typeof Configstore = require('configstore');
+      this._config = new configStore(config.configstoreName);
+    }
+
+    return this._config;
+  }
+
+  public getSettingWithDefaultValue<TValue>(settingName: string, defaultValue: TValue): TValue {
+    const configuredValue: TValue | undefined = this.config.get(settingName);
+    if (typeof configuredValue === 'undefined') {
+      return defaultValue;
+    }
+    else {
+      return configuredValue;
+    }
+  }
 
   private constructor() {
   }
@@ -238,7 +261,7 @@ export class Cli {
           });
         }
 
-        resolve({ 
+        resolve({
           stdout: log.join(os.EOL),
           stderr: logErr.join(os.EOL)
         });
@@ -703,7 +726,7 @@ export class Cli {
     Cli.log();
   }
 
-  private closeWithError(error: any, showHelp: boolean = false): Promise<void> {
+  private closeWithError(error: any, showHelpIfEnabled: boolean = false): Promise<void> {
     const chalk: typeof Chalk = require('chalk');
     let exitCode: number = 1;
 
@@ -718,7 +741,8 @@ export class Cli {
       Cli.error(chalk.red(`Error: ${error}`));
     }
 
-    if (showHelp) {
+    if (showHelpIfEnabled &&
+      this.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
       Cli.log();
       this.printHelp(exitCode);
     }

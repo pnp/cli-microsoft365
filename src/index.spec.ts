@@ -50,6 +50,7 @@ describe('Lazy loading commands', () => {
       'spo sp permissionrequest deny',
       'spo sp permissionrequest list',
       'spo sp set',
+      'teams team get',
       'teams user add',
       'teams user list',
       'teams user remove',
