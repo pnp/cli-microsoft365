@@ -62,25 +62,9 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
       }).then((userIds: string[]) => {
         const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(channelId)}/members`;
         const roles: string[] = args.options.owner ? ["owner"] : [];
-        const tasks: Promise<string>[] = [];
-        const addUser: (userId: string) => Promise<any> = (userId: string): Promise<any> => {
-          const requestOptions: any = {
-            url: endpoint,
-            headers: {
-              'content-type': 'application/json;odata=nometadata',
-              'accept': 'application/json;odata.metadata=none'
-            },
-            responseType: 'json',
-            data: {
-              '@odata.type': '#microsoft.graph.aadUserConversationMember',
-              'roles': roles,
-              'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${userId}')`
-            }
-          };
-          return request.post(requestOptions);
-        }
-        for(const userId of userIds) {
-          tasks.push(addUser(userId));
+        const tasks: Promise<void>[] = [];
+        for (const userId of userIds) {
+          tasks.push(this.addUser(userId, endpoint, roles));
         }
         return Promise.all(tasks);
       }).then((): void => {
@@ -89,7 +73,7 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
         }
 
         cb();
-      }, (err: any): void => this.handleError(err, logger, cb));
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -157,85 +141,77 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
     return true;
   }
 
+  private addUser(userId: string, endpoint: string, roles: string[]): Promise<void> {
+    const requestOptions: any = {
+      url: endpoint,
+      headers: {
+        'content-type': 'application/json;odata=nometadata',
+        'accept': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: {
+        '@odata.type': '#microsoft.graph.aadUserConversationMember',
+        'roles': roles,
+        'user@odata.bind': `${this.resource}/v1.0/users('${userId}')`
+      }
+    };
+    return request.post(requestOptions);
+  }
+
   private getTeamId(args: CommandArgs): Promise<string> {
     if (args.options.teamId) {
       return Promise.resolve(args.options.teamId);
     }
 
-    return new Promise<string>((resolve: (channelId: string) => void, reject: (error: any) => void): void => {
-      const teamRequestOptions: any = {
-        url: `${this.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
+    const teamRequestOptions: any = {
+      url: `${this.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
 
-      request
-        .get<{ value: Team[] }>(teamRequestOptions)
-        .then(response => {
-          const teamItem: Team | undefined = response.value[0];
+    return request
+      .get<{ value: Team[] }>(teamRequestOptions)
+      .then(response => {
+        const teamItem: Team | undefined = response.value[0];
 
-          if (!teamItem) {
-            return reject(`The specified team '${args.options.teamName}' does not exist in Microsoft Teams`);
-          }
+        if (!teamItem) {
+          return Promise.reject(`The specified team '${args.options.teamName}' does not exist in Microsoft Teams`);
+        }
 
-          if (response.value.length > 1) {
-            return reject(`Multiple Microsoft Teams with name '${args.options.teamName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`);
-          }
+        if (response.value.length > 1) {
+          return Promise.reject(`Multiple Microsoft Teams with name '${args.options.teamName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`);
+        }
 
-          return resolve(teamItem.id);
-        }, err => { reject(err) });
-    })
+        return Promise.resolve(teamItem.id);
+      }, err => { return Promise.reject(err); });
   }
 
   private getChannelId(teamId: string, args: CommandArgs): Promise<string> {
     if (args.options.channelId) {
-      const channelIdRequestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels/${encodeURIComponent(args.options.channelId as string)}`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      return new Promise<string>((resolve: (channelId: string) => void, reject: (error: any) => void): void => {
-        request
-          .get<Channel>(channelIdRequestOptions)
-          .then((response: Channel) => {
-            const channelItem: Channel | undefined = response;
-            return resolve(channelItem.id);
-          }, (err: any) => {
-            if (err.error && err.error.code == "NotFound") {
-              return reject(`The specified channel '${args.options.channelId}' does not exist or is invalid in the Microsoft Teams team with ID '${teamId}'`);
-            } else {
-              return reject(err);
-            }
-          });
-      });
-    } else {
-      const channelRequestOptions: any = {
-        url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
-
-      return new Promise<string>((resolve: (channelId: string) => void, reject: (error: any) => void): void => {
-        request
-          .get<{ value: Channel[] }>(channelRequestOptions)
-          .then(response => {
-            const channelItem: Channel | undefined = response.value[0];
-
-            if (!channelItem) {
-              return reject(`The specified channel '${args.options.channelName}' does not exist in the Microsoft Teams team with ID '${teamId}'`);
-            }
-
-            return resolve(channelItem.id);
-          }, err => reject(err));
-      });
+      return Promise.resolve(args.options.channelId);
     }
+
+    const channelRequestOptions: any = {
+      url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    return request
+      .get<{ value: Channel[] }>(channelRequestOptions)
+      .then(response => {
+        const channelItem: Channel | undefined = response.value[0];
+
+        if (!channelItem) {
+          return Promise.reject(`The specified channel '${args.options.channelName}' does not exist in the Microsoft Teams team with ID '${teamId}'`);
+        }
+
+        return Promise.resolve(channelItem.id);
+      }, err => { return Promise.reject(err); });
   }
 
   private getUserId(args: CommandArgs): Promise<string[]> {
@@ -243,40 +219,38 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
       return Promise.resolve(args.options.userId.split(',').map(u => u.trim()));
     }
 
-    return new Promise<string[]>((resolve: (userId: string[]) => void, reject: (error: any) => void): any => {
-      const getSingleUser: (userDisplayName: string) => Promise<string> = (userDisplayName: string): Promise<string> => {
-        const userRequestOptions: any = {
-          url: `${this.resource}/v1.0/users?$filter=displayName eq '${encodeURIComponent(userDisplayName as string)}'`,
-          headers: {
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
-
-        return request.get<{ value: any[] }>(userRequestOptions)
-          .then(response => {
-            const userItem: any | undefined = response.value[0];
-
-            if (!userItem) {
-              reject(`The specified user '${userDisplayName}' does not exist`);
-            }
-
-            if (response.value.length > 1) {
-              reject(`Multiple users with display name '${userDisplayName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`);
-            }
-
-            return Promise.resolve(userItem.id);
-          }, err => { reject(err) });
-      };
-
-      const tasks: Promise<string>[] = [];
-      const userDisplayNames: any | undefined = args.options.userDisplayName && args.options.userDisplayName.split(',').map(u => u.trim());
-      for (const userName of userDisplayNames) {
-        tasks.push(getSingleUser(userName));
-      }
-      return Promise.all(tasks).then((userIds: string[]) => resolve(userIds));
-    });
+    const tasks: Promise<string>[] = [];
+    const userDisplayNames: any | undefined = args.options.userDisplayName && args.options.userDisplayName.split(',').map(u => u.trim());
+    for (const userName of userDisplayNames) {
+      tasks.push(this.getSingleUser(userName));
+    }
+    return Promise.all(tasks);
   }
+
+  private getSingleUser(userDisplayName: string): Promise<string> {
+    const userRequestOptions: any = {
+      url: `${this.resource}/v1.0/users?$filter=displayName eq '${encodeURIComponent(userDisplayName as string)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    return request.get<{ value: any[] }>(userRequestOptions)
+      .then(response => {
+        const userItem: any | undefined = response.value[0];
+
+        if (!userItem) {
+          return Promise.reject(`The specified user '${userDisplayName}' does not exist`);
+        }
+
+        if (response.value.length > 1) {
+          return Promise.reject(`Multiple users with display name '${userDisplayName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`);
+        }
+
+        return Promise.resolve(userItem.id);
+      }, err => { return Promise.reject(err) });
+  };
 }
 
 module.exports = new TeamsConversationMemberAddCommand();

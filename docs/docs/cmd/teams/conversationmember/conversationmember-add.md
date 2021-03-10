@@ -28,7 +28,7 @@ m365 teams conversationmember add [options]
 `--userDisplayName [userDisplayName]`
 : The displayName of a user. You can also pass a comma separated list of displaynames.
 
-`--owner [owner]`
+`--owner`
 : Assign the user the owner role. Defaults to member permissions.
 
 --8<-- "docs/cmd/_global.md"

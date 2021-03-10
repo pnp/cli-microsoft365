@@ -218,18 +218,6 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
     "membershipType": "private"
   }
 
-  const channelIdErrorResponse: any = {
-    "error": {
-      "code": "NotFound",
-      "message": "Failed to execute Skype backend request GetThreadS2SRequest.",
-      "innerError": {
-        "date": "2020-11-05T15:30:50",
-        "request-id": "bf7c27d4-38d1-42a8-af93-03e5446af010",
-        "client-request-id": "89f8859a-bc75-36ce-b4ca-035a6889844d"
-      }
-    }
-  }
-
   const singleUserResponse: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users",
     "value": [
@@ -815,38 +803,6 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
         assert.strictEqual(
           JSON.stringify(err),
           JSON.stringify(new CommandError(`The specified channel 'Other Private Channel' does not exist in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails adding conversation members with invalid channelId', (done) => {
-    Utils.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
-        return Promise.resolve(singleTeamResponse);
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:whatever@thread.skype')}`) {
-        return Promise.reject(channelIdErrorResponse);
-      }
-
-      return Promise.reject('Invalid Request 123');
-    });
-
-    command.action(logger, {
-      options: {
-        teamId: "47d6625d-a540-4b59-a4ab-19b787e40593",
-        channelId: "19:whatever@thread.skype"
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(
-          JSON.stringify(err),
-          JSON.stringify(new CommandError(`The specified channel '19:whatever@thread.skype' does not exist or is invalid in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`)));
         done();
       }
       catch (e) {
