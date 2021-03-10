@@ -4,6 +4,10 @@
 
 ### New commands
 
+**CLI:**
+
+- [cli config set](../cmd/cli/config/config-set.md) - sets CLI for Microsoft 365 configuration options [#1945](https://github.com/pnp/cli-microsoft365/issues/1945)
+
 **SharePoint:**
 
 - [spo site apppermission list](../cmd/spo/site/site-apppermission-list.md) - lists application permissions for a site [#2206](https://github.com/pnp/cli-microsoft365/issues/2206)
@@ -15,6 +19,8 @@
 - added missing `includeOndriveSites` option to `spo site classic list` docs [#2234](https://github.com/pnp/cli-microsoft365/issues/2234)
 - added Remote Development container [#1832](https://github.com/pnp/cli-microsoft365/issues/1832)
 - moved `spo page list` to use pages API [#2241](https://github.com/pnp/cli-microsoft365/issues/2241)
+- added support for configuring auto showing help on failure [#1945](https://github.com/pnp/cli-microsoft365/issues/1945)
+- added the 'Provision a Team with channels and assign a custom icon' sample [#2148](https://github.com/pnp/cli-microsoft365/issues/2148)
 
 ## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
 
