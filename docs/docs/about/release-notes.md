@@ -12,6 +12,10 @@
 
 - [spo site apppermission list](../cmd/spo/site/site-apppermission-list.md) - lists application permissions for a site [#2206](https://github.com/pnp/cli-microsoft365/issues/2206)
 
+**Teams:**
+
+- [teams conversationmember add](../cmd/teams/conversationmember/conversationmember-add.md) - adds a conversation member in a private channel [#1986](https://github.com/pnp/cli-microsoft365/issues/1986)
+
 ### Changes
 
 - added conditionally saving page in 'spo page set' [#2211](https://github.com/pnp/cli-microsoft365/issues/2211)
@@ -21,6 +25,7 @@
 - moved `spo page list` to use pages API [#2241](https://github.com/pnp/cli-microsoft365/issues/2241)
 - added support for configuring auto showing help on failure [#1945](https://github.com/pnp/cli-microsoft365/issues/1945)
 - added the 'Provision a Team with channels and assign a custom icon' sample [#2148](https://github.com/pnp/cli-microsoft365/issues/2148)
+- extended `aad o365group remove` with `skipRecycleBin` [#1986](https://github.com/pnp/cli-microsoft365/issues/1986)
 
 ## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
 
