@@ -64,7 +64,7 @@ class GraphPlannerPlanAddCommand extends GraphCommand {
         .then((groups: any[]): void => {
           if (groups && groups.length > 0) {
             if (groups.length > 1) {
-              logger.logToStderr(`More than one groups found with name ${args.options.ownerGroupName}`);
+              logger.log(`More than one groups found with name ${args.options.ownerGroupName}`);
               cb();
             }
             else {
@@ -88,7 +88,7 @@ class GraphPlannerPlanAddCommand extends GraphCommand {
             }
           }
           else {
-            logger.logToStderr(`Owner group not found with name ${args.options.ownerGroupName}`);
+            logger.log(`Owner group not found with name ${args.options.ownerGroupName}`);
             cb();
           }
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
