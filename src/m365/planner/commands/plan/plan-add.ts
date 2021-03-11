@@ -37,29 +37,45 @@ class GraphPlannerPlanAddCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const endpointPlanner: string = `${this.resource}/v1.0/planner/plans`;
     if (args.options.ownerGroupId) {
-      const requestOptions: any = {
-        url: endpointPlanner,
-        headers: {
-          'accept': 'application/json;odata.metadata=none'
-        },
-        responseType: 'json',
-        data: {
-          "owner": args.options.ownerGroupId,
-          "title": args.options.title
-        }
-      };
-      request
-        .post(requestOptions)
-        .then((res: any): void => {
-          logger.log(res);
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        ((): Promise<any[]> => {
+          return this.getGroupsWithFilter(`?$filter=ID eq '${args.options.ownerGroupId}'`);
+        })()
+          .then((groups: any[]): void => {
+            if (groups && groups.length > 0) {
+              if (groups.length > 1) {
+                logger.log(`More than one groups found with id ${args.options.ownerGroupId}`);
+                cb();
+              }
+              else {
+                const requestOptions: any = {
+                  url: endpointPlanner,
+                  headers: {
+                    'accept': 'application/json;odata.metadata=none'
+                  },
+                  responseType: 'json',
+                  data: {
+                    "owner": groups[0].id,
+                    "title": args.options.title
+                  }
+                };
+                request
+                  .post(requestOptions)
+                  .then((res: any): void => {
+                    logger.log(res);
+                    cb();
+                  }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+              }
+            }
+            else {
+              logger.log(`Owner group not found with id ${args.options.ownerGroupId}`);
+              cb();
+            }
+          }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
     else {
-      const ownerGroupNameFilter: string = args.options.ownerGroupName ? `?$filter=DisplayName eq '${encodeURIComponent(args.options.ownerGroupName).replace(/'/g, `''`)}'` : '';
-      const endpoint: string = `${this.resource}/v1.0/groups${ownerGroupNameFilter}`;
       ((): Promise<any[]> => {
-        return this.getGroups(endpoint);
+        const ownerGroupNameFilter: string = args.options.ownerGroupName ? `?$filter=DisplayName eq '${encodeURIComponent(args.options.ownerGroupName).replace(/'/g, `''`)}'` : '';
+        return this.getGroupsWithFilter(ownerGroupNameFilter);
       })()
         .then((groups: any[]): void => {
           if (groups && groups.length > 0) {
@@ -95,9 +111,10 @@ class GraphPlannerPlanAddCommand extends GraphCommand {
     }
   }
 
-  private getGroups(url: string): Promise<any[]> {
+  private getGroupsWithFilter(ownerGroupFilter: string): Promise<any[]> {
+    const endpoint: string = `${this.resource}/v1.0/groups${ownerGroupFilter}`;
     const requestOptions: any = {
-      url: url,
+      url: endpoint,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
