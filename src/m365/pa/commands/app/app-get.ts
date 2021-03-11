@@ -37,7 +37,7 @@ class PaAppGetCommand extends AzmgmtCommand {
     let requestUrl: string = '';
     const isValidGuid: boolean = Utils.isValidGuid(args.options.name);
     if (isValidGuid) {
-      requestUrl = `${this.resource}providers/MicrosoftPowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`
+      requestUrl = `${this.resource}providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`
     }
     else {
       requestUrl = `${this.resource}providers/Microsoft.PowerApps/apps?api-version=2016-11-01`
@@ -45,7 +45,6 @@ class PaAppGetCommand extends AzmgmtCommand {
 
     const requestOptions: any = {
       url: requestUrl,
-      //url: `${this.resource}providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
       headers: {
         accept: 'application/json'
       },
@@ -65,7 +64,7 @@ class PaAppGetCommand extends AzmgmtCommand {
         } else {
           if (res.value.length > 0) {
             let app = res.value.find((a: any)=> {
-              return a.properties.displayName == args.options.name;
+              return a.properties.displayName.toLowerCase() == args.options.name.toLowerCase();
             });
             if (!!app) {
               app.displayName = app.properties.displayName;
@@ -74,12 +73,17 @@ class PaAppGetCommand extends AzmgmtCommand {
               app.owner = app.properties.owner.email || '';
               logger.log(app);
             }
-
-            //res.value.forEach((a: any) => {
-            //  a.displayName = a.properties.displayName;
-            //});
-            //logger.log(this.items);
-          } 
+            else {
+              if (this.verbose) {
+                logger.logToStderr(`No app found with the name '${args.options.name}'`);
+              }
+            }
+          }
+          else {
+            if (this.verbose) {
+              logger.logToStderr('No apps found');
+            }
+          }
         }
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));

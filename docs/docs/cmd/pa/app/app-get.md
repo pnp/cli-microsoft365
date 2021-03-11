@@ -29,3 +29,6 @@ Get information about the specified Microsoft Power App
 ```sh
 m365 pa app get --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d
 ```
+```sh
+m365 pa app get --name App
+```
