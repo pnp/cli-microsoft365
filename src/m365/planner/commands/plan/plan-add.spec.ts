@@ -60,6 +60,10 @@ describe(commands.PLANNER_PLAN_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'title', 'createdDateTime', 'owner']);
+  });
+
   it('fails validation if the ownerGroupId is not a valid guid.', (done) => {
     const actual = command.validate({
       options: {
