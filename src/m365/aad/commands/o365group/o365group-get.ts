@@ -7,6 +7,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import teamsCommands from '../../../teams/commands';
 import { Group } from './Group';
 
 interface CommandArgs {
@@ -24,7 +25,11 @@ class AadO365GroupGetCommand extends GraphCommand {
   }
 
   public get description(): string {
-    return 'Gets information about the specified Microsoft 365 Group';
+    return 'Gets information about the specified Microsoft 365 Group or Microsoft Teams team';
+  }
+
+  public alias(): string[] | undefined {
+    return [teamsCommands.TEAMS_TEAM_GET];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

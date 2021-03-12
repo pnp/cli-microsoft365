@@ -8,9 +8,11 @@ nav:
     - 'Run CLI in a Docker Container': 'user-guide/run-cli-in-docker-container.md'
     - 'Logging in to Microsoft 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
+    - 'Configuring CLI': 'user-guide/configuring-cli.md'
     - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
     - 'Caveats when working with the CLI and certificate login': 'user-guide/cli-certificate-caveats.md'
   - Commands:
+    - config set: 'cmd/cli/config/config-set.md'
     - consent: 'cmd/cli/cli-consent.md'
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
@@ -81,25 +83,7 @@ nav:
         - completion sh update: 'cmd/cli/completion/completion-sh-update.md'
     - File (file):
       - convert:
-        - convert pdf: 'cmd/file/convert/convert-pdf.md'
-    - Microsoft Flow (flow):
-      - disable: 'cmd/flow/flow-disable.md'
-      - enable: 'cmd/flow/flow-enable.md'
-      - export: 'cmd/flow/flow-export.md'
-      - get: 'cmd/flow/flow-get.md'
-      - list: 'cmd/flow/flow-list.md'
-      - remove: 'cmd/flow/flow-remove.md'
-      - connector:
-        - connector export: 'cmd/pa/connector/connector-export.md'
-        - connector list: 'cmd/pa/connector/connector-list.md'
-      - environment:
-        - environment get: 'cmd/flow/environment/environment-get.md'
-        - environment list: 'cmd/flow/environment/environment-list.md'
-      - run:
-        - run cancel: 'cmd/flow/run/run-cancel.md'
-        - run get: 'cmd/flow/run/run-get.md'
-        - run list: 'cmd/flow/run/run-list.md'
-        - run resubmit: 'cmd/flow/run/run-resubmit.md'
+        - convert pdf: 'cmd/file/convert/convert-pdf.md'   
     - Microsoft Graph (graph):
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
@@ -136,7 +120,10 @@ nav:
         - report mailboxusagemailboxcount: 'cmd/outlook/report/report-mailboxusagemailboxcount.md'
         - report mailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md'
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
-    - PowerApps (pa):
+    - Microsoft Planner (planner):
+      - task:
+        - task list: 'cmd/planner/task/task-list.md'
+    - Power Apps (pa):
       - app:
         - app get: 'cmd/pa/app/app-get.md'
         - app list: 'cmd/pa/app/app-list.md'
@@ -150,10 +137,25 @@ nav:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
       - solution:
         - solution init: 'cmd/pa/solution/solution-init.md'
-        - solution reference add: 'cmd/pa/solution/solution-reference-add.md'
-    - Microsoft Planner (planner):
-      - task:
-        - task list: 'cmd/planner/task/task-list.md'
+        - solution reference add: 'cmd/pa/solution/solution-reference-add.md'        
+    - Power Automate (flow):
+      - disable: 'cmd/flow/flow-disable.md'
+      - enable: 'cmd/flow/flow-enable.md'
+      - export: 'cmd/flow/flow-export.md'
+      - get: 'cmd/flow/flow-get.md'
+      - list: 'cmd/flow/flow-list.md'
+      - remove: 'cmd/flow/flow-remove.md'
+      - connector:
+        - connector export: 'cmd/pa/connector/connector-export.md'
+        - connector list: 'cmd/pa/connector/connector-list.md'
+      - environment:
+        - environment get: 'cmd/flow/environment/environment-get.md'
+        - environment list: 'cmd/flow/environment/environment-list.md'
+      - run:
+        - run cancel: 'cmd/flow/run/run-cancel.md'
+        - run get: 'cmd/flow/run/run-get.md'
+        - run list: 'cmd/flow/run/run-list.md'
+        - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Skype (skype):
       - report:
         - report activitycounts: 'cmd/skype/report/report-activitycounts.md'
@@ -362,6 +364,8 @@ nav:
         - site set: 'cmd/spo/site/site-set.md'
         - site appcatalog add: 'cmd/spo/site/site-appcatalog-add.md'
         - site appcatalog remove: 'cmd/spo/site/site-appcatalog-remove.md'
+        - site apppermission get: 'cmd/spo/site/site-apppermission-get.md'
+        - site apppermission list: 'cmd/spo/site/site-apppermission-list.md'
         - site chrome set: 'cmd/spo/site/site-chrome-set.md'
         - site classic add: 'cmd/spo/site/site-classic-add.md'
         - site classic list: 'cmd/spo/site/site-classic-list.md'
@@ -448,6 +452,7 @@ nav:
         - channel remove: 'cmd/teams/channel/channel-remove.md'
         - channel set: 'cmd/teams/channel/channel-set.md'
       - conversationmember:
+        - conversationmember add: 'cmd/teams/conversationmember/conversationmember-add.md'
         - conversationmember list: 'cmd/teams/conversationmember/conversationmember-list.md'
       - funsettings:
         - funsettings list: 'cmd/teams/funsettings/funsettings-list.md'
@@ -483,6 +488,7 @@ nav:
         - team add: 'cmd/teams/team/team-add.md'
         - team archive: 'cmd/teams/team/team-archive.md'
         - team clone: 'cmd/teams/team/team-clone.md'
+        - team get: 'cmd/aad/o365group/o365group-get.md'
         - team list: 'cmd/teams/team/team-list.md'
         - team remove: 'cmd/teams/team/team-remove.md'
         - team set: 'cmd/teams/team/team-set.md'
@@ -586,13 +592,17 @@ nav:
       - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
       - 'Lists all application customizers in the tenant': 'sample-scripts/spo/list-all-application-customizers.md'
       - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
+      - 'List site collections and their lists': 'sample-scripts/spo/list-site-collection-lists.md'
+      - 'Lists site collection owners': 'sample-scripts/spo/list-site-collection-owners.md'
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
       - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
     - Microsoft Teams:
+      - 'Create a Microsoft Team with channels from a Microsoft 365 Group': 'sample-scripts/teams/create-team-from-group.md'
       - 'Deploy a Microsoft Teams personal app and add it to users': 'sample-scripts/teams/install-personal-app.md'
       - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
       - 'Export conversations from Microsoft Teams Channels': 'sample-scripts/teams/export-teams-conversations.md'
       - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
+      - 'List all tabs in Microsoft Teams teams in the tenant': 'sample-scripts/teams/list-all-tabs-teams.md'
       - 'List app usage in Microsoft Teams': 'sample-scripts/teams/list-teams-app-usage.md'
       - 'Remove a Microsoft Teams personal app': 'sample-scripts/teams/remove-personal-app.md'
       - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'

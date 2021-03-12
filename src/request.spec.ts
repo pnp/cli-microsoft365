@@ -373,7 +373,7 @@ describe('Request', () => {
 
   it('repeats 429-throttled request after the designated retry value', (done) => {
     let i: number = 0;
-    let timeout: number = -1;
+    let timeout: number | undefined = -1;
 
     sinon.stub(_request as any, 'req').callsFake(() => {
       if (i++ === 0) {
@@ -415,7 +415,7 @@ describe('Request', () => {
 
   it('repeats 429-throttled request after 10s if no value specified', (done) => {
     let i: number = 0;
-    let timeout: number = -1;
+    let timeout: number | undefined = -1;
 
     sinon.stub(_request as any, 'req').callsFake(() => {
       if (i++ === 0) {
@@ -455,7 +455,7 @@ describe('Request', () => {
 
   it('repeats 429-throttled request after 10s if the specified value is not a number', (done) => {
     let i: number = 0;
-    let timeout: number = -1;
+    let timeout: number | undefined = -1;
 
     sinon.stub(_request as any, 'req').callsFake(() => {
       if (i++ === 0) {
@@ -535,7 +535,7 @@ describe('Request', () => {
 
   it('repeats 429-throttled request after the designated retry value for large file (stream)', (done) => {
     let i: number = 0;
-    let timeout: number = -1;
+    let timeout: number | undefined = -1;
 
     sinon.stub(_request as any, 'req').callsFake((options) => {
       _options = options;

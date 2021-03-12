@@ -1,0 +1,8 @@
+{
+  "name": "CLI for Microsoft 365",
+  "dockerFile": "Dockerfile",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/zsh"
+  },
+  "postCreateCommand": "npm i && npm run clean && npm run build && npm link"
+}

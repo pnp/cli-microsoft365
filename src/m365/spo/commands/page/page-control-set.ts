@@ -53,7 +53,7 @@ class SpoPageControlSetCommand extends SpoCommand {
         }
 
         const canvasContent: PageControl[] = JSON.parse(res.CanvasContent1);
-        const control: PageControl | undefined = canvasContent.find(control => control.id.toLowerCase() === args.options.id.toLowerCase());
+        const control: PageControl | undefined = canvasContent.find(control => control.id && control.id.toLowerCase() === args.options.id.toLowerCase());
 
         if (!control) {
           return Promise.reject(`Control with ID ${args.options.id} not found on page ${pageName}`);
@@ -120,7 +120,43 @@ class SpoPageControlSetCommand extends SpoCommand {
           }
         }
 
-        return Page.save(pageName, args.options.webUrl, canvasContent, logger, this.debug, this.verbose);
+        let pageData: any = {};
+
+        if (page.AuthorByline) {
+          pageData.AuthorByline = page.AuthorByline;
+        }
+        if (page.BannerImageUrl) {
+          pageData.BannerImageUrl = page.BannerImageUrl;
+        }
+        if (page.Description) {
+          pageData.Description = page.Description;
+        }
+        if (page.Title) {
+          pageData.Title = page.Title;
+        }
+        if (page.TopicHeader) {
+          pageData.TopicHeader = page.TopicHeader;
+        }
+        if (page.LayoutWebpartsContent) {
+          pageData.LayoutWebpartsContent = page.LayoutWebpartsContent;
+        }
+        if (canvasContent) {
+          pageData.CanvasContent1 = JSON.stringify(canvasContent);
+        }
+
+        const requestOptions: any = {
+          url: `${args.options.webUrl}/_api/sitepages/pages/GetByUrl('sitepages/${encodeURIComponent(pageName)}')/SavePageAsDraft`,
+          headers: {
+            'X-HTTP-Method': 'MERGE',
+            'IF-MATCH': '*',
+            'content-type': 'application/json;odata=nometadata',
+            accept: 'application/json;odata=nometadata'
+          },
+          data: pageData,
+          responseType: 'json'
+        };
+
+        return request.post(requestOptions);
       })
       .then(_ => cb())
       .catch((err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
