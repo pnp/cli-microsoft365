@@ -433,7 +433,7 @@ describe(commands.POLICY_LIST, () => {
         policyType: policyType
       }
     });
-    assert.strictEqual(actual, `${policyType} is not a valid policyType. Allowed values are activityBasedTimeout|authorization|claimsMapping|identitySecurityDefaultsEnforcement|homeRealmDiscovery|tokenIssuance|tokenLifetime`);
+    assert.strictEqual(actual, `${policyType} is not a valid policyType. Allowed values are activityBasedTimeout|authorization|claimsMapping|homeRealmDiscovery|identitySecurityDefaultsEnforcement|tokenIssuance|tokenLifetime`);
   });
 
   it('supports debug mode', () => {
