@@ -163,6 +163,7 @@ export default {
   SITE_ADD: `${prefix} site add`,
   SITE_APPCATALOG_ADD: `${prefix} site appcatalog add`,
   SITE_APPCATALOG_REMOVE: `${prefix} site appcatalog remove`,
+  SITE_APPPERMISSION_GET: `${prefix} site apppermission get`,
   SITE_APPPERMISSION_LIST: `${prefix} site apppermission list`,
   SITE_CLASSIC_ADD: `${prefix} site classic add`,
   SITE_CLASSIC_LIST: `${prefix} site classic list`,

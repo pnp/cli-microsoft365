@@ -4,9 +4,18 @@
 
 ### New commands
 
+**CLI:**
+
+- [cli config set](../cmd/cli/config/config-set.md) - sets CLI for Microsoft 365 configuration options [#1945](https://github.com/pnp/cli-microsoft365/issues/1945)
+
 **SharePoint:**
 
+- [spo site apppermission get](../cmd/spo/site/site-apppermission-get.md) - gets a specific application permissions for the site [#2207](https://github.com/pnp/cli-microsoft365/issues/2207)
 - [spo site apppermission list](../cmd/spo/site/site-apppermission-list.md) - lists application permissions for a site [#2206](https://github.com/pnp/cli-microsoft365/issues/2206)
+
+**Teams:**
+
+- [teams conversationmember add](../cmd/teams/conversationmember/conversationmember-add.md) - adds a conversation member in a private channel [#1986](https://github.com/pnp/cli-microsoft365/issues/1986)
 
 ### Changes
 
@@ -15,6 +24,11 @@
 - added missing `includeOndriveSites` option to `spo site classic list` docs [#2234](https://github.com/pnp/cli-microsoft365/issues/2234)
 - added Remote Development container [#1832](https://github.com/pnp/cli-microsoft365/issues/1832)
 - moved `spo page list` to use pages API [#2241](https://github.com/pnp/cli-microsoft365/issues/2241)
+- added support for configuring auto showing help on failure [#1945](https://github.com/pnp/cli-microsoft365/issues/1945)
+- added the 'Provision a Team with channels and assign a custom icon' sample [#2148](https://github.com/pnp/cli-microsoft365/issues/2148)
+- extended `aad o365group remove` with `skipRecycleBin` [#1986](https://github.com/pnp/cli-microsoft365/issues/1986)
+- updated product name from 'Microsoft Flow' to 'Power Automate' in docs [#2259](https://github.com/pnp/cli-microsoft365/issues/2259)
+- added the 'List site collections and their lists' sample script [#2272](https://github.com/pnp/cli-microsoft365/issues/2272)
 
 ## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
 

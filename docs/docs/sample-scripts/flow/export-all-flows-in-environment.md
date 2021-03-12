@@ -1,12 +1,12 @@
-# Export all Flows in environment
+# Export all flows in environment
 
 Author: [Garry Trinder](https://garrytrinder.github.io/2021/01/export-all-flows-from-environment-cli-microsoft365)
 
-When was the last time you backed up all the Flows in your environment?
+When was the last time you backed up all the flows in your environment?
 
 By combining the CLI for Microsoft 365 and PowerShell we can make this task easy and repeatable.
 
-This script will get all Flows in your default environment and export them as both a ZIP file for importing back into Power Automate and as a JSON file for importing into Azure as an Azure Logic App.
+This script will get all flows in your default environment and export them as both a ZIP file for importing back into Power Automate and as a JSON file for importing into Azure as an Azure Logic App.
 
 ```powershell tab="PowerShell Core"
 Write-Output "Getting environment info..."
