@@ -59,6 +59,10 @@ describe(commands.POLICY_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'isOrganizationDefault']);
+  });
+
   it('retrieves the specified policy', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/policies/authorizationPolicy`) {
