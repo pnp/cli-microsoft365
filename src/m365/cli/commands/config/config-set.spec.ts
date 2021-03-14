@@ -56,6 +56,48 @@ describe(commands.CONFIG_SET, () => {
     });
   });
 
+  it(`sets ${settingsNames.output} property to 'text'`, (done) => {
+    const output = "text"
+    const config = Cli.getInstance().config;
+    let actualKey: string, actualValue: any;
+    sinon.restore()
+    sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
+      actualKey = key;
+      actualValue = value;
+    }) as any);
+
+    command.action(logger, { options: { key: settingsNames.output, value: output } }, () => {
+      try {
+        assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
+        assert.strictEqual(actualValue, output, 'Invalid value');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`sets ${settingsNames.output} property to 'json'`, (done) => {
+    const output = "json"
+    const config = Cli.getInstance().config;
+    let actualKey: string, actualValue: any;
+    sinon.restore()
+    sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
+      actualKey = key;
+      actualValue = value;
+    }) as any);
+
+    command.action(logger, { options: { key: settingsNames.output, value: output } }, () => {
+      try {
+        assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
+        assert.strictEqual(actualValue, output, 'Invalid value');
+        done();
+      } catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports specifying key and value', () => {
     const options = command.options();
     let containsOptionKey = false;
@@ -80,5 +122,10 @@ describe(commands.CONFIG_SET, () => {
   it(`passes validation if service is set to ${settingsNames.showHelpOnFailure} `, () => {
     const actual = command.validate({ options: { key: settingsNames.showHelpOnFailure, value: false } });
     assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if specified output key is invalid ', () => {
+    const actual = command.validate({ options: { key: settingsNames.output, value: 'invalid' } });
+    assert.notStrictEqual(actual, true);
   });
 });
