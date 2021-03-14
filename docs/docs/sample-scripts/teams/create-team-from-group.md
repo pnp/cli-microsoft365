@@ -2,7 +2,7 @@
 
 Inspired by: [Patrick Lamber](https://www.nubo.eu/Provision-A-Team-With-CLI-For-Microsoft-365/)
 
-A sample script which creates a Microsoft 365 Group, associates a logo to it and some members. Afterward, it teamyfies the Group and creates two public channels.
+A sample script which creates a Microsoft 365 Group, associates a logo to it and some members. Afterward, it teamyfies the Group and creates two public channels. 
 
 ```powershell tab="PowerShell Core"
 # this examples searches the users in a directory by displayname
@@ -10,7 +10,7 @@ $memberDisplayName = "A"
 # Group settings
 $logoPath = "./pnpImage.png"
 $displayName = "Contoso Group"
-$mailNickName = "contosoGroup"
+$mailNickName = "demoGroup4"
 # add more items to the array to provision channels
 $channelNames = @("Public relations", "CLI Project")
 
