@@ -6,10 +6,19 @@ To reset settings to their default values, remove them from the configuration fi
 
 ## Configuring settings
 
-You can configure the specific setting using the `cli config set` command. For example, to configure CLI to automatically show help when executing a command failed, execute:
+You can configure the specific setting using the `cli config set` command. 
+
+
+Show help when command execution failed.
 
 ```sh
 m365 cli config set --key showHelpOnFailure --value true
+```
+
+Configure the default output when executing a command.
+
+```sh
+m365 cli config set --key output --value json
 ```
 
 ## Available settings
@@ -19,3 +28,4 @@ Following is the list of configuration settings available in CLI for Microsoft 3
 Setting name|Definition|Default value
 ------------|----------|-------------
 `showHelpOnFailure`|Automatically display help when executing a command failed|`true`
+`output`|Defines the default output when issuing a command|`text|json`

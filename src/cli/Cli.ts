@@ -448,6 +448,11 @@ export class Cli {
       logStatementType = typeof logStatement;
     }
 
+    // overwrite output value with default value if not explicitly specified
+    if (options.output === undefined) {
+      options.output = this.instance.getSettingWithDefaultValue<string|undefined>(settingsNames.output, options.output);
+    }
+
     if (options.output === 'json') {
       return JSON.stringify(logStatement, null, 2);
     }
