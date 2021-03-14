@@ -34,11 +34,13 @@ class CliConfigSetCommand extends AnonymousCommand {
 
     switch (args.options.key) {
       case settingsNames.showHelpOnFailure:
-        value = args.options.value === "true";
+        value = args.options.value === 'true';
+        break;
+      default:
+        value = args.options.value;
         break;
     }
 
-    console.log(Cli.getInstance().config.path);
     Cli.getInstance().config.set(args.options.key, value);
     cb();
   }
@@ -47,7 +49,7 @@ class CliConfigSetCommand extends AnonymousCommand {
     const options: CommandOption[] = [
       {
         option: '-k, --key <key>',
-        autocomplete: [settingsNames.showHelpOnFailure]
+        autocomplete: [settingsNames.showHelpOnFailure, settingsNames.output]
       },
       {
         option: '-v, --value <value>'
@@ -59,8 +61,15 @@ class CliConfigSetCommand extends AnonymousCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (args.options.key !== settingsNames.showHelpOnFailure) {
-      return `${args.options.key} is not a valid value for the service option. Allowed values: ${settingsNames.showHelpOnFailure}`;
+    if (args.options.key !== settingsNames.showHelpOnFailure &&
+      args.options.key !== settingsNames.output) {
+      return `${args.options.key} is not a valid setting. Allowed values: ${settingsNames.showHelpOnFailure}, ${settingsNames.output}`;
+    }
+
+    const allowedOutputs = ['text', 'json']
+    if (args.options.key === settingsNames.output &&
+      allowedOutputs.indexOf(args.options.value) === -1) {
+      return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${allowedOutputs.join(', ')}`;
     }
 
     return true;

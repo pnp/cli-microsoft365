@@ -19,3 +19,4 @@ Following is the list of configuration settings available in CLI for Microsoft 3
 Setting name|Definition|Default value
 ------------|----------|-------------
 `showHelpOnFailure`|Automatically display help when executing a command failed|`true`
+`output`|Defines the default output when issuing a command|`text`
