@@ -814,33 +814,6 @@ describe('Cli', () => {
     assert.strictEqual(actual, '');
   });
 
-  it('formats output as pretty JSON when JSON output configured', (done) => {
-    const o = { lorem: 'ipsum', dolor: 'sit' };
-    sinon.stub((cli as any).config, 'get').callsFake(() => { return 'json' });
-
-    const actual = (Cli as any).formatOutput(o, {});
-    try {
-      assert.strictEqual(actual, JSON.stringify(o, null, 2));
-      done();
-    }
-    catch (e) {
-      done(e);
-    }
-  });
-
-  it('formats simple output as text even when the default output is set to JSON', (done) => {
-    const o = false;    
-    sinon.stub((cli as any).config, 'get').callsFake(() => { return 'json' });
-    const actual = (Cli as any).formatOutput(o, { output: 'text' });
-    try {
-      assert.strictEqual(actual, `${o}`);
-      done();
-    }
-    catch (e) {
-      done(e);
-    }
-  });
-
   it('formats output as pretty JSON when JSON output requested', (done) => {
     const o = { lorem: 'ipsum', dolor: 'sit' };
     const actual = (Cli as any).formatOutput(o, { output: 'json' });

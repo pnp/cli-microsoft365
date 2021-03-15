@@ -176,6 +176,11 @@ export class Cli {
       return this.closeWithError(validationResult, true);
     }
 
+    // overwrite output value with default value if not explicitly specified
+    if (optionsWithoutShorts.options.output === undefined) {
+      optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string|undefined>(settingsNames.output, optionsWithoutShorts.options.output);
+    }
+
     return Cli
       .executeCommand(this.commandToExecute.command, optionsWithoutShorts)
       .then(_ => {
@@ -446,11 +451,6 @@ export class Cli {
       // returns an object of different shape than the original message to log
       // #2095
       logStatementType = typeof logStatement;
-    }
-
-    // overwrite output value with default value if not explicitly specified
-    if (options.output === undefined) {
-      options.output = this.instance.getSettingWithDefaultValue<string|undefined>(settingsNames.output, options.output);
     }
 
     if (options.output === 'json') {
