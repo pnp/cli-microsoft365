@@ -72,7 +72,7 @@ class PlannerPlanAddCommand extends GraphCommand {
 
   private getGroupId(args: CommandArgs): Promise<string> {
 
-    const channelRequestOptions: any = {
+    const requestOptions: any = {
       url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.ownerGroupName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
@@ -81,7 +81,7 @@ class PlannerPlanAddCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: any[] }>(channelRequestOptions)
+      .get<{ value: any[] }>(requestOptions)
       .then(response => {
         const group: any | undefined = response.value[0];
 
