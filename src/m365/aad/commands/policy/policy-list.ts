@@ -109,13 +109,11 @@ class AadPolicyListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    try {
-      const response = await request
-        .get<{ value: any[]; }>(requestOptions);
-      return await Promise.resolve(response.value);
-    } catch (error) {
-      return await Promise.reject(error);
-    }
+    return request
+      .get<{ value: any[] }>(requestOptions)
+      .then(response => {
+        return Promise.resolve(response.value);
+      });
   }
 
   private async getPolicy(url: string): Promise<any> {
@@ -127,13 +125,11 @@ class AadPolicyListCommand extends GraphCommand {
       responseType: 'json'
     };
 
-    try {
-      const response = await request
-        .get<{ value: any; }>(requestOptions);
-      return await Promise.resolve(response);
-    } catch (error) {
-      return await Promise.reject(error);
-    }
+    return request
+      .get<{ value: any }>(requestOptions)
+      .then(response => {
+        return Promise.resolve(response);
+      });
   }
 
   public options(): CommandOption[] {
