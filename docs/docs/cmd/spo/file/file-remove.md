@@ -8,6 +8,12 @@ Removes the specified file
 m365 spo file remove [options]
 ```
 
+## Alias
+
+```sh
+m365 spo page template remove
+```
+
 ## Options
 
 `-w, --webUrl <webUrl>`
@@ -45,4 +51,10 @@ Move the file with server-relative URL _/sites/project-x/SharedDocuments/Test.do
 
 ```sh
 m365 spo file remove --webUrl https://contoso.sharepoint.com/sites/project-x --url /sites/project-x/SharedDocuments/Test.docx --recycle
+```
+
+Remove the page template with site-relative URL _Pages/Templates/contoso-template.aspx_ from located in site _https://contoso.sharepoint.com/sites/project-x_
+
+```sh
+m365 spo page template remove --webUrl https://contoso.sharepoint.com/sites/project-x --url Pages/Templates/contoso-template.aspx
 ```

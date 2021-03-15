@@ -29,6 +29,10 @@ class SpoFileRemoveCommand extends SpoCommand {
     return 'Removes the specified file';
   }
 
+  public alias(): string[] | undefined {
+    return [commands.PAGE_TEMPLATE_REMOVE];
+  }
+
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.id = (!(!args.options.id)).toString();
