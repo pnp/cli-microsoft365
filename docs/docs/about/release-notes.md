@@ -29,6 +29,8 @@
 - extended `aad o365group remove` with `skipRecycleBin` [#1986](https://github.com/pnp/cli-microsoft365/issues/1986)
 - updated product name from 'Microsoft Flow' to 'Power Automate' in docs [#2259](https://github.com/pnp/cli-microsoft365/issues/2259)
 - added the 'List site collections and their lists' sample script [#2272](https://github.com/pnp/cli-microsoft365/issues/2272)
+- added site external users report sample [#2277](https://github.com/pnp/cli-microsoft365/issues/2277)
+- added the 'Delete all Microsoft 365 groups and SharePoint sites' sample [#2278](https://github.com/pnp/cli-microsoft365/issues/2278)
 
 ## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
 

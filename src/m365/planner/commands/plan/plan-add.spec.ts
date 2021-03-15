@@ -238,7 +238,7 @@ describe(commands.PLANNER_PLAN_ADD, () => {
 
   it('correctly adds planner plan with given title with available ownerGroupName', (done) => {
     let getFakeOneGroupFound = (opts: any) => {
-      if ((opts.url as string).indexOf('/groups?$filter=DisplayName') > -1) {
+      if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
           "value": [
@@ -299,19 +299,13 @@ describe(commands.PLANNER_PLAN_ADD, () => {
     let postFakeAddPlannerPlan = (opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans`) {
         return Promise.resolve({
-          "createdDateTime": "2021-03-10T17:39:43.1045549Z",
-          "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-          "title": "My Planner Plan",
-          "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
-          "createdBy": {
-            "user": {
-              "displayName": null,
-              "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
-            },
-            "application": {
-              "displayName": null,
-              "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
-            }
+          createdDateTime: '2021-03-15T13:58:51.2580774Z',
+          owner: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4',
+          title: 'My Planner Plan',
+          id: 'oVDjUOY_CkWLi7okcKxGwWUABFaL',
+          createdBy: {
+            user: { displayName: null, id: 'eded3a2a-8f01-40aa-998a-e4f02ec693ba' },
+            application: { displayName: null, id: '31359c7f-bd7e-475c-86db-fdb8c937548e' }
           }
         });
       }
@@ -330,19 +324,13 @@ describe(commands.PLANNER_PLAN_ADD, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(loggerLogSpy.calledWith({
-          "createdDateTime": "2021-03-10T17:39:43.1045549Z",
-          "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-          "title": "My Planner Plan",
-          "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
-          "createdBy": {
-            "user": {
-              "displayName": null,
-              "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
-            },
-            "application": {
-              "displayName": null,
-              "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
-            }
+          createdDateTime: '2021-03-15T13:58:51.2580774Z',
+          owner: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4',
+          title: 'My Planner Plan',
+          id: 'oVDjUOY_CkWLi7okcKxGwWUABFaL',
+          createdBy: {
+            user: { displayName: null, id: 'eded3a2a-8f01-40aa-998a-e4f02ec693ba' },
+            application: { displayName: null, id: '31359c7f-bd7e-475c-86db-fdb8c937548e' }
           }
         }));
         done();
@@ -354,303 +342,22 @@ describe(commands.PLANNER_PLAN_ADD, () => {
   });
 
   it('fails validation when ownerGroupName not found', (done) => {
-    let getFakeNoGroupsFound = (opts: any) => {
-      if ((opts.url as string).indexOf('/groups?$filter=DisplayName') > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
-          "value": []
-        });
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/groups?$filter=displayName') > -1) {
+        return Promise.resolve({ value: [] });
       }
       return Promise.reject('Invalid request');
-    }
-
-    sinon.stub(request, 'get').callsFake(getFakeNoGroupsFound);
-
-    let options: any = {
-      debug: false,
-      title: 'My Planner Plan',
-      ownerGroupName: 'foo'
-    }
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(`Owner group not found with name foo`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
     });
-  });
 
-  it('fails validation when ownerGroupId not found', (done) => {
-    let getFakeNoGroupsFound = (opts: any) => {
-      if ((opts.url as string).indexOf('/groups?$filter=ID') > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
-          "value": []
-        });
+    command.action(logger, {
+      options: {
+        debug: false,
+        title: 'My Planner Plan',
+        ownerGroupName: 'foo'
       }
-      return Promise.reject('Invalid request');
-    }
-
-    sinon.stub(request, 'get').callsFake(getFakeNoGroupsFound);
-
-    let options: any = {
-      debug: false,
-      title: 'My Planner Plan',
-      ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce123'
-    }
-
-    command.action(logger, { options: options } as any, () => {
+    }, (err?: any) => {
       try {
-        assert(loggerLogSpy.calledWith(`Owner group not found with id 233e43d0-dc6a-482e-9b4e-0de7a7bce123`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation when more than one ownerGroupName found', (done) => {
-
-    let getFakeMoreThanOneGroup = (opts: any) => {
-      if ((opts.url as string).indexOf('/groups?$filter=DisplayName') > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
-          "value": [
-              {
-                  "id": "134f5bf2-238b-4b89-b855-cba02b1ffc60",
-                  "deletedDateTime": null,
-                  "classification": null,
-                  "createdDateTime": "2020-09-22T21:41:28Z",
-                  "creationOptions": [
-                      "ProvisionGroupHomepage",
-                      "HubSiteId:00000000-0000-0000-0000-000000000000",
-                      "SPSiteLanguage:1033"
-                  ],
-                  "description": "dev",
-                  "displayName": "dev",
-                  "expirationDateTime": null,
-                  "groupTypes": [
-                      "Unified"
-                  ],
-                  "isAssignableToRole": null,
-                  "mail": "dev@spridermvp.onmicrosoft.com",
-                  "mailEnabled": true,
-                  "mailNickname": "dev",
-                  "membershipRule": null,
-                  "membershipRuleProcessingState": null,
-                  "onPremisesDomainName": null,
-                  "onPremisesLastSyncDateTime": null,
-                  "onPremisesNetBiosName": null,
-                  "onPremisesSamAccountName": null,
-                  "onPremisesSecurityIdentifier": null,
-                  "onPremisesSyncEnabled": null,
-                  "preferredDataLocation": null,
-                  "preferredLanguage": null,
-                  "proxyAddresses": [
-                      "SPO:SPO_8faf2144-5902-4bcc-b91f-a5d3b2c8d7ea@SPO_b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923",
-                      "SMTP:dev@spridermvp.onmicrosoft.com"
-                  ],
-                  "renewedDateTime": "2020-09-22T21:41:28Z",
-                  "resourceBehaviorOptions": [],
-                  "resourceProvisioningOptions": [],
-                  "securityEnabled": false,
-                  "securityIdentifier": "S-1-12-1-323967986-1267278731-2697680312-1627135787",
-                  "theme": null,
-                  "visibility": "Private",
-                  "onPremisesProvisioningErrors": []
-              },
-              {
-                  "id": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-                  "deletedDateTime": null,
-                  "classification": null,
-                  "createdDateTime": "2021-01-23T17:58:03Z",
-                  "creationOptions": [
-                      "Team",
-                      "ExchangeProvisioningFlags:3552"
-                  ],
-                  "description": "Check here for organization announcements and important info.",
-                  "displayName": "spridermvp",
-                  "expirationDateTime": null,
-                  "groupTypes": [
-                      "Unified"
-                  ],
-                  "isAssignableToRole": null,
-                  "mail": "spridermvp@spridermvp.onmicrosoft.com",
-                  "mailEnabled": true,
-                  "mailNickname": "spridermvp",
-                  "membershipRule": null,
-                  "membershipRuleProcessingState": null,
-                  "onPremisesDomainName": null,
-                  "onPremisesLastSyncDateTime": null,
-                  "onPremisesNetBiosName": null,
-                  "onPremisesSamAccountName": null,
-                  "onPremisesSecurityIdentifier": null,
-                  "onPremisesSyncEnabled": null,
-                  "preferredDataLocation": null,
-                  "preferredLanguage": null,
-                  "proxyAddresses": [
-                      "SPO:SPO_fe66856a-ca60-457c-9215-cef02b57bf01@SPO_b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923",
-                      "SMTP:spridermvp@spridermvp.onmicrosoft.com"
-                  ],
-                  "renewedDateTime": "2021-01-23T17:58:03Z",
-                  "resourceBehaviorOptions": [
-                      "HideGroupInOutlook",
-                      "SubscribeMembersToCalendarEventsDisabled",
-                      "WelcomeEmailDisabled"
-                  ],
-                  "resourceProvisioningOptions": [
-                      "Team"
-                  ],
-                  "securityEnabled": false,
-                  "securityIdentifier": "S-1-12-1-591283152-1211030634-3876408987-3035217063",
-                  "theme": null,
-                  "visibility": "Public",
-                  "onPremisesProvisioningErrors": []
-              }
-          ]
-      });
-      }
-      return Promise.reject('Invalid request');
-    }
-
-    sinon.stub(request, 'get').callsFake(getFakeMoreThanOneGroup);
-
-    let options: any = {
-      debug: false,
-      title: 'My Planner Plan',
-      ownerGroupName: 'spridermvp'
-    }
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(`More than one groups found with name spridermvp`));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation when more than one ownerGroupId found', (done) => {
-
-    let getFakeMoreThanOneGroup = (opts: any) => {
-      if ((opts.url as string).indexOf('/groups?$filter=ID') > -1) {
-        return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
-          "value": [
-              {
-                  "id": "134f5bf2-238b-4b89-b855-cba02b1ffc60",
-                  "deletedDateTime": null,
-                  "classification": null,
-                  "createdDateTime": "2020-09-22T21:41:28Z",
-                  "creationOptions": [
-                      "ProvisionGroupHomepage",
-                      "HubSiteId:00000000-0000-0000-0000-000000000000",
-                      "SPSiteLanguage:1033"
-                  ],
-                  "description": "dev",
-                  "displayName": "dev",
-                  "expirationDateTime": null,
-                  "groupTypes": [
-                      "Unified"
-                  ],
-                  "isAssignableToRole": null,
-                  "mail": "dev@spridermvp.onmicrosoft.com",
-                  "mailEnabled": true,
-                  "mailNickname": "dev",
-                  "membershipRule": null,
-                  "membershipRuleProcessingState": null,
-                  "onPremisesDomainName": null,
-                  "onPremisesLastSyncDateTime": null,
-                  "onPremisesNetBiosName": null,
-                  "onPremisesSamAccountName": null,
-                  "onPremisesSecurityIdentifier": null,
-                  "onPremisesSyncEnabled": null,
-                  "preferredDataLocation": null,
-                  "preferredLanguage": null,
-                  "proxyAddresses": [
-                      "SPO:SPO_8faf2144-5902-4bcc-b91f-a5d3b2c8d7ea@SPO_b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923",
-                      "SMTP:dev@spridermvp.onmicrosoft.com"
-                  ],
-                  "renewedDateTime": "2020-09-22T21:41:28Z",
-                  "resourceBehaviorOptions": [],
-                  "resourceProvisioningOptions": [],
-                  "securityEnabled": false,
-                  "securityIdentifier": "S-1-12-1-323967986-1267278731-2697680312-1627135787",
-                  "theme": null,
-                  "visibility": "Private",
-                  "onPremisesProvisioningErrors": []
-              },
-              {
-                  "id": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-                  "deletedDateTime": null,
-                  "classification": null,
-                  "createdDateTime": "2021-01-23T17:58:03Z",
-                  "creationOptions": [
-                      "Team",
-                      "ExchangeProvisioningFlags:3552"
-                  ],
-                  "description": "Check here for organization announcements and important info.",
-                  "displayName": "spridermvp",
-                  "expirationDateTime": null,
-                  "groupTypes": [
-                      "Unified"
-                  ],
-                  "isAssignableToRole": null,
-                  "mail": "spridermvp@spridermvp.onmicrosoft.com",
-                  "mailEnabled": true,
-                  "mailNickname": "spridermvp",
-                  "membershipRule": null,
-                  "membershipRuleProcessingState": null,
-                  "onPremisesDomainName": null,
-                  "onPremisesLastSyncDateTime": null,
-                  "onPremisesNetBiosName": null,
-                  "onPremisesSamAccountName": null,
-                  "onPremisesSecurityIdentifier": null,
-                  "onPremisesSyncEnabled": null,
-                  "preferredDataLocation": null,
-                  "preferredLanguage": null,
-                  "proxyAddresses": [
-                      "SPO:SPO_fe66856a-ca60-457c-9215-cef02b57bf01@SPO_b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923",
-                      "SMTP:spridermvp@spridermvp.onmicrosoft.com"
-                  ],
-                  "renewedDateTime": "2021-01-23T17:58:03Z",
-                  "resourceBehaviorOptions": [
-                      "HideGroupInOutlook",
-                      "SubscribeMembersToCalendarEventsDisabled",
-                      "WelcomeEmailDisabled"
-                  ],
-                  "resourceProvisioningOptions": [
-                      "Team"
-                  ],
-                  "securityEnabled": false,
-                  "securityIdentifier": "S-1-12-1-591283152-1211030634-3876408987-3035217063",
-                  "theme": null,
-                  "visibility": "Public",
-                  "onPremisesProvisioningErrors": []
-              }
-          ]
-      });
-      }
-      return Promise.reject('Invalid request');
-    }
-
-    sinon.stub(request, 'get').callsFake(getFakeMoreThanOneGroup);
-
-    let options: any = {
-      debug: false,
-      title: 'My Planner Plan',
-      ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce123'
-    }
-
-    command.action(logger, { options: options } as any, () => {
-      try {
-        assert(loggerLogSpy.calledWith(`More than one groups found with id 233e43d0-dc6a-482e-9b4e-0de7a7bce123`));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified owner group does not exist`)));
         done();
       }
       catch (e) {

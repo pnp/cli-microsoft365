@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-class GraphPlannerPlanAddCommand extends GraphCommand {
+class PlannerPlanAddCommand extends GraphCommand {
   public get name(): string {
     return commands.PLANNER_PLAN_ADD;
   }
@@ -39,95 +39,58 @@ class GraphPlannerPlanAddCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const endpointPlanner: string = `${this.resource}/v1.0/planner/plans`;
     if (args.options.ownerGroupId) {
-      this.getGroupsWithFilter(`?$filter=ID eq '${args.options.ownerGroupId}'`)
-        .then((groups: any[]): void => {
-          if (groups && groups.length > 0) {
-            if (groups.length > 1) {
-              logger.log(`More than one groups found with id ${args.options.ownerGroupId}`);
-              cb();
-            }
-            else {
-              const requestOptions: any = {
-                url: endpointPlanner,
-                headers: {
-                  'accept': 'application/json;odata.metadata=none'
-                },
-                responseType: 'json',
-                data: {
-                  "owner": groups[0].id,
-                  "title": args.options.title
-                }
-              };
-              request
-                .post(requestOptions)
-                .then((res: any): void => {
-                  logger.log(res);
-                  cb();
-                }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-            }
-          }
-          else {
-            logger.log(`Owner group not found with id ${args.options.ownerGroupId}`);
-            cb();
-          }
-        }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+      this.createPlan(args.options.ownerGroupId, args, logger, cb);
     }
     else {
-      const ownerGroupNameFilter: string = args.options.ownerGroupName ? `?$filter=DisplayName eq '${encodeURIComponent(args.options.ownerGroupName).replace(/'/g, `''`)}'` : '';
-      this.getGroupsWithFilter(ownerGroupNameFilter)
-        .then((groups: any[]): void => {
-          if (groups && groups.length > 0) {
-            if (groups.length > 1) {
-              logger.log(`More than one groups found with name ${args.options.ownerGroupName}`);
-              cb();
-            }
-            else {
-              const requestOptions: any = {
-                url: endpointPlanner,
-                headers: {
-                  'accept': 'application/json;odata.metadata=none'
-                },
-                responseType: 'json',
-                data: {
-                  "owner": groups[0].id,
-                  "title": args.options.title
-                }
-              };
-              request
-                .post(requestOptions)
-                .then((res: any): void => {
-                  logger.log(res);
-                  cb();
-                }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-            }
-          }
-          else {
-            logger.log(`Owner group not found with name ${args.options.ownerGroupName}`);
-            cb();
-          }
+      this.getGroupId(args)
+        .then((groupId: string): void => {
+          this.createPlan(groupId, args, logger, cb);
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     }
   }
 
-  private async getGroupsWithFilter(ownerGroupFilter: string): Promise<any[]> {
-    const endpoint: string = `${this.resource}/v1.0/groups${ownerGroupFilter}`;
+  private createPlan(groupId: string, args: CommandArgs, logger: Logger, cb: () => void) {
     const requestOptions: any = {
-      url: endpoint,
+      url: `${this.resource}/v1.0/planner/plans`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none'
+      },
+      responseType: 'json',
+      data: {
+        "owner": groupId,
+        "title": args.options.title
+      }
+    };
+    request
+      .post(requestOptions)
+      .then((res: any): void => {
+        logger.log(res);
+        cb();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  private getGroupId(args: CommandArgs): Promise<string> {
+
+    const channelRequestOptions: any = {
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.ownerGroupName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
 
-    try {
-      const response = await request
-        .get<{ value: any[]; }>(requestOptions);
-      return await Promise.resolve(response.value);
-    } catch (error) {
-      return await Promise.reject(error);
-    }
+    return request
+      .get<{ value: any[] }>(channelRequestOptions)
+      .then(response => {
+        const group: any | undefined = response.value[0];
+
+        if (!group) {
+          return Promise.reject(`The specified owner group does not exist`);
+        }
+
+        return Promise.resolve(group.id);
+      });
   }
 
   public options(): CommandOption[] {
@@ -164,4 +127,4 @@ class GraphPlannerPlanAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new GraphPlannerPlanAddCommand();
+module.exports = new PlannerPlanAddCommand();
