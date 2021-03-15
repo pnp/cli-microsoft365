@@ -81,7 +81,7 @@ nav:
         - completion sh update: 'cmd/cli/completion/completion-sh-update.md'
     - File (file):
       - convert:
-        - convert pdf: 'cmd/file/convert/convert-pdf.md'   
+        - convert pdf: 'cmd/file/convert/convert-pdf.md'
     - Microsoft Graph (graph):
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
@@ -135,7 +135,7 @@ nav:
         - pcf init: 'cmd/pa/pcf/pcf-init.md'
       - solution:
         - solution init: 'cmd/pa/solution/solution-init.md'
-        - solution reference add: 'cmd/pa/solution/solution-reference-add.md'        
+        - solution reference add: 'cmd/pa/solution/solution-reference-add.md'
     - Power Automate (flow):
       - disable: 'cmd/flow/flow-disable.md'
       - enable: 'cmd/flow/flow-enable.md'
@@ -590,6 +590,7 @@ nav:
       - 'Insert pictures in a SharePoint Document Library into a Word document': 'sample-scripts/spo/insert-sp-library-pictures-into-word.md'
       - 'Lists active SharePoint site collection application catalogs': 'sample-scripts/spo/list-site-app-catalogs.md'
       - 'Lists all application customizers in the tenant': 'sample-scripts/spo/list-all-application-customizers.md'
+      - 'Lists all external users in all site collections': 'sample-scripts/spo/list-site-externalusers.md'
       - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
       - 'List site collections and their lists': 'sample-scripts/spo/list-site-collection-lists.md'
       - 'Lists site collection owners': 'sample-scripts/spo/list-site-collection-owners.md'
