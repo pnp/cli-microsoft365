@@ -12,6 +12,7 @@ export default {
   TEAMS_CHANNEL_LIST: `${prefix} channel list`,
   TEAMS_CHANNEL_REMOVE: `${prefix} channel remove`,
   TEAMS_CHANNEL_SET: `${prefix} channel set`,
+  TEAMS_CONVERSATIONMEMBER_ADD: `${prefix} conversationmember add`,
   TEAMS_CONVERSATIONMEMBER_LIST: `${prefix} conversationmember list`,
   TEAMS_FUNSETTINGS_LIST: `${prefix} funsettings list`,
   TEAMS_FUNSETTINGS_SET: `${prefix} funsettings set`,
