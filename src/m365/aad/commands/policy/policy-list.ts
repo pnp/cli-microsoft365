@@ -45,64 +45,34 @@ class AadPolicyListCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-
     const policyType: string = args.options.policyType ? args.options.policyType.toLowerCase() : 'all';
+
     if (policyType && policyType !== "all") {
-      const endpoint = policyEndPoints[policyType];
-      const url: string = `${this.resource}/v1.0/policies/${endpoint}`;
-      if (endpoint === policyEndPoints.authorization || endpoint === policyEndPoints.identitysecuritydefaultsenforcement) {
-        this.getPolicy(url)
-          .then((policy: any): void => {
-            if (policy) {
-              logger.log(policy);
-            }
-            cb();
-          }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-      }
-      else {
-        this.getPolicies(url)
-          .then((policies: any[]): void => {
-            if (policies && policies.length > 0) {
-              logger.log(policies);
-            }
-            cb();
-          }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-      }
+      this.getPolicies(policyType).then((policies?: any): void => {
+        logger.log(policies);
+        cb();
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
     else {
-      let promiseCalls: any[] = [];
       const policyTypes: string[] = Object.keys(policyEndPoints);
-      policyTypes.forEach((policyType) => {
-        let endpoint = policyEndPoints[policyType];
-        const url: string = `${this.resource}/v1.0/policies/${endpoint}`;
-        if (endpoint === policyEndPoints.authorization || endpoint === policyEndPoints.identitysecuritydefaultsenforcement) {
-          promiseCalls.push(this.getPolicy(url));
-        }
-        else {
-          promiseCalls.push(this.getPolicies(url));
-        }
-      }
-      );
-      Promise.all(promiseCalls)
-        .then(((results) => {
+      Promise.all(policyTypes.map(policyType => this.getPolicies(policyType)))
+        .then((results) => {
           let allPolicies: any = [];
           results.forEach((policies: any) => {
             allPolicies = allPolicies.concat(policies);
           });
-          if (allPolicies && allPolicies.length > 0) {
-            logger.log(allPolicies);
-          }
+          logger.log(allPolicies);
           cb();
-        }))
-        .catch(err => {
+        }).catch(err => {
           this.handleRejectedODataJsonPromise(err, logger, cb)
         });
     }
   }
 
-  private async getPolicies(url: string): Promise<any[]> {
+  private getPolicies(policyType: string): Promise<any> {
+    const endpoint = policyEndPoints[policyType];
     const requestOptions: any = {
-      url: url,
+      url: `${this.resource}/v1.0/policies/${endpoint}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -111,24 +81,15 @@ class AadPolicyListCommand extends GraphCommand {
 
     return request
       .get<{ value: any[] }>(requestOptions)
-      .then(response => {
-        return Promise.resolve(response.value);
-      });
-  }
-
-  private async getPolicy(url: string): Promise<any> {
-    const requestOptions: any = {
-      url: url,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: any }>(requestOptions)
-      .then(response => {
-        return Promise.resolve(response);
+      .then((response: any) => {
+        if (endpoint === policyEndPoints.authorization || endpoint === policyEndPoints.identitysecuritydefaultsenforcement) {
+          return Promise.resolve(response);
+        }
+        else {
+          return Promise.resolve(response.value);
+        }
+      }, (err: any): any => {
+        return Promise.reject(err);
       });
   }
 
