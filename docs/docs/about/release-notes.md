@@ -1,5 +1,11 @@
 # Release notes
 
+## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
+
+### Changes
+
+- added support for configuring default output [#2246](https://github.com/pnp/cli-microsoft365/issues/2246)
+
 ## [v3.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.7.0)
 
 ### New commands
