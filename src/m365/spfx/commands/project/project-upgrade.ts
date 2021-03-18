@@ -59,7 +59,8 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.8.2',
     '1.9.1',
     '1.10.0',
-    '1.11.0'
+    '1.11.0',
+    '1.12.0'
   ];
   private static packageCommands = {
     npm: {

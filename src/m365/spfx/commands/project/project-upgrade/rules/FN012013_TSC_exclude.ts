@@ -3,7 +3,7 @@ import { Project, TsConfigJson } from "../../model";
 import { JsonRule } from "./JsonRule";
 
 export class FN012013_TSC_exclude extends JsonRule {
-  constructor(private exclude: string[]) {
+  constructor(private exclude: string[], private add: boolean = true) {
     super();
   }
 
@@ -16,7 +16,12 @@ export class FN012013_TSC_exclude extends JsonRule {
   }
 
   get description(): string {
-    return `Update tsconfig.json exclude property`;
+    if (this.add) {
+      return `Update tsconfig.json exclude property`;
+    }
+    else {
+      return `Remove tsconfig.json exclude property`;
+    }
   };
 
   get resolution(): string {
@@ -42,10 +47,18 @@ export class FN012013_TSC_exclude extends JsonRule {
       return;
     }
 
-    if (!project.tsConfigJson.exclude ||
-      this.exclude.filter(e => ((project.tsConfigJson as TsConfigJson).exclude as string[]).indexOf(e) < 0).length > 0) {
-      const node = this.getAstNodeFromFile(project.tsConfigJson, 'exclude');
-      this.addFindingWithPosition(findings, node);
+    if (this.add) {
+      if (!project.tsConfigJson.exclude ||
+        this.exclude.filter(e => ((project.tsConfigJson as TsConfigJson).exclude as string[]).indexOf(e) < 0).length > 0) {
+        const node = this.getAstNodeFromFile(project.tsConfigJson, 'exclude');
+        this.addFindingWithPosition(findings, node);
+      }
+    }
+    else {
+      if (project.tsConfigJson.exclude) {
+        const node = this.getAstNodeFromFile(project.tsConfigJson, 'exclude');
+        this.addFindingWithPosition(findings, node);
+      }
     }
   }
 }

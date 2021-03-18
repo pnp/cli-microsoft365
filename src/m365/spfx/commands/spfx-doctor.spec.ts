@@ -74,11 +74,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.22.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.14.6');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -88,7 +83,7 @@ describe(commands.DOCTOR, () => {
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
         case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '4.0.2'));
+          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
         case 'react':
           callback(undefined, packageVersionResponse(packageName, '16.8.5'));
@@ -106,9 +101,8 @@ describe(commands.DOCTOR, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.22.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
@@ -123,11 +117,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.14.6');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -137,7 +126,7 @@ describe(commands.DOCTOR, () => {
           callback(undefined, packageVersionResponse(packageName, '3.1.1'));
           break;
         case 'gulp':
-          callback(undefined, packageVersionResponse(packageName, '4.0.2'));
+          callback(undefined, packageVersionResponse(packageName, '3.9.1'));
           break;
         case 'react':
           callback(undefined, packageVersionResponse(packageName, '16.8.5'));
@@ -155,9 +144,8 @@ describe(commands.DOCTOR, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v4.0.2')), 'Invalid gulp version reported');
+        assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'bundled typescript used')), 'Invalid typescript reported');
         done();
@@ -172,11 +160,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -207,7 +190,6 @@ describe(commands.DOCTOR, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
@@ -224,11 +206,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -259,7 +236,6 @@ describe(commands.DOCTOR, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
@@ -276,11 +252,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.14.6');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -311,7 +282,6 @@ describe(commands.DOCTOR, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.11.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.14.6')), 'Invalid npm version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
@@ -328,11 +298,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -360,7 +325,6 @@ describe(commands.DOCTOR, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
@@ -377,11 +341,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -409,7 +368,6 @@ describe(commands.DOCTOR, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
@@ -426,11 +384,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -461,7 +414,6 @@ describe(commands.DOCTOR, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
@@ -478,11 +430,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -513,7 +460,6 @@ describe(commands.DOCTOR, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
@@ -530,11 +476,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -565,7 +506,6 @@ describe(commands.DOCTOR, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(0, 'SharePoint Framework v1.10.0')), 'Invalid SharePoint Framework version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'Node v10.18.0')), 'Invalid Node version reported');
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.13.4')), 'Invalid npm version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'yo v3.1.1')), 'Invalid yo version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'gulp v3.9.1')), 'Invalid gulp version reported');
         assert(loggerLogSpy.calledWith(getStatus(0, 'react v16.8.5')), 'Invalid react version reported');
@@ -888,166 +828,6 @@ describe(commands.DOCTOR, () => {
     });
   });
 
-  it('passes npm check when version meets single range prerequisite', (done) => {
-    const sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'version').value('v8.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '5.0.0');
-        return {} as child_process.ChildProcess;
-      }
-
-      const packageName: string = (args as string[])[1];
-      switch (packageName) {
-        case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.6.0'));
-          break;
-        default:
-          callback(new Error(`${file} ENOENT`));
-      }
-      return {} as child_process.ChildProcess;
-    });
-
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v5.0.0')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('passes npm.logger check when os is Windows', (done) => {
-    Utils.restore(process.platform);
-    sinon.stub(process, 'platform').value('win32');
-
-    const sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'version').value('v8.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm.logger' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '5.0.0');
-        return {} as child_process.ChildProcess;
-      }
-
-      const packageName: string = (args as string[])[1];
-      switch (packageName) {
-        case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.6.0'));
-          break;
-        default:
-          callback(new Error(`${file} ENOENT`));
-      }
-      return {} as child_process.ChildProcess;
-    });
-
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v5.0.0')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('passes npm check when version meets double range prerequisite', (done) => {
-    const sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'version').value('v10.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.0.0');
-        return {} as child_process.ChildProcess;
-      }
-
-      const packageName: string = (args as string[])[1];
-      switch (packageName) {
-        case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.10.0'));
-          break;
-        default:
-          callback(new Error(`${file} ENOENT`));
-      }
-      return {} as child_process.ChildProcess;
-    });
-
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(0, 'npm v6.0.0')));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails npm check when version does not meet single range prerequisite', (done) => {
-    const sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'version').value('v8.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '4.0.0');
-        return {} as child_process.ChildProcess;
-      }
-
-      const packageName: string = (args as string[])[1];
-      switch (packageName) {
-        case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.6.0'));
-          break;
-        default:
-          callback(new Error(`${file} ENOENT`));
-      }
-      return {} as child_process.ChildProcess;
-    });
-
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'npm v4.0.0 found, v^5.0.0 required')));
-        assert(loggerLogSpy.calledWith('- npm i -g npm@5'), 'No fix provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails npm check when version does not meet double range prerequisite', (done) => {
-    const sandbox = sinon.createSandbox();
-    sandbox.stub(process, 'version').value('v10.0.0');
-    sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '7.0.0');
-        return {} as child_process.ChildProcess;
-      }
-
-      const packageName: string = (args as string[])[1];
-      switch (packageName) {
-        case '@microsoft/sp-core-library':
-          callback(undefined, packageVersionResponse(packageName, '1.10.0'));
-          break;
-        default:
-          callback(new Error(`${file} ENOENT`));
-      }
-      return {} as child_process.ChildProcess;
-    });
-
-    command.action(logger, { options: { debug: false } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'npm v7.0.0 found, v^5.0.0 || ^6.0.0 required')));
-        assert(loggerLogSpy.calledWith('- npm i -g npm@6'), 'No fix provided');
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('fails with friendly error message when npm not found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.0.0');
@@ -1067,16 +847,11 @@ describe(commands.DOCTOR, () => {
       }
     });
   });
-
+  
   it('passes yo check when yo found', (done) => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1106,11 +881,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1139,11 +909,6 @@ describe(commands.DOCTOR, () => {
     sandbox.stub(process, 'version').value('v10.18.0');
 
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(null, '6.13.4', '');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1173,11 +938,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1205,11 +965,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1237,11 +992,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v8.0.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '5.0.0');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1271,11 +1021,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1305,11 +1050,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v8.0.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '5.0.0');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1340,11 +1080,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1375,11 +1110,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1409,11 +1139,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1444,11 +1169,6 @@ describe(commands.DOCTOR, () => {
     const sandbox = sinon.createSandbox();
     sandbox.stub(process, 'version').value('v10.18.0');
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(undefined, '6.13.4');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':
@@ -1482,11 +1202,6 @@ describe(commands.DOCTOR, () => {
       sandbox.stub(process.env, 'TERM').value('16');
     }
     sinon.stub(child_process, 'execFile').callsFake((file, args, callback: any) => {
-      if (file === 'npm' && args && args.length === 1 && args[0] === '-v') {
-        callback(null, '6.13.4', '');
-        return {} as child_process.ChildProcess;
-      }
-
       const packageName: string = (args as string[])[1];
       switch (packageName) {
         case '@microsoft/sp-core-library':

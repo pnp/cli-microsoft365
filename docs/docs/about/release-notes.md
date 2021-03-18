@@ -1,5 +1,11 @@
 # Release notes
 
+## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
+
+### Changes
+
+- added support for configuring default output [#2246](https://github.com/pnp/cli-microsoft365/issues/2246)
+
 ## [v3.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.7.0)
 
 ### New commands
@@ -31,6 +37,8 @@
 - added the 'List site collections and their lists' sample script [#2272](https://github.com/pnp/cli-microsoft365/issues/2272)
 - added site external users report sample [#2277](https://github.com/pnp/cli-microsoft365/issues/2277)
 - added the 'Delete all Microsoft 365 groups and SharePoint sites' sample [#2278](https://github.com/pnp/cli-microsoft365/issues/2278)
+- added support for upgrading SPFx projects to v1.12 [#2154](https://github.com/pnp/cli-microsoft365/issues/2154)
+- extended spfx doctor with support for SPFx v1.12 [#2173](https://github.com/pnp/cli-microsoft365/issues/2173)
 
 ## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
 

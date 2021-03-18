@@ -78,7 +78,7 @@ export abstract class DependencyRule extends JsonRule {
       }
     }
     else {
-      let jsonProperty: string = `${(this.isDevDep ? 'devDependencies' : 'dependencies')}.${this.packageName}`;
+      const jsonProperty: string = `${(this.isDevDep ? 'devDependencies' : 'dependencies')}.${this.packageName}`;
 
       if (versionEntry) {
         const node = this.getAstNodeFromFile(project.packageJson, jsonProperty);

@@ -2282,6 +2282,62 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
   //#endregion
 
+  //#region 1.11.0
+  it('e2e: shows correct number of findings for upgrading application customizer 1.11.0 project to 1.12.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1110-applicationcustomizer'));
+
+    command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 23);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.11.0 project to 1.12.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1110-fieldcustomizer-react'));
+
+    command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 27);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.11.0 project to 1.12.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1110-listviewcommandset'));
+
+    command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 23);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.11.0 project to 1.12.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1110-webpart-nolib'));
+
+    command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 24);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.11.0 project to 1.12.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1110-webpart-react'));
+
+    command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 29);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.11.0 project to 1.12.0', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1110-webpart-optionaldeps'));
+
+    command.action(logger, { options: { toVersion: '1.12.0', output: 'json' } } as any, (err?: any) => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 34);
+    });
+  });
+  //#endregion
+
   //#region superseded rules
   it('ignores superseded findings (1.1.0 > 1.2.0)', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-110-webpart-react'));
