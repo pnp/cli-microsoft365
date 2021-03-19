@@ -2,9 +2,15 @@
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 
+**Azure Active Directory:**
+
+- [aad policy list](../cmd/aad/policy/policy-list.md) - returns policies from Azure AD [#2164](https://github.com/pnp/cli-microsoft365/issues/2164)
+
 ### Changes
 
 - added support for configuring default output [#2246](https://github.com/pnp/cli-microsoft365/issues/2246)
+- restored showing original API errors [#2138](https://github.com/pnp/cli-microsoft365/issues/2138)
+- added new sample script for granting API permissions to SharePoint AAD App [#2243](https://github.com/pnp/cli-microsoft365/issues/2243)
 
 ## [v3.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.7.0)
 
