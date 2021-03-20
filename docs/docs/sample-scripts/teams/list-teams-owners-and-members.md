@@ -2,7 +2,7 @@
 
 Author: [Patrick Lamber](https://www.nubo.eu/List-All-Microsoft-Teams-Owners-And-Members/)
 
-This script allows you to list all Teams team's owners and members and export them into a CSV file. 
+This script allows you to list all Teams team's owners and members and export them into a CSV file. This script is inspired by [Robin Clarke](https://dailysysadmin.com/KB/Article/3607/microsoft-teams-powershell-commands-to-list-all-members-and-owners/).
 
 ```powershell tab="PowerShell Core"
 $fileExportPath = "<PUTYOURPATHHERE.csv>"
