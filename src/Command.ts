@@ -211,6 +211,7 @@ export default abstract class Command {
   }
 
   protected handleRejectedODataJsonPromise(response: any, logger: Logger, callback: (err?: any) => void): void {
+    // console.log(JSON.stringify(response, null, 2));
     if (response.error &&
       response.error['odata.error'] &&
       response.error['odata.error'].message) {

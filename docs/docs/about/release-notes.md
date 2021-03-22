@@ -1,5 +1,17 @@
 # Release notes
 
+## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
+
+**Azure Active Directory:**
+
+- [aad policy list](../cmd/aad/policy/policy-list.md) - returns policies from Azure AD [#2164](https://github.com/pnp/cli-microsoft365/issues/2164)
+
+### Changes
+
+- added support for configuring default output [#2246](https://github.com/pnp/cli-microsoft365/issues/2246)
+- restored showing original API errors [#2138](https://github.com/pnp/cli-microsoft365/issues/2138)
+- added new sample script for granting API permissions to SharePoint AAD App [#2243](https://github.com/pnp/cli-microsoft365/issues/2243)
+
 ## [v3.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.7.0)
 
 ### New commands
@@ -31,6 +43,8 @@
 - added the 'List site collections and their lists' sample script [#2272](https://github.com/pnp/cli-microsoft365/issues/2272)
 - added site external users report sample [#2277](https://github.com/pnp/cli-microsoft365/issues/2277)
 - added the 'Delete all Microsoft 365 groups and SharePoint sites' sample [#2278](https://github.com/pnp/cli-microsoft365/issues/2278)
+- added support for upgrading SPFx projects to v1.12 [#2154](https://github.com/pnp/cli-microsoft365/issues/2154)
+- extended spfx doctor with support for SPFx v1.12 [#2173](https://github.com/pnp/cli-microsoft365/issues/2173)
 
 ## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
 
@@ -522,7 +536,7 @@
 
 **SharePoint Framework:**
 
-- [spfx doctor](../cmd/spfx/doctor.md) - verifies environment configuration for using the specific version of the SharePoint Framework [#1353](https://github.com/pnp/cli-microsoft365/issues/1353)
+- [spfx doctor](../cmd/spfx/spfx-doctor.md) - verifies environment configuration for using the specific version of the SharePoint Framework [#1353](https://github.com/pnp/cli-microsoft365/issues/1353)
 
 **Skype:**
 

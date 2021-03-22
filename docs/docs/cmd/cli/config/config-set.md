@@ -11,7 +11,7 @@ m365 cli config set [options]
 ## Options
 
 `-k, --key <key>`
-: Config key to specify. Allowed values: `showHelpOnFailure`
+: Config key to specify. Allowed values: `showHelpOnFailure,output`
 
 `-v, --value <value>`
 : Config value to set
@@ -24,6 +24,12 @@ Configure CLI to automatically display help when executing a command failed
 
 ```sh
 m365 cli config set --key showHelpOnFailure --value true
+```
+
+Configure the default CLI output to JSON
+
+```sh
+m365 cli config set --key output --value json
 ```
 
 ## More information

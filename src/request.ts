@@ -49,12 +49,11 @@ class Request {
       }, (error: AxiosError): void => {
         if (this._logger) {
           const properties: string[] = ['status', 'statusText', 'headers'];
-          if (error.response &&
-            !(error.response.data instanceof Stream)) {
-            properties.push('data');
-          }
-          this._logger.logToStderr('Request error');
-          this._logger.logToStderr(JSON.stringify(Utils.filterObject(error.response, properties), null, 2));
+          this._logger.logToStderr('Request error:');
+          this._logger.logToStderr(JSON.stringify({
+            ...Utils.filterObject(error.response, properties),
+            error: (error as any).error
+          }, null, 2));
         }
         throw error;
       });
@@ -86,6 +85,24 @@ class Request {
 
       return config;
     });
+    // since we're stubbing requests, response interceptor is never called in
+    // tests, so let's exclude it from coverage
+    /* c8 ignore next 15 */
+    this.req.interceptors.response.use(
+      (response: AxiosResponse) => response,
+      (error: AxiosError): void => {
+        if (error &&
+          error.response &&
+          error.response.data &&
+          !(error.response.data instanceof Stream)) {
+          // move error details from response.data to error property to make
+          // it compatible with our code
+          (error as any).error = JSON.parse(JSON.stringify(error.response.data));
+        }
+
+        throw error;
+      }
+    );
   }
 
   public post<TResponse>(options: AxiosRequestConfig): Promise<TResponse> {

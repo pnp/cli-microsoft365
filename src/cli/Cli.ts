@@ -176,6 +176,11 @@ export class Cli {
       return this.closeWithError(validationResult, true);
     }
 
+    // if output not specified, set the configured output value (if any)
+    if (optionsWithoutShorts.options.output === undefined) {
+      optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, undefined);
+    }
+
     return Cli
       .executeCommand(this.commandToExecute.command, optionsWithoutShorts)
       .then(_ => {
