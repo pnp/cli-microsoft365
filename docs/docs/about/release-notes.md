@@ -11,6 +11,7 @@
 - added support for configuring default output [#2246](https://github.com/pnp/cli-microsoft365/issues/2246)
 - restored showing original API errors [#2138](https://github.com/pnp/cli-microsoft365/issues/2138)
 - added new sample script for granting API permissions to SharePoint AAD App [#2243](https://github.com/pnp/cli-microsoft365/issues/2243)
+- added the 'List all Microsoft Teams team's Owners and Members' sample [#2284](https://github.com/pnp/cli-microsoft365/issues/2284)
 
 ## [v3.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.7.0)
 
