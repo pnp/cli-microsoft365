@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
-import Command, { CommandError } from '../../../../Command';
+import Command, { CommandError, CommandErrorWithOutput } from '../../../../Command';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
 import * as spoSiteClassicAddCommand from '../site/site-classic-add';
@@ -286,7 +286,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
           return Promise.resolve();
         }
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('404 FILE NOT FOUND'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -336,7 +336,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
           return Promise.resolve();
         }
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('404 FILE NOT FOUND'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -386,7 +386,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
           return Promise.resolve();
         }
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('404 FILE NOT FOUND'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -428,7 +428,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
           return Promise.resolve();
         }
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('An error has occurred')));
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -546,7 +546,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
-          return Promise.reject(new CommandError('404 FILE NOT FOUND'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
         }
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
@@ -596,7 +596,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
-          return Promise.reject(new CommandError('404 FILE NOT FOUND'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
         }
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
@@ -638,7 +638,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
-          return Promise.reject(new CommandError('404 FILE NOT FOUND'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
         }
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
@@ -672,7 +672,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
-          return Promise.reject(new CommandError('404 FILE NOT FOUND'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
         }
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
           return Promise.resolve();
@@ -715,7 +715,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog' ||
           args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
-          return Promise.reject(new CommandError('404 FILE NOT FOUND'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -755,7 +755,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog' ||
           args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
-          return Promise.reject(new CommandError('404 FILE NOT FOUND'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -788,7 +788,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/old-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('An error has occurred')));
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -1035,7 +1035,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('404 FILE NOT FOUND'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -1074,7 +1074,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('404 FILE NOT FOUND'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('404 FILE NOT FOUND')));
         }
 
         return Promise.reject(new CommandError('Invalid URL'));
@@ -1102,7 +1102,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
 
       if (command === spoSiteGetCommand) {
         if (args.options.url === 'https://contoso.sharepoint.com/sites/new-app-catalog') {
-          return Promise.reject(new CommandError('An error has occurred'));
+          return Promise.reject(new CommandErrorWithOutput(new CommandError('An error has occurred')));
         }
 
         return Promise.reject(new CommandError('Invalid URL'));

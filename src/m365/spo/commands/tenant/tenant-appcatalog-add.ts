@@ -1,5 +1,5 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
-import Command, { CommandError, CommandOption } from '../../../../Command';
+import Command, { CommandError, CommandErrorWithOutput, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
@@ -96,10 +96,10 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
           Cli
             .executeCommand(spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } })
             .then(() => resolve(), (err: CommandError) => reject(err));
-        }, (err: CommandError) => {
-          if (err.message !== 'File Not Found.' && err.message !== '404 FILE NOT FOUND') {
+        }, (err: CommandErrorWithOutput) => {
+          if (err.error.message !== 'File Not Found.' && err.error.message !== '404 FILE NOT FOUND') {
             // some other error occurred
-            return reject(err);
+            return reject(err.error);
           }
 
           if (this.verbose) {
