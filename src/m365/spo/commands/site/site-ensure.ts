@@ -1,7 +1,8 @@
 import * as chalk from 'chalk';
-import { Cli, CommandErrorWithOutput, CommandOutput, Logger } from '../../../../cli';
+import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, {
-  CommandOption
+  CommandOption,
+  CommandErrorWithOutput
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import SpoCommand from '../../../base/SpoCommand';

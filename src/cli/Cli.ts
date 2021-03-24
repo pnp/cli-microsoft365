@@ -21,11 +21,6 @@ export interface CommandOutput {
   stderr: string;
 }
 
-export interface CommandErrorWithOutput {
-  error: CommandError;
-  stderr: string;
-}
-
 export class Cli {
   public commands: CommandInfo[] = [];
   /**

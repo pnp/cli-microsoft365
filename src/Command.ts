@@ -26,6 +26,11 @@ export class CommandError {
   }
 }
 
+export class CommandErrorWithOutput {
+  constructor(public error: CommandError, public stderr?: string) {
+  }
+}
+
 export interface ODataError {
   "odata.error": {
     code: string;
