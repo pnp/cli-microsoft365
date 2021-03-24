@@ -233,6 +233,7 @@ export default {
   USER_GET: `${prefix} user get`,
   USER_LIST:`${prefix} user list`,
   USER_REMOVE:`${prefix} user remove`,
+  USERPROFILE_GET:`${prefix} userprofile get`,
   USERPROFILE_SET: `${prefix} userprofile set`,
   WEB_ADD: `${prefix} web add`,
   WEB_CLIENTSIDEWEBPART_LIST: `${prefix} web clientsidewebpart list`,

@@ -429,6 +429,7 @@ nav:
         - user list: 'cmd/spo/user/user-list.md'
         - user remove: 'cmd/spo/user/user-remove.md'
       - userprofile:
+        - userprofile get: 'cmd/spo/userprofile/userprofile-get.md'
         - userprofile set: 'cmd/spo/userprofile/userprofile-set.md'
       - web:
         - web add: 'cmd/spo/web/web-add.md'
