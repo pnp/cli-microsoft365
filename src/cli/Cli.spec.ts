@@ -1191,7 +1191,7 @@ describe('Cli', () => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => 'abc');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
+      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt', '-o', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith('abc'));
@@ -1224,7 +1224,7 @@ describe('Cli', () => {
   it(`leaves the original value if the file specified in @ value doesn't exist`, (done) => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
+      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt', '-o', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith('@file.txt'));
