@@ -121,6 +121,8 @@ nav:
         - report mailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md'
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
     - Microsoft Planner (planner):
+      - plan:
+        - plan add: 'cmd/planner/plan/plan-add.md'
       - task:
         - task list: 'cmd/planner/task/task-list.md'
     - Power Apps (pa):
