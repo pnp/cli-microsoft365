@@ -46,6 +46,8 @@
 - added the 'Delete all Microsoft 365 groups and SharePoint sites' sample [#2278](https://github.com/pnp/cli-microsoft365/issues/2278)
 - added support for upgrading SPFx projects to v1.12 [#2154](https://github.com/pnp/cli-microsoft365/issues/2154)
 - extended spfx doctor with support for SPFx v1.12 [#2173](https://github.com/pnp/cli-microsoft365/issues/2173)
+- added the 'M365 health status' sample script [#2107](https://github.com/pnp/cli-microsoft365/issues/2107)
+- fixed broken tests when default output configured to JSON [#2305](https://github.com/pnp/cli-microsoft365/issues/2305)
 
 ## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
 
