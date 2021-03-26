@@ -329,7 +329,7 @@ describe(commands.POLICY_LIST, () => {
   });
 
   it('correctly handles API OData error for specified policies', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject("An error has occurred.");
     });
 
@@ -345,7 +345,7 @@ describe(commands.POLICY_LIST, () => {
   });
 
   it('correctly handles API OData error for all policies', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject("An error has occurred.");
     });
 

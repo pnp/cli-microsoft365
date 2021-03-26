@@ -36,9 +36,6 @@ describe(commands.STATUS, () => {
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
-  afterEach(() => {
-    });
-
   after(() => {
     Utils.restore([
       auth.restoreAuth,

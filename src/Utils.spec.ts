@@ -80,14 +80,14 @@ describe('Utils', () => {
   });
 
   it('isDateInRange returns true if date within monthOffset is passed', () => {
-    let d: Date = new Date()
+    const d: Date = new Date();
     d.setMonth(d.getMonth() - 1);
     const result = Utils.isDateInRange(d.toISOString(), 2);
     assert.strictEqual(result, true);
   });
 
   it('isDateInRange returns false if date prior to monthOffset is passed', () => {
-    let d: Date = new Date()
+    const d: Date = new Date();
     d.setMonth(d.getMonth() - 2);
     const result = Utils.isDateInRange(d.toISOString(), 1);
     assert.strictEqual(result, false);
@@ -130,7 +130,7 @@ describe('Utils', () => {
 
   it('isValidGuid returns false if invalid guid', () => {
     const result = Utils.isValidGuid('b2307a39-e878-458b-bc90-03bc578531dw');
-    assert(result == false);
+    assert(result === false);
   });
 
   it('isValidTeamsChannelId returns true if valid channelId (all numbers)', () => {
@@ -190,7 +190,7 @@ describe('Utils', () => {
 
   it('isValidBoolean returns false if invalid boolean', () => {
     const result = Utils.isValidBoolean('foo');
-    assert(result == false);
+    assert(result === false);
   });
 
   it('doesn\'t fail when restoring stub if the passed object is undefined', () => {

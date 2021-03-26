@@ -34,7 +34,7 @@ class AadO365GroupRenewCommand extends GraphCommand {
       url: `${this.resource}/v1.0/groups/${args.options.id}/renew/`,
       headers: {
         'accept': 'application/json;odata.metadata=none'
-      },
+      }
     };
 
     request

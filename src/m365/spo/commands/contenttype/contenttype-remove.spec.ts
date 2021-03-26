@@ -75,7 +75,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
 
     command.action(logger, {
       options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', id: '0x0100558D85B7216F6A489A499DB361E1AE2F', confirm: false }
-    } as any, (err?: any) => {
+    } as any, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -114,8 +114,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
         id: '0x0100558D85B7216F6A489A499DB361E1AE2F',
         confirm: false
       }
-    } as any, (err?: any) => {
-
+    } as any, () => {
       try {
         assert(postCallbackStub.called);
         done();
@@ -148,7 +147,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
         id: '0x0100558D85B7216F6A489A499DB361E1AE2F',
         confirm: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.notCalled);
         done();
@@ -276,7 +275,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'Test Content Type', confirm: true } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'Test Content Type', confirm: true } } as any, () => {
       try {
         assert(getStub.called);
         assert(postStub.called);
@@ -345,7 +344,7 @@ describe(commands.CONTENTTYPE_REMOVE, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: { webUrl: 'https://contoso.sharepoint.com/sites/portal', name: 'NonExistentContentType', confirm: true } } as any, (err?: any) => {
       try {

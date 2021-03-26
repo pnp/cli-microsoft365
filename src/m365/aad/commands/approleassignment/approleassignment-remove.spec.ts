@@ -339,7 +339,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
 
   it('correctly handles API OData error', (done) => {
     Utils.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {
@@ -391,7 +391,7 @@ describe(commands.APPROLEASSIGNMENT_REMOVE, () => {
   it('fails validation if both objectId, appId and displayName are specified', () => {
     const actual = command.validate({ options: { appId: '123', objectId: '123', displayName: 'abc', resource: 'abc', scope: 'abc' } });
     assert.notStrictEqual(actual, true);
-  })
+  });
 
   it('passes validation when the appId option specified', () => {
     const actual = command.validate({ options: { appId: '57907bf8-73fa-43a6-89a5-1f603e29e452', resource: 'abc', scope: 'abc' } });

@@ -17,7 +17,7 @@ export class FN012018_TSC_lib_es2015_promise extends JsonRule {
 
   get description(): string {
     return `Add es2015.promise lib in tsconfig.json`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -27,19 +27,19 @@ export class FN012018_TSC_lib_es2015_promise extends JsonRule {
     ]
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './tsconfig.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {

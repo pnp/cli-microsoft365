@@ -146,7 +146,7 @@ describe(commands.TEAMS_APP_UNINSTALL, () => {
   });
 
   it('correctly handles error when uninstalling an app', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

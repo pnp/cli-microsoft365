@@ -66,7 +66,7 @@ class SpoStorageEntityListCommand extends SpoCommand {
                 Value: property.Value,
                 Description: property.Description,
                 Comment: property.Comment
-              }
+              };
             }));
           }
           cb();

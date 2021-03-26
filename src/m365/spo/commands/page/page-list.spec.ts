@@ -136,7 +136,7 @@ describe(commands.PAGE_LIST, () => {
   });
 
   it('correctly handles OData error when retrieving pages', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 

@@ -38,11 +38,11 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
       let spoAdminUrl: string = '';
 
       this.getSpoAdminUrl(logger, this.debug)
-      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
-        spoAdminUrl = _spoAdminUrl;
+        .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+          spoAdminUrl = _spoAdminUrl;
 
-        return this.getRequestDigest(spoAdminUrl);
-      })
+          return this.getRequestDigest(spoAdminUrl);
+        })
         .then((res: ContextInfo): Promise<string> => {
           const requestOptions: any = {
             url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
@@ -64,7 +64,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
           else {
             logger.log(json[json.length - 1]);
           }
-          
+
           cb();
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
     };
@@ -78,7 +78,7 @@ class SpoHomeSiteRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the Home Site?`,
+        message: `Are you sure you want to remove the Home Site?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

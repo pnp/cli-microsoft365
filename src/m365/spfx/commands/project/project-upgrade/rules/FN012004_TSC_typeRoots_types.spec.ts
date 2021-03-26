@@ -10,7 +10,7 @@ describe('FN012004_TSC_typeRoots_types', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN012004_TSC_typeRoots_types();
-  })
+  });
 
   it('doesn\'t return notification if ./node_modules/@types is already present', () => {
     const project: Project = {

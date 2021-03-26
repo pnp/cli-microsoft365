@@ -60,7 +60,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
     let description: string = "";
     let title: string = "";
     let topicHeader: string = "";
-    let pageData: any = {};
+    const pageData: any = {};
 
     let pageFullName: string = args.options.pageName;
     if (args.options.pageName.indexOf('.aspx') < 0) {
@@ -133,7 +133,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
               sectionIndex: 1,
               zoneIndex: 1,
               sectionFactor: 12,
-              layoutIndex: 1,
+              layoutIndex: 1
             },
             emphasis: {},
             displayMode: 2
@@ -331,9 +331,9 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
               id: componentId,
               instanceId: id,
               properties: preconfiguredEntries.properties,
-              title: preconfiguredEntries.title.default,
+              title: preconfiguredEntries.title.default
             },
-            webPartId: componentId,
+            webPartId: componentId
           };
           resolve(webPart);
         }, (error: any): void => {
@@ -352,7 +352,7 @@ class SpoPageClientSideWebPartAddCommand extends SpoCommand {
 
       try {
         const properties: any = JSON.parse(args.options.webPartProperties);
-        (webPart as any).webPartData.properties = this.extend((webPart as any).webPartData.properties, properties)
+        (webPart as any).webPartData.properties = this.extend((webPart as any).webPartData.properties, properties);
       }
       catch {
       }

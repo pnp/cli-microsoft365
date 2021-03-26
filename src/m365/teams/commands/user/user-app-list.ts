@@ -39,14 +39,14 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
       .getUserId(args)
       .then((_userId): Promise<void> => {
         userId = _userId.value;
-        const endpoint: string = `${this.resource}/beta/users/${encodeURIComponent(userId)}/teamwork/installedApps`
+        const endpoint: string = `${this.resource}/beta/users/${encodeURIComponent(userId)}/teamwork/installedApps`;
 
         return this.getAllItems(endpoint, logger, true);
       })
       .then((): void => {
         this.items.map(i => {
           const userAppId: string = Buffer.from(i.id, 'base64').toString('ascii');
-          const appId: string = userAppId.substr(userAppId.indexOf("##") + 2, userAppId.length - userId.length - 2)
+          const appId: string = userAppId.substr(userAppId.indexOf("##") + 2, userAppId.length - userId.length - 2);
           i.appId = appId;
         });
         

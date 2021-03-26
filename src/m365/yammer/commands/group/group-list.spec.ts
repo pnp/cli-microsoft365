@@ -14,7 +14,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  let groupsFirstBatchList: any = [
+  const groupsFirstBatchList: any = [
     {
       "type": "group",
       "id": 13114605568,
@@ -80,7 +80,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
       }
     }];
 
-  let groupsSecondBatchList: any = [
+  const groupsSecondBatchList: any = [
     {
       "type": "group",
       "id": 4708910,
@@ -228,7 +228,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
   });
 
   it('correctly handles error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "base": "An error has occurred."
@@ -285,9 +285,9 @@ describe(commands.YAMMER_GROUP_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: {} } as any, (err?: any) => {
+    command.action(logger, { options: {} } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910);
         done();
       }
       catch (e) {
@@ -297,7 +297,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
   });
 
   it('returns all groups', (done) => {
-    let first50Groups: any[] = [];
+    const first50Groups: any[] = [];
     // create a batch with 50 groups
     for (let index = 0; index < 25; index++) {
       first50Groups.concat(groupsFirstBatchList);
@@ -312,7 +312,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 3);
         done();
@@ -324,10 +324,10 @@ describe(commands.YAMMER_GROUP_LIST, () => {
   });
 
   it('returns groups with a specific limit', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve(groupsFirstBatchList);
     });
-    command.action(logger, { options: { limit: 1, output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { limit: 1, output: 'json' } } as any, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 1);
         done();
@@ -340,13 +340,13 @@ describe(commands.YAMMER_GROUP_LIST, () => {
 
   it('handles error in loop', (done) => {
     let i: number = 0;
-    let first50Groups: any[] = [];
+    const first50Groups: any[] = [];
     // create a batch with 50 groups
     for (let index = 0; index < 25; index++) {
       first50Groups.concat(groupsFirstBatchList);
     }
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       if (i++ === 0) {
         return Promise.resolve(first50Groups);
       }
@@ -376,9 +376,9 @@ describe(commands.YAMMER_GROUP_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { userId: 10123190123128, output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { userId: 10123190123128, output: 'json' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 4708910);
         done();
       }
       catch (e) {

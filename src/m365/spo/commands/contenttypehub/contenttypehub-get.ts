@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-    CommandError
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -10,10 +10,7 @@ import commands from '../../commands';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
-  options: Options;
-}
-
-interface Options extends GlobalOptions {
+  options: GlobalOptions;
 }
 
 class SpoContentTypeHubGetCommand extends SpoCommand {
@@ -76,7 +73,7 @@ class SpoContentTypeHubGetCommand extends SpoCommand {
         else {
           const result: any = {
             ContentTypePublishingHub: json[json.length - 1]["ContentTypePublishingHub"]
-          } 
+          }; 
           logger.log(result);
           cb();
         }

@@ -13,23 +13,23 @@ export class FN003004_CFG_entries extends JsonRule {
 
   get description(): string {
     return `Remove the "entries" property in ${this.file}`;
-  };
+  }
 
   get resolution(): string {
     return '';
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './config/config.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.configJson) {

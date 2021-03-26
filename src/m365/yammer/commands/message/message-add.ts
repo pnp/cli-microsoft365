@@ -60,7 +60,7 @@ class YammerMessageAddCommand extends YammerCommand {
       .post(requestOptions)
       .then((res: any): void => {
         let result = null;
-        if (res.messages && res.messages.length == 1) {
+        if (res.messages && res.messages.length === 1) {
           result = res.messages[0];
         }
 

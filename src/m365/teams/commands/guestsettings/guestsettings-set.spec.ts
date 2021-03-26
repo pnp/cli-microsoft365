@@ -125,7 +125,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   });
 
   it('correctly handles error when updating guest settings', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

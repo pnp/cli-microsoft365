@@ -115,7 +115,7 @@ describe(commands.ENVIRONMENT_GET, () => {
   });
 
   it('correctly handles no environment found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -136,7 +136,7 @@ describe(commands.ENVIRONMENT_GET, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

@@ -68,7 +68,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
       options: {
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     });
     assert.strictEqual(actual, true);
@@ -89,7 +89,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
       options: {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         channelId: 'invalid',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -101,7 +101,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
       options: {
         teamId: 'invalid',
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -111,7 +111,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
       options: {
         teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        tabId: 'invalid',
+        tabId: 'invalid'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -124,7 +124,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
         debug: false,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       let promptIssued = false;
@@ -149,7 +149,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       let promptIssued = false;
@@ -175,7 +175,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       try {
@@ -195,7 +195,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       try {
@@ -226,7 +226,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         teamId: '00000000-0000-0000-0000-000000000000',
-        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        tabId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, (err?: any) => {
       try {

@@ -36,8 +36,8 @@ class SpoHubSiteSetCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.title = typeof args.options.title === 'string';
-    telemetryProps.description = typeof args.options.description === 'string'
-    telemetryProps.logoUrl = typeof args.options.logoUrl === 'string'
+    telemetryProps.description = typeof args.options.description === 'string';
+    telemetryProps.logoUrl = typeof args.options.logoUrl === 'string';
     return telemetryProps;
   }
 
@@ -129,7 +129,7 @@ class SpoHubSiteSetCommand extends SpoCommand {
     // required to support passing empty strings as valid values
     return {
       string: ['t', 'title', 'd', 'description', 'l', 'logoUrl']
-    }
+    };
   }
 }
 

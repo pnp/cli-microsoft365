@@ -717,7 +717,7 @@ describe(commands.FILE_REMOVE, () => {
   it('uses correct API url when id option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById(guid') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -747,7 +747,7 @@ describe(commands.FILE_REMOVE, () => {
   it('uses correct API url when url option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -777,7 +777,7 @@ describe(commands.FILE_REMOVE, () => {
   it('uses correct API url when recycle option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/recycle()') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');

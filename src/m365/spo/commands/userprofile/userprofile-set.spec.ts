@@ -86,10 +86,11 @@ describe(commands.USERPROFILE_SET, () => {
         const lastCall = postStub.lastCall.args[0];
         assert.strictEqual(JSON.stringify(lastCall.data), JSON.stringify(data));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
-    })
+    });
   });
 
   it('updates multi valued profile property', (done) => {
@@ -119,14 +120,15 @@ describe(commands.USERPROFILE_SET, () => {
         const lastCall = postStub.lastCall.args[0];
         assert.strictEqual(JSON.stringify(lastCall.data), JSON.stringify(data));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
-    })
+    });
   });
 
   it('correctly handles error while updating profile property', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

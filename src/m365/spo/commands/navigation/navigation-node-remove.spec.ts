@@ -128,7 +128,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   });
 
   it('aborts removing app when prompt not confirmed', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject('Invalid request');
     });
     Utils.restore(Cli.prompt);
@@ -173,7 +173,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({ error: 'An error has occurred' });
     });
 
@@ -189,7 +189,7 @@ describe(commands.NAVIGATION_NODE_REMOVE, () => {
   });
 
   it('correctly handles random API error (string error)', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

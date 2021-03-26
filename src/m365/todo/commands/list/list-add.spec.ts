@@ -100,7 +100,7 @@ describe(commands.LIST_ADD, () => {
   });
 
   it('handles error correctly', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

@@ -116,7 +116,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   });
 
   it('handles no client side webparts', (done) => {
-    let clientsideWebPartRsp = {
+    const clientsideWebPartRsp = {
       value: [
         {
           "ComponentType": 4,
@@ -164,7 +164,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
 
 
   it('handles no client side webparts (debug)', (done) => {
-    let clientsideWebPartRsp = {
+    const clientsideWebPartRsp = {
       value: [
         {
           "ComponentType": 4,
@@ -211,7 +211,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   });
 
   it('retrieves the list of clientside components of ComponentType : 1', (done) => {
-    let clientsideWebPartRsp = {
+    const clientsideWebPartRsp = {
       value: [
         {
           "ComponentType": 1,
@@ -248,7 +248,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     }, () => {
 
       try {
-        let expectedClientSideWebparts: any[] = [];
+        const expectedClientSideWebparts: any[] = [];
 
         clientsideWebPartRsp.value.forEach(
           component => {
@@ -274,7 +274,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
   });
 
   it('retrieves the list of clientside components of ComponentType : 1 and removes curly brackets from the Id', (done) => {
-    let clientsideWebPartRsp = {
+    const clientsideWebPartRsp = {
       value: [
         {
           "ComponentType": 1,
@@ -311,7 +311,7 @@ describe(commands.WEB_CLIENTSIDEWEBPART_LIST, () => {
     }, () => {
 
       try {
-        let expectedClientSideWebparts: any[] = [];
+        const expectedClientSideWebparts: any[] = [];
 
         clientsideWebPartRsp.value.forEach(
           component => {

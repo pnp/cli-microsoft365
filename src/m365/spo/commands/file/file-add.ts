@@ -101,7 +101,7 @@ class SpoFileAddCommand extends SpoCommand {
     }
 
     if (this.debug) {
-      logger.logToStderr('Check if the specified folder exists.')
+      logger.logToStderr('Check if the specified folder exists.');
       logger.logToStderr('');
     }
 
@@ -116,14 +116,14 @@ class SpoFileAddCommand extends SpoCommand {
       }
     };
 
-    request.get<void>(requestOptions).catch((err: string): Promise<void> => {
+    request.get<void>(requestOptions).catch((): Promise<void> => {
       // folder does not exist so will attempt to create the folder tree
       return folderExtensions.ensureFolder(args.options.webUrl, folderPath);
     })
       .then((): Promise<void> => {
         if (args.options.checkOut) {
           return this.fileCheckOut(fileName, args.options.webUrl, folderPath)
-            .then((res: any) => {
+            .then(() => {
               // flag the file is checkedOut by the command
               // so in case of command failure we can try check it in
               isCheckedOut = true;
@@ -184,13 +184,13 @@ class SpoFileAddCommand extends SpoCommand {
               })
                 .then((): Promise<void> => {
                   if (this.verbose) {
-                    logger.logToStderr(`Finished uploading ${fileUploadInfo.Position} bytes in ${fileChunkCount} chunks`)
+                    logger.logToStderr(`Finished uploading ${fileUploadInfo.Position} bytes in ${fileChunkCount} chunks`);
                   }
                   return Promise.resolve();
                 })
                 .catch((err: any) => {
                   if (this.verbose) {
-                    logger.logToStderr('Cancelling upload session due to error...')
+                    logger.logToStderr('Cancelling upload session due to error...');
                   }
 
                   const requestOptions: any = {
@@ -250,7 +250,7 @@ class SpoFileAddCommand extends SpoCommand {
       .then((): Promise<void> => {
         // check if there are unknown options
         // and map them as fields to update
-        let fieldsToUpdate: FieldValue[] = this.mapUnknownOptionsAsFieldValue(args.options);
+        const fieldsToUpdate: FieldValue[] = this.mapUnknownOptionsAsFieldValue(args.options);
 
         if (args.options.contentType) {
           fieldsToUpdate.push({
@@ -319,7 +319,7 @@ class SpoFileAddCommand extends SpoCommand {
           // then have to rollback the checkout
 
           const requestOptions: any = {
-            url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/UndoCheckOut()`,
+            url: `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderPath)}')/Files('${encodeURIComponent(fileName)}')/UndoCheckOut()`
           };
 
           request.post(requestOptions)
@@ -439,7 +439,7 @@ class SpoFileAddCommand extends SpoCommand {
         const requestOptions: any = {
           url: `${webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folder)}')/Files('${encodeURIComponent(fileName)}')/CheckOut()`,
           headers: {
-            'accept': 'application/json;odata=nometadata',
+            'accept': 'application/json;odata=nometadata'
           },
           responseType: 'json'
         };
@@ -462,7 +462,7 @@ class SpoFileAddCommand extends SpoCommand {
       const isLastChunk: boolean = info.Position >= info.Size;
       if (isLastChunk) {
         // trim buffer for last chunk
-        fileBuffer = fileBuffer.slice(0, readCount)
+        fileBuffer = fileBuffer.slice(0, readCount);
       }
 
       const requestOptions: any = {

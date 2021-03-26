@@ -14,7 +14,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
-  const stubAllGetRequests: any = (getField: any = null) => {
+  const stubAllGetRequests: any = () => {
     return sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/fields/getbyinternalnameortitle') > -1 || (opts.url as string).indexOf('/fields/getbyid') > -1) {
         return Promise.resolve({
@@ -72,7 +72,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -217,7 +217,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -249,7 +249,7 @@ describe(commands.LIST_VIEW_FIELD_SET, () => {
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');

@@ -11,13 +11,13 @@ describe('DynamicRule', () => {
 
   beforeEach(() => {
     rule = new DynamicRule();
-  })
+  });
 
   afterEach(() => {
     Utils.restore([
       fs.readFileSync,
       request.head,
-      request.post,
+      request.post
     ]);
   });
 
@@ -62,7 +62,7 @@ describe('DynamicRule', () => {
       packageJson: {
         dependencies: {
           '@pnp/sp-taxonomy': '1.3.5',
-          '@pnp/sp-clientsvc': '1.3.5',
+          '@pnp/sp-clientsvc': '1.3.5'
         }
       }
     };
@@ -117,7 +117,7 @@ describe('DynamicRule', () => {
       }
     };
     const originalReadFileSync = fs.readFileSync;
-    sinon.stub(fs, 'readFileSync').callsFake((path, options) => {
+    sinon.stub(fs, 'readFileSync').callsFake((path) => {
       if (path.toString().endsWith('@pnp/pnpjs/package.json')) {
         return JSON.stringify({
           main: "./dist/pnpjs.es5.umd.bundle.js",
@@ -230,10 +230,10 @@ describe('DynamicRule', () => {
           es2015: "./dist/pnpjs.es5.umd.bundle.min.js",
           jspm: {
             main: "./dist/pnpjs.es5.umd.bundle.min.js",
-            files: ["./dist/pnpjs.es5.umd.bundle.min.js"],
+            files: ["./dist/pnpjs.es5.umd.bundle.min.js"]
           },
           spm: {
-            main: "./dist/pnpjs.es5.umd.bundle.min.js",
+            main: "./dist/pnpjs.es5.umd.bundle.min.js"
           }
         });
       }

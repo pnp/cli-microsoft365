@@ -54,7 +54,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
           const opts: Options = args.options;
           if (opts.folder) {
             // get the folder guid instead of the web guid
-            return clientSvcCommons.getFolderIdentity(identityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue)
+            return clientSvcCommons.getFolderIdentity(identityResp.objectIdentity, opts.webUrl, opts.folder, this.formDigestValue);
           }
           return new Promise<IdentityResponse>(resolve => { return resolve(identityResp); });
         })
@@ -62,7 +62,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
           return this.removeProperty(identityResp, args.options);
         })
         .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       removeProperty();
@@ -72,7 +72,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the ${args.options.key} property?`,
+        message: `Are you sure you want to remove the ${args.options.key} property?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -108,7 +108,7 @@ class SpoPropertyBagRemoveCommand extends SpoPropertyBagBaseCommand {
         else {
           resolve(res);
         }
-      }, (err: any): void => { reject(err); })
+      }, (err: any): void => { reject(err); });
     });
   }
 

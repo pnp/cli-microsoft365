@@ -3,8 +3,6 @@ import * as sinon from 'sinon';
 import { Logger } from '../../../../cli';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import { ClientSidePageProperties } from './ClientSidePageProperties';
-import { ClientSidePage } from './clientsidepages';
 import { Page } from './Page';
 
 describe('Page', () => {
@@ -34,7 +32,7 @@ describe('Page', () => {
   });
 
   it('correctly handles error when parsing modern page', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({
         ListItemAllFields: {
           ClientSideApplicationId: 'b6917cb1-93a0-4b97-a84d-7cf49975d4ec',
@@ -45,9 +43,9 @@ describe('Page', () => {
 
     Page
       .getPage('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
-      .then((page: ClientSidePage): void => {
+      .then((): void => {
         done(new Error('Parsing page didn\'t fail while expected'));
-      }, (error: any): void => {
+      }, (): void => {
         done();
       });
   });
@@ -123,13 +121,13 @@ describe('Page', () => {
 
     Page
       .getPage('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
-      .then((page: ClientSidePage): void => {
+      .then((): void => {
         done();
-      }, (error: any): void => {
+      }, (): void => {
         done();
       });
 
-    assert(getCallIssued)
+    assert(getCallIssued);
 
   });
 
@@ -204,40 +202,38 @@ describe('Page', () => {
 
     Page
       .getPage('page.aspx', 'https://contoso.sharepoint.com/sites/team-a', logger, false, false)
-      .then((page: ClientSidePage): void => {
+      .then((): void => {
         done();
-      }, (error: any): void => {
+      }, (): void => {
         done();
       });
-    assert(getCallIssued)
+    assert(getCallIssued);
   });
 
-
   it('correctly handles checking out modern page', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve({});
     });
 
     Page
       .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
-      .then((page: ClientSidePageProperties): void => {
+      .then((): void => {
         done();
-      }, (error: any): void => {
+      }, (): void => {
         done();
       });
   });
 
-
   it('correctly handles error when checking out modern page with no data returned', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(null);
     });
 
     Page
       .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
-      .then((page: ClientSidePageProperties): void => {
+      .then((): void => {
         done(new Error('Parsing page didn\'t fail while expected'));
-      }, (error: any): void => {
+      }, (): void => {
         done();
       });
   });
@@ -246,16 +242,16 @@ describe('Page', () => {
   it('correctly handles error in checking out modern page request', (done) => {
     let getCallIssued = false;
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       getCallIssued = true;
       return Promise.reject(null);
     });
 
     Page
       .checkout('page.aspx', 'https://contoso.sharepoint.com', logger, false, false)
-      .then((page: ClientSidePageProperties): void => {
+      .then((): void => {
         done(new Error('Parsing page didn\'t fail while expected'));
-      }, (error: any): void => {
+      }, (): void => {
         done();
       });
 

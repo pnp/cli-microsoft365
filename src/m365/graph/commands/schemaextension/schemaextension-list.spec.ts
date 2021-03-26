@@ -16,7 +16,7 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -61,32 +61,32 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   });
   it('lists schema extensions', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`schemaExtensions`)> -1) {
+      if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgBAAAAAAAAAA%3d%3d%23RT%3a1%23TRC%3a1%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKACLAQgAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
           "value": [
-              {
-                  "id": "adatumisv_exo2",
-                  "description": "sample desccription",
-                  "targetTypes": [
-                      "Message"
-                  ],
-                  "status": "Available",
-                  "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-                  "properties": [
-                      {
-                          "name": "p1",
-                          "type": "String"
-                      },
-                      {
-                          "name": "p2",
-                          "type": "String"
-                      }
-                  ]
-              }
+            {
+              "id": "adatumisv_exo2",
+              "description": "sample desccription",
+              "targetTypes": [
+                "Message"
+              ],
+              "status": "Available",
+              "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+              "properties": [
+                {
+                  "name": "p1",
+                  "type": "String"
+                },
+                {
+                  "name": "p2",
+                  "type": "String"
+                }
+              ]
+            }
           ]
-      });
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -98,25 +98,25 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     }, () => {
       try {
         assert(loggerLogSpy.calledWith([{
-                  "id": "adatumisv_exo2",
-                  "description": "sample desccription",
-                  "targetTypes": [
-                      "Message"
-                  ],
-                  "status": "Available",
-                  "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-                  "properties": [
-                      {
-                          "name": "p1",
-                          "type": "String"
-                      },
-                      {
-                          "name": "p2",
-                          "type": "String"
-                      }
-                  ]
-              }]
-         ));
+          "id": "adatumisv_exo2",
+          "description": "sample desccription",
+          "targetTypes": [
+            "Message"
+          ],
+          "status": "Available",
+          "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+          "properties": [
+            {
+              "name": "p1",
+              "type": "String"
+            },
+            {
+              "name": "p2",
+              "type": "String"
+            }
+          ]
+        }]
+        ));
         done();
       }
       catch (e) {
@@ -129,51 +129,51 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   });
   it('lists two schema extensions', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`schemaExtensions`)> -1) {
+      if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgBAAAAAAAAAA%3d%3d%23RT%3a1%23TRC%3a1%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKACLAQgAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
           "value": [
-              {
-                  "id": "adatumisv_exo2",
-                  "description": "sample desccription",
-                  "targetTypes": [
-                      "Message"
-                  ],
-                  "status": "Available",
-                  "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-                  "properties": [
-                      {
-                          "name": "p1",
-                          "type": "String"
-                      },
-                      {
-                          "name": "p2",
-                          "type": "String"
-                      }
-                  ]
-              },
-              {
-                "id": "adatumisv_exo3",
-                "description": "sample desccription",
-                "targetTypes": [
-                    "Message"
-                ],
-                "status": "Available",
-                "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-                "properties": [
-                    {
-                        "name": "p1",
-                        "type": "String"
-                    },
-                    {
-                        "name": "p2",
-                        "type": "String"
-                    }
-                ]
+            {
+              "id": "adatumisv_exo2",
+              "description": "sample desccription",
+              "targetTypes": [
+                "Message"
+              ],
+              "status": "Available",
+              "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+              "properties": [
+                {
+                  "name": "p1",
+                  "type": "String"
+                },
+                {
+                  "name": "p2",
+                  "type": "String"
+                }
+              ]
+            },
+            {
+              "id": "adatumisv_exo3",
+              "description": "sample desccription",
+              "targetTypes": [
+                "Message"
+              ],
+              "status": "Available",
+              "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+              "properties": [
+                {
+                  "name": "p1",
+                  "type": "String"
+                },
+                {
+                  "name": "p2",
+                  "type": "String"
+                }
+              ]
             }
           ]
-      });
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -197,36 +197,36 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   });
   it('lists schema extensions with filter options', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`$filter`)> -1) {
+      if ((opts.url as string).indexOf(`$filter`) > -1) {
         return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
-            "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgGAAAAAAAAAA%3d%3d%23RT%3a2%23TRC%3a2%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKAAaAIcAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
-            "value": [
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgGAAAAAAAAAA%3d%3d%23RT%3a2%23TRC%3a2%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKAAaAIcAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
+          "value": [
+            {
+              "id": "adatumisv_courses",
+              "description": "Extension description",
+              "targetTypes": [
+                "User",
+                "Group"
+              ],
+              "status": "Available",
+              "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
+              "properties": [
                 {
-                    "id": "adatumisv_courses",
-                    "description": "Extension description",
-                    "targetTypes": [
-                        "User",
-                        "Group"
-                    ],
-                    "status": "Available",
-                    "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
-                    "properties": [
-                        {
-                            "name": "id",
-                            "type": "Integer"
-                        },
-                        {
-                            "name": "name",
-                            "type": "String"
-                        },
-                        {
-                            "name": "type",
-                            "type": "String"
-                        }
-                    ]
+                  "name": "id",
+                  "type": "Integer"
+                },
+                {
+                  "name": "name",
+                  "type": "String"
+                },
+                {
+                  "name": "type",
+                  "type": "String"
                 }
-            ]
+              ]
+            }
+          ]
         });
       }
 
@@ -235,37 +235,37 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     command.action(logger, {
       options: {
         debug: false,
-        owner:'07d21ad2-c8f9-4316-a14a-347db702bd3c'
+        owner: '07d21ad2-c8f9-4316-a14a-347db702bd3c'
       }
     }, () => {
       try {
         assert(loggerLogSpy.calledWith([
+          {
+            "id": "adatumisv_courses",
+            "description": "Extension description",
+            "targetTypes": [
+              "User",
+              "Group"
+            ],
+            "status": "Available",
+            "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
+            "properties": [
               {
-                  "id": "adatumisv_courses",
-                  "description": "Extension description",
-                  "targetTypes": [
-                      "User",
-                      "Group"
-                  ],
-                  "status": "Available",
-                  "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
-                  "properties": [
-                      {
-                          "name": "id",
-                          "type": "Integer"
-                      },
-                      {
-                          "name": "name",
-                          "type": "String"
-                      },
-                      {
-                          "name": "type",
-                          "type": "String"
-                      }
-                  ]
+                "name": "id",
+                "type": "Integer"
+              },
+              {
+                "name": "name",
+                "type": "String"
+              },
+              {
+                "name": "type",
+                "type": "String"
               }
-          ]
-      ));
+            ]
+          }
+        ]
+        ));
         done();
       }
       catch (e) {
@@ -278,36 +278,36 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   });
   it('lists schema extensions on the second page no page size given', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`$top`)> -1) {
+      if ((opts.url as string).indexOf(`$top`) > -1) {
         return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
-            "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgGAAAAAAAAAA%3d%3d%23RT%3a2%23TRC%3a2%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKAAaAIcAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
-            "value": [
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgGAAAAAAAAAA%3d%3d%23RT%3a2%23TRC%3a2%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKAAaAIcAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
+          "value": [
+            {
+              "id": "adatumisv_courses",
+              "description": "Extension description",
+              "targetTypes": [
+                "User",
+                "Group"
+              ],
+              "status": "Available",
+              "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
+              "properties": [
                 {
-                    "id": "adatumisv_courses",
-                    "description": "Extension description",
-                    "targetTypes": [
-                        "User",
-                        "Group"
-                    ],
-                    "status": "Available",
-                    "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
-                    "properties": [
-                        {
-                            "name": "id",
-                            "type": "Integer"
-                        },
-                        {
-                            "name": "name",
-                            "type": "String"
-                        },
-                        {
-                            "name": "type",
-                            "type": "String"
-                        }
-                    ]
+                  "name": "id",
+                  "type": "Integer"
+                },
+                {
+                  "name": "name",
+                  "type": "String"
+                },
+                {
+                  "name": "type",
+                  "type": "String"
                 }
-            ]
+              ]
+            }
+          ]
         });
       }
 
@@ -316,37 +316,37 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     command.action(logger, {
       options: {
         debug: false,
-        pageNumber:1
+        pageNumber: 1
       }
     }, () => {
       try {
         assert(loggerLogSpy.calledWith([
+          {
+            "id": "adatumisv_courses",
+            "description": "Extension description",
+            "targetTypes": [
+              "User",
+              "Group"
+            ],
+            "status": "Available",
+            "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
+            "properties": [
               {
-                  "id": "adatumisv_courses",
-                  "description": "Extension description",
-                  "targetTypes": [
-                      "User",
-                      "Group"
-                  ],
-                  "status": "Available",
-                  "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
-                  "properties": [
-                      {
-                          "name": "id",
-                          "type": "Integer"
-                      },
-                      {
-                          "name": "name",
-                          "type": "String"
-                      },
-                      {
-                          "name": "type",
-                          "type": "String"
-                      }
-                  ]
+                "name": "id",
+                "type": "Integer"
+              },
+              {
+                "name": "name",
+                "type": "String"
+              },
+              {
+                "name": "type",
+                "type": "String"
               }
-          ]
-      ));
+            ]
+          }
+        ]
+        ));
         done();
       }
       catch (e) {
@@ -359,36 +359,36 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   });
   it('lists schema extensions on the page size 1 second page', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`$top`)> -1) {
+      if ((opts.url as string).indexOf(`$top`) > -1) {
         return Promise.resolve({
-            "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
-            "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgGAAAAAAAAAA%3d%3d%23RT%3a2%23TRC%3a2%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKAAaAIcAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
-            "value": [
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgGAAAAAAAAAA%3d%3d%23RT%3a2%23TRC%3a2%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKAAaAIcAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
+          "value": [
+            {
+              "id": "adatumisv_courses",
+              "description": "Extension description",
+              "targetTypes": [
+                "User",
+                "Group"
+              ],
+              "status": "Available",
+              "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
+              "properties": [
                 {
-                    "id": "adatumisv_courses",
-                    "description": "Extension description",
-                    "targetTypes": [
-                        "User",
-                        "Group"
-                    ],
-                    "status": "Available",
-                    "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
-                    "properties": [
-                        {
-                            "name": "id",
-                            "type": "Integer"
-                        },
-                        {
-                            "name": "name",
-                            "type": "String"
-                        },
-                        {
-                            "name": "type",
-                            "type": "String"
-                        }
-                    ]
+                  "name": "id",
+                  "type": "Integer"
+                },
+                {
+                  "name": "name",
+                  "type": "String"
+                },
+                {
+                  "name": "type",
+                  "type": "String"
                 }
-            ]
+              ]
+            }
+          ]
         });
       }
 
@@ -397,38 +397,38 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
     command.action(logger, {
       options: {
         debug: false,
-        pageNumber:1,
-        pageSize:1
+        pageNumber: 1,
+        pageSize: 1
       }
     }, () => {
       try {
         assert(loggerLogSpy.calledWith([
+          {
+            "id": "adatumisv_courses",
+            "description": "Extension description",
+            "targetTypes": [
+              "User",
+              "Group"
+            ],
+            "status": "Available",
+            "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
+            "properties": [
               {
-                  "id": "adatumisv_courses",
-                  "description": "Extension description",
-                  "targetTypes": [
-                      "User",
-                      "Group"
-                  ],
-                  "status": "Available",
-                  "owner": "07d21ad2-c8f9-4316-a14a-347db702bd3c",
-                  "properties": [
-                      {
-                          "name": "id",
-                          "type": "Integer"
-                      },
-                      {
-                          "name": "name",
-                          "type": "String"
-                      },
-                      {
-                          "name": "type",
-                          "type": "String"
-                      }
-                  ]
+                "name": "id",
+                "type": "Integer"
+              },
+              {
+                "name": "name",
+                "type": "String"
+              },
+              {
+                "name": "type",
+                "type": "String"
               }
-          ]
-      ));
+            ]
+          }
+        ]
+        ));
         done();
       }
       catch (e) {
@@ -441,64 +441,64 @@ describe(commands.SCHEMAEXTENSION_LIST, () => {
   });
   it('lists schema extensions(debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`schemaExtensions`)> -1) {
+      if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions(*)",
           "@odata.nextLink": "https://graph.microsoft.com/v1.0/schemaExtensions?$select=*&$top=1&$skiptoken=%7B%22token%22%3a%22%2bRID%3a~F7weALI27DgBAAAAAAAAAA%3d%3d%23RT%3a1%23TRC%3a1%23ISV%3a2%23IEO%3a65551%23QCF%3a1%23FPC%3aAgEAAADKACLAQgAg2BDELgAUgQAKAgRAAIDAAAYEAEWCgACY4BEAKwSQBegLBqhBAKAACEACCAAQAAAIsAGCMQQCAgAMAgiAJaACwAQfgGqADMAFIIAAJgYAoB4AYAAAACAxBwAAAEA4EAAyACEAIABGAGAAELBAiAkIBPGAADEAABEpAAKAAAgABDKAACBMJBAgARCIIBIACQgIwBiAD8AwAAEUgQgAAAhkfAADAAAAgBCAAg0ABQCgYQAMeAIiAACgXQARAECAEIAGgAuAOYA%3d%22%2c%22range%22%3a%7B%22min%22%3a%22%22%2c%22max%22%3a%2205C1DFFFFFFFFC%22%7D%7D",
           "value": [
-              {
-                  "id": "adatumisv_exo2",
-                  "description": "sample desccription",
-                  "targetTypes": [
-                      "Message"
-                  ],
-                  "status": "Available",
-                  "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-                  "properties": [
-                      {
-                          "name": "p1",
-                          "type": "String"
-                      },
-                      {
-                          "name": "p2",
-                          "type": "String"
-                      }
-                  ]
-              }
+            {
+              "id": "adatumisv_exo2",
+              "description": "sample desccription",
+              "targetTypes": [
+                "Message"
+              ],
+              "status": "Available",
+              "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+              "properties": [
+                {
+                  "name": "p1",
+                  "type": "String"
+                },
+                {
+                  "name": "p2",
+                  "type": "String"
+                }
+              ]
+            }
           ]
-      });
+        });
       }
 
       return Promise.reject('Invalid request');
     });
     command.action(logger, {
       options: {
-        debug: true,
+        debug: true
       }
     }, () => {
       try {
         assert(loggerLogSpy.calledWith([
+          {
+            "id": "adatumisv_exo2",
+            "description": "sample desccription",
+            "targetTypes": [
+              "Message"
+            ],
+            "status": "Available",
+            "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+            "properties": [
               {
-                  "id": "adatumisv_exo2",
-                  "description": "sample desccription",
-                  "targetTypes": [
-                      "Message"
-                  ],
-                  "status": "Available",
-                  "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-                  "properties": [
-                      {
-                          "name": "p1",
-                          "type": "String"
-                      },
-                      {
-                          "name": "p2",
-                          "type": "String"
-                      }
-                  ]
+                "name": "p1",
+                "type": "String"
+              },
+              {
+                "name": "p2",
+                "type": "String"
               }
-          ]
-      ));
+            ]
+          }
+        ]
+        ));
         done();
       }
       catch (e) {

@@ -167,7 +167,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
   });
 
   it('handles error correctly', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
@@ -305,7 +305,7 @@ describe(commands.SCHEMAEXTENSION_SET, () => {
         debug: false,
         id: 'TestSchemaExtension',
         owner: 'b07a45b3-f7b7-489b-9269-da6f3f93dff0',
-        description: 'test',
+        description: 'test'
       }
     });
     assert.strictEqual(actual, true);

@@ -17,7 +17,7 @@ export class FN008002_CFG_TSL_removeRule extends JsonRule {
 
   get description(): string {
     return `In tslint.json remove the ${this.rule} rule`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -27,19 +27,19 @@ export class FN008002_CFG_TSL_removeRule extends JsonRule {
     }
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Recommended';
-  };
+  }
 
   get file(): string {
     return './config/tslint.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsLintJson ||

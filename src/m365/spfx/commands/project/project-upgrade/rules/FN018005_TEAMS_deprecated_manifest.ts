@@ -27,7 +27,7 @@ export class FN018005_TEAMS_deprecated_manifest extends Rule {
 
   get resolution(): string {
     return '';
-  };
+  }
 
   get resolutionType(): string {
     return 'cmd';
@@ -35,7 +35,7 @@ export class FN018005_TEAMS_deprecated_manifest extends Rule {
 
   get file(): string {
     return '';
-  };
+  }
 
   get severity(): string {
     return 'Optional';

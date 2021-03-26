@@ -15,7 +15,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
   let defaultCommandOptions: any;
-  let initDefaultPostStubs = (): sinon.SinonStub => {
+  const initDefaultPostStubs = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions') > -1) {
         return Promise.resolve('abc');
@@ -27,7 +27,7 @@ describe(commands.CUSTOMACTION_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -54,7 +54,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       url: 'https://contoso.sharepoint.com',
       id: '058140e3-0e37-44fc-a1d3-79c487d371a3',
       title: 'title'
-    }
+    };
   });
 
   afterEach(() => {
@@ -96,7 +96,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       description: 'description1',
       group: 'SiteActions',
       actionUrl: '~site/Shared%20Documents/Forms/AllItems.aspx'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -131,7 +131,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       clientSideComponentId: 'b41916e7-e69d-467f-b37f-ff8ecf8f99f2',
       clientSideComponentProperties: '{"testMessage":"Test message"}',
       debug: true
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -167,7 +167,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       clientSideComponentProperties: '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}',
       registrationId: 100,
       registrationType: 'List'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -204,7 +204,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       actionUrl: 'javascript:(function(){ return console.log("CLI for Microsoft 365 rocks!"); })();',
       registrationId: 101,
       registrationType: 'List'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -239,7 +239,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       description: 'description1',
       scriptSrc: '~sitecollection/SiteAssets/YourScript.js',
       scope: 'Site'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -270,7 +270,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       sequence: 108,
       location: 'ScriptLink',
       scriptBlock: '(function(){ return console.log("Hello CLI for Microsoft 365!"); })();'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -303,7 +303,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       description: 'description1',
       commandUIExtension: '<CommandUIExtension><CommandUIDefinitions><CommandUIDefinition Location = "Ribbon.List.Share.Controls._children"><Button Id = "Ribbon.List.Share.GetItemsCountButton" Alt = "Get list items count" Sequence = "11" Command = "Invoke_GetItemsCountButtonRequest" LabelText = "Get Items Count" TemplateAlias = "o1" Image32by32 = "_layouts/15/images/placeholder32x32.png" Image16by16 = "_layouts/15/images/placeholder16x16.png" /></CommandUIDefinition></CommandUIDefinitions><CommandUIHandlers><CommandUIHandler Command = "Invoke_GetItemsCountButtonRequest" CommandAction = "javascript: alert(ctx.TotalListItems);" EnabledScript = "javascript: function checkEnable() { return (true);} checkEnable();"/></CommandUIHandlers></CommandUIExtension>',
       scope: 'Web'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -338,7 +338,7 @@ describe(commands.CUSTOMACTION_SET, () => {
       actionUrl: '~site/SitePages/Home.aspx',
       rights: 'AddListItems,DeleteListItems,ManageLists',
       debug: true
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -371,11 +371,11 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
-    const options: Object = {
+    const options = {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       url: 'https://contoso.sharepoint.com',
       scope: 'Web'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -404,11 +404,11 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
-    const options: Object = {
+    const options = {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       url: 'https://contoso.sharepoint.com',
       scope: 'Site'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -459,7 +459,7 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('updateCustomAction called twice when scope is All, but item not found on web level', (done) => {
-    let postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {
+    const postRequestSpy = sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
@@ -500,11 +500,11 @@ describe(commands.CUSTOMACTION_SET, () => {
     });
 
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
-    const options: Object = {
+    const options = {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       url: 'https://contoso.sharepoint.com',
       scope: "All"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -563,12 +563,12 @@ describe(commands.CUSTOMACTION_SET, () => {
 
     const updateCustomActionSpy = sinon.spy((command as any), 'updateCustomAction');
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
-    const options: Object = {
+    const options = {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       url: 'https://contoso.sharepoint.com',
       scope: "All",
       debug: true
-    }
+    };
 
     command.action(logger, {
       options: options
@@ -724,27 +724,27 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('getRegistrationType returns 0 if registrationType wrong value', () => {
-    let registrationType: number = (command as any)['getRegistrationType']('abc');
+    const registrationType: number = (command as any)['getRegistrationType']('abc');
     assert(registrationType === 0);
   });
 
   it('getRegistrationType returns 1 if registrationType value is List', () => {
-    let registrationType: number = (command as any)['getRegistrationType']('List');
+    const registrationType: number = (command as any)['getRegistrationType']('List');
     assert(registrationType === 1);
   });
 
   it('getRegistrationType returns 2 if registrationType value is ContentType', () => {
-    let registrationType: number = (command as any)['getRegistrationType']('ContentType');
+    const registrationType: number = (command as any)['getRegistrationType']('ContentType');
     assert(registrationType === 2);
   });
 
   it('getRegistrationType returns 3 if registrationType value is ProgId', () => {
-    let registrationType: number = (command as any)['getRegistrationType']('ProgId');
+    const registrationType: number = (command as any)['getRegistrationType']('ProgId');
     assert(registrationType === 3);
   });
 
   it('getRegistrationType returns 4 if registrationType value is FileType', () => {
-    let registrationType: number = (command as any)['getRegistrationType']('FileType');
+    const registrationType: number = (command as any)['getRegistrationType']('FileType');
     assert(registrationType === 4);
   });
 
@@ -760,27 +760,27 @@ describe(commands.CUSTOMACTION_SET, () => {
   });
 
   it('getRegistrationType returns 1 if registrationType value is List', () => {
-    let registrationType: number = (command as any)['getRegistrationType']('List');
+    const registrationType: number = (command as any)['getRegistrationType']('List');
     assert(registrationType === 1);
   });
 
   it('should map independently location', () => {
-    let result: number = (command as any)['mapRequestBody']({location: 'abc'});
+    const result: number = (command as any)['mapRequestBody']({location: 'abc'});
     assert(JSON.stringify(result) === `{"Location":"abc"}`);
   });
 
   it('should map independently name', () => {
-    let result: number = (command as any)['mapRequestBody']({name: 'abc'});
+    const result: number = (command as any)['mapRequestBody']({name: 'abc'});
     assert(JSON.stringify(result) === `{"Name":"abc"}`);
   });
 
   it('should map independently title', () => {
-    let result: number = (command as any)['mapRequestBody']({title: 'abc'});
+    const result: number = (command as any)['mapRequestBody']({title: 'abc'});
     assert(JSON.stringify(result) === `{"Title":"abc"}`);
   });
 
   it('should map independently group', () => {
-    let result: number = (command as any)['mapRequestBody']({group: 'abc'});
+    const result: number = (command as any)['mapRequestBody']({group: 'abc'});
     assert(JSON.stringify(result) === `{"Group":"abc"}`);
   });
 
@@ -845,7 +845,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     command.action(logger, { options: defaultCommandOptions } as any, () => {
       try {
         assert(postRequestSpy.calledWith(sinon.match({
-          url: `https://contoso.sharepoint.com/_api/Web/UserCustomActions('${defaultCommandOptions.id}')`,
+          url: `https://contoso.sharepoint.com/_api/Web/UserCustomActions('${defaultCommandOptions.id}')`
         })));
         done();
       }
@@ -862,7 +862,7 @@ describe(commands.CUSTOMACTION_SET, () => {
     command.action(logger, { options: defaultCommandOptions } as any, () => {
       try {
         assert(postRequestSpy.calledWith(sinon.match({
-          url: `https://contoso.sharepoint.com/_api/Site/UserCustomActions('${defaultCommandOptions.id}')`,
+          url: `https://contoso.sharepoint.com/_api/Site/UserCustomActions('${defaultCommandOptions.id}')`
         })));
         done();
       }

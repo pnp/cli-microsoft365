@@ -187,7 +187,7 @@ describe(commands.SITESCRIPT_LIST, () => {
   });
 
   it('correctly handles OData error when creating site script', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 

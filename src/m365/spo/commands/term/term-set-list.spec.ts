@@ -487,7 +487,7 @@ describe(commands.TERM_SET_LIST, () => {
   });
 
   it('correctly handles error when retrieving taxonomy term sets', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
@@ -508,7 +508,7 @@ describe(commands.TERM_SET_LIST, () => {
   });
 
   it('correctly handles error when the specified term group id doesn\'t exist', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1217", "ErrorInfo": {
@@ -529,7 +529,7 @@ describe(commands.TERM_SET_LIST, () => {
   });
 
   it('correctly handles error when the specified term group name doesn\'t exist', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1217", "ErrorInfo": {

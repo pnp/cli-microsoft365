@@ -73,7 +73,7 @@ class SpoListItemRecordDeclareCommand extends SpoCommand {
             accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
-        }
+        };
 
         return request.get(requestOptions);
       })

@@ -14,7 +14,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
   let logger: Logger;
   const expectedId = 147;
   let actualId = 0;
-  let postFakes = (opts: any) => {
+  const postFakes = (opts: any) => {
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
       // requestObjectIdentity mock
@@ -22,7 +22,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
 
         if ((opts.url as string).indexOf('rejectme.com') > -1) {
 
-          return Promise.reject('Failed request')
+          return Promise.reject('Failed request');
 
         }
 
@@ -30,7 +30,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
 
           return Promise.resolve(JSON.stringify(
             [{ "ErrorInfo": "error occurred" }]
-          ))
+          ));
 
         }
 
@@ -48,7 +48,7 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
               "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
             }
           ])
-        )
+        );
 
       }
       if (opts.data.indexOf('Name="UndeclareItemAsRecord') > -1) {
@@ -58,14 +58,14 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
       }
     }
     return Promise.reject('Invalid request');
-  }
+  };
 
-  let getFakes = (opts: any) => {
+  const getFakes = (opts: any) => {
     if ((opts.url as string).indexOf('/id') > -1) {
       return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
     }
     return Promise.reject('Invalid request');
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -120,12 +120,12 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     sinon.stub(request, 'post').callsFake(postFakes);
 
     actualId = 0;
-    let options: any = {
+    const options: any = {
       debug: false,
       listTitle: 'Demo List',
       id: 147,
-      webUrl: 'https://returnerror.com/sites/project-y',
-    }
+      webUrl: 'https://returnerror.com/sites/project-y'
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -144,12 +144,12 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
 
     command.allowUnknownOptions();
 
-    let options: any = {
+    const options: any = {
       debug: true,
       listTitle: 'Demo List',
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-    }
+    };
     command.action(logger, { options: options } as any, () => {
       try {
         done();
@@ -166,12 +166,12 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
 
     command.allowUnknownOptions();
 
-    let options: any = {
+    const options: any = {
       debug: true,
       listId: '770fe148-1d72-480e-8cde-f9d3832798b6',
       id: 47,
       webUrl: 'https://contoso.sharepoint.com/sites/project-x'
-    }
+    };
     command.action(logger, { options: options } as any, () => {
       try {
         done();
@@ -188,12 +188,12 @@ describe(commands.LISTITEM_RECORD_UNDECLARE, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = {
+    const options: any = {
       debug: false,
       listTitle: 'Demo List',
       id: 47,
-      webUrl: 'https://rejectme.com/sites/project-y',
-    }
+      webUrl: 'https://rejectme.com/sites/project-y'
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {

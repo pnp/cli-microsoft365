@@ -34,7 +34,6 @@ class SpoSiteClassicAddCommand extends SpoCommand {
   private context?: FormDigestInfo;
   private spoAdminUrl?: string;
   private dots?: string;
-  private timeout?: NodeJS.Timer;
 
   public get name(): string {
     return commands.SITE_CLASSIC_ADD;
@@ -131,14 +130,14 @@ class SpoSiteClassicAddCommand extends SpoCommand {
           }
           else {
             const operation: SpoOperation = json[json.length - 1];
-            let isComplete: boolean = operation.IsComplete;
+            const isComplete: boolean = operation.IsComplete;
             if (!args.options.wait || isComplete) {
               resolve();
               return;
             }
 
-            this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
+            setTimeout(() => {
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
             }, operation.PollingInterval);
           }
         });
@@ -188,7 +187,7 @@ class SpoSiteClassicAddCommand extends SpoCommand {
             }
           }
         })
-        .then((exists: boolean): Promise<string> => {
+        .then((): Promise<string> => {
           if (this.verbose) {
             logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
           }
@@ -263,14 +262,14 @@ class SpoSiteClassicAddCommand extends SpoCommand {
           }
           else {
             const operation: SpoOperation = json[json.length - 1];
-            let isComplete: boolean = operation.IsComplete;
+            const isComplete: boolean = operation.IsComplete;
             if (!wait || isComplete) {
               resolve();
               return;
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
             }, operation.PollingInterval);
           }
         });

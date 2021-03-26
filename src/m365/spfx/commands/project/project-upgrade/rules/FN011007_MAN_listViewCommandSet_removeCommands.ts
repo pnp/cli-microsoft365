@@ -13,19 +13,19 @@ export class FN011007_MAN_listViewCommandSet_removeCommands extends ManifestRule
 
   get description(): string {
     return 'In the manifest remove the commands property';
-  };
+  }
 
   get resolution(): string {
     return '';
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.manifests ||

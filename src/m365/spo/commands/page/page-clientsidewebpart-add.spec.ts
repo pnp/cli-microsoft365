@@ -29,7 +29,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
   // with a static GUID
   const replaceId = (str: string): string => {
     const id: string[] = [];
-    let s = str.replace(/(\"instanceId\\\"\:\\\")([^\\]+)(\\\")/g, (match: string, p1: string, p2: string, p3: string, offset: string, fullString: string): string => {
+    let s = str.replace(/(\"instanceId\\\"\:\\\")([^\\]+)(\\\")/g, (match: string, p1: string, p2: string, p3: string): string => {
       id.push(p2);
       return `${p1}89c644b3-f69c-4e84-85d7-dfa04c6163b5${p3}`;
     });
@@ -38,7 +38,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
     });
 
     return s;
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -328,7 +328,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -380,7 +380,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -423,7 +424,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           order: 1
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -475,7 +476,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -518,7 +520,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           order: 5
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -570,7 +572,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -612,7 +615,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -705,7 +708,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -748,7 +752,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           order: 1
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -841,7 +845,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -884,7 +889,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           order: 2
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -977,7 +982,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -1019,7 +1025,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -1152,7 +1158,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -1195,7 +1202,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           order: 1
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -1328,7 +1335,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -1371,7 +1379,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           order: 2
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -1504,7 +1512,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -1547,7 +1556,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           order: 5
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -1680,7 +1689,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -1722,7 +1732,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           standardWebPart: 'BingMap'
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -1815,7 +1825,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -1857,7 +1868,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           standardWebPart: 'BingMap'
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -1899,7 +1910,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -1942,7 +1954,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartProperties: '{"title":"Location"}'
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -2036,7 +2048,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -2065,7 +2078,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/sitepages/foo.aspx does not exist')));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -2101,7 +2115,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -2124,7 +2139,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
@@ -2141,7 +2156,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -2184,7 +2200,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartProperties: '{"foo", }'
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -2277,7 +2293,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -2321,7 +2338,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`There is no available WebPart with Id e377ea37-9047-43b9-8cdb-aaaaaaaaaa.`)));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -2398,7 +2416,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid section '8'")));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -2436,7 +2455,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid column '7'")));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -2567,7 +2587,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -2698,7 +2719,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -2835,7 +2857,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -2878,7 +2901,7 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
           webPartId: 'e377ea37-9047-43b9-8cdb-a761be2f8e09'
         }
       },
-      (err?: any) => {
+      () => {
         try {
           assert.strictEqual(replaceId(JSON.stringify(data)), JSON.stringify({
             CanvasContent1: JSON.stringify([
@@ -2950,7 +2973,8 @@ describe(commands.PAGE_CLIENTSIDEWEBPART_ADD, () => {
             ])
           }));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }

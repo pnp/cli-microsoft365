@@ -13,8 +13,8 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let firstMessage: any = {"sender_id":1496550646, "replied_to_id":1496550647,"id":10123190123123,"thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1"};
-  let secondMessage: any = {"sender_id":1496550640, "replied_to_id":"","id":10123190123124,"thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2"};
+  const firstMessage: any = {"sender_id":1496550646, "replied_to_id":1496550647,"id":10123190123123,"thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1"};
+  const secondMessage: any = {"sender_id":1496550640, "replied_to_id":"","id":10123190123124,"thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2"};
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -82,9 +82,9 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { id:10123190123123, debug: true } } as any, (err?: any) => {
+    command.action(logger, { options: { id:10123190123123, debug: true } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123123)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123123);
         done();
       }
       catch (e) {
@@ -94,7 +94,7 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
   });
 
   it('correctly handles error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "base": "An error has occurred."
@@ -120,7 +120,7 @@ describe(commands.YAMMER_MESSAGE_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, id:10123190123124, output: "json" } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, id:10123190123124, output: "json" } } as any, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 10123190123124);
         done();

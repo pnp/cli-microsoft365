@@ -118,7 +118,7 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
     TeamsMessageSettingsSetCommand.props.every((p: string) => {
       property = p;
       value = (args.options as any)[p];
-      isValid = typeof value === 'undefined' || Utils.isValidBoolean(value)
+      isValid = typeof value === 'undefined' || Utils.isValidBoolean(value);
       return isValid;
     });
     if (!isValid) {

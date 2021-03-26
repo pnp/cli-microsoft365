@@ -17,7 +17,7 @@ export class FN014002_CODE_extensions extends Rule {
 
   get description(): string {
     return `In the .vscode folder, add the extensions.json file`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,19 +25,19 @@ export class FN014002_CODE_extensions extends Rule {
     "msjsdiag.debugger-for-chrome"
   ]
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Recommended';
-  };
+  }
 
   get file(): string {
     return '.vscode/extensions.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.vsCode || !project.vsCode.extensionsJson) {

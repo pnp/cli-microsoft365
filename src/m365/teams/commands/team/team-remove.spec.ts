@@ -77,7 +77,7 @@ describe(commands.TEAMS_TEAM_REMOVE, () => {
   it('passes validation when valid teamId is specified', (done) => {
     const actual = command.validate({
       options: {
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.strictEqual(actual, true);

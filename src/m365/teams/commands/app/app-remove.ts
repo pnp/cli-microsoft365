@@ -54,7 +54,7 @@ class TeamsAppRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the Teams app ${appId} from the app catalog?`,
+        message: `Are you sure you want to remove the Teams app ${appId} from the app catalog?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

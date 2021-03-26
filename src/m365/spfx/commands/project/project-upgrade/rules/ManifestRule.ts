@@ -6,11 +6,11 @@ import { JsonRule } from './JsonRule';
 export abstract class ManifestRule extends JsonRule {
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get file(): string {
     return '';
-  };
+  }
 
   protected addOccurrence(resolution: string, filePath: string, projectPath: string, node: parse.ASTNode | undefined, occurrences: Occurrence[]): void {
     occurrences.push({

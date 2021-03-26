@@ -96,7 +96,7 @@ describe(commands.FEATURE_LIST, () => {
             DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
             DisplayName: "Ratings"
           }
-        ]))
+        ]));
         done();
       }
       catch (e) {
@@ -143,7 +143,7 @@ describe(commands.FEATURE_LIST, () => {
             DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
             DisplayName: "Ratings"
           }
-        ]))
+        ]));
         done();
       }
       catch (e) {
@@ -193,7 +193,7 @@ describe(commands.FEATURE_LIST, () => {
             DefinitionId: "915c240e-a6cc-49b8-8b2c-0bff8b553ed3",
             DisplayName: "Ratings"
           }
-        ]))
+        ]));
         done();
       }
       catch (e) {
@@ -233,7 +233,7 @@ describe(commands.FEATURE_LIST, () => {
       url: 'https://contoso.sharepoint.com',
       scope: 'Site',
       output: 'json'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -274,8 +274,8 @@ describe(commands.FEATURE_LIST, () => {
     const options: any = {
       debug: false,
       url: 'https://contoso.sharepoint.com',
-      scope: 'Site',
-    }
+      scope: 'Site'
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -300,8 +300,8 @@ describe(commands.FEATURE_LIST, () => {
     const options: any = {
       debug: false,
       url: 'https://contoso.sharepoint.com',
-      scope: 'Web',
-    }
+      scope: 'Web'
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -327,8 +327,8 @@ describe(commands.FEATURE_LIST, () => {
       verbose: true,
       debug: false,
       url: 'https://contoso.sharepoint.com',
-      scope: 'Site',
-    }
+      scope: 'Site'
+    };
     command.action(logger, { options: options } as any, () => {
       let correctLogStatement = false;
       log.forEach(l => {
@@ -339,7 +339,7 @@ describe(commands.FEATURE_LIST, () => {
         if (l.indexOf('No activated Features found') > -1) {
           correctLogStatement = true;
         }
-      })
+      });
       try {
         assert(correctLogStatement);
         done();
@@ -363,8 +363,8 @@ describe(commands.FEATURE_LIST, () => {
       verbose: true,
       debug: false,
       url: 'https://contoso.sharepoint.com',
-      scope: 'Web',
-    }
+      scope: 'Web'
+    };
     command.action(logger, { options: options } as any, () => {
       let correctLogStatement = false;
       log.forEach(l => {
@@ -375,7 +375,7 @@ describe(commands.FEATURE_LIST, () => {
         if (l.indexOf('No activated Features found') > -1) {
           correctLogStatement = true;
         }
-      })
+      });
       try {
         assert(correctLogStatement);
         done();

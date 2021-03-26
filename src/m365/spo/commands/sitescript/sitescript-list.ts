@@ -13,7 +13,7 @@ class SpoSiteScriptListCommand extends SpoCommand {
     return 'Lists site script available for use with site designs';
   }
 
-  public commandAction(logger: Logger, args: {}, cb: () => void): void {
+  public commandAction(logger: Logger, args: any, cb: () => void): void {
     let spoUrl: string = '';
 
     this

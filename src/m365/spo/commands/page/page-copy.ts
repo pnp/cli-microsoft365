@@ -38,7 +38,8 @@ class SpoPageCopyCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let { webUrl, targetUrl, overwrite } = args.options;
+    let { webUrl } = args.options;
+    const { targetUrl, overwrite } = args.options;
     webUrl = this.removeTrailingSlash(webUrl);
 
     let sourceFullName: string = args.options.sourceName.toLowerCase();
@@ -86,7 +87,7 @@ class SpoPageCopyCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        return request.get<ClientSidePageProperties>(requestOptions)
+        return request.get<ClientSidePageProperties>(requestOptions);
       })
       .then((res: ClientSidePageProperties): void => {
         logger.log(res);

@@ -115,7 +115,7 @@ describe(commands.PAGE_HEADER_SET, () => {
       options: {
         debug: true,
         pageName: 'home',
-        webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
+        webUrl: 'https://contoso.sharepoint.com/sites/newsletter'
       }
     }, () => {
       try {
@@ -383,7 +383,7 @@ describe(commands.PAGE_HEADER_SET, () => {
     const mockData = {
       LayoutWebpartsContent: '[{"id":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","instanceId":"cbe7b0a9-3504-44dd-a3a3-0e5cacd07788","title":"Title Region","description":"Title Region Description","serverProcessedContent":{"htmlStrings":{},"searchablePlainTexts":{},"imageSources":{"imageSource":""},"links":{},"customMetadata":{"imageSource":{"siteId":"","webId":"","listId":"","uniqueId":""}}},"dataVersion":"1.4","properties":{"imageSourceType":2,"layoutType":"FullWidthImage","textAlignment":"Left","showTopicHeader":false,"showPublishDate":false,"topicHeader":"","authors":[],"altText":"","webId":"","siteId":"","listId":"","uniqueId":"","translateX":0,"translateY":0}}]',
       CanvasContent1: '<div>just some test content</div>'
-    }
+    };
 
     command.action(logger, { options: { debug: false, pageName: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', type: 'Custom' } }, () => {
       try {
@@ -532,7 +532,7 @@ describe(commands.PAGE_HEADER_SET, () => {
 
   it('correctly handles OData error when retrieving modern page', (done) => {
     Utils.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 

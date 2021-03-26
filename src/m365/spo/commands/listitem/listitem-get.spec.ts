@@ -18,7 +18,7 @@ describe(commands.LISTITEM_GET, () => {
   const expectedId = 147;
   let actualId = 0;
 
-  let getFakes = (opts: any) => {
+  const getFakes = (opts: any) => {
     if ((opts.url as string).indexOf('/items(') > -1) {
       actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
       return Promise.resolve(
@@ -31,12 +31,12 @@ describe(commands.LISTITEM_GET, () => {
           "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
           "ID": actualId,
           "Modified": "2018-03-15T10:43:10Z",
-          "Title": expectedTitle,
+          "Title": expectedTitle
         }
       );
     }
     return Promise.reject('Invalid request');
-  }
+  };
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -148,12 +148,12 @@ describe(commands.LISTITEM_GET, () => {
 
     command.allowUnknownOptions();
 
-    let options: any = { 
+    const options: any = { 
       debug: true, 
       listTitle: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       id: expectedId
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -171,14 +171,14 @@ describe(commands.LISTITEM_GET, () => {
 
     command.allowUnknownOptions();
 
-    let options: any = { 
+    const options: any = { 
       debug: false, 
       listTitle: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       id: expectedId,
       output: "json",
       fields: "ID,Modified"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -196,13 +196,13 @@ describe(commands.LISTITEM_GET, () => {
 
     command.allowUnknownOptions();
 
-    let options: any = { 
+    const options: any = { 
       debug: false, 
       listTitle: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       id: expectedId,
       output: "text"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -220,13 +220,13 @@ describe(commands.LISTITEM_GET, () => {
 
     command.allowUnknownOptions();
 
-    let options: any = { 
+    const options: any = { 
       debug: false, 
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       id: expectedId,
       output: "json"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -242,13 +242,13 @@ describe(commands.LISTITEM_GET, () => {
   it('correctly handles random API error', (done) => {
     sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
-    let options: any = { 
+    const options: any = { 
       debug: false, 
       listId: '0CD891EF-AFCE-4E55-B836-FCE03286CCCF', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       id: expectedId,
       output: "json"
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {

@@ -53,7 +53,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
           }
           cb();
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       removeCustomAction();
@@ -63,7 +63,7 @@ class SpoCustomActionRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the ${args.options.id} user custom action?`,
+        message: `Are you sure you want to remove the ${args.options.id} user custom action?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

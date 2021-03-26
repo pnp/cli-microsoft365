@@ -49,7 +49,7 @@ class SpoWebAddCommand extends SpoCommand {
       request
         .post(requestOptions)
         .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       removeWeb();
@@ -59,7 +59,7 @@ class SpoWebAddCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the subsite ${args.options.webUrl}`,
+        message: `Are you sure you want to remove the subsite ${args.options.webUrl}`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

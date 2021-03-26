@@ -629,7 +629,7 @@ describe(commands.SEND, () => {
           done(e);
         }
       });
-    })
+    });
 
     it('sends custom card with all known options merged', (done) => {
       sinon.stub(request, 'post').callsFake(opts => {

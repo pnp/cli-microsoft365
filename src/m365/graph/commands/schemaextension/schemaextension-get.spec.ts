@@ -16,7 +16,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -61,7 +61,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
   });
   it('gets schema extension', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`schemaExtensions`)> -1) {
+      if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
           "id": "adatumisv_exo2",
@@ -70,17 +70,17 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
             "Message"
           ],
           "status": "Available",
-            "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-            "properties": [
-                {
-                    "name": "p1",
-                    "type": "String"
-                },
-                {
-                    "name": "p2",
-                    "type": "String"
-                }
-            ]
+          "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+          "properties": [
+            {
+              "name": "p1",
+              "type": "String"
+            },
+            {
+              "name": "p2",
+              "type": "String"
+            }
+          ]
         });
       }
 
@@ -89,7 +89,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
     command.action(logger, {
       options: {
         debug: false,
-        id: 'adatumisv_exo2',
+        id: 'adatumisv_exo2'
       }
     }, () => {
       try {
@@ -101,17 +101,17 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
             "Message"
           ],
           "status": "Available",
-            "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-            "properties": [
-                {
-                    "name": "p1",
-                    "type": "String"
-                },
-                {
-                    "name": "p2",
-                    "type": "String"
-                }
-            ]
+          "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+          "properties": [
+            {
+              "name": "p1",
+              "type": "String"
+            },
+            {
+              "name": "p2",
+              "type": "String"
+            }
+          ]
         }));
         done();
       }
@@ -125,7 +125,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
   });
   it('gets schema extension(debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`schemaExtensions`)> -1) {
+      if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#schemaExtensions/$entity",
           "id": "adatumisv_exo2",
@@ -134,17 +134,17 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
             "Message"
           ],
           "status": "Available",
-            "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-            "properties": [
-                {
-                    "name": "p1",
-                    "type": "String"
-                },
-                {
-                    "name": "p2",
-                    "type": "String"
-                }
-            ]
+          "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+          "properties": [
+            {
+              "name": "p1",
+              "type": "String"
+            },
+            {
+              "name": "p2",
+              "type": "String"
+            }
+          ]
         });
       }
 
@@ -153,7 +153,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
     command.action(logger, {
       options: {
         debug: true,
-        id: 'adatumisv_exo2',
+        id: 'adatumisv_exo2'
       }
     }, () => {
       try {
@@ -165,17 +165,17 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
             "Message"
           ],
           "status": "Available",
-            "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
-            "properties": [
-                {
-                    "name": "p1",
-                    "type": "String"
-                },
-                {
-                    "name": "p2",
-                    "type": "String"
-                }
-            ]
+          "owner": "617720dc-85fc-45d7-a187-cee75eaf239e",
+          "properties": [
+            {
+              "name": "p1",
+              "type": "String"
+            },
+            {
+              "name": "p2",
+              "type": "String"
+            }
+          ]
         }));
         done();
       }
@@ -186,7 +186,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
   });
   it('handles error', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`schemaExtensions`)> -1) {
+      if ((opts.url as string).indexOf(`schemaExtensions`) > -1) {
         return Promise.reject('An error has occurred');
       }
 
@@ -195,7 +195,7 @@ describe(commands.SCHEMAEXTENSION_GET, () => {
     command.action(logger, {
       options: {
         debug: true,
-        id: 'adatumisv_exo2',
+        id: 'adatumisv_exo2'
       }
     } as any, (err?: any) => {
       try {

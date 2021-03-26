@@ -491,7 +491,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
   it('uses correct API url when list id option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -520,7 +520,7 @@ describe(commands.LIST_VIEW_REMOVE, () => {
   it('uses correct API url when list title option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');

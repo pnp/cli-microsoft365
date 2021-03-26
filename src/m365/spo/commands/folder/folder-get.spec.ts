@@ -25,14 +25,15 @@ describe(commands.FOLDER_GET, () => {
         if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1) {
           if (getResp) {
             return getResp;
-          } else {
+          }
+          else {
             return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "test1", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/test1", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
           }
         }
   
         return Promise.reject('Invalid request');
       });
-    }
+    };
   });
 
   beforeEach(() => {
@@ -79,7 +80,7 @@ describe(commands.FOLDER_GET, () => {
     command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
-        folderUrl: '/Shared Documents',
+        folderUrl: '/Shared Documents'
       }
     } as any, (err?: any) => {
       try {
@@ -98,7 +99,7 @@ describe(commands.FOLDER_GET, () => {
     command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com',
-        folderUrl: '/Shared Documents',
+        folderUrl: '/Shared Documents'
       }
     } as any, (err?: any) => {
       try {
@@ -118,7 +119,7 @@ describe(commands.FOLDER_GET, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        folderUrl: '/Shared Documents',
+        folderUrl: '/Shared Documents'
       }
     }, () => {
       try {
@@ -139,7 +140,7 @@ describe(commands.FOLDER_GET, () => {
         debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com',
-        folderUrl: '/Shared Documents',
+        folderUrl: '/Shared Documents'
       }
     }, () => {
       try {
@@ -161,7 +162,7 @@ describe(commands.FOLDER_GET, () => {
         debug: false,
         output: 'json',
         webUrl: 'https://contoso.sharepoint.com/sites/test1',
-        folderUrl: 'Shared Documents/',
+        folderUrl: 'Shared Documents/'
       }
     }, () => {
       try {

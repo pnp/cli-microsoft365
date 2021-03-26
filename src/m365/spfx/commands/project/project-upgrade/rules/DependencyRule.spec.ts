@@ -55,7 +55,7 @@ describe('DependencyRule', () => {
 
   beforeEach(() => {
     findings = [];
-  })
+  });
 
   it('doesn\'t return any notifications if package.json not found', () => {
     const project: Project = {

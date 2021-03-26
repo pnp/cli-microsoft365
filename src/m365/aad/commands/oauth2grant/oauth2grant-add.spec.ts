@@ -76,7 +76,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6321', scope: 'user_impersonation' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320', resourceId: '6a7b1395-d313-4682-8ed4-65a6265a6321', scope: 'user_impersonation' } } as any, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -117,7 +117,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

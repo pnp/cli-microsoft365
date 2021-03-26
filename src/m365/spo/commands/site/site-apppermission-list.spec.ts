@@ -110,7 +110,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       "createdDateTime": "2017-05-09T20:56:00Z",
       "lastModifiedDateTime": "2017-05-09T20:56:01Z",
       "webUrl": "https://contoso.sharepoint.com/teams/1drvteam"
-    }
+    };
 
     const response = {
       "value": [
@@ -137,7 +137,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           ]
         }
       ]
-    }
+    };
 
     const transposed = [
       {
@@ -150,9 +150,9 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         appId: 'd05a2ddb-1f33-4de3-9335-3bfbe50411c5',
         permissionId: 'aTowaS50fG1zLnNwLmV4dHxkMDVhMmRkYi0xZjMzLTRkZTMtOTMzNS0zYmZiZTUwNDExYzVAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy'
       }
-    ]
+    ];
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
@@ -192,7 +192,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       "createdDateTime": "2017-05-09T20:56:00Z",
       "lastModifiedDateTime": "2017-05-09T20:56:01Z",
       "webUrl": "https://contoso.sharepoint.com/teams/1drvteam"
-    }
+    };
 
     const response = {
       "value": [
@@ -219,9 +219,9 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           ]
         }
       ]
-    }
+    };
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
@@ -274,7 +274,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       "createdDateTime": "2017-05-09T20:56:00Z",
       "lastModifiedDateTime": "2017-05-09T20:56:01Z",
       "webUrl": "https://contoso.sharepoint.com/teams/1drvteam"
-    }
+    };
 
     const error = {
       "error": {
@@ -286,9 +286,9 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           "client-request-id": "17547be8-a61d-dd38-8007-1c7b8edde0f4"
         }
       }
-    }
+    };
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
@@ -333,7 +333,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           "client-request-id": "dbd35b28-0ec3-6496-1279-0e1da3d028fe"
         }
       }
-    }
+    };
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('non-existing') === -1) {
         return Promise.resolve({ value: [] });
@@ -364,7 +364,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       "createdDateTime": "2017-05-09T20:56:00Z",
       "lastModifiedDateTime": "2017-05-09T20:56:01Z",
       "webUrl": "https://contoso.sharepoint.com/teams/1drvteam"
-    }
+    };
 
     const response = {
       "value": [
@@ -380,9 +380,9 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           ]
         }
       ]
-    }
+    };
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
@@ -429,7 +429,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       "createdDateTime": "2017-05-09T20:56:00Z",
       "lastModifiedDateTime": "2017-05-09T20:56:01Z",
       "webUrl": "https://contoso.sharepoint.com/teams/1drvteam"
-    }
+    };
 
     const response = {
       "value": [
@@ -445,9 +445,9 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           ]
         }
       ]
-    }
+    };
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {

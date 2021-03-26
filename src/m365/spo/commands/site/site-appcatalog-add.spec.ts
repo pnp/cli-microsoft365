@@ -179,7 +179,7 @@ describe(commands.SITE_APPCATALOG_ADD, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/site' } } as any, (err?: any) => {
       try {

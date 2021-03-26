@@ -34,7 +34,7 @@ export class Service {
   userName?: string;
   password?: string;
   certificateType: CertificateType = CertificateType.Unknown;
-  certificate?: string
+  certificate?: string;
   thumbprint?: string;
   accessTokens: Hash<AccessToken>;
   spoUrl?: string;
@@ -236,7 +236,7 @@ export class Auth {
         loggerOptions: {
           // loggerCallback is called by MSAL which we're not testing
           /* c8 ignore next 4 */
-          loggerCallback: (level: Msal.LogLevel, message: string, containsPii: boolean) => {
+          loggerCallback: (level: Msal.LogLevel, message: string) => {
             if (level === LogLevel.Error || debug) {
               logger.logToStderr(message);
             }
@@ -245,7 +245,7 @@ export class Auth {
           logLevel: debug ? LogLevel.Verbose : LogLevel.Error
         }
       }
-    }
+    };
   }
 
   private getPublicClient(logger: Logger, debug: boolean) {
@@ -598,7 +598,7 @@ export class Auth {
     return tokenStorage.set(JSON.stringify(this.service));
   }
 
-  public async clearConnectionInfo(logger: Logger, debug: boolean): Promise<void> {
+  public async clearConnectionInfo(): Promise<void> {
     const tokenStorage = this.getTokenStorage();
     await tokenStorage.remove();
     // we need to manually clear MSAL cache, because MSAL doesn't have support

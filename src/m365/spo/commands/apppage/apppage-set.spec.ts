@@ -79,7 +79,8 @@ describe(commands.APPPAGE_SET, () => {
             )
           );
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }

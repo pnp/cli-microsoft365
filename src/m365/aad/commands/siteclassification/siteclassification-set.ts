@@ -135,7 +135,7 @@ class AadSiteClassificationUpdateCommand extends GraphCommand {
             'content-type': 'application/json'
           },
           responseType: 'json',
-          data: updatedDirSettings,
+          data: updatedDirSettings
         };
 
         return request.patch(requestOptions);

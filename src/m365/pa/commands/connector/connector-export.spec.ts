@@ -140,9 +140,9 @@ describe(commands.CONNECTOR_EXPORT, () => {
           }
         };
         assert(writeFileSyncStub.calledWithExactly(path.join(outputFolder, 'apiProperties.json'), JSON.stringify(apiProperties, null, 2), 'utf8'), 'Did not create correct apiProperties.json file');
-        const swagger = "{\r\n  \"swagger\": \"2.0\",\r\n  \"info\": {\r\n    \"title\": \"Connector 1\",\r\n    \"description\": \"\",\r\n    \"version\": \"1.0\"\r\n  },\r\n  \"host\": \"api.contoso.com\",\r\n  \"basePath\": \"/\",\r\n  \"schemes\": [\r\n    \"https\"\r\n  ],\r\n  \"consumes\": [],\r\n  \"produces\": [],\r\n  \"paths\": {},\r\n  \"definitions\": {},\r\n  \"parameters\": {},\r\n  \"responses\": {},\r\n  \"securityDefinitions\": {},\r\n  \"security\": [],\r\n  \"tags\": []\r\n}"
+        const swagger = "{\r\n  \"swagger\": \"2.0\",\r\n  \"info\": {\r\n    \"title\": \"Connector 1\",\r\n    \"description\": \"\",\r\n    \"version\": \"1.0\"\r\n  },\r\n  \"host\": \"api.contoso.com\",\r\n  \"basePath\": \"/\",\r\n  \"schemes\": [\r\n    \"https\"\r\n  ],\r\n  \"consumes\": [],\r\n  \"produces\": [],\r\n  \"paths\": {},\r\n  \"definitions\": {},\r\n  \"parameters\": {},\r\n  \"responses\": {},\r\n  \"securityDefinitions\": {},\r\n  \"security\": [],\r\n  \"tags\": []\r\n}";
         assert(writeFileSyncStub.calledWithExactly(path.join(outputFolder, 'apiDefinition.swagger.json'), swagger, 'utf8'), 'Did not create correct apiDefinition.swagger.json file');
-        assert(writeFileSyncStub.calledWith(path.join(outputFolder, 'icon.png')))
+        assert(writeFileSyncStub.calledWith(path.join(outputFolder, 'icon.png')));
         done();
       }
       catch (e) {
@@ -196,7 +196,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
         return Promise.resolve({
           "name": "shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa",
           "id": "/providers/Microsoft.PowerApps/apis/shared_connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa",
-          "type": "Microsoft.PowerApps/apis",
+          "type": "Microsoft.PowerApps/apis"
         });
       }
 

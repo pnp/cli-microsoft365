@@ -166,7 +166,7 @@ describe(commands.TASK_ADD, () => {
 
   it('handles error correctly', (done) => {
     Utils.restore(request.post);
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

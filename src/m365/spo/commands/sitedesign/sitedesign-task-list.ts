@@ -32,7 +32,7 @@ class SpoSiteDesignTaskListCommand extends SpoCommand {
     const requestOptions: any = {
       url: `${args.options.webUrl}/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.GetSiteDesignTasks`,
       headers: {
-        accept: 'application/json;odata=nometadata',
+        accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
     };

@@ -101,11 +101,11 @@ class TodoListSetCommand extends GraphCommand {
     }
 
     if (args.options.name && args.options.id) {
-      return 'Specify either the name or the id of the list to update but not both'
+      return 'Specify either the name or the id of the list to update but not both';
     }
 
     if (!args.options.newName) {
-      return 'Required option newName is missing'
+      return 'Required option newName is missing';
     }
 
     return true;

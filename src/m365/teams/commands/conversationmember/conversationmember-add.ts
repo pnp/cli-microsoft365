@@ -252,8 +252,8 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
         }
 
         return Promise.resolve(userItem.id);
-      }, err => { return Promise.reject(err) });
-  };
+      }, err => { return Promise.reject(err); });
+  }
 }
 
 module.exports = new TeamsConversationMemberAddCommand();

@@ -172,7 +172,7 @@ class TenantAuditlogReportCommand extends Command {
       responseType: 'json'
     };
 
-    return request.get<AuditContentList[]>(requestOptions)
+    return request.get<AuditContentList[]>(requestOptions);
   }
 
   private getBatchedPromises(auditContentLists: AuditContentList[], batchSize: number): Promise<Promise<AuditlogReport[]>[][]> {
@@ -181,7 +181,7 @@ class TenantAuditlogReportCommand extends Command {
     for (let i: number = 0; i < auditContentLists.length; i += batchSize) {
       const promiseRequestBatch: Promise<AuditlogReport[]>[] = auditContentLists
         .slice(i, i + batchSize < auditContentLists.length ? i + batchSize : auditContentLists.length)
-        .map((AuditContentList: AuditContentList) => this.getAuditLogReportForSingleContentUrl(AuditContentList.contentUri))
+        .map((AuditContentList: AuditContentList) => this.getAuditLogReportForSingleContentUrl(AuditContentList.contentUri));
 
       batchedPromises.push(promiseRequestBatch);
     }
@@ -204,7 +204,7 @@ class TenantAuditlogReportCommand extends Command {
         });
 
         if (batchNumber < batchedPromiseList.length - 1) {
-          this.getBatchedAuditlogData(logger, batchedPromiseList, ++batchNumber, resolve, reject)
+          this.getBatchedAuditlogData(logger, batchedPromiseList, ++batchNumber, resolve, reject);
         }
         else {
           resolve();
@@ -227,7 +227,7 @@ class TenantAuditlogReportCommand extends Command {
   protected get auditContentTypeLists(): string[] {
     const result: string[] = [];
 
-    for (let auditContentType in AuditContentTypes) {
+    for (const auditContentType in AuditContentTypes) {
       result.push(auditContentType);
     }
 

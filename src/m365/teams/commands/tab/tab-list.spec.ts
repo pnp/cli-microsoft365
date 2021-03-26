@@ -78,7 +78,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
+        channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -89,7 +89,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
+        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -100,7 +100,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
+        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
       }
     });
     assert.strictEqual(actual, true);
@@ -128,7 +128,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
       options: {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype'
       }
     }, (error?: any) => {
       try {
@@ -184,7 +184,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
       options: {
         debug: false,
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:00000000000000000000000000000000@thread.skype',
+        channelId: '19:00000000000000000000000000000000@thread.skype'
       }
     }, () => {
       try {

@@ -70,7 +70,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
             cb();
           }
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       removeTenantProperty();
@@ -80,7 +80,7 @@ class SpoStorageEntityRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to delete the ${args.options.key} tenant property?`,
+        message: `Are you sure you want to delete the ${args.options.key} tenant property?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

@@ -78,7 +78,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
       };
 
       return request.post(requestOptions);
-    }
+    };
 
     const prepareRemoval = (): void => {
       let listRestUrl: string = '';
@@ -114,7 +114,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
               logger.logToStderr(`${filteredResults.length} matches found...`);
             }
 
-            var promises = [];
+            const promises = [];
             for (let index = 0; index < filteredResults.length; index++) {
               promises.push(removeField(listRestUrl, filteredResults[index].Id, undefined));
             }
@@ -146,7 +146,7 @@ class SpoFieldRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: confirmMessage,
+        message: confirmMessage
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

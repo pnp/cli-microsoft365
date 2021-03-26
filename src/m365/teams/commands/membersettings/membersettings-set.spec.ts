@@ -155,7 +155,7 @@ describe(commands.TEAMS_MEMBERSETTINGS_SET, () => {
   });
 
   it('correctly handles error when updating member settings', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

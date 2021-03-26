@@ -1,6 +1,4 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
 import { ManifestRule } from './ManifestRule';
 
 class MockManifestRule extends ManifestRule {
@@ -24,7 +22,7 @@ class MockManifestRule extends ManifestRule {
     return 'Required';
   }
 
-  visit(project: Project, findings: Finding[]): void {
+  visit(): void {
   }
 }
 
@@ -33,7 +31,7 @@ describe('ManifestRule', () => {
 
   beforeEach(() => {
     rule = new MockManifestRule();
-  })
+  });
 
   it('rule has empty file', () => {
     assert.strictEqual('', rule.file);

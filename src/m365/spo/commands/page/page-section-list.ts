@@ -35,7 +35,7 @@ class SpoPageSectionListCommand extends SpoCommand {
 
         const isJSONOutput = args.options.output === 'json';
         if (sections.length) {
-          let output = sections.map(section => Page.getSectionInformation(section, isJSONOutput));
+          const output = sections.map(section => Page.getSectionInformation(section, isJSONOutput));
           if (isJSONOutput) {
             logger.log(output);
           }
@@ -44,7 +44,7 @@ class SpoPageSectionListCommand extends SpoCommand {
               return {
                 order: s.order,
                 columns: s.columns.length
-              }
+              };
             }));
           }
         }

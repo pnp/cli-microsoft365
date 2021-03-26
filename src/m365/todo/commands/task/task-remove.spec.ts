@@ -215,7 +215,7 @@ describe(commands.TASK_REMOVE, () => {
 
       return Promise.reject('The list FooList cannot be found');
     });
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject('Invalid request');
     });
 

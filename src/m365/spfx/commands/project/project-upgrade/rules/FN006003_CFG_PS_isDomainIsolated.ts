@@ -17,7 +17,7 @@ export class FN006003_CFG_PS_isDomainIsolated extends JsonRule {
 
   get description(): string {
     return `Update package-solution.json isDomainIsolated`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,19 +25,19 @@ export class FN006003_CFG_PS_isDomainIsolated extends JsonRule {
     "isDomainIsolated": ${this.isDomainIsolated}
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './config/package-solution.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.packageSolutionJson ||

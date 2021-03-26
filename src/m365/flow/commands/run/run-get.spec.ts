@@ -387,7 +387,7 @@ describe(commands.FLOW_RUN_GET, () => {
   });
 
   it('correctly handles environment not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -408,7 +408,7 @@ describe(commands.FLOW_RUN_GET, () => {
   });
 
   it('correctly handles Flow not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "ConnectionAuthorizationFailed",
@@ -429,7 +429,7 @@ describe(commands.FLOW_RUN_GET, () => {
   });
 
   it('correctly handles run not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "BadRequest",
@@ -450,7 +450,7 @@ describe(commands.FLOW_RUN_GET, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

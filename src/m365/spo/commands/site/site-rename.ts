@@ -48,7 +48,7 @@ class SpoSiteRenameCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let spoAdminUrl: string = "";
-    let options = args.options;
+    const options = args.options;
 
     this
       .getSpoAdminUrl(logger, this.debug)
@@ -123,7 +123,7 @@ class SpoSiteRenameCommand extends SpoCommand {
         });
       }).then((): void => {
         logger.log(this.operationData);
-        cb()
+        cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 

@@ -37,9 +37,6 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
     loggerLogSpy = sinon.spy(logger, 'log');
   });
 
-  afterEach(() => {
-    });
-
   after(() => {
     Utils.restore([
       auth.restoreAuth,
@@ -62,7 +59,7 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
   it('uses correct API url', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -70,11 +67,11 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
 
     command.action(logger, {
       options: {
-        debug: false,
+        debug: false
       }
     }, () => {
       try {
-        assert(true)
+        assert(true);
         done();
       }
       catch (e) {
@@ -91,14 +88,14 @@ describe(commands.HIDEDEFAULTTHEMES_GET, () => {
   it('uses correct API url (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/thememanager/GetHideDefaultThemes') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
       return Promise.reject('Invalid request');
     });
 
     command.action(logger, {
       options: {
-        debug: true,
+        debug: true
       }
     }, () => {
       try {

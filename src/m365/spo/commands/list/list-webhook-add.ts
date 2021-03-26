@@ -87,7 +87,7 @@ class SpoListWebhookAddCommand extends SpoCommand {
 
         cb();
       }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, logger, cb)
+        this.handleRejectedODataJsonPromise(err, logger, cb);
       });
   }
 
@@ -137,7 +137,7 @@ class SpoListWebhookAddCommand extends SpoCommand {
       return 'Specify listId or listTitle, one is required';
     }
 
-    const parsedDateTime = Date.parse(args.options.expirationDateTime as string)
+    const parsedDateTime = Date.parse(args.options.expirationDateTime as string);
     if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
       return `Provide the date in one of the following formats:
       'YYYY-MM-DD'

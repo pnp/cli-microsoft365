@@ -13,7 +13,7 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let firstMessage: any = { messages: [{ "id": 470839661887488, "sender_id": 1496550646, "replied_to_id": null, "created_at": "2019/12/22 17:20:30 +0000", "network_id": 801445, "message_type": "update", "sender_type": "user", "url": "https://www.yammer.com/api/v1/messages/470839661887488", "web_url": "https://www.yammer.com/nubo.eu/messages/470839661887488", "group_id": 13114941440, "body": { "parsed": "send a letter to me", "plain": "send a letter to me", "rich": "send a letter to me" }, "thread_id": 470839661887488, "client_type": "O365 Api Auth", "client_url": "https://api.yammer.com", "system_message": false, "direct_message": false, "chat_client_sequence": null, "language": null, "notified_user_ids": [], "privacy": "public", "attachments": [], "liked_by": { "count": 0, "names": [] }, "content_excerpt": "send a letter to me", "group_created_id": 13114941440 }] };
+  const firstMessage: any = { messages: [{ "id": 470839661887488, "sender_id": 1496550646, "replied_to_id": null, "created_at": "2019/12/22 17:20:30 +0000", "network_id": 801445, "message_type": "update", "sender_type": "user", "url": "https://www.yammer.com/api/v1/messages/470839661887488", "web_url": "https://www.yammer.com/nubo.eu/messages/470839661887488", "group_id": 13114941440, "body": { "parsed": "send a letter to me", "plain": "send a letter to me", "rich": "send a letter to me" }, "thread_id": 470839661887488, "client_type": "O365 Api Auth", "client_url": "https://api.yammer.com", "system_message": false, "direct_message": false, "chat_client_sequence": null, "language": null, "notified_user_ids": [], "privacy": "public", "attachments": [], "liked_by": { "count": 0, "names": [] }, "content_excerpt": "send a letter to me", "group_created_id": 13114941440 }] };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -90,9 +90,9 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { body: "send a letter to me", debug: true } } as any, (err?: any) => {
+    command.action(logger, { options: { body: "send a letter to me", debug: true } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 470839661887488)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 470839661887488);
         done();
       }
       catch (e) {
@@ -108,9 +108,9 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { body: "send a letter to me", debug: true, output: "json" } } as any, (err?: any) => {
+    command.action(logger, { options: { body: "send a letter to me", debug: true, output: "json" } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 470839661887488)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 470839661887488);
         done();
       }
       catch (e) {
@@ -120,7 +120,7 @@ describe(commands.YAMMER_MESSAGE_ADD, () => {
   });
 
   it('correctly handles error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "base": "An error has occurred."

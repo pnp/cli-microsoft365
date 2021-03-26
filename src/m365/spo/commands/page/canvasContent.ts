@@ -1,7 +1,7 @@
 export interface Control {
   controlType?: number;
   displayMode: number;
-  emphasis: {};
+  emphasis: any;
   id?: string;
   position: ControlPosition;
   reservedHeight?: number;

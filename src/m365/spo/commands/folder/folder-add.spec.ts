@@ -17,7 +17,7 @@ describe(commands.FOLDER_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
 
     stubPostResponses = (addResp: any = null) => {
@@ -25,14 +25,15 @@ describe(commands.FOLDER_ADD, () => {
         if ((opts.url as string).indexOf('/_api/web/folders') > -1) {
           if (addResp) {
             return addResp;
-          } else {
+          }
+          else {
             return Promise.resolve({ "Exists": true, "IsWOPIEnabled": false, "ItemCount": 0, "Name": "abc", "ProgID": null, "ServerRelativeUrl": "/sites/test1/Shared Documents/abc", "TimeCreated": "2018-05-02T23:21:45Z", "TimeLastModified": "2018-05-02T23:21:45Z", "UniqueId": "0ac3da45-cacf-4c31-9b38-9ef3697d5a66", "WelcomePage": "" });
           }
         }
-  
+
         return Promise.reject('Invalid request');
       });
-    }
+    };
   });
 
   beforeEach(() => {
@@ -126,11 +127,13 @@ describe(commands.FOLDER_ADD, () => {
       }
     }, () => {
       try {
-        assert(request.calledWith({ url: 'https://contoso.sharepoint.com/_api/web/folders',
-        headers:
-         { accept: 'application/json;odata=nometadata' },
-        data: { ServerRelativeUrl: '/Shared Documents/abc' },
-        responseType: 'json' }));
+        assert(request.calledWith({
+          url: 'https://contoso.sharepoint.com/_api/web/folders',
+          headers:
+            { accept: 'application/json;odata=nometadata' },
+          data: { ServerRelativeUrl: '/Shared Documents/abc' },
+          responseType: 'json'
+        }));
         done();
       }
       catch (e) {
@@ -151,11 +154,13 @@ describe(commands.FOLDER_ADD, () => {
       }
     }, () => {
       try {
-        assert(request.calledWith({ url: 'https://contoso.sharepoint.com/sites/test1/_api/web/folders',
-        headers:
-         { accept: 'application/json;odata=nometadata' },
-        data: { ServerRelativeUrl: '/sites/test1/Shared Documents/abc' },
-        responseType: 'json' }));
+        assert(request.calledWith({
+          url: 'https://contoso.sharepoint.com/sites/test1/_api/web/folders',
+          headers:
+            { accept: 'application/json;odata=nometadata' },
+          data: { ServerRelativeUrl: '/sites/test1/Shared Documents/abc' },
+          responseType: 'json'
+        }));
         done();
       }
       catch (e) {
@@ -163,7 +168,7 @@ describe(commands.FOLDER_ADD, () => {
       }
     });
   });
-  
+
   it('supports debug mode', () => {
     const options = command.options();
     let containsDebugOption = false;

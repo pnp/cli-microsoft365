@@ -134,7 +134,7 @@ class SpoSearchCommand extends SpoCommand {
         }
         return new Promise<SearchResult[]>((resolve) => { resolve(resultSet); });
       })
-      .then(() => { return resultSet });
+      .then(() => resultSet);
   }
 
   private getRequestUrl(webUrl: string, logger: Logger, args: CommandArgs, startRow: number): string {
@@ -142,7 +142,7 @@ class SpoSearchCommand extends SpoCommand {
     const selectPropertiesArray: string[] = this.getSelectPropertiesArray(args);
 
     // transform arg data to query string parameters
-    const propertySelectRequestString: string = `&selectproperties='${encodeURIComponent(selectPropertiesArray.join(","))}'`
+    const propertySelectRequestString: string = `&selectproperties='${encodeURIComponent(selectPropertiesArray.join(","))}'`;
     const startRowRequestString: string = `&startrow=${startRow ? startRow : 0}`;
     const rowLimitRequestString: string = args.options.rowLimit ? `&rowlimit=${args.options.rowLimit}` : ``;
     const sourceIdRequestString: string = args.options.sourceId ? `&sourceid='${args.options.sourceId}'` : ``;
@@ -327,7 +327,7 @@ class SpoSearchCommand extends SpoCommand {
       logger.log(this.getParsedOutput(args, results));
     }
 
-    if (!args.options.output || args.options.output == 'text') {
+    if (!args.options.output || args.options.output === 'text') {
       logger.log("# Rows: " + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRows);
       logger.log("# Rows (Including duplicates): " + results[results.length - 1].PrimaryQueryResult.RelevantResults.TotalRowsIncludingDuplicates);
       logger.log("Elapsed Time: " + this.getElapsedTime(results));
@@ -345,7 +345,7 @@ class SpoSearchCommand extends SpoCommand {
   }
 
   private getRowsFromSearchResults(results: SearchResult[]): ResultTableRow[] {
-    let searchResultRows: ResultTableRow[] = [];
+    const searchResultRows: ResultTableRow[] = [];
 
     for (let i = 0; i < results.length; i++) {
       searchResultRows.push(...results[i].PrimaryQueryResult.RelevantResults.Table.Rows);
@@ -358,13 +358,13 @@ class SpoSearchCommand extends SpoCommand {
     const searchResultRows: ResultTableRow[] = this.getRowsFromSearchResults(results);
     const selectProperties: string[] = this.getSelectPropertiesArray(args);
     const outputData: any[] = searchResultRows.map(row => {
-      let rowOutput: any = {};
+      const rowOutput: any = {};
 
       row.Cells.map(cell => {
-        if (selectProperties.filter(prop => { return cell.Key.toUpperCase() === prop.toUpperCase() }).length > 0) {
+        if (selectProperties.filter(prop => { return cell.Key.toUpperCase() === prop.toUpperCase(); }).length > 0) {
           rowOutput[cell.Key] = cell.Value;
         }
-      })
+      });
 
       return rowOutput;
     });

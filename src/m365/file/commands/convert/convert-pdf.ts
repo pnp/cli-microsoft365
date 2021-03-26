@@ -44,7 +44,7 @@ class FileConvertPdfCommand extends GraphCommand {
     let targetIsLocalFile: boolean = true;
     let error: any;
 
-    let isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[auth.defaultResource].accessToken);
+    const isAppOnlyAuth: boolean | undefined = Auth.isAppOnlyAuth(auth.service.accessTokens[auth.defaultResource].accessToken);
     if (typeof isAppOnlyAuth === 'undefined') {
       return cb(new CommandError('Unable to determine authentication type'));
     }
@@ -99,7 +99,7 @@ class FileConvertPdfCommand extends GraphCommand {
         }
 
         if (error) {
-          this.handleRejectedODataJsonPromise(error, logger, cb)
+          this.handleRejectedODataJsonPromise(error, logger, cb);
         }
         else {
           cb();
@@ -241,7 +241,7 @@ class FileConvertPdfCommand extends GraphCommand {
    * @returns ID and server-relative URL of the site denoted by urlPath
    */
   private getGraphSiteInfoFromFullUrl(hostName: string, urlPath: string): Promise<{ id: string, serverRelativeUrl: string }> {
-    let siteId: string = '';
+    const siteId: string = '';
     const urlChunks: string[] = urlPath.split('/');
     return new Promise((resolve: (siteInfo: { id: string; serverRelativeUrl: string }) => void, reject: (err: any) => void): void => {
       this.getGraphSiteInfo(hostName, urlChunks, 0, siteId, resolve, reject);

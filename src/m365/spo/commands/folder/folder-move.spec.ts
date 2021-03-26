@@ -14,7 +14,7 @@ describe(commands.FOLDER_MOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  let stubAllPostRequests: any = (
+  const stubAllPostRequests: any = (
     recycleFolder: any = null,
     createCopyJobs: any = null,
     getCopyJobProgress: any = null
@@ -46,9 +46,9 @@ describe(commands.FOLDER_MOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
-  let stubAllGetRequests: any = (folderExists: any = null) => {
+  const stubAllGetRequests: any = (folderExists: any = null) => {
 
     return sinon.stub(request, 'get').callsFake((opts) => {
 
@@ -61,12 +61,12 @@ describe(commands.FOLDER_MOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -135,7 +135,7 @@ describe(commands.FOLDER_MOVE, () => {
   });
 
   it('should show error when getCopyJobProgress rejects with JobError', (done) => {
-    const getCopyJobProgress = new Promise<any>((resolve, reject) => {
+    const getCopyJobProgress = new Promise<any>((resolve) => {
       const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
       return resolve({ Logs: [log] });
     });
@@ -161,7 +161,7 @@ describe(commands.FOLDER_MOVE, () => {
   });
 
   it('should show error when getCopyJobProgress rejects with JobFatalError', (done) => {
-    const getCopyJobProgress = new Promise<any>((resolve, reject) => {
+    const getCopyJobProgress = new Promise<any>((resolve) => {
       const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
       return resolve({ JobState: 0, Logs: [log] });
     });

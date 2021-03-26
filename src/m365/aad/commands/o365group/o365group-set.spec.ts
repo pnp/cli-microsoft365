@@ -237,7 +237,7 @@ describe(commands.O365GROUP_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -261,7 +261,7 @@ describe(commands.O365GROUP_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -294,7 +294,7 @@ describe(commands.O365GROUP_SET, () => {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
             }
           ]
-        })
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -336,7 +336,7 @@ describe(commands.O365GROUP_SET, () => {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8b'
             }
           ]
-        })
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -370,7 +370,7 @@ describe(commands.O365GROUP_SET, () => {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
             }
           ]
-        })
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -409,7 +409,7 @@ describe(commands.O365GROUP_SET, () => {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
             }
           ]
-        })
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -427,7 +427,7 @@ describe(commands.O365GROUP_SET, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

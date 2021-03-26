@@ -10,10 +10,7 @@ import { DirectorySettingValue } from './DirectorySettingValue';
 import { SiteClassificationSettings } from './SiteClassificationSettings';
 
 interface CommandArgs {
-  options: Options;
-}
-
-interface Options extends GlobalOptions {
+  options: GlobalOptions;
 }
 
 class AadSiteClassificationGetCommand extends GraphCommand {
@@ -37,7 +34,7 @@ class AadSiteClassificationGetCommand extends GraphCommand {
     request
       .get<DirectorySettingTemplatesRsp>(requestOptions)
       .then((res: DirectorySettingTemplatesRsp): void => {
-        if (res.value.length == 0) {
+        if (res.value.length === 0) {
           cb(new CommandError('Site classification is not enabled.'));
           return;
         }
@@ -46,7 +43,7 @@ class AadSiteClassificationGetCommand extends GraphCommand {
           return directorySetting.displayName === 'Group.Unified';
         });
 
-        if (unifiedGroupSetting == null || unifiedGroupSetting.length == 0) {
+        if (unifiedGroupSetting === null || unifiedGroupSetting.length === 0) {
           cb(new CommandError("Missing DirectorySettingTemplate for \"Group.Unified\""));
           return;
         }
@@ -59,7 +56,7 @@ class AadSiteClassificationGetCommand extends GraphCommand {
         });
 
         siteClassificationsSettings.Classifications = [];
-        if (classificationList != null && classificationList.length > 0) {
+        if (classificationList !== null && classificationList.length > 0) {
           siteClassificationsSettings.Classifications = classificationList[0].value.split(',');
         }
 
@@ -69,7 +66,7 @@ class AadSiteClassificationGetCommand extends GraphCommand {
         });
 
         siteClassificationsSettings.UsageGuidelinesUrl = "";
-        if (guidanceUrl != null && guidanceUrl.length > 0) {
+        if (guidanceUrl !==null && guidanceUrl.length > 0) {
           siteClassificationsSettings.UsageGuidelinesUrl = guidanceUrl[0].value;
         }
 
@@ -79,7 +76,7 @@ class AadSiteClassificationGetCommand extends GraphCommand {
         });
 
         siteClassificationsSettings.GuestUsageGuidelinesUrl = "";
-        if (guestGuidanceUrl != null && guestGuidanceUrl.length > 0) {
+        if (guestGuidanceUrl !== null && guestGuidanceUrl.length > 0) {
           siteClassificationsSettings.GuestUsageGuidelinesUrl = guestGuidanceUrl[0].value;
         }
 
@@ -89,7 +86,7 @@ class AadSiteClassificationGetCommand extends GraphCommand {
         });
 
         siteClassificationsSettings.DefaultClassification = "";
-        if (defaultClassification != null && defaultClassification.length > 0) {
+        if (defaultClassification !== null && defaultClassification.length > 0) {
           siteClassificationsSettings.DefaultClassification = defaultClassification[0].value;
         }
 

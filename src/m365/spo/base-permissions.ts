@@ -10,52 +10,52 @@ export class BasePermissions {
     return this._high;
   }
 
+  public set high(value: number) {
+    this._high = value;
+  }
+
   public get low(): number {
     return this._low;
   }
 
-  public set high(value:number) {
-    this._high = value;
-  }
-
-  public set low(value:number) {
+  public set low(value: number) {
     this._low = value;
   }
 
-  public has(perm: PermissionKind) : boolean {
-    var hasPermission = false;
+  public has(perm: PermissionKind): boolean {
+    let hasPermission = false;
 
-    if (perm === PermissionKind.FullMask)
-    {
+    if (perm === PermissionKind.FullMask) {
       hasPermission = (this.high & 32767) === 32767 && this.low === 65535;
     }
 
-    var a = perm;
+    let a = perm;
     a = a - 1;
-    var b = 1;
+    let b = 1;
     if (a >= 0 && a < 32) {
       b = b << a;
       hasPermission = 0 !== (this.low & b);
-    } else if (a >= 32 && a < 64) {
+    }
+    else if (a >= 32 && a < 64) {
       b = b << a - 32;
       hasPermission = (0 !== (this.high & b));
     }
-    
+
     return hasPermission;
   }
 
   public set(perm: PermissionKind): void {
-    if (perm == PermissionKind.FullMask) {
+    if (perm === PermissionKind.FullMask) {
       this._low = 65535;
       this._high = 32767;
     }
-    else if (perm == PermissionKind.EmptyMask) {
+    else if (perm === PermissionKind.EmptyMask) {
       this._low = 0;
       this._high = 0;
     }
     else {
-      let num1: number = (perm - 1);
-      let num2: number = 1;
+      const num1: number = (perm - 1);
+      const num2: number = 1;
       if (num1 >= 0 && num1 < 32) {
         this._low = this._low | num2 << num1;
       }

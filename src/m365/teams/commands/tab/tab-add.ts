@@ -106,7 +106,7 @@ class TeamsTabAddCommand extends GraphItemsListCommand<Tab> {
   }
 
   private mapRequestBody(options: Options): any {
-    const requestBody: any = {}
+    const requestBody: any = {};
     requestBody['configuration'] = {};
     const excludeOptions: string[] = [
       'debug',

@@ -43,7 +43,7 @@ class SpoSiteListCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const siteType: string = args.options.type || 'TeamSite';
     const webTemplate: string = siteType === 'TeamSite' ? 'GROUP#0' : 'SITEPAGEPUBLISHING#0';
-    let startIndex: string = '0';
+    const startIndex: string = '0';
     let spoAdminUrl: string;
 
     this

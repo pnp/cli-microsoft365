@@ -84,7 +84,7 @@ class SpoPropertyBagListCommand extends SpoPropertyBagBaseCommand {
    * @param propertyBag client.svc property bag javascript object
    */
   private formatOutput(propertyBag: any): Property[] {
-    let result: Property[] = [];
+    const result: Property[] = [];
     const keys = Object.keys(propertyBag);
 
     for (let i = 0; i < keys.length; i++) {

@@ -17,7 +17,7 @@ export class TsFile {
     }
 
     return this._sourceFile;
-  };
+  }
 
   private _nodes: ts.Node[] | undefined;
   public get nodes(): ts.Node[] | undefined {
@@ -30,7 +30,7 @@ export class TsFile {
     }
 
     return this._nodes;
-  };
+  }
 
   private _source: string | undefined;
   public get source(): string | undefined {

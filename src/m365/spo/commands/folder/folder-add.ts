@@ -39,7 +39,7 @@ class SpoFolderAddCommand extends SpoCommand {
     const requestOptions: any = {
       url: requestUrl,
       headers: {
-        'accept': 'application/json;odata=nometadata',
+        'accept': 'application/json;odata=nometadata'
       },
       data: {
         'ServerRelativeUrl': serverRelativeUrl

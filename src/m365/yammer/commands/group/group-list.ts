@@ -46,7 +46,7 @@ class YammerGroupListCommand extends YammerCommand {
       let endpoint = `${this.resource}/v1`;
 
       if (args.options.userId) {
-        endpoint += `/groups/for_user/${args.options.userId}.json`
+        endpoint += `/groups/for_user/${args.options.userId}.json`;
       }
       else {
         endpoint += `/groups.json`;
@@ -90,7 +90,7 @@ class YammerGroupListCommand extends YammerCommand {
           reject(err);
         });
     });
-  };
+  }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.items = []; // this will reset the items array in interactive mode
@@ -101,7 +101,7 @@ class YammerGroupListCommand extends YammerCommand {
         logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

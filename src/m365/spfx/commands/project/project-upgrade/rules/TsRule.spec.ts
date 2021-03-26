@@ -19,7 +19,6 @@ class MockTsRule extends TsRule {
   }
 
   visit(): void {
-
   }
 }
 
@@ -28,7 +27,7 @@ describe('TsRule', () => {
 
   beforeEach(() => {
     rule = new MockTsRule();
-  })
+  });
 
   it('returns no resolution by default', () => {
     assert.strictEqual(rule.resolution, '');

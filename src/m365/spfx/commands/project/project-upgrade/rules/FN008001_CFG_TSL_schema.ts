@@ -17,25 +17,25 @@ export class FN008001_CFG_TSL_schema extends JsonRule {
 
   get description(): string {
     return `Update tslint.json schema URL`;
-  };
+  }
 
   get resolution(): string {
     return `{
   "$schema": "${this.schema}"
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './config/tslint.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsLintJson) {

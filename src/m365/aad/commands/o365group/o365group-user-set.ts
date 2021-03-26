@@ -43,7 +43,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string
+    const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
     this
       .getOwners(logger, groupId)
@@ -107,7 +107,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
               url: endpoint,
               headers: {
                 'accept': 'application/json;odata.metadata=none'
-              },
+              }
             };
 
             return request.delete(requestOptions);
@@ -130,7 +130,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
     return this.getAllItems(endpoint, logger, true).then((): void => {
       // Currently there is a bug in the Microsoft Graph that returns Owners as
       // userType 'member'. We therefore update all returned user as owner
-      for (var i in this.items) {
+      for (const i in this.items) {
         this.items[i].userType = 'Owner';
       }
     });

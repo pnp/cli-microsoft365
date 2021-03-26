@@ -59,7 +59,7 @@ describe(commands.LIST_LABEL_SET, () => {
 
   it('should handle error when trying to set label', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url == `https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) {
+      if (opts.url === `https://contoso.sharepoint.com/sites/team1/_api/SP_CompliancePolicy_SPPolicyStoreProxy_SetListComplianceTag`) {
         return Promise.reject({
           error: {
             'odata.error': {
@@ -87,7 +87,7 @@ describe(commands.LIST_LABEL_SET, () => {
     command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
-        listTitle: 'MyLibrary',
+        listTitle: 'MyLibrary'
       }
     } as any, (err?: any) => {
       try {

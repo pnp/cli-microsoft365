@@ -25,7 +25,7 @@ describe(commands.SITE_REMOVE, () => {
   });
 
   beforeEach(() => {
-    let futureDate = new Date();
+    const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
     log = [];
@@ -390,7 +390,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, skipRecycleBin: true } } as any, (error: any) => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, debug: true, skipRecycleBin: true } } as any, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -476,7 +476,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, skipRecycleBin: true } } as any, (error: any) => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demosite', confirm: true, skipRecycleBin: true } } as any, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -677,7 +677,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -806,7 +806,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -884,7 +884,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -963,7 +963,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -1149,7 +1149,7 @@ describe(commands.SITE_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });

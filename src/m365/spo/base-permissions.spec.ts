@@ -5,11 +5,11 @@ describe('BasePermissions', () => {
 
   let basePermissions: BasePermissions;
   const getPermissions = (rights: PermissionKind[]): BasePermissions => {
-    for (let kind of rights) {
-        basePermissions.set(kind);
+    for (const kind of rights) {
+      basePermissions.set(kind);
     }
     return basePermissions;
-  }
+  };
 
   beforeEach(() => {
     basePermissions = new BasePermissions();

@@ -10,7 +10,7 @@ describe('FN006002_CFG_PS_includeClientSideAssets', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN006002_CFG_PS_includeClientSideAssets(true);
-  })
+  });
 
   it('doesn\'t return notification if includeClientSideAssets is already up-to-date', () => {
     const project: Project = {

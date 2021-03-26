@@ -44,7 +44,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
       this
         .getSpoUrl(logger, this.debug)
         .then((spoUrl: string): Promise<string> => {
-          return this.getAppCatalogSiteUrl(logger, spoUrl, args)
+          return this.getAppCatalogSiteUrl(logger, spoUrl, args);
         })
         .then((appCatalogUrl: string): Promise<void> => {
           if (this.debug) {
@@ -71,7 +71,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the app ${args.options.id} from the app catalog?`,
+        message: `Are you sure you want to remove the app ${args.options.id} from the app catalog?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -109,7 +109,7 @@ class SpoAppRemoveCommand extends SpoAppBaseCommand {
     if (args.options.scope) {
       const testScope: string = args.options.scope.toLowerCase();
       if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-        return `Scope must be either 'tenant' or 'sitecollection' if specified`
+        return `Scope must be either 'tenant' or 'sitecollection' if specified`;
       }
 
       if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {

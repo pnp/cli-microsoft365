@@ -19,7 +19,7 @@ describe(commands.SITE_RENAME, () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return { FormDigestValue: 'abc' }; });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -28,7 +28,7 @@ describe(commands.SITE_RENAME, () => {
   });
 
   beforeEach(() => {
-    let futureDate = new Date();
+    const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
 
@@ -46,7 +46,7 @@ describe(commands.SITE_RENAME, () => {
     };
     loggerLogSpy = sinon.spy(logger, 'log');
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
-  })
+  });
 
   afterEach(() => {
     Utils.restore([
@@ -357,7 +357,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', wait: true, debug: true, verbose: true } } as any, (err?: any) => {
+    command.action(logger, { options: { siteUrl: 'https://contoso.sharepoint.com/sites/site1', newSiteUrl: 'https://contoso.sharepoint.com/sites/site1-renamed', wait: true, debug: true, verbose: true } } as any, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -464,7 +464,7 @@ describe(commands.SITE_RENAME, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('Invalid request');
     });
 

@@ -124,7 +124,7 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
   });
 
   it('correctly handles OData error when retrieving page templates', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
@@ -140,11 +140,11 @@ describe(commands.PAGE_TEMPLATE_LIST, () => {
   });
 
   it('correctly handles error when retrieving page templates on a site which does not have any', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ response: { status: 404 } });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a' } } as any, () => {
       try {
         assert(loggerLogSpy.calledWith([]));
         done();

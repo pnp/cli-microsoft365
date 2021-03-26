@@ -14,7 +14,7 @@ describe(commands.FILE_MOVE, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  let stubAllPostRequests: any = (
+  const stubAllPostRequests: any = (
     recycleFile: any = null,
     createCopyJobs: any = null,
     waitForJobResult: any = null
@@ -46,9 +46,9 @@ describe(commands.FILE_MOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
-  let stubAllGetRequests: any = (fileExists: any = null) => {
+  const stubAllGetRequests: any = (fileExists: any = null) => {
     return sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('GetFileByServerRelativeUrl') > -1) {
         if (fileExists) {
@@ -59,7 +59,7 @@ describe(commands.FILE_MOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -67,7 +67,7 @@ describe(commands.FILE_MOVE, () => {
     sinon.stub((command as any), 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc'
     }));
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -136,7 +136,7 @@ describe(commands.FILE_MOVE, () => {
   });
 
   it('should complete successfully in 4 tries', (done) => {
-    var counter = 4;
+    let counter = 4;
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/recycle()') > -1) {
         return Promise.resolve();
@@ -310,7 +310,7 @@ describe(commands.FILE_MOVE, () => {
   });
 
   it('should show error when waitForJobResult rejects with JobError', (done) => {
-    const waitForJobResult = new Promise<any>((resolve, reject) => {
+    const waitForJobResult = new Promise<any>((resolve) => {
       const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
       return resolve({ Logs: [log] });
     });
@@ -337,7 +337,7 @@ describe(commands.FILE_MOVE, () => {
   });
 
   it('should show error when waitForJobResult rejects with JobFatalError', (done) => {
-    const waitForJobResult = new Promise<any>((resolve, reject) => {
+    const waitForJobResult = new Promise<any>((resolve) => {
       const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
       return resolve({ JobState: 0, Logs: [log] });
     });

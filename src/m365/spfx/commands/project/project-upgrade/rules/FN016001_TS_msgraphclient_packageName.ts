@@ -22,7 +22,7 @@ export class FN016001_TS_msgraphclient_packageName extends TsRule {
 
   get resolution(): string {
     return ``;
-  };
+  }
 
   get resolutionType(): string {
     return 'ts';

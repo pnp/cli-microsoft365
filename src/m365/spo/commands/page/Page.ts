@@ -13,7 +13,7 @@ export class Page {
         logger.logToStderr(`Retrieving information about the page...`);
       }
 
-      let pageName: string = this.getPageNameWithExtension(name);
+      const pageName: string = this.getPageNameWithExtension(name);
 
       const requestOptions: any = {
         url: `${webUrl}/_api/web/getfilebyserverrelativeurl('${Utils.getServerRelativeSiteUrl(webUrl)}/SitePages/${encodeURIComponent(pageName)}')?$expand=ListItemAllFields/ClientSideApplicationId`,
@@ -97,7 +97,7 @@ export class Page {
     return control;
   }
 
-  public static getColumnsInformation(column: CanvasColumn, isJSONOutput: boolean) {
+  public static getColumnsInformation(column: CanvasColumn, isJSONOutput: boolean): any {
     const output: any = {
       factor: column.factor,
       order: column.order
@@ -115,7 +115,7 @@ export class Page {
     return {
       order: section.order,
       columns: section.columns.map(column => this.getColumnsInformation(column, isJSONOutput))
-    }
+    };
   }
 
   private static getPageNameWithExtension(name: string): string {

@@ -17,15 +17,15 @@ export class FN011008_MAN_requiresCustomScript extends ManifestRule {
 
   get description(): string {
     return 'In the manifest rename the safeWithCustomScriptDisabled property to requiresCustomScript and invert its value';
-  };
+  }
 
   get resolution(): string {
     return '';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.manifests ||

@@ -10,7 +10,7 @@ describe('FN012003_TSC_skipLibCheck', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN012003_TSC_skipLibCheck(true);
-  })
+  });
 
   it('doesn\'t return notification if skipLibCheck is already up-to-date', () => {
     const project: Project = {

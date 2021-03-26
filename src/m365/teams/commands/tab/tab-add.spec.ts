@@ -114,7 +114,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
         channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
         appId: 'com.microsoft.teamspace.tab.web',
         appName: 'test',
-        contentUrl: '/',
+        contentUrl: '/'
       }
     });
     assert.strictEqual(actual, true);
@@ -140,7 +140,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
         channelId: '9:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
         appId: 'com.microsoft.teamspace.tab.web',
         appName: 'testweb',
-        contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/',
+        contentUrl: 'https://xxx.sharepoint.com/Shared%20Documents/'
       }
     }, () => {
       try {
@@ -246,7 +246,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
   });
 
   it('correctly handles error when adding a tab', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

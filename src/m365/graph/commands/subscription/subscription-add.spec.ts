@@ -13,7 +13,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
-  let mockNowNumber = Date.parse("2019-01-01T00:00:00.000Z");
+  const mockNowNumber = Date.parse("2019-01-01T00:00:00.000Z");
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -296,7 +296,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         resource: "teams",
         changeType: 'updated',
         clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
     }, () => {
       try {
@@ -335,7 +335,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
         resource: "teams",
         changeType: 'updated',
         clientState: 'secretClientValue',
-        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient",
+        notificationUrl: "https://webhook.azurewebsites.net/api/send/myNotifyClient"
       }
     }, () => {
       try {
@@ -350,7 +350,7 @@ describe(commands.SUBSCRIPTION_ADD, () => {
   });
 
   it('handles error correctly', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

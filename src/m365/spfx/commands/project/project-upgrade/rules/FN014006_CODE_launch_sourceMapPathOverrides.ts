@@ -18,7 +18,7 @@ export class FN014006_CODE_launch_sourceMapPathOverrides extends JsonRule {
 
   get description(): string {
     return `In the .vscode/launch.json file, for each configuration, in the sourceMapPathOverrides property, add "${this.overrideKey}": "${this.overrideValue}"`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -30,19 +30,19 @@ export class FN014006_CODE_launch_sourceMapPathOverrides extends JsonRule {
     }
   ]
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Recommended';
-  };
+  }
 
   get file(): string {
     return '.vscode/launch.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.vsCode ||

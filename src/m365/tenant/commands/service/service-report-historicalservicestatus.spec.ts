@@ -14,7 +14,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  let jsonOutput = {
+  const jsonOutput = {
     "@odata.context": "https://office365servicecomms-prod.cloudapp.net/api/v1.0/contoso.sharepoint.com/$metadata#CurrentStatus",
     "value": [
       {

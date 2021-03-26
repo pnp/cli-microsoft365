@@ -13,7 +13,7 @@ class StatusCommand extends Command {
     return 'Shows Microsoft 365 login status';
   }
 
-  public commandAction(logger: Logger, args: {}, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     if (auth.service.connected) {
       if (this.debug) {
         logger.logToStderr({

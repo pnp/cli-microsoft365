@@ -219,7 +219,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
   private get sharingCapabilities(): string[] {
     const result: string[] = [];
 
-    for (let sharingCapability in SharingCapabilities) {
+    for (const sharingCapability in SharingCapabilities) {
       if (typeof SharingCapabilities[sharingCapability] === 'number') {
         result.push(sharingCapability);
       }

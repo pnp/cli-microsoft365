@@ -17,7 +17,7 @@ export class FN012011_TSC_outDir extends JsonRule {
 
   get description(): string {
     return `Update tsconfig.json outDir value`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,19 +25,19 @@ export class FN012011_TSC_outDir extends JsonRule {
     "outDir": "${this.outDir}"
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './tsconfig.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {

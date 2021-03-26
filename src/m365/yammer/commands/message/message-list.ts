@@ -55,10 +55,10 @@ class YammerMessageListCommand extends YammerCommand {
       let endpoint = `${this.resource}/v1`;
 
       if (args.options.threadId) {
-        endpoint += `/messages/in_thread/${args.options.threadId}.json`
+        endpoint += `/messages/in_thread/${args.options.threadId}.json`;
       }
       else if (args.options.groupId) {
-        endpoint += `/messages/in_group/${args.options.groupId}.json`
+        endpoint += `/messages/in_group/${args.options.groupId}.json`;
       }
       else {
         if (!args.options.feedType) {
@@ -143,7 +143,7 @@ class YammerMessageListCommand extends YammerCommand {
           reject(err);
         });
     });
-  };
+  }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.items = []; // this will reset the items array in interactive mode
@@ -172,7 +172,7 @@ class YammerMessageListCommand extends YammerCommand {
         logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

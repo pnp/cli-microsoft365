@@ -167,7 +167,7 @@ describe(commands.PLANNER_TASK_LIST, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {

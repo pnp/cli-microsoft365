@@ -17,25 +17,25 @@ export class FN006001_CFG_PS_schema extends JsonRule {
 
   get description(): string {
     return `Update package-solution.json schema URL`;
-  };
+  }
 
   get resolution(): string {
     return `{
   "$schema": "${this.schema}"
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './config/package-solution.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.packageSolutionJson) {

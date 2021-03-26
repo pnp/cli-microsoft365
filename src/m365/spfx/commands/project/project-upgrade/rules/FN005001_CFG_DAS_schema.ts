@@ -17,25 +17,25 @@ export class FN005001_CFG_DAS_schema extends JsonRule {
 
   get description(): string {
     return `Update deploy-azure-storage.json schema URL`;
-  };
+  }
 
   get resolution(): string {
     return `{
   "$schema": "${this.schema}"
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './config/deploy-azure-storage.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.deployAzureStorageJson) {

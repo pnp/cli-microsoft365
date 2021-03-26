@@ -102,7 +102,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
     const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -113,7 +113,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
     const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        role: 'Invalid',
+        role: 'Invalid'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -306,7 +306,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('correctly handles error when listing users', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

@@ -154,7 +154,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
         debug: true,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        name: '08585981115186985105550762687CU161',
+        name: '08585981115186985105550762687CU161'
       }
     }, () => {
       try {
@@ -168,7 +168,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
   });
 
   it('correctly handles no environment found without prompting when confirm specified', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -198,7 +198,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
   });
 
   it('correctly handles no environment found when prompt confirmed', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -218,7 +218,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
         debug: false,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        name: '08585981115186985105550762687CU161',
+        name: '08585981115186985105550762687CU161'
       }
     } as any, (err?: any) => {
       try {
@@ -232,7 +232,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
   });
 
   it('correctly handles specified Microsoft Flow not found when prompt confirmed', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "ConnectionAuthorizationFailed",
@@ -253,7 +253,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
         debug: false,
         environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
-        name: '08585981115186985105550762687CU161',
+        name: '08585981115186985105550762687CU161'
       }
     } as any, (err?: any) => {
       try {
@@ -267,7 +267,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
   });
 
   it('correctly handles specified Microsoft Flow not found without prompting when confirm specified', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "ConnectionAuthorizationFailed",
@@ -297,7 +297,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
   });
 
   it('correctly handles specified Microsoft Flow run not found when prompt confirmed', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "AzureResourceManagerRequestFailed",
@@ -317,7 +317,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
         debug: false,
         environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        name: '08585981115186985105550762688CP233',
+        name: '08585981115186985105550762688CP233'
       }
     } as any, (err?: any) => {
       try {
@@ -331,7 +331,7 @@ describe(commands.FLOW_RUN_CANCEL, () => {
   });
 
   it('correctly handles specified Microsoft Flow run not found without prompting when confirm specified', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "AzureResourceManagerRequestFailed",

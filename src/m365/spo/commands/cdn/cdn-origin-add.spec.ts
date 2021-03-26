@@ -63,9 +63,6 @@ describe(commands.CDN_ORIGIN_ADD, () => {
     requests = [];
   });
 
-  afterEach(() => {
-    });
-
   after(() => {
     Utils.restore([
       auth.restoreAuth,
@@ -193,7 +190,7 @@ describe(commands.CDN_ORIGIN_ADD, () => {
 
   it('correctly handles random API error', (done) => {
     Utils.restore(request.post);
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
     command.action(logger, { options: { debug: true, origin: '*/cdn', type: 'Public' } } as any, (err?: any) => {

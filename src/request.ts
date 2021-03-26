@@ -147,7 +147,7 @@ class Request {
         }
         else {
           const resource: string = Auth.getResourceFromUrl(options.url as string);
-          return auth.ensureAccessToken(resource, this._logger as Logger, this._debug)
+          return auth.ensureAccessToken(resource, this._logger as Logger, this._debug);
         }
       })()
         .then((accessToken: string): AxiosPromise<TResponse> => {

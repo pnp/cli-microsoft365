@@ -258,7 +258,7 @@ describe(commands.CONTENTTYPE_FIELD_SET, () => {
     },
     "TraceCorrelationId": "59577d9e-70af-0000-22fb-870cf639feff"
   }
-]`)
+]`);
       }
 
       return Promise.reject('Invalid request');

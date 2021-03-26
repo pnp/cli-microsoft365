@@ -299,7 +299,7 @@ describe(commands.FLOW_ENVIRONMENT_LIST, () => {
                 "microsoft.Flow": "https://europe.api.flow.microsoft.com"
               }
             },
-            "displayName": "Contoso (default)",
+            "displayName": "Contoso (default)"
           },
           {
             "name": "Test-d87a7535-dd31-4437-bfe1-95340acd55c5",
@@ -327,7 +327,7 @@ describe(commands.FLOW_ENVIRONMENT_LIST, () => {
                 "microsoft.Flow": "https://europe.api.flow.microsoft.com"
               }
             },
-            "displayName": "Contoso (test)",
+            "displayName": "Contoso (test)"
           }
         ]));
         done();
@@ -365,7 +365,7 @@ describe(commands.FLOW_ENVIRONMENT_LIST, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

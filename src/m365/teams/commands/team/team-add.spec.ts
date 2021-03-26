@@ -400,7 +400,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
@@ -457,7 +457,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -468,7 +468,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
         wait: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-        templatePath: 'template.json',
+        templatePath: 'template.json'
       }
     }, () => {
       try {
@@ -486,7 +486,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
   });
 
   it('correctly handles error when creating a Team', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
@@ -521,7 +521,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
@@ -560,7 +560,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -570,7 +570,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
         wait: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-        templatePath: 'template.json',
+        templatePath: 'template.json'
       }
     } as any, (err?: any) => {
       try {
@@ -602,7 +602,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if (opts.url === `https://graph.microsoft.com/v1.0/teams('79afc64f-c76b-4edc-87f3-a47a1264695a')/operations('8ad1effa-7ed1-4d03-bd60-fe177d8d56f1')`) {
@@ -641,7 +641,7 @@ describe(commands.TEAMS_TEAM_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -651,9 +651,9 @@ describe(commands.TEAMS_TEAM_ADD, () => {
         wait: true,
         name: 'Sample Classroom Team',
         description: 'This is a sample classroom team, used to showcase the range of properties supported by this API',
-        templatePath: 'template.json',
+        templatePath: 'template.json'
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert.deepEqual(requestStub.getCall(0).args[0].data, {
           "template@odata.bind": "https://graph.microsoft.com/v1.0/teamsTemplates('standard')",

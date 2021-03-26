@@ -10,7 +10,7 @@ describe('FN012007_TSC_lib_es5', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN012007_TSC_lib_es5();
-  })
+  });
 
   it('doesn\'t return notification if es5 is already present', () => {
     const project: Project = {

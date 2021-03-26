@@ -1,0 +1,113 @@
+{
+  "root": true,
+  "env": {
+    "node": true,
+    "es2021": true,
+    "commonjs": true,
+    "mocha": true
+  },
+  "globals": {
+    "NodeJS": true
+  },
+  "extends": [
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2015,
+    "sourceType": "module"
+  },
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "ignorePatterns": [
+    "**/pcf-init/assets/**",
+    "**/solution-init/assets/**",
+    "**/test-projects/**",
+    "clientsidepages.ts",
+    "*.js"
+  ],
+  "rules": {
+    "indent": "off",
+    "@typescript-eslint/indent": [
+      "error",
+      2
+    ],
+    "semi": "off",
+    "@typescript-eslint/semi": [
+      "error"
+    ],
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/explicit-module-boundary-types": [
+      "error",
+      {
+        "allowArgumentsExplicitlyTypedAsAny": true
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "brace-style": [
+      "error",
+      "stroustrup",
+      {
+        "allowSingleLine": true
+      }
+    ],
+    "camelcase": [
+      "error",
+      {
+        "allow": [
+          "child_process",
+          "error_description",
+          "_Child_Items_",
+          "_Object_Type_",
+          "FN\\d+",
+          "OData__.*",
+          "vti_.*",
+          "Query.*",
+          "app_displayname",
+          "access_token",
+          "expires_on"
+        ]
+      }
+    ],
+    "comma-dangle": [
+      "error",
+      "never"
+    ],
+    "curly": [
+      "error",
+      "all"
+    ],
+    "eqeqeq": [
+      "error",
+      "always"
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "*.spec.ts"
+      ],
+      "rules": {
+        "no-console": "error",
+        "@typescript-eslint/no-empty-function": "off"
+      }
+    },
+    {
+      "files": [
+        "**/yammer/**"
+      ],
+      "rules": {
+        "camelcase": "off"
+      }
+    }
+  ]
+}

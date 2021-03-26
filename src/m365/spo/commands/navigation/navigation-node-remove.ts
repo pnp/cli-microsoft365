@@ -66,7 +66,7 @@ class SpoNavigationNodeRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the node ${args.options.id} from the navigation?`,
+        message: `Are you sure you want to remove the node ${args.options.id} from the navigation?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

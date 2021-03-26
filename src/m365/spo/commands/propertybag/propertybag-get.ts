@@ -57,7 +57,8 @@ class SpoPropertyBagGetCommand extends SpoPropertyBagBaseCommand {
 
         if (property) {
           logger.log(property.value);
-        } else if (this.verbose) {
+        }
+        else if (this.verbose) {
           logger.logToStderr('Property not found.');
         }
         cb();

@@ -91,7 +91,7 @@ class SpoCdnOriginRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to delete the ${args.options.origin} CDN origin?`,
+        message: `Are you sure you want to delete the ${args.options.origin} CDN origin?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

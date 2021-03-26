@@ -1,11 +1,11 @@
 export interface DeletedSiteProperties {
-  DaysRemaining: Number;
+  DaysRemaining: number;
   DeletionTime: string | Date;
   Url: string;
   SiteId: string;
   Status: string;
-  StorageMaximumLevel: Number;
-  UserCodeMaximumLevel: Number;
+  StorageMaximumLevel: number;
+  UserCodeMaximumLevel: number;
   _ObjectIdentity_: string;
   _Object_Type_: string;
 }

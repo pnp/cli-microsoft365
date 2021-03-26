@@ -42,7 +42,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     }
 
     return Promise.reject('Invalid request');
-  }
+  };
   const postStubSuccCalls = (opts: any) => {
     if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
       // Web CT
@@ -81,7 +81,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
     }
 
     return Promise.reject('Invalid request');
-  }
+  };
   const postStubFailedCalls = (opts: any) => {
     if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
       // WEB CT
@@ -126,7 +126,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
 
     }
     return Promise.reject('Invalid request');
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -223,7 +223,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: true,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.called);
         done();
@@ -244,7 +244,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: false,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -274,7 +274,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         updateChildContentTypes: false,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.called);
         done();
@@ -298,7 +298,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         updateChildContentTypes: true,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.notCalled);
         done();
@@ -320,7 +320,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: false,
         debug: true
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         let promptIssued = false;
 
@@ -350,7 +350,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         updateChildContentTypes: true,
         debug: true
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.notCalled);
         done();
@@ -373,7 +373,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: true,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -393,7 +393,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         updateChildContentTypes: true,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         let promptIssued = false;
 
@@ -423,7 +423,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: false,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.called);
         done();
@@ -448,7 +448,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: false,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.notCalled);
         done();
@@ -470,7 +470,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: false,
         debug: true
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         let promptIssued = false;
 
@@ -501,7 +501,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: false,
         debug: true
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.called);
         done();
@@ -527,7 +527,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: false,
         debug: true
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.notCalled);
         done();
@@ -549,7 +549,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: true,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.called);
         assert(loggerLogSpy.notCalled);
@@ -569,7 +569,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -601,7 +601,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: true,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.called);
         assert(loggerLogSpy.notCalled);
@@ -628,7 +628,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: false,
         debug: false
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.notCalled);
         assert(loggerLogSpy.notCalled);
@@ -652,7 +652,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         confirm: true,
         debug: true
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.called);
         done();
@@ -671,7 +671,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         webUrl: WEB_URL, listTitle: LIST_TITLE, contentTypeId: LIST_CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         debug: true
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       let promptIssued = false;
 
       if (promptOptions && promptOptions.type === 'confirm') {
@@ -701,7 +701,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         updateChildContentTypes: false,
         debug: true
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.called);
         done();
@@ -725,7 +725,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         updateChildContentTypes: false,
         debug: true
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(postCallbackStub.notCalled);
         done();
@@ -746,7 +746,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         confirm: true,
-        debug: false,
+        debug: false
       }
     } as any, (err?: any) => {
       try {
@@ -786,7 +786,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
         confirm: false,
-        debug: false,
+        debug: false
       }
     } as any, (err?: any) => {
       try {
@@ -807,7 +807,7 @@ describe(commands.CONTENTTYPE_FIELD_REMOVE, () => {
       options: {
         webUrl: WEB_URL, contentTypeId: CONTENT_TYPE_ID, fieldLinkId: FIELD_LINK_ID,
         updateChildContentTypes: true,
-        confirm: true,
+        confirm: true
       }
     } as any, (err?: any) => {
       try {

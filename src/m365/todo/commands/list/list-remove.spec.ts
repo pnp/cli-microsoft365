@@ -208,7 +208,7 @@ describe(commands.LIST_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.resolve();
     });
 
@@ -248,7 +248,7 @@ describe(commands.LIST_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

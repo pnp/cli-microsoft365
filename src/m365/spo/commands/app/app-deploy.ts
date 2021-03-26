@@ -47,7 +47,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     this
       .getSpoUrl(logger, this.debug)
       .then((spoUrl: string): Promise<string> => {
-        return this.getAppCatalogSiteUrl(logger, spoUrl, args)
+        return this.getAppCatalogSiteUrl(logger, spoUrl, args);
       })
       .then((_appCatalogUrl: string): Promise<{ UniqueId: string; }> => {
         appCatalogUrl = _appCatalogUrl;
@@ -126,7 +126,7 @@ class SpoAppDeployCommand extends SpoAppBaseCommand {
     if (args.options.scope) {
       const testScope: string = args.options.scope.toLowerCase();
       if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-        return `Scope must be either 'tenant' or 'sitecollection'`
+        return `Scope must be either 'tenant' or 'sitecollection'`;
       }
 
       if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {

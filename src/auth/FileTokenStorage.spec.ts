@@ -232,7 +232,7 @@ describe('FileTokenStorage', () => {
       .remove()
       .then(() => {
         done();
-      }, (err) => {
+      }, () => {
         done('Pass expected but failed instead');
       });
   });
@@ -245,7 +245,7 @@ describe('FileTokenStorage', () => {
       .remove()
       .then(() => {
         done();
-      }, (err) => {
+      }, () => {
         done('Pass expected but failed instead');
       });
   });
@@ -258,7 +258,7 @@ describe('FileTokenStorage', () => {
       .remove()
       .then(() => {
         done();
-      }, (err) => {
+      }, () => {
         done('Pass expected but failed instead');
       });
   });
@@ -271,7 +271,7 @@ describe('FileTokenStorage', () => {
       .remove()
       .then(() => {
         done();
-      }, (err) => {
+      }, () => {
         done('Pass expected but failed instead');
       });
   });
@@ -293,7 +293,7 @@ describe('FileTokenStorage', () => {
         catch (e) {
           done(e);
         }
-      }, (err) => {
+      }, () => {
         done('Pass expected but failed instead');
       });
   });

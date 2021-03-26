@@ -26,7 +26,6 @@ class SpoSiteRemoveCommand extends SpoCommand {
   private context?: FormDigestInfo;
   private spoAdminUrl?: string;
   private dots?: string;
-  private timeout?: NodeJS.Timer;
 
   public get name(): string {
     return commands.SITE_REMOVE;
@@ -64,14 +63,14 @@ class SpoSiteRemoveCommand extends SpoCommand {
               logger.logToStderr(`Site attached to group ${_groupId}. Initiating group delete operation via Graph API`);
             }
             if (args.options.fromRecycleBin || args.options.skipRecycleBin || args.options.wait) {
-              logger.log(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'fromRecycleBin' or 'skipRecycleBin' or 'wait' will not be applicable.`))
+              logger.log(chalk.yellow(`Entered site is a groupified site. Hence, the parameters 'fromRecycleBin' or 'skipRecycleBin' or 'wait' will not be applicable.`));
             }
 
             return this.deleteGroupifiedSite(_groupId, logger);
           }
         })
         .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       removeSite();
@@ -81,7 +80,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the site ${args.options.url}?`,
+        message: `Are you sure you want to remove the site ${args.options.url}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -122,7 +121,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
       .then((): Promise<void> => {
         if (args.options.skipRecycleBin) {
           if (this.verbose) {
-            logger.logToStderr(`Also deleting site collection from recycle bin ${args.options.url}...`)
+            logger.logToStderr(`Also deleting site collection from recycle bin ${args.options.url}...`);
           }
           return this.deleteSiteFromTheRecycleBin(args.options.url, args.options.wait, logger);
         }
@@ -168,7 +167,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
             }, operation.PollingInterval);
           }
         });
@@ -210,7 +209,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
             }, operation.PollingInterval);
           }
         });
@@ -262,7 +261,7 @@ class SpoSiteRemoveCommand extends SpoCommand {
       url: `https://graph.microsoft.com/v1.0/groups/${groupId}`,
       headers: {
         'accept': 'application/json;odata.metadata=none'
-      },
+      }
     };
 
     return request.delete(requestOptions);

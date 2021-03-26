@@ -21,7 +21,6 @@ interface Options extends GlobalOptions {
 
 class SpoFolderMoveCommand extends SpoCommand {
   private dots?: string;
-  private timeout?: NodeJS.Timer;
 
   public get name(): string {
     return commands.FOLDER_MOVE;
@@ -56,7 +55,7 @@ class SpoFolderMoveCommand extends SpoCommand {
         options: {
           "AllowSchemaMismatch": allowSchemaMismatch,
           "IgnoreVersionHistory": true,
-          "IsMoveMode": true,
+          "IsMoveMode": true
         }
       },
       responseType: 'json'
@@ -71,8 +70,8 @@ class SpoFolderMoveCommand extends SpoCommand {
           const copyJobInfo: any = jobInfo.value[0];
           const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
-          this.timeout = setTimeout(() => {
-            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, logger, this.dots, this.timeout)
+          setTimeout(() => {
+            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, logger, this.dots);
           }, progressPollInterval);
         });
       })

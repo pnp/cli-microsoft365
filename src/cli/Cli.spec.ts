@@ -20,7 +20,7 @@ class MockCommand extends AnonymousCommand {
     return 'cli mock';
   }
   public get description(): string {
-    return 'Mock command'
+    return 'Mock command';
   }
   public options(): CommandOption[] {
     const options: CommandOption[] = [
@@ -51,7 +51,7 @@ class MockCommandWithAlias extends AnonymousCommand {
     return 'cli mock alias';
   }
   public get description(): string {
-    return 'Mock command with alias'
+    return 'Mock command with alias';
   }
   public alias(): string[] {
     return ['cli mock alt'];
@@ -66,7 +66,7 @@ class MockCommandWithValidation extends AnonymousCommand {
     return 'cli mock1 validation';
   }
   public get description(): string {
-    return 'Mock command with validation'
+    return 'Mock command with validation';
   }
   public options(): CommandOption[] {
     const options: CommandOption[] = [
@@ -90,15 +90,15 @@ class MockCommandWithPrompt extends AnonymousCommand {
     return 'cli mock prompt';
   }
   public get description(): string {
-    return 'Mock command with prompt'
+    return 'Mock command with prompt';
   }
   public commandAction(logger: Logger, args: any, cb: () => void): void {
     Cli.prompt({
       type: 'confirm',
       name: 'continue',
       default: false,
-      message: `Continue?`,
-    }, (result: { continue: boolean }): void => {
+      message: `Continue?`
+    }, (): void => {
       cb();
     });
   }
@@ -109,7 +109,7 @@ class MockCommandWithOutput extends AnonymousCommand {
     return 'cli mock output';
   }
   public get description(): string {
-    return 'Mock command with output'
+    return 'Mock command with output';
   }
   public commandAction(logger: Logger, args: any, cb: () => void): void {
     logger.log('Command output');
@@ -122,7 +122,7 @@ class MockCommandWithRawOutput extends AnonymousCommand {
     return 'cli mock output';
   }
   public get description(): string {
-    return 'Mock command with output'
+    return 'Mock command with output';
   }
   public commandAction(logger: Logger, args: any, cb: () => void): void {
     if (this.debug) {
@@ -166,7 +166,7 @@ describe('Cli', () => {
         rootFolder = resolvedPath;
         resolve(undefined);
       });
-    })
+    });
   });
 
   beforeEach(() => {
@@ -191,7 +191,9 @@ describe('Cli', () => {
       mockCommandWithValidation.validate,
       mockCommandWithValidation.action,
       inquirer.prompt,
+      // eslint-disable-next-line no-console
       console.log,
+      // eslint-disable-next-line no-console
       console.error,
       mockCommand.commandAction
     ]);
@@ -1259,8 +1261,8 @@ describe('Cli', () => {
 
   it(`returns stored configuration value when available`, () => {
     const config = cli.config;
-    sinon.stub(config, 'get').callsFake(key => 'value');
+    sinon.stub(config, 'get').callsFake(() => 'value');
     const actualValue = cli.getSettingWithDefaultValue('key', '');
     assert.strictEqual(actualValue, 'value');
-  })
+  });
 });

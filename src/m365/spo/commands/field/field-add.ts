@@ -31,7 +31,7 @@ class SpoFieldAddCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this
       .getRequestDigest(args.options.webUrl)
-      .then((res: ContextInfo): Promise<{}> => {
+      .then((res: ContextInfo): Promise<any> => {
         const requestOptions: any = {
           url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}fields/CreateFieldAsXml`,
           headers: {

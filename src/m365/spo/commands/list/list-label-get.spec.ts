@@ -397,9 +397,9 @@ describe(commands.LIST_LABEL_GET, () => {
     command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
-        listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188',
+        listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -440,7 +440,7 @@ describe(commands.LIST_LABEL_GET, () => {
     command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
-        listTitle: 'MyLibrary',
+        listTitle: 'MyLibrary'
       }
     } as any, (err?: any) => {
       try {
@@ -473,7 +473,7 @@ describe(commands.LIST_LABEL_GET, () => {
     command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
-        listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
+        listId: 'dfddade1-4729-428d-881e-7fedf3cae50d'
       }
     } as any, (err?: any) => {
       try {

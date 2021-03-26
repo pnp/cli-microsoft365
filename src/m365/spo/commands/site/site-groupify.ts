@@ -40,7 +40,7 @@ class SpoSiteGroupifyCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const optionalParams: any = {}
+    const optionalParams: any = {};
     const payload: any = {
       displayName: args.options.displayName,
       alias: args.options.alias,
@@ -99,7 +99,7 @@ class SpoSiteGroupifyCommand extends SpoCommand {
       },
       {
         option: '--keepOldHomepage'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();

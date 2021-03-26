@@ -68,13 +68,13 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
               accept: 'application/json;odata.metadata=none',
               'content-type': 'application/json'
             },
-            responseType: 'json',
+            responseType: 'json'
           };
 
           return request.delete(requestOptions);
         })
         .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       disableSiteClassification();
@@ -84,7 +84,7 @@ class AadSiteClassificationDisableCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to disable site classification?`,
+        message: `Are you sure you want to disable site classification?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

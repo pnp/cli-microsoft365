@@ -119,7 +119,7 @@ class SpoListItemAddCommand extends SpoCommand {
               'accept': 'application/json;odata=nometadata'
             },
             responseType: 'json'
-          }
+          };
 
           return request
             .get<any>(requestOptions)
@@ -175,18 +175,18 @@ class SpoListItemAddCommand extends SpoCommand {
       .then((response: any): Promise<any> => {
         // Response is from /AddValidateUpdateItemUsingPath POST call, perform get on added item to get all field values
         const fieldValues: FieldValue[] = response.value;
-        const idField = fieldValues.filter((thisField, index, values) => {
-          return (thisField.FieldName == "Id");
+        const idField = fieldValues.filter((thisField) => {
+          return (thisField.FieldName === "Id");
         });
 
         if (this.debug) {
-          logger.logToStderr(`field values returned:`)
-          logger.logToStderr(fieldValues)
+          logger.logToStderr(`field values returned:`);
+          logger.logToStderr(fieldValues);
           logger.logToStderr(`Id returned by AddValidateUpdateItemUsingPath: ${idField}`);
         }
 
         if (idField.length === 0) {
-          return Promise.reject(`Item didn't add successfully`)
+          return Promise.reject(`Item didn't add successfully`);
         }
 
         const requestOptions: any = {
@@ -221,7 +221,7 @@ class SpoListItemAddCommand extends SpoCommand {
       },
       {
         option: '-f, --folder [folder]'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();

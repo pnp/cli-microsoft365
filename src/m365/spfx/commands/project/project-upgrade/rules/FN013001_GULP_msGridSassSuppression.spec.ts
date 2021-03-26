@@ -10,7 +10,7 @@ describe('FN013001_GULP_msGridSassSuppression', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN013001_GULP_msGridSassSuppression();
-  })
+  });
 
   it('doesn\'t return notification if ms-grid sass suppression is already present', () => {
     const project: Project = {

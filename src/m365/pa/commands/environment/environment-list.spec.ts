@@ -142,7 +142,7 @@ describe(commands.ENVIRONMENT_LIST, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

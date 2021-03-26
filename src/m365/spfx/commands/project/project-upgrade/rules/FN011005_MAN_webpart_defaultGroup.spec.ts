@@ -10,7 +10,7 @@ describe('FN011005_MAN_webpart_defaultGroup', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN011005_MAN_webpart_defaultGroup('Under Development', 'Other');
-  })
+  });
 
   it('doesn\'t return notifications if no manifests collected', () => {
     const project: Project = {

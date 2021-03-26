@@ -73,7 +73,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
         accept: 'application/json;odata=nometadata'
       },
       responseType: 'json'
-    }
+    };
 
     request
       .get<FieldLink>(requestOptions)
@@ -97,7 +97,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
             accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
-        }
+        };
 
         return request.get(requestOptions);
       })
@@ -169,7 +169,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
             accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
-        }
+        };
 
         return request.get(requestOptions);
       })
@@ -192,7 +192,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
             accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
-        }
+        };
 
         return request.get(requestOptions);
       })
@@ -269,7 +269,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
               accept: 'application/json;odata=nometadata'
             },
             responseType: 'json'
-          }
+          };
 
           return request.get(requestOptions);
         })
@@ -286,7 +286,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
               accept: 'application/json;odata=nometadata'
             },
             responseType: 'json'
-          }
+          };
 
           return request.get(requestOptions);
         })
@@ -350,7 +350,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
               SchemaXml: schemaXml
             },
             responseType: 'json'
-          }
+          };
 
           return request.post(requestOptions);
         })
@@ -358,7 +358,7 @@ class SpoContentTypeFieldSetCommand extends SpoCommand {
           resolve();
         }, (error: any): void => {
           reject(error);
-        })
+        });
     });
   }
 

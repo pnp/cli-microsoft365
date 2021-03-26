@@ -146,7 +146,7 @@ class GraphSchemaExtensionSetCommand extends GraphCommand {
     }
 
     if (!args.options.status && !args.options.properties && !args.options.targetTypes && !args.options.description) {
-      return `No updates were specified. Please specify at least one argument among --status, --targetTypes, --description or --properties`
+      return `No updates were specified. Please specify at least one argument among --status, --targetTypes, --description or --properties`;
     }
 
     const validStatusValues = ['Available', 'Deprecated'];

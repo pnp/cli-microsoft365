@@ -17,23 +17,23 @@ export class FN013001_GULP_msGridSassSuppression extends Rule {
 
   get description(): string {
     return `Add suppression for ms-Grid sass warning`;
-  };
+  }
 
   get resolution(): string {
     return "build.addSuppression(`Warning - [sass] The local CSS class 'ms-Grid' is not camelCase and will not be type-safe.`);";
-  };
+  }
 
   get resolutionType(): string {
     return 'js';
-  };
+  }
 
   get severity(): string {
     return 'Recommended';
-  };
+  }
 
   get file(): string {
     return './gulpfile.js';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.gulpfileJs) {

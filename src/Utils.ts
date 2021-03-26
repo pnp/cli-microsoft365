@@ -1,7 +1,7 @@
 import * as url from 'url';
 
 export default class Utils {
-  public static escapeXml(s: any | undefined) {
+  public static escapeXml(s: any | undefined): any | undefined {
     if (!s) {
       return s;
     }
@@ -64,7 +64,7 @@ export default class Utils {
 
   public static isDateInRange(date: string, monthOffset: number): boolean {
     const d: Date = new Date(date);
-    let cutoffDate: Date = new Date();
+    const cutoffDate: Date = new Date();
     cutoffDate.setMonth(cutoffDate.getMonth() - monthOffset);
     return d > cutoffDate;
   }
@@ -120,7 +120,7 @@ export default class Utils {
   }
 
   public static isValidBoolean(value: string): boolean {
-    return value.toLowerCase() === 'true' || value.toLowerCase() === 'false'
+    return value.toLowerCase() === 'true' || value.toLowerCase() === 'false';
   }
 
   public static getTenantIdFromAccessToken(accessToken: string): string {
@@ -523,7 +523,7 @@ export default class Utils {
 
   public static getSafeFileName(input: string): string {
     return input
-      .replace(/'/g, "''")
+      .replace(/'/g, "''");
   }
 
   public static isValidTheme(input: string): boolean {

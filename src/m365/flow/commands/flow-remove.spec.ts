@@ -291,7 +291,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('correctly handles no environment found without prompting when confirm specified', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -320,7 +320,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('correctly handles no environment found when prompt confirmed', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -353,7 +353,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('correctly handles no Microsoft Flow found when prompt confirmed', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.resolve({ statusCode: 204 });
     });
 
@@ -369,7 +369,7 @@ describe(commands.FLOW_REMOVE, () => {
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72'
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(loggerLogSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
         done();
@@ -381,7 +381,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('correctly handles no Microsoft Flow found when confirm specified', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.resolve({ statusCode: 204 });
     });
 
@@ -393,7 +393,7 @@ describe(commands.FLOW_REMOVE, () => {
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
         confirm: true
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(loggerLogSpy.calledWith(chalk.red(`Error: Resource '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72' does not exist in environment 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c'`)));
         done();

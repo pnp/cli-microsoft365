@@ -156,7 +156,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
         newChannelName: 'New Review',
         description: 'New Review'
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();

@@ -73,7 +73,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        return request.post(requestOptions)
+        return request.post(requestOptions);
       }).then((): void => {
         // REST post call doesn't return anything
         cb();
@@ -88,7 +88,7 @@ class SpoGroupRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the group ${args.options.id || args.options.name} from web ${args.options.webUrl}?`,
+        message: `Are you sure you want to remove the group ${args.options.id || args.options.name} from web ${args.options.webUrl}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

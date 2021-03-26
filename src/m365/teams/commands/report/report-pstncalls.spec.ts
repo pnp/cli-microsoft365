@@ -40,7 +40,7 @@ describe(commands.TEAMS_REPORT_PSTNCALLS, () => {
       "inventoryType": "Subscriber"
     }],
     "@odata.nextLink": "https://graph.microsoft.com/beta/communications/callRecords/getPstnCalls(from=2019-11-01,to=2019-12-01)?$skip=1000"
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -189,7 +189,7 @@ describe(commands.TEAMS_REPORT_PSTNCALLS, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: { debug: false, fromDateTime: '2019-11-01', toDateTime: '2019-12-01' } } as any, (err?: any) => {
       try {

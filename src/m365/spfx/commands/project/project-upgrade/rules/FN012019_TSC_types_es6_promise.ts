@@ -17,7 +17,7 @@ export class FN012019_TSC_types_es6_promise extends JsonRule {
 
   get description(): string {
     return `${(this.add ? 'Add' : 'Remove')} es6-promise type in tsconfig.json`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -27,19 +27,19 @@ export class FN012019_TSC_types_es6_promise extends JsonRule {
     ]
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './tsconfig.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {

@@ -77,7 +77,7 @@ class FlowExportCommand extends AzmgmtCommand {
 
       return request.post(requestOptions);
     })()
-      .then((res: any): Promise<{}> => {
+      .then((res: any): Promise<any> => {
         if (typeof res !== 'undefined' && res.errors && res.errors.length && res.errors.length > 0) {
           return Promise.reject(res.errors[0].message);
         }
@@ -116,7 +116,7 @@ class FlowExportCommand extends AzmgmtCommand {
               "sourceEnvironment": args.options.packageSourceEnvironment
             },
             "resources": res.resources
-          }
+          };
         }
 
         return formatArgument === 'json' ? request.get(requestOptions) : request.post(requestOptions);
@@ -142,9 +142,10 @@ class FlowExportCommand extends AzmgmtCommand {
           // Set responseType to arraybuffer, otherwise binary data will be encoded
           // to utf8 and binary data is corrupt 
           responseType: 'arraybuffer',
-          headers: formatArgument === 'json' ? {
-            accept: 'application/json'
-          } : {
+          headers: formatArgument === 'json' ?
+            {
+              accept: 'application/json'
+            } : {
               'x-anonymous': true
             }
         };
@@ -154,7 +155,7 @@ class FlowExportCommand extends AzmgmtCommand {
           : request.get(requestOptions);
       })
       .then((file: string): void => {
-        const path = args.options.path ? args.options.path : `./${filenameFromApi}`
+        const path = args.options.path ? args.options.path : `./${filenameFromApi}`;
 
         fs.writeFileSync(path, file, 'binary');
         if (!args.options.path || this.verbose) {
@@ -195,8 +196,7 @@ class FlowExportCommand extends AzmgmtCommand {
       },
       {
         option: '-p, --path [path]'
-      },
-
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();

@@ -17,25 +17,25 @@ export class FN019001_TSL_rulesDirectory extends JsonRule {
 
   get description(): string {
     return `Remove rulesDirectory from tslint.json`;
-  };
+  }
 
   get resolution(): string {
     return `{
   "rulesDirectory": []
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './tslint.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsLintJsonRoot) {

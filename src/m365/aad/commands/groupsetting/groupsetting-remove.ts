@@ -42,7 +42,7 @@ class AadGroupSettingRemoveCommand extends GraphCommand {
         url: `${this.resource}/v1.0/groupSettings/${args.options.id}`,
         headers: {
           'accept': 'application/json;odata.metadata=none'
-        },
+        }
       };
 
       request
@@ -58,7 +58,7 @@ class AadGroupSettingRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the group setting ${args.options.id}?`,
+        message: `Are you sure you want to remove the group setting ${args.options.id}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

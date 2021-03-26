@@ -41,8 +41,9 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
       .then((): Promise<any> => {
         if (args.options.joined) {
           return Promise.resolve();
-        } else {
-          return Promise.all(this.items.map(g => this.getTeamFromGroup(g, logger)));
+        }
+        else {
+          return Promise.all(this.items.map(g => this.getTeamFromGroup(g)));
         }
       })
       .then((res?: Team[]): void => {
@@ -55,7 +56,7 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getTeamFromGroup(group: { id: string, displayName: string, description: string }, logger: Logger): Promise<Team> {
+  private getTeamFromGroup(group: { id: string, displayName: string, description: string }): Promise<Team> {
     return new Promise<Team>((resolve: (team: Team) => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
         url: `${this.resource}/beta/teams/${group.id}`,

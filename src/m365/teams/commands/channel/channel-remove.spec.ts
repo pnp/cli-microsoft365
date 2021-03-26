@@ -68,7 +68,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
     const actual = command.validate({
       options: {
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     });
     assert.strictEqual(actual, true);
@@ -78,7 +78,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
     const actual = command.validate({
       options: {
         channelName: 'Channel Name',
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     });
     assert.strictEqual(actual, true);
@@ -167,7 +167,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
       options: {
         debug: false,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       let promptIssued = false;
@@ -191,7 +191,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       let promptIssued = false;
@@ -216,7 +216,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       try {
@@ -235,7 +235,7 @@ describe(commands.TEAMS_CHANNEL_REMOVE, () => {
       options: {
         debug: true,
         channelId: '19:f3dcbb1674574677abcae89cb626f1e6@thread.skype',
-        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656',
+        teamId: 'd66b8110-fcad-49e8-8159-0d488ddb7656'
       }
     }, () => {
       try {

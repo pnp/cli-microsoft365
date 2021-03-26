@@ -120,7 +120,7 @@ describe(commands.GROUP_LIST, () => {
     command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, (error?: any) => {
       try {

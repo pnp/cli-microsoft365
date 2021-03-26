@@ -112,7 +112,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
         "onPremisesProvisioningErrors": []
       }
     ]
-  }
+  };
 
   const singleTeamResponse: any = {
     "@odata.context": "https://graph.microsoft.com/beta/$metadata#groups",
@@ -164,7 +164,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
         "onPremisesProvisioningErrors": []
       }
     ]
-  }
+  };
 
   const conversationMembersOwnerResponse: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('d21d1577-83b5-4357-a09b-6d338c44fac4')/channels('19%3Aa0555558d9e842c3a8bae7d9d6734d7d%40thread.skype')/members/$entity",
@@ -204,7 +204,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
         "membershipType": "private"
       }
     ]
-  }
+  };
 
   const channelIdResponse: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels/$entity",
@@ -215,7 +215,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
     "email": "",
     "webUrl": "https://teams.microsoft.com/l/channel/19%3a586a8b9e36c4479bbbd378e439a96df2%40thread.skype/Private+Channel?groupId=47d6625d-a540-4b59-a4ab-19b787e40593&tenantId=d544d1e7-d321-494b-870a-1beac97967a2",
     "membershipType": "private"
-  }
+  };
 
   const singleUserResponse: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users",
@@ -234,7 +234,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
         "id": "f410f714-29e3-43f7-874d-d7d35c33eaf1"
       }
     ]
-  }
+  };
 
   const multipleUserResponse: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users",
@@ -268,12 +268,12 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
         "id": "662c9a98-1e96-44d2-b5ef-4933004200f8"
       }
     ]
-  }
+  };
 
   const noUserResponse: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users",
     "value": []
-  }
+  };
   //#endregion
 
   let log: string[];
@@ -354,7 +354,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
   it('fails validation if teamId, channelId, and userId are not specified', () => {
     const actual = command.validate({
       options: {
-        debug: false,
+        debug: false
       }
     });
     assert.notStrictEqual(actual, true);
@@ -363,7 +363,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
   it('fails validation if teamName, channelName, and userDisplayName are not specified', () => {
     const actual = command.validate({
       options: {
-        debug: false,
+        debug: false
       }
     });
     assert.notStrictEqual(actual, true);
@@ -868,7 +868,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
 
   it('correctly handles error when adding conversation members', (done) => {
     Utils.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

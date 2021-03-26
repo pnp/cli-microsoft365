@@ -28,7 +28,7 @@ describe(commands.CONFIG_SET, () => {
 
   after(() => {
     Utils.restore(Cli.getInstance().config.set);
-  })
+  });
 
   it('has correct name', () => {
     assert.strictEqual(command.name.startsWith(commands.CONFIG_SET), true);
@@ -50,17 +50,18 @@ describe(commands.CONFIG_SET, () => {
         assert.strictEqual(actualKey, settingsNames.showHelpOnFailure, 'Invalid key');
         assert.strictEqual(actualValue, false, 'Invalid value');
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
   });
 
   it(`sets ${settingsNames.output} property to 'text'`, (done) => {
-    const output = "text"
+    const output = "text";
     const config = Cli.getInstance().config;
     let actualKey: string, actualValue: any;
-    sinon.restore()
+    sinon.restore();
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
@@ -71,17 +72,18 @@ describe(commands.CONFIG_SET, () => {
         assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
         assert.strictEqual(actualValue, output, 'Invalid value');
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
   });
 
   it(`sets ${settingsNames.output} property to 'json'`, (done) => {
-    const output = "json"
+    const output = "json";
     const config = Cli.getInstance().config;
     let actualKey: string, actualValue: any;
-    sinon.restore()
+    sinon.restore();
     sinon.stub(config, 'set').callsFake(((key: string, value: any) => {
       actualKey = key;
       actualValue = value;
@@ -92,7 +94,8 @@ describe(commands.CONFIG_SET, () => {
         assert.strictEqual(actualKey, settingsNames.output, 'Invalid key');
         assert.strictEqual(actualValue, output, 'Invalid value');
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });

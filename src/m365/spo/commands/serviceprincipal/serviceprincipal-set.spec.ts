@@ -185,7 +185,7 @@ describe(commands.SERVICEPRINCIPAL_SET, () => {
   });
 
   it('correctly handles error when approving permission request', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {

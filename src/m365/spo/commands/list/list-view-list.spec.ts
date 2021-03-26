@@ -267,7 +267,7 @@ describe(commands.LIST_VIEW_LIST, () => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
         return Promise.resolve({
           "value": []
-        })
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -297,7 +297,7 @@ describe(commands.LIST_VIEW_LIST, () => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
         return Promise.resolve({
           "value": []
-        })
+        });
       }
 
       return Promise.reject('Invalid request');

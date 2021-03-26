@@ -42,7 +42,7 @@ class AadO365GroupUserAddCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string
+    const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
     const requestOptions: any = {
       url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
@@ -54,7 +54,7 @@ class AadO365GroupUserAddCommand extends GraphCommand {
 
     request
       .get<{ value: string; }>(requestOptions)
-      .then((res: { value: string; }): Promise<{}> => {
+      .then((res: { value: string; }): Promise<void> => {
         const endpoint: string = `${this.resource}/v1.0/groups/${providedGroupId}/${((typeof args.options.role !== 'undefined') ? args.options.role : '').toLowerCase() === 'owner' ? 'owners' : 'members'}/$ref`;
 
         const requestOptions: any = {

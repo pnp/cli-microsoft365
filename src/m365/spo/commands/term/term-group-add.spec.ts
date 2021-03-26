@@ -158,7 +158,7 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8' } } as any, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Name": "PnPTermSets",
@@ -284,7 +284,7 @@ describe(commands.TERM_GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8', description: 'Term sets for PnP' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, name: 'PnPTermSets', id: '6cb612c7-2e96-47b9-b7c7-41ddc87379a8', description: 'Term sets for PnP' } } as any, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Name": "PnPTermSets",

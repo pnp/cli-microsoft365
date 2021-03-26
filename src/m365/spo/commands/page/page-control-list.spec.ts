@@ -154,7 +154,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, () => {
       try {
         assert(loggerLogSpy.calledWith(mockControlListDataWithTextWebPartOutput));
         done();
@@ -166,11 +166,11 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   });
 
   it('correctly handles page when CanvasContent1 is not defined', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({ CanvasContent1: null });
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, () => {
       try {
         assert([]);
         done();
@@ -182,7 +182,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   });
 
   it('correctly handles page not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: {
         "odata.error": {
           "code": "-2130575338, Microsoft.SharePoint.SPException",
@@ -206,7 +206,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   });
 
   it('correctly handles OData error when retrieving pages', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 

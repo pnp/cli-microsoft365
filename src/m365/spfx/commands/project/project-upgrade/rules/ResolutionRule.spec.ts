@@ -22,7 +22,7 @@ class ResRule2 extends ResolutionRule {
     return 'FN000000';
   }
 
-  customCondition(project: Project): boolean {
+  customCondition(): boolean {
     return true;
   }
 }
@@ -39,7 +39,7 @@ describe('ResolutionRule', () => {
 
   beforeEach(() => {
     findings = [];
-  })
+  });
 
   it('doesn\'t return any notifications if package.json not found', () => {
     const project: Project = {

@@ -124,11 +124,14 @@ describe(commands.GET, () => {
     options.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
         containsOutputOption = true;
-      } else if (o.option.indexOf('--verbose') > -1) {
+      }
+      else if (o.option.indexOf('--verbose') > -1) {
         containsVerboseOption = true;
-      } else if (o.option.indexOf('--debug') > -1) {
+      }
+      else if (o.option.indexOf('--debug') > -1) {
         containsDebugOption = true;
-      } else if (o.option.indexOf('--query') > -1) {
+      }
+      else if (o.option.indexOf('--query') > -1) {
         containsQueryOption = true;
       }
     });

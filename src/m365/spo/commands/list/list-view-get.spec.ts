@@ -59,7 +59,7 @@ describe(commands.LIST_VIEW_GET, () => {
   });
 
   it('correctly handles error when the specified list doesn\'t exist', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {
@@ -70,7 +70,7 @@ describe(commands.LIST_VIEW_GET, () => {
             }
           }
         }
-      })
+      });
     });
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All items' } } as any, (err?: any) => {
@@ -85,7 +85,7 @@ describe(commands.LIST_VIEW_GET, () => {
   });
 
   it('correctly handles error when the specified view doesn\'t exist', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {
@@ -96,7 +96,7 @@ describe(commands.LIST_VIEW_GET, () => {
             }
           }
         }
-      })
+      });
     });
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', listTitle: 'List', viewTitle: 'All Items' } } as any, (err?: any) => {

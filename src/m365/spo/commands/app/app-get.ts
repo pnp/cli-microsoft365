@@ -116,7 +116,7 @@ class SpoAppGetCommand extends SpoAppBaseCommand {
     if (args.options.scope) {
       const testScope: string = args.options.scope.toLowerCase();
       if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-        return `Scope must be either 'tenant' or 'sitecollection'`
+        return `Scope must be either 'tenant' or 'sitecollection'`;
       }
 
       if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {

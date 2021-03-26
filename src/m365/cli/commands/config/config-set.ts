@@ -66,7 +66,7 @@ class CliConfigSetCommand extends AnonymousCommand {
       return `${args.options.key} is not a valid setting. Allowed values: ${settingsNames.showHelpOnFailure}, ${settingsNames.output}`;
     }
 
-    const allowedOutputs = ['text', 'json']
+    const allowedOutputs = ['text', 'json'];
     if (args.options.key === settingsNames.output &&
       allowedOutputs.indexOf(args.options.value) === -1) {
       return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${allowedOutputs.join(', ')}`;

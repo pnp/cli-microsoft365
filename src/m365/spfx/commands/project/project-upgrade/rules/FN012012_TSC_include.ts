@@ -17,25 +17,25 @@ export class FN012012_TSC_include extends JsonRule {
 
   get description(): string {
     return `Add to the tsconfig.json include property`;
-  };
+  }
 
   get resolution(): string {
     return JSON.stringify({
       include: this.include
     }, null, 2);
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './tsconfig.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsConfigJson) {

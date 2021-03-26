@@ -105,7 +105,7 @@ describe(commands.O365GROUP_RENEW, () => {
   });
 
   it('correctly handles error when group is not found', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'The remote server returned an error: (404) Not Found.' } } } });
     });
 

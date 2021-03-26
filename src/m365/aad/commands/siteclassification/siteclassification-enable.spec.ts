@@ -235,7 +235,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
+    command.action(logger, { options: { debug: true, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, () => {
       try {
         assert(enableRequestIssued);
         done();
@@ -331,7 +331,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
+    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, () => {
       try {
         assert(enableRequestIssued);
         done();
@@ -427,7 +427,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
+    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", usageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, () => {
       try {
         assert(enableRequestIssued);
         done();
@@ -523,7 +523,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, (err: any) => {
+    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI", guestUsageGuidelinesUrl: "http://aka.ms/sppnp" } } as any, () => {
       try {
         assert(enableRequestIssued);
         done();
@@ -619,7 +619,7 @@ describe(commands.SITECLASSIFICATION_ENABLE, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any, (err: any) => {
+    command.action(logger, { options: { debug: false, classifications: "HBI, LBI, Top Secret", defaultClassification: "HBI" } } as any, () => {
       try {
         assert(enableRequestIssued);
         done();

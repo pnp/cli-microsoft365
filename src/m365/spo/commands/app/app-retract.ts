@@ -61,7 +61,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
           return request.post(requestOptions);
         })
         .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataPromise(rawRes, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       retractApp();
@@ -71,7 +71,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to retract the app ${args.options.id} from the app catalog?`,
+        message: `Are you sure you want to retract the app ${args.options.id} from the app catalog?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -108,7 +108,7 @@ class SpoAppRetractCommand extends SpoAppBaseCommand {
     if (args.options.scope) {
       const testScope: string = args.options.scope.toLowerCase();
       if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-        return `Scope must be either 'tenant' or 'sitecollection' if specified`
+        return `Scope must be either 'tenant' or 'sitecollection' if specified`;
       }
 
       if (testScope === 'sitecollection' && !args.options.appCatalogUrl) {

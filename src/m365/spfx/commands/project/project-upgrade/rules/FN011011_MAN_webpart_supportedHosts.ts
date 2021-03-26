@@ -17,17 +17,17 @@ export class FN011011_MAN_webpart_supportedHosts extends ManifestRule {
 
   get description(): string {
     return `${this.add ? 'Update' : 'Remove'} the supportedHosts property in the manifest`;
-  };
+  }
 
   get resolution(): string {
     return `{
   "supportedHosts": ["SharePointWebPart"]
 }`;
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.manifests ||

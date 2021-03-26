@@ -37,9 +37,6 @@ describe(commands.APP_INSTALL, () => {
     requests = [];
   });
 
-  afterEach(() => {
-    });
-
   after(() => {
     Utils.restore([
       auth.restoreAuth,

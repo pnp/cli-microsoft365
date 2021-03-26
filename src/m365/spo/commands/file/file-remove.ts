@@ -60,7 +60,7 @@ class SpoFileRemoveCommand extends SpoCommand {
 
         let fileUrl: string = args.options.url as string;
         if (!fileUrl.startsWith(serverRelativeSiteUrl)) {
-          fileUrl = `${serverRelativeSiteUrl}${fileUrl}`
+          fileUrl = `${serverRelativeSiteUrl}${fileUrl}`;
         }
         requestUrl = `${args.options.webUrl}/_api/web/GetFileByServerRelativeUrl('${encodeURIComponent(fileUrl)}')`;
       }
@@ -96,7 +96,7 @@ class SpoFileRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the file ${args.options.id || args.options.url} located in site ${args.options.webUrl}?`,
+        message: `Are you sure you want to ${args.options.recycle ? "recycle" : "remove"} the file ${args.options.id || args.options.url} located in site ${args.options.webUrl}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

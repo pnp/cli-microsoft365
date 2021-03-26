@@ -130,7 +130,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
         size: "Medium",
         weight: "Bolder",
         text: args.options.title
-      })
+      });
     }
 
     if (args.options.imageUrl) {
@@ -156,7 +156,7 @@ class AdaptiveCardSendCommand extends AnonymousCommand {
           return {
             title: `${o}:`,
             value: unknownOptions[o]
-          }
+          };
         })
       });
     }

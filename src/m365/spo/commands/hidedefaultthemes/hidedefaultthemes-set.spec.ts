@@ -68,7 +68,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('/_api/thememanager/SetHideDefaultThemes') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -103,7 +103,7 @@ describe(commands.HIDEDEFAULTTHEMES_SET, () => {
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
       if ((opts.url as string).indexOf('/_api/thememanager/SetHideDefaultThemes') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');

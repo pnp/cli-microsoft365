@@ -182,7 +182,7 @@ describe(commands.TEAMS_MEMBERSETTINGS_LIST, () => {
   });
 
   it('correctly handles error when listing member settings', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

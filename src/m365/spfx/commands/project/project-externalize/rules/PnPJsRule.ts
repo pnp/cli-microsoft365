@@ -13,12 +13,12 @@ export class PnPJsRule extends BasicDependencyRule {
         "@pnp/logging",
         "tslib"
       ],
-      shadowRequire: "require(\"@pnp/odata\");",
+      shadowRequire: "require(\"@pnp/odata\");"
     },
     {
       key: "@pnp/common",
       globalName: "pnp.common",
-      shadowRequire: "require(\"@pnp/common\");",
+      shadowRequire: "require(\"@pnp/common\");"
     },
     {
       key: "@pnp/logging",
@@ -26,7 +26,7 @@ export class PnPJsRule extends BasicDependencyRule {
       globalDependencies: [
         "tslib"
       ],
-      shadowRequire: "require(\"@pnp/logging\");",
+      shadowRequire: "require(\"@pnp/logging\");"
     },
     {
       key: "@pnp/sp",
@@ -55,7 +55,7 @@ export class PnPJsRule extends BasicDependencyRule {
         action: "add",
         path: y,
         targetValue: x.shadowRequire
-      } as FileEdit)))
+      } as FileEdit)));
     const fileEdits: FileEdit[] = rawFileEdits.length > 0 ? rawFileEdits.reduce((x, y) => [...x, ...y]) : [];
     if (findings.filter(x => x.key && x.key !== '@pnp/pnpjs').length > 0) { // we're adding tslib only if we found other packages that are not the bundle which already contains tslib
       findings.push({
@@ -87,7 +87,7 @@ export class PnPJsRule extends BasicDependencyRule {
       if (version) {
         result.push({
           ...moduleConfiguration,
-          path: `https://unpkg.com/${moduleConfiguration.key}@${version}/dist/${moduleName.replace('@pnp/', '')}.es5.umd${moduleName === '@pnp/common' || moduleName === ' @pnp/pnpjs' ? '.bundle' : ''}.min.js`,
+          path: `https://unpkg.com/${moduleConfiguration.key}@${version}/dist/${moduleName.replace('@pnp/', '')}.es5.umd${moduleName === '@pnp/common' || moduleName === ' @pnp/pnpjs' ? '.bundle' : ''}.min.js`
         });
         moduleConfiguration.globalDependencies && moduleConfiguration.globalDependencies.forEach(dependency => {
           result.push(...this.getModuleAndParents(project, `@${dependency.replace('/', '.')}`));

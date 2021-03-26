@@ -437,7 +437,7 @@ describe(commands.APP_ADD, () => {
 
   it('handles promise error while getting tenant appcatalog', (done) => {
     Utils.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
@@ -458,7 +458,7 @@ describe(commands.APP_ADD, () => {
 
   it('handles error while getting tenant appcatalog', (done) => {
     Utils.restore(request.get);
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
@@ -582,7 +582,8 @@ describe(commands.APP_ADD, () => {
       try {
         assert(correctAppCatalogUsed);
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
       finally {
@@ -590,7 +591,7 @@ describe(commands.APP_ADD, () => {
           request.post,
           fs.readFileSync
         ]);
-      };
+      }
     });
   });
 
@@ -624,7 +625,8 @@ describe(commands.APP_ADD, () => {
       try {
         assert(correctAppCatalogUsed);
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
       finally {
@@ -632,7 +634,7 @@ describe(commands.APP_ADD, () => {
           request.post,
           fs.readFileSync
         ]);
-      };
+      }
     });
   });
 
@@ -666,7 +668,8 @@ describe(commands.APP_ADD, () => {
       try {
         assert(correctAppCatalogUsed);
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
       finally {
@@ -674,7 +677,7 @@ describe(commands.APP_ADD, () => {
           request.post,
           fs.readFileSync
         ]);
-      };
+      }
     });
   });
 

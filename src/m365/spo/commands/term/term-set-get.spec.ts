@@ -718,7 +718,7 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('correctly handles term group not found via id', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
@@ -739,7 +739,7 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('correctly handles term group not found via name', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
@@ -760,7 +760,7 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('correctly handles term set not found via id', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
@@ -781,7 +781,7 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('correctly handles term set not found via name', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8112.1218", "ErrorInfo": {
@@ -802,7 +802,7 @@ describe(commands.TERM_SET_GET, () => {
   });
 
   it('correctly handles error when retrieving taxonomy term set', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {

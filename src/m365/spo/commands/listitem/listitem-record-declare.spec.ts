@@ -14,20 +14,20 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
   let logger: Logger;
   let declareItemAsRecordFakeCalled = false;
 
-  let postFakes = (opts: any) => {
+  const postFakes = (opts: any) => {
     if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
 
       // requestObjectIdentity mock
       if (opts.data.indexOf('Name="Current"') > -1) {
 
         if ((opts.url as string).indexOf('rejectme.sharepoint.com') > -1) {
-          return Promise.reject('Failed request')
+          return Promise.reject('Failed request');
         }
 
         if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
           return Promise.reject(JSON.stringify(
             [{ "ErrorInfo": "error occurred" }]
-          ))
+          ));
         }
 
         return Promise.resolve(JSON.stringify(
@@ -44,7 +44,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
               "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
             }
           ])
-        )
+        );
       }
 
       if (opts.data.indexOf('Name="DeclareItemAsRecord') > -1
@@ -75,9 +75,9 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       }
     }
     return Promise.reject('Invalid request');
-  }
+  };
 
-  let getFakes = (opts: any) => {
+  const getFakes = (opts: any) => {
     if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
       (opts.url as string).indexOf('$select=Id') > -1) {
       logger.log('faked!');
@@ -89,7 +89,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
     }
     return Promise.reject('Invalid request');
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -147,7 +147,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       debug: true,
       listTitle: 'Test List',
       id: 147,
-      webUrl: `https://contoso.sharepoint.com/sites/project-y/`,
+      webUrl: `https://contoso.sharepoint.com/sites/project-y/`
     };
 
     declareItemAsRecordFakeCalled = false;
@@ -170,7 +170,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
       id: 147,
       webUrl: `https://contoso.sharepoint.com/sites/project-y/`,
-      debug: true,
+      debug: true
     };
 
     declareItemAsRecordFakeCalled = false;
@@ -194,7 +194,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
       id: 147,
       date: '2019-03-14',
-      webUrl: `https://contoso.sharepoint.com/sites/project-y/`,
+      webUrl: `https://contoso.sharepoint.com/sites/project-y/`
     };
 
     declareItemAsRecordFakeCalled = false;
@@ -217,7 +217,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
       id: 147,
       date: '2019-03-14',
-      webUrl: `https://contoso.sharepoint.com/sites/project-y/`,
+      webUrl: `https://contoso.sharepoint.com/sites/project-y/`
     };
 
     declareItemAsRecordFakeCalled = false;
@@ -241,7 +241,7 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
       id: 147,
       date: '2019-03-14',
-      webUrl: `https://alreadydeclared.sharepoint.com/sites/project-y/`,
+      webUrl: `https://alreadydeclared.sharepoint.com/sites/project-y/`
     };
 
     command.action(logger, { options: options } as any, (err?: any) => {
@@ -259,13 +259,13 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = {
+    const options: any = {
       debug: true,
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
       id: 147,
       date: '2019-03-14',
       webUrl: `https://returnerror.sharepoint.com/sites/project-y/`
-    }
+    };
 
     declareItemAsRecordFakeCalled = false;
     command.action(logger, { options: options } as any, () => {
@@ -284,12 +284,12 @@ describe(commands.LISTITEM_RECORD_DECLARE, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = {
+    const options: any = {
       debug: true,
       listTitle: 'Test List',
       id: 147,
-      webUrl: 'https://rejectme.sharepoint.com/sites/project-y',
-    }
+      webUrl: 'https://rejectme.sharepoint.com/sites/project-y'
+    };
 
     declareItemAsRecordFakeCalled = false;
     command.action(logger, { options: options } as any, () => {

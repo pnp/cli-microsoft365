@@ -55,7 +55,7 @@ class TeamsRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the team ${args.options.teamId}?`,
+        message: `Are you sure you want to remove the team ${args.options.teamId}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

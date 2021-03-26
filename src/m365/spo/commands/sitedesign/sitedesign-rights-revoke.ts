@@ -72,7 +72,7 @@ class SpoSiteDesignRightsRevokeCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to revoke access to site design ${args.options.id} from the specified users?`,
+        message: `Are you sure you want to revoke access to site design ${args.options.id} from the specified users?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

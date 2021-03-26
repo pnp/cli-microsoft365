@@ -127,7 +127,7 @@ class SpoSiteApppermissionListCommand extends GraphCommand {
 
   public validate(args: CommandArgs): boolean | string {
     if (args.options.appId && args.options.appDisplayName) {
-      return `Provide either appId or appDisplayName, not both`
+      return `Provide either appId or appDisplayName, not both`;
     }
 
     return SpoCommand.isValidSharePointUrl(args.options.siteUrl);

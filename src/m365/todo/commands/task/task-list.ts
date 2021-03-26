@@ -65,7 +65,7 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
       .getTodoListId(args)
       .then((listId: string): Promise<any> => {
         const endpoint: string = `${this.resource}/v1.0/me/todo/lists/${listId}/tasks`;
-        return this.getAllItems(endpoint, logger, true)
+        return this.getAllItems(endpoint, logger, true);
       })
       .then((): void => {
         if (args.options.output === 'json') {
@@ -79,7 +79,7 @@ class TodoTaskListCommand extends GraphItemsListCommand<ToDoTask> {
               status: m.status,
               createdDateTime: m.createdDateTime,
               lastModifiedDateTime: m.lastModifiedDateTime
-            }
+            };
           }));
         }
 

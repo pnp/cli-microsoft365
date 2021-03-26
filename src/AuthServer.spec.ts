@@ -19,16 +19,16 @@ describe('AuthServer', () => {
     log: (msg: any) => log.push(msg),
     logRaw: (msg: any) => log.push(msg),
     logToStderr: (msg: any) => log.push(msg)
-  }
+  };
 
   beforeEach(() => {
     log = [];
-    auth = new Auth()
+    auth = new Auth();
     auth.service.appId = '9bc3ab49-b65d-410a-85ad-de819febfddc';
     auth.service.tenant = '9bc3ab49-b65d-410a-85ad-de819febfddd';
     openStub = sinon.stub(authServer as any, 'open').callsFake(_ => Promise.resolve());
-    callbackResolveStub = sinon.stub().callsFake(() => { })
-    callbackRejectStub = sinon.stub().callsFake(() => { })
+    callbackResolveStub = sinon.stub().callsFake(() => { });
+    callbackRejectStub = sinon.stub().callsFake(() => { });
     authServer.initializeServer(auth.service, auth.defaultResource, callbackResolveStub, callbackRejectStub, logger, true);
     const address = authServer.server.address() as AddressInfo;
     serverUrl = `http://localhost:${address?.port}`;
@@ -73,7 +73,7 @@ describe('AuthServer', () => {
         done();
       }).catch((reason) => {
         done(reason);
-      })
+      });
     }
     catch (err) {
       done(err);
@@ -92,7 +92,7 @@ describe('AuthServer', () => {
         done();
       }).catch((reason) => {
         done(reason);
-      })
+      });
     }
     catch (err) {
       done(err);
@@ -111,7 +111,7 @@ describe('AuthServer', () => {
         done();
       }).catch((reason) => {
         done(reason);
-      })
+      });
     }
     catch (err) {
       done(err);
@@ -130,7 +130,7 @@ describe('AuthServer', () => {
         done();
       }).catch((reason) => {
         done(reason);
-      })
+      });
     }
     catch (err) {
       done(err);

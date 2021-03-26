@@ -27,14 +27,15 @@ describe(commands.FOLDER_REMOVE, () => {
         if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1) {
           if (removeResp) {
             return removeResp;
-          } else {
+          }
+          else {
             return Promise.resolve();
           }
         }
   
         return Promise.reject('Invalid request');
       });
-    }
+    };
   });
 
   beforeEach(() => {
@@ -137,7 +138,7 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('should send params for remove request', (done) => {
-    let request: sinon.SinonStub = stubPostResponses();
+    const request: sinon.SinonStub = stubPostResponses();
 
     command.action(logger, { options: 
       { verbose: true, 
@@ -159,7 +160,7 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('should send params for remove request for sites/test1', (done) => {
-    let request: sinon.SinonStub = stubPostResponses();
+    const request: sinon.SinonStub = stubPostResponses();
 
     Utils.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
@@ -184,7 +185,7 @@ describe(commands.FOLDER_REMOVE, () => {
   });
 
   it('should send params for recycle request when recycle is set to true', (done) => {
-    let request: sinon.SinonStub = stubPostResponses();
+    const request: sinon.SinonStub = stubPostResponses();
 
     Utils.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {

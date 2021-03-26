@@ -5,7 +5,7 @@ import Utils from '../Utils';
 import { msalCachePlugin } from './msalCachePlugin';
 
 const mockCache: ISerializableTokenCache = {
-  deserialize: (cache: string) => { },
+  deserialize: () => { },
   serialize: () => ''
 };
 const mockCacheContext = new TokenCacheContext(mockCache, false);
@@ -25,7 +25,7 @@ describe('msalCachePlugin', () => {
     mockCacheContext.hasChanged = false;
     Utils.restore([
       (msalCachePlugin as any).fileTokenStorage.get,
-      (msalCachePlugin as any).fileTokenStorage.set,
+      (msalCachePlugin as any).fileTokenStorage.set
     ]);
   });
 

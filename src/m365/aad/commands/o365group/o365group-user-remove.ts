@@ -43,7 +43,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let userId = '';
-    const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string
+    const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
     const removeUser: () => void = (): void => {
       const requestOptions: any = {
@@ -77,7 +77,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
             url: endpoint,
             headers: {
               'accept': 'application/json;odata.metadata=none'
-            },
+            }
           };
 
           return request.delete(requestOptions);
@@ -93,7 +93,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove ${args.options.userName} from the ${(typeof args.options.groupId !== 'undefined' ? 'group' : 'team')} ${groupId}?`,
+        message: `Are you sure you want to remove ${args.options.userName} from the ${(typeof args.options.groupId !== 'undefined' ? 'group' : 'team')} ${groupId}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
