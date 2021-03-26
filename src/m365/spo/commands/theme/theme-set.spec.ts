@@ -144,7 +144,7 @@ describe(commands.THEME_SET, () => {
         debug: true,
         name: 'Contoso',
         filePath: 'theme.json',
-        inverted: false,
+        inverted: false
       }
     } as any, (err?: any) => {
       try {
@@ -170,7 +170,7 @@ describe(commands.THEME_SET, () => {
         debug: true,
         name: 'Contoso',
         filePath: 'theme.json',
-        inverted: false,
+        inverted: false
       }
     } as any, (err?: any) => {
       try {

@@ -19,25 +19,25 @@ export class FN012017_TSC_extends extends JsonRule {
 
   get description(): string {
     return `Update tsconfig.json extends property`;
-  };
+  }
 
   get resolution(): string {
     return `{
   "extends": "${this._extends}"
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './tsconfig.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsConfigJson) {

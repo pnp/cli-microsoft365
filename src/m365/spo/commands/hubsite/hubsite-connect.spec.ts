@@ -83,7 +83,7 @@ describe(commands.HUBSITE_CONNECT, () => {
   });
 
   it('correctly handles error when the specified id doesn\'t point to a valid hub site', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {

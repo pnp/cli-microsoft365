@@ -110,7 +110,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -341,7 +341,7 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       memberDeleteCallIssued = true;
       return Promise.resolve();
     });

@@ -144,7 +144,7 @@ describe(commands.SITEDESIGN_REMOVE, () => {
   });
 
   it('correctly handles error when site design not found', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 

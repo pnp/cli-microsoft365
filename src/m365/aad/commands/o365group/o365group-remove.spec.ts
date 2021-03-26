@@ -217,12 +217,12 @@ describe(commands.O365GROUP_REMOVE, () => {
     let groupPermDeleteCallIssued = false;
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/28beab62-7540-4db1-a23f-29a6018a3848`) {
-        return Promise.resolve()
+        return Promise.resolve();
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/28beab62-7540-4db1-a23f-29a6018a3848`) {
         groupPermDeleteCallIssued = true;
-        return Promise.resolve()
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
@@ -243,7 +243,7 @@ describe(commands.O365GROUP_REMOVE, () => {
   });
 
   it('correctly handles error when group is not found', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 

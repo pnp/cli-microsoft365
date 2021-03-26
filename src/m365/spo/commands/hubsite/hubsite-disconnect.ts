@@ -53,7 +53,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
           return request.post(requestOptions);
         })
         .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       disconnectHubSite();
@@ -63,7 +63,7 @@ class SpoHubSiteDisconnectCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to disconnect the site collection ${args.options.url} from its hub site?`,
+        message: `Are you sure you want to disconnect the site collection ${args.options.url} from its hub site?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

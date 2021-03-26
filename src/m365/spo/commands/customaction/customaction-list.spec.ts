@@ -74,11 +74,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
     });
 
     const getCustomActionsSpy = sinon.spy((command as any), 'getCustomActions');
-    const options: Object = {
+    const options = {
       debug: false,
       url: 'https://contoso.sharepoint.com',
       scope: 'Web'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -111,11 +111,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
     });
 
     const getCustomActionsSpy = sinon.spy((command as any), 'getCustomActions');
-    const options: Object = {
+    const options = {
       debug: false,
       url: 'https://contoso.sharepoint.com',
       scope: 'Site'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -146,12 +146,12 @@ describe(commands.CUSTOMACTION_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    const options: Object = {
+    const options = {
       debug: false,
       url: 'https://contoso.sharepoint.com',
       scope: 'Site',
       output: 'json'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -212,11 +212,11 @@ describe(commands.CUSTOMACTION_LIST, () => {
     });
 
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
-    const options: Object = {
+    const options = {
       debug: false,
       url: 'https://contoso.sharepoint.com',
       scope: "All"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -484,7 +484,7 @@ describe(commands.CUSTOMACTION_LIST, () => {
         if (l.indexOf('Attempt to get custom actions list with scope: All') > -1) {
           correctLogStatement = true;
         }
-      })
+      });
       try {
         assert(correctLogStatement);
         assert(loggerLogSpy.calledWith([

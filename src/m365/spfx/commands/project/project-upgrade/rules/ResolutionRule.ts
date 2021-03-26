@@ -13,28 +13,29 @@ export abstract class ResolutionRule extends JsonRule {
 
   get description(): string {
     return `Add resolution for package ${this.packageName}`;
-  };
+  }
 
   get resolution(): string {
     return `{
   "resolutions": {
     "${this.packageName}": "${this.packageVersion}"
   }
-}`
-  };
+}`;
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './package.json';
-  };
+  }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   customCondition(project: Project): boolean {
     return false;
   }

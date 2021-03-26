@@ -23,7 +23,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   });
 
   beforeEach(() => {
-    let futureDate = new Date();
+    const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
 
@@ -92,7 +92,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   it('restores the deleted site collection from the tenant recycle bin, doesn\'t wait for completion', (done) => {
     Utils.restore((command as any).ensureFormDigest);
 
-    let pastDate = new Date();
+    const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 
@@ -133,7 +133,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   it('restores the deleted site collection from the tenant recycle bin, doesn\'t wait for completion (verbose)', (done) => {
     Utils.restore((command as any).ensureFormDigest);
 
-    let pastDate = new Date();
+    const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 
@@ -174,7 +174,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   it('restores the deleted site collection from the tenant recycle bin, doesn\'t wait for completion (debug)', (done) => {
     Utils.restore((command as any).ensureFormDigest);
 
-    let pastDate = new Date();
+    const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 
@@ -215,7 +215,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   it('restores the deleted site collection from the tenant recycle bin, wait for completion. Operation immediately completed', (done) => {
     Utils.restore((command as any).ensureFormDigest);
 
-    let pastDate = new Date();
+    const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 
@@ -256,7 +256,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   it('restores the deleted site collection from the tenant recycle bin, wait for completion', (done) => {
     Utils.restore((command as any).ensureFormDigest);
 
-    let pastDate = new Date();
+    const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 
@@ -294,7 +294,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -313,7 +313,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   it('restores the deleted site collection from the tenant recycle bin, wait for completion (verbose)', (done) => {
     Utils.restore((command as any).ensureFormDigest);
 
-    let pastDate = new Date();
+    const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 
@@ -351,7 +351,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -370,7 +370,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   it('restores the deleted site collection from the tenant recycle bin, wait for completion (debug)', (done) => {
     Utils.restore((command as any).ensureFormDigest);
 
-    let pastDate = new Date();
+    const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 
@@ -408,7 +408,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -427,7 +427,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
   it('did not restore the deleted site collection from the tenant recycle bin', (done) => {
     Utils.restore((command as any).ensureFormDigest);
 
-    let pastDate = new Date();
+    const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 

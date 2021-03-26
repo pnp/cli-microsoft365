@@ -4929,7 +4929,7 @@ export const aadSp = {
   "appRoles": []
 };
 export const mockCrmSp = {
-  
+
   "servicePrincipalNames": [
     "https://admin.services.crm17.dynamics.com/",
     "00000007-0000-0000-c000-000000000000/*.crm9.dynamics.com",
@@ -4957,20 +4957,19 @@ export const mockCrmSp = {
     "https://admin.services.crm15.dynamics.com/",
     "https://admin.services.crm16.dynamics.com/",
     "https://siteapi.crm2.crmlivetie.com/"
-],
-"appId": "00000007-0000-0000-c000-000000000000",
-"oauth2PermissionScopes": [
+  ],
+  "appId": "00000007-0000-0000-c000-000000000000",
+  "oauth2PermissionScopes": [
     {
-        "adminConsentDescription": "Allows the application to access Common Data Service acting as users in the organization.",
-        "adminConsentDisplayName": "Access Common Data Service as organization users",
-        "id": "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4",
-        "isEnabled": true,
-        "type": "User",
-        "userConsentDescription": "Allows the application to access Common Data Service as you.",
-        "userConsentDisplayName": "Access Common Data Service as you",
-        "value": "user_impersonation"
+      "adminConsentDescription": "Allows the application to access Common Data Service acting as users in the organization.",
+      "adminConsentDisplayName": "Access Common Data Service as organization users",
+      "id": "78ce3f0f-a1ce-49c2-8cde-64b5c0896db4",
+      "isEnabled": true,
+      "type": "User",
+      "userConsentDescription": "Allows the application to access Common Data Service as you.",
+      "userConsentDisplayName": "Access Common Data Service as you",
+      "value": "user_impersonation"
     }
-],
-"appRoles": []
+  ],
+  "appRoles": []
 };
-

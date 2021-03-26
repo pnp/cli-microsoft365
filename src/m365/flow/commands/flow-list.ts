@@ -42,7 +42,7 @@ class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName
       .then((): void => {
         if (this.items.length > 0) {
           this.items.forEach(i => {
-            i.displayName = i.properties.displayName
+            i.displayName = i.properties.displayName;
           });
 
           logger.log(this.items);

@@ -23,19 +23,19 @@ describe(commands.LISTITEM_ADD, () => {
   const expectedContentType = 'Item';
   let actualContentType = '';
 
-  let postFakes = (opts: any) => {
+  const postFakes = (opts: any) => {
     if ((opts.url as string).indexOf('AddValidateUpdateItemUsingPath') > -1) {
       const bodyString = JSON.stringify(opts.data);
       const ctMatch = bodyString.match(/\"?FieldName\"?:\s*\"?ContentType\"?,\s*\"?FieldValue\"?:\s*\"?(\w*)\"?/i);
       actualContentType = ctMatch ? ctMatch[1] : "";
-      if (bodyString.indexOf("fail adding me") > -1) return Promise.resolve({ value: [] })
+      if (bodyString.indexOf("fail adding me") > -1) {return Promise.resolve({ value: [] });}
       return Promise.resolve({ value: [{ FieldName: "Id", FieldValue: expectedId }] });
     }
 
     return Promise.reject('Invalid request');
-  }
+  };
 
-  let getFakes = (opts: any) => {
+  const getFakes = (opts: any) => {
     if ((opts.url as string).indexOf('contenttypes') > -1) {
       return Promise.resolve({ value: [{ Id: { StringValue: expectedContentType }, Name: "Item" }] });
     }
@@ -54,12 +54,12 @@ describe(commands.LISTITEM_ADD, () => {
           "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
           "ID": actualId,
           "Modified": "2018-03-15T10:43:10Z",
-          "Title": expectedTitle,
+          "Title": expectedTitle
         }
       );
     }
     return Promise.reject('Invalid request');
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -170,12 +170,12 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = {
+    const options: any = {
       debug: false,
       listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       Title: "fail adding me"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -195,12 +195,12 @@ describe(commands.LISTITEM_ADD, () => {
 
     command.allowUnknownOptions();
 
-    let options: any = {
+    const options: any = {
       debug: true,
       listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       Title: expectedTitle
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -221,7 +221,7 @@ describe(commands.LISTITEM_ADD, () => {
       listId: 'cf8c72a1-0207-40ee-aebd-fca67d20bc8a',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       Title: expectedTitle
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -238,17 +238,17 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = {
+    const options: any = {
       debug: true,
       listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-y',
       contentType: expectedContentType,
       Title: expectedTitle
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(expectedContentType == actualContentType);
+        assert(expectedContentType === actualContentType);
         done();
       }
       catch (e) {
@@ -262,17 +262,17 @@ describe(commands.LISTITEM_ADD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = {
+    const options: any = {
       debug: false,
       listTitle: 'Demo List',
       webUrl: 'https://contoso.sharepoint.com/sites/project-y',
       contentType: "Unexpected content type",
       Title: expectedTitle
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(expectedContentType == actualContentType);
+        assert(expectedContentType === actualContentType);
         done();
       }
       catch (e) {

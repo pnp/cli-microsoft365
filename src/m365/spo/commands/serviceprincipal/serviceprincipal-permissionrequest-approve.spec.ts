@@ -150,7 +150,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
   });
 
   it('correctly handles error when approving permission request', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {
@@ -171,7 +171,7 @@ describe(commands.SERVICEPRINCIPAL_PERMISSIONREQUEST_APPROVE, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
     command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));

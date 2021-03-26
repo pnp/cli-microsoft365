@@ -15,14 +15,14 @@ describe(commands.LISTITEM_ISRECORD, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
-  let postFakes = (opts: any) => {
+  const postFakes = (opts: any) => {
     // requestObjectIdentity mock
     if (opts.data.indexOf('Name="Current"') > -1) {
       if ((opts.url as string).indexOf('returnerror.sharepoint.com') > -1) {
-        logger.log("Returns error from requestObjectIdentity")
+        logger.log("Returns error from requestObjectIdentity");
         return Promise.reject(JSON.stringify(
           [{ "ErrorInfo": "error occurred" }]
-        ))
+        ));
       }
 
       return Promise.resolve(JSON.stringify(
@@ -39,7 +39,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
             "ServerRelativeUrl": "\\u002fsites\\u002fprojectx"
           }
         ])
-      )
+      );
     }
 
     // IsRecord request mocks
@@ -52,7 +52,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
               "ErrorInfo": { "ErrorMessage": "Item does not exist. It may have been deleted by another user.", "ErrorValue": null, "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32", "ErrorCode": -2130575338, "ErrorTypeName": "Microsoft.SharePoint.SPException" },
               "LibraryVersion": "16.0.9005.1214",
               "SchemaVersion": "15.0.0.0",
-              "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32",
+              "TraceCorrelationId": "fedae69e-4077-8000-f13a-d4a607aefc32"
             }]));
       }
 
@@ -66,9 +66,9 @@ describe(commands.LISTITEM_ISRECORD, () => {
       ));
     }
     return Promise.reject('Invalid request');
-  }
+  };
 
-  let getFakes = (opts: any) => {
+  const getFakes = (opts: any) => {
     // Get list mock
     if ((opts.url as string).indexOf('/_api/web/lists') > -1 &&
       (opts.url as string).indexOf('$select=Id') > -1) {
@@ -81,7 +81,7 @@ describe(commands.LISTITEM_ISRECORD, () => {
       return Promise.resolve({ value: "f64041f2-9818-4b67-92ff-3bc5dbbef27e" });
     }
     return Promise.reject('Invalid request');
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -206,13 +206,13 @@ describe(commands.LISTITEM_ISRECORD, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = {
+    const options: any = {
       debug: true,
       listId: '99a14fe8-781c-3ce1-a1d5-c6e6a14561da',
       id: 147,
       date: '2019-03-14',
       webUrl: `https://returnerror.sharepoint.com/sites/project-y/`
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {

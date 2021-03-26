@@ -10,10 +10,7 @@ import commands from '../../commands';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
-  options: Options;
-}
-
-interface Options extends GlobalOptions {
+  options: GlobalOptions;
 }
 
 class SpoOrgNewsSiteListCommand extends SpoCommand {

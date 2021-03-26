@@ -53,16 +53,14 @@ class YammerMessageLikeSetCommand extends YammerCommand {
       if (args.options.enable !== 'false') {
         request
           .post(requestOptions)
-          .then((res: any): void => {
-            cb();
-          }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+          .then((): void => cb(),
+            (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
       }
       else {
         request
           .delete(requestOptions)
-          .then((res: any): void => {
-            cb();
-          }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+          .then((): void => cb(),
+            (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
       }
     };
 
@@ -77,7 +75,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
           type: 'confirm',
           name: 'continue',
           default: false,
-          message: messagePrompt,
+          message: messagePrompt
         }, (result: { continue: boolean }): void => {
           if (!result.continue) {
             cb();
@@ -91,7 +89,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
     else {
       executeLikeAction();
     }
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

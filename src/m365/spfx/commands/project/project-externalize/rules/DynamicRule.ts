@@ -1,3 +1,4 @@
+import { AxiosRequestConfig } from 'axios';
 import * as fs from 'fs';
 import { ExternalizeEntry } from "../";
 import request from '../../../../../../request';
@@ -69,7 +70,7 @@ export class DynamicRule extends BasicDependencyRule {
   }
 
   private getExternalEntryForFilePath(filePath: string, packageName: string, version: string): Promise<ExternalizeEntry | undefined> {
-    let url: string = this.getFileUrl(packageName, version, filePath);
+    const url: string = this.getFileUrl(packageName, version, filePath);
 
     return this
       .testUrl(url)
@@ -81,16 +82,18 @@ export class DynamicRule extends BasicDependencyRule {
         return this.getModuleType(url).then((moduleInfo) => {
           if (moduleInfo.scriptType === 'CommonJs') {
             return Promise.resolve(undefined); //browsers don't support those module types without an additional library
-          } else if (moduleInfo.scriptType === 'ES2015' || moduleInfo.scriptType === 'AMD') {
+          }
+          else if (moduleInfo.scriptType === 'ES2015' || moduleInfo.scriptType === 'AMD') {
             return {
               key: packageName,
-              path: url,
+              path: url
             } as ExternalizeEntry;
-          } else { //TODO for non-module and UMD we should technically add dependencies as well
+          }
+          else { //TODO for non-module and UMD we should technically add dependencies as well
             return {
               key: packageName,
               path: url,
-              globalName: moduleInfo.exports && moduleInfo.exports.length > 0 ? moduleInfo.exports[0] : packageName, // examples where this is not good https://unpkg.com/@pnp/polyfill-ie11@^1.0.2/dist/index.js https://unpkg.com/moment-timezone@^0.5.27/builds/moment-timezone-with-data.js
+              globalName: moduleInfo.exports && moduleInfo.exports.length > 0 ? moduleInfo.exports[0] : packageName // examples where this is not good https://unpkg.com/@pnp/polyfill-ie11@^1.0.2/dist/index.js https://unpkg.com/moment-timezone@^0.5.27/builds/moment-timezone-with-data.js
             } as ExternalizeEntry;
           }
         });
@@ -98,13 +101,15 @@ export class DynamicRule extends BasicDependencyRule {
   }
 
   private getModuleType(url: string): Promise<ScriptCheckApiResponse> {
+    const requestOptions: AxiosRequestConfig = {
+      url: 'https://scriptcheck-weu-fn.azurewebsites.net/api/v2/script-check',
+      headers: { 'content-type': 'application/json', accept: 'application/json', 'x-anonymous': 'true' },
+      data: { url: url },
+      responseType: 'json'
+    };
     return request
-      .post<ScriptCheckApiResponse>({
-        url: 'https://scriptcheck-weu-fn.azurewebsites.net/api/v2/script-check',
-        headers: { 'content-type': 'application/json', accept: 'application/json', 'x-anonymous': 'true' },
-        data: { url: url },
-        responseType: 'json'
-      }).catch(() => {
+      .post<ScriptCheckApiResponse>(requestOptions)
+      .catch(() => {
         return { scriptType: 'non-module' as ModuleType, exports: [] };
       });
   }

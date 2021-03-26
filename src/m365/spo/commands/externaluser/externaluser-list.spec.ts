@@ -623,7 +623,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
   });
 
   it('correctly handles no results', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": null, "TraceCorrelationId": "5ae83b9e-30dd-4000-c878-aba6be0addde"
@@ -650,7 +650,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
   });
 
   it('correctly handles a generic error when retrieving external users', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7206.1204", "ErrorInfo": {
@@ -671,7 +671,7 @@ describe(commands.EXTERNALUSER_LIST, () => {
   });
 
   it('correctly handles a random API error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
     command.action(logger, { options: { debug: true } } as any, (err?: any) => {

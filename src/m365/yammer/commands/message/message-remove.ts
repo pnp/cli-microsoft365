@@ -43,7 +43,7 @@ class YammerMessageRemoveCommand extends YammerCommand {
       request
         .delete(requestOptions)
         .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       removeMessage();
@@ -53,7 +53,7 @@ class YammerMessageRemoveCommand extends YammerCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the Yammer message ${args.options.id}?`,
+        message: `Are you sure you want to remove the Yammer message ${args.options.id}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

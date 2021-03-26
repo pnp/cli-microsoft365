@@ -65,7 +65,8 @@ class GraphSchemaExtensionListCommand extends GraphCommand {
               owner: x.owner,
               properties: JSON.stringify(x.properties)
             })));
-          } else {
+          }
+          else {
             logger.log(result);
           }
         }

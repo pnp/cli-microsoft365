@@ -76,7 +76,8 @@ class SpoAppPageSetCommand extends SpoCommand {
     }
     try {
       JSON.parse(args.options.webPartData);
-    } catch (e) {
+    }
+    catch (e) {
       return `Specified webPartData is not a valid JSON string. Error: ${e}`;
     }
     return true;

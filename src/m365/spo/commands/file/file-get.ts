@@ -75,7 +75,7 @@ class SpoFileGetCommand extends SpoCommand {
         options += '&';
       }
 
-      options += `@f='${encodeURIComponent(args.options.url)}'`
+      options += `@f='${encodeURIComponent(args.options.url)}'`;
     }
 
     const requestOptions: any = {

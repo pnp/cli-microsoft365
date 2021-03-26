@@ -52,7 +52,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
   protected get permissionsKindMap(): string[] {
     const result: string[] = [];
 
-    for (let kind in PermissionKind) {
+    for (const kind in PermissionKind) {
       if (typeof PermissionKind[kind] === 'number') {
         result.push(kind);
       }
@@ -211,7 +211,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
     if (args.options.rights) {
       const rights = args.options.rights.split(',');
 
-      for (let item of rights) {
+      for (const item of rights) {
         const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
 
         if (!kind) {
@@ -336,7 +336,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
       const permissions: BasePermissions = new BasePermissions();
       const rights = options.rights.split(',');
 
-      for (let item of rights) {
+      for (const item of rights) {
         const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
 
         permissions.set(kind);
@@ -344,7 +344,7 @@ class SpoCustomActionSetCommand extends SpoCommand {
       requestBody.Rights = {
         High: permissions.high.toString(),
         Low: permissions.low.toString()
-      }
+      };
     }
 
     return requestBody;

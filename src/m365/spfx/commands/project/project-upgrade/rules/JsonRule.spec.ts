@@ -1,7 +1,6 @@
 import * as assert from 'assert';
 import * as parse from 'json-to-ast';
-import { JsonFile, Project } from '../../model';
-import { Finding } from '../Finding';
+import { JsonFile } from '../../model';
 import { JsonRule } from './JsonRule';
 
 class MockJsonRule extends JsonRule {
@@ -21,7 +20,7 @@ class MockJsonRule extends JsonRule {
     return 'Required';
   }
 
-  visit(project: Project, findings: Finding[]): void {
+  visit(): void {
   }
 
   public getAstNode(jsonFile: JsonFile, jsonProperty: string): parse.ASTNode | undefined {
@@ -34,7 +33,7 @@ describe('JsonRule', () => {
 
   beforeEach(() => {
     rule = new MockJsonRule();
-  })
+  });
 
   it('has empty resolution', () => {
     assert.strictEqual('', rule.resolution);

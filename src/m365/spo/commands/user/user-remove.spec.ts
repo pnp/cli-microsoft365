@@ -94,7 +94,7 @@ describe(commands.USER_REMOVE, () => {
       }
     });
     assert.notStrictEqual(actual, true);
-  })
+  });
 
   it('should fail validation if the webUrl option is not a valid SharePoint site URL', () => {
     const actual = command.validate({

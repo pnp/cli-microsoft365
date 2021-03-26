@@ -65,7 +65,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
   it('fails validation if teamId, channelId and messageId are not specified', () => {
     const actual = command.validate({
       options: {
-        debug: false,
+        debug: false
       }
     });
     assert.notStrictEqual(actual, true);
@@ -605,7 +605,7 @@ describe(commands.TEAMS_MESSAGE_REPLY_LIST, () => {
   });
 
   it('correctly handles error when retrieving replies', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

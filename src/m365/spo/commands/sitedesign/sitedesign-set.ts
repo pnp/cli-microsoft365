@@ -127,7 +127,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
       },
       {
         option: '--isDefault [isDefault]'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -163,7 +163,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
     if (typeof args.options.isDefault !== 'undefined' &&
       args.options.isDefault !== 'true' &&
       args.options.isDefault !== 'false') {
-      return `${args.options.isDefault} is not a valid boolean value`
+      return `${args.options.isDefault} is not a valid boolean value`;
     }
 
     return true;

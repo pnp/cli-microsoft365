@@ -16,7 +16,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -81,7 +81,8 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             }
           ]
         });
-      } else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
+      }
+      else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams/$entity",
@@ -112,8 +113,8 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             "allowStickersAndMemes": true,
             "allowCustomMemes": false
           }
-        })
-      };
+        });
+      }
 
       return Promise.reject('Invalid request');
     });
@@ -160,7 +161,8 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             }
           ]
         });
-      } else if (opts.url === `https://graph.microsoft.com/beta/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315`) {
+      }
+      else if (opts.url === `https://graph.microsoft.com/beta/teams/02bd9fd6-8f93-4758-87c3-1fb73740a315`) {
         return Promise.reject({ statusCode: 403 });
       }
 
@@ -235,7 +237,8 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             }
           ]
         });
-      } else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
+      }
+      else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams/$entity",
@@ -266,8 +269,8 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             "allowStickersAndMemes": true,
             "allowCustomMemes": false
           }
-        })
-      };
+        });
+      }
 
       return Promise.reject('Invalid request');
     });
@@ -324,7 +327,8 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             }
           ]
         });
-      } else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
+      }
+      else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams/$entity",
@@ -355,8 +359,9 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             "allowStickersAndMemes": true,
             "allowCustomMemes": false
           }
-        })
-      } else if (opts.url === `https://graph.microsoft.com/beta/me/joinedTeams`) {
+        });
+      }
+      else if (opts.url === `https://graph.microsoft.com/beta/me/joinedTeams`) {
         return Promise.resolve({
           "value": [
             {
@@ -379,7 +384,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             }
           ]
         });
-      };
+      }
 
       return Promise.reject('Invalid request');
     });
@@ -436,7 +441,8 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             }
           ]
         });
-      } else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
+      }
+      else if ((opts.url as string).startsWith(`https://graph.microsoft.com/beta/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/beta/$metadata#teams/$entity",
@@ -467,8 +473,9 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             "allowStickersAndMemes": true,
             "allowCustomMemes": false
           }
-        })
-      } else if (opts.url === `https://graph.microsoft.com/beta/me/joinedTeams`) {
+        });
+      }
+      else if (opts.url === `https://graph.microsoft.com/beta/me/joinedTeams`) {
         return Promise.resolve({
           "value": [
             {
@@ -491,7 +498,7 @@ describe(commands.TEAMS_TEAM_LIST, () => {
             }
           ]
         });
-      };
+      }
 
       return Promise.reject('Invalid request');
     });

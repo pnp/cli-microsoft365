@@ -94,7 +94,7 @@ describe(commands.O365GROUP_USER_SET, () => {
     const actual = command.validate({
       options: {
         role: 'Member',
-        userName: 'anne.matthews@contoso.onmicrosoft.com',
+        userName: 'anne.matthews@contoso.onmicrosoft.com'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -105,7 +105,7 @@ describe(commands.O365GROUP_USER_SET, () => {
     const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -117,7 +117,7 @@ describe(commands.O365GROUP_USER_SET, () => {
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com',
-        role: 'Invalid',
+        role: 'Invalid'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -326,7 +326,7 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } } as any, () => {
       try {
         assert(promoteMemberIssued);
         done();
@@ -366,7 +366,7 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000", userName: 'karl.matteson@contoso.onmicrosoft.com', role: 'Owner' } } as any, () => {
       try {
         assert(promoteMemberIssued);
         done();
@@ -405,7 +405,7 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } } as any, () => {
       try {
         assert(demoteOwnerIssued);
         done();
@@ -443,7 +443,7 @@ describe(commands.O365GROUP_USER_SET, () => {
       return Promise.reject('Invalid request');      
     });
 
-    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000", userName: 'anne.matthews@contoso.onmicrosoft.com', role: 'Member' } } as any, () => {
       try {
         assert(demoteOwnerIssued);
         done();

@@ -99,7 +99,7 @@ class SpoExternalUserListCommand extends SpoCommand {
                 .split(',')
                 .map(c => {
                   return parseInt(c);
-                })
+                });
               e.WhenCreated = new Date(dateChunks[0], dateChunks[1], dateChunks[2], dateChunks[3], dateChunks[4], dateChunks[5], dateChunks[6]);
               return e;
             }));

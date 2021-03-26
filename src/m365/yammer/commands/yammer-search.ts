@@ -80,8 +80,9 @@ interface YammerBasicMessageResponse {
 }
 
 class YammerSearchCommand extends YammerCommand {
-  private static showOptions: string[] =
-    ['summary', 'messages', 'users', 'topics', 'groups'];
+  private static showOptions: string[] = [
+    'summary', 'messages', 'users', 'topics', 'groups'
+  ];
 
   private summary: YammerSearchSummary;
   private messages: YammerBasicMessageResponse[];
@@ -96,7 +97,7 @@ class YammerSearchCommand extends YammerCommand {
       groups: 0,
       topics: 0,
       users: 0
-    }
+    };
     this.messages = [];
     this.groups = [];
     this.topics = [];
@@ -136,7 +137,7 @@ class YammerSearchCommand extends YammerCommand {
               topics: results.count.topics,
               users: results.count.users,
               groups: results.count.groups
-            }
+            };
           }
 
           const resultMessages = results.messages.messages;
@@ -196,7 +197,7 @@ class YammerSearchCommand extends YammerCommand {
           reject(err);
         });
     });
-  };
+  }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.summary = {
@@ -204,7 +205,7 @@ class YammerSearchCommand extends YammerCommand {
       groups: 0,
       topics: 0,
       users: 0
-    }
+    };
     this.messages = [];
     this.groups = [];
     this.topics = [];
@@ -220,14 +221,14 @@ class YammerSearchCommand extends YammerCommand {
               messages: this.messages,
               users: this.users,
               topics: this.topics,
-              groups: this.groups,
+              groups: this.groups
             });
         }
         else {
           const show = args.options.show?.toLowerCase();
 
           if (show === "summary") {
-            logger.log(this.summary)
+            logger.log(this.summary);
           }
           else {
             let results: YammerConsolidatedResponse[] = [];
@@ -235,14 +236,14 @@ class YammerSearchCommand extends YammerCommand {
               results = [...results, ...this.messages.map((msg) => {
                 let trimmedMessage = msg.content_excerpt;
                 trimmedMessage = trimmedMessage?.length >= 80 ? (trimmedMessage.substring(0, 80) + "...") : trimmedMessage;
-                trimmedMessage = trimmedMessage?.replace(/\n/g, " ")
+                trimmedMessage = trimmedMessage?.replace(/\n/g, " ");
                 return <YammerConsolidatedResponse>
                   {
                     id: msg.id,
                     description: trimmedMessage,
                     type: "message",
                     web_url: msg.web_url
-                  }
+                  };
               })];
             }
 
@@ -254,7 +255,7 @@ class YammerSearchCommand extends YammerCommand {
                     description: topic.name,
                     type: "topic",
                     web_url: topic.web_url
-                  }
+                  };
               })];
             }
 
@@ -266,7 +267,7 @@ class YammerSearchCommand extends YammerCommand {
                     description: user.name,
                     type: "user",
                     web_url: user.web_url
-                  }
+                  };
               })];
             }
 
@@ -278,7 +279,7 @@ class YammerSearchCommand extends YammerCommand {
                     description: group.name,
                     type: "group",
                     web_url: group.web_url
-                  }
+                  };
               })];
             }
 
@@ -287,7 +288,7 @@ class YammerSearchCommand extends YammerCommand {
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

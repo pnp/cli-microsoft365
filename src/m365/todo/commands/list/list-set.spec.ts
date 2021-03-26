@@ -168,7 +168,7 @@ describe(commands.LIST_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.resolve();
     });
 

@@ -70,7 +70,7 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
     }
 
     this
-      .getNeededFileInformation(args, logger)
+      .getNeededFileInformation(args)
       .then((fileInformation: { fileItemId: number; libraryName: string; }): Promise<SharingInformation> => {
         if (this.verbose) {
           logger.logToStderr(`Retrieving sharing information report for the file with item Id  ${fileInformation.fileItemId}`);
@@ -83,7 +83,7 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
           },
           responseType: 'json'
         };
-        return request.post(requestOptions)
+        return request.post(requestOptions);
       }).then((res: SharingInformation): void => {
         // typically, we don't do this, but in this case, we need to due to
         // the complexity of the retrieved object and the fact that we can't
@@ -101,8 +101,8 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
                 IsExternal: linkInvite.invitee.isExternal,
                 PrincipalType: FileSharingPrincipalType[parseInt(linkInvite.invitee.principalType)]
               });
-            })
-          })
+            });
+          });
           res.permissionsInformation.principals.forEach(principal => {
             fileSharingInfoCollection.push({
               SharedWith: principal.principal.name,
@@ -119,7 +119,7 @@ class SpoFileSharinginfoGetCommand extends SpoCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getNeededFileInformation(args: CommandArgs, logger: Logger): Promise<{ fileItemId: number; libraryName: string; }> {
+  private getNeededFileInformation(args: CommandArgs): Promise<{ fileItemId: number; libraryName: string; }> {
     let requestUrl: string = '';
 
     if (args.options.id) {

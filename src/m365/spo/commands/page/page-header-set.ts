@@ -257,7 +257,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           return Promise.all([
             this.getSiteId(args.options.webUrl, this.verbose, logger),
             this.getWebId(args.options.webUrl, this.verbose, logger),
-            this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, this.verbose, logger),
+            this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, this.verbose, logger)
           ]);
         }
         else {

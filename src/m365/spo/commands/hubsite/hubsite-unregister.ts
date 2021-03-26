@@ -59,7 +59,7 @@ class SpoHubSiteUnregisterCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to unregister the site collection ${args.options.url} as a hub site?`,
+        message: `Are you sure you want to unregister the site collection ${args.options.url} as a hub site?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

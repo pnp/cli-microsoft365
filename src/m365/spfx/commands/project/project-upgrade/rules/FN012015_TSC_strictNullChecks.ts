@@ -17,7 +17,7 @@ export class FN012015_TSC_strictNullChecks extends JsonRule {
 
   get description(): string {
     return `Update tsconfig.json strictNullChecks value`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,19 +25,19 @@ export class FN012015_TSC_strictNullChecks extends JsonRule {
     "strictNullChecks": ${this.strictNullChecks}
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './tsconfig.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {

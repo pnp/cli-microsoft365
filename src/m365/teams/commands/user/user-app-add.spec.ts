@@ -116,7 +116,7 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
   });
 
   it('correctly handles error while installing teams app', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

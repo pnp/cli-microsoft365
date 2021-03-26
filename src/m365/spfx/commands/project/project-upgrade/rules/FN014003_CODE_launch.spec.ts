@@ -10,7 +10,7 @@ describe('FN014003_CODE_launch', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN014003_CODE_launch();
-  })
+  });
 
   it('doesn\'t return notification if launch.json already exists', () => {
     const project: Project = {

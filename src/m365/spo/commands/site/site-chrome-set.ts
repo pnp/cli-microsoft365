@@ -80,7 +80,7 @@ class SpoSiteChromeSetCommand extends SpoCommand {
     const disableMegaMenu = typeof args.options.disableMegaMenu !== 'undefined' ? args.options.disableMegaMenu.toLowerCase() === "true" : null;
     const disableFooter = typeof args.options.disableFooter !== 'undefined' ? args.options.disableFooter.toLowerCase() === "true" : null;
 
-    let body: any = {};
+    const body: any = {};
     if (headerLayout !== null) {
       body["headerLayout"] = headerLayout;
     }
@@ -94,7 +94,7 @@ class SpoSiteChromeSetCommand extends SpoCommand {
       body["footerLayout"] = footerLayout;
     }
     if (footerEmphasis !== null) {
-      body["footerEmphasis"] = 3 - parseInt(footerEmphasis) // Footer is inverted;
+      body["footerEmphasis"] = 3 - parseInt(footerEmphasis); // Footer is inverted
     }
     if (hideTitleInHeader !== null) {
       body["hideTitleInHeader"] = hideTitleInHeader;

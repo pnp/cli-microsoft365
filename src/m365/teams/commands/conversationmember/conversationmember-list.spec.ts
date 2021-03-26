@@ -15,221 +15,221 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
   const multipleTeamsResponse: any = {
     "@odata.context": "https://graph.microsoft.com/beta/$metadata#groups",
     "value": [
-        {
-            "id": "47d6625d-a540-4b59-a4ab-19b787e40593",
-            "deletedDateTime": null,
-            "classification": null,
-            "createdDateTime": "2018-12-28T04:09:33Z",
-            "createdByAppId": null,
-            "description": "Human Resources",
-            "displayName": "Human Resources",
-            "expirationDateTime": null,
-            "groupTypes": [
-                "Unified"
-            ],
-            "infoCatalogs": [],
-            "isAssignableToRole": null,
-            "mail": "hr@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "hr",
-            "membershipRule": null,
-            "membershipRuleProcessingState": null,
-            "onPremisesDomainName": null,
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesNetBiosName": null,
-            "onPremisesSamAccountName": null,
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "preferredLanguage": null,
-            "proxyAddresses": [
-                "SPO:SPO_c562a29c-2afd-4b53-ae4d-f94f200de3ef@SPO_d544d1e7-d321-494b-870a-1beac97967a2",
-                "SMTP:hr@sconsoto.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2018-12-28T04:09:33Z",
-            "resourceBehaviorOptions": [],
-            "resourceProvisioningOptions": [
-                "Team"
-            ],
-            "securityEnabled": false,
-            "securityIdentifier": "S-1-12-1-1205232221-1264166208-3071912868-2466636935",
-            "theme": null,
-            "visibility": "Private",
-            "writebackConfiguration": {
-                "isEnabled": null,
-                "onPremisesGroupType": null
-            },
-            "onPremisesProvisioningErrors": []
+      {
+        "id": "47d6625d-a540-4b59-a4ab-19b787e40593",
+        "deletedDateTime": null,
+        "classification": null,
+        "createdDateTime": "2018-12-28T04:09:33Z",
+        "createdByAppId": null,
+        "description": "Human Resources",
+        "displayName": "Human Resources",
+        "expirationDateTime": null,
+        "groupTypes": [
+          "Unified"
+        ],
+        "infoCatalogs": [],
+        "isAssignableToRole": null,
+        "mail": "hr@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "hr",
+        "membershipRule": null,
+        "membershipRuleProcessingState": null,
+        "onPremisesDomainName": null,
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesNetBiosName": null,
+        "onPremisesSamAccountName": null,
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "preferredLanguage": null,
+        "proxyAddresses": [
+          "SPO:SPO_c562a29c-2afd-4b53-ae4d-f94f200de3ef@SPO_d544d1e7-d321-494b-870a-1beac97967a2",
+          "SMTP:hr@sconsoto.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2018-12-28T04:09:33Z",
+        "resourceBehaviorOptions": [],
+        "resourceProvisioningOptions": [
+          "Team"
+        ],
+        "securityEnabled": false,
+        "securityIdentifier": "S-1-12-1-1205232221-1264166208-3071912868-2466636935",
+        "theme": null,
+        "visibility": "Private",
+        "writebackConfiguration": {
+          "isEnabled": null,
+          "onPremisesGroupType": null
         },
-        {
-            "id": "5b1fac18-4ae3-43b4-9ca8-e27c7f44b65f",
-            "deletedDateTime": null,
-            "classification": null,
-            "createdDateTime": "2020-10-28T21:50:12Z",
-            "createdByAppId": "cc15fd57-2c6c-4117-a88c-83b1d56b4bbe",
-            "description": "Human Resources",
-            "displayName": "Human Resources",
-            "expirationDateTime": null,
-            "groupTypes": [
-                "Unified"
-            ],
-            "infoCatalogs": [],
-            "isAssignableToRole": null,
-            "mail": "HumanResources@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "HumanResources",
-            "membershipRule": null,
-            "membershipRuleProcessingState": null,
-            "onPremisesDomainName": null,
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesNetBiosName": null,
-            "onPremisesSamAccountName": null,
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "preferredLanguage": null,
-            "proxyAddresses": [
-                "SPO:SPO_4bb60dfd-0d1d-4242-9e50-cfb41c37d022@SPO_d544d1e7-d321-494b-870a-1beac97967a2",
-                "SMTP:HumanResources@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2020-10-28T21:50:12Z",
-            "resourceBehaviorOptions": [
-                "HideGroupInOutlook",
-                "SubscribeMembersToCalendarEventsDisabled",
-                "WelcomeEmailDisabled"
-            ],
-            "resourceProvisioningOptions": [
-                "Team"
-            ],
-            "securityEnabled": false,
-            "securityIdentifier": "S-1-12-1-1528802328-1135889123-2095229084-1605780607",
-            "theme": null,
-            "visibility": "Public",
-            "writebackConfiguration": {
-                "isEnabled": null,
-                "onPremisesGroupType": null
-            },
-            "onPremisesProvisioningErrors": []
-        }
+        "onPremisesProvisioningErrors": []
+      },
+      {
+        "id": "5b1fac18-4ae3-43b4-9ca8-e27c7f44b65f",
+        "deletedDateTime": null,
+        "classification": null,
+        "createdDateTime": "2020-10-28T21:50:12Z",
+        "createdByAppId": "cc15fd57-2c6c-4117-a88c-83b1d56b4bbe",
+        "description": "Human Resources",
+        "displayName": "Human Resources",
+        "expirationDateTime": null,
+        "groupTypes": [
+          "Unified"
+        ],
+        "infoCatalogs": [],
+        "isAssignableToRole": null,
+        "mail": "HumanResources@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "HumanResources",
+        "membershipRule": null,
+        "membershipRuleProcessingState": null,
+        "onPremisesDomainName": null,
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesNetBiosName": null,
+        "onPremisesSamAccountName": null,
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "preferredLanguage": null,
+        "proxyAddresses": [
+          "SPO:SPO_4bb60dfd-0d1d-4242-9e50-cfb41c37d022@SPO_d544d1e7-d321-494b-870a-1beac97967a2",
+          "SMTP:HumanResources@contoso.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2020-10-28T21:50:12Z",
+        "resourceBehaviorOptions": [
+          "HideGroupInOutlook",
+          "SubscribeMembersToCalendarEventsDisabled",
+          "WelcomeEmailDisabled"
+        ],
+        "resourceProvisioningOptions": [
+          "Team"
+        ],
+        "securityEnabled": false,
+        "securityIdentifier": "S-1-12-1-1528802328-1135889123-2095229084-1605780607",
+        "theme": null,
+        "visibility": "Public",
+        "writebackConfiguration": {
+          "isEnabled": null,
+          "onPremisesGroupType": null
+        },
+        "onPremisesProvisioningErrors": []
+      }
     ]
-  }
+  };
 
   const singleTeamResponse: any = {
     "@odata.context": "https://graph.microsoft.com/beta/$metadata#groups",
     "value": [
-        {
-            "id": "47d6625d-a540-4b59-a4ab-19b787e40593",
-            "deletedDateTime": null,
-            "classification": null,
-            "createdDateTime": "2018-12-28T04:09:33Z",
-            "createdByAppId": null,
-            "description": "Human Resources",
-            "displayName": "Human Resources",
-            "expirationDateTime": null,
-            "groupTypes": [
-                "Unified"
-            ],
-            "infoCatalogs": [],
-            "isAssignableToRole": null,
-            "mail": "hr@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "hr",
-            "membershipRule": null,
-            "membershipRuleProcessingState": null,
-            "onPremisesDomainName": null,
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesNetBiosName": null,
-            "onPremisesSamAccountName": null,
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "preferredLanguage": null,
-            "proxyAddresses": [
-                "SPO:SPO_c562a29c-2afd-4b53-ae4d-f94f200de3ef@SPO_d544d1e7-d321-494b-870a-1beac97967a2",
-                "SMTP:hr@sconsoto.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2018-12-28T04:09:33Z",
-            "resourceBehaviorOptions": [],
-            "resourceProvisioningOptions": [
-                "Team"
-            ],
-            "securityEnabled": false,
-            "securityIdentifier": "S-1-12-1-1205232221-1264166208-3071912868-2466636935",
-            "theme": null,
-            "visibility": "Private",
-            "writebackConfiguration": {
-                "isEnabled": null,
-                "onPremisesGroupType": null
-            },
-            "onPremisesProvisioningErrors": []
-        }
+      {
+        "id": "47d6625d-a540-4b59-a4ab-19b787e40593",
+        "deletedDateTime": null,
+        "classification": null,
+        "createdDateTime": "2018-12-28T04:09:33Z",
+        "createdByAppId": null,
+        "description": "Human Resources",
+        "displayName": "Human Resources",
+        "expirationDateTime": null,
+        "groupTypes": [
+          "Unified"
+        ],
+        "infoCatalogs": [],
+        "isAssignableToRole": null,
+        "mail": "hr@contoso.onmicrosoft.com",
+        "mailEnabled": true,
+        "mailNickname": "hr",
+        "membershipRule": null,
+        "membershipRuleProcessingState": null,
+        "onPremisesDomainName": null,
+        "onPremisesLastSyncDateTime": null,
+        "onPremisesNetBiosName": null,
+        "onPremisesSamAccountName": null,
+        "onPremisesSecurityIdentifier": null,
+        "onPremisesSyncEnabled": null,
+        "preferredDataLocation": null,
+        "preferredLanguage": null,
+        "proxyAddresses": [
+          "SPO:SPO_c562a29c-2afd-4b53-ae4d-f94f200de3ef@SPO_d544d1e7-d321-494b-870a-1beac97967a2",
+          "SMTP:hr@sconsoto.onmicrosoft.com"
+        ],
+        "renewedDateTime": "2018-12-28T04:09:33Z",
+        "resourceBehaviorOptions": [],
+        "resourceProvisioningOptions": [
+          "Team"
+        ],
+        "securityEnabled": false,
+        "securityIdentifier": "S-1-12-1-1205232221-1264166208-3071912868-2466636935",
+        "theme": null,
+        "visibility": "Private",
+        "writebackConfiguration": {
+          "isEnabled": null,
+          "onPremisesGroupType": null
+        },
+        "onPremisesProvisioningErrors": []
+      }
     ]
-  }
+  };
 
   const conversationMembersResponse: any = {
-      "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
-      "@odata.count": 2,
-      "value": [
-          {
-              "@odata.type": "#microsoft.graph.aadUserConversationMember",
-              "id": "MTk6NTg2YThiOWUzNmM0NDc5YmJiZDM3OGU0MzlhOTZkZjJAdGhyZWFkLnNreXBlIyM1YzcwNTI4OC1lZDdmLTQ0ZmMtYWYwYS1hYzE2NDQxOTkwMWM=",
-              "roles": [
-                  "owner"
-              ],
-              "displayName": "Mary Thompson",
-              "userId": "5c705288-ed7f-44fc-af0a-ac164419901c",
-              "email": "mary@contoso.com"
-          },
-          {
-              "@odata.type": "#microsoft.graph.aadUserConversationMember",
-              "id": "MTk6NTg2YThiOWUzNmM0NDc5YmJiZDM3OGU0MzlhOTZkZjJAdGhyZWFkLnNreXBlIyMzZjhkYjI5NC03ODE0LTQzZTYtOGE1NC1hZDUxM2YzYTA2ZTE=",
-              "roles": [],
-              "displayName": "John Smith",
-              "userId": "3f8db294-7814-43e6-8a54-ad513f3a06e1",
-              "email": "john@contoso.com"
-          }
-      ]
-  }
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels('19%3A586a8b9e36c4479bbbd378e439a96df2%40thread.skype')/members",
+    "@odata.count": 2,
+    "value": [
+      {
+        "@odata.type": "#microsoft.graph.aadUserConversationMember",
+        "id": "MTk6NTg2YThiOWUzNmM0NDc5YmJiZDM3OGU0MzlhOTZkZjJAdGhyZWFkLnNreXBlIyM1YzcwNTI4OC1lZDdmLTQ0ZmMtYWYwYS1hYzE2NDQxOTkwMWM=",
+        "roles": [
+          "owner"
+        ],
+        "displayName": "Mary Thompson",
+        "userId": "5c705288-ed7f-44fc-af0a-ac164419901c",
+        "email": "mary@contoso.com"
+      },
+      {
+        "@odata.type": "#microsoft.graph.aadUserConversationMember",
+        "id": "MTk6NTg2YThiOWUzNmM0NDc5YmJiZDM3OGU0MzlhOTZkZjJAdGhyZWFkLnNreXBlIyMzZjhkYjI5NC03ODE0LTQzZTYtOGE1NC1hZDUxM2YzYTA2ZTE=",
+        "roles": [],
+        "displayName": "John Smith",
+        "userId": "3f8db294-7814-43e6-8a54-ad513f3a06e1",
+        "email": "john@contoso.com"
+      }
+    ]
+  };
 
   const singleChannelResponse: any = {
     "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels",
     "@odata.count": 1,
     "value": [
-        {
-            "id": "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
-            "createdDateTime": null,
-            "displayName": "Private Channel",
-            "description": null,
-            "isFavoriteByDefault": null,
-            "email": "",
-            "webUrl": "https://teams.microsoft.com/l/channel/19%3a586a8b9e36c4479bbbd378e439a96df2%40thread.skype/Private+Channel?groupId=47d6625d-a540-4b59-a4ab-19b787e40593&tenantId=d544d1e7-d321-494b-870a-1beac97967a2",
-            "membershipType": "private",
-            "moderationSettings": null
-        }
+      {
+        "id": "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
+        "createdDateTime": null,
+        "displayName": "Private Channel",
+        "description": null,
+        "isFavoriteByDefault": null,
+        "email": "",
+        "webUrl": "https://teams.microsoft.com/l/channel/19%3a586a8b9e36c4479bbbd378e439a96df2%40thread.skype/Private+Channel?groupId=47d6625d-a540-4b59-a4ab-19b787e40593&tenantId=d544d1e7-d321-494b-870a-1beac97967a2",
+        "membershipType": "private",
+        "moderationSettings": null
+      }
     ]
-  }
+  };
 
   const channelIdResponse: any = {
-      "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels/$entity",
-      "id": "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
-      "displayName": "Private Channel",
-      "description": null,
-      "email": "",
-      "webUrl": "https://teams.microsoft.com/l/channel/19%3a586a8b9e36c4479bbbd378e439a96df2%40thread.skype/Private+Channel?groupId=47d6625d-a540-4b59-a4ab-19b787e40593&tenantId=d544d1e7-d321-494b-870a-1beac97967a2",
-      "membershipType": "private"
-  }
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams('47d6625d-a540-4b59-a4ab-19b787e40593')/channels/$entity",
+    "id": "19:586a8b9e36c4479bbbd378e439a96df2@thread.skype",
+    "displayName": "Private Channel",
+    "description": null,
+    "email": "",
+    "webUrl": "https://teams.microsoft.com/l/channel/19%3a586a8b9e36c4479bbbd378e439a96df2%40thread.skype/Private+Channel?groupId=47d6625d-a540-4b59-a4ab-19b787e40593&tenantId=d544d1e7-d321-494b-870a-1beac97967a2",
+    "membershipType": "private"
+  };
 
   const channelIdErrorResponse: any = {
-      "error": {
-          "code": "NotFound",
-          "message": "Failed to execute Skype backend request GetThreadS2SRequest.",
-          "innerError": {
-              "date": "2020-11-05T15:30:50",
-              "request-id": "bf7c27d4-38d1-42a8-af93-03e5446af010",
-              "client-request-id": "89f8859a-bc75-36ce-b4ca-035a6889844d"
-          }
+    "error": {
+      "code": "NotFound",
+      "message": "Failed to execute Skype backend request GetThreadS2SRequest.",
+      "innerError": {
+        "date": "2020-11-05T15:30:50",
+        "request-id": "bf7c27d4-38d1-42a8-af93-03e5446af010",
+        "client-request-id": "89f8859a-bc75-36ce-b4ca-035a6889844d"
       }
-  }
+    }
+  };
   //#endregion
 
   let log: string[];
@@ -238,7 +238,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -283,16 +283,16 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
   it('fails validation if teamId and channelId are not specified', () => {
     const actual = command.validate({
       options: {
-        debug: false,
+        debug: false
       }
     });
     assert.notStrictEqual(actual, true);
   });
-  
+
   it('fails validation if teamName and channelName are not specified', () => {
     const actual = command.validate({
       options: {
-        debug: false,
+        debug: false
       }
     });
     assert.notStrictEqual(actual, true);
@@ -307,12 +307,12 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     });
     assert.notStrictEqual(actual, true);
   });
-  
+
   it('fails validatation for a incorrect channelId missing leading 19:.', (done) => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '586a8b9e36c4479bbbd378e439a96df2@thread.skype',
+        channelId: '586a8b9e36c4479bbbd378e439a96df2@thread.skype'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -323,7 +323,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:586a8b9e36c4479bbbd378e439a96df2',
+        channelId: '19:586a8b9e36c4479bbbd378e439a96df2'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -350,7 +350,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  
+
   it('fails validation if teamName and teamId are specified', () => {
     const actual = command.validate({
       options: {
@@ -372,7 +372,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     });
     assert.notStrictEqual(actual, true);
   });
-  
+
   it('validates for a correct teamId and channelId input', () => {
     const actual = command.validate({
       options: {
@@ -382,7 +382,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     });
     assert.strictEqual(actual, true);
   });
-  
+
   it('validates for a correct teamId and channelName input', () => {
     const actual = command.validate({
       options: {
@@ -402,7 +402,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     });
     assert.strictEqual(actual, true);
   });
-  
+
   it('validates for a correct teamId and channelName input', () => {
     const actual = command.validate({
       options: {
@@ -473,7 +473,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}/members`) {
         return Promise.resolve(conversationMembersResponse);
       }
-      
+
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}`) {
         return Promise.resolve(channelIdResponse);
       }
@@ -516,7 +516,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}/members`) {
         return Promise.resolve(conversationMembersResponse);
       }
-      
+
       if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
@@ -563,7 +563,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}/members`) {
         return Promise.resolve(conversationMembersResponse);
       }
-      
+
       if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
@@ -604,7 +604,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       }
     });
   });
-  
+
   it('fails listing conversation members with invalid teamName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Other Human Resources')}'`) {
@@ -626,7 +626,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(
-          JSON.stringify(err), 
+          JSON.stringify(err),
           JSON.stringify(new CommandError(`The specified team 'Other Human Resources' does not exist in Microsoft Teams`)));
         done();
       }
@@ -661,7 +661,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(
-          JSON.stringify(err), 
+          JSON.stringify(err),
           JSON.stringify(new CommandError(`The specified channel 'Other Private Channel' does not exist in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`)));
         done();
       }
@@ -676,7 +676,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
-      
+
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:whatever@thread.skype')}`) {
         return Promise.reject(channelIdErrorResponse);
       }
@@ -692,7 +692,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(
-          JSON.stringify(err), 
+          JSON.stringify(err),
           JSON.stringify(new CommandError(`The specified channel '19:whatever@thread.skype' does not exist or is invalid in the Microsoft Teams team with ID '47d6625d-a540-4b59-a4ab-19b787e40593'`)));
         done();
       }
@@ -707,7 +707,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/${encodeURIComponent('47d6625d-a540-4b59-a4ab-19b787e40593')}/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}/members`) {
         return Promise.resolve(conversationMembersResponse);
       }
-      
+
       if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
@@ -766,9 +766,9 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(
-          JSON.stringify(err), 
+          JSON.stringify(err),
           JSON.stringify(new CommandError(`Multiple Microsoft Teams with name 'Human Resources' found. Please disambiguate:${os.EOL}${[
-            '- 47d6625d-a540-4b59-a4ab-19b787e40593', 
+            '- 47d6625d-a540-4b59-a4ab-19b787e40593',
             '- 5b1fac18-4ae3-43b4-9ca8-e27c7f44b65f'].join(os.EOL)}`)));
         done();
       }
@@ -783,7 +783,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}/members`) {
         return Promise.resolve(conversationMembersResponse);
       }
-      
+
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/47d6625d-a540-4b59-a4ab-19b787e40593/channels/${encodeURIComponent('19:586a8b9e36c4479bbbd378e439a96df2@thread.skype')}`) {
         return Promise.resolve(channelIdResponse);
       }
@@ -804,7 +804,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
             "@odata.type": "#microsoft.graph.aadUserConversationMember",
             "id": "MTk6NTg2YThiOWUzNmM0NDc5YmJiZDM3OGU0MzlhOTZkZjJAdGhyZWFkLnNreXBlIyM1YzcwNTI4OC1lZDdmLTQ0ZmMtYWYwYS1hYzE2NDQxOTkwMWM=",
             "roles": [
-                "owner"
+              "owner"
             ],
             "displayName": "Mary Thompson",
             "userId": "5c705288-ed7f-44fc-af0a-ac164419901c",
@@ -829,7 +829,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_LIST, () => {
   });
 
   it('correctly handles error when listing conversation members', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

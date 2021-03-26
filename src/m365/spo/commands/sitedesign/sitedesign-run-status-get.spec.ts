@@ -119,7 +119,7 @@ describe(commands.SITEDESIGN_RUN_STATUS_GET, () => {
   });
 
   it('correctly handles error when the specified runId doesn\'t point to a valid run', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'Value does not fall within the expected range' } } } });
     });
 

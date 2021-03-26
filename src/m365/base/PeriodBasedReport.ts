@@ -35,7 +35,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
       .get(requestOptions)
       .then((res: any): void => {
         let content: string = '';
-        let cleanResponse = this.removeEmptyLines(res);
+        const cleanResponse = this.removeEmptyLines(res);
 
         if (output && output.toLowerCase() === 'json') {
           const reportData: any = this.getReport(cleanResponse);
@@ -64,7 +64,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
 
     for (let i = 1; i < rows.length; i++) {
       const data: string[] = rows[i].split(',');
-      let obj: any = {};
+      const obj: any = {};
       for (let j = 0; j < data.length; j++) {
         obj[headers[j].trim()] = data[j].trim();
       }

@@ -89,9 +89,9 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
         done();
       }
       catch (e) {
@@ -101,7 +101,7 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
   });
 
   it('correctly handles error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "base": "An error has occurred."
@@ -146,7 +146,7 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, output: "json" } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, output: "json" } } as any, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
         done();
@@ -183,7 +183,7 @@ describe(commands.YAMMER_NETWORK_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { debug: true, includeSuspended: true } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, includeSuspended: true } } as any, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 123);
         done();

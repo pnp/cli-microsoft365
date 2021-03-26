@@ -53,7 +53,7 @@ describe('CdsProjectMutator', () => {
 </Project>`);
 
     assert.doesNotThrow(() => {
-      cdsProjectMutator.addProjectReference(pcfProjectFilePath)
+      cdsProjectMutator.addProjectReference(pcfProjectFilePath);
     });
 
     assert.strictEqual(new XMLSerializer().serializeToString(cdsProjectMutator.cdsProjectDocument), `<?xml version="1.0" encoding="utf-8"?>
@@ -157,7 +157,7 @@ describe('CdsProjectMutator', () => {
 </Project>`);
 
     assert.doesNotThrow(() => {
-      cdsProjectMutator.addProjectReference(pcfProjectFilePath)
+      cdsProjectMutator.addProjectReference(pcfProjectFilePath);
     });
 
     assert.strictEqual(new XMLSerializer().serializeToString(cdsProjectMutator.cdsProjectDocument), `<?xml version="1.0" encoding="utf-8"?>
@@ -235,7 +235,7 @@ describe('CdsProjectMutator', () => {
 </Project>`);
 
     assert.doesNotThrow(() => {
-      cdsProjectMutator.addProjectReference(pcfProjectFilePath)
+      cdsProjectMutator.addProjectReference(pcfProjectFilePath);
     });
 
     assert.strictEqual(new XMLSerializer().serializeToString(cdsProjectMutator.cdsProjectDocument), `<?xml version="1.0" encoding="utf-8"?>
@@ -278,7 +278,7 @@ describe('CdsProjectMutator', () => {
 </Project>`);
 
     assert.doesNotThrow(() => {
-      cdsProjectMutator.addProjectReference(pcfProjectFilePath)
+      cdsProjectMutator.addProjectReference(pcfProjectFilePath);
     });
 
     assert.strictEqual(new XMLSerializer().serializeToString(cdsProjectMutator.cdsProjectDocument), `<?xml version="1.0" encoding="utf-8"?>
@@ -303,7 +303,7 @@ describe('CdsProjectMutator', () => {
 </Project>`);
 
     assert.doesNotThrow(() => {
-      cdsProjectMutator.addProjectReference(pcfProjectFilePath)
+      cdsProjectMutator.addProjectReference(pcfProjectFilePath);
     });
 
     assert.strictEqual(new XMLSerializer().serializeToString(cdsProjectMutator.cdsProjectDocument), `<?xml version="1.0" encoding="utf-8"?>

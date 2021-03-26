@@ -67,15 +67,16 @@ describe(commands.YAMMER_USER_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1') {
         return Promise.resolve(
-          [{ "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" }]
+          [
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" }]
         );
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: {} } as any, (err?: any) => {
+    command.action(logger, { options: {} } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
         done();
       }
       catch (e) {
@@ -88,15 +89,17 @@ describe(commands.YAMMER_USER_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1') {
         return Promise.resolve(
-          [{ "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" }]
+          [
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" }
+          ]
         );
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
         done();
       }
       catch (e) {
@@ -108,16 +111,16 @@ describe(commands.YAMMER_USER_LIST, () => {
   it('sorts network users by messages', function (done) {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&sort_by=messages') {
-        return Promise.resolve(
-          [{ "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }]
-        );
+        return Promise.resolve([
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }
+        ]);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { sortBy: "messages" } } as any, (err?: any) => {
+    command.action(logger, { options: { sortBy: "messages" } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
         done();
       }
       catch (e) {
@@ -129,23 +132,25 @@ describe(commands.YAMMER_USER_LIST, () => {
   it('fakes the return of more results', (done) => {
     let i: number = 0;
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       if (i++ === 0) {
         return Promise.resolve({
-          users: [{ "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }],
+          users: [
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }],
           more_available: true
         });
       }
       else {
         return Promise.resolve({
-          users: [{ "type": "user", "id": 14965556, "network_id": 801445, "state": "active", "full_name": "Daniela Kiener" },
-          { "type": "user", "id": 12310090123, "network_id": 801445, "state": "active", "full_name": "Carlo Lamber" }],
+          users: [
+            { "type": "user", "id": 14965556, "network_id": 801445, "state": "active", "full_name": "Daniela Kiener" },
+            { "type": "user", "id": 12310090123, "network_id": 801445, "state": "active", "full_name": "Carlo Lamber" }],
           more_available: false
         });
       }
     });
-    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 4);
         done();
@@ -159,67 +164,69 @@ describe(commands.YAMMER_USER_LIST, () => {
   it('fakes the return of more than 50 entries', (done) => {
     let i: number = 0;
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       if (i++ === 0) {
         return Promise.resolve(
-          [{ "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }]
+          [
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }]
         );
       }
       else {
-        return Promise.resolve([{ "type": "user", "id": 14965556, "network_id": 801445, "state": "active", "full_name": "Daniela Kiener" },
-        { "type": "user", "id": 12310090123, "network_id": 801445, "state": "active", "full_name": "Carlo Lamber" }]);
+        return Promise.resolve([
+          { "type": "user", "id": 14965556, "network_id": 801445, "state": "active", "full_name": "Daniela Kiener" },
+          { "type": "user", "id": 12310090123, "network_id": 801445, "state": "active", "full_name": "Carlo Lamber" }]);
       }
     });
-    command.action(logger, { options: { output: 'debug' } } as any, (err?: any) => {
+    command.action(logger, { options: { output: 'debug' } } as any, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 52);
         done();
@@ -233,11 +240,12 @@ describe(commands.YAMMER_USER_LIST, () => {
   it('fakes the return of more results with exception', (done) => {
     let i: number = 0;
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       if (i++ === 0) {
         return Promise.resolve({
-          users: [{ "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }],
+          users: [
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }],
           more_available: true
         });
       }
@@ -264,16 +272,16 @@ describe(commands.YAMMER_USER_LIST, () => {
   it('sorts network users by messages', function (done) {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&sort_by=messages') {
-        return Promise.resolve(
-          [{ "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }]
-        );
+        return Promise.resolve([
+          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }
+        ]);
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { sortBy: "messages" } } as any, (err?: any) => {
+    command.action(logger, { options: { sortBy: "messages" } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
         done();
       }
       catch (e) {
@@ -286,16 +294,17 @@ describe(commands.YAMMER_USER_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&reverse=true') {
         return Promise.resolve(
-          [{ "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550643, "network_id": 801445, "state": "active", "full_name": "Daniela Lamber" }]
+          [
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550643, "network_id": 801445, "state": "active", "full_name": "Daniela Lamber" }]
         );
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { reverse: true } } as any, (err?: any) => {
+    command.action(logger, { options: { reverse: true } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
         done();
       }
       catch (e) {
@@ -308,18 +317,19 @@ describe(commands.YAMMER_USER_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/in_group/5785177.json?page=1&reverse=true') {
         return Promise.resolve({
-          users: [{ "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
-          { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550643, "network_id": 801445, "state": "active", "full_name": "Daniela Lamber" }],
+          users: [
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" },
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550643, "network_id": 801445, "state": "active", "full_name": "Daniela Lamber" }],
           has_more: true
         });
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { groupId: 5785177, reverse: true, limit: 2 } } as any, (err?: any) => {
+    command.action(logger, { options: { groupId: 5785177, reverse: true, limit: 2 } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647)
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 2)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550647);
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 2);
         done();
       }
       catch (e) {
@@ -332,15 +342,16 @@ describe(commands.YAMMER_USER_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users/in_group/5785177.json?page=1') {
         return Promise.resolve({
-          users: [{ "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }, { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" }],
+          users: [
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" }, { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" }],
           has_more: false
         });
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { groupId: 5785177 } } as any, (err?: any) => {
+    command.action(logger, { options: { groupId: 5785177 } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
         done();
       }
       catch (e) {
@@ -353,15 +364,16 @@ describe(commands.YAMMER_USER_LIST, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://www.yammer.com/api/v1/users.json?page=1&letter=P') {
         return Promise.resolve(
-          [{ "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
-          { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" }]
+          [
+            { "type": "user", "id": 1496550646, "network_id": 801445, "state": "active", "full_name": "Patrick Lamber" },
+            { "type": "user", "id": 1496550647, "network_id": 801445, "state": "active", "full_name": "Sergio Cappelletti" }]
         );
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { letter: "P" } } as any, (err?: any) => {
+    command.action(logger, { options: { letter: "P" } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
         done();
       }
       catch (e) {
@@ -371,7 +383,7 @@ describe(commands.YAMMER_USER_LIST, () => {
   });
 
   it('correctly handles error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "base": "An error has occurred."

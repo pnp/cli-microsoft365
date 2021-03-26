@@ -78,7 +78,7 @@ class SpoFileMoveCommand extends SpoCommand {
             options: {
               "AllowSchemaMismatch": allowSchemaMismatch,
               "IgnoreVersionHistory": true,
-              "IsMoveMode": true,
+              "IsMoveMode": true
             }
           },
           responseType: 'json'
@@ -94,7 +94,7 @@ class SpoFileMoveCommand extends SpoCommand {
           const progressPollInterval: number = 1800; // 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
           setTimeout(() => {
-            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, logger, this.dots)
+            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, logger, this.dots);
           }, progressPollInterval);
         });
       })

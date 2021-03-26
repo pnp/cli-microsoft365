@@ -92,7 +92,7 @@ class SpoTenantAppCatalogAddCommand extends SpoCommand {
             confirm: true,
             verbose: this.verbose,
             debug: this.debug
-          }
+          };
           Cli
             .executeCommand(spoSiteRemoveCommand as Command, { options: { ...siteRemoveOptions, _: [] } })
             .then(() => resolve(), (err: CommandError) => reject(err));

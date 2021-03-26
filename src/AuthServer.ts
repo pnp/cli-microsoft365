@@ -29,7 +29,7 @@ export class AuthServer {
     return this.httpServer;
   }
 
-  public initializeServer = (service: Service, resource: string, resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: ErrorResponse) => void, logger: Logger, debug: boolean = false) => {
+  public initializeServer = (service: Service, resource: string, resolve: (error: InteractiveAuthorizationCodeResponse) => void, reject: (error: ErrorResponse) => void, logger: Logger, debug: boolean = false): void => {
     this.service = service;
     this.resolve = resolve;
     this.reject = reject;
@@ -38,7 +38,7 @@ export class AuthServer {
     this.resource = resource;
 
     this.httpServer = http.createServer(this.httpRequest).listen(0, this.httpListener);
-  }
+  };
 
   private httpListener = () => {
     const requestState = Math.random().toString(16).substr(2, 20);
@@ -51,16 +51,16 @@ export class AuthServer {
       this.logger.logToStderr('');
     }
     this.openUrl(url);
-  }
+  };
 
   private openUrl(url: string) {
     this.open(url).then(() => {
-      this.logger.logToStderr("To sign in, use the web browser that just has been opened. Please sign-in there.")
+      this.logger.logToStderr("To sign in, use the web browser that just has been opened. Please sign-in there.");
     }).catch(() => {
       const errorResponse: ErrorResponse = {
         error: "Can't open the default browser",
         errorDescription: "Was not able to open a browser instance. Try again later or use a different authentication method."
-      }
+      };
 
       this.reject(errorResponse);
       this.httpServer.close();
@@ -96,7 +96,7 @@ export class AuthServer {
       const errorMessage: ErrorResponse = {
         error: queryString.error as string,
         errorDescription: queryString.error_description as string
-      }
+      };
 
       body = "<p>Oops! Azure Active Directory replied with an error message.</p>";
       body += `<p>${errorMessage.error}</p>`;
@@ -111,7 +111,7 @@ export class AuthServer {
       const errorMessage: ErrorResponse = {
         error: "invalid request",
         errorDescription: "An invalid request has been received by the HTTP server"
-      }
+      };
 
       body = "<p>Oops! This is an invalid request.</p>";
       body += `<p>${errorMessage.error}</p>`;
@@ -125,7 +125,7 @@ export class AuthServer {
     response.end();
 
     this.httpServer.close();
-  }
+  };
 }
 
 export default new AuthServer();

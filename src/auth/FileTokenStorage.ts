@@ -16,7 +16,7 @@ export class FileTokenStorage implements TokenStorage {
       const contents: string = fs.readFileSync(this.filePath, 'utf8');
       resolve(contents);
     });
-  };
+  }
 
   public set(connectionInfo: string): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
@@ -29,7 +29,7 @@ export class FileTokenStorage implements TokenStorage {
         }
       });
     });
-  };
+  }
 
   public remove(): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
@@ -47,5 +47,5 @@ export class FileTokenStorage implements TokenStorage {
         }
       });
     });
-  };
+  }
 }

@@ -12,11 +12,12 @@ const command: Command = require('./file-checkin');
 describe(commands.FILE_CHECKIN, () => {
   let log: any[];
   let logger: Logger;
-  let stubPostResponses: any = (getFileByServerRelativeUrlResp: any = null, getFileByIdResp: any = null) => {
+  const stubPostResponses: any = (getFileByServerRelativeUrlResp: any = null, getFileByIdResp: any = null) => {
     return sinon.stub(request, 'post').callsFake((opts) => {
       if (getFileByServerRelativeUrlResp) {
         return getFileByServerRelativeUrlResp;
-      } else {
+      }
+      else {
         if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativeUrl(') > -1) {
           return Promise.resolve();
         }
@@ -24,7 +25,8 @@ describe(commands.FILE_CHECKIN, () => {
 
       if (getFileByIdResp) {
         return getFileByIdResp;
-      } else {
+      }
+      else {
         if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
           return Promise.resolve();
         }
@@ -32,7 +34,7 @@ describe(commands.FILE_CHECKIN, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -93,7 +95,7 @@ describe(commands.FILE_CHECKIN, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        id: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
+        id: 'f09c4efe-b8c0-4e89-a166-03418661b89b'
       }
     }, (error?: any) => {
       try {
@@ -119,7 +121,7 @@ describe(commands.FILE_CHECKIN, () => {
       options: {
         verbose: true,
         id: actionId,
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     }, (err: any) => {
       try {
@@ -145,7 +147,7 @@ describe(commands.FILE_CHECKIN, () => {
       options: {
         verbose: true,
         id: actionId,
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     }, (err: any) => {
       try {
@@ -167,7 +169,7 @@ describe(commands.FILE_CHECKIN, () => {
       options: {
         verbose: true,
         id: actionId,
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     }, () => {
       try {
@@ -187,7 +189,7 @@ describe(commands.FILE_CHECKIN, () => {
       options: {
         debug: false,
         fileUrl: '/sites/project-x/Documents/Test1.docx',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     }, () => {
       try {
@@ -207,7 +209,7 @@ describe(commands.FILE_CHECKIN, () => {
       options: {
         debug: false,
         fileUrl: '/Documents/Test1.docx',
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {

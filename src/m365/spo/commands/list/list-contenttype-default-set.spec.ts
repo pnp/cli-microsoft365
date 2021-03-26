@@ -507,7 +507,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('Request failed with status code 404');
     });
 
@@ -532,7 +532,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
     sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('Request failed with status code 404');
     });
 

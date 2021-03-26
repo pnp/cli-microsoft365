@@ -58,7 +58,7 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
   });
 
   it('correctly handles error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "base": "An error has occurred."

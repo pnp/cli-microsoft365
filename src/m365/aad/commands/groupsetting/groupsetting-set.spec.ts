@@ -381,7 +381,7 @@ describe(commands.GROUPSETTING_SET, () => {
   });
 
   it('handles error when no group setting with the specified id found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           "error": {

@@ -78,7 +78,7 @@ class SpoListWebhookSetCommand extends SpoCommand {
         // REST patch call doesn't return anything
         cb();
       }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, logger, cb)
+        this.handleRejectedODataJsonPromise(err, logger, cb);
       });
   }
 
@@ -136,7 +136,7 @@ class SpoListWebhookSetCommand extends SpoCommand {
       return 'Specify notificationUrl, expirationDateTime or both, at least one is required';
     }
 
-    const parsedDateTime = Date.parse(args.options.expirationDateTime as string)
+    const parsedDateTime = Date.parse(args.options.expirationDateTime as string);
     if (args.options.expirationDateTime && !(!parsedDateTime) !== true) {
       return `${args.options.expirationDateTime} is not a valid date format. Provide the date in one of the following formats:
   ${chalk.grey('YYYY-MM-DD')}

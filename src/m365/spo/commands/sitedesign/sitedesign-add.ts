@@ -114,7 +114,7 @@ class SpoSiteDesignAddCommand extends SpoCommand {
       },
       {
         option: '--isDefault'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();

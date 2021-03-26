@@ -77,7 +77,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Control with ID 3ede60d3-dc2c-438b-b5bf-cc40bb2351e6 not found on page home.aspx")));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -96,7 +97,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Page home.aspx doesn't contain canvas controls.")));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -111,7 +113,7 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
@@ -119,7 +121,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -148,7 +151,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Page home.aspx information not retrieved with the checkout')));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -177,7 +181,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Control with ID ede2ee65-157d-4523-b4ed-87b9b64374a6 not found on page home.aspx')));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -202,10 +207,11 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, (err) => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, () => {
       try {
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -235,10 +241,11 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartData: '{}' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartData: '{}' } }, () => {
       try {
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -268,10 +275,11 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, () => {
       try {
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -301,17 +309,18 @@ describe(commands.PAGE_CONTROL_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, (err?: any) => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6', webPartProperties: '{}' } }, () => {
       try {
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
   });
 
   it('correctly handles OData error when retrieving pages', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
@@ -319,7 +328,8 @@ describe(commands.PAGE_CONTROL_SET, () => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });

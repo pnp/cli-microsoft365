@@ -1,7 +1,7 @@
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, {
-    CommandError, CommandOption
+  CommandError, CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';

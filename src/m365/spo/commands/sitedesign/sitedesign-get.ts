@@ -62,7 +62,7 @@ class SpoSiteDesignGetCommand extends SpoCommand {
     this
       .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<string> => {
-        this.spoUrl = _spoUrl
+        this.spoUrl = _spoUrl;
         return this.getSiteDesignId(args);
       })
       .then((siteDesignId: string): Promise<string> => {

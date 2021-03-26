@@ -1,6 +1,4 @@
 import * as assert from 'assert';
-import { Project } from '../../model';
-import { Finding } from '../Finding';
 import { ScssRule } from './ScssRule';
 
 class MockScssRule extends ScssRule {
@@ -24,7 +22,7 @@ class MockScssRule extends ScssRule {
     return 'Required';
   }
 
-  visit(project: Project, findings: Finding[]): void {
+  visit(): void {
   }
 }
 
@@ -33,7 +31,7 @@ describe('ScssRule', () => {
 
   beforeEach(() => {
     rule = new MockScssRule();
-  })
+  });
 
   it('rule has empty file', () => {
     assert.strictEqual('', rule.file);

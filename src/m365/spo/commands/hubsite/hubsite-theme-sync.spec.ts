@@ -103,7 +103,7 @@ describe(commands.HUBSITE_THEME_SYNC, () => {
   });
 
   it('correctly handles error when hub site not found', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {

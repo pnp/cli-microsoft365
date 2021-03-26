@@ -63,7 +63,7 @@ class SpoAppUninstallCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to uninstall the app ${args.options.id} from site ${args.options.siteUrl}?`,
+        message: `Are you sure you want to uninstall the app ${args.options.id} from site ${args.options.siteUrl}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -100,7 +100,7 @@ class SpoAppUninstallCommand extends SpoCommand {
     if (args.options.scope) {
       const testScope: string = args.options.scope.toLowerCase();
       if (!(testScope === 'tenant' || testScope === 'sitecollection')) {
-        return `Scope must be either 'tenant' or 'sitecollection' if specified`
+        return `Scope must be either 'tenant' or 'sitecollection' if specified`;
       }
     }
 

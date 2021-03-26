@@ -25,14 +25,15 @@ describe(commands.FOLDER_LIST, () => {
         if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1) {
           if (getResp) {
             return getResp;
-          } else {
+          }
+          else {
             return Promise.resolve({value:[{"Exists":true,"IsWOPIEnabled":false,"ItemCount":2,"Name":"Test","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/Test","TimeCreated":"2018-04-23T21:29:40Z","TimeLastModified":"2018-04-23T21:32:13Z","UniqueId":"3e735407-9c9f-418b-8378-450a9888d815","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"velin12","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/velin12","TimeCreated":"2018-05-02T22:28:50Z","TimeLastModified":"2018-05-02T22:36:14Z","UniqueId":"edeb37c6-8502-4a35-9fa2-6934bfc30214","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"test111","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/test111","TimeCreated":"2018-05-02T23:21:45Z","TimeLastModified":"2018-05-02T23:21:45Z","UniqueId":"0ac3da45-cacf-4c31-9b38-9ef3697d5a66","WelcomePage":""},{"Exists":true,"IsWOPIEnabled":false,"ItemCount":0,"Name":"Forms","ProgID":null,"ServerRelativeUrl":"/sites/abc/Shared Documents/Forms","TimeCreated":"2018-02-15T13:57:52Z","TimeLastModified":"2018-02-15T13:57:52Z","UniqueId":"cbb96da6-c2d8-4af0-9451-d534d5949371","WelcomePage":""}]});
           }
         }
   
         return Promise.reject('Invalid request');
       });
-    }
+    };
   });
 
   beforeEach(() => {
@@ -84,7 +85,7 @@ describe(commands.FOLDER_LIST, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        parentFolderUrl: '/Shared Documents',
+        parentFolderUrl: '/Shared Documents'
       }
     } as any, (err?: any) => {
       try {
@@ -104,7 +105,7 @@ describe(commands.FOLDER_LIST, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        parentFolderUrl: '/Shared Documents',
+        parentFolderUrl: '/Shared Documents'
       }
     }, () => {
       try {
@@ -139,13 +140,13 @@ describe(commands.FOLDER_LIST, () => {
   });
 
   it('should send correct request params when /', (done) => {
-    let request: sinon.SinonStub = stubGetResponses();
+    const request: sinon.SinonStub = stubGetResponses();
 
     command.action(logger, {
       options: {
         debug: false,
         webUrl: 'https://contoso.sharepoint.com',
-        parentFolderUrl: '/Shared Documents',
+        parentFolderUrl: '/Shared Documents'
       }
     }, () => {
       try {
@@ -160,13 +161,13 @@ describe(commands.FOLDER_LIST, () => {
   });
 
   it('should send correct request params when /sites/abc', (done) => {
-    let request: sinon.SinonStub = stubGetResponses();
+    const request: sinon.SinonStub = stubGetResponses();
 
     command.action(logger, {
       options: {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/abc',
-        parentFolderUrl: '/Shared Documents',
+        parentFolderUrl: '/Shared Documents'
       }
     }, () => {
       try {

@@ -231,7 +231,7 @@ describe(commands.FIELD_REMOVE, () => {
   it('uses correct API url when id option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/fields/getbyid(\'') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -428,7 +428,7 @@ describe(commands.FIELD_REMOVE, () => {
   it('handles failure when get operation fails', (done) => {
     const err = 'Invalid request';
     
-    const getStub = sinon.stub(request, 'get').callsFake((opts) => {
+    const getStub = sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject(err);
     });
 

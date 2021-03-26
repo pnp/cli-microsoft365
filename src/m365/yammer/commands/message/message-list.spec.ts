@@ -14,19 +14,21 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  let firstMessageBatch: any = {
-    messages: [{ "sender_id": 1496550646, "replied_to_id": 1496550647, "id": 10123190123123, "thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1", "body": { "plain": "message1 message is longer than 25 chars. Just for testing shortening" } },
-    { "sender_id": 1496550640, "replied_to_id": "", "id": 10123190123124, "thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2", "body": { "plain": "message2" } },
-    { "sender_id": 1496550610, "replied_to_id": "", "id": 10123190123125, "thread_id": "", group_id: "", created_at: "2019/09/07 07:53:18 +0000", "content_excerpt": "message3", "body": { "plain": "message3" } },
-    { "sender_id": 1496550630, "replied_to_id": "", "id": 10123190123126, "thread_id": "", group_id: 1123121, created_at: "2019/09/06 07:53:18 +0000", "content_excerpt": "message4", "body": { "plain": "message4" } },
-    { "sender_id": 1496550646, "replied_to_id": "", "id": 10123190123127, "thread_id": "", group_id: 1123121, created_at: "2019/09/05 07:53:18 +0000", "content_excerpt": "message5", "body": { "plain": "message5" } }],
+  const firstMessageBatch: any = {
+    messages: [
+      { "sender_id": 1496550646, "replied_to_id": 1496550647, "id": 10123190123123, "thread_id": "", group_id: 11231123123, created_at: "2019/09/09 07:53:18 +0000", "content_excerpt": "message1", "body": { "plain": "message1 message is longer than 25 chars. Just for testing shortening" } },
+      { "sender_id": 1496550640, "replied_to_id": "", "id": 10123190123124, "thread_id": "", group_id: "", created_at: "2019/09/08 07:53:18 +0000", "content_excerpt": "message2", "body": { "plain": "message2" } },
+      { "sender_id": 1496550610, "replied_to_id": "", "id": 10123190123125, "thread_id": "", group_id: "", created_at: "2019/09/07 07:53:18 +0000", "content_excerpt": "message3", "body": { "plain": "message3" } },
+      { "sender_id": 1496550630, "replied_to_id": "", "id": 10123190123126, "thread_id": "", group_id: 1123121, created_at: "2019/09/06 07:53:18 +0000", "content_excerpt": "message4", "body": { "plain": "message4" } },
+      { "sender_id": 1496550646, "replied_to_id": "", "id": 10123190123127, "thread_id": "", group_id: 1123121, created_at: "2019/09/05 07:53:18 +0000", "content_excerpt": "message5", "body": { "plain": "message5" } }],
     meta: {
       older_available: true
     }
   };
-  let secondMessageBatch: any = {
-    messages: [{ "sender_id": 1496550646, "replied_to_id": 1496550647, "id": 10123190123130, "thread_id": "", group_id: 11231123123, created_at: "2019/09/04 07:53:18 +0000", "content_excerpt": "message6", "body": { "plain": "message6" } },
-    { "sender_id": 1496550640, "replied_to_id": "", "id": 10123190123131, "thread_id": "", group_id: "", created_at: "2019/09/03 07:53:18 +0000", "content_excerpt": "message7", "body": { "plain": "message7" } }],
+  const secondMessageBatch: any = {
+    messages: [
+      { "sender_id": 1496550646, "replied_to_id": 1496550647, "id": 10123190123130, "thread_id": "", group_id: 11231123123, created_at: "2019/09/04 07:53:18 +0000", "content_excerpt": "message6", "body": { "plain": "message6" } },
+      { "sender_id": 1496550640, "replied_to_id": "", "id": 10123190123131, "thread_id": "", group_id: "", created_at: "2019/09/03 07:53:18 +0000", "content_excerpt": "message7", "body": { "plain": "message7" } }],
     meta: {
       older_available: false
     }
@@ -82,7 +84,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
   });
 
   it('correctly handles error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "base": "An error has occurred."
@@ -169,9 +171,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: {} } as any, (err?: any) => {
+    command.action(logger, { options: {} } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -187,9 +189,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'Top' } } as any, (err?: any) => {
+    command.action(logger, { options: { feedType: 'Top' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -205,9 +207,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'My' } } as any, (err?: any) => {
+    command.action(logger, { options: { feedType: 'My' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -223,9 +225,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'Following' } } as any, (err?: any) => {
+    command.action(logger, { options: { feedType: 'Following' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -241,9 +243,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'Sent' } } as any, (err?: any) => {
+    command.action(logger, { options: { feedType: 'Sent' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -259,9 +261,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'Private' } } as any, (err?: any) => {
+    command.action(logger, { options: { feedType: 'Private' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -277,9 +279,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'Received' } } as any, (err?: any) => {
+    command.action(logger, { options: { feedType: 'Received' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -295,9 +297,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { feedType: 'All' } } as any, (err?: any) => {
+    command.action(logger, { options: { feedType: 'All' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -313,9 +315,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { groupId: 123123 } } as any, (err?: any) => {
+    command.action(logger, { options: { groupId: 123123 } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -331,9 +333,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { threadId: 123123 } } as any, (err?: any) => {
+    command.action(logger, { options: { threadId: 123123 } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -345,7 +347,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
   it('returns all messages', (done) => {
     let i: number = 0;
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       if (i++ === 0) {
         return Promise.resolve(firstMessageBatch);
       }
@@ -353,7 +355,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
         return Promise.resolve(secondMessageBatch);
       }
     });
-    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 7);
         done();
@@ -367,7 +369,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
   it('returns message with a specific limit', (done) => {
     let i: number = 0;
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       if (i++ === 0) {
         return Promise.resolve(firstMessageBatch);
       }
@@ -375,7 +377,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
         return Promise.resolve(secondMessageBatch);
       }
     });
-    command.action(logger, { options: { limit: 6, output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { limit: 6, output: 'json' } } as any, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].length, 6);
         done();
@@ -389,7 +391,7 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
   it('handles error in loop', (done) => {
     let i: number = 0;
 
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       if (i++ === 0) {
         return Promise.resolve(firstMessageBatch);
       }
@@ -419,9 +421,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { olderThanId: 10123190123128, output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { olderThanId: 10123190123128, output: 'json' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -437,9 +439,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { olderThanId: 10123190123128, threaded: true, output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { olderThanId: 10123190123128, threaded: true, output: 'json' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {
@@ -455,9 +457,9 @@ describe(commands.YAMMER_MESSAGE_LIST, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { threaded: true, output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { threaded: true, output: 'json' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 10123190123130);
         done();
       }
       catch (e) {

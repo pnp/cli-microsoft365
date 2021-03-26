@@ -288,7 +288,7 @@ describe(commands.TEAMS_USER_APP_LIST, () => {
   });
 
   it('correctly handles error while listing teams apps', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
 
     });

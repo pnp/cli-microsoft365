@@ -16,11 +16,11 @@ class MockCommand extends YammerCommand {
     return 'Mock command';
   }
 
-  public commandAction(logger: Logger, args: {}, cb: () => void): void {
+  public commandAction(logger: Logger, args: any, cb: () => void): void {
     cb();
   }
 
-  public commandHelp(args: any, log: (message: string) => void): void {
+  public commandHelp(): void {
   }
 
   public handlePromiseError(response: any, logger: Logger, callback: (err?: any) => void): void {
@@ -45,9 +45,9 @@ describe('YammerCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { },
-      logRaw: (msg: any) => { },
-      logToStderr: (msg: any) => { }
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { }
     };
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {
@@ -64,9 +64,9 @@ describe('YammerCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { },
-      logRaw: (msg: any) => { },
-      logToStderr: (msg: any) => { }
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { }
     };
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
     command.action(logger, { options: {} }, () => {
@@ -84,9 +84,9 @@ describe('YammerCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { },
-      logRaw: (msg: any) => { },
-      logToStderr: (msg: any) => { }
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { }
     };
     auth.service.connected = false;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
@@ -105,9 +105,9 @@ describe('YammerCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { },
-      logRaw: (msg: any) => { },
-      logToStderr: (msg: any) => { }
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { }
     };
     auth.service.connected = true;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
@@ -132,9 +132,9 @@ describe('YammerCommand', () => {
       commandWrapper: {
         command: 'command'
       },
-      log: (msg?: string) => { },
-      logRaw: (msg?: string) => { },
-      logToStderr: (msg?: string) => { },
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { },
       prompt: () => { }
     };
     const mock = new MockCommand();
@@ -153,9 +153,9 @@ describe('YammerCommand', () => {
       commandWrapper: {
         command: 'command'
       },
-      log: (msg?: string) => { },
-      logRaw: (msg?: string) => { },
-      logToStderr: (msg?: string) => { },
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { },
       prompt: () => { }
     };
     const mock = new MockCommand();
@@ -171,9 +171,9 @@ describe('YammerCommand', () => {
       commandWrapper: {
         command: 'command'
       },
-      log: (msg?: string) => { },
-      logRaw: (msg?: string) => { },
-      logToStderr: (msg?: string) => { },
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { },
       prompt: () => { }
     };
     const mock = new MockCommand();
@@ -189,9 +189,9 @@ describe('YammerCommand', () => {
       commandWrapper: {
         command: 'command'
       },
-      log: (msg?: string) => { },
-      logRaw: (msg?: string) => { },
-      logToStderr: (msg?: string) => { },
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { },
       prompt: () => { }
     };
     const mock = new MockCommand();

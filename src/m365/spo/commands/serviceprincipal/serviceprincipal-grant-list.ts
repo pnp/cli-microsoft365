@@ -22,7 +22,7 @@ class SpoServicePrincipalGrantListCommand extends SpoCommand {
     return [commands.SP_GRANT_LIST];
   }
 
-  public commandAction(logger: Logger, args: {}, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
     this
       .getSpoAdminUrl(logger, this.debug)

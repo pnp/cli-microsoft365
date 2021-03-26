@@ -108,7 +108,7 @@ describe(commands.STORAGEENTITY_REMOVE, () => {
   });
 
   it('aborts removing property when prompt not confirmed', (done) => {
-    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
 

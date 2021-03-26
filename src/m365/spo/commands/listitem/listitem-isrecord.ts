@@ -79,7 +79,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
           accept: 'application/json;odata=nometadata'
         },
         responseType: 'json'
-      }
+      };
 
       return request.get(requestOptions);
     })()
@@ -101,12 +101,12 @@ class SpoListItemIsRecordCommand extends SpoCommand {
           logger.logToStderr(`Checking if list item is a record in list ${args.options.listId || args.options.listTitle} in site ${args.options.webUrl}...`);
         }
 
-        const requestBody = this.getIsRecordRequestBody(webIdentityResp.objectIdentity, listId, args.options.id)
+        const requestBody = this.getIsRecordRequestBody(webIdentityResp.objectIdentity, listId, args.options.id);
         const requestOptions: any = {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
             'Content-Type': 'text/xml',
-            'X-RequestDigest': formDigestValue,
+            'X-RequestDigest': formDigestValue
           },
           data: requestBody
         };
@@ -126,7 +126,7 @@ class SpoListItemIsRecordCommand extends SpoCommand {
           cb();
         }
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  };
+  }
 
   private getIsRecordRequestBody(webIdentity: string, listId: string, id: string): string {
     const requestBody: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009">

@@ -43,7 +43,6 @@ interface Options extends GlobalOptions {
 
 class TeamsTeamAddCommand extends GraphCommand {
   private dots?: string;
-  private timeout?: NodeJS.Timer;
   private pollingInterval: number = 30000;
 
   public get name(): string {
@@ -72,20 +71,20 @@ class TeamsTeamAddCommand extends GraphCommand {
 
       if (this.verbose) {
         logger.logToStderr(`Using template '${fullPath}'...`);
-      };
-      requestBody = JSON.parse(fs.readFileSync(fullPath, 'utf-8'))
+      }
+      requestBody = JSON.parse(fs.readFileSync(fullPath, 'utf-8'));
 
       if (args.options.name) {
         if (this.verbose) {
           logger.logToStderr(`Using '${args.options.name}' as name...`);
-        };
+        }
         requestBody.displayName = args.options.name;
       }
 
       if (args.options.description) {
         if (this.verbose) {
           logger.logToStderr(`Using '${args.options.description}' as description...`);
-        };
+        }
         requestBody.description = args.options.description;
       }
     }
@@ -94,7 +93,7 @@ class TeamsTeamAddCommand extends GraphCommand {
         'template@odata.bind': `https://graph.microsoft.com/v1.0/teamsTemplates('standard')`,
         displayName: args.options.name,
         description: args.options.description
-      }
+      };
     }
 
     const requestOptions: AxiosRequestConfig = {
@@ -122,9 +121,10 @@ class TeamsTeamAddCommand extends GraphCommand {
             .then((teamsAsyncOperation: TeamsAsyncOperation) => {
               if (!args.options.wait) {
                 resolve(teamsAsyncOperation);
-              } else {
-                this.timeout = setTimeout(() => {
-                  this.waitUntilFinished(requestOptions, resolve, reject, logger, this.dots, this.timeout)
+              }
+              else {
+                setTimeout(() => {
+                  this.waitUntilFinished(requestOptions, resolve, reject, logger, this.dots);
                 }, this.pollingInterval);
               }
             });
@@ -147,11 +147,11 @@ class TeamsTeamAddCommand extends GraphCommand {
         logger.log(output);
         cb();
       }, (err: any): void => {
-        this.handleRejectedODataJsonPromise(err, logger, cb)
+        this.handleRejectedODataJsonPromise(err, logger, cb);
       });
   }
 
-  private waitUntilFinished(requestOptions: any, resolve: (teamsAsyncOperation: TeamsAsyncOperation) => void, reject: (error: any) => void, logger: Logger, dots?: string, timeout?: NodeJS.Timer): void {
+  private waitUntilFinished(requestOptions: any, resolve: (teamsAsyncOperation: TeamsAsyncOperation) => void, reject: (error: any) => void, logger: Logger, dots?: string): void {
     if (!this.debug && this.verbose) {
       dots += '.';
       process.stdout.write(`\r${dots}`);
@@ -171,8 +171,8 @@ class TeamsTeamAddCommand extends GraphCommand {
           reject(teamsAsyncOperation.error);
           return;
         }
-        timeout = setTimeout(() => {
-          this.waitUntilFinished(requestOptions, resolve, reject, logger, dots)
+        setTimeout(() => {
+          this.waitUntilFinished(requestOptions, resolve, reject, logger, dots);
         }, this.pollingInterval);
       }).catch(err => reject(err));
   }
@@ -200,17 +200,17 @@ class TeamsTeamAddCommand extends GraphCommand {
   public validate(args: CommandArgs): boolean | string {
     if (!args.options.templatePath) {
       if (!args.options.name) {
-        return `Required parameter name missing`
+        return `Required parameter name missing`;
       }
 
       if (!args.options.description) {
-        return `Required parameter description missing`
+        return `Required parameter description missing`;
       }
     }
 
     if (args.options.templatePath && !fs.existsSync(args.options.templatePath)) {
       return 'Specified path of the template does not exist';
-    };
+    }
 
     return true;
   }

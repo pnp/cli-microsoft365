@@ -65,7 +65,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
   it('fails validation if teamId and channelId are not specified', () => {
     const actual = command.validate({
       options: {
-        debug: false,
+        debug: false
       }
     });
     assert.notStrictEqual(actual, true);
@@ -85,7 +85,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype',
+        channelId: '552b7125655c46d5b5b86db02ee7bfdf@thread.skype'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -96,7 +96,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
+        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -115,7 +115,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
   });
 
   it('fails validation for since date too far in the past (> 8 months)', () => {
-    let d: Date = new Date()
+    const d: Date = new Date();
     d.setMonth(d.getMonth() - 9);
     const actual = command.validate({
       options: {
@@ -149,7 +149,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
   });
 
   it('validates for a correct input (with optional --since param)', () => {
-    let d: Date = new Date()
+    const d: Date = new Date();
     d.setMonth(d.getMonth() - 7);
     const actual = command.validate({
       options: {
@@ -521,7 +521,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
   });
 
   it('lists messages since date specified', (done) => {
-    const dt: string = new Date().toISOString()
+    const dt: string = new Date().toISOString();
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/beta/teams/fce9e580-8bba-4638-ab5c-ab40016651e3/channels/19:eb30973b42a847a2a1df92d91e37c76a@thread.skype/messages/delta?$filter=lastModifiedDateTime gt ${dt}`) {
         return Promise.resolve({
@@ -826,7 +826,7 @@ describe(commands.TEAMS_MESSAGE_LIST, () => {
   });
 
   it('correctly handles error when listing messages', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

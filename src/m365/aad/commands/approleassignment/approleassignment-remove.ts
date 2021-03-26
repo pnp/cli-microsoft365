@@ -131,11 +131,11 @@ class AadAppRoleAssignmentRemoveCommand extends GraphCommand {
               return Promise.reject('App role assignment not found');
             }
             tasks.push(this.removeAppRoleAssignmentForServicePrincipal(sp.id, appRoleAssignment[0].id));
-          };
+          }
 
           return Promise.all(tasks);
-        }).then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));;
-    }
+        }).then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
+    };
 
     if (args.options.confirm) {
       removeAppRoleAssignment();

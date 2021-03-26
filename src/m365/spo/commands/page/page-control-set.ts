@@ -120,7 +120,7 @@ class SpoPageControlSetCommand extends SpoCommand {
           }
         }
 
-        let pageData: any = {};
+        const pageData: any = {};
 
         if (page.AuthorByline) {
           pageData.AuthorByline = page.AuthorByline;

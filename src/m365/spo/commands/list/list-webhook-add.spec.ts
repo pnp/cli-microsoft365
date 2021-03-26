@@ -61,7 +61,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   it('uses correct API url when list id option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -73,7 +73,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listId: 'cc27a922-8224-4296-90a5-ebbc54da2e81',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     }, () => {
 
@@ -90,7 +90,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   it('uses correct API url when list title option is passed', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -102,7 +102,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         id: '0cd891ef-afce-4e55-b836-fce03286cccf',
         webUrl: 'https://contoso.sharepoint.com',
         listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     }, () => {
 
@@ -137,7 +137,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     }, () => {
       try {
@@ -178,7 +178,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         verbose: true,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listId: '0987cfd9-f02c-479b-9fb4-3f0550462848',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     }, () => {
       try {
@@ -219,7 +219,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     }, () => {
       try {
@@ -324,7 +324,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
   });
 
   it('correctly handles a random API error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
@@ -353,7 +353,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       options:
       {
         webUrl: 'https://contoso.sharepoint.com',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     });
     assert.strictEqual(actual, 'Specify listId or listTitle, one is required');
@@ -365,7 +365,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       {
         webUrl: 'foo',
         listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     });
     assert.strictEqual(typeof (actual), 'string');
@@ -377,7 +377,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     });
     assert.strictEqual(actual, true);
@@ -389,7 +389,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '12345',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     });
     assert.strictEqual(typeof (actual), 'string');
@@ -401,7 +401,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
       {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     });
     assert.strictEqual(actual, true);
@@ -414,7 +414,7 @@ describe(commands.LIST_WEBHOOK_ADD, () => {
         webUrl: 'https://contoso.sharepoint.com',
         listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
         listTitle: 'Documents',
-        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook',
+        notificationUrl: 'https://contoso-funcions.azurewebsites.net/webhook'
       }
     });
     assert.strictEqual(actual, 'Specify listId or listTitle, but not both');

@@ -333,7 +333,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
   });
 
   it('correctly handles error when adding a channel', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

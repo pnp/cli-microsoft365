@@ -25,7 +25,8 @@ describe(commands.PROPERTYBAG_SET, () => {
       if (opts.data.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
           return requestObjectIdentityResp;
-        } else {
+        }
+        else {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
@@ -43,7 +44,8 @@ describe(commands.PROPERTYBAG_SET, () => {
       if (opts.data.indexOf('GetFolderByServerRelativeUrl') > -1) {
         if (folderObjectIdentityResp) {
           return folderObjectIdentityResp;
-        } else {
+        }
+        else {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
@@ -64,7 +66,8 @@ describe(commands.PROPERTYBAG_SET, () => {
       if (opts.data.indexOf('SetFieldValue') > -1) {
         if (setPropertyResp) {
           return setPropertyResp;
-        } else {
+        }
+        else {
 
           return Promise.resolve(JSON.stringify([
             {
@@ -79,7 +82,8 @@ describe(commands.PROPERTYBAG_SET, () => {
       if (opts.data.indexOf('EffectiveBasePermissions') > -1) {
         if (effectiveBasePermissionsResp) {
           return effectiveBasePermissionsResp;
-        } else {
+        }
+        else {
           // effective base permissions (success case)
           return Promise.resolve(JSON.stringify([
             {
@@ -102,11 +106,11 @@ describe(commands.PROPERTYBAG_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc'
     }));
@@ -154,17 +158,17 @@ describe(commands.PROPERTYBAG_SET, () => {
   it('should call setProperty when folder is not specified', (done) => {
     stubAllPostRequests();
     const setPropertySpy = sinon.spy((command as any), 'setProperty');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
-      debug: true,
+      debug: true
 
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002fsites\u002fabc"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -192,17 +196,17 @@ describe(commands.PROPERTYBAG_SET, () => {
       }]));
     }));
     const setPropertySpy = sinon.spy((command as any), 'setProperty');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
-      folder: '/',
+      folder: '/'
 
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
       serverRelativeUrl: "/"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -220,17 +224,17 @@ describe(commands.PROPERTYBAG_SET, () => {
   it('should call setProperty when list folder is specified', (done) => {
     stubAllPostRequests();
     const setPropertySpy = sinon.spy((command as any), 'setProperty');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
       key: 'key1',
       value: 'value1',
-      folder: '/Shared Documents',
+      folder: '/Shared Documents'
 
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
       serverRelativeUrl: "/sites/abc/Shared Documents"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -247,20 +251,20 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should send correct property set request data when folder is not specified', (done) => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
-      value: 'value1',
+      value: 'value1'
 
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002fsites\u002fabc"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
-        const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="String">${(options as any).value}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="AllProperties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`
+        const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="String">${(options as any).value}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="AllProperties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
         assert(requestStub.calledWith(sinon.match({ data: bodyPayload })));
         done();
       }
@@ -272,20 +276,20 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should send correct property set request data when folder is specified', (done) => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/'
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
       serverRelativeUrl: "/"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
-        const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="String">${(options as any).value}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="Properties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`
+        const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="String">${(options as any).value}</Parameter></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="Properties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
         assert(requestStub.calledWith(sinon.match({ data: bodyPayload })));
         done();
       }
@@ -297,12 +301,12 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should correctly handle requestObjectIdentity reject promise', (done) => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('requestObjectIdentity error'); }));
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -317,13 +321,13 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should correctly handle requestObjectIdentity ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]);
-    stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -338,13 +342,13 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should correctly handle requestFolderObjectIdentity reject promise', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
       debug: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -359,14 +363,14 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestFolderObjectIdentity error" } }]);
-    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
       verbose: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -381,14 +385,14 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
-    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
       debug: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -402,13 +406,13 @@ describe(commands.PROPERTYBAG_SET, () => {
   });
 
   it('should requestFolderObjectIdentity reject promise if _ObjectIdentity_ not found', (done) => {
-    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    const options: Object = {
+    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve('[{}]'); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_parentid',
       value: 'value1'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -422,7 +426,7 @@ describe(commands.PROPERTYBAG_SET, () => {
   });
 
   it('should correctly handle isNoScriptSite = true', (done) => {
-    stubAllPostRequests(null, null, null, new Promise<any>((resolve, reject) => {
+    stubAllPostRequests(null, null, null, new Promise<any>((resolve) => {
       return resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0",
@@ -439,13 +443,13 @@ describe(commands.PROPERTYBAG_SET, () => {
         }
       ]));
     }));
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
       debug: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -460,13 +464,13 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should correctly handle getEffectiveBasePermissions reject promise', (done) => {
     stubAllPostRequests(null, null, null, new Promise<any>((resolve, reject) => { return reject('getEffectiveBasePermissions abc'); }));
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
       debug: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -481,14 +485,14 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should correctly handle getEffectiveBasePermissions ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getEffectiveBasePermissions error" } }]);
-    stubAllPostRequests(null, null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(null, null, null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
       verbose: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -503,14 +507,14 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should correctly handle getEffectiveBasePermissions ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
-    stubAllPostRequests(null, null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(null, null, null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
       debug: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -524,13 +528,13 @@ describe(commands.PROPERTYBAG_SET, () => {
   });
 
   it('should getEffectiveBasePermissions reject promise if EffectiveBasePermissions not found', (done) => {
-    stubAllPostRequests(null, null, null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    const options: Object = {
+    stubAllPostRequests(null, null, null, new Promise<any>((resolve) => { return resolve('[{}]'); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_parentid',
       value: 'value1'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -546,13 +550,13 @@ describe(commands.PROPERTYBAG_SET, () => {
   it('should correctly handle setProperty reject promise response', (done) => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('setProperty promise error'); }));
     const setPropertySpy = sinon.spy((command as any), 'setProperty');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
       verbose: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -568,14 +572,14 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should correctly handle setProperty ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "setProperty error" } }]);
-    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
       verbose: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -590,14 +594,14 @@ describe(commands.PROPERTYBAG_SET, () => {
 
   it('should correctly handle setProperty ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
-    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       value: 'value1',
       folder: '/',
       verbose: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -642,11 +646,11 @@ describe(commands.PROPERTYBAG_SET, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: 'foo',
-          key: 'key1',
-          value: 'value1'
-        }
+      {
+        webUrl: 'foo',
+        key: 'key1',
+        value: 'value1'
+      }
     });
     assert.notStrictEqual(actual, true);
   });
@@ -654,10 +658,10 @@ describe(commands.PROPERTYBAG_SET, () => {
   it('fails validation if the property value option valid', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: 'https://contoso.sharepoint.com',
-          key: 'key1'
-        }
+      {
+        webUrl: 'https://contoso.sharepoint.com',
+        key: 'key1'
+      }
     });
     assert.notStrictEqual(actual, true);
   });
@@ -665,9 +669,9 @@ describe(commands.PROPERTYBAG_SET, () => {
   it('fails validation if the key option is not valid', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: 'https://contoso.sharepoint.com'
-        }
+      {
+        webUrl: 'https://contoso.sharepoint.com'
+      }
     });
     assert.notStrictEqual(actual, true);
   });
@@ -675,11 +679,11 @@ describe(commands.PROPERTYBAG_SET, () => {
   it('passes validation when the url option specified', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: 'https://contoso.sharepoint.com',
-          key: 'key1',
-          value: 'value1'
-        }
+      {
+        webUrl: 'https://contoso.sharepoint.com',
+        key: 'key1',
+        value: 'value1'
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -687,12 +691,12 @@ describe(commands.PROPERTYBAG_SET, () => {
   it('passes validation when the url and folder options specified', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: 'https://contoso.sharepoint.com',
-          key: 'key1',
-          value: 'value1',
-          folder: '/'
-        }
+      {
+        webUrl: 'https://contoso.sharepoint.com',
+        key: 'key1',
+        value: 'value1',
+        folder: '/'
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -701,11 +705,11 @@ describe(commands.PROPERTYBAG_SET, () => {
     const actual = command.validate(
       {
         options:
-          {
-            webUrl: 'https://contoso.sharepoint.com',
-            key: 'key1',
-            value: 'value1'
-          }
+        {
+          webUrl: 'https://contoso.sharepoint.com',
+          key: 'key1',
+          value: 'value1'
+        }
       });
     assert.strictEqual(actual, true);
   });

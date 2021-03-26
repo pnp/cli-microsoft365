@@ -10,7 +10,7 @@ describe('FN012009_TSC_lib_es2015_collection', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN012009_TSC_lib_es2015_collection();
-  })
+  });
 
   it('doesn\'t return notification if es2015.collection is already present', () => {
     const project: Project = {

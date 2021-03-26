@@ -25,7 +25,7 @@ describe(commands.DOCTOR, () => {
   };
   const getStatus = (status: number, message: string): string => {
     return (<any>command).getStatus(status, message);
-  }
+  };
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });

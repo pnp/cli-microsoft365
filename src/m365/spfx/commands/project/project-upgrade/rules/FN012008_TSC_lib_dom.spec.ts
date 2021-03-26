@@ -10,7 +10,7 @@ describe('FN012008_TSC_lib_dom', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN012008_TSC_lib_dom();
-  })
+  });
 
   it('doesn\'t return notification if dom is already present', () => {
     const project: Project = {

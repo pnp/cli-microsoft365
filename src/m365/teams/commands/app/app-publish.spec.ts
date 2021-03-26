@@ -126,7 +126,8 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
       try {
         assert(loggerLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -161,7 +162,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
   });
 
   it('correctly handles error when publishing an app', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
@@ -171,7 +172,8 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });

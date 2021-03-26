@@ -778,7 +778,7 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
-        listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188',
+        listId: 'fb4b0cf8-c006-4802-a1ea-57e0e4852188'
       }
     } as any, (err?: any) => {
       try {
@@ -814,7 +814,7 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
-        listTitle: 'MyLibrary',
+        listTitle: 'MyLibrary'
       }
     } as any, (err?: any) => {
       try {
@@ -849,7 +849,7 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
     command.action(logger, {
       options: {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
-        listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
+        listId: 'dfddade1-4729-428d-881e-7fedf3cae50d'
       }
     } as any, (err?: any) => {
       try {
@@ -865,7 +865,7 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
   it('uses correct API url when listId option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -876,7 +876,7 @@ describe(commands.LIST_SITESCRIPT_GET, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/team1',
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
-        debug: false,
+        debug: false
       }
     }, () => {
       try {

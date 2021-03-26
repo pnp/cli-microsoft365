@@ -108,10 +108,10 @@ class SpoHubSiteListCommand extends SpoCommand {
               return {
                 Title: a.Title,
                 SiteUrl: a.SiteUrl
-              }
+              };
             });
           });
-        };
+        }
 
         logger.log(hubSites);
         cb();

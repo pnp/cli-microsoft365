@@ -101,7 +101,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

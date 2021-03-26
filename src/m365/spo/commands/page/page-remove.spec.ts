@@ -95,7 +95,8 @@ describe(commands.PAGE_REMOVE, () => {
         try {
           assert(loggerLogSpy.notCalled);
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -117,7 +118,8 @@ describe(commands.PAGE_REMOVE, () => {
         try {
           assert(loggerLogToStderrSpy.called);
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -146,7 +148,8 @@ describe(commands.PAGE_REMOVE, () => {
         try {
           assert(loggerLogToStderrSpy.called);
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -172,7 +175,8 @@ describe(commands.PAGE_REMOVE, () => {
         try {
           assert(loggerLogSpy.notCalled);
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -198,7 +202,8 @@ describe(commands.PAGE_REMOVE, () => {
         try {
           assert(loggerLogToStderrSpy.called);
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -225,7 +230,8 @@ describe(commands.PAGE_REMOVE, () => {
         try {
           assert(promptIssued);
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -233,7 +239,7 @@ describe(commands.PAGE_REMOVE, () => {
   });
 
   it('should abort page removal when prompt not confirmed', (done) => {
-    let postCallSpy = fakeRestCalls();
+    const postCallSpy = fakeRestCalls();
     Utils.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: false });
@@ -250,7 +256,8 @@ describe(commands.PAGE_REMOVE, () => {
         try {
           assert(postCallSpy.notCalled === true);
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -276,7 +283,8 @@ describe(commands.PAGE_REMOVE, () => {
         try {
           assert(loggerLogSpy.notCalled);
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -284,7 +292,7 @@ describe(commands.PAGE_REMOVE, () => {
   });
 
   it('correctly handles OData error when removing modern page', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
@@ -305,7 +313,8 @@ describe(commands.PAGE_REMOVE, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }

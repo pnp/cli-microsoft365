@@ -534,7 +534,7 @@ describe(commands.THEME_APPLY, () => {
         debug: true,
         name: 'Contoso',
         filePath: 'theme.json',
-        inverted: false,
+        inverted: false
       }
     } as any, (err?: any) => {
       try {
@@ -597,7 +597,7 @@ describe(commands.THEME_APPLY, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, {
       options: {

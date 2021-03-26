@@ -49,7 +49,7 @@ class YammerGroupUserAddCommand extends YammerCommand {
     request
       .post(requestOptions)
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

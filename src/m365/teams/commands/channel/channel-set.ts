@@ -42,7 +42,7 @@ class TeamsChannelSetCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
-    }
+    };
 
     request
       .get<{ value: Channel[] }>(requestOptions)

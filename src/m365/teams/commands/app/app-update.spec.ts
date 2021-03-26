@@ -132,7 +132,8 @@ describe(commands.TEAMS_APP_UPDATE, () => {
       try {
         assert(updateTeamsAppCalled);
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -163,7 +164,7 @@ describe(commands.TEAMS_APP_UPDATE, () => {
   });
 
   it('correctly handles error when updating an app', (done) => {
-    sinon.stub(request, 'put').callsFake((opts) => {
+    sinon.stub(request, 'put').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
@@ -173,7 +174,8 @@ describe(commands.TEAMS_APP_UPDATE, () => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });

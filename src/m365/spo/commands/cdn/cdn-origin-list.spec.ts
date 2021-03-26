@@ -250,7 +250,7 @@ describe(commands.CDN_ORIGIN_LIST, () => {
 
   it('correctly handles random API error', (done) => {
     Utils.restore(request.post);
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

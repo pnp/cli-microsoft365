@@ -10,7 +10,7 @@ describe('FN012006_TSC_types_es6_collections', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN012006_TSC_types_es6_collections(false);
-  })
+  });
 
   it('doesn\'t return notification if es6-collection should be removed and is not present', () => {
     const project: Project = {

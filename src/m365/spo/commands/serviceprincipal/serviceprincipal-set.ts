@@ -81,7 +81,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
           
           cb();
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       toggleServicePrincipal();
@@ -91,7 +91,7 @@ class SpoServicePrincipalSetCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to ${enabled ? 'enable' : 'disable'} the service principal?`,
+        message: `Are you sure you want to ${enabled ? 'enable' : 'disable'} the service principal?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

@@ -17,25 +17,25 @@ export class FN004001_CFG_CA_schema extends JsonRule {
 
   get description(): string {
     return `Update copy-assets.json schema URL`;
-  };
+  }
 
   get resolution(): string {
     return `{
   "$schema": "${this.schema}"
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './config/copy-assets.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.copyAssetsJson) {

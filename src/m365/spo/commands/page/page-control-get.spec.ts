@@ -265,7 +265,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
   });
 
   it('correctly handles page not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {
@@ -291,7 +291,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
   });
 
   it('correctly handles OData error when retrieving pages', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 

@@ -17,7 +17,7 @@ export class FN010007_YORC_isDomainIsolated extends JsonRule {
 
   get description(): string {
     return `Update isDomainIsolated in .yo-rc.json`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,19 +25,19 @@ export class FN010007_YORC_isDomainIsolated extends JsonRule {
     "isDomainIsolated": ${this.value.toString()}
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Recommended';
-  };
+  }
 
   get file(): string {
     return './.yo-rc.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.yoRcJson) {

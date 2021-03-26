@@ -66,7 +66,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
   });
 
   it('correctly handles error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "base": "An error has occurred."

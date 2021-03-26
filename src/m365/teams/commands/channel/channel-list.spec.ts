@@ -99,7 +99,7 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
   it('validates for a correct input.', (done) => {
     const actual = command.validate({
       options: {
-        teamId: '00000000-0000-0000-0000-000000000000',
+        teamId: '00000000-0000-0000-0000-000000000000'
       }
     });
     assert.strictEqual(actual, true);
@@ -488,7 +488,7 @@ describe(commands.TEAMS_CHANNEL_LIST, () => {
   });
 
   it('correctly handles error when retrieving all teams', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

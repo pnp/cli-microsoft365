@@ -31,4 +31,4 @@ describe('appInsights', () => {
     const i: any = require('./appInsights');
     assert(i.default.commonProperties.env === 'docker');
   });
-})
+});

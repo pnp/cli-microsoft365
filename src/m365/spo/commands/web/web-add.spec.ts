@@ -16,7 +16,7 @@ describe(commands.WEB_ADD, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc' }); });
     auth.service.connected = true;
   });
@@ -442,7 +442,7 @@ describe(commands.WEB_ADD, () => {
               "ErrorMessage": "An error has occurred.", "ErrorValue": null, "TraceCorrelationId": "7420429e-a097-5000-fcf8-bab3f3683799", "ErrorCode": -2146232832, "ErrorTypeName": "Microsoft.SharePoint.SPFieldValidationException"
             }, "TraceCorrelationId": "7420429e-a097-5000-fcf8-bab3f3683799"
           }
-        ]))
+        ]));
       }
 
       return Promise.reject('Invalid request');

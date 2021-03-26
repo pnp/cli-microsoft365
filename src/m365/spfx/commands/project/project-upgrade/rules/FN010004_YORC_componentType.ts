@@ -17,23 +17,23 @@ export class FN010004_YORC_componentType extends JsonRule {
 
   get description(): string {
     return `Update componentType in .yo-rc.json`;
-  };
+  }
 
   get resolution(): string {
     return '';
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Recommended';
-  };
+  }
 
   get file(): string {
     return './.yo-rc.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.yoRcJson) {

@@ -15,7 +15,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
-  let JSONActiveSubscription =
+  const JSONActiveSubscription =
     [
       {
         "contentType": "Audit.Exchange",
@@ -265,7 +265,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
   afterEach(() => {
     Utils.restore([
       request.get,
-      request.post,
+      request.post
     ]);
   });
 

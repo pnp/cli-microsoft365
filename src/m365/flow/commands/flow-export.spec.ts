@@ -16,7 +16,7 @@ describe(commands.FLOW_EXPORT, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
-  const actualFilename = `20180916t000000zba9d7134cc81499e9884bf70642afac7_20180916042428.zip`
+  const actualFilename = `20180916t000000zba9d7134cc81499e9884bf70642afac7_20180916042428.zip`;
   const actualFileUrl = `https://bapfeblobprodml.blob.core.windows.net/20180916t000000zb5faa82a53cb4cd29f2a20fde7dbb785/${actualFilename}?sv=2017-04-17&sr=c&sig=AOp0fzKc0dLpY2yovI%2BSHJnQ92GxaMvbWgxyCX5Wwno%3D&se=2018-09-16T12%3A24%3A28Z&sp=rl`;
   const flowDisplayName = `Request manager approval for a Page`;
   const notFoundFlowId = '1c6ee23a-a835-44bc-a4f5-462b658efc12';
@@ -25,7 +25,7 @@ describe(commands.FLOW_EXPORT, () => {
   const foundEnvironmentId = 'cf409f12-a06f-426e-9955-20f5d7a31dd3';
   const nonZipFileFlowId = '694d21e4-49be-4e19-987b-074889e45c75';
 
-  let postFakes = (opts: any) => {
+  const postFakes = (opts: any) => {
     if ((opts.url as string).indexOf(notFoundEnvironmentId) > -1) {
       return Promise.reject({
         "error": {
@@ -78,9 +78,9 @@ describe(commands.FLOW_EXPORT, () => {
       );
     }
     return Promise.reject('Invalid request');
-  }
+  };
 
-  let getFakes = (opts: any) => {
+  const getFakes = (opts: any) => {
     if ((opts.url as string).indexOf(notFoundEnvironmentId) > -1) {
       return Promise.reject({
         "error": {
@@ -112,9 +112,9 @@ describe(commands.FLOW_EXPORT, () => {
     }
 
     return Promise.reject('Invalid request');
-  }
+  };
 
-  let writeFileSyncFake = () => { };
+  const writeFileSyncFake = () => { };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -308,7 +308,7 @@ describe(commands.FLOW_EXPORT, () => {
   });
 
   it('call is made with suggestedCreationType properties when format specified as ZIP', (done) => {
-    const resourceIds = ["L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FAZFGGHDDCAAVEX0FQUFJPVkFMUw==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkAZVVDSSAFBRTM2NVVTRVJTL0NPTk5FQ1RJT05TL1NIQVJFRC1PRkZJQ0UzNjVVU0VSLUExOUI5QjBELTFFQTUtNDhGOS1BQUM4LTgwRjkyQTFGRjE3OB==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX09GRklDRTM2NVVTRVJT", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX0FQUFJPVkFMUy9DT05ORUNUSU9OUy1AFFFVAGJXAAGHQUk9WQUxTLUQ2Njc1RUE5LUZDM0QtNDA4MS1CNTY4LUFCRDc3MzMyOTMyMZ==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NFTkRNQUlM", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NFTkRNQUlML0NPTk5FQ1RJT05TL1NIQVJFRC1TRU5ETUFJTC05NEUzODVCQi1CNUE3LTRBODgtOURFRC1FMEVFRDAzNTY1Njk=", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NIQVJFUE9JTlRPTkxJTkU=", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NIQVJFUE9JTlRPTkxJTkUvQ09OTkVDVElPTlMvU0hBUkVELVNIQVJFUE9JTlRPTkwtRjg0NTE4MDktREEwNi00RDQ3LTg3ODYtMTUxMjM4RDUwRTdB"]
+    const resourceIds = ["L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FAZFGGHDDCAAVEX0FQUFJPVkFMUw==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkAZVVDSSAFBRTM2NVVTRVJTL0NPTk5FQ1RJT05TL1NIQVJFRC1PRkZJQ0UzNjVVU0VSLUExOUI5QjBELTFFQTUtNDhGOS1BQUM4LTgwRjkyQTFGRjE3OB==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX09GRklDRTM2NVVTRVJT", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX0FQUFJPVkFMUy9DT05ORUNUSU9OUy1AFFFVAGJXAAGHQUk9WQUxTLUQ2Njc1RUE5LUZDM0QtNDA4MS1CNTY4LUFCRDc3MzMyOTMyMZ==", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NFTkRNQUlM", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NFTkRNQUlML0NPTk5FQ1RJT05TL1NIQVJFRC1TRU5ETUFJTC05NEUzODVCQi1CNUE3LTRBODgtOURFRC1FMEVFRDAzNTY1Njk=", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NIQVJFUE9JTlRPTkxJTkU=", "L1BST1ZJREVSUy9NSUNST1NPRlQuUE9XRVJBUFBTL0FQSVMvU0hBUkVEX1NIQVJFUE9JTlRPTkxJTkUvQ09OTkVDVElPTlMvU0hBUkVELVNIQVJFUE9JTlRPTkwtRjg0NTE4MDktREEwNi00RDQ3LTg3ODYtMTUxMjM4RDUwRTdB"];
     const postRequestsStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake(postFakes);
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(fs, 'writeFileSync').callsFake(writeFileSyncFake);

@@ -108,7 +108,7 @@ class TeamsChannelGetCommand extends GraphCommand {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
-        }
+        };
 
         return request
           .get<Channel>(requestOptions);

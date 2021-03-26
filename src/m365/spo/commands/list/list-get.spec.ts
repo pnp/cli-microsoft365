@@ -16,7 +16,7 @@ describe(commands.LIST_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -59,73 +59,75 @@ describe(commands.LIST_GET, () => {
   });
 
   it('retrieves and prints all details of list if title option is passed', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       //if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
-        return Promise.resolve(
-          {
-            "AllowContentTypes": true,
-            "BaseTemplate": 109,
-            "BaseType": 1,
-            "ContentTypesEnabled": false,
-            "CrawlNonDefaultViews": false,
-            "Created": null,
-            "CurrentChangeToken": null,
-            "CustomActionElements": null,
-            "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
-            "DefaultItemOpenUseListSetting": false,
-            "Description": "",
-            "Direction": "none",
-            "DocumentTemplateUrl": null,
-            "DraftVersionVisibility": 0,
-            "EnableAttachments": false,
-            "EnableFolderCreation": true,
-            "EnableMinorVersions": false,
-            "EnableModeration": false,
-            "EnableVersioning": false,
-            "EntityTypeName": "Documents",
-            "ExemptFromBlockDownloadOfNonViewableFiles": false,
-            "FileSavePostProcessingEnabled": false,
-            "ForceCheckout": false,
-            "HasExternalDataSource": false,
-            "Hidden": false,
-            "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
-            "ImagePath": null,
-            "ImageUrl": null,
-            "IrmEnabled": false,
-            "IrmExpire": false,
-            "IrmReject": false,
-            "IsApplicationList": false,
-            "IsCatalog": false,
-            "IsPrivate": false,
-            "ItemCount": 69,
-            "LastItemDeletedDate": null,
-            "LastItemModifiedDate": null,
-            "LastItemUserModifiedDate": null,
-            "ListExperienceOptions": 0,
-            "ListItemEntityTypeFullName": null,
-            "MajorVersionLimit": 0,
-            "MajorWithMinorVersionsLimit": 0,
-            "MultipleDataList": false,
-            "NoCrawl": false,
-            "ParentWebPath": null,
-            "ParentWebUrl": null,
-            "ParserDisabled": false,
-            "ServerTemplateCanCreateFolders": true,
-            "TemplateFeatureId": null,
-            "Title": "Documents"
-          }
-        );
+      return Promise.resolve(
+        {
+          "AllowContentTypes": true,
+          "BaseTemplate": 109,
+          "BaseType": 1,
+          "ContentTypesEnabled": false,
+          "CrawlNonDefaultViews": false,
+          "Created": null,
+          "CurrentChangeToken": null,
+          "CustomActionElements": null,
+          "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
+          "DefaultItemOpenUseListSetting": false,
+          "Description": "",
+          "Direction": "none",
+          "DocumentTemplateUrl": null,
+          "DraftVersionVisibility": 0,
+          "EnableAttachments": false,
+          "EnableFolderCreation": true,
+          "EnableMinorVersions": false,
+          "EnableModeration": false,
+          "EnableVersioning": false,
+          "EntityTypeName": "Documents",
+          "ExemptFromBlockDownloadOfNonViewableFiles": false,
+          "FileSavePostProcessingEnabled": false,
+          "ForceCheckout": false,
+          "HasExternalDataSource": false,
+          "Hidden": false,
+          "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
+          "ImagePath": null,
+          "ImageUrl": null,
+          "IrmEnabled": false,
+          "IrmExpire": false,
+          "IrmReject": false,
+          "IsApplicationList": false,
+          "IsCatalog": false,
+          "IsPrivate": false,
+          "ItemCount": 69,
+          "LastItemDeletedDate": null,
+          "LastItemModifiedDate": null,
+          "LastItemUserModifiedDate": null,
+          "ListExperienceOptions": 0,
+          "ListItemEntityTypeFullName": null,
+          "MajorVersionLimit": 0,
+          "MajorWithMinorVersionsLimit": 0,
+          "MultipleDataList": false,
+          "NoCrawl": false,
+          "ParentWebPath": null,
+          "ParentWebUrl": null,
+          "ParserDisabled": false,
+          "ServerTemplateCanCreateFolders": true,
+          "TemplateFeatureId": null,
+          "Title": "Documents"
+        }
+      );
       //}
       //return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: {
-      debug: true,
-      title: 'Documents',
-      webUrl: 'https://contoso.sharepoint.com'
-    } }, () => {
+    command.action(logger, {
+      options: {
+        debug: true,
+        title: 'Documents',
+        webUrl: 'https://contoso.sharepoint.com'
+      }
+    }, () => {
       try {
-        assert(loggerLogSpy.calledWith({ 
+        assert(loggerLogSpy.calledWith({
           AllowContentTypes: true,
           BaseTemplate: 109,
           BaseType: 1,
@@ -201,7 +203,7 @@ describe(commands.LIST_GET, () => {
       options: {
         debug: true,
         title: actionTitle,
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, (error?: any) => {
       try {
@@ -217,7 +219,7 @@ describe(commands.LIST_GET, () => {
   it('uses correct API url when id option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -229,12 +231,12 @@ describe(commands.LIST_GET, () => {
       options: {
         debug: false,
         id: actionId,
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
 
       try {
-        assert(1===1);
+        assert(1 === 1);
         done();
       }
       catch (e) {

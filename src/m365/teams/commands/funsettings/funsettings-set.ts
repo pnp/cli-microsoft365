@@ -68,7 +68,7 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
     request
       .patch(requestOptions)
       .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
@@ -116,7 +116,7 @@ class TeamsFunSettingsSetCommand extends GraphCommand {
     if (args.options.giphyContentRating) {
       const giphyContentRating = args.options.giphyContentRating.toLowerCase();
       if (giphyContentRating !== 'strict' && giphyContentRating !== 'moderate') {
-        return `giphyContentRating value ${value} is not valid.  Please specify Strict or Moderate.`
+        return `giphyContentRating value ${value} is not valid.  Please specify Strict or Moderate.`;
       }
     }
 

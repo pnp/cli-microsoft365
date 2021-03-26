@@ -274,7 +274,7 @@ describe(commands.TERM_GROUP_GET, () => {
   });
 
   it('correctly handles error when retrieving taxonomy term groups', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7018.1204", "ErrorInfo": {

@@ -89,7 +89,7 @@ describe(commands.THEME_REMOVE, () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -119,7 +119,7 @@ describe(commands.THEME_REMOVE, () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -148,7 +148,7 @@ describe(commands.THEME_REMOVE, () => {
     const postStub: sinon.SinonStub = sinon.stub(request, 'post').callsFake((opts) => {
 
       if ((opts.url as string).indexOf('/_api/thememanager/DeleteTenantTheme') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');

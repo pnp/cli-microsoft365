@@ -58,7 +58,7 @@ class SpoPageControlListCommand extends SpoCommand {
           return;
         }
 
-        return this.handleRejectedODataJsonPromise(err, logger, cb)
+        return this.handleRejectedODataJsonPromise(err, logger, cb);
       });
   }
 

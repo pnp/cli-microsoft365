@@ -38,13 +38,13 @@ class TeamsFunSettingsListCommand extends GraphCommand {
         logger.log(res.funSettings);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
         option: '-i, --teamId <teamId>'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();

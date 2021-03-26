@@ -18,23 +18,23 @@ export class FN022002_SCSS_add_fabric_react extends ScssRule {
 
   get description(): string {
     return `Add scss file import`;
-  };
+  }
 
   get resolution(): string {
     return `@import '${this.importValue}'`;
-  };
+  }
 
   get resolutionType(): string {
     return 'scss';
-  };
+  }
 
   get severity(): string {
     return 'Optional';
-  };
+  }
 
   get file(): string {
     return '';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (Utils.isReactProject(project) === false) {

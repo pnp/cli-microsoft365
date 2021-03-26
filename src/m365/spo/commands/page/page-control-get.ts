@@ -60,7 +60,7 @@ class SpoPageControlGetCommand extends SpoCommand {
             },
             type: getControlTypeDisplayName(control.controlType || 0),
             ...control.webPartData || {}
-          }
+          };
 
           logger.log(controlData);
         }

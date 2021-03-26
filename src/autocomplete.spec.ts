@@ -14,7 +14,7 @@ class SimpleCommand extends Command {
     return 'cli mock';
   }
   public get description(): string {
-    return 'Mock command'
+    return 'Mock command';
   }
   public commandAction(logger: Logger, args: any, cb: () => void): void {
     cb();
@@ -26,7 +26,7 @@ class CommandWithOptions extends Command {
     return 'cli mock2';
   }
   public get description(): string {
-    return 'Mock command 2'
+    return 'Mock command 2';
   }
   public options(): CommandOption[] {
     const options: CommandOption[] = [
@@ -48,7 +48,7 @@ class CommandWithAlias extends Command {
     return 'cli mock';
   }
   public get description(): string {
-    return 'Mock command'
+    return 'Mock command';
   }
   public alias(): string[] | undefined {
     return ['cli alias'];
@@ -61,7 +61,7 @@ class CommandWithAlias extends Command {
 describe('autocomplete', () => {
   let autocomplete: any;
   let sandbox: SinonSandbox;
-  let commandInfo = {
+  const commandInfo = {
     "help": {
       "--help": {}
     },
@@ -114,7 +114,7 @@ describe('autocomplete', () => {
   });
 
   afterEach(() => {
-    (cli as any).commands = []
+    (cli as any).commands = [];
   });
 
   after(() => {
@@ -126,7 +126,7 @@ describe('autocomplete', () => {
   });
 
   it('writes sh completion to disk', () => {
-    const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake((path, contents) => { });
+    const writeFileSyncStub = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
     (cli as any).loadCommand(new SimpleCommand());
     autocomplete.generateShCompletion();
     assert(writeFileSyncStub.calledWith(path.join(__dirname, `..${path.sep}commands.json`), JSON.stringify({
@@ -231,8 +231,8 @@ describe('autocomplete', () => {
 
   it('loads generated commands info from the file system', () => {
     Utils.restore(fs.existsSync);
-    sinon.stub(fs, 'existsSync').callsFake((path) => true);
-    const readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => JSON.stringify({}));
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake(() => JSON.stringify({}));
     (autocomplete as any).init();
     try {
       assert(readFileSyncStub.calledWith(path.join(__dirname, `..${path.sep}commands.json`), 'utf-8'));
@@ -251,8 +251,8 @@ describe('autocomplete', () => {
 
   it('doesnt fail when the commands file is empty', () => {
     Utils.restore(fs.existsSync);
-    sinon.stub(fs, 'existsSync').callsFake((path) => true);
-    const readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => '');
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const readFileSyncStub = sinon.stub(fs, 'readFileSync').callsFake(() => '');
     (autocomplete as any).init();
     try {
       assert.strictEqual(JSON.stringify((autocomplete as any).commands), JSON.stringify({}));
@@ -274,7 +274,7 @@ describe('autocomplete', () => {
       before: "m365",
       fragment: 1,
       line: "m365 ",
-      reply: (data: Object | string[]) => { }
+      reply: (_data: any | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -290,7 +290,7 @@ describe('autocomplete', () => {
       before: "spo",
       fragment: 2,
       line: "m365 spo ",
-      reply: (data: Object | string[]) => { }
+      reply: (_data: any | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -317,7 +317,7 @@ describe('autocomplete', () => {
       before: "status",
       fragment: 3,
       line: "m365 spo status ",
-      reply: (data: Object | string[]) => { }
+      reply: (_data: any | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -333,7 +333,7 @@ describe('autocomplete', () => {
       before: "--output",
       fragment: 4,
       line: "m365 spo status --output ",
-      reply: (data: Object | string[]) => { }
+      reply: (_data: any | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -349,7 +349,7 @@ describe('autocomplete', () => {
       before: "json",
       fragment: 5,
       line: "m365 spo status --output json ",
-      reply: (data: Object | string[]) => { }
+      reply: (_data: any | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -365,7 +365,7 @@ describe('autocomplete', () => {
       before: "--debug",
       fragment: 6,
       line: "m365 spo status --output json --debug ",
-      reply: (data: Object | string[]) => { }
+      reply: (_data: any | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -381,7 +381,7 @@ describe('autocomplete', () => {
       before: "def",
       fragment: 2,
       line: "m365 abc def",
-      reply: (data: Object | string[]) => { }
+      reply: (_data: any | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {
@@ -397,7 +397,7 @@ describe('autocomplete', () => {
       before: "def",
       fragment: 3,
       line: "m365 abc def ",
-      reply: (data: Object | string[]) => { }
+      reply: (_data: any | string[]) => { }
     };
     const replies: any[] = [];
     const replyStub = sinon.stub(evtData, 'reply').callsFake((r) => {

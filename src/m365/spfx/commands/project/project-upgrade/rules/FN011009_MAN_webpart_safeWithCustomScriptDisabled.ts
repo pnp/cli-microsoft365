@@ -17,17 +17,17 @@ export class FN011009_MAN_webpart_safeWithCustomScriptDisabled extends ManifestR
 
   get description(): string {
     return `${this.add ? 'Update' : 'Remove'} the safeWithCustomScriptDisabled property in the manifest`;
-  };
+  }
 
   get resolution(): string {
     return `{
   "safeWithCustomScriptDisabled": false
 }`;
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.manifests ||

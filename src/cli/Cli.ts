@@ -60,6 +60,7 @@ export class Cli {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {
   }
 
@@ -130,7 +131,7 @@ export class Cli {
     // if the command doesn't allow unknown options, check if all specified
     // options match command options
     if (!this.commandToExecute.command.allowUnknownOptions()) {
-      for (let optionFromArgs in this.optionsFromArgs.options) {
+      for (const optionFromArgs in this.optionsFromArgs.options) {
         if (optionFromArgs === '_') {
           // ignore catch-all option
           continue;
@@ -292,7 +293,7 @@ export class Cli {
         }
       }
     });
-  };
+  }
 
   /**
    * Loads command files into CLI based on the specified arguments.
@@ -359,7 +360,7 @@ export class Cli {
     return fs.statSync(dir).isDirectory()
       ? Array.prototype.concat(...fs.readdirSync(dir).map(f => Cli.readdirR(path.join(dir, f))))
       : dir;
-  };
+  }
 
   private loadCommand(command: Command): void {
     this.commands.push({
@@ -566,7 +567,7 @@ export class Cli {
     return undefined;
   }
 
-  private printHelp(exitCode: number = 0, std: any = Cli.log): void {
+  private printHelp(exitCode: number = 0): void {
     if (this.commandToExecute) {
       this.printCommandHelp();
     }
@@ -679,7 +680,7 @@ export class Cli {
           }
         }
       }
-    }
+    };
 
     getCommandsForGroup();
     if (Object.keys(commandsToPrint).length === 0 &&
@@ -697,7 +698,7 @@ export class Cli {
       Cli.log(`Commands:`);
       Cli.log();
 
-      for (let commandName in commandsToPrint) {
+      for (const commandName in commandsToPrint) {
         Cli.log(`  ${`${commandName} [options]`.padEnd(maxLength, ' ')}  ${commandsToPrint[commandName].command.description}`);
       }
     }
@@ -723,7 +724,7 @@ export class Cli {
           return object;
         }, {});
 
-      for (let commandGroup in sortedCommandGroupsToPrint) {
+      for (const commandGroup in sortedCommandGroupsToPrint) {
         Cli.log(`  ${`${commandGroup} *`.padEnd(maxLength, ' ')}  ${commandGroupsToPrint[commandGroup]} command${commandGroupsToPrint[commandGroup] === 1 ? '' : 's'}`);
       }
     }

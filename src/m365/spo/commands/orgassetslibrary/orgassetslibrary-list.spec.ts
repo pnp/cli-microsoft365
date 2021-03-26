@@ -374,7 +374,7 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
       options: {
         debug: true
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(loggerLogSpy.calledWith('No libraries in Organization Assets'));
         done();
@@ -417,7 +417,7 @@ describe(commands.ORGASSETSLIBRARY_LIST, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {

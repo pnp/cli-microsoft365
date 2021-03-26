@@ -17,7 +17,7 @@ describe('FN012010_TSC_experimentalDecorators', () => {
       path: '/usr/tmp',
       tsConfigJson: {
         compilerOptions: {
-          experimentalDecorators: true,
+          experimentalDecorators: true
         }
       }
     };
@@ -30,11 +30,11 @@ describe('FN012010_TSC_experimentalDecorators', () => {
       path: '/usr/tmp',
       tsConfigJson: {
         compilerOptions: {
-          experimentalDecorators: false,
+          experimentalDecorators: false
         },
         source: JSON.stringify({
           compilerOptions: {
-            experimentalDecorators: false,
+            experimentalDecorators: false
           }
         }, null, 2)
       }

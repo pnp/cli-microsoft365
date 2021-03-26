@@ -203,7 +203,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
   // all enums as get methods
   private getSharingLinkType(): string[] { return ['None', 'Direct', 'Internal', 'AnonymousAccess']; }
   private getSharingCapabilities(): string[] { return ['Disabled', 'ExternalUserSharingOnly', 'ExternalUserAndGuestSharing', 'ExistingExternalUserSharingOnly']; }
-  private getSharingDomainRestrictionModes(): string[] { return ['None', 'AllowList', 'BlockList'] };
+  private getSharingDomainRestrictionModes(): string[] { return ['None', 'AllowList', 'BlockList']; }
   private getSharingState(): string[] { return ['Unspecified', 'On', 'Off']; }
   private getAnonymousLinkType(): string[] { return ['None', 'View', 'Edit']; }
   private getSharingPermissionType(): string[] { return ['None', 'View', 'Edit']; }
@@ -232,7 +232,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         // map the args.options to XML Properties
         let propsXml: string = '';
         let id: number = 42; // geek's humor
-        for (let optionKey of Object.keys(args.options)) {
+        for (const optionKey of Object.keys(args.options)) {
           if (this.isExcludedOption(optionKey)) {
             continue;
           }
@@ -262,7 +262,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
           else {
             propsXml += `<SetProperty Id="${id++}" ObjectPathId="7" Name="${optionKey}"><Parameter Type="String">${optionValue}</Parameter></SetProperty>`;
           }
-        };
+        }
 
         const requestOptions: any = {
           url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
@@ -360,7 +360,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         autocomplete: ['true', 'false']
       },
       {
-        option: '--BccExternalSharingInvitationsList [BccExternalSharingInvitationsList]',
+        option: '--BccExternalSharingInvitationsList [BccExternalSharingInvitationsList]'
       },
       {
         option: '--UserVoiceForFeedbackEnabled [UserVoiceForFeedbackEnabled]',
@@ -387,7 +387,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         autocomplete: this.getSharingDomainRestrictionModes()
       },
       {
-        option: '--OneDriveStorageQuota [OneDriveStorageQuota]',
+        option: '--OneDriveStorageQuota [OneDriveStorageQuota]'
       },
       {
         option: '--OneDriveForGuestsEnabled [OneDriveForGuestsEnabled]',
@@ -401,7 +401,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
         option: '--IPAddressAllowList [IPAddressAllowList]'
       },
       {
-        option: '--IPAddressWACTokenLifetime [IPAddressWACTokenLifetime]',
+        option: '--IPAddressWACTokenLifetime [IPAddressWACTokenLifetime]'
       },
       {
         option: '--UseFindPeopleInPeoplePicker [UseFindPeopleInPeoplePicker]',
@@ -608,7 +608,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
     const opts: any = args.options;
     let hasAtLeastOneOption: boolean = false;
 
-    for (let propertyKey of Object.keys(opts)) {
+    for (const propertyKey of Object.keys(opts)) {
       if (this.isExcludedOption(propertyKey)) {
         continue;
       }
@@ -617,7 +617,7 @@ class SpoTenantSettingsSetCommand extends SpoCommand {
       const propertyValue = opts[propertyKey];
       const commandOptions: CommandOption[] = this.options();
 
-      for (let item of commandOptions) {
+      for (const item of commandOptions) {
         if (item.option.indexOf(propertyKey) > -1 &&
           item.autocomplete &&
           item.autocomplete.indexOf(propertyValue.toString()) === -1) {

@@ -88,7 +88,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
         confirm: true,
         url: "http://contoso.sharepoint.com/sites/site1"
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(svcListRequest.called);
         done();
@@ -122,7 +122,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
         confirm: false,
         url: "http://contoso.sharepoint.com/sites/site1"
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(svcListRequest.called);
         done();
@@ -169,7 +169,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1', confirm: true } } as any, (err?: any) => {
       try {
@@ -201,7 +201,7 @@ describe(commands.ORGNEWSSITE_REMOVE, () => {
   });
 
   it('aborts when declined confirmation', (done) => {
-    const postStub = sinon.stub(request, 'post').callsFake((opts) => {
+    const postStub = sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('Invalid request');
     });
     Utils.restore(Cli.prompt);

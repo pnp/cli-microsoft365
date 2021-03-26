@@ -54,7 +54,6 @@ class SpoSiteAddCommand extends SpoCommand {
   private context?: FormDigestInfo;
   private spoAdminUrl?: string;
   private dots?: string;
-  private timeout?: NodeJS.Timer;
 
   private get supportedLcids(): number[] {
     // Languages supported by SharePoint
@@ -128,7 +127,7 @@ class SpoSiteAddCommand extends SpoCommand {
           logger.logToStderr(`Creating new site...`);
         }
 
-        let requestOptions: any = {}
+        let requestOptions: any = {};
 
         if (isTeamSite) {
           requestOptions = {
@@ -313,14 +312,14 @@ class SpoSiteAddCommand extends SpoCommand {
           }
           else {
             const operation: SpoOperation = json[json.length - 1];
-            let isComplete: boolean = operation.IsComplete;
+            const isComplete: boolean = operation.IsComplete;
             if (!args.options.wait || isComplete) {
               resolve();
               return;
             }
 
-            this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
+            setTimeout(() => {
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
             }, operation.PollingInterval);
           }
         });
@@ -370,7 +369,7 @@ class SpoSiteAddCommand extends SpoCommand {
             }
           }
         })
-        .then((exists: boolean): Promise<string> => {
+        .then((): Promise<string> => {
           if (this.verbose) {
             logger.logToStderr(`Site doesn't exist. Checking if the site ${url} exists in the recycle bin...`);
           }
@@ -445,14 +444,14 @@ class SpoSiteAddCommand extends SpoCommand {
           }
           else {
             const operation: SpoOperation = json[json.length - 1];
-            let isComplete: boolean = operation.IsComplete;
+            const isComplete: boolean = operation.IsComplete;
             if (!wait || isComplete) {
               resolve();
               return;
             }
 
             setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
             }, operation.PollingInterval);
           }
         });

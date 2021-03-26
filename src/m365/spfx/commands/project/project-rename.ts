@@ -87,7 +87,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
 
   private generateNewId = (): string => {
     return v4();
-  }
+  };
 
   private replacePackageJsonContent = (filePath: string, args: CommandArgs, logger: Logger) => {
     if (!fs.existsSync(filePath)) {
@@ -111,7 +111,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
         logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
-  }
+  };
 
   private replaceYoRcJsonContent = (filePath: string, newId: string, args: CommandArgs, logger: Logger) => {
     if (!fs.existsSync(filePath)) {
@@ -147,7 +147,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
         logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
-  }
+  };
 
   private replacePackageSolutionJsonContent = (filePath: string, projectName: string, newId: string, args: CommandArgs, logger: Logger) => {
     if (!fs.existsSync(filePath)) {
@@ -183,7 +183,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
         logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
-  }
+  };
 
   private replaceDeployAzureStorageJsonContent = (filePath: string, args: CommandArgs, logger: Logger) => {
     if (!fs.existsSync(filePath)) {
@@ -207,7 +207,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
         logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
-  }
+  };
 
   private replaceReadMeContent = (filePath: string, projectName: string, args: CommandArgs, logger: Logger) => {
     if (!fs.existsSync(filePath)) {
@@ -224,7 +224,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
         logger.logToStderr(`Updated ${path.basename(filePath)}`);
       }
     }
-  }
+  };
 }
 
 module.exports = new SpfxProjectRenameCommand();

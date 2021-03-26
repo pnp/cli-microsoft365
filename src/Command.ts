@@ -156,6 +156,7 @@ export default abstract class Command {
     ];
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public validate(args: any): boolean | string {
     return true;
   }
@@ -167,7 +168,7 @@ export default abstract class Command {
   public getCommandName(): string {
     let commandName: string = this.name;
     let pos: number = commandName.indexOf('<');
-    let pos1: number = commandName.indexOf('[');
+    const pos1: number = commandName.indexOf('[');
     if (pos > -1 || pos1 > -1) {
       if (pos1 > -1) {
         pos = pos1;
@@ -191,7 +192,8 @@ export default abstract class Command {
           const graphResponseError: GraphResponseError = res.error;
           if (graphResponseError.error.code) {
             callback(new CommandError(graphResponseError.error.code + " - " + graphResponseError.error.message));
-          } else {
+          }
+          else {
             callback(new CommandError(graphResponseError.error.message));
           }
         }
@@ -306,7 +308,7 @@ export default abstract class Command {
     return unknownOptions;
   }
 
-  protected trackUnknownOptions(telemetryProps: any, options: any) {
+  protected trackUnknownOptions(telemetryProps: any, options: any): void {
     const unknownOptions: any = this.getUnknownOptions(options);
     const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     unknownOptionsNames.forEach(o => {
@@ -314,7 +316,7 @@ export default abstract class Command {
     });
   }
 
-  protected addUnknownOptionsToPayload(payload: any, options: any) {
+  protected addUnknownOptionsToPayload(payload: any, options: any): void {
     const unknownOptions: any = this.getUnknownOptions(options);
     const unknownOptionsNames: string[] = Object.getOwnPropertyNames(unknownOptions);
     unknownOptionsNames.forEach(o => {

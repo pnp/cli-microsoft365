@@ -32,7 +32,7 @@ describe('FileAddRemoveRule', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     rule = new FileAddRule(false);
     const project: Project = {
-      path: '/usr/tmp',
+      path: '/usr/tmp'
     };
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
@@ -42,7 +42,7 @@ describe('FileAddRemoveRule', () => {
     sinon.stub(fs, 'existsSync').callsFake(() => true);
     rule = new FileAddRule(true);
     const project: Project = {
-      path: '/usr/tmp',
+      path: '/usr/tmp'
     };
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);

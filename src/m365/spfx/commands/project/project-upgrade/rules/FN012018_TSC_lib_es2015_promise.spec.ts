@@ -10,7 +10,7 @@ describe('FN012018_TSC_lib_es2015_promise', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN012018_TSC_lib_es2015_promise();
-  })
+  });
 
   it('doesn\'t return notification if es2015.promise is already present', () => {
     const project: Project = {

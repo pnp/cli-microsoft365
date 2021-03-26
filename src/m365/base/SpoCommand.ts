@@ -81,7 +81,7 @@ export default abstract class SpoCommand extends Command {
     return false;
   }
 
-  protected waitUntilFinished(operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, logger: Logger, currentContext: FormDigestInfo, dots?: string, timeout?: NodeJS.Timer): void {
+  protected waitUntilFinished(operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, logger: Logger, currentContext: FormDigestInfo, dots?: string): void {
     this
       .ensureFormDigest(siteUrl, logger, currentContext, this.debug)
       .then((res: FormDigestInfo): Promise<string> => {
@@ -114,7 +114,7 @@ export default abstract class SpoCommand extends Command {
         }
         else {
           const operation: SpoOperation = json[json.length - 1];
-          let isComplete: boolean = operation.IsComplete;
+          const isComplete: boolean = operation.IsComplete;
           if (isComplete) {
             if (!this.debug && this.verbose) {
               process.stdout.write('\n');
@@ -124,14 +124,14 @@ export default abstract class SpoCommand extends Command {
             return;
           }
 
-          timeout = setTimeout(() => {
+          setTimeout(() => {
             this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), siteUrl, resolve, reject, logger, currentContext, dots);
           }, operation.PollingInterval);
         }
       });
   }
 
-  protected waitUntilCopyJobFinished(copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, logger: Logger, dots?: string, timeout?: NodeJS.Timer): void {
+  protected waitUntilCopyJobFinished(copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, logger: Logger, dots?: string): void {
     const requestUrl: string = `${siteUrl}/_api/site/GetCopyJobProgress`;
     const requestOptions: any = {
       url: requestUrl,
@@ -175,8 +175,9 @@ export default abstract class SpoCommand extends Command {
           }
 
           resolve();
-        } else {
-          timeout = setTimeout(() => {
+        }
+        else {
+          setTimeout(() => {
             this.waitUntilCopyJobFinished(copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, dots);
           }, pollingInterval);
         }

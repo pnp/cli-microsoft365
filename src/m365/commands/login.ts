@@ -71,8 +71,8 @@ class LoginCommand extends Command {
           auth.service.userName = args.options.userName;
           break;        
         case 'browser':
-            auth.service.authType = AuthType.Browser;
-            break;
+          auth.service.authType = AuthType.Browser;
+          break;
       }
 
       auth
@@ -93,7 +93,7 @@ class LoginCommand extends Command {
           }
           cb();
         });
-    }
+    };
 
     auth
       .clearConnectionInfo()

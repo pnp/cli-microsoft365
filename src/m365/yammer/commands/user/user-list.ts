@@ -115,7 +115,7 @@ class YammerUserListCommand extends YammerCommand {
           reject(err);
         });
     });
-  };
+  }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     this.items = []; // this will reset the items array in interactive mode
@@ -126,7 +126,7 @@ class YammerUserListCommand extends YammerCommand {
         logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

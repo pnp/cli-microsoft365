@@ -50,19 +50,20 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
         this.teamId = teamId;
         return this.getChannelId(teamId, args);
       }).then((channelId: string) => {
-        let endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(channelId)}/members`;
+        const endpoint: string = `${this.resource}/v1.0/teams/${encodeURIComponent(this.teamId)}/channels/${encodeURIComponent(channelId)}/members`;
         return this.getAllItems(endpoint, logger, true);
       }).then((): void => {
         if (args.options.output === 'json') {
           logger.log(this.items);
-        } else {
+        }
+        else {
           logger.log(this.items.map((c: ConversationMember) => {
             return {
               id: c.id,
               displayName: c.displayName,
               userId: c.userId,
               email: c.email
-            }
+            };
           }));
         }
 
@@ -146,8 +147,8 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
           }
 
           return resolve(teamItem.id);
-        }, err => { reject(err) });
-    })
+        }, err => { reject(err); });
+    });
   }
 
   private getChannelId(teamId: string, args: CommandArgs): Promise<string> {
@@ -167,14 +168,16 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
             const channelItem: Channel | undefined = response;
             return resolve(channelItem.id);
           }, (err: any) => {
-            if(err.error && err.error.code == "NotFound") {
+            if(err.error && err.error.code === "NotFound") {
               return reject(`The specified channel '${args.options.channelId}' does not exist or is invalid in the Microsoft Teams team with ID '${teamId}'`);
-            } else {
+            }
+            else {
               return reject(err);
             }            
           });
       });
-    } else {
+    }
+    else {
       const channelRequestOptions: any = {
         url: `${this.resource}/v1.0/teams/${encodeURIComponent(teamId)}/channels?$filter=displayName eq '${encodeURIComponent(args.options.channelName as string)}'`,
         headers: {

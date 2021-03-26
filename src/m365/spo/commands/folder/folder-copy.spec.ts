@@ -14,7 +14,7 @@ describe(commands.FOLDER_COPY, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  let stubAllPostRequests: any = (
+  const stubAllPostRequests: any = (
     recycleFolder: any = null,
     createCopyJobs: any = null,
     waitForJobResult: any = null
@@ -46,9 +46,9 @@ describe(commands.FOLDER_COPY, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
-  let stubAllGetRequests: any = (folderExists: any = null) => {
+  const stubAllGetRequests: any = (folderExists: any = null) => {
     return sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('GetFolderByServerRelativeUrl') > -1) {
         if (folderExists) {
@@ -59,12 +59,12 @@ describe(commands.FOLDER_COPY, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -133,7 +133,7 @@ describe(commands.FOLDER_COPY, () => {
   });
 
   it('should show error when waitForJobResult rejects with JobError', (done) => {
-    const waitForJobResult = new Promise<any>((resolve, reject) => {
+    const waitForJobResult = new Promise<any>((resolve) => {
       const log = JSON.stringify({ Event: 'JobError', Message: 'error1' });
       return resolve({ Logs: [log] });
     });
@@ -159,7 +159,7 @@ describe(commands.FOLDER_COPY, () => {
   });
 
   it('should show error when waitForJobResult rejects with JobFatalError', (done) => {
-    const waitForJobResult = new Promise<any>((resolve, reject) => {
+    const waitForJobResult = new Promise<any>((resolve) => {
       const log = JSON.stringify({ Event: 'JobFatalError', Message: 'error2' });
       return resolve({ JobState: 0, Logs: [log] });
     });

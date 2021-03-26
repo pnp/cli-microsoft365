@@ -114,7 +114,7 @@ class TeamsTabGetCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
-    }
+    };
 
     return request
       .get<{ value: Tab[] }>(tabRequestOptions)
@@ -149,7 +149,7 @@ class TeamsTabGetCommand extends GraphCommand {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
-        }
+        };
 
         return request.get<Tab>(requestOptions);
       })

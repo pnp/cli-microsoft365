@@ -57,9 +57,6 @@ describe(commands.CDN_POLICY_SET, () => {
     requests = [];
   });
 
-  afterEach(() => {
-    });
-
   after(() => {
     Utils.restore([
       auth.restoreAuth,

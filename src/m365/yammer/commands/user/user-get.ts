@@ -39,7 +39,8 @@ class YammerUserGetCommand extends YammerCommand {
 
     if (args.options.userId) {
       endPoint = `${this.resource}/v1/users/${encodeURIComponent(args.options.userId)}.json`;
-    } else if (args.options.email) {
+    }
+    else if (args.options.email) {
       endPoint = `${this.resource}/v1/users/by_email.json?email=${encodeURIComponent(args.options.email)}`;
     }
 

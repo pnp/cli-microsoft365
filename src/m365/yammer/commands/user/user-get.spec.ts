@@ -72,9 +72,9 @@ describe(commands.YAMMER_USER_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { email: "pl@nubo.eu" } } as any, (err?: any) => {
+    command.action(logger, { options: { email: "pl@nubo.eu" } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0][0].id, 1496550646);
         done();
       }
       catch (e) {
@@ -92,9 +92,9 @@ describe(commands.YAMMER_USER_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { userId: 1496550646 } } as any, (err?: any) => {
+    command.action(logger, { options: { userId: 1496550646 } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646);
         done();
       }
       catch (e) {
@@ -112,9 +112,9 @@ describe(commands.YAMMER_USER_GET, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, () => {
       try {
-        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646)
+        assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 1496550646);
         done();
       }
       catch (e) {
@@ -124,7 +124,7 @@ describe(commands.YAMMER_USER_GET, () => {
   });
 
   it('correctly handles error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "base": "An error has occurred."
@@ -144,7 +144,7 @@ describe(commands.YAMMER_USER_GET, () => {
   });
 
   it('correctly handles 404 error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "statusCode": 404
       });

@@ -25,6 +25,6 @@ export interface Manifest extends JsonFile {
 }
 
 export interface CommandSetManifest extends Manifest {
-  commands?: Object;
-  items?: Object;
+  commands?: any;
+  items?: any;
 }

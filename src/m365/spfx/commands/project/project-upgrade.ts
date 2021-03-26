@@ -81,7 +81,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
       uninstall: 'yarn remove',
       uninstallDev: 'yarn remove'
     }
-  }
+  };
 
   private static copyCommands = {
     bash: {
@@ -96,54 +96,54 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
       copyCommand: 'copy',
       copyDestinationParam: ' '
     }
-  }
+  };
 
   private static createDirectoryCommands = {
     bash: {
       createDirectoryCommand: 'mkdir',
       createDirectoryPathParam: ' "',
       createDirectoryNameParam: '/',
-      createDirectoryItemTypeParam: '"',
+      createDirectoryItemTypeParam: '"'
     },
     powershell: {
       createDirectoryCommand: 'New-Item',
       createDirectoryPathParam: ' -Path "',
       createDirectoryNameParam: '" -Name "',
-      createDirectoryItemTypeParam: '" -ItemType "directory"',
+      createDirectoryItemTypeParam: '" -ItemType "directory"'
     },
     cmd: {
       createDirectoryCommand: 'mkdir',
       createDirectoryPathParam: ' "',
       createDirectoryNameParam: '\\',
-      createDirectoryItemTypeParam: '"',
+      createDirectoryItemTypeParam: '"'
     }
-  }
+  };
 
   private static addFileCommands = {
     bash: {
-      addFileCommand: 'cat > [FILEPATH] << EOF [FILECONTENT]EOF',
+      addFileCommand: 'cat > [FILEPATH] << EOF [FILECONTENT]EOF'
     },
     powershell: {
       addFileCommand: `@"[FILECONTENT]"@ | Out-File -FilePath "[FILEPATH]"
-      `,
+      `
     },
     cmd: {
       addFileCommand: `echo [FILECONTENT] > "[FILEPATH]"
-      `,
+      `
     }
-  }
+  };
 
   private static removeFileCommands = {
     bash: {
-      removeFileCommand: 'rm',
+      removeFileCommand: 'rm'
     },
     powershell: {
-      removeFileCommand: 'Remove-Item',
+      removeFileCommand: 'Remove-Item'
     },
     cmd: {
-      removeFileCommand: 'del',
+      removeFileCommand: 'del'
     }
-  }
+  };
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
@@ -238,7 +238,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     }
 
     // dedupe
-    const findings: Finding[] = this.allFindings.filter((f: Finding, i: number, allFindings: Finding[]) => {
+    const findings: Finding[] = this.allFindings.filter((f: Finding, i: number) => {
       const firstFindingPos: number = this.allFindings.findIndex(f1 => f1.id === f.id);
       return i === firstFindingPos;
     });
@@ -333,7 +333,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         const fileContent: string = f.resolution.substring(contentStart, contentEnd);
 
         f.resolution = this.getAddCommand('addFileCommand');
-        f.resolution = f.resolution.replace('[FILECONTENT]', fileContent)
+        f.resolution = f.resolution.replace('[FILECONTENT]', fileContent);
         f.resolution = f.resolution.replace('[FILEPATH]', filePath);
         f.resolution = f.resolution.replace('[BEFOREPATH]', ' ');
         f.resolution = f.resolution.replace('[AFTERPATH]', ' ');
@@ -353,7 +353,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         logger.log(findingsToReport);
         break;
       case 'tour':
-        this.writeReportTourFolder(this.getTourReport(findingsToReport, project), logger, args.options);
+        this.writeReportTourFolder(this.getTourReport(findingsToReport, project));
         break;
       case 'md':
         logger.log(this.getMdReport(findingsToReport));
@@ -365,7 +365,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     cb();
   }
 
-  private writeReportTourFolder(findingsToReport: any, logger: Logger, options: Options): void {
+  private writeReportTourFolder(findingsToReport: any): void {
     const toursFolder: string = path.join(this.projectRootPath as string, '.tours');
 
     if (!fs.existsSync(toursFolder)) {
@@ -393,10 +393,10 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         return [
           file, os.EOL,
           '-'.repeat(file.length), os.EOL,
-          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${m.modification}${os.EOL}`).join(os.EOL), os.EOL,
+          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${m.modification}${os.EOL}`).join(os.EOL), os.EOL
         ].join('');
       }).join(os.EOL),
-      os.EOL,
+      os.EOL
     ];
 
     return s.join('').trim();
@@ -470,10 +470,10 @@ ${f.resolution}
         return [
           `#### [${file}](${file})`, os.EOL,
           os.EOL,
-          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${os.EOL}\`\`\`${reportData.modificationTypePerFile[file]}${os.EOL}${m.modification}${os.EOL}\`\`\``).join(os.EOL + os.EOL), os.EOL,
+          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${os.EOL}\`\`\`${reportData.modificationTypePerFile[file]}${os.EOL}${m.modification}${os.EOL}\`\`\``).join(os.EOL + os.EOL), os.EOL
         ].join('');
       }).join(os.EOL),
-      os.EOL,
+      os.EOL
     ];
 
     return s.join('').trim();
@@ -525,7 +525,8 @@ ${f.resolution}
       // Point to a directory if there is no file
       if (file !== undefined) {
         step.file = file;
-      } else {
+      }
+      else {
         step.directory = "";
       }
 
@@ -592,7 +593,7 @@ ${f.resolution}
       packageManagerCommands: packageManagerCommands,
       modificationPerFile: modificationPerFile,
       modificationTypePerFile: modificationTypePerFile
-    }
+    };
   }
 
   private mapPackageManagerCommand(command: string, packagesDevExact: string[],
@@ -679,7 +680,7 @@ ${f.resolution}
       if (o.option.indexOf('--output') > -1) {
         o.autocomplete = ['json', 'text', 'md', 'tour'];
       }
-    })
+    });
     return options.concat(parentOptions);
   }
 

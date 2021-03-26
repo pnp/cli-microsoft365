@@ -26,7 +26,7 @@ export class FN016002_TS_msgraphclient_instance extends TsRule {
   .then((client: MSGraphClient): void => {
     // use MSGraphClient here
   });`;
-  };
+  }
 
   get resolutionType(): string {
     return 'ts';

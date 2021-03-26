@@ -57,7 +57,7 @@ class AadO365GroupAddCommand extends GraphCommand {
         mailEnabled: true,
         mailNickname: args.options.mailNickname,
         securityEnabled: false,
-        visibility: args.options.isPrivate == 'true' ? 'Private' : 'Public'
+        visibility: args.options.isPrivate === 'true' ? 'Private' : 'Public'
       }
     };
 
@@ -182,22 +182,21 @@ class AadO365GroupAddCommand extends GraphCommand {
   private setGroupLogo(requestOptions: any, retryLeft: number, resolve: () => void, reject: (err: any) => void, logger: Logger): void {
     request
       .put(requestOptions)
-      .then((res: any): void => {
-        resolve();
-      }, (err: any): void => {
-        if (--retryLeft > 0) {
-          setTimeout(() => {
-            this.setGroupLogo(requestOptions, retryLeft, resolve, reject, logger);
-          }, 500 * (AadO365GroupAddCommand.numRepeat - retryLeft));
-        }
-        else {
-          reject(err);
-        }
-      });
+      .then((): void => resolve(),
+        (err: any): void => {
+          if (--retryLeft > 0) {
+            setTimeout(() => {
+              this.setGroupLogo(requestOptions, retryLeft, resolve, reject, logger);
+            }, 500 * (AadO365GroupAddCommand.numRepeat - retryLeft));
+          }
+          else {
+            reject(err);
+          }
+        });
   }
 
   private getImageContentType(imagePath: string): string {
-    let extension: string = imagePath.substr(imagePath.lastIndexOf('.')).toLowerCase();
+    const extension: string = imagePath.substr(imagePath.lastIndexOf('.')).toLowerCase();
 
     switch (extension) {
       case '.png':
@@ -240,7 +239,7 @@ class AadO365GroupAddCommand extends GraphCommand {
 
   public validate(args: CommandArgs): boolean | string {
     if (args.options.owners) {
-      let owners: string[] = args.options.owners.split(',').map(o => o.trim());
+      const owners: string[] = args.options.owners.split(',').map(o => o.trim());
       for (let i = 0; i < owners.length; i++) {
         if (owners[i].indexOf('@') < 0) {
           return `${owners[i]} is not a valid userPrincipalName`;
@@ -249,7 +248,7 @@ class AadO365GroupAddCommand extends GraphCommand {
     }
 
     if (args.options.members) {
-      let members: string[] = args.options.members.split(',').map(m => m.trim());
+      const members: string[] = args.options.members.split(',').map(m => m.trim());
       for (let i = 0; i < members.length; i++) {
         if (members[i].indexOf('@') < 0) {
           return `${members[i]} is not a valid userPrincipalName`;

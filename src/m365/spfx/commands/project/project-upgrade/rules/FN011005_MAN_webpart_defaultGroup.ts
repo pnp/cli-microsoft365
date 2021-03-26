@@ -17,7 +17,7 @@ export class FN011005_MAN_webpart_defaultGroup extends ManifestRule {
 
   get description(): string {
     return 'In the manifest update the default group value';
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,11 +25,11 @@ export class FN011005_MAN_webpart_defaultGroup extends ManifestRule {
     "group": { "default": "${this.newDefaultGroup}" }
   }]
 }`;
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.manifests ||

@@ -14,26 +14,27 @@ export abstract class DependencyRule extends JsonRule {
 
   get description(): string {
     return `${(this.add ? 'Upgrade' : 'Remove')} SharePoint Framework ${(this.isDevDep ? 'dev ' : '')}dependency package ${this.packageName}`;
-  };
+  }
 
   get resolution(): string {
     return this.add ?
       `${(this.isDevDep ? 'installDev' : 'install')} ${this.packageName}@${this.packageVersion}` :
       `${(this.isDevDep ? 'uninstallDev' : 'uninstall')} ${this.packageName}`;
-  };
+  }
 
   get resolutionType(): string {
     return 'cmd';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './package.json';
-  };
+  }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   customCondition(project: Project): boolean {
     return false;
   }

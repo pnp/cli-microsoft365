@@ -33,7 +33,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
   private spoAdminUrl?: string;
   private tenantId?: string;
   private dots?: string;
-  private timeout?: NodeJS.Timer;
 
   public get name(): string {
     return commands.SITE_CLASSIC_SET;
@@ -67,7 +66,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
       .then((_tenantId: string): Promise<string> => {
         this.tenantId = _tenantId;
 
-        return this.getSpoAdminUrl(logger, this.debug)
+        return this.getSpoAdminUrl(logger, this.debug);
       })
       .then((_spoAdminUrl: string): Promise<FormDigestInfo> => {
         this.spoAdminUrl = _spoAdminUrl;
@@ -159,14 +158,14 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           }
           else {
             const operation: SpoOperation = json[json.length - 1];
-            let isComplete: boolean = operation.IsComplete;
+            const isComplete: boolean = operation.IsComplete;
             if (!args.options.wait || isComplete) {
               resolve();
               return;
             }
 
-            this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
+            setTimeout(() => {
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
             }, operation.PollingInterval);
           }
         });
@@ -221,14 +220,14 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           }
           else {
             const operation: SpoOperation = json[json.length - 1];
-            let isComplete: boolean = operation.IsComplete;
+            const isComplete: boolean = operation.IsComplete;
             if (!args.options.wait || isComplete) {
               resolve();
               return;
             }
 
-            this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
+            setTimeout(() => {
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
             }, operation.PollingInterval);
           }
         });

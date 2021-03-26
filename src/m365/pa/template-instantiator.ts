@@ -10,7 +10,7 @@ import { SolutionInitVariables } from "./commands/solution/solution-init/solutio
  * Class: bolt.cli.TemplateInstantiator
  */
 export default class TemplateInstantiator {
-  public static instantiate(logger: Logger, sourcePath: string, destinationPath: string, recursive: boolean, variables: PcfInitVariables | SolutionInitVariables, verbose: boolean) {
+  public static instantiate(logger: Logger, sourcePath: string, destinationPath: string, recursive: boolean, variables: PcfInitVariables | SolutionInitVariables, verbose: boolean): void {
     TemplateInstantiator.mkdirSyncIfNotExists(logger, destinationPath, verbose);
 
     this.getFiles(sourcePath, recursive).forEach(file => {
@@ -23,7 +23,7 @@ export default class TemplateInstantiator {
     });
   }
 
-  public static mkdirSyncIfNotExists(logger: Logger, destinationPath: string, verbose: boolean) {
+  public static mkdirSyncIfNotExists(logger: Logger, destinationPath: string, verbose: boolean): void {
     if (!fs.existsSync(destinationPath)) {
       if (verbose) {
         logger.logToStderr(`Create directory: ${destinationPath}`);
@@ -41,11 +41,11 @@ export default class TemplateInstantiator {
       fileName = fileName.substring('template_'.length, fileName.length);
     }
 
-    for (var variable in variables) {
+    for (const variable in variables) {
       fileName = fileName.replace(variable, variables[variable]);
     }
 
-    let destinationFilePath: string = path.join(destinationPath, fileName);
+    const destinationFilePath: string = path.join(destinationPath, fileName);
 
     if (!isTemplateFile) {
       fs.copyFileSync(templatePath, destinationFilePath);
@@ -53,7 +53,7 @@ export default class TemplateInstantiator {
     else {
       let fileContent = fs.readFileSync(templatePath, 'utf8');
 
-      for (var variable in variables) {
+      for (const variable in variables) {
         fileContent = fileContent.replace(new RegExp(variable.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), 'g'), variables[variable]);
       }
 

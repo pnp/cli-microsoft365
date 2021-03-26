@@ -55,7 +55,7 @@ class SpoListItemGetCommand extends SpoCommand {
         (!args.options.output || args.options.output === 'text') ?
           `?$select=Id,Title` :
           ``
-      )
+      );
 
     const requestOptions: any = {
       url: `${listRestUrl}/items(${args.options.id})${fieldSelect}`,
@@ -90,7 +90,7 @@ class SpoListItemGetCommand extends SpoCommand {
       },
       {
         option: '-f, --fields [fields]'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -104,7 +104,7 @@ class SpoListItemGetCommand extends SpoCommand {
         'listId',
         'listTitle',
         'id',
-        'fields',
+        'fields'
       ]
     };
   }

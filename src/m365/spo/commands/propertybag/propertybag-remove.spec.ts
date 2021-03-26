@@ -26,7 +26,8 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       if (opts.data.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
           return requestObjectIdentityResp;
-        } else {
+        }
+        else {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
@@ -44,7 +45,8 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       if (opts.data.indexOf('GetFolderByServerRelativeUrl') > -1) {
         if (folderObjectIdentityResp) {
           return folderObjectIdentityResp;
-        } else {
+        }
+        else {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
@@ -65,7 +67,8 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       if (opts.data.indexOf('SetFieldValue') > -1) {
         if (removePropertyResp) {
           return removePropertyResp;
-        } else {
+        }
+        else {
 
           return Promise.resolve(JSON.stringify([
             {
@@ -79,11 +82,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc'
     }));
@@ -159,10 +162,10 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('should prompt before removing property when confirmation argument not passed', (done) => {
     command.action(logger, {
       options:
-        {
-          webUrl: 'https://contoso.sharepoint.com',
-          key: 'key1'
-        }
+      {
+        webUrl: 'https://contoso.sharepoint.com',
+        key: 'key1'
+      }
     }, () => {
       let promptIssued = false;
 
@@ -232,16 +235,16 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('should call removeProperty when folder is not specified', (done) => {
     stubAllPostRequests();
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       debug: true,
       confirm: true
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002fsites\u002fabc"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -269,16 +272,16 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
       }]));
     }));
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
       confirm: true
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
       serverRelativeUrl: "/"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -295,16 +298,16 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('should call removeProperty when list folder is specified', (done) => {
     stubAllPostRequests();
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com/sites/abc',
       key: 'key1',
       folder: '/Shared Documents',
       confirm: true
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
       serverRelativeUrl: "/sites/abc/Shared Documents"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -319,21 +322,21 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   });
 
   it('should send correct remove request data when folder is not specified', (done) => {
-    const requestStub: sinon.SinonStub  = stubAllPostRequests();
-    const options: Object = {
+    const requestStub: sinon.SinonStub = stubAllPostRequests();
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       confirm: true
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002fsites\u002fabc"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
-        const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="AllProperties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`
-        assert(requestStub.calledWith(sinon.match({data:bodyPayload})));
+        const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="AllProperties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
+        assert(requestStub.calledWith(sinon.match({ data: bodyPayload })));
         done();
       }
       catch (e) {
@@ -343,22 +346,22 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   });
 
   it('should send correct remove request data when folder is specified', (done) => {
-    const requestStub: sinon.SinonStub  = stubAllPostRequests();
-    const options: Object = {
+    const requestStub: sinon.SinonStub = stubAllPostRequests();
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
       confirm: true
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "93e5499e-00f1-5000-1f36-3ab12512a7e9|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:f3806c23-0c9f-42d3-bc7d-3895acc06dc3:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d2c5:folder:df4291de-226f-4c39-bbcc-df21915f5fc1",
       serverRelativeUrl: "/"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
-        const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="Properties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`
-        assert(requestStub.calledWith(sinon.match({data:bodyPayload})));
+        const bodyPayload = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Method Name="SetFieldValue" Id="206" ObjectPathId="205"><Parameters><Parameter Type="String">${(options as any).key}</Parameter><Parameter Type="Null" /></Parameters></Method><Method Name="Update" Id="207" ObjectPathId="198" /></Actions><ObjectPaths><Property Id="205" ParentId="198" Name="Properties" /><Identity Id="198" Name="${objIdentity.objectIdentity}" /></ObjectPaths></Request>`;
+        assert(requestStub.calledWith(sinon.match({ data: bodyPayload })));
         done();
       }
       catch (e) {
@@ -369,12 +372,12 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   it('should correctly handle requestObjectIdentity reject promise', (done) => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('requestObjectIdentity error'); }));
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -389,13 +392,13 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   it('should correctly handle requestObjectIdentity ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity ClientSvc error" } }]);
-    stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -410,13 +413,13 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   it('should correctly handle requestFolderObjectIdentity reject promise', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'key1',
       folder: '/',
       confirm: true,
       debug: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -431,13 +434,13 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestFolderObjectIdentity error" } }]);
-    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       verbose: true,
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -452,13 +455,13 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   it('should correctly handle requestFolderObjectIdentity ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
-    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       debug: true,
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -472,13 +475,13 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   });
 
   it('should requestFolderObjectIdentity reject promise if _ObjectIdentity_ not found', (done) => {
-    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    const options: Object = {
+    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve('[{}]'); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_parentid',
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -494,12 +497,12 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('should correctly handle removeProperty reject promise response', (done) => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('removeProperty promise error'); }));
     const removePropertySpy = sinon.spy((command as any), 'removeProperty');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       verbose: true,
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -515,13 +518,13 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   it('should correctly handle removeProperty ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "removeProperty error" } }]);
-    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       verbose: true,
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -536,13 +539,13 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
 
   it('should correctly handle removeProperty ClientSvc empty error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "" } }]);
-    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       verbose: true,
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -587,10 +590,10 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: 'foo',
-          key: 'key1'
-        }
+      {
+        webUrl: 'foo',
+        key: 'key1'
+      }
     });
     assert.notStrictEqual(actual, true);
   });
@@ -598,9 +601,9 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('fails validation if the key option is not a valid SharePoint site URL', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: 'https://contoso.sharepoint.com'
-        }
+      {
+        webUrl: 'https://contoso.sharepoint.com'
+      }
     });
     assert.notStrictEqual(actual, true);
   });
@@ -608,10 +611,10 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('passes validation when the url option specified', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: 'https://contoso.sharepoint.com',
-          key: 'key1'
-        }
+      {
+        webUrl: 'https://contoso.sharepoint.com',
+        key: 'key1'
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -619,11 +622,11 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
   it('passes validation when the url and folder options specified', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: 'https://contoso.sharepoint.com',
-          key: 'key1',
-          folder: '/'
-        }
+      {
+        webUrl: 'https://contoso.sharepoint.com',
+        key: 'key1',
+        folder: '/'
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -632,10 +635,10 @@ describe(commands.PROPERTYBAG_REMOVE, () => {
     const actual = command.validate(
       {
         options:
-          {
-            webUrl: 'https://contoso.sharepoint.com',
-            key: 'key1'
-          }
+        {
+          webUrl: 'https://contoso.sharepoint.com',
+          key: 'key1'
+        }
       });
     assert.strictEqual(actual, true);
   });

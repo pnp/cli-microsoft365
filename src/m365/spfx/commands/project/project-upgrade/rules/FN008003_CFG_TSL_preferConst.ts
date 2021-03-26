@@ -17,7 +17,7 @@ export class FN008003_CFG_TSL_preferConst extends JsonRule {
 
   get description(): string {
     return `Remove prefer-const from tslint.json`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -27,19 +27,19 @@ export class FN008003_CFG_TSL_preferConst extends JsonRule {
     }
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './config/tslint.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsLintJson) {

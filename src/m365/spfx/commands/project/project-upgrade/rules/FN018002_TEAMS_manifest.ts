@@ -71,7 +71,7 @@ export class FN018002_TEAMS_manifest extends Rule {
   }
 }
 [AFTERCONTENT]`;
-  };
+  }
 
   get resolutionType(): string {
     return 'cmd';
@@ -79,7 +79,7 @@ export class FN018002_TEAMS_manifest extends Rule {
 
   get file(): string {
     return '';
-  };
+  }
 
   get severity(): string {
     return 'Optional';

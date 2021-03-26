@@ -24,7 +24,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   });
 
   beforeEach(() => {
-    let futureDate = new Date();
+    const futureDate = new Date();
     futureDate.setSeconds(futureDate.getSeconds() + 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: futureDate.toISOString() }); });
 
@@ -748,7 +748,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, site doesn\'t exist. refreshes expired token', (done) => {
     Utils.restore((command as any).ensureFormDigest);
 
-    let pastDate = new Date();
+    const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 
@@ -817,7 +817,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
   it('creates classic site with minimal options. doesn\'t wait for completion. remove deleted site, site doesn\'t exist. refreshes expired token (debug)', (done) => {
     Utils.restore((command as any).ensureFormDigest);
     //sinon.stub(command as any, 'getRequestDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: -1 }); });
-    let pastDate = new Date();
+    const pastDate = new Date();
     pastDate.setSeconds(pastDate.getSeconds() - 1800);
     sinon.stub(command as any, 'ensureFormDigest').callsFake(() => { return Promise.resolve({ FormDigestValue: 'abc', FormDigestTimeoutSeconds: 1800, FormDigestExpiresAt: pastDate.toISOString() }); });
 
@@ -1045,7 +1045,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -1148,7 +1148,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -1251,7 +1251,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -1354,7 +1354,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -1421,7 +1421,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -1535,7 +1535,7 @@ describe(commands.SITE_CLASSIC_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });

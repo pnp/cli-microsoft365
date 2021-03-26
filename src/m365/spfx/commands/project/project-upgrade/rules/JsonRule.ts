@@ -11,11 +11,11 @@ export abstract class JsonRule extends Rule {
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get file(): string {
     return '';
-  };
+  }
 
   protected addFindingWithPosition(findings: Finding[], node: parse.ASTNode | undefined): void {
     this.addFindingWithOccurrences([{

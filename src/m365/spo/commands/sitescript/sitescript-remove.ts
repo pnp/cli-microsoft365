@@ -68,7 +68,7 @@ class SpoSiteScriptRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the site script ${args.options.id}?`,
+        message: `Are you sure you want to remove the site script ${args.options.id}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

@@ -28,7 +28,7 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -164,12 +164,12 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
-    const options: Object = {
+    const options = {
       debug: false,
       url: 'https://contoso.sharepoint.com',
       scope: 'Web',
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -196,11 +196,11 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     const clearScopedCustomActionsSpy = sinon.spy((command as any), 'clearScopedCustomActions');
-    const options: Object = {
+    const options = {
       url: 'https://contoso.sharepoint.com',
       scope: 'Site',
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -252,10 +252,10 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
     defaultPostCallsStub();
 
     const clearScopedCustomActionsSpy: sinon.SinonSpy = sinon.spy((command as any), 'clearScopedCustomActions');
-    const options: Object = {
+    const options = {
       url: 'https://contoso.sharepoint.com',
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -274,10 +274,10 @@ describe(commands.CUSTOMACTION_CLEAR, () => {
   it('should the post calls be have the correct endpoint urls when scope is All', (done) => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
-    const options: Object = {
+    const options = {
       url: 'https://contoso.sharepoint.com',
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {

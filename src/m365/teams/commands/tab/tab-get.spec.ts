@@ -168,7 +168,7 @@ describe(commands.TEAMS_TAB_GET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '00000000000000000000000000000000@thread.skype',
+        channelId: '00000000000000000000000000000000@thread.skype'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -179,7 +179,7 @@ describe(commands.TEAMS_TAB_GET, () => {
     const actual = command.validate({
       options: {
         teamId: '00000000-0000-0000-0000-000000000000',
-        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread',
+        channelId: '19:552b7125655c46d5b5b86db02ee7bfdf@thread'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -457,7 +457,7 @@ describe(commands.TEAMS_TAB_GET, () => {
               }
             }
           ]
-        })
+        });
       }
 
       if ((opts.url as string).indexOf(`/tabs/`) > -1) {
@@ -540,7 +540,7 @@ describe(commands.TEAMS_TAB_GET, () => {
               }
             }
           ]
-        })
+        });
       }
 
       if ((opts.url as string).indexOf(`/tabs/`) > -1) {

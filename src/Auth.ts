@@ -29,7 +29,7 @@ export class Service {
   userName?: string;
   password?: string;
   certificateType: CertificateType = CertificateType.Unknown;
-  certificate?: string
+  certificate?: string;
   thumbprint?: string;
   accessTokens: Hash<AccessToken>;
   spoUrl?: string;
@@ -86,7 +86,7 @@ export class Auth {
     }
 
     return this._authCtx;
-  };
+  }
   private userCodeInfo?: UserCodeInfo;
   private _service: Service;
 
@@ -103,13 +103,13 @@ export class Auth {
   }
 
   public restoreAuth(): Promise<void> {
-    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+    return new Promise<void>((resolve: () => void): void => {
       this
         .getServiceConnectionInfo<Service>()
         .then((service: Service): void => {
           this._service = Object.assign(this._service, service);
           resolve();
-        }, (error: any): void => {
+        }, (): void => {
           resolve();
         });
     });
@@ -122,7 +122,7 @@ export class Auth {
       log:
         // Dependency code, we do not control when and how it gets called, thus ignored from coverage
         /* c8 ignore next 3 */
-        (level: LoggingLevel, message: string, error?: Error): void => {
+        (level: LoggingLevel, message: string): void => {
           logger.log(message);
         }
     });
@@ -225,7 +225,7 @@ export class Auth {
 
       (this._authServer as AuthServer).initializeServer(this.service, resource, resolve, reject, logger, debug);
     });
-  }
+  };
 
   private ensureAccessTokenWithBrowser(resource: string, logger: Logger, debug: boolean): Promise<TokenResponse> {
     return new Promise<TokenResponse>((resolve: (tokenResponse: TokenResponse) => void, reject: (error: any) => void): void => {
@@ -265,7 +265,7 @@ export class Auth {
         .catch((response: ErrorResponse) => {
           reject((response && (response as ErrorResponse).errorDescription) || response.error);
           return;
-        })
+        });
     });
   }
 
@@ -619,7 +619,8 @@ export class Auth {
 
   public cancel(): void {
     if (this.userCodeInfo) {
-      this.authCtx.cancelRequestToGetTokenWithDeviceCode(this.userCodeInfo as UserCodeInfo, (error: Error, response: TokenResponse | ErrorResponse): void => { });
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
+      this.authCtx.cancelRequestToGetTokenWithDeviceCode(this.userCodeInfo as UserCodeInfo, (): void => { });
     }
   }
 
@@ -653,7 +654,7 @@ export class Auth {
           }
         }, (error: any): void => {
           reject(error);
-        })
+        });
     });
   }
 

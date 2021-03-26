@@ -85,7 +85,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
         debug: true,
         name: 'home',
         webUrl: 'https://contoso.sharepoint.com/sites/newsletter',
-        sectionTemplate: 'OneColumn',
+        sectionTemplate: 'OneColumn'
       }
     }, () => {
       try {
@@ -549,7 +549,7 @@ describe(commands.PAGE_SECTION_ADD, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

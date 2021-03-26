@@ -135,12 +135,12 @@ describe(commands.CUSTOMACTION_GET, () => {
     });
 
     const getCustomActionSpy = sinon.spy((command as any), 'getCustomAction');
-    const options: Object = {
+    const options = {
       debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       url: 'https://contoso.sharepoint.com',
       scope: 'Web'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -151,7 +151,7 @@ describe(commands.CUSTOMACTION_GET, () => {
           url: 'https://contoso.sharepoint.com',
           scope: 'Web'
         }), 'getCustomActionSpy.calledWith');
-        assert(getCustomActionSpy.calledOnce == true, 'getCustomActionSpy.calledOnce');
+        assert(getCustomActionSpy.calledOnce, 'getCustomActionSpy.calledOnce');
         done();
       }
       catch (e) {
@@ -173,12 +173,12 @@ describe(commands.CUSTOMACTION_GET, () => {
     });
 
     const getCustomActionSpy = sinon.spy((command as any), 'getCustomAction');
-    const options: Object = {
+    const options = {
       debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       url: 'https://contoso.sharepoint.com',
       scope: 'Site'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -236,7 +236,7 @@ describe(commands.CUSTOMACTION_GET, () => {
   });
 
   it('getCustomAction called twice when scope is All, but item not found on web level', (done) => {
-    let getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
+    const getRequestSpy = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/Web/UserCustomActions(') > -1) {
         return Promise.resolve({ "odata.null": true });
       }
@@ -281,12 +281,12 @@ describe(commands.CUSTOMACTION_GET, () => {
     });
 
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
-    const options: Object = {
+    const options = {
       debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       url: 'https://contoso.sharepoint.com',
       scope: "All"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {

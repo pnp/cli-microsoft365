@@ -93,7 +93,8 @@ export class FN014005_CODE_settingsfile extends Rule {
     }
   ]
 }`;
-  };
+  }
+
   get resolutionType(): string {
     return 'json';
   }

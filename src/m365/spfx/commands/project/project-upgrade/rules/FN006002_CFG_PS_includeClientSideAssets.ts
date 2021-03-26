@@ -17,7 +17,7 @@ export class FN006002_CFG_PS_includeClientSideAssets extends JsonRule {
 
   get description(): string {
     return `Update package-solution.json includeClientSideAssets`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,19 +25,19 @@ export class FN006002_CFG_PS_includeClientSideAssets extends JsonRule {
     "includeClientSideAssets": ${this.includeClientSideAssets}
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './config/package-solution.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.packageSolutionJson ||

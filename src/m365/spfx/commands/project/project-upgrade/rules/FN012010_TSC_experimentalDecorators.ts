@@ -17,7 +17,7 @@ export class FN012010_TSC_experimentalDecorators extends JsonRule {
 
   get description(): string {
     return `Enable tsconfig.json experimental decorators`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,19 +25,19 @@ export class FN012010_TSC_experimentalDecorators extends JsonRule {
     "experimentalDecorators": true
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './tsconfig.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {

@@ -682,7 +682,8 @@ describe(commands.PAGE_TEXT_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('The file /sites/team-a/SitePages/foo.aspx does not exist')));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -756,7 +757,7 @@ describe(commands.PAGE_TEXT_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 
@@ -773,7 +774,8 @@ describe(commands.PAGE_TEXT_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -852,7 +854,8 @@ describe(commands.PAGE_TEXT_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Page page.aspx is not a modern page.`)));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -940,7 +943,8 @@ describe(commands.PAGE_TEXT_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid section '8'")));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -1029,7 +1033,8 @@ describe(commands.PAGE_TEXT_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("Invalid column '7'")));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }
@@ -1118,7 +1123,8 @@ describe(commands.PAGE_TEXT_ADD, () => {
         try {
           assert.strictEqual(JSON.stringify(new CommandError("Unexpected end of JSON input")), JSON.stringify(err));
           done();
-        } catch (e) {
+        }
+        catch (e) {
           done(e);
         }
       }

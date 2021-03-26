@@ -45,7 +45,7 @@ class SpoAppListCommand extends SpoAppBaseCommand {
       .getSpoUrl(logger, this.debug)
       .then((_spoUrl: string): Promise<string> => {
         spoUrl = _spoUrl;
-        return this.getAppCatalogSiteUrl(logger, spoUrl, args)
+        return this.getAppCatalogSiteUrl(logger, spoUrl, args);
       })
       .then((appCatalogUrl: string): Promise<{ value: any[] }> => {
         appCatalogSiteUrl = appCatalogUrl;

@@ -34,7 +34,8 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
         if (opts.data.indexOf('981cbc68-9edc-4f8d-872f-71146fcbb84f') > -1) {
           if (contentTypeHubRetrievalResp) {
             return contentTypeHubRetrievalResp;
-          } else {
+          }
+          else {
             return Promise.resolve(JSON.stringify([{
               "SchemaVersion": "15.0.0.0",
               "LibraryVersion": "16.0.7331.1206",
@@ -50,7 +51,7 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
 
         return Promise.reject('Invalid request');
       });
-    }
+    };
   });
 
   beforeEach(() => {
@@ -96,9 +97,9 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
 
   it('should send correct request body', (done) => {
     const requestStub: sinon.SinonStub = stubAllPostRequests();
-    const options: Object = {
+    const options = {
       verbose: true
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -133,9 +134,9 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
 
   it('should correctly handle reject promise', (done) => {
     stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('request error'); }));
-    const options: Object = {
+    const options = {
       verbose: true
-    }
+    };
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('request error')));
@@ -149,10 +150,10 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
 
   it('should correctly handle ErrorInfo', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "ClientSvc error" } }]);
-    stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error); }));
-    const options: Object = {
+    stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       verbose: true
-    }
+    };
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('ClientSvc error')));
@@ -174,11 +175,14 @@ describe(commands.CONTENTTYPEHUB_GET, () => {
     options.forEach(o => {
       if (o.option.indexOf('--output') > -1) {
         containsOutputOption = true;
-      } else if (o.option.indexOf('--verbose') > -1) {
+      }
+      else if (o.option.indexOf('--verbose') > -1) {
         containsVerboseOption = true;
-      } else if (o.option.indexOf('--debug') > -1) {
+      }
+      else if (o.option.indexOf('--debug') > -1) {
         containsDebugOption = true;
-      } else if (o.option.indexOf('--query') > -1) {
+      }
+      else if (o.option.indexOf('--query') > -1) {
         containsQueryOption = true;
       }
     });

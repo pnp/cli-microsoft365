@@ -215,7 +215,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
           }
           // merge resolved application APIs onto resolved delegated APIs
           resolvedApplicationApis.forEach(resolvedRequiredResource => {
-            let requiredResource = resolvedApis.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
+            const requiredResource = resolvedApis.find(api => api.resourceAppId === resolvedRequiredResource.resourceAppId);
             if (requiredResource) {
               requiredResource.resourceAccess.push(...resolvedRequiredResource.resourceAccess);
             }

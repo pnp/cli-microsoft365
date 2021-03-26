@@ -17,25 +17,25 @@ export class FN009001_CFG_WM_schema extends JsonRule {
 
   get description(): string {
     return `Update write-manifests.json schema URL`;
-  };
+  }
 
   get resolution(): string {
     return `{
   "$schema": "${this.schema}"
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './config/write-manifests.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.writeManifestsJson) {

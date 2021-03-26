@@ -76,7 +76,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
           
           cb();
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       revokeRights();
@@ -86,7 +86,7 @@ class SpoHubSiteRightsRevokeCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to revoke rights to join sites to the hub site ${args.options.url} from the specified users?`,
+        message: `Are you sure you want to revoke rights to join sites to the hub site ${args.options.url} from the specified users?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

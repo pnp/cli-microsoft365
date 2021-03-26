@@ -73,7 +73,7 @@ class TeamsChannelListCommand extends GraphItemsListCommand<Channel>{
         const endpoint: string = `${this.resource}/v1.0/teams/${teamId}/channels`;
 
         return this
-          .getAllItems(endpoint, logger, true)
+          .getAllItems(endpoint, logger, true);
       })
       .then((): void => {
         logger.log(this.items);

@@ -221,7 +221,7 @@ describe(commands.SITEDESIGN_RUN_LIST, () => {
   });
 
   it('correctly handles OData error when retrieving information about site designs', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 

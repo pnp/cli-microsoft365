@@ -5,8 +5,8 @@ export interface ListInstance {
   ContentTypesEnabled: boolean;
   CrawlNonDefaultViews: boolean;
   Created: string;
-  CurrentChangeToken: Object;
-  CustomActionElements: Object[];
+  CurrentChangeToken: any;
+  CustomActionElements: any[];
   DefaultContentApprovalWorkflowId: string;
   DefaultItemOpenUseListSetting: boolean;
   Description: string;
@@ -25,7 +25,7 @@ export interface ListInstance {
   HasExternalDataSource: boolean;
   Hidden: boolean;
   Id: string;
-  ImagePath: Object;
+  ImagePath: any;
   ImageUrl: string;
   IrmEnabled: boolean;
   IrmExpire: boolean;
@@ -43,7 +43,7 @@ export interface ListInstance {
   MajorWithMinorVersionsLimit: number;
   MultipleDataList: boolean;
   NoCrawl: boolean;
-  ParentWebPath: Object;
+  ParentWebPath: any;
   ParentWebUrl: string;
   ParserDisabled: boolean;
   ServerTemplateCanCreateFolders: boolean;

@@ -35,7 +35,7 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const executeRemoveAction: () => void = (): void => {
-      let endpoint = `${this.resource}/v1/group_memberships.json`;
+      const endpoint = `${this.resource}/v1/group_memberships.json`;
 
       const requestOptions: any = {
         url: endpoint,
@@ -52,9 +52,8 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
 
       request
         .delete(requestOptions)
-        .then((res: any): void => {
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        .then((): void => cb(),
+          (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -70,7 +69,7 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: messagePrompt,
+        message: messagePrompt
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -80,7 +79,7 @@ class YammerGroupUserRemoveCommand extends YammerCommand {
         }
       });
     }
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

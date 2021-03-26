@@ -17,7 +17,7 @@ export class FN010006_YORC_framework extends JsonRule {
 
   get description(): string {
     return `${this.add ? 'Update' : 'Remove'} framework in .yo-rc.json`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,19 +25,19 @@ export class FN010006_YORC_framework extends JsonRule {
     "framework": "${this.framework}"
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Recommended';
-  };
+  }
 
   get file(): string {
     return './.yo-rc.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.yoRcJson) {

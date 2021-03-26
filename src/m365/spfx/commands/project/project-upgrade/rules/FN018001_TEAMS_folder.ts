@@ -23,7 +23,7 @@ export class FN018001_TEAMS_folder extends Rule {
 
   get resolution(): string {
     return '';
-  };
+  }
 
   get resolutionType(): string {
     return 'cmd';
@@ -31,7 +31,7 @@ export class FN018001_TEAMS_folder extends Rule {
 
   get file(): string {
     return '';
-  };
+  }
 
   get severity(): string {
     return 'Optional';

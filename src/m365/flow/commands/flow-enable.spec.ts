@@ -99,7 +99,7 @@ describe(commands.FLOW_ENABLE, () => {
   });
 
   it('correctly handles no environment found', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -120,7 +120,7 @@ describe(commands.FLOW_ENABLE, () => {
   });
 
   it('correctly handles Flow not found', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "ConnectionAuthorizationFailed",
@@ -141,7 +141,7 @@ describe(commands.FLOW_ENABLE, () => {
   });
 
   it('correctly handles Flow not found (as admin)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "FlowNotFound",
@@ -162,7 +162,7 @@ describe(commands.FLOW_ENABLE, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

@@ -93,7 +93,8 @@ describe(commands.TEAMS_APP_REMOVE, () => {
       try {
         assert(removeTeamsAppCalled);
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -139,7 +140,8 @@ describe(commands.TEAMS_APP_REMOVE, () => {
       try {
         assert(removeTeamsAppCalled);
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -161,7 +163,7 @@ describe(commands.TEAMS_APP_REMOVE, () => {
   });
 
   it('correctly handles error when removing app', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
+    sinon.stub(request, 'delete').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
@@ -169,7 +171,8 @@ describe(commands.TEAMS_APP_REMOVE, () => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });

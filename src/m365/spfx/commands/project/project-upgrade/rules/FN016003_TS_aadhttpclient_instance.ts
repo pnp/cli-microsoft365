@@ -22,7 +22,7 @@ export class FN016003_TS_aadhttpclient_instance extends TsRule {
 
   get resolution(): string {
     return '';
-  };
+  }
 
   get resolutionType(): string {
     return 'ts';

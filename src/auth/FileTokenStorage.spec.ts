@@ -14,7 +14,7 @@ describe('FileTokenStorage', () => {
       fs.readFileSync,
       fs.writeFile
     ]);
-  })
+  });
 
   it('fails retrieving connection info from file if the token file doesn\'t exist', (done) => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
@@ -226,7 +226,7 @@ describe('FileTokenStorage', () => {
       .remove()
       .then(() => {
         done();
-      }, (err) => {
+      }, () => {
         done('Pass expected but failed instead');
       });
   });
@@ -239,7 +239,7 @@ describe('FileTokenStorage', () => {
       .remove()
       .then(() => {
         done();
-      }, (err) => {
+      }, () => {
         done('Pass expected but failed instead');
       });
   });
@@ -252,7 +252,7 @@ describe('FileTokenStorage', () => {
       .remove()
       .then(() => {
         done();
-      }, (err) => {
+      }, () => {
         done('Pass expected but failed instead');
       });
   });
@@ -265,7 +265,7 @@ describe('FileTokenStorage', () => {
       .remove()
       .then(() => {
         done();
-      }, (err) => {
+      }, () => {
         done('Pass expected but failed instead');
       });
   });
@@ -287,7 +287,7 @@ describe('FileTokenStorage', () => {
         catch (e) {
           done(e);
         }
-      }, (err) => {
+      }, () => {
         done('Pass expected but failed instead');
       });
   });

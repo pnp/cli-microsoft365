@@ -51,7 +51,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
   protected get permissionsKindMap(): string[] {
     const result: string[] = [];
 
-    for (let kind in PermissionKind) {
+    for (const kind in PermissionKind) {
       if (typeof PermissionKind[kind] === 'number') {
         result.push(kind);
       }
@@ -203,7 +203,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
       return 'Option registrationType is specified, but registrationId is missing';
     }
 
-    let location: string = args.options.location.toLowerCase();
+    const location: string = args.options.location.toLowerCase();
     const locationsRequireGroup: string[] = [
       'microsoft.sharepoint.standardmenu', 'microsoft.sharepoint.contenttypesettings',
       'microsoft.sharepoint.contenttypetemplatesettings', 'microsoft.sharepoint.create',
@@ -253,7 +253,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
     if (args.options.rights) {
       const rights = args.options.rights.split(',');
 
-      for (let item of rights) {
+      for (const item of rights) {
         const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
 
         if (!kind) {
@@ -324,7 +324,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
       const permissions: BasePermissions = new BasePermissions();
       const rights = options.rights.split(',');
 
-      for (let item of rights) {
+      for (const item of rights) {
         const kind: PermissionKind = PermissionKind[(item.trim() as keyof typeof PermissionKind)];
 
         permissions.set(kind);
@@ -332,7 +332,7 @@ class SpoCustomActionAddCommand extends SpoCommand {
       requestBody.Rights = {
         High: permissions.high.toString(),
         Low: permissions.low.toString()
-      }
+      };
     }
 
     return requestBody;

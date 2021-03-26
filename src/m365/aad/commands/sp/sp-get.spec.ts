@@ -187,7 +187,7 @@ describe(commands.SP_GET, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {
@@ -244,12 +244,12 @@ describe(commands.SP_GET, () => {
   it('fails validation if both appId and displayName are specified', () => {
     const actual = command.validate({ options: { appId: '123', displayName: 'abc' } });
     assert.notStrictEqual(actual, true);
-  })
+  });
 
   it('fails validation if objectId and displayName are specified', () => {
     const actual = command.validate({ options: { displayName: 'abc', objectId: '123' } });
     assert.notStrictEqual(actual, true);
-  })
+  });
 
   it('supports debug mode', () => {
     const options = command.options();

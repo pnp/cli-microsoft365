@@ -454,7 +454,7 @@ describe(commands.TEAMS_APP_LIST, () => {
   });
 
   it('correctly handles error when retrieving apps', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

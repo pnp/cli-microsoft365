@@ -197,7 +197,7 @@ class SpoSiteSetCommand extends SpoCommand {
           resolve();
         }, (error: any): void => {
           reject(error);
-        })
+        });
     });
   }
 
@@ -402,7 +402,7 @@ class SpoSiteSetCommand extends SpoCommand {
   protected get sharingCapabilities(): string[] {
     const result: string[] = [];
 
-    for (let sharingCapability in SharingCapabilities) {
+    for (const sharingCapability in SharingCapabilities) {
       if (typeof SharingCapabilities[sharingCapability] === 'number') {
         result.push(sharingCapability);
       }
@@ -511,7 +511,7 @@ class SpoSiteSetCommand extends SpoCommand {
     // required to support passing empty strings as valid values
     return {
       string: ['classification']
-    }
+    };
   }
 }
 

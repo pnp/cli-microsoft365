@@ -93,7 +93,7 @@ class SpoFileCopyCommand extends SpoCommand {
           const progressPollInterval: number = 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
           setTimeout(() => {
-            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, logger, this.dots)
+            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, logger, this.dots);
           }, progressPollInterval);
         });
       })

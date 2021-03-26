@@ -662,7 +662,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
   });
 
   it('handles error when app catalog does not exist, site with different URL already exists and force not used', (done) => {
-    sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
+    sinon.stub(Cli, 'executeCommand').callsFake(() => {
       return Promise.reject(new CommandError('Unknown case'));
     });
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
@@ -776,7 +776,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
   });
 
   it(`handles error when checking if the app catalog site exists`, (done) => {
-    sinon.stub(Cli, 'executeCommand').callsFake((command, args) => {
+    sinon.stub(Cli, 'executeCommand').callsFake(() => {
       return Promise.reject(new CommandError('Unknown case'));
     });
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
@@ -1123,7 +1123,7 @@ describe(commands.TENANT_APPCATALOG_ADD, () => {
   });
 
   it(`handles error when checking if app catalog registered throws error`, (done) => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoTenantAppCatalogUrlGetCommand) {
         return Promise.reject(new CommandError('An error has occurred'));
       }

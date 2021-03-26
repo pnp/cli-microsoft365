@@ -46,7 +46,7 @@ class SpoThemeRemoveCommand extends SpoCommand {
               'accept': 'application/json;odata=nometadata'
             },
             data: {
-              name: args.options.name,
+              name: args.options.name
             },
             responseType: 'json'
           };
@@ -54,7 +54,7 @@ class SpoThemeRemoveCommand extends SpoCommand {
           return request.post(requestOptions);
         })
         .then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       removeTheme();
@@ -64,7 +64,7 @@ class SpoThemeRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the theme`,
+        message: `Are you sure you want to remove the theme`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

@@ -56,9 +56,6 @@ describe(commands.KNOWLEDGEHUB_SET, () => {
     requests = [];
   });
 
-  afterEach(() => {
-    });
-
   after(() => {
     Utils.restore([
       auth.restoreAuth,

@@ -21,7 +21,7 @@ export class FN017001_MISC_npm_dedupe extends Rule {
 
   get resolution(): string {
     return 'npm dedupe';
-  };
+  }
 
   get resolutionType(): string {
     return 'cmd';
@@ -29,7 +29,7 @@ export class FN017001_MISC_npm_dedupe extends Rule {
 
   get file(): string {
     return './package.json';
-  };
+  }
 
   get severity(): string {
     return 'Optional';

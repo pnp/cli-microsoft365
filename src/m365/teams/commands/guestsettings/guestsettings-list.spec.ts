@@ -116,7 +116,7 @@ describe(commands.TEAMS_GUESTSETTINGS_LIST, () => {
   });
 
   it('correctly handles error when listing guest settings for a Microsoft Team', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

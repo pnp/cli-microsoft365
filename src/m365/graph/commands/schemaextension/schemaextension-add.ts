@@ -116,7 +116,7 @@ class GraphSchemaExtensionAdd extends GraphCommand {
 
         if (typeof result !== "string") {
           result = true;
-        };
+        }
       }
     }
     catch (e) {

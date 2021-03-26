@@ -112,7 +112,7 @@ class MockCommand3 extends Command {
   public commandAction(): void {
   }
 
-  public commandHelp(args: any, log: (message: string) => void): void {
+  public commandHelp(): void {
   }
 
   public options(): CommandOption[] {
@@ -139,9 +139,9 @@ describe('Command', () => {
       telemetry = t;
     });
     logger = {
-      log: (msg: string) => { },
-      logRaw: (msg: string) => { },
-      logToStderr: (msg: string) => { }
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { }
     };
     loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     cli = Cli.getInstance();
@@ -238,8 +238,8 @@ describe('Command', () => {
   it('shows deprecation warning when command executed using the deprecated name', () => {
     cli.currentCommandName = 'mc1';
     const mock = new MockCommand1();
-    mock.commandAction(logger, {}, (err?: any): void => {
-      assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)))
+    mock.commandAction(logger, {}, (): void => {
+      assert(loggerLogToStderrSpy.calledWith(chalk.yellow(`Command 'mc1' is deprecated. Please use 'mock-command' instead`)));
     });
   });
 
@@ -351,7 +351,7 @@ describe('Command', () => {
       prop1: true,
       Prop2: false
     });
-    command.addUnknownOptionsToPayloadPublic(actual, { Prop2: false })
+    command.addUnknownOptionsToPayloadPublic(actual, { Prop2: false });
     assert.strictEqual(JSON.stringify(actual), expected);
   });
 });

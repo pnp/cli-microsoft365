@@ -29,7 +29,7 @@ describe('FN006004_CFG_PS_developer', () => {
         source: JSON.stringify({
           $schema: 'test-schema',
           solution: {}
-      }, null, 2)
+        }, null, 2)
       }
     };
     rule.visit(project, findings);

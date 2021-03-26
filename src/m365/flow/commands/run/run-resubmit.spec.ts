@@ -140,7 +140,7 @@ describe(commands.FLOW_RUN_RESUBMIT, () => {
   });
 
   it('correctly handles no environment found when prompt confirmed', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -160,7 +160,7 @@ describe(commands.FLOW_RUN_RESUBMIT, () => {
         debug: false,
         environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        name: '08585981115186985105550762687CU161',
+        name: '08585981115186985105550762687CU161'
       }
     } as any, (err?: any) => {
       try {
@@ -174,7 +174,7 @@ describe(commands.FLOW_RUN_RESUBMIT, () => {
   });
 
   it('correctly handles specified Microsoft Flow not found when prompt confirmed', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "ConnectionAuthorizationFailed",
@@ -194,7 +194,7 @@ describe(commands.FLOW_RUN_RESUBMIT, () => {
         debug: false,
         environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac88',
-        name: '08585981115186985105550762687CU161',
+        name: '08585981115186985105550762687CU161'
       }
     } as any, (err?: any) => {
       try {
@@ -233,7 +233,7 @@ describe(commands.FLOW_RUN_RESUBMIT, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "AzureResourceManagerRequestFailed",
@@ -253,7 +253,7 @@ describe(commands.FLOW_RUN_RESUBMIT, () => {
         debug: false,
         environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6',
         flow: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        name: '08585981115186985105550762688CP233',
+        name: '08585981115186985105550762688CP233'
       }
     } as any, (err?: any) => {
       try {
@@ -316,7 +316,7 @@ describe(commands.FLOW_RUN_RESUBMIT, () => {
       try {
         assert.notStrictEqual(loggerLogToStderrSpy.getCall(1).args[0].indexOf('Retrieved trigger: manual'), -1);
         assert(getStub.called);
-        assert(postStub.called)
+        assert(postStub.called);
         done();
       }
       catch (e) {

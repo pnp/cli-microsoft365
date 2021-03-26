@@ -98,7 +98,7 @@ class FlowRemoveCommand extends AzmgmtCommand {
       },
       {
         option: '--confirm'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();

@@ -161,7 +161,7 @@ describe(commands.TENANT_RECYCLEBINITEM_LIST, () => {
           }, {
             "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.DeletedSiteProperties", "_ObjectIdentity_": "85bb2b9f-5099-2000-af64-2c100126d549|908bed80-a04a-4433-b4a0-883d9847d110:c7d25483-6785-4e76-8b22-9c57c0b70134\nDeletedSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fModernThrowaway", "DaysRemaining": 92, "DeletionTime": "\/Date(2020,0,15,11,40,58,90)\/", "SiteId": "\/Guid(38fb96c1-8e1d-4d24-ad8d-e57cb9b1749e)\/", "Status": "Recycled", "StorageMaximumLevel": 26214400, "Url": "https:\u002f\u002fcontoso.sharepoint.com\u002fsites\u002fModernThrowaway", "UserCodeMaximumLevel": 300
           }
-        ]))
+        ]));
         done();
       }
       catch (e) {

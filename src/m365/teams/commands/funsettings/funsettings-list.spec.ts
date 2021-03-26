@@ -138,7 +138,7 @@ describe(commands.TEAMS_FUNSETTINGS_LIST, () => {
   });
 
   it('correctly handles error when retrieving funsettings', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

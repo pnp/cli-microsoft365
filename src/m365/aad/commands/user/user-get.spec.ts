@@ -140,7 +140,7 @@ describe(commands.USER_GET, () => {
   });
 
   it('correctly handles user not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "Request_ResourceNotFound",
