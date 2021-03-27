@@ -608,6 +608,7 @@ nav:
       - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
     - Microsoft Teams:
       - 'Create a Microsoft Team with channels from a Microsoft 365 Group': 'sample-scripts/teams/create-team-from-group.md'
+      - 'Create a Microsoft Teams team and bulk add members from CSV file': 'sample-scripts/teams/create-team-and-add-members-and-owners.md'
       - 'Deploy a Microsoft Teams personal app and add it to users': 'sample-scripts/teams/install-personal-app.md'
       - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
       - 'Export conversations from Microsoft Teams Channels': 'sample-scripts/teams/export-teams-conversations.md'
