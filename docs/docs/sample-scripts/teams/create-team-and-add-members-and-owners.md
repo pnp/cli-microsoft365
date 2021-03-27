@@ -54,8 +54,14 @@ do {
     $trial++
     Write-Host "Waiting $waitingTime seconds before teamifying the group (trial $trial/$maxRetry)..."
     Start-Sleep -Seconds $waitingTime
-    m365 aad o365group teamify --groupId $($group.id)
+    m365 aad o365group teamify --groupId $($group.id) 2>$null
 } while ($Error.Count -gt 0 -and $trial -le $maxRetry)
+
+# if it still failed, output the error and stop
+if ($Error.Count -gt 0) {
+  $Error
+  return
+}
 $Error.Clear()
 
 $whoAmI = m365 status | ConvertFrom-Json
