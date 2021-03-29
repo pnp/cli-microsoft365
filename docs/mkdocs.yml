@@ -527,6 +527,9 @@ nav:
         - task list: 'cmd/todo/task/task-list.md'
         - task remove: 'cmd/todo/task/task-remove.md'
         - task set: 'cmd/todo/task/task-set.md'
+    - Viva (viva):
+      - connections:
+        - connections app create: 'cmd/viva/connections/connections-app-create.md'
     - Yammer (yammer):
       - search: 'cmd/yammer/yammer-search.md'
       - group:
