@@ -12,6 +12,7 @@
         "@azure/msal-node": "^1.0.1",
         "adaptive-expressions": "^4.11.1",
         "adaptivecards-templating": "^2.1.0",
+        "adm-zip": "^0.5.4",
         "applicationinsights": "^1.8.10",
         "axios": "^0.21.1",
         "easy-table": "^1.1.1",
@@ -36,6 +37,7 @@
         "microsoft365": "dist/index.js"
       },
       "devDependencies": {
+        "@types/adm-zip": "^0.4.33",
         "@types/easy-table": "0.0.32",
         "@types/inquirer": "^7.3.0",
         "@types/jmespath": "^0.15.0",
@@ -321,6 +323,15 @@
       },
       "engines": {
         "node": ">=6"
+      }
+    },
+    "node_modules/@types/adm-zip": {
+      "version": "0.4.33",
+      "resolved": "https://registry.npmjs.org/@types/adm-zip/-/adm-zip-0.4.33.tgz",
+      "integrity": "sha512-WM0DCWFLjXtddl0fu0+iN2ZF+qz8RF9RddG5OSy/S90AQz01Fu8lHn/3oTIZDxvG8gVcnBLAHMHOdBLbV6m6Mw==",
+      "dev": true,
+      "dependencies": {
+        "@types/node": "*"
       }
     },
     "node_modules/@types/atob-lite": {
@@ -713,6 +724,14 @@
       "integrity": "sha512-XrO6PlGHT3Tfi8hlCYmholiwKUMOR5t/Y4pFqtNVKXJn5HUdE9A4LdZMhg9tnwjXqJ51t1XVHGm9nOLEDVICPg==",
       "peerDependencies": {
         "adaptive-expressions": "^4.11.0"
+      }
+    },
+    "node_modules/adm-zip": {
+      "version": "0.5.4",
+      "resolved": "https://registry.npmjs.org/adm-zip/-/adm-zip-0.5.4.tgz",
+      "integrity": "sha512-GMQg1a1cAegh+/EgWbz+XHZrwB467iB/IgtToldvxs7Xa5Br8mPmvCeRfY/Un2fLzrlIPt6Yu7Cej+8Ut9TGPg==",
+      "engines": {
+        "node": ">=6.0"
       }
     },
     "node_modules/ajv": {
@@ -6353,6 +6372,15 @@
         "defer-to-connect": "^1.0.1"
       }
     },
+    "@types/adm-zip": {
+      "version": "0.4.33",
+      "resolved": "https://registry.npmjs.org/@types/adm-zip/-/adm-zip-0.4.33.tgz",
+      "integrity": "sha512-WM0DCWFLjXtddl0fu0+iN2ZF+qz8RF9RddG5OSy/S90AQz01Fu8lHn/3oTIZDxvG8gVcnBLAHMHOdBLbV6m6Mw==",
+      "dev": true,
+      "requires": {
+        "@types/node": "*"
+      }
+    },
     "@types/atob-lite": {
       "version": "2.0.0",
       "resolved": "https://registry.npmjs.org/@types/atob-lite/-/atob-lite-2.0.0.tgz",
@@ -6655,6 +6683,11 @@
       "resolved": "https://registry.npmjs.org/adaptivecards-templating/-/adaptivecards-templating-2.1.0.tgz",
       "integrity": "sha512-XrO6PlGHT3Tfi8hlCYmholiwKUMOR5t/Y4pFqtNVKXJn5HUdE9A4LdZMhg9tnwjXqJ51t1XVHGm9nOLEDVICPg==",
       "requires": {}
+    },
+    "adm-zip": {
+      "version": "0.5.4",
+      "resolved": "https://registry.npmjs.org/adm-zip/-/adm-zip-0.5.4.tgz",
+      "integrity": "sha512-GMQg1a1cAegh+/EgWbz+XHZrwB467iB/IgtToldvxs7Xa5Br8mPmvCeRfY/Un2fLzrlIPt6Yu7Cej+8Ut9TGPg=="
     },
     "ajv": {
       "version": "6.12.6",

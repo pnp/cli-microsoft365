@@ -158,6 +158,7 @@
     "@azure/msal-node": "^1.0.1",
     "adaptive-expressions": "^4.11.1",
     "adaptivecards-templating": "^2.1.0",
+    "adm-zip": "^0.5.4",
     "applicationinsights": "^1.8.10",
     "axios": "^0.21.1",
     "easy-table": "^1.1.1",
@@ -177,6 +178,7 @@
     "xmldom": "^0.5.0"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.4.33",
     "@types/easy-table": "0.0.32",
     "@types/inquirer": "^7.3.0",
     "@types/jmespath": "^0.15.0",
