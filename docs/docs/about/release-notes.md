@@ -1,6 +1,26 @@
 # Release notes
 
+## [v3.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.9.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo site apppermission add](../cmd/spo/site/site-apppermission-add.md) - adds a specific application permissions to the site [#2208](https://github.com/pnp/cli-microsoft365/issues/2208)
+- [spo userprofile get](../cmd/spo/userprofile/userprofile-get.md) - gets SharePoint user profile properties for the specified user [#1670](https://github.com/pnp/cli-microsoft365/issues/1670)
+
+**Microsoft Viva:**
+
+- [viva connections app create](../cmd/viva/connections/connections-app-create.md) - creates a Viva Connections desktop app package to upload to Microsoft Teams
+
+### Changes
+
+- moved from adal-node to msal-node [#2156](https://github.com/pnp/cli-microsoft365/issues/2156)
+- added eslint. Fixed code to align with eslint config [#2058](https://github.com/pnp/cli-microsoft365/issues/2058)
+
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
+
+### New commands
 
 **Azure Active Directory:**
 
@@ -13,6 +33,8 @@
 - added new sample script for granting API permissions to SharePoint AAD App [#2243](https://github.com/pnp/cli-microsoft365/issues/2243)
 - added the 'List all Microsoft Teams team's Owners and Members' sample [#2284](https://github.com/pnp/cli-microsoft365/issues/2284)
 - fixed the 'spo tenant appcatalog add' command [#2300](https://github.com/pnp/cli-microsoft365/issues/2300)
+- added the 'M365 health status' sample script [#2107](https://github.com/pnp/cli-microsoft365/issues/2107)
+- fixed broken tests when default output configured to JSON [#2305](https://github.com/pnp/cli-microsoft365/issues/2305)
 
 ## [v3.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.7.0)
 
@@ -47,8 +69,6 @@
 - added the 'Delete all Microsoft 365 groups and SharePoint sites' sample [#2278](https://github.com/pnp/cli-microsoft365/issues/2278)
 - added support for upgrading SPFx projects to v1.12 [#2154](https://github.com/pnp/cli-microsoft365/issues/2154)
 - extended spfx doctor with support for SPFx v1.12 [#2173](https://github.com/pnp/cli-microsoft365/issues/2173)
-- added the 'M365 health status' sample script [#2107](https://github.com/pnp/cli-microsoft365/issues/2107)
-- fixed broken tests when default output configured to JSON [#2305](https://github.com/pnp/cli-microsoft365/issues/2305)
 
 ## [v3.6.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.6.0)
 
