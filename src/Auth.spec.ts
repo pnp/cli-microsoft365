@@ -3,14 +3,17 @@ import * as assert from 'assert';
 import * as fs from 'fs';
 import 'node-forge';
 import * as sinon from 'sinon';
+import type * as Configstore from 'configstore';
+import { DeviceCodeResponse } from "@azure/msal-common";
 import { Auth, AuthType, CertificateType, InteractiveAuthorizationCodeResponse, InteractiveAuthorizationErrorResponse, Service } from './Auth';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { TokenStorage } from './auth/TokenStorage';
 import authServer from './AuthServer';
-import { Logger } from './cli';
+import { Cli, Logger } from './cli';
 import { CommandError } from './Command';
 import request from './request';
 import Utils from './Utils';
+import * as open from 'open';
 
 class MockTokenStorage implements TokenStorage {
   public get(): Promise<string> {
@@ -39,7 +42,12 @@ const mockTokenCachePlugin: msal.ICachePlugin = {
 describe('Auth', () => {
   let log: any[];
   let auth: Auth;
+  let cli: Cli;
+  let response: DeviceCodeResponse;
+  let openStub: sinon.SinonStub;
+  let getSettingWithDefaultValueStub: sinon.SinonStub;
   const resource: string = 'https://contoso.sharepoint.com';
+  let loggerSpy: sinon.SinonSpy;
   const logger: Logger = {
     log: (msg: any) => log.push(msg),
     logRaw: (msg: any) => log.push(msg),
@@ -74,7 +82,16 @@ describe('Auth', () => {
 
   beforeEach(() => {
     log = [];
+    cli = Cli.getInstance();
     auth = new Auth();
+    response = {
+      deviceCode: "",
+      expiresIn: 0,
+      interval: 0,
+      message: "",
+      userCode: "",
+      verificationUri: ""
+    };
     auth.service.appId = '9bc3ab49-b65d-410a-85ad-de819febfddc';
     auth.service.tenant = '9bc3ab49-b65d-410a-85ad-de819febfddd';
     (auth as any)._authServer = authServer;
@@ -82,20 +99,29 @@ describe('Auth', () => {
     initializeServerStub = sinon.stub((auth as any)._authServer, 'initializeServer').callsFake((service: Service, resource: string, resolve: (error: InteractiveAuthorizationCodeResponse) => void) => {
       resolve(httpServerResponse);
     });
+    loggerSpy = sinon.spy(logger, 'log');
+    (auth as any)._open = open;
+    openStub = sinon.stub(auth as any, '_open').callsFake(() => { });
+    getSettingWithDefaultValueStub = sinon.stub(cli, 'getSettingWithDefaultValue').callsFake((() => 'key'));
   });
 
   afterEach(() => {
+    loggerSpy.restore();
     readFileSyncStub.restore();
     initializeServerStub.restore();
     Utils.restore([
+      cli.config.get,
       request.get,
       (auth as any).getClientApplication,
+      (auth as any).getDeviceCodeResponse,
       publicApplication.acquireTokenSilent,
       publicApplication.acquireTokenByDeviceCode,
       publicApplication.acquireTokenByUsernamePassword,
       publicApplication.acquireTokenByCode,
       tokenCache.getAllAccounts
     ]);
+    openStub.restore();
+    getSettingWithDefaultValueStub.restore();
   });
 
   it('returns existing access token if still valid', (done) => {
@@ -349,6 +375,8 @@ describe('Auth', () => {
   });
 
   it('retrieves new access token using existing refresh token when refresh forced', (done) => {
+    const config = cli.config as Configstore;
+    sinon.stub(config, 'get').callsFake((() => { }) as any);
     const now = new Date();
     now.setSeconds(now.getSeconds() + 1);
     auth.service.accessTokens[resource] = {
@@ -376,6 +404,8 @@ describe('Auth', () => {
   });
 
   it('retrieves access token using device code authentication flow when no refresh token available and no authType specified', (done) => {
+    const config = cli.config as Configstore;
+    sinon.stub(config, 'get').callsFake((() => 'value'));
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
@@ -397,7 +427,19 @@ describe('Auth', () => {
     });
   });
 
+  it('opens the browser with the login ', () => {
+    (auth as any).processDeviceCodeCallback(response, logger, false);
+    assert(openStub.called);
+  });
+
+  it('writes response from the device code request (debug)', () => {
+    (auth as any).processDeviceCodeCallback(response, logger, true);
+    assert(loggerLogToStderrSpy.calledWith(response));
+  });
+
   it('retrieves token using device code authentication flow when authType deviceCode specified', (done) => {
+    const config = cli.config as Configstore;
+    sinon.stub(config, 'get').callsFake((() => 'value'));
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
@@ -2077,5 +2119,4 @@ describe('Auth', () => {
       done(err);
     });
   });
-
 });
