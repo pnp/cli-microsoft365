@@ -10,6 +10,7 @@ import { CommandError } from './Command';
 import config from './config';
 import request from './request';
 import { settingsNames } from './settingsNames';
+import * as open from 'open';
 
 export interface Hash<TValue> {
   [key: string]: TValue;
@@ -85,6 +86,7 @@ export enum CertificateType {
 }
 
 export class Auth {
+  // private open = open;
   private _authServer: AuthServer | undefined;
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
   private _service: Service;
@@ -358,7 +360,7 @@ export class Auth {
     logger.log(response.message);
 
     if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenBrowserOnLogin, false)) {
-      const open = require('open') as typeof import('open');
+      // const open = require('open') as typeof import('open');
       open(response.verificationUri);
     }
   }
