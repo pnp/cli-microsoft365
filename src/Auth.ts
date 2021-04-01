@@ -99,6 +99,11 @@ export class Auth {
   }
 
   public async restoreAuth(): Promise<void> {
+    // check if auth has been restored previously
+    if (this._service.connected) {
+      return Promise.resolve();
+    }
+
     try {
       const service: Service = await this.getServiceConnectionInfo<Service>();
       this._service = Object.assign(this._service, service);

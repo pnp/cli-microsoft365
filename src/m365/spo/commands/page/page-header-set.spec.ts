@@ -84,6 +84,10 @@ describe(commands.PAGE_HEADER_SET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('excludes options from URL processing', () => {
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['imageUrl']);
+  });
+
   it('checks out page if not checked out by the current user', (done) => {
     Utils.restore([request.get, request.post]);
     let checkedOut = false;

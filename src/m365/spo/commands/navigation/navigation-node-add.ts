@@ -36,6 +36,10 @@ class SpoNavigationNodeAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['url'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Adding navigation node...`);

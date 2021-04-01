@@ -1843,6 +1843,23 @@ describe('Auth', () => {
       });
   });
 
+  it(`doesn't restore authentication when already restored`, (done) => {
+    const getServiceConnectionInfoStub = sinon.stub(auth as any, 'getServiceConnectionInfo').callsFake(() => Promise.resolve());
+    auth.service.connected = true;
+
+    auth
+      .restoreAuth()
+      .then(() => {
+        try {
+          assert(getServiceConnectionInfoStub.notCalled);
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
+  });
+
   it('handles error when restoring authentication', (done) => {
     sinon.stub(auth as any, 'getServiceConnectionInfo').callsFake(() => Promise.reject('An error has occurred'));
 

@@ -61,6 +61,10 @@ describe(commands.WEB_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('excludes options from URL processing', () => {
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['webUrl']);
+  });
+
   it('creates web without inheriting the navigation', (done) => {
     let configuredNavigation: boolean = false;
 

@@ -67,7 +67,7 @@ export class Cli {
     return Cli.instance;
   }
 
-  public execute(commandsFolder: string, rawArgs: string[]): Promise<void> {
+  public async execute(commandsFolder: string, rawArgs: string[]): Promise<void> {
     this.commandsFolder = commandsFolder;
 
     // check if help for a specific command has been requested using the
@@ -83,7 +83,7 @@ export class Cli {
     // parse args to see if a command has been specified and can be loaded
     // rather than loading all commands
     const parsedArgs: minimist.ParsedArgs = minimist(rawArgs);
-
+    
     // load commands
     this.loadCommandFromArgs(parsedArgs._);
 
@@ -165,6 +165,15 @@ export class Cli {
     }
     catch (e) {
       return this.closeWithError(e);
+    }
+
+
+    try {
+      // process options before passing them on to validation stage
+      await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
+    }
+    catch (e) {
+      return this.closeWithError(e.message, false);
     }
 
     const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
@@ -727,7 +736,7 @@ export class Cli {
     Cli.log();
   }
 
-  private closeWithError(error: any, showHelpIfEnabled: boolean = false): Promise<void> {
+  private closeWithError(error: any, showHelpIfEnabled: boolean = false): void {
     const chalk: typeof Chalk = require('chalk');
     let exitCode: number = 1;
 
@@ -753,7 +762,7 @@ export class Cli {
 
     // will never be run. Required for testing where we're stubbing process.exit
     /* c8 ignore next */
-    return Promise.reject();
+    throw new Error();
     /* c8 ignore next */
   }
 

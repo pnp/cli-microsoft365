@@ -58,6 +58,10 @@ describe(commands.NAVIGATION_NODE_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('excludes options from URL processing', () => {
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
+  });
+
   it('adds new navigation node to the top navigation', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/web/navigation/topnavigationbar`) > -1 &&
