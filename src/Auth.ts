@@ -4,10 +4,12 @@ import { FileTokenStorage } from './auth/FileTokenStorage';
 import { msalCachePlugin } from './auth/msalCachePlugin';
 import { TokenStorage } from './auth/TokenStorage';
 import type { AuthServer } from './AuthServer';
-import { Logger } from './cli';
+import { Cli, Logger } from './cli';
 import { CommandError } from './Command';
 import config from './config';
 import request from './request';
+import { settingsNames } from './settingsNames';
+import * as open from 'open';
 
 export interface Hash<TValue> {
   [key: string]: TValue;
@@ -83,6 +85,7 @@ export enum CertificateType {
 }
 
 export class Auth {
+  private open = open;
   private _authServer: AuthServer | undefined;
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
   private _service: Service;
@@ -348,6 +351,10 @@ export class Auth {
         }
 
         logger.log(response.message);
+
+        if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenBrowserOnLogin, false)) {
+          this.open('https://aka.ms/devicelogin');
+        }
       },
       scopes: [`${resource}/.default`]
     };

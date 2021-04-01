@@ -13,3 +13,4 @@ Setting name|Definition|Default value
 `csvQuote`|The quote characters surrounding a field. An empty quote value will preserve the original field, whether it contains quotation marks or not.|` `
 `csvQuoted`|Quote all the non-empty fields even if not required|`false`
 `csvQuotedEmpty`|Quote empty strings and overrides quoted_string on empty strings when defined|`false`
+`autoOpenBrowserOnLogin`|Automatically open the browser to <https://aka.ms/devicelogin> after running `m365 login` command in device code mode|`false`

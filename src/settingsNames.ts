@@ -7,7 +7,8 @@ const settingsNames = {
   csvEscape: 'csvEscape',
   csvQuote: 'csvQuote',
   csvQuoted: 'csvQuoted',
-  csvQuotedEmpty: 'csvQuotedEmpty'
+  csvQuotedEmpty: 'csvQuotedEmpty',
+  autoOpenBrowserOnLogin: 'autoOpenBrowserOnLogin'
 };
 
 export { settingsNames };
