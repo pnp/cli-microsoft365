@@ -74,7 +74,7 @@ m365 spo customaction set [options]
 Running this command from the Windows Command Shell (cmd.exe) or PowerShell for Windows OS XP, 7, 8, 8.1 without bash installed might require additional formatting for command options that have JSON, XML or JavaScript values because the command shell treat quotes differently. For example, this is how ApplicationCustomizer user custom action can be created from the Windows cmd.exe:
 
 ```sh
-m365 spo customaction set -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{\"testMessage\":\"Test message\"}'
+m365 spo customaction set --url https://contoso.sharepoint.com/sites/test --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --clientSideComponentProperties '{\"testMessage\":\"Test message\"}'
 ```
 
 Note, how the `clientSideComponentProperties` option (-p) has escaped double quotes `'{\"testMessage\":\"Test message\"}'` compared to execution from bash `'{"testMessage":"Test message"}'`.
@@ -88,31 +88,31 @@ Note, specifying the scope option might speed up the execution of the command, b
 Updates tenant-wide SharePoint Framework Application Customizer extension properties in site _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction set -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{"testMessage":"Test message"}'
+m365 spo customaction set --url https://contoso.sharepoint.com/sites/test --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --clientSideComponentProperties '{"testMessage":"Test message"}'
 ```
 
 Updates tenant-wide SharePoint Framework **modern List View** Command Set extension in site _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction set -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -p '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}' --sequence 100
+m365 spo customaction set --url https://contoso.sharepoint.com/sites/test --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --clientSideComponentProperties '{"sampleTextOne":"One item is selected in the list.", "sampleTextTwo":"This command is always visible."}' --sequence 100
 ```
 
 Updates url custom action in the SiteActions menu in site _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction set -u https://contoso.sharepoint.com/sites/test  -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --actionUrl "~site/SitePages/Home.aspx"
+m365 spo customaction set --url https://contoso.sharepoint.com/sites/test --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --actionUrl "~site/SitePages/Home.aspx"
 ```
 
 Updates ScriptLink custom action with script source in **classic pages** in site collection _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction set -u https://contoso.sharepoint.com/sites/test -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --scriptSrc "~sitecollection/SiteAssets/YourScript.js"
+m365 spo customaction set --url https://contoso.sharepoint.com/sites/test --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --scriptSrc "~sitecollection/SiteAssets/YourScript.js"
 ```
 
 Creates custom action with delegated rights in the SiteActions menu in site _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction set -u https://contoso.sharepoint.com/sites/test -i 058140e3-0e37-44fc-a1d3-79c487d371a3 --rights "AddListItems,DeleteListItems,ManageLists"
+m365 spo customaction set --url https://contoso.sharepoint.com/sites/test --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --rights "AddListItems,DeleteListItems,ManageLists"
 ```
 
 ## More information
