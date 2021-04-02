@@ -33,7 +33,7 @@ m365 spo cdn policy list
 Show the list of policies configured for the Private CDN
 
 ```sh
-m365 spo cdn policy list -t Private
+m365 spo cdn policy list --type Private
 ```
 
 ## More information

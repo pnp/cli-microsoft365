@@ -27,19 +27,13 @@ When using the text output type (default), the command lists only the values of 
 Return details about all user custom actions located in site or site collection _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction list -u https://contoso.sharepoint.com/sites/test
-```
-
-Return details about all user custom actions located in site or site collection _https://contoso.sharepoint.com/sites/test_
-
-```sh
 m365 spo customaction list --url https://contoso.sharepoint.com/sites/test
 ```
 
 Return details about all user custom actions located in site collection _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction list -u https://contoso.sharepoint.com/sites/test -s Site
+m365 spo customaction list --url https://contoso.sharepoint.com/sites/test --scope Site
 ```
 
 Return details about all user custom actions located in site _https://contoso.sharepoint.com/sites/test_

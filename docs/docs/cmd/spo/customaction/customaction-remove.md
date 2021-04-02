@@ -29,7 +29,7 @@ m365 spo customaction remove [options]
 Removes user custom action with ID _058140e3-0e37-44fc-a1d3-79c487d371a3_ located in site or site collection _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction remove -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test
+m365 spo customaction remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test
 ```
 
 Removes user custom action with ID _058140e3-0e37-44fc-a1d3-79c487d371a3_ located in site or site collection _https://contoso.sharepoint.com/sites/test_. Skips the confirmation prompt message.
@@ -41,7 +41,7 @@ m365 spo customaction remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url htt
 Removes user custom action with ID _058140e3-0e37-44fc-a1d3-79c487d371a3_ located in site collection _https://contoso.sharepoint.com/sites/test_
 
 ```sh
-m365 spo customaction remove -i 058140e3-0e37-44fc-a1d3-79c487d371a3 -u https://contoso.sharepoint.com/sites/test -s Site
+m365 spo customaction remove --id 058140e3-0e37-44fc-a1d3-79c487d371a3 --url https://contoso.sharepoint.com/sites/test --scope Site
 ```
 
 Removes user custom action with ID _058140e3-0e37-44fc-a1d3-79c487d371a3_ located in site _https://contoso.sharepoint.com/sites/test_

@@ -33,7 +33,7 @@ Using the `-t, --type` option you can choose whether you want to manage the sett
 Remove _*/CDN_ from the list of origins of the Public CDN
 
 ```sh
-m365 spo cdn origin remove -t Public -r */CDN
+m365 spo cdn origin remove --type Public --origin */CDN
 ```
 
 ## More information

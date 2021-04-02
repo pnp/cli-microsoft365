@@ -30,7 +30,7 @@ Using the `-t, --type` option you can choose whether you want to manage the sett
 Add _*/CDN_ to the list of origins of the Public CDN
 
 ```sh
-m365 spo cdn origin add -t Public -r */CDN
+m365 spo cdn origin add --type Public --origin */CDN
 ```
 
 ## More information
