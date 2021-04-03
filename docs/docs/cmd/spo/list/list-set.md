@@ -10,14 +10,14 @@ m365 spo list set [options]
 
 ## Options
 
-`-i
-: --id <id>`|Id of the list to update
+`-i, --id <id>`
+: Id of the list to update
 
-`-u
-: --webUrl <webUrl>`|URL of the site where the list to update is located
+`-u, --webUrl <webUrl>`
+: URL of the site where the list to update is located
 
-`-t
-: --title [title]`|The displayed title for the list
+`-t, --title [title]`
+: The displayed title for the list
 
 `--allowDeletion [allowDeletion]`
 : Boolean value specifying whether the list can be deleted. Valid values are `true,false`
