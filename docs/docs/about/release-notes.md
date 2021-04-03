@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Planner:**
+
+- [planner plan add](../cmd/planner/plan/plan-add.md) - adds a new Microsoft Planner plan [#2253](https://github.com/pnp/cli-microsoft365/issues/2253)
+
 **SharePoint:**
 
 - [spo site apppermission add](../cmd/spo/site/site-apppermission-add.md) - adds a specific application permissions to the site [#2208](https://github.com/pnp/cli-microsoft365/issues/2208)
@@ -17,6 +21,8 @@
 
 - moved from adal-node to msal-node [#2156](https://github.com/pnp/cli-microsoft365/issues/2156)
 - added eslint. Fixed code to align with eslint config [#2058](https://github.com/pnp/cli-microsoft365/issues/2058)
+- updated command examples to use long options [#2319](https://github.com/pnp/cli-microsoft365/issues/2319)
+- fixed broken list of command options [#2320](https://github.com/pnp/cli-microsoft365/issues/2320)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 
