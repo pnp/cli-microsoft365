@@ -57,6 +57,7 @@
         "coveralls": "^3.1.0",
         "eslint": "^7.22.0",
         "eslint-config-standard": "^16.0.2",
+        "eslint-plugin-cli-microsoft365": "file:eslint-rules",
         "eslint-plugin-import": "^2.22.1",
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-promise": "^4.3.1",
@@ -64,6 +65,11 @@
         "rimraf": "^3.0.2",
         "sinon": "^9.2.4"
       }
+    },
+    "eslint-rules": {
+      "name": "eslint-plugin-cli-microsoft365",
+      "version": "1.0.0",
+      "dev": true
     },
     "node_modules/@azure/msal-common": {
       "version": "4.1.1",
@@ -2093,6 +2099,10 @@
       "resolved": "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz",
       "integrity": "sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=",
       "dev": true
+    },
+    "node_modules/eslint-plugin-cli-microsoft365": {
+      "resolved": "eslint-rules",
+      "link": true
     },
     "node_modules/eslint-plugin-es": {
       "version": "3.0.1",
@@ -7762,6 +7772,9 @@
           "dev": true
         }
       }
+    },
+    "eslint-plugin-cli-microsoft365": {
+      "version": "file:eslint-rules"
     },
     "eslint-plugin-es": {
       "version": "3.0.1",
