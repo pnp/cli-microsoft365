@@ -122,13 +122,43 @@ describe(commands.CONFIG_SET, () => {
     assert.notStrictEqual(actual, true);
   });
 
-  it(`passes validation if service is set to ${settingsNames.showHelpOnFailure} `, () => {
-    const actual = command.validate({ options: { key: settingsNames.showHelpOnFailure, value: false } });
+  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure} and value to true`, () => {
+    const actual = command.validate({ options: { key: settingsNames.showHelpOnFailure, value: 'true' } });
     assert.strictEqual(actual, true);
   });
 
-  it('fails validation if specified output key is invalid ', () => {
+  it(`passes validation if setting is set to ${settingsNames.showHelpOnFailure} and value to false`, () => {
+    const actual = command.validate({ options: { key: settingsNames.showHelpOnFailure, value: 'false' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if specified output type is invalid', () => {
     const actual = command.validate({ options: { key: settingsNames.output, value: 'invalid' } });
     assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation for output type text', () => {
+    const actual = command.validate({ options: { key: settingsNames.output, value: 'text' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for output type json', () => {
+    const actual = command.validate({ options: { key: settingsNames.output, value: 'json' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails validation if specified error output type is invalid', () => {
+    const actual = command.validate({ options: { key: settingsNames.errorOutput, value: 'invalid' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation for error output stdout', () => {
+    const actual = command.validate({ options: { key: settingsNames.errorOutput, value: 'stdout' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation for error output stderr', () => {
+    const actual = command.validate({ options: { key: settingsNames.errorOutput, value: 'stderr' } });
+    assert.strictEqual(actual, true);
   });
 });

@@ -12,8 +12,6 @@ nav:
     - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
     - 'Caveats when working with the CLI and certificate login': 'user-guide/cli-certificate-caveats.md'
   - Commands:
-    - config set: 'cmd/cli/config/config-set.md'
-    - consent: 'cmd/cli/cli-consent.md'
     - login: 'cmd/login.md'
     - logout: 'cmd/logout.md'
     - status: 'cmd/status.md'
@@ -81,6 +79,8 @@ nav:
         - completion pwsh update: 'cmd/cli/completion/completion-pwsh-update.md'
         - completion sh setup: 'cmd/cli/completion/completion-sh-setup.md'
         - completion sh update: 'cmd/cli/completion/completion-sh-update.md'
+      - config:
+        - config set: 'cmd/cli/config/config-set.md'
     - File (file):
       - convert:
         - convert pdf: 'cmd/file/convert/convert-pdf.md'
