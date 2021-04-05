@@ -12,11 +12,4 @@ You can configure the specific setting using the `cli config set` command. For e
 m365 cli config set --key showHelpOnFailure --value true
 ```
 
-## Available settings
-
-Following is the list of configuration settings available in CLI for Microsoft 365.
-
-Setting name|Definition|Default value
-------------|----------|-------------
-`showHelpOnFailure`|Automatically display help when executing a command failed|`true`
-`output`|Defines the default output when issuing a command|`text`
+--8<-- "docs/_clisettings.md"

@@ -11,12 +11,14 @@ m365 cli config set [options]
 ## Options
 
 `-k, --key <key>`
-: Config key to specify. Allowed values: `showHelpOnFailure,output`
+: Config key to specify
 
 `-v, --value <value>`
 : Config value to set
 
 --8<-- "docs/cmd/_global.md"
+
+--8<-- "docs/_clisettings.md"
 
 ## Examples
 

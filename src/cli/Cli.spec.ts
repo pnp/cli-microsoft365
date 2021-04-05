@@ -1264,11 +1264,23 @@ describe('Cli', () => {
     assert(consoleLogSpy.calledWith());
   });
 
-  it(`logs error to console`, () => {
+  it(`logs error to console stderr`, () => {
     Utils.restore((Cli as any).error);
     const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').callsFake(() => { });
     (Cli as any).error('Message');
     assert(consoleErrorSpy.calledWith('Message'));
+  });
+
+  it(`logs error to console stdout when stdout configured as error output`, () => {
+    const config = cli.config;
+    sinon.stub(config, 'get').callsFake(() => 'stdout');
+    Utils.restore((Cli as any).error);
+    const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').callsFake(() => { });
+    const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').callsFake(() => { });
+
+    (Cli as any).error('Message');
+    assert(consoleErrorSpy.notCalled, 'console.error called');
+    assert(consoleLogSpy.calledWith('Message'), 'console.log not called with the right message');
   });
 
   it(`returns stored configuration value when available`, () => {

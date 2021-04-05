@@ -188,15 +188,7 @@ export class Cli {
 
     return Cli
       .executeCommand(this.commandToExecute.command, optionsWithoutShorts)
-      .then(_ => {
-        if (optionsWithoutShorts.options.verbose ||
-          optionsWithoutShorts.options.debug) {
-          const chalk: typeof Chalk = require('chalk');
-          Cli.error(chalk.green('DONE'));
-        }
-
-        process.exit(0);
-      }, err => this.closeWithError(err));
+      .then(_ => process.exit(0), err => this.closeWithError(err));
   }
 
   public static executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
@@ -220,17 +212,21 @@ export class Cli {
       const parentCommandName: string | undefined = cli.currentCommandName;
       cli.currentCommandName = command.getCommandName();
 
-      command
-        .action(logger, args as any, (err: any): void => {
-          // restore the original command name
-          cli.currentCommandName = parentCommandName;
+      command.action(logger, args as any, (err: any): void => {
+        // restore the original command name
+        cli.currentCommandName = parentCommandName;
 
-          if (err) {
-            return reject(err);
-          }
+        if (err) {
+          return reject(err);
+        }
 
-          resolve();
-        });
+        if (args.options.debug || args.options.verbose) {
+          const chalk: typeof Chalk = require('chalk');
+          logger.logToStderr(chalk.green('DONE'));
+        }
+
+        resolve();
+      });
     });
   }
 
@@ -776,7 +772,13 @@ export class Cli {
   }
 
   private static error(message?: any, ...optionalParams: any[]): void {
-    console.error(message, ...optionalParams);
+    const errorOutput: string = Cli.getInstance().getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
+    if (errorOutput === 'stdout') {
+      console.log(message, ...optionalParams);
+    }
+    else {
+      console.error(message, ...optionalParams);
+    }
   }
 
   public static prompt(options: any, cb: (result: any) => void): void {
