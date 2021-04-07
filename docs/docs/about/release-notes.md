@@ -23,6 +23,8 @@
 - added eslint. Fixed code to align with eslint config [#2058](https://github.com/pnp/cli-microsoft365/issues/2058)
 - updated command examples to use long options [#2319](https://github.com/pnp/cli-microsoft365/issues/2319)
 - fixed broken list of command options [#2320](https://github.com/pnp/cli-microsoft365/issues/2320)
+- added support for using relative URLs in spo commands [#2313](https://github.com/pnp/cli-microsoft365/issues/2313)
+- added support for configuring error output [#2325](https://github.com/pnp/cli-microsoft365/issues/2325)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 
