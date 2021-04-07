@@ -28,23 +28,23 @@ $siteType = 'CommunicationSite'
 $site = m365 spo site get --url $siteUrl --output 'json'
 $site = $site | ConvertFrom-Json
 if ($null -eq $site) {
-    Write-host 'setup site does not exist, I will create it'
-    m365 spo site add --url $siteUrl --type $siteType --title $siteTitle
+  Write-host 'setup site does not exist, I will create it'
+  m365 spo site add --url $siteUrl --type $siteType --title $siteTitle
 }
 else {
-    Write-host 'setup site already exists'
+  Write-host 'setup site already exists'
 }
 
 Write-host 'add site column'
 $fieldName = 'Sample Text Column'
 $field = m365 spo field get --webUrl $siteUrl --fieldTitle $fieldName --output 'json'
 if ($null -eq $field) {
-    Write-host 'sample site coulmn does not exist, I will create it'
-    $fieldXml = "<Field ID='{DAA84CE2-85B2-43AD-A06F-C6311E7D5E6B}' Type='Text' Name='SampleTextColumn' DisplayName='Sample Text Column' Required='FALSE' SourceID='http://schemas.microsoft.com/sharepoint/v3' StaticName='SampleTextColumn' FromBaseType='TRUE' />"
-    $field = m365 spo field add --webUrl $siteUrl --xml $fieldXml --output 'json'
+  Write-host 'sample site coulmn does not exist, I will create it'
+  $fieldXml = "<Field ID='{13AFECC0-2454-41F3-85E6-E194458C861C}' Type='Text' Name='SampleTextColumn' DisplayName='Sample Text Column' Indexed='FALSE' Group='Sample Columns' Required='FALSE' SourceID='{4f118c69-66e0-497c-96ff-d7855ce0713d}' StaticName='SampleTextColumn' FromBaseType='TRUE' ></Field>"
+  $field = m365 spo field add --webUrl $siteUrl --xml $fieldXml --output 'json'
 }
 else {
-    Write-host 'sample site coulmn already exists'
+  Write-host 'sample site coulmn already exists'
 }
 $field = $field | ConvertFrom-Json
 
@@ -54,12 +54,12 @@ $contentTypeGroup = 'sample content type group'
 $parentId = '0x01007926A45D687BA842B947286090B8F67D' # list item content type
 $contentType = m365 spo contenttype get --webUrl $siteUrl --id $parentId --output 'json'
 if ($null -eq $contentType) {
-    Write-host 'sample site content type does not exist, I will create it'
-    $contentType = m365 spo contenttype add --webUrl $siteUrl --name $contentTypeName --id $parentId --group $contentTypeGroup --output 'json'
-    $contentType = m365 spo contenttype get --webUrl $siteUrl --id $parentId --output 'json'
+  Write-host 'sample site content type does not exist, I will create it'
+  $contentType = m365 spo contenttype add --webUrl $siteUrl --name $contentTypeName --id $parentId --group $contentTypeGroup --output 'json'
+  $contentType = m365 spo contenttype get --webUrl $siteUrl --id $parentId --output 'json'
 }
 else {
-    Write-host 'sample site content type already exists'
+  Write-host 'sample site content type already exists'
 }
 $contentType = $contentType | ConvertFrom-Json
 
@@ -72,11 +72,11 @@ Write-host 'create generic list'
 $listName = 'setup test list'
 $list = m365 spo list get --title $listName --webUrl $siteUrl --output 'json'
 if ($null -eq $list) {
-    Write-host 'sample generic list does not exist, I will create it'
-    $list = m365 spo list add --title $listName --baseTemplate 'GenericList' --webUrl $siteUrl --output 'json'
+  Write-host 'sample generic list does not exist, I will create it'
+  $list = m365 spo list add --title $listName --baseTemplate 'GenericList' --webUrl $siteUrl --output 'json'
 }
 else {
-    Write-host 'sample generic list already exists'
+  Write-host 'sample generic list already exists'
 }
 $list = $list | ConvertFrom-Json
 
@@ -93,11 +93,11 @@ Write-host 'create document lib'
 $libName = 'setup test lib'
 $lib = m365 spo list get --title $libName --webUrl $siteUrl --output 'json'
 if ($null -eq $lib) {
-    Write-host 'sample document lib does not exist, I will create it'
-    $lib = m365 spo list add --title $libName --baseTemplate 'DocumentLibrary' --webUrl $siteUrl --output 'json'
+  Write-host 'sample document lib does not exist, I will create it'
+  $lib = m365 spo list add --title $libName --baseTemplate 'DocumentLibrary' --webUrl $siteUrl --output 'json'
 }
 else {
-    Write-host 'sample document lib already exists'
+  Write-host 'sample document lib already exists'
 }
 $lib = $lib | ConvertFrom-Json
 
@@ -105,12 +105,12 @@ Write-host 'add sample column'
 $columnName = 'Sample Text Column'
 $column = m365 spo field get --webUrl $siteUrl --listUrl "Lists/$libName" --fieldTitle $columnName --output 'json'
 if ($null -eq $column) {
-    Write-host 'sample column in lib does not exist, I will create it'
-    $columnXml = "<Field ID='{AC827B0C-8B45-4B4F-927B-CDDC4FEEE79E}' Type='Text' Name='SampleTextColumn' DisplayName='Sample Text Column' Required='FALSE' SourceID='http://schemas.microsoft.com/sharepoint/v3' StaticName='SampleTextColumn' FromBaseType='TRUE' />"
-    $column = m365 spo field add --webUrl $siteUrl --listTitle $libName --xml $columnXml --output 'json'
+  Write-host 'sample column in lib does not exist, I will create it'
+  $columnXml = "<Field ID='{AC827B0C-8B45-4B4F-927B-CDDC4FEEE79E}' Type='Text' Name='SampleTextColumn' DisplayName='Sample Text Column' Required='FALSE' SourceID='http://schemas.microsoft.com/sharepoint/v3' StaticName='SampleTextColumn' FromBaseType='TRUE' />"
+  $column = m365 spo field add --webUrl $siteUrl --listTitle $libName --xml $columnXml --output 'json'
 }
 else {
-    Write-host 'sample column in lib already exists'
+  Write-host 'sample column in lib already exists'
 }
 $column = $column | ConvertFrom-Json
 
@@ -118,11 +118,11 @@ Write-host 'add sample folder'
 $folderName = 'sample Folder'
 $folder = m365 spo folder get --webUrl $siteUrl --folderUrl "/$libName/$folderName" --output 'json'
 if ($null -eq $folder) {
-    Write-host 'sample folder in lib does not exist, I will create it'
-    $folder = m365 spo folder add --webUrl $siteUrl --parentFolderUrl "/$libName" --name $folderName --output 'json'
+  Write-host 'sample folder in lib does not exist, I will create it'
+  $folder = m365 spo folder add --webUrl $siteUrl --parentFolderUrl "/$libName" --name $folderName --output 'json'
 }
 else {
-    Write-host 'sample folder in lib already exists'
+  Write-host 'sample folder in lib already exists'
 }
 
 Write-host 'modify list view'
@@ -135,9 +135,8 @@ Write-host 'modify site navigation'
 $currentNavigation = m365 spo navigation node list --webUrl $siteUrl --location QuickLaunch --output 'json'
 $currentNavigation = $currentNavigation | ConvertFrom-Json
 Write-host 'clearing old navigation links'
-foreach($navigationItem in $currentNavigation)
-{
-    m365 spo navigation node remove --webUrl $siteUrl --location QuickLaunch --id $navigationItem.Id --confirm
+foreach ($navigationItem in $currentNavigation) {
+  m365 spo navigation node remove --webUrl $siteUrl --location QuickLaunch --id $navigationItem.Id --confirm
 }
 Write-host 'adding new navigation'
 $nodeAddedResponse = m365 spo navigation node add --webUrl $siteUrl --location QuickLaunch --title 'Sample Document Library' --url "/$siteRelativeUrl/$libName/Forms/AllItems.aspx"
