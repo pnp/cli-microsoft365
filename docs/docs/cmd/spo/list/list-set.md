@@ -203,10 +203,10 @@ m365 spo list set [options]
 
 ## Examples
 
-Update the _allowContentTypes_ property of the list with id _3EA5A977-315E-4E25-8B0F-E4F949BF6B8F_ located in site _https://contoso.sharepoint.com/sites/project-x_
+Update the _contentTypesEnabled_ property of the list with id _3EA5A977-315E-4E25-8B0F-E4F949BF6B8F_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --allowContentTypes true
+m365 spo list set --webUrl https://contoso.sharepoint.com/sites/project-x --id 3EA5A977-315E-4E25-8B0F-E4F949BF6B8F --contentTypesEnabled true
 ```
 
 Enable versioning and set the number of major versions to keep on the list with id _3EA5A977-315E-4E25-8B0F-E4F949BF6B8F_ located in site _https://contoso.sharepoint.com/sites/project-x_
