@@ -46,6 +46,10 @@ class SpoWebAddCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['webUrl'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let siteInfo: any = null;
     let subsiteFullUrl: string = '';

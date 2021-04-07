@@ -115,6 +115,10 @@ describe(commands.FILE_COPY, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('excludes options from URL processing', () => {
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['targetUrl']);
+  });
+
   it('should command complete successfully', (done) => {
     stubAllPostRequests();
     stubAllGetRequests();

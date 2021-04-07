@@ -101,7 +101,7 @@ jobs:
       - name: Test without coverage
         # we want to run tests on older Node versions to ensure that code works
         if: matrix.nodeRun != 14
-        run: npm run test:nocov
+        run: npm run test:test
       - name: Compress output (non-Windows)
         if: matrix.nodeRun == 14 && matrix.os != 'windows-latest' && always()
         run: tar -cvf coverage.tar coverage

@@ -67,7 +67,7 @@ export class Cli {
     return Cli.instance;
   }
 
-  public execute(commandsFolder: string, rawArgs: string[]): Promise<void> {
+  public async execute(commandsFolder: string, rawArgs: string[]): Promise<void> {
     this.commandsFolder = commandsFolder;
 
     // check if help for a specific command has been requested using the
@@ -83,7 +83,7 @@ export class Cli {
     // parse args to see if a command has been specified and can be loaded
     // rather than loading all commands
     const parsedArgs: minimist.ParsedArgs = minimist(rawArgs);
-
+    
     // load commands
     this.loadCommandFromArgs(parsedArgs._);
 
@@ -167,6 +167,15 @@ export class Cli {
       return this.closeWithError(e);
     }
 
+
+    try {
+      // process options before passing them on to validation stage
+      await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
+    }
+    catch (e) {
+      return this.closeWithError(e.message, false);
+    }
+
     const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
     if (typeof validationResult === 'string') {
       return this.closeWithError(validationResult, true);
@@ -179,15 +188,7 @@ export class Cli {
 
     return Cli
       .executeCommand(this.commandToExecute.command, optionsWithoutShorts)
-      .then(_ => {
-        if (optionsWithoutShorts.options.verbose ||
-          optionsWithoutShorts.options.debug) {
-          const chalk: typeof Chalk = require('chalk');
-          Cli.error(chalk.green('DONE'));
-        }
-
-        process.exit(0);
-      }, err => this.closeWithError(err));
+      .then(_ => process.exit(0), err => this.closeWithError(err));
   }
 
   public static executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
@@ -211,17 +212,21 @@ export class Cli {
       const parentCommandName: string | undefined = cli.currentCommandName;
       cli.currentCommandName = command.getCommandName();
 
-      command
-        .action(logger, args as any, (err: any): void => {
-          // restore the original command name
-          cli.currentCommandName = parentCommandName;
+      command.action(logger, args as any, (err: any): void => {
+        // restore the original command name
+        cli.currentCommandName = parentCommandName;
 
-          if (err) {
-            return reject(err);
-          }
+        if (err) {
+          return reject(err);
+        }
 
-          resolve();
-        });
+        if (args.options.debug || args.options.verbose) {
+          const chalk: typeof Chalk = require('chalk');
+          logger.logToStderr(chalk.green('DONE'));
+        }
+
+        resolve();
+      });
     });
   }
 
@@ -727,7 +732,7 @@ export class Cli {
     Cli.log();
   }
 
-  private closeWithError(error: any, showHelpIfEnabled: boolean = false): Promise<void> {
+  private closeWithError(error: any, showHelpIfEnabled: boolean = false): void {
     const chalk: typeof Chalk = require('chalk');
     let exitCode: number = 1;
 
@@ -753,7 +758,7 @@ export class Cli {
 
     // will never be run. Required for testing where we're stubbing process.exit
     /* c8 ignore next */
-    return Promise.reject();
+    throw new Error();
     /* c8 ignore next */
   }
 
@@ -767,7 +772,13 @@ export class Cli {
   }
 
   private static error(message?: any, ...optionalParams: any[]): void {
-    console.error(message, ...optionalParams);
+    const errorOutput: string = Cli.getInstance().getSettingWithDefaultValue(settingsNames.errorOutput, 'stderr');
+    if (errorOutput === 'stdout') {
+      console.log(message, ...optionalParams);
+    }
+    else {
+      console.error(message, ...optionalParams);
+    }
   }
 
   public static prompt(options: any, cb: (result: any) => void): void {

@@ -21,8 +21,10 @@
     "build": "tsc -p . && node scripts/copy-files.js",
     "watch": "tsc -w -p .",
     "clean": "rimraf ./dist",
-    "test": "node scripts/check-version.js && npm run lint && c8 mocha \"dist/**/*.spec.js\" --timeout 10000",
-    "test:nocov": "mocha \"dist/**/*.spec.js\" --timeout 10000",
+    "test": "npm run test:version && npm run lint && npm run test:cov",
+    "test:version": "node scripts/check-version.js",
+    "test:cov": "c8 npm run test:test",
+    "test:test": "mocha \"dist/**/*.spec.js\" --timeout 10000",
     "lint": "eslint --ext .ts src"
   },
   "keywords": [

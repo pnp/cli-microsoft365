@@ -64,6 +64,10 @@ describe(commands.FILE_REMOVE, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('excludes options from URL processing', () => {
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
+  });
+
   it('prompts before removing file when confirmation argument not passed (id)', (done) => {
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com', id: '0cd891ef-afce-4e55-b836-fce03286cccf' } }, () => {
       let promptIssued = false;

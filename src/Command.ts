@@ -170,6 +170,16 @@ export default abstract class Command {
     return;
   }
 
+  /**
+   * Processes options after resolving them from the user input and before
+   * passing them on to command action for execution. Used for example for
+   * expanding server-relative URLs to absolute in spo commands
+   * @param options Object that contains command's options
+   */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
+  public async processOptions(options: any): Promise<void> {
+  }
+
   public getCommandName(): string {
     let commandName: string = this.name;
     let pos: number = commandName.indexOf('<');

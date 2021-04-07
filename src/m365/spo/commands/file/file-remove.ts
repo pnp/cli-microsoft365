@@ -38,6 +38,10 @@ class SpoFileRemoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['url'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeFile: () => void = (): void => {
       if (this.verbose) {

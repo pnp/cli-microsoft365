@@ -39,6 +39,10 @@ class SpoFileCopyCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['targetUrl'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const webUrl = args.options.webUrl;
     const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
