@@ -154,7 +154,8 @@
     "van Rousselt, Rick <rick.vanrousselt@outlook.com>",
     "Velliah, Joseph <joseph@sprider.org>",
     "Wilen, Wictor <wictor@wictorwilen.se>",
-    "Williams, Rabia <rabiawilliams@gmail.com>"
+    "Williams, Rabia <rabiawilliams@gmail.com>",
+    "Wojcik, Adam <adam.wojcik.it@gmail.com>"
   ],
   "dependencies": {
     "@azure/msal-node": "^1.0.1",
