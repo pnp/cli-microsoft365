@@ -25,6 +25,8 @@
 - fixed broken list of command options [#2320](https://github.com/pnp/cli-microsoft365/issues/2320)
 - added support for using relative URLs in spo commands [#2313](https://github.com/pnp/cli-microsoft365/issues/2313)
 - added support for configuring error output [#2325](https://github.com/pnp/cli-microsoft365/issues/2325)
+- fixed docs for 'spo list set' [#2332](https://github.com/pnp/cli-microsoft365/issues/2332)
+- added 'Cleanup completed Microsoft To Do tasks' sample script [#2339](https://github.com/pnp/cli-microsoft365/issues/2339)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 
