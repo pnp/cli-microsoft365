@@ -19,7 +19,7 @@ const admZipMock = {
   /* eslint-enable @typescript-eslint/no-unused-vars */
 };
 
-describe(commands.VIVA_CONNECTIONS_APP_CREATE, () => {
+describe(commands.CONNECTIONS_APP_CREATE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: Sinon.SinonSpy;
@@ -63,7 +63,7 @@ describe(commands.VIVA_CONNECTIONS_APP_CREATE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.VIVA_CONNECTIONS_APP_CREATE), true);
+    assert.strictEqual(command.name.startsWith(commands.CONNECTIONS_APP_CREATE), true);
   });
 
   it('has a description', () => {

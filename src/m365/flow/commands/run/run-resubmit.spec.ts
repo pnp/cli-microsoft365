@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./run-resubmit');
 
-describe(commands.FLOW_RUN_RESUBMIT, () => {
+describe(commands.RUN_RESUBMIT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogToStderrSpy: sinon.SinonSpy;
@@ -59,7 +59,7 @@ describe(commands.FLOW_RUN_RESUBMIT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FLOW_RUN_RESUBMIT), true);
+    assert.strictEqual(command.name.startsWith(commands.RUN_RESUBMIT), true);
   });
 
   it('has a description', () => {

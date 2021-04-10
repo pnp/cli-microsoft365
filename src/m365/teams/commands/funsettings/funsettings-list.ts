@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class TeamsFunSettingsListCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_FUNSETTINGS_LIST;
+    return commands.FUNSETTINGS_LIST;
   }
 
   public get description(): string {

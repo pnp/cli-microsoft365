@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TeamsUserAppRemoveCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_USER_APP_REMOVE;
+    return commands.USER_APP_REMOVE;
   }
 
   public get description(): string {

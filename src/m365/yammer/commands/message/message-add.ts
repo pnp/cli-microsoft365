@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class YammerMessageAddCommand extends YammerCommand {
   public get name(): string {
-    return commands.YAMMER_MESSAGE_ADD;
+    return commands.MESSAGE_ADD;
   }
 
   public get description(): string {

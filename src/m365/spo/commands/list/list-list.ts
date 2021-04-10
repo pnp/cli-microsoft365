@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
 }
 
-class ListListCommand extends SpoCommand {
+class SpoListListCommand extends SpoCommand {
   public get name(): string {
     return commands.LIST_LIST;
   }
@@ -71,4 +71,4 @@ class ListListCommand extends SpoCommand {
   }
 }
 
-module.exports = new ListListCommand();
+module.exports = new SpoListListCommand();

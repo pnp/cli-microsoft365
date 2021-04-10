@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./tab-remove');
 
-describe(commands.TEAMS_TAB_REMOVE, () => {
+describe(commands.TAB_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
@@ -56,7 +56,7 @@ describe(commands.TEAMS_TAB_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_TAB_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.TAB_REMOVE), true);
   });
 
   it('has a description', () => {

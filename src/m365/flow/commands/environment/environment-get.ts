@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class FlowEnvironmentGetCommand extends AzmgmtCommand {
   public get name(): string {
-    return commands.FLOW_ENVIRONMENT_GET;
+    return commands.ENVIRONMENT_GET;
   }
 
   public get description(): string {

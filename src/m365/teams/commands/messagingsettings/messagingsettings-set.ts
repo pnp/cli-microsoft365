@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   allowChannelMentions?: string;
 }
 
-class TeamsMessageSettingsSetCommand extends GraphCommand {
+class TeamsMessagingSettingsSetCommand extends GraphCommand {
   private static props: string[] = [
     'allowUserEditMessages',
     'allowUserDeleteMessages',
@@ -31,7 +31,7 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return commands.TEAMS_MESSAGINGSETTINGS_SET;
+    return commands.MESSAGINGSETTINGS_SET;
   }
 
   public get description(): string {
@@ -40,7 +40,7 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    TeamsMessageSettingsSetCommand.props.forEach((p: string) => {
+    TeamsMessagingSettingsSetCommand.props.forEach((p: string) => {
       telemetryProps[p] = typeof (args.options as any)[p] !== 'undefined';
     });
     return telemetryProps;
@@ -50,7 +50,7 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
     const data: any = {
       messagingSettings: {}
     };
-    TeamsMessageSettingsSetCommand.props.forEach((p: string) => {
+    TeamsMessagingSettingsSetCommand.props.forEach((p: string) => {
       if (typeof (args.options as any)[p] !== 'undefined') {
         data.messagingSettings[p] = (args.options as any)[p].toLowerCase() === 'true';
       }
@@ -103,7 +103,7 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
 
     let hasDuplicate: boolean = false;
     let property: string = '';
-    TeamsMessageSettingsSetCommand.props.forEach((prop: string) => {
+    TeamsMessagingSettingsSetCommand.props.forEach((prop: string) => {
       if ((args.options as any)[prop] instanceof Array) {
         property = prop;
         hasDuplicate = true;
@@ -115,7 +115,7 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
 
     let isValid: boolean = true;
     let value: string = '';
-    TeamsMessageSettingsSetCommand.props.every((p: string) => {
+    TeamsMessagingSettingsSetCommand.props.every((p: string) => {
       property = p;
       value = (args.options as any)[p];
       isValid = typeof value === 'undefined' || Utils.isValidBoolean(value);
@@ -129,4 +129,4 @@ class TeamsMessageSettingsSetCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsMessageSettingsSetCommand();
+module.exports = new TeamsMessagingSettingsSetCommand();

@@ -22,9 +22,9 @@ interface Options extends GlobalOptions {
   saveToSentItems?: string;
 }
 
-class OutlookSendmailCommand extends GraphCommand {
+class OutlookMailSendCommand extends GraphCommand {
   public get name(): string {
-    return commands.OUTLOOK_MAIL_SEND;
+    return commands.MAIL_SEND;
   }
 
   public get description(): string {
@@ -32,7 +32,7 @@ class OutlookSendmailCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [commands.OUTLOOK_SENDMAIL];
+    return [commands.SENDMAIL];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -145,4 +145,4 @@ class OutlookSendmailCommand extends GraphCommand {
   }
 }
 
-module.exports = new OutlookSendmailCommand();
+module.exports = new OutlookMailSendCommand();

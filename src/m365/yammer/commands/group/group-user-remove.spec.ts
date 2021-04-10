@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./group-user-remove');
 
-describe(commands.YAMMER_GROUP_USER_REMOVE, () => {
+describe(commands.GROUP_USER_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let requests: any[];
@@ -52,7 +52,7 @@ describe(commands.YAMMER_GROUP_USER_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.YAMMER_GROUP_USER_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.GROUP_USER_REMOVE), true);
   });
 
   it('has a description', () => {

@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./service-message-list');
 
-describe(commands.TENANT_SERVICE_MESSAGE_LIST, () => {
+describe(commands.SERVICE_MESSAGE_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -373,7 +373,7 @@ describe(commands.TENANT_SERVICE_MESSAGE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TENANT_SERVICE_MESSAGE_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.SERVICE_MESSAGE_LIST), true);
   });
 
   it('has a description', () => {

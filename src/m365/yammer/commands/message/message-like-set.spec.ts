@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 
 const command: Command = require('./message-like-set');
-describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
+describe(commands.MESSAGE_LIKE_SET, () => {
   let log: string[];
   let logger: Logger;
   let promptOptions: any;
@@ -58,7 +58,7 @@ describe(commands.YAMMER_MESSAGE_LIKE_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.YAMMER_MESSAGE_LIKE_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.MESSAGE_LIKE_SET), true);
   });
 
   it('has a description', () => {

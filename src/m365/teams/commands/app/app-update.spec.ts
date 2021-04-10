@@ -10,7 +10,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./app-update');
 
-describe(commands.TEAMS_APP_UPDATE, () => {
+describe(commands.APP_UPDATE, () => {
   let log: string[];
   let logger: Logger;
 
@@ -53,7 +53,7 @@ describe(commands.TEAMS_APP_UPDATE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_APP_UPDATE), true);
+    assert.strictEqual(command.name.startsWith(commands.APP_UPDATE), true);
   });
 
   it('has a description', () => {

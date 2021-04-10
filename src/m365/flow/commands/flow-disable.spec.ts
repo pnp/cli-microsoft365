@@ -9,7 +9,7 @@ import Utils from '../../../Utils';
 import commands from '../commands';
 const command: Command = require('./flow-disable');
 
-describe(commands.FLOW_DISABLE, () => {
+describe(commands.DISABLE, () => {
   let log: string[];
   let logger: Logger;
 
@@ -49,7 +49,7 @@ describe(commands.FLOW_DISABLE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FLOW_DISABLE), true);
+    assert.strictEqual(command.name.startsWith(commands.DISABLE), true);
   });
 
   it('has a description', () => {

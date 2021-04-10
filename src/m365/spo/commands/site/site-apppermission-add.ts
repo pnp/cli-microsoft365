@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
   appDisplayName?: string;
 }
 
-class SpoSiteApppermissionAddCommand extends GraphCommand {
+class SpoSiteAppPermissionAddCommand extends GraphCommand {
   private siteId: string = '';
 
   public get name(): string {
@@ -180,4 +180,4 @@ class SpoSiteApppermissionAddCommand extends GraphCommand {
   }
 }
 
-module.exports = new SpoSiteApppermissionAddCommand();
+module.exports = new SpoSiteAppPermissionAddCommand();

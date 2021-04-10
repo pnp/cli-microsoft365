@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./user-get');
 
-describe(commands.YAMMER_USER_GET, () => {
+describe(commands.USER_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.YAMMER_USER_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.YAMMER_USER_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.USER_GET), true);
   });
 
   it('has a description', () => {

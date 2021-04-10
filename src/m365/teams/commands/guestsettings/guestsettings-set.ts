@@ -25,7 +25,7 @@ class TeamsGuestSettingsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return commands.TEAMS_GUESTSETTINGS_SET;
+    return commands.GUESTSETTINGS_SET;
   }
 
   public get description(): string {

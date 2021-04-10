@@ -10,7 +10,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./conversationmember-add');
 
-describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
+describe(commands.CONVERSATIONMEMBER_ADD, () => {
   //#region Mocked Responses 
   const multipleTeamsResponse: any = {
     "@odata.context": "https://graph.microsoft.com/beta/$metadata#groups",
@@ -344,7 +344,7 @@ describe(commands.TEAMS_CONVERSATIONMEMBER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_CONVERSATIONMEMBER_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.CONVERSATIONMEMBER_ADD), true);
   });
 
   it('has a description', () => {

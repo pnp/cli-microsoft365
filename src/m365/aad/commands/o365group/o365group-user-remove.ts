@@ -30,7 +30,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [teamsCommands.TEAMS_USER_REMOVE];
+    return [teamsCommands.USER_REMOVE];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {

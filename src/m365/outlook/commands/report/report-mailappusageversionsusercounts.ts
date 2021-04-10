@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class OutlookReportMailAppUsageVersionsUserCountsCommand extends PeriodBasedReport {
   public get name(): string {
-    return commands.OUTLOOK_REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS;
+    return commands.REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS;
   }
 
   public get usageEndpoint(): string {

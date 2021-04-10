@@ -9,7 +9,7 @@ import Utils from '../../../Utils';
 import commands from '../commands';
 const command: Command = require('./yammer-search');
 
-describe(commands.YAMMER_SEARCH, () => {
+describe(commands.SEARCH, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -233,7 +233,7 @@ describe(commands.YAMMER_SEARCH, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.YAMMER_SEARCH), true);
+    assert.strictEqual(command.name.startsWith(commands.SEARCH), true);
   });
 
   it('has a description', () => {

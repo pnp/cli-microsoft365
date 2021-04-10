@@ -31,7 +31,7 @@ class AadO365GroupUserSetCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   public alias(): string[] | undefined {
-    return [teamsCommands.TEAMS_USER_SET];
+    return [teamsCommands.USER_SET];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {

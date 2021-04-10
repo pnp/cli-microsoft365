@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   appDisplayName?: string;
 }
 
-class SpoSiteApppermissionListCommand extends GraphCommand {
+class SpoSiteAppPermissionListCommand extends GraphCommand {
   public get name(): string {
     return commands.SITE_APPPERMISSION_LIST;
   }
@@ -134,4 +134,4 @@ class SpoSiteApppermissionListCommand extends GraphCommand {
   }
 }
 
-module.exports = new SpoSiteApppermissionListCommand();
+module.exports = new SpoSiteAppPermissionListCommand();

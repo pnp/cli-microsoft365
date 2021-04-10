@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
   visibility?: string;
 }
 
-class TeamsSetCommand extends GraphCommand {
+class TeamsTeamSetCommand extends GraphCommand {
   private static props: string[] = [
     'displayName',
     'description',
@@ -31,7 +31,7 @@ class TeamsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return commands.TEAMS_TEAM_SET;
+    return commands.TEAM_SET;
   }
 
   public get description(): string {
@@ -40,7 +40,7 @@ class TeamsSetCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    TeamsSetCommand.props.forEach((p: string) => {
+    TeamsTeamSetCommand.props.forEach((p: string) => {
       telemetryProps[p] = typeof (args.options as any)[p] !== 'undefined';
     });
     return telemetryProps;
@@ -125,4 +125,4 @@ class TeamsSetCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsSetCommand();
+module.exports = new TeamsTeamSetCommand();

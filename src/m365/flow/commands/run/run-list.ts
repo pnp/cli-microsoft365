@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class FlowRunListCommand extends AzmgmtCommand {
   public get name(): string {
-    return commands.FLOW_RUN_LIST;
+    return commands.RUN_LIST;
   }
 
   public get description(): string {
