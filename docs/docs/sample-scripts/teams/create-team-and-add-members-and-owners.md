@@ -13,7 +13,7 @@ This sample script shows you how to create a Team and add members and owners usi
 ## szu@expertsinside.com,member
 # The CLI will provision the Group adding the current user as owner. You can remove this user from the owners list by using the $removeYourSelfFromOwners parameter
 
-$fileExportPath = "<putyourcsvhere.csv>"
+$importFile = "<putyourcsvhere.csv>"
 
 ## parameters for the Group
 $teamDisplayName = "Cool team"
@@ -26,7 +26,7 @@ $removeYourSelfFromOwners = $false
 ## Script starts here
 
 # process teams that you have joined only
-$membersList = Import-Csv $fileExportPath -Delimiter ","
+$membersList = Import-Csv $importFile -Delimiter ","
 
 $m365Status = m365 status
 
@@ -34,6 +34,8 @@ if ($m365Status -eq "Logged Out") {
   # Connection to Microsoft 365
   m365 login
 }
+
+$Error.Clear()
 
 # configure the CLI to output JSON on each execution
 m365 cli config set --key output --value json
@@ -45,6 +47,10 @@ $privateString = $(If ($isPrivate) {"true"} Else {"false"})
 Write-Host "Provisioning Group..."
 $group = m365 aad o365group add --displayName $teamDisplayName --description $teamDescription --mailNickname $mailNickname --isPrivate $privateString --members $members --owners $owners | ConvertFrom-Json
 
+if ($Error.Count -gt 0) {
+    Write-Host "Aborting operation..."
+    return
+}
 
 $trial = 0
 $maxRetry = 3
@@ -55,7 +61,7 @@ do {
     Write-Host "Waiting $waitingTime seconds before teamifying the group (trial $trial/$maxRetry)..."
     Start-Sleep -Seconds $waitingTime
     m365 aad o365group teamify --groupId $($group.id) 2>$null
-} while ($Error.Count -gt 0 -and $trial -le $maxRetry)
+} while ($Error.Count -gt 0 -and $trial -lt $maxRetry)
 
 # if it still failed, output the error and stop
 if ($Error.Count -gt 0) {
