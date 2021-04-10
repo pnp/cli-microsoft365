@@ -28,7 +28,7 @@ function Import-FilesAndFolders(
     }
 }
 
-Write-host 'enusre logged in'
+Write-host 'ensure logged in'
 $m365Status = m365 status
 if ($m365Status -eq "Logged Out") {
     m365 login
