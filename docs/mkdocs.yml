@@ -607,6 +607,7 @@ nav:
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
       - 'Setup example site': 'sample-scripts/spo/setup-example-site.md'
       - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
+      - 'Upload local files and folders to SharePoint Online': 'sample-scripts/spo/upload-local-files-and-folder.md'
     - Microsoft Teams:
       - 'Create a Microsoft Team with channels from a Microsoft 365 Group': 'sample-scripts/teams/create-team-from-group.md'
       - 'Create a Microsoft Teams team and bulk add members from CSV file': 'sample-scripts/teams/create-team-and-add-members-and-owners.md'
