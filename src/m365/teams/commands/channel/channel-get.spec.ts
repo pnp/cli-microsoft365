@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./channel-get');
 
-describe(commands.TEAMS_CHANNEL_GET, () => {
+describe(commands.CHANNEL_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.TEAMS_CHANNEL_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_CHANNEL_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.CHANNEL_GET), true);
   });
 
   it('has a description', () => {

@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class TenantReportActiveUserCountsCommand extends PeriodBasedReport {
   public get name(): string {
-    return commands.TENANT_REPORT_ACTIVEUSERCOUNTS;
+    return commands.REPORT_ACTIVEUSERCOUNTS;
   }
 
   public get description(): string {

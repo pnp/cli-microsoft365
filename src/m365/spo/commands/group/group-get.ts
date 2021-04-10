@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
   name?: string;
 }
 
-class SpoUserGetCommand extends SpoCommand {
+class SpoGroupGetCommand extends SpoCommand {
   public get name(): string {
     return commands.GROUP_GET;
   }
@@ -99,4 +99,4 @@ class SpoUserGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoUserGetCommand();
+module.exports = new SpoGroupGetCommand();

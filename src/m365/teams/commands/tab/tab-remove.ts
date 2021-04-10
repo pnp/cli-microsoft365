@@ -21,7 +21,7 @@ interface Options extends GlobalOptions {
 
 class TeamsTabRemoveCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_TAB_REMOVE;
+    return commands.TAB_REMOVE;
   }
 
   public get description(): string {

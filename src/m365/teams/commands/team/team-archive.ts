@@ -15,9 +15,9 @@ interface Options extends GlobalOptions {
   shouldSetSpoSiteReadOnlyForMembers: boolean;
 }
 
-class TeamsArchiveCommand extends GraphCommand {
+class TeamsTeamArchiveCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_TEAM_ARCHIVE;
+    return commands.TEAM_ARCHIVE;
   }
 
   public get description(): string {
@@ -72,4 +72,4 @@ class TeamsArchiveCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsArchiveCommand();
+module.exports = new TeamsTeamArchiveCommand();

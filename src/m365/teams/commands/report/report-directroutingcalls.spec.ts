@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./report-directroutingcalls');
 
-describe(commands.TEAMS_REPORT_DIRECTROUTINGCALLS, () => {
+describe(commands.REPORT_DIRECTROUTINGCALLS, () => {
   let log: string[];
   let logger: Logger;
 
@@ -80,7 +80,7 @@ describe(commands.TEAMS_REPORT_DIRECTROUTINGCALLS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_REPORT_DIRECTROUTINGCALLS), true);
+    assert.strictEqual(command.name.startsWith(commands.REPORT_DIRECTROUTINGCALLS), true);
   });
 
   it('has a description', () => {

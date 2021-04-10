@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class YammerGroupUserRemoveCommand extends YammerCommand {
   public get name(): string {
-    return commands.YAMMER_GROUP_USER_REMOVE;
+    return commands.GROUP_USER_REMOVE;
   }
 
   public get description(): string {

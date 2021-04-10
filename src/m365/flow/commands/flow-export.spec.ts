@@ -10,7 +10,7 @@ import Utils from '../../../Utils';
 import commands from '../commands';
 const command: Command = require('./flow-export');
 
-describe(commands.FLOW_EXPORT, () => {
+describe(commands.EXPORT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -156,7 +156,7 @@ describe(commands.FLOW_EXPORT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FLOW_EXPORT), true);
+    assert.strictEqual(command.name.startsWith(commands.EXPORT), true);
   });
 
   it('has a description', () => {

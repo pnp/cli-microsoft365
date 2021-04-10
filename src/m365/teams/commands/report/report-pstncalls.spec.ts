@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./report-pstncalls');
 
-describe(commands.TEAMS_REPORT_PSTNCALLS, () => {
+describe(commands.REPORT_PSTNCALLS, () => {
   let log: string[];
   let logger: Logger;
 
@@ -80,7 +80,7 @@ describe(commands.TEAMS_REPORT_PSTNCALLS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_REPORT_PSTNCALLS), true);
+    assert.strictEqual(command.name.startsWith(commands.REPORT_PSTNCALLS), true);
   });
 
   it('has a description', () => {

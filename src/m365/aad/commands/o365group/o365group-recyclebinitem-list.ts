@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   mailNickname?: string;
 }
 
-class AadO365GroupRecycleBinItemCommand extends GraphItemsListCommand<Group> {
+class AadO365GroupRecycleBinItemListCommand extends GraphItemsListCommand<Group> {
   public get name(): string {
     return commands.O365GROUP_RECYCLEBINITEM_LIST;
   }
@@ -67,4 +67,4 @@ class AadO365GroupRecycleBinItemCommand extends GraphItemsListCommand<Group> {
   }
 }
 
-module.exports = new AadO365GroupRecycleBinItemCommand();
+module.exports = new AadO365GroupRecycleBinItemListCommand();

@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
 
 class YammerNetworkListCommand extends YammerCommand {
   public get name(): string {
-    return commands.YAMMER_NETWORK_LIST;
+    return commands.NETWORK_LIST;
   }
 
   public get description(): string {

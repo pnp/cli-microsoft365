@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class FlowRemoveCommand extends AzmgmtCommand {
   public get name(): string {
-    return commands.FLOW_REMOVE;
+    return commands.REMOVE;
   }
 
   public get description(): string {

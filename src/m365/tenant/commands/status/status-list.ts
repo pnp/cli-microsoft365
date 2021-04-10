@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class TenantStatusListCommand extends Command {
   public get name(): string {
-    return commands.TENANT_STATUS_LIST;
+    return commands.STATUS_LIST;
   }
 
   public get description(): string {

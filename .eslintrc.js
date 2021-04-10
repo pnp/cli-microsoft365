@@ -1,4 +1,71 @@
-{
+// list of words used in command names used for word breaking
+// sorted alphabetically for easy maintenance
+const dictionary = [
+  'access',
+  'adaptive',
+  'app',
+  'apply',
+  'approve',
+  'assets',
+  'bin',
+  'catalog',
+  'client',
+  'comm',
+  'content',
+  'conversation',
+  'custom',
+  'default',
+  'external',
+  'externalize',
+  'fun',
+  'group',
+  'groupify',
+  'guest',
+  'hide',
+  'historical',
+  'home',
+  'hub',
+  'in',
+  'init',
+  'install',
+  'is',
+  'list',
+  'member',
+  'messaging',
+  'news',
+  'oauth2',
+  'org',
+  'o365',
+  'permission',
+  'place',
+  'property',
+  'records',
+  'recycle',
+  'role',
+  'schema',
+  'service',
+  'setting',
+  'settings',
+  'side',
+  'site',
+  'status',
+  'storage',
+  'token',
+  'type',
+  'user',
+  'web',
+  'webhook'
+];
+
+// list of words that should be capitalized in a specific way
+const capitalized = [
+  'OAuth2'
+];
+
+// sort dictionary to put the longest words first
+const sortedDictionary = dictionary.sort((a, b) => b.length - a.length);
+
+module.exports = {
   "root": true,
   "env": {
     "node": true,
@@ -18,7 +85,8 @@
     "sourceType": "module"
   },
   "plugins": [
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "cli-microsoft365"
   ],
   "ignorePatterns": [
     "**/pcf-init/assets/**",
@@ -28,6 +96,8 @@
     "*.js"
   ],
   "rules": {
+    "cli-microsoft365/correct-command-class-name": ["error", sortedDictionary, capitalized],
+    "cli-microsoft365/correct-command-name": "error",
     "indent": "off",
     "@typescript-eslint/indent": [
       "error",
@@ -98,7 +168,9 @@
       ],
       "rules": {
         "no-console": "error",
-        "@typescript-eslint/no-empty-function": "off"
+        "@typescript-eslint/no-empty-function": "off",
+        "cli-microsoft365/correct-command-class-name": "off",
+        "cli-microsoft365/correct-command-name": "off"
       }
     },
     {

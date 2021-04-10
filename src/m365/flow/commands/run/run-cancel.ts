@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class FlowRunCancelCommand extends AzmgmtCommand {
   public get name(): string {
-    return commands.FLOW_RUN_CANCEL;
+    return commands.RUN_CANCEL;
   }
 
   public get description(): string {

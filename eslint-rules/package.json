@@ -1,0 +1,5 @@
+{
+  "name": "eslint-plugin-cli-microsoft365",
+  "version": "1.0.0",
+  "main": "lib/index.js"
+}

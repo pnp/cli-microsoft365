@@ -27,7 +27,7 @@ interface Options extends GlobalOptions {
 
 class FlowExportCommand extends AzmgmtCommand {
   public get name(): string {
-    return commands.FLOW_EXPORT;
+    return commands.EXPORT;
   }
 
   public get description(): string {

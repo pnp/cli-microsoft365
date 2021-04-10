@@ -9,7 +9,7 @@ import DateAndPeriodBasedReport from '../../../base/DateAndPeriodBasedReport';
 import commands from '../../commands';
 const command: DateAndPeriodBasedReport = require('./report-useractivityuserdetail');
 
-describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
+describe(commands.REPORT_USERACTIVITYUSERDETAIL, () => {
   let log: string[];
   let logger: Logger;
 
@@ -50,7 +50,7 @@ describe(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_REPORT_USERACTIVITYUSERDETAIL), true);
+    assert.strictEqual(command.name.startsWith(commands.REPORT_USERACTIVITYUSERDETAIL), true);
   });
 
   it('has a description', () => {

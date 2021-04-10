@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./app-uninstall');
 
-describe(commands.TEAMS_APP_UNINSTALL, () => {
+describe(commands.APP_UNINSTALL, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -53,7 +53,7 @@ describe(commands.TEAMS_APP_UNINSTALL, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_APP_UNINSTALL), true);
+    assert.strictEqual(command.name.startsWith(commands.APP_UNINSTALL), true);
   });
 
   it('has a description', () => {

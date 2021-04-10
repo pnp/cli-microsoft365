@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class GraphSchemaExtensionGet extends GraphCommand {
+class GraphSchemaExtensionGetCommand extends GraphCommand {
   public get name(): string {
     return commands.SCHEMAEXTENSION_GET;
   }
@@ -56,4 +56,4 @@ class GraphSchemaExtensionGet extends GraphCommand {
     return options.concat(parentOptions);
   }
 }
-module.exports = new GraphSchemaExtensionGet();
+module.exports = new GraphSchemaExtensionGetCommand();

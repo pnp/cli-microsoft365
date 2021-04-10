@@ -20,9 +20,9 @@ interface Options extends GlobalOptions {
   visibility?: string;
 }
 
-class TeamsCloneCommand extends GraphCommand {
+class TeamsTeamCloneCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_TEAM_CLONE;
+    return commands.TEAM_CLONE;
   }
 
   public get description(): string {
@@ -141,4 +141,4 @@ class TeamsCloneCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsCloneCommand();
+module.exports = new TeamsTeamCloneCommand();

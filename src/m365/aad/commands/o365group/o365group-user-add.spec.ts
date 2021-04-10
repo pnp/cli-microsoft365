@@ -66,7 +66,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(teamsCommands.TEAMS_USER_ADD) > -1), true);
+    assert.strictEqual((alias && alias.indexOf(teamsCommands.USER_ADD) > -1), true);
   });
 
   it('fails validation if the groupId is not a valid guid.', (done) => {

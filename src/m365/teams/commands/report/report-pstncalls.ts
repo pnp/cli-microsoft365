@@ -18,7 +18,7 @@ interface DateTimeOptions extends GlobalOptions {
 }
 class TeamsReportPstncallsCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_REPORT_PSTNCALLS;
+    return commands.REPORT_PSTNCALLS;
   }
 
   public get description(): string {

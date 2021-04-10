@@ -30,7 +30,7 @@ class AadO365GroupUserAddCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [teamsCommands.TEAMS_USER_ADD];
+    return [teamsCommands.USER_ADD];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {

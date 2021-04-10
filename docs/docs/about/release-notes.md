@@ -27,6 +27,11 @@
 - added support for configuring error output [#2325](https://github.com/pnp/cli-microsoft365/issues/2325)
 - fixed docs for 'spo list set' [#2332](https://github.com/pnp/cli-microsoft365/issues/2332)
 - added 'Cleanup completed Microsoft To Do tasks' sample script [#2339](https://github.com/pnp/cli-microsoft365/issues/2339)
+- added the 'Create a Microsoft Teams team and bulk add members from CSV file' sample [#2288](https://github.com/pnp/cli-microsoft365/issues/2288)
+- added the 'Setup example site' sample script [#2328](https://github.com/pnp/cli-microsoft365/issues/2328)
+- added ESLint extension to Remote Development Container [#2327](https://github.com/pnp/cli-microsoft365/issues/2327)
+- fixed MKDocs Tab rendering issue in Remote Development Container [#2341](https://github.com/pnp/cli-microsoft365/issues/2341)
+- added eslint rule to check command's class name [#1819](https://github.com/pnp/cli-microsoft365/issues/1819)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 

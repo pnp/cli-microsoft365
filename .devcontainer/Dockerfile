@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y \
   && apt-get install nodejs -y \
   && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install mkdocs-material==3.1.0
+RUN pip3 install mkdocs-material==3.1.0 pymdown-extensions==6.0
 
 RUN useradd \
   --user-group \

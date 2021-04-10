@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class SkypeReportActivityCountsCommand extends PeriodBasedReport {
   public get name(): string {
-    return commands.SKYPE_REPORT_ACTIVITYCOUNTS;
+    return commands.REPORT_ACTIVITYCOUNTS;
   }
 
   public get usageEndpoint(): string {

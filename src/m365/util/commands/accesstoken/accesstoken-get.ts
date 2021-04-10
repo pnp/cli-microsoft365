@@ -15,9 +15,9 @@ interface Options extends GlobalOptions {
   resource: string;
 }
 
-class AccessTokenGetCommand extends Command {
+class UtilAccessTokenGetCommand extends Command {
   public get name(): string {
-    return commands.UTIL_ACCESSTOKEN_GET;
+    return commands.ACCESSTOKEN_GET;
   }
 
   public get description(): string {
@@ -58,4 +58,4 @@ class AccessTokenGetCommand extends Command {
   }
 }
 
-module.exports = new AccessTokenGetCommand();
+module.exports = new UtilAccessTokenGetCommand();
