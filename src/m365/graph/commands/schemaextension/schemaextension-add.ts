@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
   targetTypes: string;
 }
 
-class GraphSchemaExtensionAdd extends GraphCommand {
+class GraphSchemaExtensionAddCommand extends GraphCommand {
   public get name(): string {
     return commands.SCHEMAEXTENSION_ADD;
   }
@@ -135,4 +135,4 @@ class GraphSchemaExtensionAdd extends GraphCommand {
   }
 }
 
-module.exports = new GraphSchemaExtensionAdd();
+module.exports = new GraphSchemaExtensionAddCommand();

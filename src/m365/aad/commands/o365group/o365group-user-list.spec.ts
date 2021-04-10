@@ -63,7 +63,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(teamsCommands.TEAMS_USER_LIST) > -1), true);
+    assert.strictEqual((alias && alias.indexOf(teamsCommands.USER_LIST) > -1), true);
   });
 
   it('has a description', () => {

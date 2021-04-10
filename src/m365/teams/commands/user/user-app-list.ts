@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
   public get name(): string {
-    return commands.TEAMS_USER_APP_LIST;
+    return commands.USER_APP_LIST;
   }
 
   public get description(): string {

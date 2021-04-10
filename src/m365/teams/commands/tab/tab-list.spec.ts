@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./tab-list');
 
-describe(commands.TEAMS_TAB_LIST, () => {
+describe(commands.TAB_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.TEAMS_TAB_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_TAB_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.TAB_LIST), true);
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {

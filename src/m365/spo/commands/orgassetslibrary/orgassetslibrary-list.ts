@@ -14,7 +14,7 @@ interface CommandArgs {
   options: GlobalOptions;
 }
 
-class SpoOrgNewsSiteListCommand extends SpoCommand {
+class SpoOrgAssetsLibraryListCommand extends SpoCommand {
   public get name(): string {
     return commands.ORGASSETSLIBRARY_LIST;
   }
@@ -85,4 +85,4 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoOrgNewsSiteListCommand();
+module.exports = new SpoOrgAssetsLibraryListCommand();

@@ -8,9 +8,9 @@ interface CommandArgs {
   options: GlobalOptions;
 }
 
-class GraphPlannerTaskListCommand extends GraphItemsListCommand<Task> {
+class PlannerTaskListCommand extends GraphItemsListCommand<Task> {
   public get name(): string {
-    return commands.PLANNER_TASK_LIST;
+    return commands.TASK_LIST;
   }
 
   public get description(): string {
@@ -31,4 +31,4 @@ class GraphPlannerTaskListCommand extends GraphItemsListCommand<Task> {
   }
 }
 
-module.exports = new GraphPlannerTaskListCommand();
+module.exports = new PlannerTaskListCommand();

@@ -28,7 +28,7 @@ class YammerMessageListCommand extends YammerCommand {
   }
 
   public get name(): string {
-    return commands.YAMMER_MESSAGE_LIST;
+    return commands.MESSAGE_LIST;
   }
 
   public get description(): string {

@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./report-deviceusageuserdetail');
 
-describe(commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL, () => {
+describe(commands.REPORT_DEVICEUSAGEUSERDETAIL, () => {
   let log: string[];
   let logger: Logger;
 
@@ -50,7 +50,7 @@ describe(commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_REPORT_DEVICEUSAGEUSERDETAIL), true);
+    assert.strictEqual(command.name.startsWith(commands.REPORT_DEVICEUSAGEUSERDETAIL), true);
   });
 
   it('has a description', () => {

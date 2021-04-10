@@ -21,7 +21,7 @@ class YammerMessageLikeSetCommand extends YammerCommand {
   }
 
   public get name(): string {
-    return commands.YAMMER_MESSAGE_LIKE_SET;
+    return commands.MESSAGE_LIKE_SET;
   }
 
   public get description(): string {

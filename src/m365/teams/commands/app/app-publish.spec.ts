@@ -10,7 +10,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./app-publish');
 
-describe(commands.TEAMS_APP_PUBLISH, () => {
+describe(commands.APP_PUBLISH, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -55,7 +55,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_APP_PUBLISH), true);
+    assert.strictEqual(command.name.startsWith(commands.APP_PUBLISH), true);
   });
 
   it('has a description', () => {

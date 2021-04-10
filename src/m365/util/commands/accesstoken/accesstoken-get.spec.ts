@@ -8,7 +8,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./accesstoken-get');
 
-describe(commands.UTIL_ACCESSTOKEN_GET, () => {
+describe(commands.ACCESSTOKEN_GET, () => {
   let log: any[];
   let loggerLogSpy: sinon.SinonSpy;
   let logger: Logger;
@@ -51,7 +51,7 @@ describe(commands.UTIL_ACCESSTOKEN_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.UTIL_ACCESSTOKEN_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.ACCESSTOKEN_GET), true);
   });
 
   it('has a description', () => {

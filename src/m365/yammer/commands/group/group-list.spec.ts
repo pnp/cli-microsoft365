@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./group-list');
 
-describe(commands.YAMMER_GROUP_LIST, () => {
+describe(commands.GROUP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -216,7 +216,7 @@ describe(commands.YAMMER_GROUP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.YAMMER_GROUP_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.GROUP_LIST), true);
   });
 
   it('has a description', () => {

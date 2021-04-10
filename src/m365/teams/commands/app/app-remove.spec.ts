@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./app-remove');
 
-describe(commands.TEAMS_APP_REMOVE, () => {
+describe(commands.APP_REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let requests: any[];
@@ -53,7 +53,7 @@ describe(commands.TEAMS_APP_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_APP_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.APP_REMOVE), true);
   });
 
   it('has a description', () => {

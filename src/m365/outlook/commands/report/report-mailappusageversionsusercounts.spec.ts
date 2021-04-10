@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./report-mailappusageversionsusercounts');
 
-describe(commands.OUTLOOK_REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS, () => {
+describe(commands.REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS, () => {
   let log: string[];
   let logger: Logger;
 
@@ -50,7 +50,7 @@ describe(commands.OUTLOOK_REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.OUTLOOK_REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS), true);
+    assert.strictEqual(command.name.startsWith(commands.REPORT_MAILAPPUSAGEVERSIONSUSERCOUNTS), true);
   });
 
   it('has a description', () => {

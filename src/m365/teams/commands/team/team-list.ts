@@ -16,9 +16,9 @@ interface Options extends GlobalOptions {
   joined?: boolean;
 }
 
-class TeamsListCommand extends GraphItemsListCommand<Team> {
+class TeamsTeamListCommand extends GraphItemsListCommand<Team> {
   public get name(): string {
-    return commands.TEAMS_TEAM_LIST;
+    return commands.TEAM_LIST;
   }
 
   public get description(): string {
@@ -104,4 +104,4 @@ class TeamsListCommand extends GraphItemsListCommand<Team> {
   }
 }
 
-module.exports = new TeamsListCommand();
+module.exports = new TeamsTeamListCommand();

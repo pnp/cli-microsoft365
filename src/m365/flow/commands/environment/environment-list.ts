@@ -10,7 +10,7 @@ interface CommandArgs {
 
 class FlowEnvironmentListCommand extends AzmgmtCommand {
   public get name(): string {
-    return commands.FLOW_ENVIRONMENT_LIST;
+    return commands.ENVIRONMENT_LIST;
   }
 
   public get description(): string {

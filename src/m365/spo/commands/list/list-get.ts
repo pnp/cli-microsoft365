@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   title?: string;
 }
 
-class ListGetCommand extends SpoCommand {
+class SpoListGetCommand extends SpoCommand {
   public get name(): string {
     return commands.LIST_GET;
   }
@@ -108,4 +108,4 @@ class ListGetCommand extends SpoCommand {
   }
 }
 
-module.exports = new ListGetCommand();
+module.exports = new SpoListGetCommand();

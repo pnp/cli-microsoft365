@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./environment-get');
 
-describe(commands.FLOW_ENVIRONMENT_GET, () => {
+describe(commands.ENVIRONMENT_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -51,7 +51,7 @@ describe(commands.FLOW_ENVIRONMENT_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FLOW_ENVIRONMENT_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.ENVIRONMENT_GET), true);
   });
 
   it('has a description', () => {

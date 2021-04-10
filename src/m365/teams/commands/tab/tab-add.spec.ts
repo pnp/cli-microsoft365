@@ -10,7 +10,7 @@ import commands from '../../commands';
 const command: Command = require('./tab-add');
 import Sinon = require('sinon');
 
-describe(commands.TEAMS_TAB_ADD, () => {
+describe(commands.TAB_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -53,7 +53,7 @@ describe(commands.TEAMS_TAB_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_TAB_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.TAB_ADD), true);
   });
 
   it('fails validation if the teamId is not a valid guid.', (done) => {

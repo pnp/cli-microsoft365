@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./plan-add');
 
-describe(commands.PLANNER_PLAN_ADD, () => {
+describe(commands.PLAN_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -53,7 +53,7 @@ describe(commands.PLANNER_PLAN_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PLANNER_PLAN_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.PLAN_ADD), true);
   });
 
   it('has a description', () => {

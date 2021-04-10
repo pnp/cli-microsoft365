@@ -10,7 +10,7 @@ import Utils from '../../../Utils';
 import commands from '../commands';
 const command: Command = require('./flow-remove');
 
-describe(commands.FLOW_REMOVE, () => {
+describe(commands.REMOVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -61,7 +61,7 @@ describe(commands.FLOW_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FLOW_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.REMOVE), true);
   });
 
   it('has a description', () => {

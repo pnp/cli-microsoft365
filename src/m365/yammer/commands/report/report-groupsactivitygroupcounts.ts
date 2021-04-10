@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class YammerReportGroupsActivityGroupCountsCommand extends PeriodBasedReport {
   public get name(): string {
-    return commands.YAMMER_REPORT_GROUPSACTIVITYGROUPCOUNTS;
+    return commands.REPORT_GROUPSACTIVITYGROUPCOUNTS;
   }
 
   public get usageEndpoint(): string {

@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./report-groupsactivitygroupcounts');
 
-describe(commands.YAMMER_REPORT_GROUPSACTIVITYGROUPCOUNTS, () => {
+describe(commands.REPORT_GROUPSACTIVITYGROUPCOUNTS, () => {
   let log: string[];
   let logger: Logger;
 
@@ -50,7 +50,7 @@ describe(commands.YAMMER_REPORT_GROUPSACTIVITYGROUPCOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.YAMMER_REPORT_GROUPSACTIVITYGROUPCOUNTS), true);
+    assert.strictEqual(command.name.startsWith(commands.REPORT_GROUPSACTIVITYGROUPCOUNTS), true);
   });
 
   it('has a description', () => {

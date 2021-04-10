@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class TeamsMessagingSettingsListCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_MESSAGINGSETTINGS_LIST;
+    return commands.MESSAGINGSETTINGS_LIST;
   }
 
   public get description(): string {
