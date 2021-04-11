@@ -10,7 +10,7 @@ m365 aad app add [options]
 
 ## Options
 
-`-n, --name <name>`
+`-n, --name [name]`
 : Name of the app
 
 `--multitenant`
@@ -49,9 +49,30 @@ m365 aad app add [options]
 `--scopeAdminConsentDescription [scopeAdminConsentDescription]`
 : Scope admin consent description
 
+`--manifest [manifest]`
+: Azure AD app manifest as retrieved from the Azure Portal to create the app registration from
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
+
+You can use this command to create a new Azure AD app registration either by specifying the different configuration settings through the corresponding options or by using the manifest.
+
+If you don't use the manifest, you must specify the name of the Azure AD app registration using the `name` option. If you use the manifest, you can skip the `name` option assuming the manifest contains the `displayName` property.
+
+You can also use the manifest to provision some of the configuration settings of your Azure AD app. All properties specified in the manifest are optional and will set if specified.
+
+If you specify the manifest along with some options, values specified in the options will override settings from the manifest. One exception is the name specified in the `name` option which will be overriden by the `displayName` property from the manifest if specified.
+
+The following properties specified in the manifest retrieved from Azure AD are not supported by this command:
+
+- accessTokenAcceptedVersion
+- disabledByMicrosoftStatus
+- errorUrl
+- oauth2RequirePostResponse
+- oauth2AllowUrlPathMatching
+- orgRestrictions
+- samlMetadataUrl
 
 When specifying the value for the `uri`, you can use the `_appId_` token, to include the ID of the newly generated Azure AD app registration in the Application ID URI, eg. URI `api://caf406b91cd4.ngrok.io/_appId_` will become `api://caf406b91cd4.ngrok.io/ab3bd119-faf7-4db5-ba99-eb7e748f778a` where the last portion is the app ID of the created Azure AD app registration.
 
@@ -65,6 +86,12 @@ Create new Azure AD app registration with the specified name
 
 ```sh
 m365 aad app add --name 'My AAD app'
+```
+
+Create new Azure AD app registration from the manifest retrieved from the Azure Portal stored in a local file named _manifest.json_
+
+```sh
+m365 aad app add --manifest @manifest.json
 ```
 
 Create new multitenant Azure AD app registration
