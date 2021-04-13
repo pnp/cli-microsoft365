@@ -32,6 +32,9 @@
 - added ESLint extension to Remote Development Container [#2327](https://github.com/pnp/cli-microsoft365/issues/2327)
 - fixed MKDocs Tab rendering issue in Remote Development Container [#2341](https://github.com/pnp/cli-microsoft365/issues/2341)
 - added eslint rule to check command's class name [#1819](https://github.com/pnp/cli-microsoft365/issues/1819)
+- added new sample script 'Upload local files and folders to SharePoint Online' [#2302](https://github.com/pnp/cli-microsoft365/issues/2302)
+- added support for upgrading SPFx projects to beta versions of SPFx [#2354](https://github.com/pnp/cli-microsoft365/issues/2354)
+- added support for upgrading SPFx projects to v1.12.1-rc.0 [#2355](https://github.com/pnp/cli-microsoft365/issues/2355)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 
