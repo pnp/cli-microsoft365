@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TeamsChannelListCommand extends GraphItemsListCommand<Channel>{
   public get name(): string {
-    return commands.TEAMS_CHANNEL_LIST;
+    return commands.CHANNEL_LIST;
   }
 
   public get description(): string {

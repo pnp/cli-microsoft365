@@ -9,7 +9,7 @@ import Utils from '../../../Utils';
 import commands from '../commands';
 const command: Command = require('./flow-enable');
 
-describe(commands.FLOW_ENABLE, () => {
+describe(commands.ENABLE, () => {
   let log: string[];
   let logger: Logger;
 
@@ -49,7 +49,7 @@ describe(commands.FLOW_ENABLE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FLOW_ENABLE), true);
+    assert.strictEqual(command.name.startsWith(commands.ENABLE), true);
   });
 
   it('has a description', () => {

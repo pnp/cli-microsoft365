@@ -29,7 +29,7 @@ class AadO365GroupGetCommand extends GraphCommand {
   }
 
   public alias(): string[] | undefined {
-    return [teamsCommands.TEAMS_TEAM_GET];
+    return [teamsCommands.TEAM_GET];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

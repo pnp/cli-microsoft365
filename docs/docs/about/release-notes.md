@@ -25,6 +25,16 @@
 - fixed broken list of command options [#2320](https://github.com/pnp/cli-microsoft365/issues/2320)
 - added support for using relative URLs in spo commands [#2313](https://github.com/pnp/cli-microsoft365/issues/2313)
 - added support for configuring error output [#2325](https://github.com/pnp/cli-microsoft365/issues/2325)
+- fixed docs for 'spo list set' [#2332](https://github.com/pnp/cli-microsoft365/issues/2332)
+- added 'Cleanup completed Microsoft To Do tasks' sample script [#2339](https://github.com/pnp/cli-microsoft365/issues/2339)
+- added the 'Create a Microsoft Teams team and bulk add members from CSV file' sample [#2288](https://github.com/pnp/cli-microsoft365/issues/2288)
+- added the 'Setup example site' sample script [#2328](https://github.com/pnp/cli-microsoft365/issues/2328)
+- added ESLint extension to Remote Development Container [#2327](https://github.com/pnp/cli-microsoft365/issues/2327)
+- fixed MKDocs Tab rendering issue in Remote Development Container [#2341](https://github.com/pnp/cli-microsoft365/issues/2341)
+- added eslint rule to check command's class name [#1819](https://github.com/pnp/cli-microsoft365/issues/1819)
+- added new sample script 'Upload local files and folders to SharePoint Online' [#2302](https://github.com/pnp/cli-microsoft365/issues/2302)
+- added support for upgrading SPFx projects to beta versions of SPFx [#2354](https://github.com/pnp/cli-microsoft365/issues/2354)
+- added support for upgrading SPFx projects to v1.12.1-rc.0 [#2355](https://github.com/pnp/cli-microsoft365/issues/2355)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 

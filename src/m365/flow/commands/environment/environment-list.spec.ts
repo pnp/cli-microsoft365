@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./environment-list');
 
-describe(commands.FLOW_ENVIRONMENT_LIST, () => {
+describe(commands.ENVIRONMENT_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -51,7 +51,7 @@ describe(commands.FLOW_ENVIRONMENT_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FLOW_ENVIRONMENT_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.ENVIRONMENT_LIST), true);
   });
 
   it('has a description', () => {

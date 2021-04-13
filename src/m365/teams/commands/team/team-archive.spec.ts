@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./team-archive');
 
-describe(commands.TEAMS_TEAM_ARCHIVE, () => {
+describe(commands.TEAM_ARCHIVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_TEAM_ARCHIVE), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAM_ARCHIVE), true);
   });
 
   it('has a description', () => {

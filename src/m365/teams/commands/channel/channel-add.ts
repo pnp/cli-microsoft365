@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class TeamsChannelAddCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_CHANNEL_ADD;
+    return commands.CHANNEL_ADD;
   }
 
   public get description(): string {

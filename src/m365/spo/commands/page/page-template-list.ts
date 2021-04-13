@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
 }
 
-class SpoPageControlListCommand extends SpoCommand {
+class SpoPageTemplateListCommand extends SpoCommand {
   public get name(): string {
     return commands.PAGE_TEMPLATE_LIST;
   }
@@ -78,4 +78,4 @@ class SpoPageControlListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoPageControlListCommand();
+module.exports = new SpoPageTemplateListCommand();

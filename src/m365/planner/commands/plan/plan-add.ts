@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class PlannerPlanAddCommand extends GraphCommand {
   public get name(): string {
-    return commands.PLANNER_PLAN_ADD;
+    return commands.PLAN_ADD;
   }
 
   public get description(): string {

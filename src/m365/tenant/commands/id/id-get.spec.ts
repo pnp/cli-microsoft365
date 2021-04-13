@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./id-get');
 
-describe(commands.TENANT_ID_GET, () => {
+describe(commands.ID_GET, () => {
   let log: any[];
   let loggerLogSpy: sinon.SinonSpy;
   let logger: Logger;
@@ -58,7 +58,7 @@ describe(commands.TENANT_ID_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TENANT_ID_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.ID_GET), true);
   });
 
   it('has a description', () => {

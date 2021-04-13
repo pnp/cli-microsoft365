@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class YammerUserGetCommand extends YammerCommand {
   public get name(): string {
-    return commands.YAMMER_USER_GET;
+    return commands.USER_GET;
   }
 
   public get description(): string {

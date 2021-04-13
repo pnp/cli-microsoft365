@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./message-remove');
 
-describe(commands.YAMMER_MESSAGE_REMOVE, () => {
+describe(commands.MESSAGE_REMOVE, () => {
   let log: string[];
   let logger: Logger;
 
@@ -51,7 +51,7 @@ describe(commands.YAMMER_MESSAGE_REMOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.YAMMER_MESSAGE_REMOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.MESSAGE_REMOVE), true);
   });
 
   it('has a description', () => {

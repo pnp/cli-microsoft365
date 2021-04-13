@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./service-report-historicalservicestatus');
 
-describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
+describe(commands.SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -184,7 +184,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS), true);
+    assert.equal(command.name.startsWith(commands.SERVICE_REPORT_HISTORICALSERVICESTATUS), true);
   });
 
   it('has a description', () => {

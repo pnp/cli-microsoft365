@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class SpoWebAddCommand extends SpoCommand {
+class SpoWebRemoveCommand extends SpoCommand {
   public get name(): string {
     return commands.WEB_REMOVE;
   }
@@ -90,4 +90,4 @@ class SpoWebAddCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoWebAddCommand();
+module.exports = new SpoWebRemoveCommand();

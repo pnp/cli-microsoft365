@@ -10,7 +10,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./message-move');
 
-describe(commands.OUTLOOK_MESSAGE_MOVE, () => {
+describe(commands.MESSAGE_MOVE, () => {
   let log: string[];
   let logger: Logger;
 
@@ -52,7 +52,7 @@ describe(commands.OUTLOOK_MESSAGE_MOVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.OUTLOOK_MESSAGE_MOVE), true);
+    assert.strictEqual(command.name.startsWith(commands.MESSAGE_MOVE), true);
   });
 
   it('has a description', () => {

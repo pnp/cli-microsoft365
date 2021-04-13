@@ -605,9 +605,12 @@ nav:
       - 'List site collections and their lists': 'sample-scripts/spo/list-site-collection-lists.md'
       - 'Lists site collection owners': 'sample-scripts/spo/list-site-collection-owners.md'
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
+      - 'Setup example site': 'sample-scripts/spo/setup-example-site.md'
       - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
+      - 'Upload local files and folders to SharePoint Online': 'sample-scripts/spo/upload-local-files-and-folder.md'
     - Microsoft Teams:
       - 'Create a Microsoft Team with channels from a Microsoft 365 Group': 'sample-scripts/teams/create-team-from-group.md'
+      - 'Create a Microsoft Teams team and bulk add members from CSV file': 'sample-scripts/teams/create-team-and-add-members-and-owners.md'
       - 'Deploy a Microsoft Teams personal app and add it to users': 'sample-scripts/teams/install-personal-app.md'
       - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
       - 'Export conversations from Microsoft Teams Channels': 'sample-scripts/teams/export-teams-conversations.md'
@@ -617,6 +620,8 @@ nav:
       - 'List app usage in Microsoft Teams': 'sample-scripts/teams/list-teams-app-usage.md'
       - 'Remove a Microsoft Teams personal app': 'sample-scripts/teams/remove-personal-app.md'
       - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'
+    - Microsoft To Do:
+      - 'Cleanup completed Microsoft To Do tasks': 'sample-scripts/todo/cleanup-completed-todos.md'
     - Microsoft 365 tenant:
       - 'Monitor and notify Microsoft 365 health status': 'sample-scripts/tenant/tenant-monitor-notify-healthstatus.md'
   - About:

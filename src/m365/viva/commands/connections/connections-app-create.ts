@@ -33,7 +33,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
   private archive?: AdmZip;
 
   public get name(): string {
-    return commands.VIVA_CONNECTIONS_APP_CREATE;
+    return commands.CONNECTIONS_APP_CREATE;
   }
 
   public get description(): string {

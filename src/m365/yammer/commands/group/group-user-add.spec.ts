@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./group-user-add');
 
-describe(commands.YAMMER_GROUP_USER_ADD, () => {
+describe(commands.GROUP_USER_ADD, () => {
   let log: string[];
   let logger: Logger;
 
@@ -50,7 +50,7 @@ describe(commands.YAMMER_GROUP_USER_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.YAMMER_GROUP_USER_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.GROUP_USER_ADD), true);
   });
 
   it('has a description', () => {

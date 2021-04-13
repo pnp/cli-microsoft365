@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./auditlog-report');
 
-describe(commands.TENANT_AUDITLOG_REPORT, () => {
+describe(commands.AUDITLOG_REPORT, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -279,7 +279,7 @@ describe(commands.TENANT_AUDITLOG_REPORT, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TENANT_AUDITLOG_REPORT), true);
+    assert.strictEqual(command.name.startsWith(commands.AUDITLOG_REPORT), true);
   });
 
   it('has a description', () => {

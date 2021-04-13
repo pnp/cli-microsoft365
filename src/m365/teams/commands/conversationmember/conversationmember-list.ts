@@ -27,7 +27,7 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
   private teamId: string = "";
 
   public get name(): string {
-    return commands.TEAMS_CONVERSATIONMEMBER_LIST;
+    return commands.CONVERSATIONMEMBER_LIST;
   }
 
   public get description(): string {

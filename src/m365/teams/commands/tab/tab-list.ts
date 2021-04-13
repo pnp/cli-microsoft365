@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class TeamsTabListCommand extends GraphItemsListCommand<Tab> {
   public get name(): string {
-    return commands.TEAMS_TAB_LIST;
+    return commands.TAB_LIST;
   }
 
   public get description(): string {

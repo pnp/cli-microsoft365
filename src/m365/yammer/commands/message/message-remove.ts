@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class YammerMessageRemoveCommand extends YammerCommand {
   public get name(): string {
-    return commands.YAMMER_MESSAGE_REMOVE;
+    return commands.MESSAGE_REMOVE;
   }
 
   public get description(): string {

@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class FlowListCommand extends AzmgmtItemsListCommand<{ name: string, displayName: string, properties: { displayName: string } }> {
   public get name(): string {
-    return commands.FLOW_LIST;
+    return commands.LIST;
   }
 
   public get description(): string {

@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./membersettings-set');
 
-describe(commands.TEAMS_MEMBERSETTINGS_SET, () => {
+describe(commands.MEMBERSETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
 
@@ -50,7 +50,7 @@ describe(commands.TEAMS_MEMBERSETTINGS_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_MEMBERSETTINGS_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.MEMBERSETTINGS_SET), true);
   });
 
   it('has a description', () => {

@@ -57,6 +57,7 @@
         "coveralls": "^3.1.0",
         "eslint": "^7.22.0",
         "eslint-config-standard": "^16.0.2",
+        "eslint-plugin-cli-microsoft365": "file:eslint-rules",
         "eslint-plugin-import": "^2.22.1",
         "eslint-plugin-node": "^11.1.0",
         "eslint-plugin-promise": "^4.3.1",
@@ -64,6 +65,11 @@
         "rimraf": "^3.0.2",
         "sinon": "^9.2.4"
       }
+    },
+    "eslint-rules": {
+      "name": "eslint-plugin-cli-microsoft365",
+      "version": "1.0.0",
+      "dev": true
     },
     "node_modules/@azure/msal-common": {
       "version": "4.1.1",
@@ -1247,6 +1253,7 @@
       "dependencies": {
         "anymatch": "~3.1.1",
         "braces": "~3.0.2",
+        "fsevents": "~2.3.1",
         "glob-parent": "~5.1.0",
         "is-binary-path": "~2.1.0",
         "is-glob": "~4.0.1",
@@ -1748,7 +1755,8 @@
       "resolved": "https://registry.npmjs.org/easy-table/-/easy-table-1.1.1.tgz",
       "integrity": "sha512-C9Lvm0WFcn2RgxbMnTbXZenMIWcBtkzMr+dWqq/JsVoGFSVUVlPqeOa5LP5kM0I3zoOazFpckOEb2/0LDFfToQ==",
       "dependencies": {
-        "ansi-regex": "^3.0.0"
+        "ansi-regex": "^3.0.0",
+        "wcwidth": ">=1.0.1"
       },
       "optionalDependencies": {
         "wcwidth": ">=1.0.1"
@@ -1893,7 +1901,8 @@
         "esprima": "^4.0.1",
         "estraverse": "^5.2.0",
         "esutils": "^2.0.2",
-        "optionator": "^0.8.1"
+        "optionator": "^0.8.1",
+        "source-map": "~0.6.1"
       },
       "bin": {
         "escodegen": "bin/escodegen.js",
@@ -2093,6 +2102,10 @@
       "resolved": "https://registry.npmjs.org/ms/-/ms-2.0.0.tgz",
       "integrity": "sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=",
       "dev": true
+    },
+    "node_modules/eslint-plugin-cli-microsoft365": {
+      "resolved": "eslint-rules",
+      "link": true
     },
     "node_modules/eslint-plugin-es": {
       "version": "3.0.1",
@@ -4517,6 +4530,9 @@
       "version": "1.23.0",
       "resolved": "https://registry.npmjs.org/prismjs/-/prismjs-1.23.0.tgz",
       "integrity": "sha512-c29LVsqOaLbBHuIbsTxaKENh1N2EQBOHaWv7gkHN4dgRbxSREqDnDbtFJYdpPauS4YCplMSNCABQ6Eeor69bAA==",
+      "dependencies": {
+        "clipboard": "^2.0.0"
+      },
       "optionalDependencies": {
         "clipboard": "^2.0.0"
       }
@@ -7762,6 +7778,9 @@
           "dev": true
         }
       }
+    },
+    "eslint-plugin-cli-microsoft365": {
+      "version": "file:eslint-rules"
     },
     "eslint-plugin-es": {
       "version": "3.0.1",

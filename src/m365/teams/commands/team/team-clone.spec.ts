@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./team-clone');
 
-describe(commands.TEAMS_TEAM_CLONE, () => {
+describe(commands.TEAM_CLONE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.TEAMS_TEAM_CLONE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_TEAM_CLONE), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAM_CLONE), true);
   });
 
   it('has a description', () => {

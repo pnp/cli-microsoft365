@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./app-install');
 
-describe(commands.TEAMS_APP_INSTALL, () => {
+describe(commands.APP_INSTALL, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.TEAMS_APP_INSTALL, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_APP_INSTALL), true);
+    assert.strictEqual(command.name.startsWith(commands.APP_INSTALL), true);
   });
 
   it('has a description', () => {
