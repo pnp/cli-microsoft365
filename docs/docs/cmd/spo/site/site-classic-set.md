@@ -16,6 +16,9 @@ m365 spo site classic set [options]
 `-t, --title [title]`
 : The site title
 
+`-d, --description [description]`
+: The site description
+
 `--sharing [sharing]`
 : Sharing capabilities for the site. Allowed values: `Disabled,ExternalUserSharingOnly,ExternalUserAndGuestSharing,ExistingExternalUserSharingOnly`
 
@@ -75,6 +78,12 @@ Change the title of the site collection. Don't wait for the configuration to com
 
 ```sh
 m365 spo site classic set --url https://contoso.sharepoint.com/sites/team --title Team
+```
+
+Change the description of the site collection.
+
+```sh
+m365 spo site classic set --url https://contoso.sharepoint.com/sites/team --description "description"
 ```
 
 Add the specified user accounts as site collection administrators
