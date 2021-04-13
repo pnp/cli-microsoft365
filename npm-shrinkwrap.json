@@ -1253,6 +1253,7 @@
       "dependencies": {
         "anymatch": "~3.1.1",
         "braces": "~3.0.2",
+        "fsevents": "~2.3.1",
         "glob-parent": "~5.1.0",
         "is-binary-path": "~2.1.0",
         "is-glob": "~4.0.1",
@@ -1754,7 +1755,8 @@
       "resolved": "https://registry.npmjs.org/easy-table/-/easy-table-1.1.1.tgz",
       "integrity": "sha512-C9Lvm0WFcn2RgxbMnTbXZenMIWcBtkzMr+dWqq/JsVoGFSVUVlPqeOa5LP5kM0I3zoOazFpckOEb2/0LDFfToQ==",
       "dependencies": {
-        "ansi-regex": "^3.0.0"
+        "ansi-regex": "^3.0.0",
+        "wcwidth": ">=1.0.1"
       },
       "optionalDependencies": {
         "wcwidth": ">=1.0.1"
@@ -1899,7 +1901,8 @@
         "esprima": "^4.0.1",
         "estraverse": "^5.2.0",
         "esutils": "^2.0.2",
-        "optionator": "^0.8.1"
+        "optionator": "^0.8.1",
+        "source-map": "~0.6.1"
       },
       "bin": {
         "escodegen": "bin/escodegen.js",
@@ -4527,6 +4530,9 @@
       "version": "1.23.0",
       "resolved": "https://registry.npmjs.org/prismjs/-/prismjs-1.23.0.tgz",
       "integrity": "sha512-c29LVsqOaLbBHuIbsTxaKENh1N2EQBOHaWv7gkHN4dgRbxSREqDnDbtFJYdpPauS4YCplMSNCABQ6Eeor69bAA==",
+      "dependencies": {
+        "clipboard": "^2.0.0"
+      },
       "optionalDependencies": {
         "clipboard": "^2.0.0"
       }

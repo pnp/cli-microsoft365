@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+import { prerelease } from 'semver';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -21,6 +22,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   packageManager?: string;
+  preview?: boolean;
   toVersion?: string;
   shell?: string;
 }
@@ -60,7 +62,8 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.9.1',
     '1.10.0',
     '1.11.0',
-    '1.12.0'
+    '1.12.0',
+    '1.12.1-rc.0'
   ];
   private static packageCommands = {
     npm: {
@@ -162,8 +165,12 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.toVersion = args.options.toVersion || this.supportedVersions[this.supportedVersions.length - 1];
+    if (prerelease(telemetryProps.toVersion) && !args.options.preview) {
+      telemetryProps.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
+    }
     telemetryProps.packageManager = args.options.packageManager || 'npm';
     telemetryProps.shell = args.options.shell || 'bash';
+    telemetryProps.preview = args.options.preview;
     return telemetryProps;
   }
 
@@ -175,6 +182,15 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     }
 
     this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
+    if (!args.options.toVersion &&
+      !args.options.preview &&
+      prerelease(this.toVersion)) {
+      // no version and no preview specified while the current version to
+      // upgrade to is a prerelease so let's grab the first non-preview version
+      // since we're supporting only one preview version, it's sufficient for
+      // us to take second to last version
+      this.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
+    }
     this.packageManager = args.options.packageManager || 'npm';
     this.shell = args.options.shell || 'bash';
 
@@ -672,6 +688,9 @@ ${f.resolution}
       {
         option: '--shell [shell]',
         autocomplete: ['bash', 'powershell', 'cmd']
+      },
+      {
+        option: '--preview'
       }
     ];
 
