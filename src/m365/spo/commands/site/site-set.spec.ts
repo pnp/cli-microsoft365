@@ -7,7 +7,6 @@ import Command, { CommandError, CommandTypes } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import * as aadO365GroupSetCommand from '../../../aad/commands/o365group/o365group-set';
 import commands from '../../commands';
 import * as spoSiteDesignApplyCommand from '../sitedesign/sitedesign-apply';
 import * as spoSiteClassicSetCommand from './site-classic-set';
@@ -702,6 +701,41 @@ describe(commands.SITE_SET, () => {
         const options = {
           url: 'https://contoso.sharepoint.com/sites/Sales',
           title: 'New title',
+          description: undefined,
+          owners: undefined,
+          wait: true,
+          debug: false,
+          verbose: false,
+          _: []
+        };
+        assert(executeCommandSpy.calledWith(spoSiteClassicSetCommand, { options: options }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('updates description of the specified site', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
+        return Promise.resolve({
+          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          GroupId: '00000000-0000-0000-0000-000000000000'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
+
+    command.action(logger, { options: { debug: false, title: 'New title', description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+      try {
+        const options = {
+          url: 'https://contoso.sharepoint.com/sites/Sales',
+          title: 'New title',
+          description: 'Some description',
           owners: undefined,
           wait: true,
           debug: false,
@@ -735,6 +769,7 @@ describe(commands.SITE_SET, () => {
         const options = {
           url: 'https://contoso.sharepoint.com/sites/Sales',
           title: undefined,
+          description: undefined,
           owners: 'admin@contoso.onmicrosoft.com',
           wait: true,
           debug: false,
@@ -810,6 +845,42 @@ describe(commands.SITE_SET, () => {
     });
   });
 
+  it('updates description of the specified groupified site', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
+        return Promise.resolve({
+          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOGroup/UpdateGroupPropertiesBySiteId' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          groupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e',
+          siteId: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          displayName: 'New title'
+        })) {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, title: 'New title', description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+      try {
+        assert(loggerLogToStderrSpy.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('updates isPublic property of the specified groupified site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
@@ -821,18 +892,17 @@ describe(commands.SITE_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
 
-    command.action(logger, { options: { debug: false, isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/e10a459e-60c8-4000-8240-a68d6a12d39e') {
+        return Promise.resolve();
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
       try {
-        const options = {
-          id: 'e10a459e-60c8-4000-8240-a68d6a12d39e',
-          isPrivate: 'false',
-          debug: false,
-          verbose: false,
-          _: []
-        };
-        assert(executeCommandSpy.calledWith(aadO365GroupSetCommand, { options: options }));
         assert.strictEqual(typeof err, 'undefined');
         done();
       }
@@ -1199,7 +1269,7 @@ describe(commands.SITE_SET, () => {
 
   it('applies site absolute logo url to the specified site', (done) => {
     let data: any = {};
-    
+
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1233,7 +1303,7 @@ describe(commands.SITE_SET, () => {
 
   it('correctly handles unsetting the logo from the specified site', (done) => {
     let data: any = {};
-    
+
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
