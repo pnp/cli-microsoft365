@@ -856,19 +856,6 @@ describe(commands.SITE_SET, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
-    sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://contoso-admin.sharepoint.com/_api/SPOGroup/UpdateGroupPropertiesBySiteId' &&
-        JSON.stringify(opts.data) === JSON.stringify({
-          groupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e',
-          siteId: '255a50b2-527f-4413-8485-57f4c17a24d1',
-          displayName: 'New title'
-        })) {
-        return Promise.resolve();
-      }
-
-      return Promise.reject('Invalid request');
-    });
 
     command.action(logger, { options: { debug: false, title: 'New title', description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
