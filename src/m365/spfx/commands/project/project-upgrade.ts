@@ -637,20 +637,22 @@ ${f.resolution}
     packagesDepUn: string[], packagesDevUn: string[]): string[] {
     const commandsToExecute: string[] = [];
 
-    if (packagesDepExact.length > 0) {
-      commandsToExecute.push(`${this.getPackageManagerCommand('install')} ${packagesDepExact.join(' ')}`);
-    }
-
-    if (packagesDevExact.length > 0) {
-      commandsToExecute.push(`${this.getPackageManagerCommand('installDev')} ${packagesDevExact.join(' ')}`);
-    }
-
+    // uninstall commands must come first otherwise there is a chance that
+    // whatever we recommended to install, will be immediately uninstalled
     if (packagesDepUn.length > 0) {
       commandsToExecute.push(`${this.getPackageManagerCommand('uninstall')} ${packagesDepUn.join(' ')}`);
     }
 
     if (packagesDevUn.length > 0) {
       commandsToExecute.push(`${this.getPackageManagerCommand('uninstallDev')} ${packagesDevUn.join(' ')}`);
+    }
+
+    if (packagesDepExact.length > 0) {
+      commandsToExecute.push(`${this.getPackageManagerCommand('install')} ${packagesDepExact.join(' ')}`);
+    }
+
+    if (packagesDevExact.length > 0) {
+      commandsToExecute.push(`${this.getPackageManagerCommand('installDev')} ${packagesDevExact.join(' ')}`);
     }
 
     return commandsToExecute;
