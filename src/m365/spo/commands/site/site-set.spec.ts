@@ -872,7 +872,7 @@ describe(commands.SITE_SET, () => {
 
     command.action(logger, { options: { debug: false, title: 'New title', description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
-        assert(loggerLogToStderrSpy.called);
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {
