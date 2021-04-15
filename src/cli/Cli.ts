@@ -8,6 +8,7 @@ import * as minimist from 'minimist';
 import * as os from 'os';
 import * as path from 'path';
 import { Logger } from '.';
+import appInsights from '../appInsights';
 import Command, { CommandError } from '../Command';
 import config from '../config';
 import { settingsNames } from '../settingsNames';
@@ -83,7 +84,7 @@ export class Cli {
     // parse args to see if a command has been specified and can be loaded
     // rather than loading all commands
     const parsedArgs: minimist.ParsedArgs = minimist(rawArgs);
-    
+
     // load commands
     this.loadCommandFromArgs(parsedArgs._);
 
@@ -568,7 +569,10 @@ export class Cli {
   }
 
   private printHelp(exitCode: number = 0): void {
+    const properties: any = {};
+
     if (this.commandToExecute) {
+      properties.command = this.commandToExecute.name;
       this.printCommandHelp();
     }
     else {
@@ -577,8 +581,15 @@ export class Cli {
       Cli.log(`${packageJSON.description}`);
       Cli.log();
 
+      properties.command = 'commandList';
       this.printAvailableCommands();
     }
+
+    appInsights.trackEvent({
+      name: 'help',
+      properties
+    });
+    appInsights.flush();
 
     process.exit(exitCode);
   }
