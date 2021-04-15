@@ -83,7 +83,7 @@ export class Cli {
     // parse args to see if a command has been specified and can be loaded
     // rather than loading all commands
     const parsedArgs: minimist.ParsedArgs = minimist(rawArgs);
-    
+
     // load commands
     this.loadCommandFromArgs(parsedArgs._);
 
@@ -447,7 +447,13 @@ export class Cli {
     if (options.query &&
       !options.help) {
       const jmespath: typeof JMESPath = require('jmespath');
-      logStatement = jmespath.search(logStatement, options.query);
+      try {
+        logStatement = jmespath.search(logStatement, options.query);
+      }
+      catch (e) {
+        const message = `JMESPath query error. ${e.message}. See https://jmespath.org/specification.html for more information`;
+        Cli.getInstance().closeWithError(message, false);
+      }
       // we need to update the statement type in case the JMESPath query
       // returns an object of different shape than the original message to log
       // #2095

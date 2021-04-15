@@ -1119,6 +1119,25 @@ describe('Cli', () => {
     }
   });
 
+  it('throws human-readable error when invalid JMESPath query specified', () => {
+    const o = {
+      "locations": [
+        { "name": "Seattle", "state": "WA" },
+        { "name": "New York", "state": "NY" },
+        { "name": "Bellevue", "state": "WA" },
+        { "name": "Olympia", "state": "WA" }
+      ]
+    };
+    assert.throws(() => {
+      (Cli as any).formatOutput(o, {
+        query: `contains(abc)`,
+        output: 'json'
+      });
+
+      assert(cliErrorStub.calledWith(chalk.red('Error: JMESPath query error. ArgumentError: contains() takes 2 arguments but received 1. See https://jmespath.org/specification.html for more information')));
+    });
+  });
+
   it(`prints commands grouped per service when no command specified`, (done) => {
     (cli as any).commandsFolder = path.join(rootFolder, '..', 'm365');
     cli.loadCommandFromArgs(['status']);
