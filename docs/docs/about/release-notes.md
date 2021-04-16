@@ -36,6 +36,10 @@
 - added support for upgrading SPFx projects to beta versions of SPFx [#2354](https://github.com/pnp/cli-microsoft365/issues/2354)
 - added support for upgrading SPFx projects to v1.12.1-rc.0 [#2355](https://github.com/pnp/cli-microsoft365/issues/2355)
 - changed order of commands for upgrading SPFx projects [#2358](https://github.com/pnp/cli-microsoft365/issues/2358)
+- added support for creating AAD apps from manifest [#2316](https://github.com/pnp/cli-microsoft365/issues/2316)
+- added support for tracking help usage in telemetry [#2336](https://github.com/pnp/cli-microsoft365/issues/2336)
+- added returning human-readable error on invalid JMESPath queries [#2279](https://github.com/pnp/cli-microsoft365/issues/2279)
+- added support for upgrading SPFx projects to v1.12.1-rc.1 [#2363](https://github.com/pnp/cli-microsoft365/issues/2363)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 
