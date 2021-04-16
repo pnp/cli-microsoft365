@@ -1,15 +1,15 @@
 import * as assert from 'assert';
 import { Project } from '../../model';
 import { Finding } from '../Finding';
-import { FN005001_CFG_DAS_schema } from './FN005001_CFG_DAS_schema';
+import { FN005002_CFG_DAS_workingDir } from './FN005002_CFG_DAS_workingDir';
 
-describe('FN005001_CFG_DAS_schema', () => {
+describe('FN005002_CFG_DAS_workingDir', () => {
   let findings: Finding[];
-  let rule: FN005001_CFG_DAS_schema;
+  let rule: FN005002_CFG_DAS_workingDir;
 
   beforeEach(() => {
     findings = [];
-    rule = new FN005001_CFG_DAS_schema('test-schema');
+    rule = new FN005002_CFG_DAS_workingDir('./release/assets/');
   });
 
   it('doesn\'t return notification if no deploy-azure-storage.json found', () => {
@@ -20,31 +20,32 @@ describe('FN005001_CFG_DAS_schema', () => {
     assert.strictEqual(findings.length, 0);
   });
 
-  it('doesn\'t return notification if schema is already up-to-date', () => {
+  it('doesn\'t return notification if workingDir is already up-to-date', () => {
     const project: Project = {
       path: '/usr/tmp',
       deployAzureStorageJson: {
         $schema: 'test-schema',
-        workingDir: './temp/deploy/'
+        workingDir: './release/assets/'
       }
     };
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 0);
   });
 
-  it('returns notification if schema is not up-to-date', () => {
+  it('returns notification if workingDir is not up-to-date', () => {
     const project: Project = {
       path: '/usr/tmp',
       deployAzureStorageJson: {
-        $schema: 'old-schema',
+        $schema: 'test-schema',
         workingDir: './temp/deploy/',
         source: JSON.stringify({
-          $schema: 'old-schema'
+          $schema: 'test-schema',
+          workingDir: './temp/deploy/'
         }, null, 2)
       }
     };
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
-    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
 });
