@@ -609,6 +609,7 @@ nav:
       - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
       - 'Upload local files and folders to SharePoint Online': 'sample-scripts/spo/upload-local-files-and-folder.md'
     - Microsoft Teams:
+      - 'Bulk add members to Microsoft Teams team from CSV file': 'sample-scripts/teams/add-bulk-users-teams.md'
       - 'Create a Microsoft Team with channels from a Microsoft 365 Group': 'sample-scripts/teams/create-team-from-group.md'
       - 'Create a Microsoft Teams team and bulk add members from CSV file': 'sample-scripts/teams/create-team-and-add-members-and-owners.md'
       - 'Deploy a Microsoft Teams personal app and add it to users': 'sample-scripts/teams/install-personal-app.md'
