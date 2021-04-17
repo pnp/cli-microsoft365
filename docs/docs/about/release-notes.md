@@ -40,6 +40,8 @@
 - added support for tracking help usage in telemetry [#2336](https://github.com/pnp/cli-microsoft365/issues/2336)
 - added returning human-readable error on invalid JMESPath queries [#2279](https://github.com/pnp/cli-microsoft365/issues/2279)
 - added support for upgrading SPFx projects to v1.12.1-rc.1 [#2363](https://github.com/pnp/cli-microsoft365/issues/2363)
+- fixed the conflicting documentation around the --withSecret command option in aad app add [#2365](https://github.com/pnp/cli-microsoft365/pull/2365)
+- added the 'Bulk add members to Microsoft Teams team from CSV file' sample script [#2285](https://github.com/pnp/cli-microsoft365/issues/2285)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 
