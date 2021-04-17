@@ -12,7 +12,8 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   listTitle?: string;
-  id: string;
+  id?: string;
+  contenttypeTitle?: string;
 }
 
 class SpoContentTypeGetCommand extends SpoCommand {
@@ -31,8 +32,18 @@ class SpoContentTypeGetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+
+    let requestUrl: string = '';
+
+    if (args.options.id) {
+      requestUrl = `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes('${encodeURIComponent(args.options.id)}')`;
+    }
+    else if (args.options.contenttypeTitle) {
+      requestUrl = `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes?$filter=Name eq '${encodeURIComponent(args.options.contenttypeTitle)}'`;
+    }
+
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes('${encodeURIComponent(args.options.id)}')`,
+      url: requestUrl,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -43,7 +54,12 @@ class SpoContentTypeGetCommand extends SpoCommand {
       .get(requestOptions)
       .then((res: any): void => {
         if (res['odata.null'] === true) {
-          cb(new CommandError(`Content type with ID ${args.options.id} not found`));
+          if(args.options.id){
+            cb(new CommandError(`Content type with ID ${args.options.id} not found`));
+          }
+          if(args.options.contenttypeTitle){
+            cb(new CommandError(`Content type with title ${args.options.contenttypeTitle} not found`));
+          }
           return;
         }
 
@@ -61,7 +77,10 @@ class SpoContentTypeGetCommand extends SpoCommand {
         option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-c, --contenttypeTitle [contenttypeTitle]'
       }
     ];
 
@@ -70,7 +89,20 @@ class SpoContentTypeGetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
+
+    if (args.options.id && args.options.contenttypeTitle) {
+      return 'Specify id or content type title, but not both';
+    }
+
+    if (!args.options.id && !args.options.contenttypeTitle) {
+      return 'Specify id or content type title, one is required';
+    }
+
+    return true;
   }
 }
 

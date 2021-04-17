@@ -19,6 +19,9 @@ m365 spo contenttype get [options]
 `-i, --id <id>`
 : The ID of the content type to retrieve
 
+`-c, --contenttypeTitle <contenttypeTitle>`
+: The title of the content type to retrieve
+
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
