@@ -1,6 +1,6 @@
 # Replace an owner in a Microsoft 365 Group or Microsoft Team
 
-Inspired by: [Alan Eardley](https://blog.eardley.org.uk/2021/04/managing-teams-movers-and-leavers/), [Patrick Lamber](https://www.nubo.eu/Create-A-New-Microsoft-Team-And-Bulk-Add-Members-From-CSV-File/)
+Inspired by: [Alan Eardley](https://blog.eardley.org.uk/2021/04/managing-teams-movers-and-leavers/), [Patrick Lamber](https://www.nubo.eu/Replace-Owners-In-A-Microsoft-Group-Or-Team/)
 
 Find all the Microsoft 365 Groups that a user is an Owner of and replace them with someone else useful for when an employee leaves and ownership needs to be updated.
 
