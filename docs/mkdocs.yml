@@ -605,6 +605,7 @@ nav:
       - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
       - 'List site collections and their lists': 'sample-scripts/spo/list-site-collection-lists.md'
       - 'Lists site collection owners': 'sample-scripts/spo/list-site-collection-owners.md'
+      - 'Remove a Site Collection Admin User from all Site Collections': 'sample-scripts/spo/remove-siteCollection-admin-user.md'
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
       - 'Setup example site': 'sample-scripts/spo/setup-example-site.md'
       - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
