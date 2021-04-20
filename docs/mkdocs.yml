@@ -370,6 +370,7 @@ nav:
         - site apppermission add: 'cmd/spo/site/site-apppermission-add.md'
         - site apppermission get: 'cmd/spo/site/site-apppermission-get.md'
         - site apppermission list: 'cmd/spo/site/site-apppermission-list.md'
+        - site apppermission set: 'cmd/spo/site/site-apppermission-set.md'
         - site chrome set: 'cmd/spo/site/site-chrome-set.md'
         - site classic add: 'cmd/spo/site/site-classic-add.md'
         - site classic list: 'cmd/spo/site/site-classic-list.md'
