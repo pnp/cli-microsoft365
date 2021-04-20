@@ -1,18 +1,18 @@
 import * as assert from 'assert';
 import { Project } from '../../model';
 import { Finding } from '../Finding';
-import { FN004001_CFG_CA_schema } from './FN004001_CFG_CA_schema';
+import { FN004002_CFG_CA_deployCdnPath } from './FN004002_CFG_CA_deployCdnPath';
 
-describe('FN004001_CFG_CA_schema', () => {
+describe('FN004002_CFG_CA_deployCdnPath', () => {
   let findings: Finding[];
-  let rule: FN004001_CFG_CA_schema;
+  let rule: FN004002_CFG_CA_deployCdnPath;
 
   beforeEach(() => {
     findings = [];
-    rule = new FN004001_CFG_CA_schema('test-schema');
+    rule = new FN004002_CFG_CA_deployCdnPath('./release/assets/');
   });
 
-  it('doesn\'t return notification if no copy-assets.json found', () => {
+  it(`doesn't return notification if no copy-assets.json found`, () => {
     const project: Project = {
       path: '/usr/tmp'
     };
@@ -20,7 +20,7 @@ describe('FN004001_CFG_CA_schema', () => {
     assert.strictEqual(findings.length, 0);
   });
 
-  it('doesn\'t return notification if schema is already up-to-date', () => {
+  it(`doesn't return notification if deployCdnPath is already up-to-date`, () => {
     const project: Project = {
       path: '/usr/tmp',
       copyAssetsJson: {
@@ -32,19 +32,20 @@ describe('FN004001_CFG_CA_schema', () => {
     assert.strictEqual(findings.length, 0);
   });
 
-  it('returns notification if schema is not up-to-date', () => {
+  it('returns notification if deployCdnPath is not up-to-date', () => {
     const project: Project = {
       path: '/usr/tmp',
       copyAssetsJson: {
-        $schema: 'old-schema',
-        deployCdnPath: './release/assets/',
+        $schema: 'test-schema',
+        deployCdnPath: './tmp/deploy/',
         source: JSON.stringify({
-          $schema: 'old-schema'
+          $schema: 'test-schema',
+          deployCdnPath: './tmp/deploy/'
         }, null, 2)
       }
     };
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
-    assert.strictEqual(findings[0].occurrences[0].position?.line, 2, 'Incorrect line number');
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
 });

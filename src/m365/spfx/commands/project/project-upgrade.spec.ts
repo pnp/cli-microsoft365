@@ -2339,57 +2339,57 @@ describe(commands.PROJECT_UPGRADE, () => {
   //#endregion
 
   //#region 1.12.0
-  it('e2e: shows correct number of findings for upgrading application customizer 1.12.0 project to 1.12.1-rc.1', () => {
+  it('e2e: shows correct number of findings for upgrading application customizer 1.12.0 project to 1.12.1-rc.2', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1120-applicationcustomizer'));
 
-    command.action(logger, { options: { toVersion: '1.12.1-rc.1', output: 'json' } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.12.1-rc.2', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 11);
+      assert.strictEqual(findings.length, 13);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading field customizer react 1.12.0 project to 1.12.1-rc.1', () => {
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.12.0 project to 1.12.1-rc.2', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1120-fieldcustomizer-react'));
 
-    command.action(logger, { options: { toVersion: '1.12.1-rc.1', output: 'json' } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.12.1-rc.2', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 10);
+      assert.strictEqual(findings.length, 12);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading list view command set 1.12.0 project to 1.12.1-rc.1', () => {
+  it('e2e: shows correct number of findings for upgrading list view command set 1.12.0 project to 1.12.1-rc.2', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1120-listviewcommandset'));
 
-    command.action(logger, { options: { toVersion: '1.12.1-rc.1', output: 'json' } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.12.1-rc.2', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 11);
+      assert.strictEqual(findings.length, 13);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading no framework web part 1.12.0 project to 1.12.1-rc.1', () => {
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.12.0 project to 1.12.1-rc.2', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1120-webpart-nolib'));
 
-    command.action(logger, { options: { toVersion: '1.12.1-rc.1', output: 'json' } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.12.1-rc.2', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 12);
+      assert.strictEqual(findings.length, 14);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading react web part 1.12.0 project to 1.12.1-rc.1', () => {
+  it('e2e: shows correct number of findings for upgrading react web part 1.12.0 project to 1.12.1-rc.2', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1120-webpart-react'));
 
-    command.action(logger, { options: { toVersion: '1.12.1-rc.1', output: 'json' } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.12.1-rc.2', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 12);
+      assert.strictEqual(findings.length, 14);
     });
   });
 
-  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.12.0 project to 1.12.1-rc.1', () => {
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.12.0 project to 1.12.1-rc.2', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1120-webpart-optionaldeps'));
 
-    command.action(logger, { options: { toVersion: '1.12.1-rc.1', output: 'json' } } as any, () => {
+    command.action(logger, { options: { toVersion: '1.12.1-rc.2', output: 'json' } } as any, () => {
       const findings: FindingToReport[] = log[0];
-      assert.strictEqual(findings.length, 22);
+      assert.strictEqual(findings.length, 24);
     });
   });
   //#endregion
@@ -2444,7 +2444,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1120-webpart-nolib'));
 
     command.action(logger, { options: { preview: true } } as any, () => {
-      assert(log[0].indexOf('1.12.1-rc.1') > -1);
+      assert(log[0].indexOf('1.12.1-rc.2') > -1);
     });
   });
 
