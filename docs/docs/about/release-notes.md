@@ -42,6 +42,7 @@
 - added support for upgrading SPFx projects to v1.12.1-rc.1 [#2363](https://github.com/pnp/cli-microsoft365/issues/2363)
 - fixed the conflicting documentation around the --withSecret command option in aad app add [#2365](https://github.com/pnp/cli-microsoft365/pull/2365)
 - added the 'Bulk add members to Microsoft Teams team from CSV file' sample script [#2285](https://github.com/pnp/cli-microsoft365/issues/2285)
+- added the 'Copy files to another SharePoint Library in another site' sample script [#2370](https://github.com/pnp/cli-microsoft365/pull/2370)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 
