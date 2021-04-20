@@ -13,7 +13,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   listTitle?: string;
   id?: string;
-  contenttypeTitle?: string;
+  name?: string;
 }
 
 class SpoContentTypeGetCommand extends SpoCommand {
@@ -33,13 +33,13 @@ class SpoContentTypeGetCommand extends SpoCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
 
-    let requestUrl: string = '';
+    let requestUrl: string = `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes`;
 
     if (args.options.id) {
-      requestUrl = `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes('${encodeURIComponent(args.options.id)}')`;
+      requestUrl = `${requestUrl}('${encodeURIComponent(args.options.id)}')`;
     }
-    else if (args.options.contenttypeTitle) {
-      requestUrl = `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes?$filter=Name eq '${encodeURIComponent(args.options.contenttypeTitle)}'`;
+    else if (args.options.name) {
+      requestUrl = `${requestUrl}?$filter=Name eq '${encodeURIComponent(args.options.name)}'`;
     }
 
     const requestOptions: any = {
@@ -53,13 +53,22 @@ class SpoContentTypeGetCommand extends SpoCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        if (res['odata.null'] === true) {
-          if(args.options.id){
-            cb(new CommandError(`Content type with ID ${args.options.id} not found`));
-          }
-          if(args.options.contenttypeTitle){
-            cb(new CommandError(`Content type with title ${args.options.contenttypeTitle} not found`));
-          }
+
+        let errorMessage: string = '';
+
+        if (args.options.name) {
+          res = res.value;
+        }
+
+        if (args.options.id && res['odata.null'] === true) {
+          errorMessage = `Content type with ID ${args.options.id} not found`;
+        }
+        else if (res.length === 0) {
+          errorMessage = `Content type with name ${args.options.name} not found`;
+        }
+
+        if (errorMessage) {
+          cb(new CommandError(errorMessage));
           return;
         }
 
@@ -80,7 +89,7 @@ class SpoContentTypeGetCommand extends SpoCommand {
         option: '-i, --id [id]'
       },
       {
-        option: '-c, --contenttypeTitle [contenttypeTitle]'
+        option: '-n, --name [name]'
       }
     ];
 
@@ -94,12 +103,12 @@ class SpoContentTypeGetCommand extends SpoCommand {
       return isValidSharePointUrl;
     }
 
-    if (args.options.id && args.options.contenttypeTitle) {
-      return 'Specify id or content type title, but not both';
+    if (args.options.id && args.options.name) {
+      return 'Specify id or name, but not both';
     }
 
-    if (!args.options.id && !args.options.contenttypeTitle) {
-      return 'Specify id or content type title, one is required';
+    if (!args.options.id && !args.options.name) {
+      return 'Specify id or name, one is required';
     }
 
     return true;
