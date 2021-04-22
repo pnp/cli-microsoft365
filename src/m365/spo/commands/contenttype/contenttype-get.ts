@@ -57,14 +57,16 @@ class SpoContentTypeGetCommand extends SpoCommand {
         let errorMessage: string = '';
 
         if (args.options.name) {
-          res = res.value;
+          if (res.value.length === 0) {
+            errorMessage = `Content type with name ${args.options.name} not found`;
+          }
+          else{
+            res = res.value[0];
+          }
         }
 
         if (args.options.id && res['odata.null'] === true) {
           errorMessage = `Content type with ID ${args.options.id} not found`;
-        }
-        else if (res.length === 0) {
-          errorMessage = `Content type with name ${args.options.name} not found`;
         }
 
         if (errorMessage) {
