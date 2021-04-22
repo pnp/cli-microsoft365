@@ -1,11 +1,13 @@
-import { Logger } from '../../../../cli';
-import { CommandError, CommandOption, CommandTypes } from '../../../../Command';
+import { Cli, Logger } from '../../../../cli';
+import Command, { CommandError, CommandOption, CommandTypes } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import * as SpoContentTypeGetCommand from './contenttype-get';
+import { Options as SpoContentTypeGetCommandOptions } from './contenttype-get';
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
 
 interface CommandArgs {
@@ -68,16 +70,30 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((res: string): void => {
+      .then((res: string): Promise<void> => {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
-          return;
+          return Promise.resolve();
         }
-        
-        cb();
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+
+        const options: SpoContentTypeGetCommandOptions = {
+          webUrl: args.options.webUrl,
+          listTitle: args.options.listTitle,
+          id: args.options.id,
+          debug: this.debug,
+          verbose: this.verbose
+        };
+        return Cli.executeCommand(SpoContentTypeGetCommand as Command, { options: { ...options, _: [] } });
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb))
+      .then(_ => cb(), (err: any): void => {
+        if (err instanceof CommandError) {
+          err = (err as CommandError).message;
+        }
+
+        this.handleRejectedPromise(err, logger, cb);
+      });
   }
 
   private getParentInfo(listTitle: string | undefined, webUrl: string, logger: Logger): Promise<string> {
