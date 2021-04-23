@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad app role add](../cmd/aad/app/app-role-add.md) - Adds role to the specified Azure AD app registration [#2145](https://github.com/pnp/cli-microsoft365/issues/2145)
+
 **Planner:**
 
 - [planner plan add](../cmd/planner/plan/plan-add.md) - adds a new Microsoft Planner plan [#2253](https://github.com/pnp/cli-microsoft365/issues/2253)
@@ -44,6 +48,9 @@
 - added the 'Bulk add members to Microsoft Teams team from CSV file' sample script [#2285](https://github.com/pnp/cli-microsoft365/issues/2285)
 - added the 'Copy files to another SharePoint Library in another site' sample script [#2370](https://github.com/pnp/cli-microsoft365/pull/2370)
 - added support for upgrading SPFx projects to v1.12.1-rc.2 [#2378](https://github.com/pnp/cli-microsoft365/issues/2378)
+- extended the `spo contenttype get` command with `name` [#2335](https://github.com/pnp/cli-microsoft365/issues/2335)
+- added the 'Remove a Site Collection Admin User from all Site Collections' sample script [#2223](https://github.com/pnp/cli-microsoft365/issues/2223)
+- added support for upgrading SPFx projects to v1.12.1-rc.3 [#2387](https://github.com/pnp/cli-microsoft365/issues/2387)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 
