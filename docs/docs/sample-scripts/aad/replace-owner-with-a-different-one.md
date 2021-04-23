@@ -64,12 +64,12 @@ function Replace-Owner {
  
         $hasOwner = $null
         # verify if the old user is in the owners list
-        $hasOwner = m365 aad o365group user list --groupId $groupId --query "[?userType=='Owner' && userPrincipalName=='$oldUser'].[id]" | Get-CLIValue
+        $hasOwner = m365 aad o365group user list --groupId $group.id --query "[?userType=='Owner' && userPrincipalName=='$oldUser'].[id]" | Get-CLIValue
         if ($hasOwner -ne $null) {
             Write-Host "Found $oldUser" -ForegroundColor Green
             try {
                 Write-Host "Granting $newUser owner rights"
-                m365 aad o365group user add --groupId $groupId --userName $newUser --role Owner | Get-CLIValue
+                m365 aad o365group user add --groupId $group.id --userName $newUser --role Owner | Get-CLIValue
             }
             catch  {
                 Write-Host $_.Exception.Message -ForegroundColor White
@@ -77,7 +77,7 @@ function Replace-Owner {
 
             try {
                 Write-Host "Removing $oldUser permissions..."
-                m365 aad o365group user remove --groupId $groupId --userName $oldUser --confirm $false | Get-CLIValue
+                m365 aad o365group user remove --groupId $group.id --userName $oldUser --confirm $false | Get-CLIValue
             }
             catch  {
                 Write-Host $_.Exception.Message -ForegroundColor Red
