@@ -1195,11 +1195,24 @@ describe('Cli', () => {
 
   it(`exits with the specified exit code`, () => {
     try {
-      (cli as any).closeWithError(new CommandError('Error', 5));
+      (cli as any).closeWithError(new CommandError('Error', 5), { options: {} });
       assert.fail(`Didn't fail while expected`);
     }
     catch {
       assert(processExitStub.calledWith(5));
+    }
+  });
+
+  it(`prints error as JSON in JSON output mode and printErrorsAsPlainText set to false`, () => {
+    const config = cli.config;
+    sinon.stub(config, 'get').callsFake(() => false);
+
+    try {
+      (cli as any).closeWithError(new CommandError('Error'), { options: { output: 'json' } });
+      assert.fail(`Didn't fail while expected`);
+    }
+    catch (err) {
+      assert(cliErrorStub.calledWith(JSON.stringify({ error: 'Error' })));
     }
   });
 
