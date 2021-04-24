@@ -9,7 +9,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { Logger } from '.';
 import appInsights from '../appInsights';
-import Command, { CommandError } from '../Command';
+import Command, { CommandArgs, CommandError } from '../Command';
 import config from '../config';
 import { settingsNames } from '../settingsNames';
 import Utils from '../Utils';
@@ -145,7 +145,7 @@ export class Cli {
         }
 
         if (!matches) {
-          return this.closeWithError(`Invalid option: '${optionFromArgs}'${os.EOL}`, true);
+          return this.closeWithError(`Invalid option: '${optionFromArgs}'${os.EOL}`, this.optionsFromArgs, true);
         }
       }
     }
@@ -155,7 +155,7 @@ export class Cli {
     for (let i = 0; i < this.commandToExecute.options.length; i++) {
       if (this.commandToExecute.options[i].required &&
         typeof this.optionsFromArgs.options[this.commandToExecute.options[i].name] === 'undefined') {
-        return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, true);
+        return this.closeWithError(`Required option ${this.commandToExecute.options[i].name} not specified`, this.optionsFromArgs, true);
       }
     }
 
@@ -165,7 +165,7 @@ export class Cli {
       Cli.loadOptionValuesFromFiles(optionsWithoutShorts);
     }
     catch (e) {
-      return this.closeWithError(e);
+      return this.closeWithError(e, optionsWithoutShorts);
     }
 
 
@@ -174,12 +174,12 @@ export class Cli {
       await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
     }
     catch (e) {
-      return this.closeWithError(e.message, false);
+      return this.closeWithError(e.message, optionsWithoutShorts, false);
     }
 
     const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
     if (typeof validationResult === 'string') {
-      return this.closeWithError(validationResult, true);
+      return this.closeWithError(validationResult, optionsWithoutShorts, true);
     }
 
     // if output not specified, set the configured output value (if any)
@@ -189,7 +189,7 @@ export class Cli {
 
     return Cli
       .executeCommand(this.commandToExecute.command, optionsWithoutShorts)
-      .then(_ => process.exit(0), err => this.closeWithError(err));
+      .then(_ => process.exit(0), err => this.closeWithError(err, optionsWithoutShorts));
   }
 
   public static executeCommand(command: Command, args: { options: minimist.ParsedArgs }): Promise<void> {
@@ -290,7 +290,7 @@ export class Cli {
           }
         }
         catch (e) {
-          this.closeWithError(e);
+          this.closeWithError(e, { options: {} });
         }
       }
     });
@@ -453,7 +453,7 @@ export class Cli {
       }
       catch (e) {
         const message = `JMESPath query error. ${e.message}. See https://jmespath.org/specification.html for more information`;
-        Cli.getInstance().closeWithError(message, false);
+        Cli.getInstance().closeWithError(message, { options }, false);
       }
       // we need to update the statement type in case the JMESPath query
       // returns an object of different shape than the original message to log
@@ -749,24 +749,27 @@ export class Cli {
     Cli.log();
   }
 
-  private closeWithError(error: any, showHelpIfEnabled: boolean = false): void {
+  private closeWithError(error: any, args: CommandArgs, showHelpIfEnabled: boolean = false): void {
     const chalk: typeof Chalk = require('chalk');
     let exitCode: number = 1;
 
-    if (error instanceof CommandError) {
-      if (error.code) {
-        exitCode = error.code;
-      }
-
-      Cli.error(chalk.red(`Error: ${error.message}`));
+    let errorMessage: string = error instanceof CommandError ? error.message : error;
+    if (args.options.output === 'json' &&
+      !this.getSettingWithDefaultValue<boolean>(settingsNames.printErrorsAsPlainText, true)) {
+      errorMessage = JSON.stringify({ error: errorMessage });
     }
     else {
-      Cli.error(chalk.red(`Error: ${error}`));
+      errorMessage = chalk.red(`Error: ${errorMessage}`);
     }
+
+    if (error instanceof CommandError && error.code) {
+      exitCode = error.code;
+    }
+
+    Cli.error(errorMessage);
 
     if (showHelpIfEnabled &&
       this.getSettingWithDefaultValue<boolean>(settingsNames.showHelpOnFailure, showHelpIfEnabled)) {
-      Cli.log();
       this.printHelp(exitCode);
     }
     else {
