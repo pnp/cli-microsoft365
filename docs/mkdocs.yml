@@ -579,6 +579,7 @@ nav:
       - 'Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups' : 'sample-scripts/aad/manage-group-users.md'
       - 'Delete all Microsoft 365 groups' : 'sample-scripts/aad/delete-m365-groups.md'
       - 'Delete all Microsoft 365 groups and SharePoint Online sites' : 'sample-scripts/aad/delete-m365-groups-and-sharepoint-sites.md'
+      - 'Replace a user''s membership in selected Microsoft 365 Groups or Teams' : 'sample-scripts/aad/replace-membership-of-selected-groups.md'
       - 'Replace an owner in a Microsoft 365 Group or Microsoft Team' : 'sample-scripts/aad/replace-owner-with-a-different-one.md'
       - 'Scan for Microsoft 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
     - Microsoft Graph:
