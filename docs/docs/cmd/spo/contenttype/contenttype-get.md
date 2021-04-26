@@ -16,8 +16,11 @@ m365 spo contenttype get [options]
 `-l, --listTitle [listTitle]`
 : Title of the list where the content type is located (if it is a list content type)
 
-`-i, --id <id>`
-: The ID of the content type to retrieve
+`-i, --id [id]`
+: The ID of the content type to retrieve. Specify either id or name but not both
+
+`-n, --name [name]`
+: The name of the content type to retrieve. Specify either id or name but not both
 
 --8<-- "docs/cmd/_global.md"
 
@@ -27,10 +30,16 @@ If no content type with the specified is found in the site or the list, you will
 
 ## Examples
 
-Retrieve site content type
+Retrieve site content type by id
 
 ```sh
 m365 spo contenttype get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --id 0x0100558D85B7216F6A489A499DB361E1AE2F
+```
+
+Retrieve site content type by name
+
+```sh
+m365 spo contenttype get --webUrl https://contoso.sharepoint.com/sites/contoso-sales --name "Document"
 ```
 
 Retrieve list content type
