@@ -133,6 +133,7 @@ nav:
       - app:
         - app get: 'cmd/pa/app/app-get.md'
         - app list: 'cmd/pa/app/app-list.md'
+        - app remove: 'cmd/pa/app/app-remove.md'
       - connector:
         - connector export: 'cmd/pa/connector/connector-export.md'
         - connector list: 'cmd/pa/connector/connector-list.md'
