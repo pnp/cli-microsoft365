@@ -14,6 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   siteUrl: string;
+  permissionId?: string;
   appId?: string;
   appDisplayName?: string;
 }
@@ -31,6 +32,7 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.permissionId = typeof args.options.permissionId !== 'undefined';
     telemetryProps.appId = typeof args.options.appId !== 'undefined';
     telemetryProps.appDisplayName = typeof args.options.appDisplayName !== 'undefined';
     return telemetryProps;
@@ -66,7 +68,11 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
     });
   }
 
-  private getPermissions(args: CommandArgs): Promise<SitePermission> {
+  private getPermission(args: CommandArgs): Promise<string> {
+    if (args.options.permissionId) {
+      return Promise.resolve(args.options.permissionId);
+    }
+
     const permissionRequestOptions: any = {
       url: `${this.resource}/v1.0/sites/${this.siteId}/permissions`,
       headers: {
@@ -88,20 +94,20 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
           return Promise.reject(`Multiple app permissions with displayName ${args.options.appDisplayName} found: ${response.value.map(x => x.grantedToIdentities.map(y => y.application.id))}`);
         }
 
-        return Promise.resolve(sitePermissionItems[0]);
+        return Promise.resolve(sitePermissionItems[0].id);
       });
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
       .getSpoSiteId(args)
-      .then((siteId: string): Promise<SitePermission> => {
+      .then((siteId: string): Promise<string> => {
         this.siteId = siteId;
-        return this.getPermissions(args);
+        return this.getPermission(args);
       })
-      .then((sitePermissionInfo: SitePermission) => {
+      .then((sitePermissionId: string) => {
         const requestOptions: any = {
-          url: `${this.resource}/v1.0/sites/${this.siteId}/permissions/${sitePermissionInfo.id}`,
+          url: `${this.resource}/v1.0/sites/${this.siteId}/permissions/${sitePermissionId}`,
           headers: {
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json;odata=nometadata'
@@ -126,6 +132,9 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
         option: '-u, --siteUrl <siteUrl>'
       },
       {
+        option: '-i, --permissionId [permissionId]'
+      },
+      {
         option: '-p, --permission <permission>'
       },
       {
@@ -141,8 +150,8 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.appId && !args.options.appDisplayName) {
-      return `Specify appId or appDisplayName, one is required`;
+    if (!args.options.permissionId && !args.options.appId && !args.options.appDisplayName) {
+      return `Specify permissionId, appId or appDisplayName, one is required`;
     }
 
     if (args.options.appId && !Utils.isValidGuid(args.options.appId)) {

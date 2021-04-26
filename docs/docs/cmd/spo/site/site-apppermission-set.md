@@ -13,10 +13,13 @@ m365 spo site apppermission set [options]
 `-u, --siteUrl <siteUrl>`
 : URL of the site collection where the permission to retrieve is located
 
-`-p, --permission <permission>`
-: Permission to site (`read`, `write`, `read,write`). If multiple permissions have to be granted, they have to be comma separated ex. `read,write`
+`-i, --permissionId <permissionId>`
+: ID of the permission for which to grant permissions
 
-`-i, --appId [appId]`
+`-p, --permission <permission>`
+: Permission to site (`read`, `write`, `sp.full control`).
+
+`--appId [appId]`
 : Client ID of the Azure AD app for which to grant permissions
 
 `-n, --appDisplayName [appDisplayName]`
@@ -25,6 +28,12 @@ m365 spo site apppermission set [options]
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
+
+Updates a specific application permission to _read_ for the _https://contoso.sharepoint.com/sites/project-x_ site collection with permission id _aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0_
+
+```sh
+m365 spo site apppermission set --siteUrl https://contoso.sharepoint.com/sites/project-x --permissionId aTowaS50fG1zLnNwLmV4dHw4OWVhNWM5NC03NzM2LTRlMjUtOTVhZC0zZmE5NWY2MmI2NmVAZGUzNDhiYzctMWFlYi00NDA2LThjYjMtOTdkYjAyMWNhZGI0 --permission read
+```
 
 Updates a specific application permission to _read_ for the _https://contoso.sharepoint.com/sites/project-x_ site collection with an application called _Foo_
 
