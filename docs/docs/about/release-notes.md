@@ -51,6 +51,10 @@
 - extended the `spo contenttype get` command with `name` [#2335](https://github.com/pnp/cli-microsoft365/issues/2335)
 - added the 'Remove a Site Collection Admin User from all Site Collections' sample script [#2223](https://github.com/pnp/cli-microsoft365/issues/2223)
 - added support for upgrading SPFx projects to v1.12.1-rc.3 [#2387](https://github.com/pnp/cli-microsoft365/issues/2387)
+- added the 'Replace an owner in a Microsoft 365 Group or Microsoft Team' sample script [#2348](https://github.com/pnp/cli-microsoft365/issues/2348)
+- fixed typo in docs for 'teams tab get' [#2390](https://github.com/pnp/cli-microsoft365/pull/2390)
+- added the 'Add a site collection admin using csv file' sample [#2220](https://github.com/pnp/cli-microsoft365/issues/2220)
+- fixed API change in 'flow export' [#2398](https://github.com/pnp/cli-microsoft365/issues/2398)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 
