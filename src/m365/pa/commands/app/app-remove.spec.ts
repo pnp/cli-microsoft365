@@ -354,6 +354,56 @@ describe(commands.APP_REMOVE, () => {
     });
   });
 
+  it('correctly handles Microsoft Power App found when prompt confirmed', (done) => {
+    sinon.stub(request, 'delete').callsFake(() => {
+      return Promise.resolve({ statusCode: 200 });
+    });
+
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+
+    command.action(logger, {
+      options:
+      {
+        debug: false,
+        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
+        name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
+      }
+    } as any, () => {
+      try {
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles Microsoft Power App found when confirm specified', (done) => {
+    sinon.stub(request, 'delete').callsFake(() => {
+      return Promise.resolve({ statusCode: 200 });
+    });
+
+    command.action(logger, {
+      options:
+      {
+        debug: false,
+        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
+        name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
+        confirm: true
+      }
+    } as any, () => {
+      try {
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('supports debug mode', () => {
     const options = command.options();
     let containsOption = false;
