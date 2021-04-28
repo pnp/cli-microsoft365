@@ -137,7 +137,37 @@ describe(commands.APP_REMOVE, () => {
 
   it('removes the specified Microsoft Power App when prompt confirmed (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/Default-8063a435-fc8f-447b-b03b-9e50a265c748/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2016-11-01`) {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2020-06-01`) {
+        return Promise.resolve({ statusCode: 200 });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+    command.action(logger, {
+      options: {
+        debug: true,
+        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
+        name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
+      }
+    }, () => {
+      try {
+        assert(loggerLogToStderrSpy.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes the specified Microsoft Power App as Admin when prompt confirmed (debug)', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/Default-8063a435-fc8f-447b-b03b-9e50a265c748/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2020-06-01`) {
         return Promise.resolve({ statusCode: 200 });
       }
 
@@ -167,7 +197,7 @@ describe(commands.APP_REMOVE, () => {
 
   it('removes the specified Microsoft Power App without prompting when confirm specified (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/Default-8063a435-fc8f-447b-b03b-9e50a265c748/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2016-11-01`) {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2020-06-01`) {
         return Promise.resolve({ statusCode: 200 });
       }
 
@@ -180,6 +210,29 @@ describe(commands.APP_REMOVE, () => {
         environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
+      }
+    }, () => {
+      assert(loggerLogToStderrSpy.called);
+      done();
+    });
+  });
+
+  it('removes the specified Microsoft PowerApp as Admin without prompting when confirm specified (debug)', (done) => {
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2020-06-01`) {
+        return Promise.resolve({ statusCode: 200 });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
+        name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
+        confirm: true,
+        asAdmin: true
       }
     }, () => {
       assert(loggerLogToStderrSpy.called);
