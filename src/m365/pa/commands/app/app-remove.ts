@@ -42,7 +42,7 @@ class PaAppRemoveCommand extends AzmgmtCommand {
 
     const removePaApp: () => void = (): void => {
       const requestOptions: any = {
-        url: `${this.resource}providers/Microsoft.PowerApps/scopes/admin/environments/${encodeURIComponent(args.options.environment)}/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+        url: `${this.resource}providers/Microsoft.PowerApps${args.options.asAdmin ? `/scopes/admin/environments/${encodeURIComponent(args.options.environment)}` : ''}/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
         resolveWithFullResponse: true,
         headers: {
           accept: 'application/json'
@@ -64,7 +64,7 @@ class PaAppRemoveCommand extends AzmgmtCommand {
           }
         }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
-    
+
     if (args.options.confirm) {
       removePaApp();
     }
@@ -92,6 +92,9 @@ class PaAppRemoveCommand extends AzmgmtCommand {
       },
       {
         option: '-e, --environment <environment>'
+      },
+      {
+        option: '--asAdmin'
       },
       {
         option: '--confirm'
