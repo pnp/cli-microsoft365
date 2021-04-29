@@ -55,6 +55,7 @@
 - fixed typo in docs for 'teams tab get' [#2390](https://github.com/pnp/cli-microsoft365/pull/2390)
 - added the 'Add a site collection admin using csv file' sample [#2220](https://github.com/pnp/cli-microsoft365/issues/2220)
 - fixed API change in 'flow export' [#2398](https://github.com/pnp/cli-microsoft365/issues/2398)
+- added support for upgrading SPFx projects to v1.12.1 [#2401](https://github.com/pnp/cli-microsoft365/issues/2401)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 
