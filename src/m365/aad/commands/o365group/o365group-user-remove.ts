@@ -42,47 +42,56 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let userId = '';
     const groupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
 
-    const removeUser: () => void = (): void => {
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
+    const removeUser: () => void = async (): Promise<void> => {
+      try {
+        // retrieve userId
+        const userId: any = await request.get({
+          url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
+          headers: {
+            accept: 'application/json;odata.metadata=none'
+          },
+          responseType: 'json'
+        });
 
-      request
-        .get<{ value: string; }>(requestOptions)
-        .then((res: { value: string; }): Promise<any> => {
-          userId = res.value;
-
-          const requestOptions: any = {
-            url: `${this.resource}/v1.0/groups/${groupId}/owners?$select=id,displayName,userPrincipalName,userType`,
-            headers: {
-              accept: 'application/json;odata.metadata=none'
-            },
-            responseType: 'json'
-          };
-
-          return request.get(requestOptions);
-        })
-        .then((res: any): Promise<void> => {
-          const userIsOwner: boolean = (res.value.filter((i: any) => i.userPrincipalName === args.options.userName).length > 0);
-          const endpoint: string = `${this.resource}/v1.0/groups/${groupId}/${userIsOwner ? 'owners' : 'members'}/${userId}/$ref`;
-
-          const requestOptions: any = {
-            url: endpoint,
+        try {
+          // try to delete the user from the owners. Accepted error is 404
+          await request.delete({
+            url: `${this.resource}/v1.0/groups/${groupId}/owners/${userId.value}/$ref`,
             headers: {
               'accept': 'application/json;odata.metadata=none'
             }
-          };
+          });
+        }
+        catch (err) {
+          // the 404 error is accepted
+          if (err.response.status !== 404) {
+            throw err.response.data;
+          }
+        }
+        
+        // try to delete the user from the members. Accepted error is 404
+        try {
+          await request.delete({
+            url: `${this.resource}/v1.0/groups/${groupId}/members/${userId.value}/$ref`,
+            headers: {
+              'accept': 'application/json;odata.metadata=none'
+            }
+          });
+        }
+        catch (err) {
+          // the 404 error is accepted
+          if (err.response.status !== 404) {
+            throw err.response.data;
+          }
+        }
 
-          return request.delete(requestOptions);
-        })
-        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+        cb();
+      }
+      catch (err: any) {
+        this.handleRejectedODataJsonPromise(err, logger, cb);
+      }
     };
 
     if (args.options.confirm) {
