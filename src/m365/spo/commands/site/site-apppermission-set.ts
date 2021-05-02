@@ -62,10 +62,10 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
       filterValue = args.options.appId;
     }
 
-    return permissions.filter((p: SitePermission) => {
-      return p.grantedToIdentities.some(({ application }: SitePermissionIdentitySet) =>
-        (application as any)[filterProperty] === filterValue);
-    });
+    return permissions.filter((p: SitePermission) =>
+      p.grantedToIdentities.some(({ application }: SitePermissionIdentitySet) =>
+        (application as any)[filterProperty] === filterValue)
+    );
   }
 
   private getPermission(args: CommandArgs): Promise<string> {
@@ -113,7 +113,7 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
             'content-type': 'application/json;odata=nometadata'
           },
           data: {
-            "roles": [args.options.permission]
+            "roles": args.options.permission.split(',')
           },
           responseType: 'json'
         };
@@ -158,8 +158,11 @@ class SpoSiteAppPermissionSetCommand extends GraphCommand {
       return `${args.options.appId} is not a valid GUID`;
     }
 
-    if (['read', 'write', 'sp.full control'].indexOf(args.options.permission) === -1) {
-      return `${args.options.permission} is not a valid permission value. Allowed values read|write|sp.full control`;
+    const permissions: string[] = args.options.permission.split(',');
+    for (let i = 0; i < permissions.length; i++) {
+      if (['read', 'write'].indexOf(permissions[i]) === -1) {
+        return `${permissions[i]} is not a valid permission value. Allowed values read|write|read,write`;
+      }
     }
 
     return SpoCommand.isValidSharePointUrl(args.options.siteUrl);

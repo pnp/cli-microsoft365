@@ -17,7 +17,7 @@ m365 spo site apppermission set [options]
 : ID of the permission for which to grant permissions
 
 `-p, --permission <permission>`
-: Permission to site (`read`, `write`, `sp.full control`).
+: Permission to site (`read`, `write`, `read,write`). If multiple permissions have to be granted, they have to be comma separated ex. `read,write`
 
 `--appId [appId]`
 : Client ID of the Azure AD app for which to grant permissions
