@@ -1,5 +1,19 @@
 # Release notes
 
+## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo site apppermission set](../cmd/spo/site/site-apppermission-set.md) - updates a specific application permission for a site [#2210](https://github.com/pnp/cli-microsoft365/issues/2210)
+
+### Changes
+
+- added the 'Replace membership in group or team' sample [#2372](https://github.com/pnp/cli-microsoft365/issues/2372)
+- added the 'Monitor Site Collections Storage Usage' sample script [#2224](https://github.com/pnp/cli-microsoft365/issues/2224)
+- added support for printing errors as JSON in JSON output [#2298](https://github.com/pnp/cli-microsoft365/issues/2298)
+
 ## [v3.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.9.0)
 
 ### New commands
