@@ -1,6 +1,7 @@
 export interface SitePermission {
   id: string;
   grantedToIdentities: SitePermissionIdentitySet[];
+  roles: string[];
 }
 
 export interface SitePermissionIdentitySet {

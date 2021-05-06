@@ -18,6 +18,8 @@ interface Options extends GlobalOptions {
 }
 
 class SpoSiteAppPermissionListCommand extends GraphCommand {
+  private siteId: string = '';
+
   public get name(): string {
     return commands.SITE_APPPERMISSION_LIST;
   }
@@ -63,8 +65,20 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
     });
   }
 
-  private getTransposed(permissions: SitePermission[]): { appDisplayName: string; appId: string; permissionId: string }[] {
-    const transposed: { appDisplayName: string; appId: string; permissionId: string }[] = [];
+  private getApplicationPermission(permissionId: string): Promise<SitePermission> {
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/sites/${this.siteId}/permissions/${permissionId}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
+
+    return request.get<SitePermission>(requestOptions);
+  }
+
+  private getTransposed(permissions: SitePermission[]): { appDisplayName: string; appId: string; permissionId: string, roles: string[] }[] {
+    const transposed: { appDisplayName: string; appId: string; permissionId: string, roles: string[] }[] = [];
 
     permissions.forEach((permissionObject: SitePermission) => {
       permissionObject.grantedToIdentities.forEach((permissionEntity: SitePermissionIdentitySet) => {
@@ -72,7 +86,8 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
           {
             appDisplayName: permissionEntity.application.displayName,
             appId: permissionEntity.application.id,
-            permissionId: permissionObject.id
+            permissionId: permissionObject.id,
+            roles: permissionObject.roles
           });
       });
     });
@@ -80,9 +95,9 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
     return transposed;
   }
 
-  private getPermissions(siteId: string): Promise<{ value: SitePermission[] }> {
+  private getPermissions(): Promise<{ value: SitePermission[] }> {
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/sites/${siteId}/permissions`,
+      url: `${this.resource}/v1.0/sites/${this.siteId}/permissions`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -95,7 +110,10 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
       .getSpoSiteId(args)
-      .then((siteId: string): Promise<{ value: SitePermission[] }> => this.getPermissions(siteId))
+      .then((siteId: string): Promise<{ value: SitePermission[] }> => {
+        this.siteId = siteId;
+        return this.getPermissions();
+      })
       .then((res: { value: SitePermission[] }) => {
         let permissions: SitePermission[] = res.value;
 
@@ -103,7 +121,10 @@ class SpoSiteAppPermissionListCommand extends GraphCommand {
           permissions = this.getFilteredPermissions(args, res.value);
         }
 
-        logger.log(this.getTransposed(permissions));
+        return Promise.all(permissions.map(g => this.getApplicationPermission(g.id)));
+      })
+      .then((res: SitePermission[]): void => {
+        logger.log(this.getTransposed(res));
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
