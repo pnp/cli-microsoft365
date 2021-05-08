@@ -13,6 +13,7 @@
 - added the 'Replace membership in group or team' sample [#2372](https://github.com/pnp/cli-microsoft365/issues/2372)
 - added the 'Monitor Site Collections Storage Usage' sample script [#2224](https://github.com/pnp/cli-microsoft365/issues/2224)
 - added support for printing errors as JSON in JSON output [#2298](https://github.com/pnp/cli-microsoft365/issues/2298)
+- extended 'spo site apppermission list' with roles [#2412](https://github.com/pnp/cli-microsoft365/issues/2412)
 
 ## [v3.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.9.0)
 
