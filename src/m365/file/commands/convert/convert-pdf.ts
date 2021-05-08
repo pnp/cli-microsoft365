@@ -218,9 +218,6 @@ class FileConvertPdfCommand extends GraphCommand {
         }
         const siteRelativeFileUrlChunks: string[] = siteRelativeFileUrl.split('/');
         driveRelativeFileUrl = `/${siteRelativeFileUrlChunks.slice(2).join('/')}`;
-        // console.log(siteRelativeFileUrl);
-        // console.log(siteRelativeFileUrlChunks);
-        // console.log(driveRelativeFileUrl);
         // chunk 0 is empty because the URL starts with /
         return this.getDriveId(logger, siteId, siteRelativeFileUrlChunks[1]);
       })
