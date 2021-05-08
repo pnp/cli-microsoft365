@@ -593,6 +593,7 @@ nav:
       - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
       - 'Add custom client-side web part to modern page': 'sample-scripts/spo/add-custom-clientside-webpart-to-modern-page.md'
       - 'Add a Site Collection Admin using a csv file': 'sample-scripts/spo/add-site-collection-admin-using-csv-file.md'
+      - 'Add multiple folders in libraries using a csv file': 'sample-scripts/spo/add-multiple-folders-in-libraries-using-csv-file.md'
       - 'Copy files to another SharePoint Library in another site': 'sample-scripts/spo/copy-files-to-another-library.md'
       - 'Delete all (non-group connected) modern SharePoint sites': 'sample-scripts/spo/delete-non-group-connected-modern-sites.md'
       - 'Delete custom color themes from SharePoint': 'sample-scripts/spo/remove-custom-themes.md'
