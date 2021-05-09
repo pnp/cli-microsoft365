@@ -208,6 +208,17 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         });
       }
 
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
+        return Promise.resolve({ 
+          response: { 
+            status: 200,
+            data: {
+              value: "00000000-0000-0000-0000-000000000000"
+            }
+          } 
+        });
+      }
+
       return Promise.reject('Invalid request');
     });
 
@@ -249,6 +260,17 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
         return Promise.resolve({
           "value": "00000000-0000-0000-0000-000000000001"
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
+        return Promise.resolve({ 
+          response: { 
+            status: 200,
+            data: {
+              value: "00000000-0000-0000-0000-000000000000"
+            }
+          } 
         });
       }
 
@@ -300,6 +322,17 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         });
       }
 
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
+        return Promise.resolve({ 
+          response: { 
+            status: 200,
+            data: {
+              value: "00000000-0000-0000-0000-000000000000"
+            }
+          } 
+        });
+      }
+
       return Promise.reject('Invalid request');
     });
 
@@ -345,6 +378,17 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
         return Promise.resolve({
           "value": "00000000-0000-0000-0000-000000000001"
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
+        return Promise.resolve({ 
+          response: { 
+            status: 200,
+            data: {
+              value: "00000000-0000-0000-0000-000000000000"
+            }
+          } 
         });
       }
 
@@ -401,6 +445,17 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
         });
       }
 
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
+        return Promise.resolve({ 
+          response: { 
+            status: 200,
+            data: {
+              value: "00000000-0000-0000-0000-000000000000"
+            }
+          } 
+        });
+      }
+
       return Promise.reject('Invalid request');
     });
 
@@ -444,11 +499,52 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
     });
   });
 
+  it('correctly retrieves user but does not find the Group Microsoft 365 group', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
+        return Promise.resolve({
+          "value": "00000000-0000-0000-0000-000000000001"
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
+        return Promise.reject("Invalid object identifier");
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", userName: "anne.matthews@contoso.onmicrosoft.com" } } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Invalid object identifier'))); done();
+      }
+      catch (e) {
+
+        done(e);
+      }
+    });
+  });
+
   it('correctly retrieves user and handle error removing owner from specified Microsoft 365 group', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
         return Promise.resolve({
           "value": "00000000-0000-0000-0000-000000000001"
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
+        return Promise.resolve({ 
+          response: { 
+            status: 200,
+            data: {
+              value: "00000000-0000-0000-0000-000000000000"
+            }
+          } 
         });
       }
 
@@ -489,6 +585,17 @@ describe(commands.O365GROUP_USER_REMOVE, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/users/anne.matthews%40contoso.onmicrosoft.com/id`) {
         return Promise.resolve({
           "value": "00000000-0000-0000-0000-000000000001"
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/id`) {
+        return Promise.resolve({ 
+          response: { 
+            status: 200,
+            data: {
+              value: "00000000-0000-0000-0000-000000000000"
+            }
+          } 
         });
       }
 

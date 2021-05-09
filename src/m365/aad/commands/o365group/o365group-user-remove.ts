@@ -13,6 +13,10 @@ interface CommandArgs {
   options: Options;
 }
 
+interface UserResponse {
+  value: string
+}
+
 interface Options extends GlobalOptions {
   teamId?: string;
   groupId?: string;
@@ -46,8 +50,8 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
 
     const removeUser: () => void = async (): Promise<void> => {
       try {
-        // retrieve userId
-        const userId: any = await request.get({
+        // retrieve user
+        const user: UserResponse = await request.get({
           url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.userName)}/id`,
           headers: {
             accept: 'application/json;odata.metadata=none'
@@ -55,10 +59,18 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
           responseType: 'json'
         });
 
+        // used to verify if the group exists or not
+        await request.get({
+          url: `${this.resource}/v1.0/groups/${groupId}/id`,
+          headers: {
+            'accept': 'application/json;odata.metadata=none'
+          }
+        });
+
         try {
           // try to delete the user from the owners. Accepted error is 404
           await request.delete({
-            url: `${this.resource}/v1.0/groups/${groupId}/owners/${userId.value}/$ref`,
+            url: `${this.resource}/v1.0/groups/${groupId}/owners/${user.value}/$ref`,
             headers: {
               'accept': 'application/json;odata.metadata=none'
             }
@@ -74,7 +86,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
         // try to delete the user from the members. Accepted error is 404
         try {
           await request.delete({
-            url: `${this.resource}/v1.0/groups/${groupId}/members/${userId.value}/$ref`,
+            url: `${this.resource}/v1.0/groups/${groupId}/members/${user.value}/$ref`,
             headers: {
               'accept': 'application/json;odata.metadata=none'
             }
