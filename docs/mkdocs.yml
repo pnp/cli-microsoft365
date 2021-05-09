@@ -82,6 +82,7 @@ nav:
         - completion sh setup: 'cmd/cli/completion/completion-sh-setup.md'
         - completion sh update: 'cmd/cli/completion/completion-sh-update.md'
       - config:
+        - config get: 'cmd/cli/config/config-get.md'
         - config set: 'cmd/cli/config/config-set.md'
     - File (file):
       - add: 'cmd/file/file-add.md'
