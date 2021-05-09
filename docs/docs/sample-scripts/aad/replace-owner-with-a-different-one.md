@@ -21,30 +21,19 @@ if ($m365Status -eq "Logged Out") {
 m365 cli config set --key output --value json
 m365 cli config set --key errorOutput --value stdout
 m365 cli config set --key showHelpOnFailure --value false
+m365 cli config set --key printErrorsAsPlainText --value false
 
 function Get-CLIValue {
-[cmdletbinding()]
-    param(
-        [parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        $input,
-        [parameter(Mandatory = $false)]
-        $convertFromJson = $true
-    )
-    if ($convertFromJson) {
-      try {
-        return $input | ConvertFrom-Json
-      }
-      catch {
-        
-      }
+  [cmdletbinding()]
+  param(
+    [parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    $input
+  )
+    $output = $input | ConvertFrom-Json
+    if ($output.error -ne $null) {
+      throw $output.error
     }
-
-    if ($input.StartsWith("Error:")) {
-        $errorMessage = $input.Replace("Error: ", "")
-        throw $errorMessage
-    }
-
-    return $input
+    return $output
 }
 
 function Replace-Owner {
