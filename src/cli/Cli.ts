@@ -168,7 +168,6 @@ export class Cli {
       return this.closeWithError(e, optionsWithoutShorts);
     }
 
-
     try {
       // process options before passing them on to validation stage
       await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
@@ -177,14 +176,14 @@ export class Cli {
       return this.closeWithError(e.message, optionsWithoutShorts, false);
     }
 
-    const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
-    if (typeof validationResult === 'string') {
-      return this.closeWithError(validationResult, optionsWithoutShorts, true);
-    }
-
     // if output not specified, set the configured output value (if any)
     if (optionsWithoutShorts.options.output === undefined) {
       optionsWithoutShorts.options.output = this.getSettingWithDefaultValue<string | undefined>(settingsNames.output, undefined);
+    }
+
+    const validationResult: boolean | string = this.commandToExecute.command.validate(optionsWithoutShorts);
+    if (typeof validationResult === 'string') {
+      return this.closeWithError(validationResult, optionsWithoutShorts, true);
     }
 
     return Cli
