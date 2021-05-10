@@ -4,6 +4,18 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad app role list](../cmd/aad/app/app-role-list.md) - gets Azure AD app registration roles [#2144](https://github.com/pnp/cli-microsoft365/issues/2144)
+
+**CLI:**
+
+- [cli config get](../cmd/cli/config/config-get.md) - gets value of a CLI for Microsoft 365 configuration option [#2343](https://github.com/pnp/cli-microsoft365/issues/2343)
+
+**File:**
+
+- [file add](../cmd/file/file-add.md) - uploads file to the specified site using Microsoft Graph [#2384](https://github.com/pnp/cli-microsoft365/issues/2384)
+
 **SharePoint:**
 
 - [spo site apppermission set](../cmd/spo/site/site-apppermission-set.md) - updates a specific application permission for a site [#2210](https://github.com/pnp/cli-microsoft365/issues/2210)
@@ -14,6 +26,10 @@
 - added the 'Monitor Site Collections Storage Usage' sample script [#2224](https://github.com/pnp/cli-microsoft365/issues/2224)
 - added support for printing errors as JSON in JSON output [#2298](https://github.com/pnp/cli-microsoft365/issues/2298)
 - extended 'spo site apppermission list' with roles [#2412](https://github.com/pnp/cli-microsoft365/issues/2412)
+- fixed removing users from O365 groups [#2368](https://github.com/pnp/cli-microsoft365/issues/2368)
+- fixed printing validation errors as json [#2429](https://github.com/pnp/cli-microsoft365/issues/2429)
+- added the 'Add multiple folders in libraries using a csv file' sample script [#2415](https://github.com/pnp/cli-microsoft365/issues/2415)
+- updated PowerShell samples to use simplified CLI config [#2428](https://github.com/pnp/cli-microsoft365/issues/2428)
 
 ## [v3.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.9.0)
 
