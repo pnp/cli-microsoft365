@@ -57,7 +57,7 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
       .getSpoSiteId(args)
       .then((siteId: string): Promise<SitePermission> => this.getApplicationPermission(args, siteId))
       .then((permissionObject: SitePermission) => {
-        const transposed: { appDisplayName: string; appId: string; permissionId: string, roles: string[] }[] = [];
+        const transposed: { appDisplayName: string; appId: string; permissionId: string, roles: string }[] = [];
 
         permissionObject.grantedToIdentities.forEach((permissionEntity: SitePermissionIdentitySet) => {
           transposed.push(
@@ -65,7 +65,7 @@ class SpoSiteAppPermissionGetCommand extends GraphCommand {
               appDisplayName: permissionEntity.application.displayName,
               appId: permissionEntity.application.id,
               permissionId: permissionObject.id,
-              roles: permissionObject.roles
+              roles: permissionObject.roles.join()
             });
         });
 

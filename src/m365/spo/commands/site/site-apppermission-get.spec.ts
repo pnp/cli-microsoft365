@@ -145,7 +145,7 @@ describe(commands.SITE_APPPERMISSION_GET, () => {
           appDisplayName: 'Selected',
           appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
           permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
-          roles: ["write"]
+          roles: "write"
         }]));
         done();
       }
