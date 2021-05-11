@@ -15,6 +15,7 @@
     "./**/test-projects",
     "./**/pcf-init/assets",
     "./**/solution-init/assets",
+    "./**/package-generate/assets",
     "node_modules"
   ]
 }
