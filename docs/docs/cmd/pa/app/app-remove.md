@@ -1,4 +1,4 @@
-# app remove
+# pa app remove
 
 Removes the specified Power App
 
