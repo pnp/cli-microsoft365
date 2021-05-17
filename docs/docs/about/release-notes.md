@@ -31,6 +31,7 @@
 - added the 'Add multiple folders in libraries using a csv file' sample script [#2415](https://github.com/pnp/cli-microsoft365/issues/2415)
 - updated PowerShell samples to use simplified CLI config [#2428](https://github.com/pnp/cli-microsoft365/issues/2428)
 - updated 'aad user list' docs [#2434](https://github.com/pnp/cli-microsoft365/issues/2434)
+- added the 'Replace spo site collection admin' sample [#2221](https://github.com/pnp/cli-microsoft365/issues/2221)
 
 ## [v3.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.9.0)
 
