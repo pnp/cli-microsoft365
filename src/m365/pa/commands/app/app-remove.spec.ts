@@ -137,7 +137,7 @@ describe(commands.APP_REMOVE, () => {
 
   it('removes the specified Microsoft Power App when prompt confirmed (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2020-06-01`) {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2017-08-01`) {
         return Promise.resolve({ statusCode: 200 });
       }
 
@@ -151,7 +151,6 @@ describe(commands.APP_REMOVE, () => {
     command.action(logger, {
       options: {
         debug: true,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     }, () => {
@@ -165,9 +164,9 @@ describe(commands.APP_REMOVE, () => {
     });
   });
 
-  it('removes the specified Microsoft Power App as Admin when prompt confirmed (debug)', (done) => {
+  it('removes the specified Microsoft Power App from other user when prompt confirmed (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/scopes/admin/environments/Default-8063a435-fc8f-447b-b03b-9e50a265c748/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2020-06-01`) {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2017-08-01`) {
         return Promise.resolve({ statusCode: 200 });
       }
 
@@ -181,7 +180,6 @@ describe(commands.APP_REMOVE, () => {
     command.action(logger, {
       options: {
         debug: true,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     }, () => {
@@ -197,7 +195,7 @@ describe(commands.APP_REMOVE, () => {
 
   it('removes the specified Microsoft Power App without prompting when confirm specified (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2020-06-01`) {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/e0c89645-7f00-4877-a290-cbaf6e060da1?api-version=2017-08-01`) {
         return Promise.resolve({ statusCode: 200 });
       }
 
@@ -207,7 +205,6 @@ describe(commands.APP_REMOVE, () => {
     command.action(logger, {
       options: {
         debug: true,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
@@ -217,9 +214,9 @@ describe(commands.APP_REMOVE, () => {
     });
   });
 
-  it('removes the specified Microsoft PowerApp as Admin without prompting when confirm specified (debug)', (done) => {
+  it('removes the specified Microsoft PowerApp from other user without prompting when confirm specified (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://management.azure.com/providers/Microsoft.ProcessSimple/scopes/admin/environments/Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c/flows/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2020-06-01`) {
+      if (opts.url === `https://api.powerapps.com/providers/Microsoft.PowerApps/apps/0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72?api-version=2017-08-01`) {
         return Promise.resolve({ statusCode: 200 });
       }
 
@@ -229,10 +226,8 @@ describe(commands.APP_REMOVE, () => {
     command.action(logger, {
       options: {
         debug: true,
-        environment: 'Default-eff8592e-e14a-4ae8-8771-d96d5c549e1c',
         name: '0f64d9dd-01bb-4c1b-95b3-cb4a1a08ac72',
-        confirm: true,
-        asAdmin: true
+        confirm: true
       }
     }, () => {
       assert(loggerLogToStderrSpy.called);
@@ -245,7 +240,7 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
-          "message": "Access to the environment 'Default-8063a435-fc8f-447b-b03b-9e50a265c748' is denied."
+          "message": "Access to the environment is denied."
         }
       });
     });
@@ -254,13 +249,12 @@ describe(commands.APP_REMOVE, () => {
       options:
       {
         debug: false,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
     } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-8063a435-fc8f-447b-b03b-9e50a265c748' is denied.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment is denied.`)));
         done();
       }
       catch (e) {
@@ -274,7 +268,7 @@ describe(commands.APP_REMOVE, () => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
-          "message": "Access to the environment 'Default-8063a435-fc8f-447b-b03b-9e50a265c748' is denied."
+          "message": "Access to the environment is denied."
         }
       });
     });
@@ -288,12 +282,11 @@ describe(commands.APP_REMOVE, () => {
       options:
       {
         debug: false,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment 'Default-8063a435-fc8f-447b-b03b-9e50a265c748' is denied.`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment is denied.`)));
         done();
       }
       catch (e) {
@@ -316,12 +309,11 @@ describe(commands.APP_REMOVE, () => {
       options:
       {
         debug: false,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(chalk.red(`Error: Resource 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist in environment 'Default-8063a435-fc8f-447b-b03b-9e50a265c748'`)));
+        assert(loggerLogSpy.calledWith(chalk.red(`Error: Resource 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`)));
         done();
       }
       catch (e) {
@@ -339,13 +331,12 @@ describe(commands.APP_REMOVE, () => {
       options:
       {
         debug: false,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
     } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(chalk.red(`Error: Resource 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist in environment 'Default-8063a435-fc8f-447b-b03b-9e50a265c748'`)));
+        assert(loggerLogSpy.calledWith(chalk.red(`Error: Resource 'e0c89645-7f00-4877-a290-cbaf6e060da1' does not exist`)));
         done();
       }
       catch (e) {
@@ -368,7 +359,6 @@ describe(commands.APP_REMOVE, () => {
       options:
       {
         debug: false,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     } as any, () => {
@@ -390,7 +380,6 @@ describe(commands.APP_REMOVE, () => {
       options:
       {
         debug: false,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
         confirm: true
       }
@@ -426,14 +415,15 @@ describe(commands.APP_REMOVE, () => {
     assert(containsOption);
   });
 
-  it('supports specifying environment', () => {
+  it('supports specifying confirm', () => {
     const options = command.options();
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--environment') > -1) {
+      if (o.option.indexOf('--confirm') > -1) {
         containsOption = true;
       }
     });
     assert(containsOption);
   });
+
 });

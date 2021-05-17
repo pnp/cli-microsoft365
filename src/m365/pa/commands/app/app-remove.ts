@@ -13,9 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;
   name: string;
-  asAdmin?: boolean;
   confirm?: boolean;
 }
 
@@ -30,7 +28,6 @@ class PaAppRemoveCommand extends AzmgmtCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.asAdmin = typeof args.options.asAdmin !== 'undefined';
     telemetryProps.confirm = typeof args.options.confirm !== 'undefined';
     return telemetryProps;
   }
@@ -42,7 +39,7 @@ class PaAppRemoveCommand extends AzmgmtCommand {
 
     const removePaApp: () => void = (): void => {
       const requestOptions: any = {
-        url: `${this.resource}providers/Microsoft.PowerApps${args.options.asAdmin ? `/scopes/admin/environments/${encodeURIComponent(args.options.environment)}` : ''}/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`,
+        url: `${this.resource}providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2017-08-01`,
         resolveWithFullResponse: true,
         headers: {
           accept: 'application/json'
@@ -53,10 +50,10 @@ class PaAppRemoveCommand extends AzmgmtCommand {
       request
         .delete(requestOptions)
         .then((rawRes: any): void => {
-          // handle 204 and throw error message to cmd when invalid flow id is passed
+          // handle 204 and throw error message to cmd when invalid Power App id is passed
           // https://github.com/pnp/cli-microsoft365/issues/1063#issuecomment-537218957
           if (rawRes.statusCode === 204) {
-            logger.log(chalk.red(`Error: Resource '${args.options.name}' does not exist in environment '${args.options.environment}'`));
+            logger.log(chalk.red(`Error: Resource '${args.options.name}' does not exist`));
             cb();
           }
           else {
@@ -89,12 +86,6 @@ class PaAppRemoveCommand extends AzmgmtCommand {
     const options: CommandOption[] = [
       {
         option: '-n, --name <name>'
-      },
-      {
-        option: '-e, --environment <environment>'
-      },
-      {
-        option: '--asAdmin'
       },
       {
         option: '--confirm'
