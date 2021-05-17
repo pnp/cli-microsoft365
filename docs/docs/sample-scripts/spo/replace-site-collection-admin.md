@@ -1,11 +1,15 @@
 # Replace site collection admin with another user
 
-Author: [Patrick Lamber](https://www.nubo.eu/Delete-All-SPO-Sites-And-M365-Groups/)
+Author: [Patrick Lamber](https://www.nubo.eu/Replace-Site-Collection-Admin-Using-CLI/)
 Inspired By: [Salaudeen Rajack](https://www.sharepointdiary.com/2015/08/sharepoint-online-add-site-collection-administrator-using-powershell.html)
 
 The script removes a user from a site collection and adds a new one as site collection admin.
 
 ```powershell tab="PowerShell Core"
+$userToAdd = "<upnOfUserToAdd>"
+$userToRemove = "<upnOfUserToRemove>"
+$webUrl = "<spoUrl>"
+
 $m365Status = m365 status
 Write-Host $m365Status
 if ($m365Status -eq "Logged Out") {
