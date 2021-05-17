@@ -50,9 +50,7 @@ class PaAppRemoveCommand extends AzmgmtCommand {
       request
         .delete(requestOptions)
         .then((rawRes: any): void => {
-          // handle 204 and throw error message to cmd when invalid Power App id is passed
-          // https://github.com/pnp/cli-microsoft365/issues/1063#issuecomment-537218957
-          if (rawRes.statusCode === 204) {
+          if (rawRes.statusCode === 403) {
             logger.log(chalk.red(`Error: Resource '${args.options.name}' does not exist`));
             cb();
           }
