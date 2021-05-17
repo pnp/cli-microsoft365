@@ -297,7 +297,7 @@ describe(commands.APP_REMOVE, () => {
 
   it('correctly handles no Microsoft Power App found when prompt confirmed', (done) => {
     sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.resolve({ statusCode: 204 });
+      return Promise.resolve({ statusCode: 403 });
     });
 
     Utils.restore(Cli.prompt);
@@ -324,7 +324,7 @@ describe(commands.APP_REMOVE, () => {
 
   it('correctly handles no Microsoft Power App found when confirm specified', (done) => {
     sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.resolve({ statusCode: 204 });
+      return Promise.resolve({ statusCode: 403 });
     });
 
     command.action(logger, {
