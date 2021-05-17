@@ -22,7 +22,7 @@ m365 pa app remove [options]
 
 By default, the command will try to remove a Power App. As maker, you are able to delete the Power Apps you own. As administrator, you are also able to delete Power Apps from other users.
 
-If you want to remove a model-driven Power App you Administrator permissions.
+To remove a model-driven Power App you need administrator permissions.
 
 If the Power App with the name you specified doesn't exist, you will get the `Error: Resource 'abc' does not exist` error.
 
