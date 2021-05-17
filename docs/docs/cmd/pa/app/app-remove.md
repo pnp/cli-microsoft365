@@ -20,7 +20,7 @@ m365 pa app remove [options]
 
 ## Remarks
 
-By default, the command will try to remove a Power App. As Maker you are able to delete the Power Apps you own, as Administrator you are also able to delete Power Apps from other users.
+By default, the command will try to remove a Power App. As maker, you are able to delete the Power Apps you own. As administrator, you are also able to delete Power Apps from other users.
 
 If you want to remove a model-driven Power App you Administrator permissions.
 
