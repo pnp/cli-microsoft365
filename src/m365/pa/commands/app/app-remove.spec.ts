@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
 import { Cli, Logger } from '../../../../cli';
-import Command, { CommandError } from '../../../../Command';
+import Command from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
@@ -71,17 +71,15 @@ describe(commands.APP_REMOVE, () => {
   it('fails validation if the name is not valid GUID', () => {
     const actual = command.validate({
       options: {
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'invalid'
       }
     });
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the name and environment specified', () => {
+  it('passes validation when the name specified', () => {
     const actual = command.validate({
       options: {
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     });
@@ -92,7 +90,6 @@ describe(commands.APP_REMOVE, () => {
     command.action(logger, {
       options: {
         debug: false,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     }, () => {
@@ -121,7 +118,6 @@ describe(commands.APP_REMOVE, () => {
     command.action(logger, {
       options: {
         debug: false,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     }, () => {
@@ -235,69 +231,9 @@ describe(commands.APP_REMOVE, () => {
     });
   });
 
-  it('correctly handles no environment found without prompting when confirm specified', (done) => {
-    sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": "Access to the environment is denied."
-        }
-      });
-    });
-
-    command.action(logger, {
-      options:
-      {
-        debug: false,
-        name: 'e0c89645-7f00-4877-a290-cbaf6e060da1',
-        confirm: true
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment is denied.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly handles no environment found when prompt confirmed', (done) => {
-    sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.reject({
-        "error": {
-          "code": "EnvironmentAccessDenied",
-          "message": "Access to the environment is denied."
-        }
-      });
-    });
-
-    Utils.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-
-    command.action(logger, {
-      options:
-      {
-        debug: false,
-        name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Access to the environment is denied.`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correctly handles no Microsoft Power App found when prompt confirmed', (done) => {
     sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.resolve({ statusCode: 403 });
+      return Promise.reject({ response: { status: 403 }});
     });
 
     Utils.restore(Cli.prompt);
@@ -324,7 +260,7 @@ describe(commands.APP_REMOVE, () => {
 
   it('correctly handles no Microsoft Power App found when confirm specified', (done) => {
     sinon.stub(request, 'delete').callsFake(() => {
-      return Promise.resolve({ statusCode: 403 });
+      return Promise.reject({ response: { status: 403 }});
     });
 
     command.action(logger, {

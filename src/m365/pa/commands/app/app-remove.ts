@@ -49,15 +49,17 @@ class PaAppRemoveCommand extends AzmgmtCommand {
 
       request
         .delete(requestOptions)
-        .then((rawRes: any): void => {
-          if (rawRes.statusCode === 403) {
+        .then((): void => {
+          cb();
+        }, (rawRes: any): void => {
+          if (rawRes.response && rawRes.response.status === 403) {
             logger.log(chalk.red(`Error: Resource '${args.options.name}' does not exist`));
             cb();
           }
           else {
-            cb();
+            this.handleRejectedODataJsonPromise(rawRes, logger, cb);
           }
-        }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+        });
     };
 
     if (args.options.confirm) {
