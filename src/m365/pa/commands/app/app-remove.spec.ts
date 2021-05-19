@@ -90,7 +90,6 @@ describe(commands.APP_REMOVE, () => {
     command.action(logger, {
       options: {
         debug: false,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     }, () => {
@@ -119,7 +118,6 @@ describe(commands.APP_REMOVE, () => {
     command.action(logger, {
       options: {
         debug: false,
-        environment: 'Default-8063a435-fc8f-447b-b03b-9e50a265c748',
         name: 'e0c89645-7f00-4877-a290-cbaf6e060da1'
       }
     }, () => {
