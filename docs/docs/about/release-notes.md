@@ -16,6 +16,10 @@
 
 - [file add](../cmd/file/file-add.md) - uploads file to the specified site using Microsoft Graph [#2384](https://github.com/pnp/cli-microsoft365/issues/2384)
 
+**Power Apps:**
+
+- [pa app remove](../cmd/pa/app/app-remove.md) - removes the specified Power App [#2133](https://github.com/pnp/cli-microsoft365/issues/2133)
+
 **SharePoint:**
 
 - [spo site apppermission set](../cmd/spo/site/site-apppermission-set.md) - updates a specific application permission for a site [#2210](https://github.com/pnp/cli-microsoft365/issues/2210)
@@ -32,6 +36,7 @@
 - updated PowerShell samples to use simplified CLI config [#2428](https://github.com/pnp/cli-microsoft365/issues/2428)
 - updated 'aad user list' docs [#2434](https://github.com/pnp/cli-microsoft365/issues/2434)
 - added the 'Replace spo site collection admin' sample [#2221](https://github.com/pnp/cli-microsoft365/issues/2221)
+- extended 'spo site apppermission get' with roles [#2409](https://github.com/pnp/cli-microsoft365/issues/2409)
 
 ## [v3.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.9.0)
 
