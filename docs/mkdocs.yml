@@ -592,6 +592,7 @@ nav:
       - 'Export a single Flow to a Logic App' : 'sample-scripts/flow/export-flow-logicapp.md'
       - 'Export all Flows in environment' : 'sample-scripts/flow/export-all-flows-in-environment.md'
       - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
+      - 'Search flows for connections' : 'sample-scripts/flow/search-flows-for-connection.md'
     - SharePoint Online:
       - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
       - 'Add custom client-side web part to modern page': 'sample-scripts/spo/add-custom-clientside-webpart-to-modern-page.md'
@@ -617,7 +618,7 @@ nav:
       - 'Lists site collection owners': 'sample-scripts/spo/list-site-collection-owners.md'
       - 'Monitor site collections storage usage': 'sample-scripts/spo/monitor-site-collection-storage-usage.md'
       - 'Remove a Site Collection Admin User from all Site Collections': 'sample-scripts/spo/remove-siteCollection-admin-user.md'
-      - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'      
+      - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
       - 'Replace site collection admin with another user': 'sample-scripts/spo/replace-site-collection-admin.md'
       - 'Setup example site': 'sample-scripts/spo/setup-example-site.md'
       - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
