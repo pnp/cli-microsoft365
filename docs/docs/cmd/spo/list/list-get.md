@@ -19,6 +19,9 @@ m365 spo list get [options]
 `-t, --title [title]`
 : Title of the list to retrieve information for. Specify either `id` or `title` but not both
 
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve from the list. Will retrieve all properties possible from default response, if not specified.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
