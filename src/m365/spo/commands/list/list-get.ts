@@ -54,7 +54,7 @@ class SpoListGetCommand extends SpoCommand {
     const propertiesSelect: string = args.options.properties ? `?$select=${encodeURIComponent(args.options.properties)}` : ``;
 
     const requestOptions: any = {
-      url: `${requestUrl}${propertiesSelect}`,
+      url: requestUrl + propertiesSelect,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'

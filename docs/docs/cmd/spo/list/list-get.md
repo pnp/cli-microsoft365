@@ -38,6 +38,12 @@ Return information about a list with title _Documents_ located in site _https://
 m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x
 ```
 
+Get information about a list returning the specified list properties
+
+```sh
+m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Id,HasUniqueRoleAssignments,AllowContentTypes"
+```
+
 ## More information
 
 - List REST API resources: [https://msdn.microsoft.com/en-us/library/office/dn531433.aspx#bk_ListEndpoint](https://msdn.microsoft.com/en-us/library/office/dn531433.aspx#bk_ListEndpoint)
