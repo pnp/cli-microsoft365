@@ -1,5 +1,6 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import Sinon = require('sinon');
 import appInsights from '../../../appInsights';
 import auth from '../../../Auth';
 import { Logger } from '../../../cli';
@@ -8,16 +9,18 @@ import Utils from '../../../Utils';
 import commands from '../commands';
 
 const command: Command = require('./cli-issue');
-const open = require('open');
 
 describe(commands.ISSUE, () => {
   let log: any[];
   let logger: Logger;
+  let openBrowserSpy: Sinon.SinonSpy;
 
   before(() => {
     sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     auth.service.connected = true;
+    (command as any).open = () => { };
+    openBrowserSpy = sinon.spy(command as any, 'openBrowser');
   });
 
   beforeEach(() => {
@@ -37,11 +40,11 @@ describe(commands.ISSUE, () => {
 
   afterEach(() => {
     Utils.restore([
-      auth.ensureAccessToken,
-      (command as any).openBrowser
+      auth.ensureAccessToken
     ]);
     auth.service.accessTokens = {};
     auth.service.spoUrl = undefined;
+    openBrowserSpy.resetHistory();
   });
 
   after(() => {
@@ -80,31 +83,15 @@ describe(commands.ISSUE, () => {
     assert.strictEqual(actual, `${type} is not a valid Issue type. Allowed values are bug|command|sample`);
   });
 
-  it('Opens URL for a bug (debug)', (done) => {
-    sinon.stub((command as any), 'openBrowser').callsFake((issueLink): Promise<void> => {
-      //console.log('x');
-      //console.log(issueLink);
-      if (issueLink === null) {
-        return Promise.resolve(open);
-      }
-      else {
-        return Promise.resolve(open);
-      }
-    });
-
-    // sinon.stub((command as any), 'openBrowser').callsFake((issueLink): Promise<void> => {
-    //   return Promise.resolve(issueLink);
-    // });
-
+  it('Opens URL for a command (debug)', (done) => {
     command.action(logger, {
       options: {
         debug: true,
-        type: 'bug'
+        type: 'command'
       }
     } as any, () => {
       try {
-        assert(true);
-        //sinon.spy(open.call).calledOnceWith("https://aka.ms/cli-m365/bug");
+        openBrowserSpy.calledWith("https://aka.ms/cli-m365/new-command");
         done();
       }
       catch (e) {
@@ -113,19 +100,15 @@ describe(commands.ISSUE, () => {
     });
   });
 
-  it('Opens URL for a command (debug)', (done) => {
-    sinon.stub((command as any), 'openBrowser').callsFake((): Promise<void> => {
-      return Promise.resolve();
-    });
-
+  it('Opens URL for a bug (debug)', (done) => {
     command.action(logger, {
       options: {
         debug: true,
-        type: 'command'
+        type: 'bug'
       }
     } as any, () => {
       try {
-        sinon.spy(open).calledOnceWith("https://aka.ms/cli-m365/new-command");
+        openBrowserSpy.calledWith("https://aka.ms/cli-m365/bug");
         done();
       }
       catch (e) {
@@ -135,10 +118,6 @@ describe(commands.ISSUE, () => {
   });
 
   it('Opens URL for a sample (debug)', (done) => {
-    sinon.stub((command as any), 'openBrowser').callsFake((): Promise<void> => {
-      return Promise.resolve();
-    });
-
     command.action(logger, {
       options: {
         debug: true,
@@ -146,7 +125,7 @@ describe(commands.ISSUE, () => {
       }
     } as any, () => {
       try {
-        sinon.spy(open).calledOnceWith("https://aka.ms/cli-m365/new-sample-script");
+        openBrowserSpy.calledWith("https://aka.ms/cli-m365/new-sample-script");
         done();
       }
       catch (e) {

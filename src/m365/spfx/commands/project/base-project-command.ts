@@ -13,6 +13,16 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       path: projectRootPath
     };
 
+    const gitignorePath: string = path.join(projectRootPath, '.gitignore');
+    if (fs.existsSync(gitignorePath)) {
+      try {
+        project.gitignore = {
+          source: fs.readFileSync(gitignorePath, 'utf-8')
+        };
+      }
+      catch { }
+    }
+
     const configJsonPath: string = path.join(projectRootPath, 'config/config.json');
     if (fs.existsSync(configJsonPath)) {
       try {

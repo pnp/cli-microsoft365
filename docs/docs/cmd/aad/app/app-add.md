@@ -26,7 +26,7 @@ m365 aad app add [options]
 : Specify, to indicate that the authorization endpoint should return ID and access tokens
 
 `-s, --withSecret`
-: When specified, will create for the app a non-expiring secret named `Default`
+: When specified, will create a secret named `Default` and set it to expire 1 year in the future
 
 `--apisDelegated [apisDelegated]`
 : Comma-separated list of delegated permissions to register with the app
@@ -76,7 +76,7 @@ The following properties specified in the manifest retrieved from Azure AD are n
 
 When specifying the value for the `uri`, you can use the `_appId_` token, to include the ID of the newly generated Azure AD app registration in the Application ID URI, eg. URI `api://caf406b91cd4.ngrok.io/_appId_` will become `api://caf406b91cd4.ngrok.io/ab3bd119-faf7-4db5-ba99-eb7e748f778a` where the last portion is the app ID of the created Azure AD app registration.
 
-When using the `withSecret` option, this command will automatically generate a secret and set it to expire in 1 year in the future.
+When using the `withSecret` option, this command will automatically generate a secret named `Default` and set it to expire 1 year in the future.
 
 After creating the Azure AD app registration, this command returns the app ID and object ID of the created app registration. If you used the `withSecret` option, it will also return the generated secret.
 

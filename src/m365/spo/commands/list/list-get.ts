@@ -17,6 +17,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
   id?: string;
   title?: string;
+  properties?: string;
 }
 
 class SpoListGetCommand extends SpoCommand {
@@ -32,6 +33,7 @@ class SpoListGetCommand extends SpoCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.id = (!(!args.options.id)).toString();
     telemetryProps.title = (!(!args.options.title)).toString();
+    telemetryProps.properties = (!(!args.options.properties)).toString();
     return telemetryProps;
   }
 
@@ -49,8 +51,10 @@ class SpoListGetCommand extends SpoCommand {
       requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.title as string)}')`;
     }
 
+    const propertiesSelect: string = args.options.properties ? `?$select=${encodeURIComponent(args.options.properties)}` : ``;
+
     const requestOptions: any = {
-      url: requestUrl,
+      url: requestUrl + propertiesSelect,
       method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
@@ -77,6 +81,9 @@ class SpoListGetCommand extends SpoCommand {
       },
       {
         option: '-t, --title [title]'
+      },
+      {
+        option: '-p, --properties [properties]'
       }
     ];
 

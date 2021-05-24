@@ -1,6 +1,7 @@
 export * from './ConfigJson';
 export * from './CopyAssetsJson';
 export * from './DeployAzureStorageJson';
+export * from './Gitignore';
 export * from './GulpfileJs';
 export * from './Manifest';
 export * from './JsonFile';

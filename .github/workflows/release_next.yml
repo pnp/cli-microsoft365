@@ -56,10 +56,10 @@ jobs:
         nodeBuild: [14]
         include:
           - os: ubuntu-latest
-            nodeRun: 10
+            nodeRun: 12
             nodeBuild: 14
           - os: ubuntu-latest
-            nodeRun: 12
+            nodeRun: 16
             nodeBuild: 14
 
     steps:

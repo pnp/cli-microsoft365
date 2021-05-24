@@ -4,8 +4,8 @@ import Command, {
 } from '../../../Command';
 import GlobalOptions from '../../../GlobalOptions';
 import commands from '../commands';
-
-const open = require('open');
+import * as open from 'open';
+import { ChildProcess } from 'node:child_process';
 
 interface CommandArgs {
   options: Options;
@@ -17,6 +17,10 @@ interface Options extends GlobalOptions {
 
 
 class CliIssueCommand extends Command {
+  constructor(private open: any) {
+    super();
+  }
+
   public get name(): string {
     return commands.ISSUE;
   }
@@ -49,22 +53,12 @@ class CliIssueCommand extends Command {
     this.openBrowser(issueLink).then((): void => {
       logger.log(issueLink);
       cb();
-    }).catch(() => {
-      return cb(`Could not open url ` + issueLink);
-
     });
   }
 
-  //private openBrowser = (issueLink: string): Promise<any> => {
-  private async openBrowser(issueLink: string): Promise<void> {
-    return open(issueLink, { wait: true });
+  private async openBrowser(issueLink: string): Promise<ChildProcess> {
+    return this.open(issueLink, { wait: false });
   }
-
-  // private async openBrowser(issueLink: string): Promise<void> {
-  //   await open(issueLink, { wait: true }).then((): void => {
-  //     return;
-  //   });
-  // }
 
   private static issueType: string[] = [
     'bug',
@@ -93,4 +87,4 @@ class CliIssueCommand extends Command {
   }
 }
 
-module.exports = new CliIssueCommand();
+module.exports = new CliIssueCommand(open);
