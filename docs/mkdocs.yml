@@ -8,6 +8,7 @@ nav:
     - 'Run CLI in a Docker Container': 'user-guide/run-cli-in-docker-container.md'
     - 'Logging in to Microsoft 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
+    - 'Filter CLI data': 'user-guide/filter-cli-data.md'
     - 'Configuring CLI': 'user-guide/configuring-cli.md'
     - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
     - 'Caveats when working with the CLI and certificate login': 'user-guide/cli-certificate-caveats.md'
