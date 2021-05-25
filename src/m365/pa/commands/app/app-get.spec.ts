@@ -596,12 +596,12 @@ describe(commands.APP_GET, () => {
           "usesOnPremiseGateway": false
         },
         "isAppComponentLibrary": false,
-        "appType": "ClassicCanvasApp",
+        "appType": "ClassicCanvasApp"
       }
     ];
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
-      if (command == paAppListCommand) {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+      if (command === paAppListCommand) {
         return Promise.resolve({ "stdout": JSON.stringify(apps) });
       }
       return Promise.reject('Invalid request');
@@ -770,7 +770,7 @@ describe(commands.APP_GET, () => {
             "displayName": "Playwright",
             "description": "",
             "appVersion": "2020-08-12T20:40:16Z",
-            "owner": "garry@trinder365dev.onmicrosoft.com",
+            "owner": "garry@trinder365dev.onmicrosoft.com"
           }
         ));
         done();
@@ -1270,12 +1270,12 @@ describe(commands.APP_GET, () => {
           "usesOnPremiseGateway": false
         },
         "isAppComponentLibrary": false,
-        "appType": "ClassicCanvasApp",
+        "appType": "ClassicCanvasApp"
       }
     ];
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
-      if (command == paAppListCommand) {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+      if (command === paAppListCommand) {
         return Promise.resolve({ "stdout": JSON.stringify(apps) });
       }
       return Promise.reject('Invalid request');
@@ -1444,7 +1444,7 @@ describe(commands.APP_GET, () => {
             "displayName": "Playwright",
             "description": "",
             "appVersion": "2020-08-12T20:40:16Z",
-            "owner": "",
+            "owner": ""
           }
         ));
         done();
@@ -1456,7 +1456,7 @@ describe(commands.APP_GET, () => {
   });
 
   it('correctly handles App not found using GUID', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "AppNotFound",
@@ -1942,12 +1942,12 @@ describe(commands.APP_GET, () => {
           "usesOnPremiseGateway": false
         },
         "isAppComponentLibrary": false,
-        "appType": "ClassicCanvasApp",
+        "appType": "ClassicCanvasApp"
       }
     ];
 
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
-      if (command == paAppListCommand) {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+      if (command === paAppListCommand) {
         return Promise.resolve({ "stdout": JSON.stringify(apps) });
       }
       return Promise.reject('Invalid request');
@@ -1965,8 +1965,8 @@ describe(commands.APP_GET, () => {
   });
 
   it('correctly handles no apps found using displayName (debug)', (done) => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
-      if (command == paAppListCommand) {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
+      if (command === paAppListCommand) {
         return Promise.resolve({ "stdout": JSON.stringify([]) });
       }
       return Promise.reject('Invalid request');

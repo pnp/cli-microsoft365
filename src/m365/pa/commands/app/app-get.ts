@@ -61,8 +61,8 @@ class PaAppGetCommand extends AzmgmtCommand {
         .then((getAppsOutput: CommandOutput): void => {
           const allApps: any = JSON.parse(getAppsOutput.stdout);
           if (allApps.length > 0) {
-            let app = allApps.find((a: any) => {
-              return a.properties.displayName.toLowerCase() == `${args.options.name}`.toLowerCase();
+            const app = allApps.find((a: any) => {
+              return a.properties.displayName.toLowerCase() === `${args.options.name}`.toLowerCase();
             });
             if (!!app) {
               logger.log(this.setProperties(app));
