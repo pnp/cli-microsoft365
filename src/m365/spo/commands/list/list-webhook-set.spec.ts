@@ -59,7 +59,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   it('uses correct API url when list id option is passed', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -88,7 +88,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   it('uses correct API url when list title option is passed', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists/GetByTitle(') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -291,7 +291,7 @@ describe(commands.LIST_WEBHOOK_SET, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

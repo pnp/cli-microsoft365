@@ -17,9 +17,9 @@ interface Options extends GlobalOptions {
   confirm?: boolean;
 }
 
-class TeamsRemoveCommand extends GraphCommand {
+class TeamsTeamRemoveCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_TEAM_REMOVE;
+    return commands.TEAM_REMOVE;
   }
 
   public get description(): string {
@@ -55,7 +55,7 @@ class TeamsRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the team ${args.options.teamId}?`,
+        message: `Are you sure you want to remove the team ${args.options.teamId}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -90,4 +90,4 @@ class TeamsRemoveCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsRemoveCommand();
+module.exports = new TeamsTeamRemoveCommand();

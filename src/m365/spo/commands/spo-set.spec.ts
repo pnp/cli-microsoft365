@@ -101,7 +101,7 @@ describe(commands.SET, () => {
   it('throws error when setting the password fails', (done) => {
     auth.service.connected = true;
     Utils.restore(auth.storeConnectionInfo);
-    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred while setting the password'))
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.reject('An error has occurred while setting the password'));
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com' } } as any, (err?: any) => {
       try {

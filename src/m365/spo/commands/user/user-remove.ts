@@ -62,7 +62,7 @@ class SpoUserRemoveCommand extends SpoCommand {
       request
         .post(requestOptions)
         .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       removeUser();
@@ -72,7 +72,7 @@ class SpoUserRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove specified user from the site ${args.options.webUrl}`,
+        message: `Are you sure you want to remove specified user from the site ${args.options.webUrl}`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

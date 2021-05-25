@@ -34,7 +34,7 @@ class SpoGroupListCommand extends SpoCommand {
       logger.logToStderr(`Retrieving list of groups for specified web at ${args.options.webUrl}...`);
     }
 
-    let requestUrl = `${args.options.webUrl}/_api/web/sitegroups`;
+    const requestUrl = `${args.options.webUrl}/_api/web/sitegroups`;
 
     const requestOptions: any = {
       url: requestUrl,
@@ -42,7 +42,7 @@ class SpoGroupListCommand extends SpoCommand {
         'accept': 'application/json;odata=nometadata'
       },
       responseType: 'json'
-    }
+    };
 
     request
       .get<GroupPropertiesCollection>(requestOptions)
@@ -56,7 +56,7 @@ class SpoGroupListCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-u, --webUrl <webUrl>'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();

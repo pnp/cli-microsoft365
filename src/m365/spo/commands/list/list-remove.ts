@@ -78,7 +78,7 @@ class SpoListRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the list ${args.options.id || args.options.title} from site ${args.options.webUrl}?`,
+        message: `Are you sure you want to remove the list ${args.options.id || args.options.title} from site ${args.options.webUrl}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

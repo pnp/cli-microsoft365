@@ -39,6 +39,10 @@ class SpoFileMoveCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['targetUrl'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const webUrl = args.options.webUrl;
     const parsedUrl: url.UrlWithStringQuery = url.parse(webUrl);
@@ -78,7 +82,7 @@ class SpoFileMoveCommand extends SpoCommand {
             options: {
               "AllowSchemaMismatch": allowSchemaMismatch,
               "IgnoreVersionHistory": true,
-              "IsMoveMode": true,
+              "IsMoveMode": true
             }
           },
           responseType: 'json'
@@ -94,7 +98,7 @@ class SpoFileMoveCommand extends SpoCommand {
           const progressPollInterval: number = 1800; // 30 * 60; //used previously implemented interval. The API does not provide guidance on what value should be used.
 
           setTimeout(() => {
-            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, logger, this.dots)
+            this.waitUntilCopyJobFinished(copyJobInfo, webUrl, progressPollInterval, resolve, reject, logger, this.dots);
           }, progressPollInterval);
         });
       })

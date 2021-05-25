@@ -4,5 +4,8 @@
   "settings": {
     "terminal.integrated.shell.linux": "/bin/zsh"
   },
-  "postCreateCommand": "npm i && npm run clean && npm run build && npm link"
+  "postCreateCommand": "npm i && npm run clean && npm run build && npm link",
+  "extensions": [
+    "dbaeumer.vscode-eslint"
+  ]
 }

@@ -101,7 +101,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
             accept: 'application/json;odata=nometadata'
           },
           responseType: 'json'
-        }
+        };
 
         return request.get(requestOptions);
       })()
@@ -118,7 +118,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
               accept: 'application/json;odata=nometadata'
             },
             responseType: 'json'
-          }
+          };
 
           return request.get(requestOptions);
         })
@@ -135,12 +135,12 @@ class SpoContentTypeAddCommand extends SpoCommand {
               accept: 'application/json;odata=nometadata'
             },
             responseType: 'json'
-          }
+          };
 
           return request.get(requestOptions);
         })
         .then((res: { Id: string }): void => {
-          resolve(`<Identity Id="5" Name="1a48869e-c092-0000-1f61-81ec89809537|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:list:${res.Id}" />`)
+          resolve(`<Identity Id="5" Name="1a48869e-c092-0000-1f61-81ec89809537|740c6a0b-85e2-48a0-a494-e0f1759d4aa7:site:${siteId}:web:${webId}:list:${res.Id}" />`);
         }, (error: any): void => {
           reject(error);
         });

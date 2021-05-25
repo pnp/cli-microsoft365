@@ -136,7 +136,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
   });
 
   it('correctly handles error when the specified resource doesn\'t exist', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8224.1210", "ErrorInfo": {
@@ -157,7 +157,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
   });
 
   it('correctly handles error when the specified scope doesn\'t exist', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8224.1210", "ErrorInfo": {
@@ -178,7 +178,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
   });
 
   it('correctly handles error when the specified permission has already been granted', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.resolve(JSON.stringify([
         {
           "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8224.1210", "ErrorInfo": {
@@ -199,7 +199,7 @@ describe(commands.SERVICEPRINCIPAL_GRANT_ADD, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
     command.action(logger, { options: { debug: false, resource: 'Microsoft Graph', scope: 'Mail.Read' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));

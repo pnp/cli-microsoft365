@@ -80,7 +80,7 @@ class SpoCdnPolicyListCommand extends SpoCommand {
             return {
               Policy: kv[0],
               Value: kv[1]
-            }
+            };
           }));
         }
         cb();

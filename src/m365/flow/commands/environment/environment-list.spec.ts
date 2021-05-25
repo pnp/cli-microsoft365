@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./environment-list');
 
-describe(commands.FLOW_ENVIRONMENT_LIST, () => {
+describe(commands.ENVIRONMENT_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -51,7 +51,7 @@ describe(commands.FLOW_ENVIRONMENT_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FLOW_ENVIRONMENT_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.ENVIRONMENT_LIST), true);
   });
 
   it('has a description', () => {
@@ -299,7 +299,7 @@ describe(commands.FLOW_ENVIRONMENT_LIST, () => {
                 "microsoft.Flow": "https://europe.api.flow.microsoft.com"
               }
             },
-            "displayName": "Contoso (default)",
+            "displayName": "Contoso (default)"
           },
           {
             "name": "Test-d87a7535-dd31-4437-bfe1-95340acd55c5",
@@ -327,7 +327,7 @@ describe(commands.FLOW_ENVIRONMENT_LIST, () => {
                 "microsoft.Flow": "https://europe.api.flow.microsoft.com"
               }
             },
-            "displayName": "Contoso (test)",
+            "displayName": "Contoso (test)"
           }
         ]));
         done();
@@ -365,7 +365,7 @@ describe(commands.FLOW_ENVIRONMENT_LIST, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

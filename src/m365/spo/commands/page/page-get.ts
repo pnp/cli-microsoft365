@@ -59,7 +59,7 @@ class SpoPageGetCommand extends SpoCommand {
 
         pageItemData = Object.assign({}, res);
         pageItemData.commentsDisabled = res.ListItemAllFields.CommentsDisabled;
-        pageItemData.title = res.ListItemAllFields.Title
+        pageItemData.title = res.ListItemAllFields.Title;
 
         if (res.ListItemAllFields.PageLayoutType) {
           pageItemData.layoutType = res.ListItemAllFields.PageLayoutType;

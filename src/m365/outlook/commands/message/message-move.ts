@@ -23,7 +23,7 @@ interface Options extends GlobalOptions {
 
 class OutlookMessageMoveCommand extends GraphCommand {
   public get name(): string {
-    return commands.OUTLOOK_MESSAGE_MOVE;
+    return commands.MESSAGE_MOVE;
   }
 
   public get description(): string {

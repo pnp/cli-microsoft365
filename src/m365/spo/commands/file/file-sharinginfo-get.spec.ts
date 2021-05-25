@@ -15,7 +15,7 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
 
-  let JSONOuput = {
+  const JSONOuput = {
     "permissionsInformation": {
       "hasInheritedLinks": false,
       "links": [{
@@ -504,6 +504,10 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('excludes options from URL processing', () => {
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
+  });
+
   it('command correctly handles file get reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -518,7 +522,7 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        id: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
+        id: 'f09c4efe-b8c0-4e89-a166-03418661b89b'
       }
     }, (error?: any) => {
       try {
@@ -572,7 +576,7 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
         debug: false,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
-        output: 'json',
+        output: 'json'
       }
     } as any, () => {
       try {
@@ -615,7 +619,7 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         url: '/sites/project-x/documents/SharedFile.docx',
-        output: 'json',
+        output: 'json'
       }
     } as any, () => {
       try {
@@ -658,7 +662,7 @@ describe(commands.FILE_SHARINGINFO_GET, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/project-x',
         id: 'b2307a39-e878-458b-bc90-03bc578531d6',
         output: 'text',
-        debug: true,
+        debug: true
       }
     } as any, () => {
       try {

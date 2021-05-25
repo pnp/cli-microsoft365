@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class TeamsFunSettingsListCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_FUNSETTINGS_LIST;
+    return commands.FUNSETTINGS_LIST;
   }
 
   public get description(): string {
@@ -38,13 +38,13 @@ class TeamsFunSettingsListCommand extends GraphCommand {
         logger.log(res.funSettings);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
         option: '-i, --teamId <teamId>'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();

@@ -1,8 +1,8 @@
 export interface CustomAction {
   "odata.null": boolean;
   ClientSideComponentId: string;
-  ClientSideComponentProperties: Object;
-  CommandUIExtension: Object;
+  ClientSideComponentProperties: any;
+  CommandUIExtension: any;
   Description: string;
   Group: string;
   Id: string;

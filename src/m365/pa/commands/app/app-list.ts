@@ -4,10 +4,8 @@ import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
-  options: Options;
+  options: GlobalOptions;
 }
-
-interface Options extends GlobalOptions { }
 
 class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string; displayName: string; properties: { displayName: string } }> {
   public get name(): string {

@@ -17,7 +17,7 @@ export class FN012005_TSC_typeRoots_microsoft extends JsonRule {
 
   get description(): string {
     return `Add ./node_modules/@microsoft to typeRoots in tsconfig.json`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -27,19 +27,19 @@ export class FN012005_TSC_typeRoots_microsoft extends JsonRule {
     ]
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './tsconfig.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {

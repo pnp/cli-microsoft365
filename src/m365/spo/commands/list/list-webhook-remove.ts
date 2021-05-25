@@ -70,9 +70,9 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
           // REST delete call doesn't return anything
           cb();
         }, (err: any): void => {
-          this.handleRejectedODataJsonPromise(err, logger, cb)
+          this.handleRejectedODataJsonPromise(err, logger, cb);
         });
-    }
+    };
 
     if (args.options.confirm) {
       removeWebhook();
@@ -82,7 +82,7 @@ class SpoListWebhookRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove webhook ${args.options.id} from list ${list} located at site ${args.options.webUrl}?`,
+        message: `Are you sure you want to remove webhook ${args.options.id} from list ${list} located at site ${args.options.webUrl}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

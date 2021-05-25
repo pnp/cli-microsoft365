@@ -59,7 +59,7 @@ describe('Lazy loading commands', () => {
     const allCommandNames: string[] = [];
 
     commandCollections.forEach(commandsCollection => {
-      for (var commandName in commandsCollection) {
+      for (const commandName in commandsCollection) {
         allCommandNames.push(commandsCollection[commandName]);
       }
     });

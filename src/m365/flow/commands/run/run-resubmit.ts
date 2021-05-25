@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class FlowRunResubmitCommand extends AzmgmtCommand {
   public get name(): string {
-    return commands.FLOW_RUN_RESUBMIT;
+    return commands.RUN_RESUBMIT;
   }
 
   public get description(): string {

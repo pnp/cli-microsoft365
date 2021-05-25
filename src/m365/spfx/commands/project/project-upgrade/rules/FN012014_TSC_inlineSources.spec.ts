@@ -50,7 +50,7 @@ describe('FN012014_TSC_inlineSources', () => {
     };
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
-    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number')
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
 
   it('returns notification if inlineSources is missing', () => {

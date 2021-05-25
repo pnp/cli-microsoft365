@@ -54,6 +54,10 @@ class SpoPageHeaderSetCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['imageUrl'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const noPageHeader: PageHeader = {
       "id": "cbe7b0a9-3504-44dd-a3a3-0e5cacd07788",
@@ -257,7 +261,7 @@ class SpoPageHeaderSetCommand extends SpoCommand {
           return Promise.all([
             this.getSiteId(args.options.webUrl, this.verbose, logger),
             this.getWebId(args.options.webUrl, this.verbose, logger),
-            this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, this.verbose, logger),
+            this.getImageInfo(args.options.webUrl, args.options.imageUrl as string, this.verbose, logger)
           ]);
         }
         else {

@@ -45,6 +45,10 @@ class SpoFileGetCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return ['url'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Retrieving file from site ${args.options.webUrl}...`);
@@ -75,7 +79,7 @@ class SpoFileGetCommand extends SpoCommand {
         options += '&';
       }
 
-      options += `@f='${encodeURIComponent(args.options.url)}'`
+      options += `@f='${encodeURIComponent(args.options.url)}'`;
     }
 
     const requestOptions: any = {

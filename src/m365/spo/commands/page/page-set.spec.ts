@@ -227,7 +227,7 @@ describe(commands.PAGE_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', description: "template", promoteAs: 'Template' } } as any, (res: { Id: string }) => {
+    command.action(logger, { options: { debug: false, name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com/sites/team-a', description: "template", promoteAs: 'Template' } } as any, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -523,7 +523,7 @@ describe(commands.PAGE_SET, () => {
   it('correctly handles OData error when creating modern page', (done) => {
     Utils.restore([request.post]);
 
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 

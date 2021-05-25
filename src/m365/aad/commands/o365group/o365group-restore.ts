@@ -40,7 +40,7 @@ class AadO365GroupRestoreCommand extends GraphCommand {
       url: `${this.resource}/v1.0/directory/deleteditems/${args.options.id}/restore/`,
       headers: {
         'accept': 'application/json;odata.metadata=none'
-      },
+      }
     };
 
     request

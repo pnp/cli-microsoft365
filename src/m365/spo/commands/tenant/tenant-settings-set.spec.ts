@@ -15,7 +15,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  let defaultRequestsSuccessStub = (): sinon.SinonStub => {
+  const defaultRequestsSuccessStub = (): sinon.SinonStub => {
     return sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
@@ -27,11 +27,11 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       }
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso-admin.sharepoint.com';
@@ -132,7 +132,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   });
 
   it('sends xml as array of strings for option excludedFileExtensionsForSyncClient', (done) => {
-    let request = defaultRequestsSuccessStub();
+    const request = defaultRequestsSuccessStub();
 
     command.action(logger, {
       options: {
@@ -150,7 +150,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   });
 
   it('sends xml as array of guids for option allowedDomainListForSyncClient', (done) => {
-    let request = defaultRequestsSuccessStub();
+    const request = defaultRequestsSuccessStub();
 
     command.action(logger, {
       options: {
@@ -168,7 +168,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   });
 
   it('sends xml as array of guids for option disabledWebPartIds', (done) => {
-    let request = defaultRequestsSuccessStub();
+    const request = defaultRequestsSuccessStub();
 
     command.action(logger, {
       options: {
@@ -186,7 +186,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   });
 
   it('sends xml for multiple options specified', (done) => {
-    let request = defaultRequestsSuccessStub();
+    const request = defaultRequestsSuccessStub();
 
     command.action(logger, {
       options: {
@@ -259,7 +259,8 @@ describe(commands.TENANT_SETTINGS_SET, () => {
               ], "RequireAcceptingAccountMatchInvitedAccount": true, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 66700, "ResourceQuotaAllocated": 13668, "RootSiteUrl": "https:\u002f\u002fprufinancial.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": "microsoft.com pramerica.ie pramericacdsdev.com prudential.com prufinancial.onmicrosoft.com", "SharingBlockedDomainList": "deloitte.com", "SharingCapability": 1, "SharingDomainRestrictionMode": 1, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": false, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 4448256, "StorageQuotaAllocated": 676508312, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": false, "HideDefaultThemes": true, "DisableCustomAppAuthentication": true
             }
           ]));
-        } else {
+        }
+        else {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7407.1202", "ErrorInfo": { "ErrorMessage": "Timed out" }, "TraceCorrelationId": "2df74b9e-c022-5000-1529-309f2cd00843"
@@ -321,7 +322,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('validation fails if wrong enum value', () => {
     const options: any = {
       SharingCapability: 'abc'
-    }
+    };
     const actual = command.validate({ options: options });
     assert.strictEqual(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
   });
@@ -339,8 +340,8 @@ describe(commands.TENANT_SETTINGS_SET, () => {
       DefaultLinkPermission: 'View',
       ConditionalAccessPolicy: 'AllowLimitedAccess',
       LimitedAccessFileType: 'WebPreviewableFiles',
-      SpecialCharactersStateInFileFolderNames: 'Allowed',
-    }
+      SpecialCharactersStateInFileFolderNames: 'Allowed'
+    };
     const actual = command.validate({ options: options });
     assert.strictEqual(actual, true);
   });
@@ -348,7 +349,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('validation fails if wrong enum value', () => {
     const options: any = {
       SharingCapability: 'abc'
-    }
+    };
     const actual = command.validate({ options: options });
     assert.strictEqual(actual, 'SharingCapability option has invalid value of abc. Allowed values are ["Disabled","ExternalUserSharingOnly","ExternalUserAndGuestSharing","ExistingExternalUserSharingOnly"]');
   });
@@ -362,7 +363,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('validation passes if right prop value', () => {
     const options: any = {
       OrgNewsSiteUrl: 'abc'
-    }
+    };
     const actual = command.validate({ options: options });
     assert.strictEqual(actual, true);
   });
@@ -370,7 +371,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('validation false if boolean option has non boolean value', () => {
     const options: any = {
       ShowAllUsersClaim: 'abc'
-    }
+    };
     const actual = command.validate({ options: options });
     assert.strictEqual(actual, 'ShowAllUsersClaim option has invalid value of abc. Allowed values are ["true","false"]');
   });
@@ -379,7 +380,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
     const options: any = {
       debug: true,
       verbose: true
-    }
+    };
     const actual = command.validate({ options: options });
     assert.strictEqual(actual, `You must specify at least one option`);
   });
@@ -387,7 +388,7 @@ describe(commands.TENANT_SETTINGS_SET, () => {
   it('validation passes autocomplete check if has the right value specified', () => {
     const options: any = {
       ShowAllUsersClaim: true
-    }
+    };
     const actual = command.validate({ options: options });
     assert.strictEqual(actual, true);
   });

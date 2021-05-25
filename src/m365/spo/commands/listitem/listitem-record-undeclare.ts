@@ -90,7 +90,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
           url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
           headers: {
             'Content-Type': 'text/xml',
-            'X-RequestDigest': formDigestValue,
+            'X-RequestDigest': formDigestValue
           },
           data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><StaticMethod TypeId="{ea8e1356-5910-4e69-bc05-d0c30ed657fc}" Name="UndeclareItemAsRecord" Id="53"><Parameters><Parameter ObjectPathId="49" /></Parameters></StaticMethod></Actions><ObjectPaths><Identity Id="49" Name="${objectIdentity.objectIdentity}:list:${environmentListId}:item:${args.options.id},1" /></ObjectPaths></Request>`
         };
@@ -101,7 +101,7 @@ class SpoListItemRecordUndeclareCommand extends SpoCommand {
         // REST post call doesn't return anything
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

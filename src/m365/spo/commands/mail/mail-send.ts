@@ -74,7 +74,7 @@ class SpoMailSendCommand extends SpoCommand {
             Key: key,
             Value: h[key],
             ValueType: 'Edm.String'
-          }
+          };
         })
       };
     }

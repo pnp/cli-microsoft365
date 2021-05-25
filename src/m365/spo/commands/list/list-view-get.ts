@@ -93,7 +93,7 @@ class SpoListViewGetCommand extends SpoCommand {
       },
       {
         option: '--viewTitle [viewTitle]'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();

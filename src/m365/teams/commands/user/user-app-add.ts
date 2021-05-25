@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TeamsUserAppAddCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_USER_APP_ADD;
+    return commands.USER_APP_ADD;
   }
 
   public get description(): string {
@@ -25,7 +25,7 @@ class TeamsUserAppAddCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${this.resource}/beta`
+    const endpoint: string = `${this.resource}/beta`;
 
     const requestOptions: any = {
       url: `${endpoint}/users/${args.options.userId}/teamwork/installedApps`,

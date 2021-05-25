@@ -49,6 +49,30 @@ When the value, that you want to provide contains quotes, it needs to be wrapped
 m365 spo sitescript add --title "Contoso" --description "Contoso theme script" --content '{"abc": "def"}'
 ```
 
+## Working with SharePoint URLs in `spo` commands
+
+CLI for Microsoft 365 contains a number of commands for managing SharePoint Online. Each of these commands requires you to specify the site or web on which you want to execute the command. For example, to get information about a site collection located at `https://contoso.sharepoint.com/sites/contoso`, you'd execute:
+
+```sh
+m365 spo site get --url https://contoso.sharepoint.com/sites/contoso
+```
+
+If you executed an `spo` command previously, CLI for Microsoft 365 already knows the hostname of your SharePoint Online tenant. In such case, you can use a server-relative URL as well:
+
+```sh
+m365 spo site get --url /sites/contoso
+```
+
+If you try to use a server-relative URL but CLI for Microsoft 365 doesn't know of your SharePoint Online URL yet, you will see an error prompting you to either use an absolute URL or set the SPO URL using the `spo set` command:
+
+```sh
+m365 spo set --url https://contoso.sharepoint.com
+```
+
+You can also execute a command like `m365 spo site list` that will automatically detect your SharePoint Online tenant URL for you.
+
+To check if CLI detected the SPO URL previously, use the `m365 spo get` command.
+
 ## Passing complex content into CLI options
 
 When passing complex content into CLI options, such as JSON strings, you will need to properly escape nested quotes. The exact way to do it, depends on the shell that you're using. Alternatively, you can choose to pass complex content by storing the complex content in a file and passing the path to the file prefixed with an `@`, for example:

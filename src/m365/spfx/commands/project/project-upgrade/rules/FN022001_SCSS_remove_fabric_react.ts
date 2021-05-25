@@ -18,23 +18,23 @@ export class FN022001_SCSS_remove_fabric_react extends ScssRule {
 
   get description(): string {
     return `Remove scss file import`;
-  };
+  }
 
   get resolution(): string {
     return `@import '${this.importValue}'`;
-  };
+  }
 
   get resolutionType(): string {
     return 'scss';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return '';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (Utils.isReactProject(project) === false) {

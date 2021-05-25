@@ -95,7 +95,7 @@ describe(commands.WEB_GET, () => {
               "UIVersion": 15,
               "UIVersionConfigurationEnabled": false,
               "Url": "https://contoso.sharepoint.com/subsite",
-              "WebTemplate": "STS",
+              "WebTemplate": "STS"
             }]
           }
         );
@@ -144,7 +144,7 @@ describe(commands.WEB_GET, () => {
             UIVersion: 15,
             UIVersionConfigurationEnabled: false,
             Url: "https://contoso.sharepoint.com/subsite",
-            WebTemplate: "STS",
+            WebTemplate: "STS"
           }]
         }));
         done();
@@ -192,7 +192,7 @@ describe(commands.WEB_GET, () => {
               "UIVersion": 15,
               "UIVersionConfigurationEnabled": false,
               "Url": "https://contoso.sharepoint.com/subsite",
-              "WebTemplate": "STS",
+              "WebTemplate": "STS"
             }]
           }
         );
@@ -241,7 +241,7 @@ describe(commands.WEB_GET, () => {
             UIVersion: 15,
             UIVersionConfigurationEnabled: false,
             Url: "https://contoso.sharepoint.com/subsite",
-            WebTemplate: "STS",
+            WebTemplate: "STS"
           }]
         }));
         done();
@@ -265,7 +265,7 @@ describe(commands.WEB_GET, () => {
     command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, (error?: any) => {
       try {
@@ -289,7 +289,7 @@ describe(commands.WEB_GET, () => {
       logger.log('Test Url:');
       logger.log(opts.url);
       if ((opts.url as string).indexOf('select123=') > -1) {
-        return Promise.resolve('Correct Url1')
+        return Promise.resolve('Correct Url1');
       }
 
       return Promise.reject('Invalid request');
@@ -299,7 +299,7 @@ describe(commands.WEB_GET, () => {
       options: {
         output: 'json',
         debug: false,
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
 

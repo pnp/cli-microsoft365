@@ -103,11 +103,11 @@ class GraphSubscriptionAddCommand extends GraphCommand {
     const fromNow = (minutes: number) => {
       // convert minutes in milliseconds
       return new Date(Date.now() + (minutes * 60000));
-    }
+    };
 
     const expirationDelayPerResource: any = DEFAULT_EXPIRATION_DELAY_IN_MINUTES_PER_RESOURCE_TYPE;
 
-    for (let resource in expirationDelayPerResource) {
+    for (const resource in expirationDelayPerResource) {
       if (args.options.resource.indexOf(resource) < 0) {
         continue;
       }

@@ -17,7 +17,7 @@ export class FN013002_GULP_serveTask extends Rule {
 
   get description(): string {
     return `Before 'build.initialize(require('gulp'));' add the serve task`;
-  };
+  }
 
   get resolution(): string {
     return `var getTasks = build.rig.getTasks;
@@ -29,19 +29,19 @@ build.rig.getTasks = function () {
   return result;
 };
 `;
-  };
+  }
 
   get resolutionType(): string {
     return 'js';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './gulpfile.js';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.gulpfileJs) {

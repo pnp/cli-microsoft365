@@ -39,7 +39,7 @@ class PaEnvironmentListCommand extends AzmgmtCommand {
       .then((res: { value: [{ name: string, displayName: string; properties: { displayName: string } }] }): void => {
         if (res.value && res.value.length > 0) {
           res.value.forEach(e => {
-            e.displayName = e.properties.displayName
+            e.displayName = e.properties.displayName;
           });
 
           logger.log(res.value);

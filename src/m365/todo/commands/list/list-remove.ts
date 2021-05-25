@@ -106,7 +106,7 @@ class TodoListRemoveCommand extends GraphCommand {
       },
       {
         option: '--confirm'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -119,7 +119,7 @@ class TodoListRemoveCommand extends GraphCommand {
     }
 
     if (args.options.name && args.options.id) {
-      return 'Specify either the name or the id of the list to remove but not both'
+      return 'Specify either the name or the id of the list to remove but not both';
     }
 
     return true;

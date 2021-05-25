@@ -284,7 +284,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
       options: {
         debug: true,
         title: actionTitle,
-        webUrl: 'https://contoso.sharepoint.com/sites/ninja',
+        webUrl: 'https://contoso.sharepoint.com/sites/ninja'
       }
     }, (error?: any) => {
       try {
@@ -300,7 +300,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
   it('uses correct API url when id option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -311,7 +311,7 @@ describe(commands.LIST_WEBHOOK_GET, () => {
         webUrl: 'https://contoso.sharepoint.com/sites/ninja',
         listId: 'dfddade1-4729-428d-881e-7fedf3cae50d',
         id: 'cc27a922-8224-4296-90a5-ebbc54da2e85',
-        debug: false,
+        debug: false
       }
     }, () => {
       try {

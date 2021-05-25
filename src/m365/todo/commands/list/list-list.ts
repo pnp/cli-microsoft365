@@ -5,10 +5,8 @@ import commands from '../../commands';
 import { ToDoList } from '../../ToDoList';
 
 interface CommandArgs {
-  options: Options;
+  options: GlobalOptions;
 }
-
-interface Options extends GlobalOptions { }
 
 class TodoListListCommand extends GraphItemsListCommand<ToDoList> {
   public get name(): string {

@@ -22,7 +22,6 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
   private context?: FormDigestInfo;
   private spoAdminUrl?: string;
   private dots?: string;
-  private timeout?: NodeJS.Timer;
 
   public get name(): string {
     return commands.TENANT_RECYCLEBINITEM_RESTORE;
@@ -80,8 +79,8 @@ class SpoTenantRecycleBinItemRestoreCommand extends SpoCommand {
               return;
             }
 
-            this.timeout = setTimeout(() => {
-              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
+            setTimeout(() => {
+              this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
             }, operation.PollingInterval);
           }
         });

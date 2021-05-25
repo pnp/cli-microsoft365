@@ -29,7 +29,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
     const data: any = {
       "template@odata.bind": "https://graph.microsoft.com/beta/teamsTemplates('standard')",
       "group@odata.bind": `https://graph.microsoft.com/v1.0/groups('${encodeURIComponent(args.options.groupId)}')`
-    }
+    };
 
     const requestOptions: any = {
       url: `${this.resource}/beta/teams`,

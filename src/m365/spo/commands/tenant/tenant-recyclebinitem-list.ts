@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-    CommandError
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';

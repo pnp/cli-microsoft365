@@ -1,7 +1,8 @@
 import * as chalk from 'chalk';
-import { Cli, CommandErrorWithOutput, CommandOutput, Logger } from '../../../../cli';
+import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, {
-  CommandOption
+  CommandOption,
+  CommandErrorWithOutput
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import SpoCommand from '../../../base/SpoCommand';
@@ -218,7 +219,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
   private get sharingCapabilities(): string[] {
     const result: string[] = [];
 
-    for (let sharingCapability in SharingCapabilities) {
+    for (const sharingCapability in SharingCapabilities) {
       if (typeof SharingCapabilities[sharingCapability] === 'number') {
         result.push(sharingCapability);
       }

@@ -1,7 +1,7 @@
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
 import Command, {
-    CommandError, CommandOption
+  CommandError, CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TenantIdGetCommand extends Command {
   public get name(): string {
-    return commands.TENANT_ID_GET;
+    return commands.ID_GET;
   }
 
   public get description(): string {
@@ -28,7 +28,7 @@ class TenantIdGetCommand extends Command {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let domainName: string = args.options.domainName;
     if (!domainName) {
-      const userName: string = Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
+      const userName: string = Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
       domainName = userName.split('@')[1];
     }
 

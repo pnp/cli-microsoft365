@@ -19,6 +19,9 @@ m365 spo list get [options]
 `-t, --title [title]`
 : Title of the list to retrieve information for. Specify either `id` or `title` but not both
 
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve from the list. Will retrieve all properties possible from default response, if not specified.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
@@ -33,6 +36,12 @@ Return information about a list with title _Documents_ located in site _https://
 
 ```sh
 m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x
+```
+
+Get information about a list returning the specified list properties
+
+```sh
+m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Id,HasUniqueRoleAssignments,AllowContentTypes"
 ```
 
 ## More information

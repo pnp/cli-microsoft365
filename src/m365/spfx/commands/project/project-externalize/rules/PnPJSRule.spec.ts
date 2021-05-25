@@ -10,7 +10,7 @@ describe('PnPJsRule', () => {
 
   beforeEach(() => {
     rule = new PnPJsRule();
-  })
+  });
 
   it('returns notification if dependency is here', async () => {
     const project: Project = {
@@ -61,7 +61,7 @@ describe('PnPJsRule', () => {
   });
   afterEach(() => {
     Utils.restore([
-      fs.existsSync,
+      fs.existsSync
     ]);
   });
 });

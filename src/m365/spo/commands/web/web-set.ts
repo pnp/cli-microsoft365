@@ -25,8 +25,7 @@ interface Options extends GlobalOptions {
 }
 
 class SpoWebSetCommand extends SpoCommand {
-  private static searchScopeOptions: string[] =
-    ['defaultscope', 'tenant', 'hub', 'site'];
+  private static searchScopeOptions: string[] = ['defaultscope', 'tenant', 'hub', 'site'];
 
   public get name(): string {
     return commands.WEB_SET;

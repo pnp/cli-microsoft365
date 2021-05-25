@@ -22,7 +22,7 @@ class MockCommand extends DateAndPeriodBasedReport {
     return 'MockEndPoint';
   }
 
-  public commandHelp(args: any, log: (message: string) => void): void {
+  public commandHelp(): void {
   }
 }
 
@@ -191,7 +191,7 @@ describe('PeriodBasedReport', () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     mockCommand.action(logger, { options: { debug: false, period: 'D7' } } as any, (err?: any) => {
       try {

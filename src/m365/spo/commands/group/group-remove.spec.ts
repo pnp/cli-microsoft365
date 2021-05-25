@@ -105,10 +105,11 @@ describe(commands.GROUP_REMOVE, () => {
       try {
         assert(requestPostSpy.called);
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
-    })
+    });
   });
 
   it('deletes the group when name is passed', (done) => {
@@ -132,10 +133,11 @@ describe(commands.GROUP_REMOVE, () => {
       try {
         assert(requestPostSpy.called);
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
-    })
+    });
   });
 
   it('aborts deleting the group when prompt is not continued', (done) => {
@@ -150,10 +152,11 @@ describe(commands.GROUP_REMOVE, () => {
       try {
         assert(requestPostSpy.notCalled);
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
-    })
+    });
   });
 
   it('deletes the group when prompt is continued', (done) => {
@@ -172,7 +175,8 @@ describe(commands.GROUP_REMOVE, () => {
       try {
         assert(requestPostSpy.called);
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -191,10 +195,11 @@ describe(commands.GROUP_REMOVE, () => {
       try {
         assert.strictEqual(JSON.stringify(error), JSON.stringify(new CommandError(err)));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
-    })
+    });
   });
 
   it('prompts before removing group when confirmation argument not passed (id)', (done) => {

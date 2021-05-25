@@ -141,7 +141,7 @@ class SpfxProjectExternalizeCommand extends BaseProjectCommand {
       JSON.stringify(this.serializeJsonReport(findingsToReport), null, 2), os.EOL,
       '```', os.EOL,
       ...this.getReportForFileEdit(this.getGroupedFileEdits(editsToReport, 'add')),
-      ...this.getReportForFileEdit(this.getGroupedFileEdits(editsToReport, 'remove')),
+      ...this.getReportForFileEdit(this.getGroupedFileEdits(editsToReport, 'remove'))
     ];
     return lines.join('');
   }

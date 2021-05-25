@@ -23,7 +23,6 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
   private context?: FormDigestInfo;
   private spoAdminUrl?: string;
   private dots?: string;
-  private timeout?: NodeJS.Timer;
 
   public get name(): string {
     return commands.TENANT_RECYCLEBINITEM_REMOVE;
@@ -81,8 +80,8 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
                 return;
               }
 
-              this.timeout = setTimeout(() => {
-                this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots, this.timeout);
+              setTimeout(() => {
+                this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), this.spoAdminUrl as string, resolve, reject, logger, this.context as FormDigestInfo, this.dots);
               }, operation.PollingInterval);
             }
           });
@@ -98,7 +97,7 @@ class SpoTenantRecycleBinItemRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the deleted site collection ${args.options.url} from tenant recycle bin?`,
+        message: `Are you sure you want to remove the deleted site collection ${args.options.url} from tenant recycle bin?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

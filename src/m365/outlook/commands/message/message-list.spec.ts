@@ -10,7 +10,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./message-list');
 
-describe(commands.OUTLOOK_MESSAGE_LIST, () => {
+describe(commands.MESSAGE_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -381,7 +381,7 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.OUTLOOK_MESSAGE_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.MESSAGE_LIST), true);
   });
 
   it('has a description', () => {
@@ -514,7 +514,7 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
 
     command.action(logger, { options: { debug: false, folderName: 'Imbox' } } as any, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Folder with name 'Imbox' not found`)))
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Folder with name 'Imbox' not found`)));
         done();
       }
       catch (e) {
@@ -573,7 +573,7 @@ describe(commands.OUTLOOK_MESSAGE_LIST, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {

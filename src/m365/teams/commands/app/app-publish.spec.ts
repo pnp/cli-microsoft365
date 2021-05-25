@@ -10,7 +10,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./app-publish');
 
-describe(commands.TEAMS_APP_PUBLISH, () => {
+describe(commands.APP_PUBLISH, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -55,7 +55,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_APP_PUBLISH), true);
+    assert.strictEqual(command.name.startsWith(commands.APP_PUBLISH), true);
   });
 
   it('has a description', () => {
@@ -126,7 +126,8 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
       try {
         assert(loggerLogSpy.calledWith("e3e29acb-8c79-412b-b746-e6c39ff4cd22"));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
@@ -161,7 +162,7 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
   });
 
   it('correctly handles error when publishing an app', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
@@ -171,7 +172,8 @@ describe(commands.TEAMS_APP_PUBLISH, () => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });

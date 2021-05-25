@@ -20,7 +20,7 @@ interface Options extends GlobalOptions {
 
 class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
   public get name(): string {
-    return commands.TEAMS_APP_LIST;
+    return commands.APP_LIST;
   }
 
   public get description(): string {
@@ -104,7 +104,7 @@ class TeamsAppListCommand extends GraphItemsListCommand<TeamsApp> {
       .getEndpointUrl(args)
       .then((endpoint: string): Promise<void> => this.getAllItems(endpoint, logger, true))
       .then((): void => {
-		if (args.options.teamId || args.options.teamName) {
+        if (args.options.teamId || args.options.teamName) {
           this.items.forEach(t => {
             t.displayName = (t as any).teamsApp.displayName;
             t.distributionMethod = (t as any).teamsApp.distributionMethod;

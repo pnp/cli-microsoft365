@@ -17,7 +17,7 @@ export class FN014003_CODE_launch extends Rule {
 
   get description(): string {
     return `In the .vscode folder, add the launch.json file`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -62,19 +62,19 @@ export class FN014003_CODE_launch extends Rule {
     }
   ]
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Recommended';
-  };
+  }
 
   get file(): string {
     return '.vscode/launch.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.vsCode || !project.vsCode.launchJson) {

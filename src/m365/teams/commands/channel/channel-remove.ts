@@ -22,7 +22,7 @@ interface Options extends GlobalOptions {
 
 class TeamsChannelRemoveCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_CHANNEL_REMOVE;
+    return commands.CHANNEL_REMOVE;
   }
 
   public get description(): string {
@@ -47,7 +47,7 @@ class TeamsChannelRemoveCommand extends GraphCommand {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
-        }
+        };
 
         request
           .get<{ value: Channel[] }>(requestOptions)

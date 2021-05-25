@@ -193,7 +193,7 @@ describe(commands.SITE_ENSURE, () => {
             "Url": "https://contoso.sharepoint.com/sites/team1",
             "WebTemplate": "GROUP",
             "WelcomePage": "SitePages/Home.aspx"
-          }),
+          })
         });
       }
 
@@ -284,7 +284,7 @@ describe(commands.SITE_ENSURE, () => {
             "Url": "https://contoso.sharepoint.com/sites/team1",
             "WebTemplate": "GROUP",
             "WelcomePage": "SitePages/Home.aspx"
-          }),
+          })
         });
       }
 
@@ -375,7 +375,7 @@ describe(commands.SITE_ENSURE, () => {
             "Url": "https://contoso.sharepoint.com/sites/commsite1",
             "WebTemplate": "SITEPAGEPUBLISHING",
             "WelcomePage": "SitePages/Home.aspx"
-          }),
+          })
         });
       }
 
@@ -466,7 +466,7 @@ describe(commands.SITE_ENSURE, () => {
             "Url": "https://contoso.sharepoint.com/sites/commsite1",
             "WebTemplate": "SITEPAGEPUBLISHING",
             "WelcomePage": "SitePages/Home.aspx"
-          }),
+          })
         });
       }
 
@@ -557,7 +557,7 @@ describe(commands.SITE_ENSURE, () => {
             "Url": "https://contoso.sharepoint.com/sites/classic",
             "WebTemplate": "STS",
             "WelcomePage": "SitePages/Home.aspx"
-          }),
+          })
         });
       }
 
@@ -648,7 +648,7 @@ describe(commands.SITE_ENSURE, () => {
             "Url": "https://contoso.sharepoint.com/sites/team1",
             "WebTemplate": "GROUP",
             "WelcomePage": "SitePages/Home.aspx"
-          }),
+          })
         });
       }
 
@@ -685,7 +685,7 @@ describe(commands.SITE_ENSURE, () => {
   });
 
   it('returns error when validation of options for creating site failed', (done) => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoWebGetCommand) {
         return Promise.reject({
           error: new CommandError('Request failed with status code 404')
@@ -707,7 +707,7 @@ describe(commands.SITE_ENSURE, () => {
   });
 
   it('returns error when an error has occurred when checking if a site exists at the specified URL', (done) => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoWebGetCommand) {
         return Promise.reject({
           error: new CommandError('An error has occurred')
@@ -729,7 +729,7 @@ describe(commands.SITE_ENSURE, () => {
   });
 
   it('returns error when the specified site type is invalid', (done) => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoWebGetCommand) {
         return Promise.resolve({
           stdout: JSON.stringify({
@@ -785,7 +785,7 @@ describe(commands.SITE_ENSURE, () => {
             "Url": "https://contoso.sharepoint.com/sites/classic",
             "WebTemplate": "STS",
             "WelcomePage": "SitePages/Home.aspx"
-          }),
+          })
         });
       }
 
@@ -804,7 +804,7 @@ describe(commands.SITE_ENSURE, () => {
   });
 
   it('returns error when a communication site expected but a team site found', (done) => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoWebGetCommand) {
         return Promise.resolve({
           stdout: JSON.stringify({
@@ -860,7 +860,7 @@ describe(commands.SITE_ENSURE, () => {
             "Url": "https://contoso.sharepoint.com/sites/team1",
             "WebTemplate": "GROUP",
             "WelcomePage": "SitePages/Home.aspx"
-          }),
+          })
         });
       }
 
@@ -879,7 +879,7 @@ describe(commands.SITE_ENSURE, () => {
   });
 
   it('returns error when no properties to update specified', (done) => {
-    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
+    sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoWebGetCommand) {
         return Promise.resolve({
           stdout: JSON.stringify({
@@ -935,7 +935,7 @@ describe(commands.SITE_ENSURE, () => {
             "Url": "https://contoso.sharepoint.com/sites/team1",
             "WebTemplate": "GROUP",
             "WelcomePage": "SitePages/Home.aspx"
-          }),
+          })
         });
       }
 

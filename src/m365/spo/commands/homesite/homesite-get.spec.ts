@@ -75,7 +75,7 @@ describe(commands.HOMESITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
+    command.action(logger, { options: {} } as any, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "SiteId": "53ad95dc-5d2c-42a3-a63c-716f7b8014f5",
@@ -103,7 +103,7 @@ describe(commands.HOMESITE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
+    command.action(logger, { options: {} } as any, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -115,7 +115,7 @@ describe(commands.HOMESITE_GET, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {

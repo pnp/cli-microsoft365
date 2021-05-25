@@ -330,7 +330,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', logoPath: 'logo.png' } } as any, () => {
       try {
         assert(loggerLogSpy.calledWith({
           id: "f3db5c2b-068f-480d-985b-ec78b9fa0e76",
@@ -570,7 +570,7 @@ describe(commands.O365GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -633,7 +633,7 @@ describe(commands.O365GROUP_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -702,7 +702,7 @@ describe(commands.O365GROUP_ADD, () => {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
             }
           ]
-        })
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -799,7 +799,7 @@ describe(commands.O365GROUP_ADD, () => {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
             }
           ]
-        })
+        });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id`) {
@@ -809,7 +809,7 @@ describe(commands.O365GROUP_ADD, () => {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8b'
             }
           ]
-        })
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -879,7 +879,7 @@ describe(commands.O365GROUP_ADD, () => {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
             }
           ]
-        })
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -976,7 +976,7 @@ describe(commands.O365GROUP_ADD, () => {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
             }
           ]
-        })
+        });
       }
 
       if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id`) {
@@ -986,7 +986,7 @@ describe(commands.O365GROUP_ADD, () => {
               id: '949b16c1-a032-453e-a8ae-89a52bfc1d8b'
             }
           ]
-        })
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -1004,7 +1004,7 @@ describe(commands.O365GROUP_ADD, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

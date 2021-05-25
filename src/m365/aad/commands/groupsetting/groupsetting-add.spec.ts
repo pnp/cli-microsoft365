@@ -460,7 +460,7 @@ describe(commands.GROUPSETTING_ADD, () => {
   });
 
   it('handles error when no template with the specified id found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           "error": {
@@ -496,7 +496,7 @@ describe(commands.GROUPSETTING_ADD, () => {
 
       return Promise.reject('Invalid request');
     });
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
           "error": {

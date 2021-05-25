@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class TenantStatusListCommand extends Command {
   public get name(): string {
-    return commands.TENANT_STATUS_LIST;
+    return commands.STATUS_LIST;
   }
 
   public get description(): string {
@@ -40,7 +40,7 @@ class TenantStatusListCommand extends Command {
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
     const statusEndpoint: string = typeof args.options.workload !== 'undefined' ? `ServiceComms/CurrentStatus?$filter=Workload eq '${encodeURIComponent(args.options.workload)}'` : 'ServiceComms/CurrentStatus';
-    const tenantId: string = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
+    const tenantId: string = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
 
     const requestOptions: any = {
       url: `${serviceUrl}/${tenantId}/${statusEndpoint}`,

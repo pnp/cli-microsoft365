@@ -293,7 +293,7 @@ describe(commands.SITE_GROUPIFY, () => {
   });
 
   it('handles error when a group with the specified alias already exists', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {
@@ -319,7 +319,7 @@ describe(commands.SITE_GROUPIFY, () => {
   });
 
   it('handles error when the specified site already is connected to a group', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {
@@ -345,7 +345,7 @@ describe(commands.SITE_GROUPIFY, () => {
   });
 
   it('correctly handles OData error when creating site script', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'An error has occurred' } } } });
     });
 

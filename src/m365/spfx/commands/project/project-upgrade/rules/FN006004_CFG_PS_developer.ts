@@ -17,7 +17,7 @@ export class FN006004_CFG_PS_developer extends JsonRule {
 
   get description(): string {
     return `In package-solution.json add developer section`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -31,19 +31,19 @@ export class FN006004_CFG_PS_developer extends JsonRule {
     }
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Optional';
-  };
+  }
 
   get file(): string {
     return './config/package-solution.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.packageSolutionJson ||

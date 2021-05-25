@@ -81,7 +81,7 @@ class SpoKnowledgehubRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove Knowledge Hub Site from your tenant?`,
+        message: `Are you sure you want to remove Knowledge Hub Site from your tenant?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

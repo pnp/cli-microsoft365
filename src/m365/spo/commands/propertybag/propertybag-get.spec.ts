@@ -16,7 +16,7 @@ describe(commands.PROPERTYBAG_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
   let loggerLogToStderrSpy: sinon.SinonSpy;
-  let stubAllPostRequests: any = (
+  const stubAllPostRequests: any = (
     requestObjectIdentityResp: any = null,
     getFolderPropertyBagResp: any = null,
     getWebPropertyBagResp: any = null
@@ -26,7 +26,8 @@ describe(commands.PROPERTYBAG_GET, () => {
       if (opts.data.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
           return requestObjectIdentityResp;
-        } else {
+        }
+        else {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
@@ -44,7 +45,8 @@ describe(commands.PROPERTYBAG_GET, () => {
       if (opts.data.indexOf('GetFolderByServerRelativeUrl') > -1) {
         if (getFolderPropertyBagResp) {
           return getFolderPropertyBagResp;
-        } else {
+        }
+        else {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
@@ -65,7 +67,8 @@ describe(commands.PROPERTYBAG_GET, () => {
       if (opts.data.indexOf('Property Name="AllProperties" SelectAll="true"') > -1) {
         if (getWebPropertyBagResp) {
           return getWebPropertyBagResp;
-        } else {
+        }
+        else {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "e7e5499e-7031-5000-ccf1-ddcbe51e534c"
@@ -80,11 +83,11 @@ describe(commands.PROPERTYBAG_GET, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc'
     }));
@@ -137,14 +140,14 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should call getWebPropertyBag when folder is not specified and site is /', (done) => {
     stubAllPostRequests();
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       debug: true
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002f"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -160,26 +163,28 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('should call getWebPropertyBag when folder is not specified and site is /sites/test', (done) => {
-    stubAllPostRequests(new Promise((resolve, reject) => { return resolve(JSON.stringify([{
-      "SchemaVersion": "15.0.0.0",
-      "LibraryVersion": "16.0.7331.1206",
-      "ErrorInfo": null,
-      "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
-    }, 7, {
-      "_ObjectType_": "SP.Web",
-      "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
-      "ServerRelativeUrl": "\u002fsites\u002ftest"
-    }])) }));
+    stubAllPostRequests(new Promise((resolve) => {
+      return resolve(JSON.stringify([{
+        "SchemaVersion": "15.0.0.0",
+        "LibraryVersion": "16.0.7331.1206",
+        "ErrorInfo": null,
+        "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
+      }, 7, {
+        "_ObjectType_": "SP.Web",
+        "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+        "ServerRelativeUrl": "\u002fsites\u002ftest"
+      }]));
+    }));
 
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com/sites/test',
       debug: true
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002fsites\u002ftest"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -197,15 +202,15 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should call getFolderPropertyBag when folder is specified and site is /', (done) => {
     stubAllPostRequests();
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       debug: true
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002f"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -221,27 +226,29 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('should call getFolderPropertyBag when folder is specified and site is /sites/test', (done) => {
-    stubAllPostRequests(new Promise((resolve, reject) => { return resolve(JSON.stringify([{
-      "SchemaVersion": "15.0.0.0",
-      "LibraryVersion": "16.0.7331.1206",
-      "ErrorInfo": null,
-      "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
-    }, 7, {
-      "_ObjectType_": "SP.Web",
-      "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
-      "ServerRelativeUrl": "\u002fsites\u002ftest"
-    }])) }));
+    stubAllPostRequests(new Promise((resolve) => {
+      return resolve(JSON.stringify([{
+        "SchemaVersion": "15.0.0.0",
+        "LibraryVersion": "16.0.7331.1206",
+        "ErrorInfo": null,
+        "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
+      }, 7, {
+        "_ObjectType_": "SP.Web",
+        "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+        "ServerRelativeUrl": "\u002fsites\u002ftest"
+      }]));
+    }));
 
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com/sites/test',
       folder: '/',
       debug: true
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002fsites\u002ftest"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -259,10 +266,10 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should correctly handle getFolderPropertyBag reject promise', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -279,10 +286,10 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should correctly handle getWebPropertyBag reject promise', (done) => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('abc1'); }));
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       debug: false
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -298,13 +305,13 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   it('should correctly handle getFolderPropertyBag ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getFolderPropertyBag error" } }]);
-    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
+    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       verbose: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -320,11 +327,11 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   it('should correctly handle getWebPropertyBag ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getWebPropertyBag error" } }]);
-    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
+    stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -341,11 +348,11 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should correctly handle requestObjectIdentity error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity error" } }]);
 
-    stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error) }), null, null);
+    stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }), null, null);
     const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -362,11 +369,11 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should correctly handle requestObjectIdentity ErrorMessage null response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
 
-    stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error) }), null, null);
+    stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }), null, null);
     const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -383,12 +390,12 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should correctly handle getFolderPropertyBag ErrorMessage null response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
 
-    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error) }));
-    const options: Object = {
+    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid',
       folder: '/'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -404,11 +411,11 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should correctly handle getFolderPropertyBag ErrorMessage null response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
 
-    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error) }));
-    const options: Object = {
+    stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -424,11 +431,11 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should correctly return string property', (done) => {
     stubAllPostRequests();
     const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_parentid'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -448,11 +455,11 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should correctly return date property (text)', (done) => {
     stubAllPostRequests();
     const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_timelastmodified' //\/Date(2017,10,7,11,29,31,0)\/
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -478,12 +485,12 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should correctly return date property (json)', (done) => {
     stubAllPostRequests();
     const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_timelastmodified',
       output: 'json'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -510,11 +517,11 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should correctly return int property', (done) => {
     stubAllPostRequests();
     const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_level'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -533,11 +540,11 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   it('should correctly return int property with value 0', (done) => {
     stubAllPostRequests();
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_folderitemcount'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -553,16 +560,16 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('should correctly return bool property', (done) => {
     stubAllPostRequests();
     const filterByKeySpy = sinon.spy((command as any), 'filterByKey');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_candeleteversion'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
         assert(filterByKeySpy.calledOnce === true);
-        
+
         const out = loggerLogSpy.lastCall.args[0];
         assert.strictEqual(out, true);
         done();
@@ -575,12 +582,12 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   it('should correctly return property not found (verbose)', (done) => {
     stubAllPostRequests();
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'abc',
       verbose: true
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -597,12 +604,12 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   it('should correctly return empty line if not found and not verbose', (done) => {
     stubAllPostRequests();
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'abc',
       verbose: false
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -616,12 +623,12 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('should reject promise if _ObjectIdentity_ not found', (done) => {
-    stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    const options: Object = {
+    stubAllPostRequests(new Promise<any>((resolve) => { return resolve('[{}]'); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_parentid'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -635,12 +642,12 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('should reject promise if Properties not found', (done) => {
-    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    const options: Object = {
+    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve('[{}]'); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       key: 'vti_parentid'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -654,11 +661,11 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('should reject promise if AllProperties not found', (done) => {
-    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve('[{}]') }));
-    const options: Object = {
+    stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve('[{}]'); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -672,11 +679,11 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('should return error if requestObjectIdentity reqest failed', (done) => {
-    stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('error1') }));
-    const options: Object = {
+    stubAllPostRequests(new Promise<any>((resolve, reject) => { return reject('error1'); }));
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -691,8 +698,8 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   it('should correctly post url, headers and data when calling client.svc when requestObjectIdentity', (done) => {
     const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
-    
-    const options: Object = {
+
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid'
     };
@@ -701,8 +708,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         const secondCall = postRequestSpy.getCalls()[0];
         assert(secondCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })), 'url');
-        assert(secondCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})), 'request digest');
-        assert(secondCall.calledWith(sinon.match({ data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
+        assert(secondCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc' } })), 'request digest');
+        assert(secondCall.calledWith(sinon.match({
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="1" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /></Properties></Query></Query></Actions><ObjectPaths><Property Id="5" ParentId="3" Name="Web" /><StaticProperty Id="3" TypeId="{3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a}" Name="Current" /></ObjectPaths></Request>`
         })), 'data');
         done();
       }
@@ -714,7 +722,7 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   it('should correctly post url, headers and data when calling client.svc when getWebPropertyBag', (done) => {
     const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid'
     };
@@ -723,8 +731,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
-        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
-        assert(lastCall.calledWith(sinon.match({ data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="97" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /><Property Name="AllProperties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
+        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc' } })));
+        assert(lastCall.calledWith(sinon.match({
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="97" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /><Property Name="AllProperties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
         })));
         done();
       }
@@ -736,7 +745,7 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   it('should correctly post payload when calling client.svc when getFolderPropertyBag and site is /', (done) => {
     const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid',
       folder: '/'
@@ -747,8 +756,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
-        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
-        assert(lastCall.calledWith(sinon.match({ data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
+        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc' } })));
+        assert(lastCall.calledWith(sinon.match({
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
         })));
         done();
       }
@@ -759,18 +769,20 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('should correctly post payload when calling client.svc when getFolderPropertyBag and site is /sites/test', (done) => {
-    const postRequestSpy: sinon.SinonSpy = stubAllPostRequests(new Promise((resolve, reject) => { return resolve(JSON.stringify([{
-      "SchemaVersion": "15.0.0.0",
-      "LibraryVersion": "16.0.7331.1206",
-      "ErrorInfo": null,
-      "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
-    }, 7, {
-      "_ObjectType_": "SP.Web",
-      "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
-      "ServerRelativeUrl": "\u002fsites\u002ftest"
-    }])) }));
+    const postRequestSpy: sinon.SinonSpy = stubAllPostRequests(new Promise((resolve) => {
+      return resolve(JSON.stringify([{
+        "SchemaVersion": "15.0.0.0",
+        "LibraryVersion": "16.0.7331.1206",
+        "ErrorInfo": null,
+        "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
+      }, 7, {
+        "_ObjectType_": "SP.Web",
+        "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+        "ServerRelativeUrl": "\u002fsites\u002ftest"
+      }]));
+    }));
 
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com/sites/test',
       key: 'vti_parentid',
       folder: '/'
@@ -781,8 +793,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/sites/test/_vti_bin/client.svc/ProcessQuery' })));
-        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
-        assert(lastCall.calledWith(sinon.match({ data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/sites/test/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
+        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc' } })));
+        assert(lastCall.calledWith(sinon.match({
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/sites/test/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
         })));
         done();
       }
@@ -794,7 +807,7 @@ describe(commands.PROPERTYBAG_GET, () => {
 
   it('should correctly post payload when calling client.svc when getFolderPropertyBag and site is /', (done) => {
     const postRequestSpy: sinon.SinonSpy = stubAllPostRequests();
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       key: 'vti_parentid',
       folder: '/'
@@ -805,8 +818,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/_vti_bin/client.svc/ProcessQuery' })));
-        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
-        assert(lastCall.calledWith(sinon.match({ data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
+        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc' } })));
+        assert(lastCall.calledWith(sinon.match({
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
         })));
         done();
       }
@@ -817,18 +831,20 @@ describe(commands.PROPERTYBAG_GET, () => {
   });
 
   it('should correctly post payload when calling client.svc when getFolderPropertyBag and site is /sites/test', (done) => {
-    const postRequestSpy: sinon.SinonSpy = stubAllPostRequests(new Promise((resolve, reject) => { return resolve(JSON.stringify([{
-      "SchemaVersion": "15.0.0.0",
-      "LibraryVersion": "16.0.7331.1206",
-      "ErrorInfo": null,
-      "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
-    }, 7, {
-      "_ObjectType_": "SP.Web",
-      "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
-      "ServerRelativeUrl": "\u002fsites\u002ftest"
-    }])) }));
+    const postRequestSpy: sinon.SinonSpy = stubAllPostRequests(new Promise((resolve) => {
+      return resolve(JSON.stringify([{
+        "SchemaVersion": "15.0.0.0",
+        "LibraryVersion": "16.0.7331.1206",
+        "ErrorInfo": null,
+        "TraceCorrelationId": "38e4499e-10a2-5000-ce25-77d4ccc2bd96"
+      }, 7, {
+        "_ObjectType_": "SP.Web",
+        "_ObjectIdentity_": "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
+        "ServerRelativeUrl": "\u002fsites\u002ftest"
+      }]));
+    }));
 
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com/sites/test',
       key: 'vti_parentid',
       folder: '/'
@@ -838,8 +854,9 @@ describe(commands.PROPERTYBAG_GET, () => {
       try {
         const lastCall = postRequestSpy.lastCall;
         assert(lastCall.calledWith(sinon.match({ url: 'https://contoso.sharepoint.com/sites/test/_vti_bin/client.svc/ProcessQuery' })));
-        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc'}})));
-        assert(lastCall.calledWith(sinon.match({ data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/sites/test/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
+        assert(lastCall.calledWith(sinon.match({ headers: { 'X-RequestDigest': 'abc' } })));
+        assert(lastCall.calledWith(sinon.match({
+          data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">/sites/test/</Parameter></Parameters></Method><Identity Id="5" Name="38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275" /></ObjectPaths></Request>`
         })));
         done();
       }
@@ -900,10 +917,10 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: 'foo',
-          key: 'abc'
-        }
+      {
+        webUrl: 'foo',
+        key: 'abc'
+      }
     });
     assert.notStrictEqual(actual, true);
   });
@@ -911,10 +928,10 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('passes validation when the url and key options specified', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com",
-          key: 'abc'
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com",
+        key: 'abc'
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -922,11 +939,11 @@ describe(commands.PROPERTYBAG_GET, () => {
   it('passes validation when the url, key and folder options specified', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com",
-          key: 123,
-          folder: "/"
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com",
+        key: 123,
+        folder: "/"
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -935,10 +952,10 @@ describe(commands.PROPERTYBAG_GET, () => {
     const actual = command.validate(
       {
         options:
-          {
-            webUrl: "https://contoso.sharepoint.com",
-            key: 'abc'
-          }
+        {
+          webUrl: "https://contoso.sharepoint.com",
+          key: 'abc'
+        }
       });
     assert.strictEqual(actual, true);
   });

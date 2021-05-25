@@ -414,7 +414,7 @@ describe(commands.WEB_SET, () => {
   });
 
   it('correctly handles error when hub site not found', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {
@@ -440,7 +440,7 @@ describe(commands.WEB_SET, () => {
   });
 
   it('correctly handles error while updating Welcome page', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {

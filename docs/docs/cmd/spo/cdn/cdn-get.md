@@ -33,7 +33,7 @@ m365 spo cdn get
 Show if the Private CDN is currently enabled or not
 
 ```sh
-m365 spo cdn get -t Private
+m365 spo cdn get --type Private
 ```
 
 ## More information

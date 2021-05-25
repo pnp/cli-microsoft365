@@ -86,8 +86,6 @@ describe(commands.APP_GET, () => {
   it('retrieves information about the specified app using GUID (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7?api-version=2016-11-01`) > -1) {
-        console.log(opts.url);
-
         if (opts.headers &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
@@ -112,8 +110,6 @@ describe(commands.APP_GET, () => {
   it('retrieves information about the specified app using GUID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7?api-version=2016-11-01`) > -1) {
-        console.log(opts.url);
-
         if (opts.headers &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
@@ -788,8 +784,6 @@ describe(commands.APP_GET, () => {
   it('renders empty string for missing properties using GUID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7?api-version=2016-11-01`) > -1) {
-        console.log(opts.url);
-
         if (opts.headers &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
@@ -1990,7 +1984,7 @@ describe(commands.APP_GET, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

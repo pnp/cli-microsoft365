@@ -74,7 +74,7 @@ describe(commands.HOMESITE_REMOVE, () => {
   });
 
   it('prompts before removing the Home Site when confirm option is not passed', (done) => {
-    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true } } as any, () => {
 
       try {
         let promptIssued = false;
@@ -131,7 +131,7 @@ describe(commands.HOMESITE_REMOVE, () => {
       }
 
       return Promise.reject('Invalid request');
-    })
+    });
 
     Utils.restore(Cli.prompt);
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
@@ -177,7 +177,7 @@ describe(commands.HOMESITE_REMOVE, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, {
       options: {

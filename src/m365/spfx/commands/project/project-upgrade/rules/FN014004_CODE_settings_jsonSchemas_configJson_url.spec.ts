@@ -10,7 +10,7 @@ describe('FN014004_CODE_settings_jsonSchemas_configJson_url', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN014004_CODE_settings_jsonSchemas_configJson_url('./node_modules/@microsoft/sp-build-core-tasks/lib/configJson/schemas/config-v1.schema.json');
-  })
+  });
 
   it('doesn\'t return notification if config.json already has correct URL', () => {
     const project: Project = {

@@ -64,7 +64,7 @@ describe(commands.O365GROUP_RESTORE, () => {
   it('restores the specified group', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/directory/deleteditems/28beab62-7540-4db1-a23f-29a6018a3848/restore/') {
-          return Promise.resolve();
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
@@ -84,13 +84,13 @@ describe(commands.O365GROUP_RESTORE, () => {
   it('restores the specified group (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/directory/deleteditems/28beab62-7540-4db1-a23f-29a6018a3848/restore/') {
-          return Promise.resolve();
+        return Promise.resolve();
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848'} } as any, (err?: any) => {
+    command.action(logger, { options: { debug: true, id: '28beab62-7540-4db1-a23f-29a6018a3848'} } as any, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -102,7 +102,7 @@ describe(commands.O365GROUP_RESTORE, () => {
   });
 
   it('correctly handles error when group is not found', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({ error: { 'odata.error': { message: { value: 'File Not Found.' } } } });
     });
 

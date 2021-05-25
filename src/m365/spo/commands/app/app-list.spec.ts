@@ -111,7 +111,7 @@ describe(commands.APP_LIST, () => {
             Deployed: true,
             AppCatalogVersion: '1.0.0.0'
           }
-        ]))
+        ]));
         done();
       }
       catch (e) {
@@ -166,7 +166,7 @@ describe(commands.APP_LIST, () => {
             Deployed: true,
             AppCatalogVersion: '1.0.0.0'
           }
-        ]))
+        ]));
         done();
       }
       catch (e) {
@@ -241,7 +241,7 @@ describe(commands.APP_LIST, () => {
             "IsClientSideSolution": true,
             "Title": "spfx-140-online-client-side-solution"
           }
-        ]))
+        ]));
         done();
       }
       catch (e) {
@@ -353,7 +353,7 @@ describe(commands.APP_LIST, () => {
         if (l.indexOf('No apps found') > -1) {
           correctLogStatement = true;
         }
-      })
+      });
       try {
         assert(correctLogStatement);
         done();

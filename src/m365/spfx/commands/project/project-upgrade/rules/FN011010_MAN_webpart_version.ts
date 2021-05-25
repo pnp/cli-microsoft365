@@ -13,17 +13,17 @@ export class FN011010_MAN_webpart_version extends ManifestRule {
 
   get description(): string {
     return 'Update version in manifest to use automated component versioning';
-  };
+  }
 
   get resolution(): string {
     return `{
   "version": "*",
 }`;
-  };
+  }
 
   get severity(): string {
     return 'Optional';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.manifests ||

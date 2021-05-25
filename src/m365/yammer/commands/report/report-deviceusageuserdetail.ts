@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class YammerReportDeviceUsageUserDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {
-    return commands.YAMMER_REPORT_DEVICEUSAGEUSERDETAIL;
+    return commands.REPORT_DEVICEUSAGEUSERDETAIL;
   }
 
   public get usageEndpoint(): string {

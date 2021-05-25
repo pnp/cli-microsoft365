@@ -35,7 +35,7 @@ describe('PackageRule', () => {
 
   beforeEach(() => {
     findings = [];
-  })
+  });
 
   it('returns notification if package.json does not have property', () => {
     const project: Project = {

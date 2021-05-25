@@ -765,7 +765,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       options: {
         debug: true,
         title: actionTitle,
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, (error?: any) => {
       try {
@@ -781,7 +781,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
   it('uses correct API url when id option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/lists(guid') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -793,7 +793,7 @@ describe(commands.LIST_WEBHOOK_LIST, () => {
       options: {
         debug: false,
         id: actionId,
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {

@@ -27,7 +27,7 @@ interface Options extends GlobalOptions {
 
 class TeamsConversationMemberAddCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_CONVERSATIONMEMBER_ADD;
+    return commands.CONVERSATIONMEMBER_ADD;
   }
 
   public get description(): string {
@@ -252,8 +252,8 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
         }
 
         return Promise.resolve(userItem.id);
-      }, err => { return Promise.reject(err) });
-  };
+      }, err => { return Promise.reject(err); });
+  }
 }
 
 module.exports = new TeamsConversationMemberAddCommand();

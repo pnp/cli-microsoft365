@@ -13,15 +13,15 @@ export class FN011006_MAN_listViewCommandSet_items extends ManifestRule {
 
   get description(): string {
     return 'In the manifest add the items property';
-  };
+  }
 
   get resolution(): string {
     return '';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.manifests ||
@@ -44,7 +44,7 @@ export class FN011006_MAN_listViewCommandSet_items extends ManifestRule {
       };
       Object.keys(resolution.items).forEach(k => {
         resolution.items[k].title = { default: resolution.items[k].title },
-          resolution.items[k].type = 'command';
+        resolution.items[k].type = 'command';
       });
 
       const node = this.getAstNodeFromFile(manifest, 'commands');

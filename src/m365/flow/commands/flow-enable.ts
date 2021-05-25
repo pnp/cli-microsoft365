@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class FlowEnableCommand extends AzmgmtCommand {
   public get name(): string {
-    return commands.FLOW_ENABLE;
+    return commands.ENABLE;
   }
 
   public get description(): string {

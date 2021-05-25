@@ -70,8 +70,8 @@ export const pageListItemMock = {
 
 export const sectionMock = {
   "numSections": 2,
-  "numControls": 2,
-}
+  "numControls": 2
+};
 
 export const controlsMock = {
   CanvasContent1: `[{"id":"EMPTY_0","position":{"zoneIndex":0.5,"sectionIndex":1,"sectionFactor":12,"layoutIndex":1},"emphasis":{}},{"controlType":3,"displayMode":2,"id":"24fc9905-d571-4555-8bfc-c14f6f2eff48","position":{"controlIndex":1,"sectionIndex":1,"zoneIndex":1,"sectionFactor":12,"layoutIndex":1},"webPartId":"1ef5ed11-ce7b-44be-bc5e-4abd55101d16","emphasis":{},"addedFromPersistedData":true,"reservedHeight":600,"reservedWidth":1180,"webPartData":{"id":"1ef5ed11-ce7b-44be-bc5e-4abd55101d16","instanceId":"24fc9905-d571-4555-8bfc-c14f6f2eff48","title":"doctor-placeholder","description":"Use Markdown language to add and format text.","audiences":[],"serverProcessedContent":[null],"dataVersion":"2.0","properties":[]}}]`

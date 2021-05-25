@@ -5,10 +5,8 @@ import SpoCommand from '../../base/SpoCommand';
 import commands from '../commands';
 
 interface CommandArgs {
-  options: Options;
+  options: GlobalOptions;
 }
-
-interface Options extends GlobalOptions { }
 
 interface SpoContext {
   SpoUrl: string;

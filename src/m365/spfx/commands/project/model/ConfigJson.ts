@@ -3,7 +3,7 @@ import { Hash } from "../project-upgrade/";
 
 export interface ConfigJson extends JsonFile {
   $schema?: string;
-  bundles?: Object;
+  bundles?: any;
   entries?: Entry[];
   localizedResources?: Hash;
   version?: string;

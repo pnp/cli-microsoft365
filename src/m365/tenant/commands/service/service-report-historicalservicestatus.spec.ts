@@ -9,12 +9,12 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./service-report-historicalservicestatus');
 
-describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
+describe(commands.SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  let jsonOutput = {
+  const jsonOutput = {
     "@odata.context": "https://office365servicecomms-prod.cloudapp.net/api/v1.0/contoso.sharepoint.com/$metadata#CurrentStatus",
     "value": [
       {
@@ -147,7 +147,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
     if (!auth.service.accessTokens[auth.defaultResource]) {
       auth.service.accessTokens[auth.defaultResource] = {
         expiresOn: 'abc',
-        value: 'abc'
+        accessToken: 'abc'
       };
     }
   });
@@ -184,7 +184,7 @@ describe(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS, () => {
   });
 
   it('has correct name', () => {
-    assert.equal(command.name.startsWith(commands.TENANT_SERVICE_REPORT_HISTORICALSERVICESTATUS), true);
+    assert.equal(command.name.startsWith(commands.SERVICE_REPORT_HISTORICALSERVICESTATUS), true);
   });
 
   it('has a description', () => {

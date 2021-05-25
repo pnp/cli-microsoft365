@@ -22,7 +22,7 @@ class SpoServicePrincipalPermissionRequestListCommand extends SpoCommand {
     return [commands.SP_PERMISSIONREQUEST_LIST];
   }
 
-  public commandAction(logger: Logger, args: {}, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     let spoAdminUrl: string = '';
 
     this

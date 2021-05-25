@@ -49,7 +49,7 @@ export class FolderExtensions {
     let folderIndex: number = 0;
 
     // build array of folders e.g. ["Shared%20Documents","22","54","55"]
-    let folders: string[] = folderToEnsure.substring(1).split('/');
+    const folders: string[] = folderToEnsure.substring(1).split('/');
 
     if (this.debug) {
       this.logger.log('folders to process');
@@ -108,7 +108,7 @@ export class FolderExtensions {
               reject(err);
             });
         });
-    }
+    };
     return new Promise<void>(checkOrAddFolder);
   }
 }

@@ -9,7 +9,7 @@ import Utils from '../../../Utils';
 import commands from '../commands';
 const command: Command = require('./flow-disable');
 
-describe(commands.FLOW_DISABLE, () => {
+describe(commands.DISABLE, () => {
   let log: string[];
   let logger: Logger;
 
@@ -49,7 +49,7 @@ describe(commands.FLOW_DISABLE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FLOW_DISABLE), true);
+    assert.strictEqual(command.name.startsWith(commands.DISABLE), true);
   });
 
   it('has a description', () => {
@@ -99,7 +99,7 @@ describe(commands.FLOW_DISABLE, () => {
   });
 
   it('correctly handles no environment found', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -120,7 +120,7 @@ describe(commands.FLOW_DISABLE, () => {
   });
 
   it('correctly handles Flow not found', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "ConnectionAuthorizationFailed",
@@ -141,7 +141,7 @@ describe(commands.FLOW_DISABLE, () => {
   });
 
   it('correctly handles Flow not found (as admin)', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "FlowNotFound",
@@ -162,7 +162,7 @@ describe(commands.FLOW_DISABLE, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

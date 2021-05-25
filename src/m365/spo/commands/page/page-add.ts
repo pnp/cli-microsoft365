@@ -49,7 +49,7 @@ class SpoPageAddCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let resource = Auth.getResourceFromUrl(args.options.webUrl);
+    const resource = Auth.getResourceFromUrl(args.options.webUrl);
     let requestDigest: string = '';
     let itemId: string = '';
     let pageName: string = args.options.name;
@@ -165,7 +165,7 @@ class SpoPageAddCommand extends SpoCommand {
             requestOptions.data = {
               PromotedState: 2,
               FirstPublishedDate: new Date().toISOString().replace('Z', '')
-            }
+            };
             break;
           case 'Template':
             requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyid('${itemId}')/ListItemAllFields`;

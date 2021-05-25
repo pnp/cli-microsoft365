@@ -27,7 +27,7 @@ export class FN018004_TEAMS_tab96x96_png extends Rule {
 
   get resolution(): string {
     return '';
-  };
+  }
 
   get resolutionType(): string {
     return 'cmd';
@@ -35,7 +35,7 @@ export class FN018004_TEAMS_tab96x96_png extends Rule {
 
   get file(): string {
     return '';
-  };
+  }
 
   get severity(): string {
     return 'Optional';

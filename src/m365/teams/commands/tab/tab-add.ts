@@ -26,7 +26,7 @@ interface Options extends GlobalOptions {
 
 class TeamsTabAddCommand extends GraphItemsListCommand<Tab> {
   public get name(): string {
-    return commands.TEAMS_TAB_ADD;
+    return commands.TAB_ADD;
   }
   public allowUnknownOptions(): boolean | undefined {
     return true;
@@ -106,7 +106,7 @@ class TeamsTabAddCommand extends GraphItemsListCommand<Tab> {
   }
 
   private mapRequestBody(options: Options): any {
-    const requestBody: any = {}
+    const requestBody: any = {};
     requestBody['configuration'] = {};
     const excludeOptions: string[] = [
       'debug',

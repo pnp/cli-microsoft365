@@ -144,7 +144,7 @@ class SpoListAddCommand extends SpoCommand {
   protected get listTemplateTypeMap(): string[] {
     const result: string[] = [];
 
-    for (let template in ListTemplateType) {
+    for (const template in ListTemplateType) {
       if (typeof ListTemplateType[template] === 'number') {
         result.push(template);
       }
@@ -159,7 +159,7 @@ class SpoListAddCommand extends SpoCommand {
   protected get draftVisibilityTypeMap(): string[] {
     const result: string[] = [];
 
-    for (let draftType in DraftVisibilityType) {
+    for (const draftType in DraftVisibilityType) {
       if (typeof DraftVisibilityType[draftType] === 'number') {
         result.push(draftType);
       }
@@ -174,7 +174,7 @@ class SpoListAddCommand extends SpoCommand {
   protected get listExperienceMap(): string[] {
     const result: string[] = [];
 
-    for (let experience in ListExperience) {
+    for (const experience in ListExperience) {
       if (typeof ListExperience[experience] === 'number') {
         result.push(experience);
       }
@@ -532,7 +532,7 @@ class SpoListAddCommand extends SpoCommand {
       const option: string = SpoListAddCommand.booleanOptions[i];
       const value: string | undefined = (args.options as any)[option];
       if (value && !Utils.isValidBoolean(value)) {
-        return `${value} in option ${option} is not a valid boolean value`
+        return `${value} in option ${option} is not a valid boolean value`;
       }
     }
 

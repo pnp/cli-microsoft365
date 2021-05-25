@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./message-get');
 
-describe(commands.TEAMS_MESSAGE_GET, () => {
+describe(commands.MESSAGE_GET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -51,7 +51,7 @@ describe(commands.TEAMS_MESSAGE_GET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_MESSAGE_GET), true);
+    assert.strictEqual(command.name.startsWith(commands.MESSAGE_GET), true);
   });
 
   it('has a description', () => {
@@ -61,7 +61,7 @@ describe(commands.TEAMS_MESSAGE_GET, () => {
   it('fails validation if teamId, channelId and messageId are not specified', () => {
     const actual = command.validate({
       options: {
-        debug: false,
+        debug: false
       }
     });
     assert.notStrictEqual(actual, true);
@@ -262,7 +262,7 @@ describe(commands.TEAMS_MESSAGE_GET, () => {
   });
 
   it('correctly handles error when retrieving a message', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

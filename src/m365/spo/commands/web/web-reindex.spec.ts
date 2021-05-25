@@ -47,7 +47,7 @@ describe(commands.WEB_REINDEX, () => {
       SpoPropertyBagBaseCommand.isNoScriptSite,
       SpoPropertyBagBaseCommand.setProperty
     ]);
-    (command as any).reindexedLists = false
+    (command as any).reindexedLists = false;
   });
 
   after(() => {

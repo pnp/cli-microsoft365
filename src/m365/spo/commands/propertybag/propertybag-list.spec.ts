@@ -14,7 +14,7 @@ describe(commands.PROPERTYBAG_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
-  let stubAllPostRequests: any = (
+  const stubAllPostRequests: any = (
     requestObjectIdentityResp: any = null,
     getFolderPropertyBagResp: any = null,
     getWebPropertyBagResp: any = null
@@ -24,7 +24,8 @@ describe(commands.PROPERTYBAG_LIST, () => {
       if (opts.data.indexOf('3747adcd-a3c3-41b9-bfab-4a64dd2f1e0a') > -1) {
         if (requestObjectIdentityResp) {
           return requestObjectIdentityResp;
-        } else {
+        }
+        else {
           return Promise.resolve(JSON.stringify([{
             "SchemaVersion": "15.0.0.0",
             "LibraryVersion": "16.0.7331.1206",
@@ -42,7 +43,8 @@ describe(commands.PROPERTYBAG_LIST, () => {
       if (opts.data.indexOf('GetFolderByServerRelativeUrl') > -1) {
         if (getFolderPropertyBagResp) {
           return getFolderPropertyBagResp;
-        } else {
+        }
+        else {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "93e5499e-00f1-5000-1f36-3ab12512a7e9"
@@ -63,7 +65,8 @@ describe(commands.PROPERTYBAG_LIST, () => {
       if (opts.data.indexOf('Property Name="AllProperties" SelectAll="true"') > -1) {
         if (getWebPropertyBagResp) {
           return getWebPropertyBagResp;
-        } else {
+        }
+        else {
           return Promise.resolve(JSON.stringify([
             {
               "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.7331.1206", "ErrorInfo": null, "TraceCorrelationId": "e7e5499e-7031-5000-ccf1-ddcbe51e534c"
@@ -78,11 +81,11 @@ describe(commands.PROPERTYBAG_LIST, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({
       FormDigestValue: 'abc'
     }));
@@ -134,14 +137,14 @@ describe(commands.PROPERTYBAG_LIST, () => {
   it('should call getWebPropertyBag when folder is not specified', (done) => {
     stubAllPostRequests();
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       debug: true
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002fsites\u002fabc"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -158,15 +161,15 @@ describe(commands.PROPERTYBAG_LIST, () => {
   it('should call getFolderPropertyBag when folder is specified', (done) => {
     stubAllPostRequests();
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       debug: true
-    }
+    };
     const objIdentity: IdentityResponse = {
       objectIdentity: "38e4499e-10a2-5000-ce25-77d4ccc2bd96|740c6a0b-85e2-48a0-a494-e0f1759d4a77:site:f3806c23-0c9f-42d3-bc7d-3895acc06d73:web:5a39e548-b3d7-4090-9cb9-0ce7cd85d275",
       serverRelativeUrl: "\u002fsites\u002fabc"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -183,10 +186,10 @@ describe(commands.PROPERTYBAG_LIST, () => {
   it('should correctly handle getFolderPropertyBag reject promise', (done) => {
     stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return reject('abc'); }));
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -203,10 +206,10 @@ describe(commands.PROPERTYBAG_LIST, () => {
   it('should correctly handle getWebPropertyBag reject promise', (done) => {
     stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return reject('abc1'); }));
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       debug: false
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -222,13 +225,13 @@ describe(commands.PROPERTYBAG_LIST, () => {
 
   it('should correctly handle getFolderPropertyBag ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getFolderPropertyBag error" } }]);
-    stubAllPostRequests(null, new Promise<any>((resolve, reject) => { return resolve(error); }));
+    stubAllPostRequests(null, new Promise<any>((resolve) => { return resolve(error); }));
     const getFolderPropertyBagSpy = sinon.spy((command as any), 'getFolderPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/',
       verbose: true
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -244,11 +247,11 @@ describe(commands.PROPERTYBAG_LIST, () => {
 
   it('should correctly handle getWebPropertyBag ClientSvc error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "getWebPropertyBag error" } }]);
-    stubAllPostRequests(null, null, new Promise<any>((resolve, reject) => { return resolve(error); }));
+    stubAllPostRequests(null, null, new Promise<any>((resolve) => { return resolve(error); }));
     const getWebPropertyBagSpy = sinon.spy((command as any), 'getWebPropertyBag');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -265,11 +268,11 @@ describe(commands.PROPERTYBAG_LIST, () => {
   it('should correctly handle requestObjectIdentity error response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": "requestObjectIdentity error" } }]);
 
-    stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error) }), null, null);
+    stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }), null, null);
     const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -286,11 +289,11 @@ describe(commands.PROPERTYBAG_LIST, () => {
   it('should correctly handle requestObjectIdentity ErrorMessage null response', (done) => {
     const error = JSON.stringify([{ "ErrorInfo": { "ErrorMessage": undefined } }]);
 
-    stubAllPostRequests(new Promise<any>((resolve, reject) => { return resolve(error) }), null, null);
+    stubAllPostRequests(new Promise<any>((resolve) => { return resolve(error); }), null, null);
     const requestObjectIdentitySpy = sinon.spy(ClientSvc.prototype, 'getCurrentWebIdentity');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -307,10 +310,10 @@ describe(commands.PROPERTYBAG_LIST, () => {
   it('should correctly format response output (text)', (done) => {
     stubAllPostRequests();
     const formatOutputSpy = sinon.spy((command as any), 'formatOutput');
-    const options: Object = {
+    const options = {
       webUrl: 'https://contoso.sharepoint.com',
       folder: '/'
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
 
@@ -401,9 +404,9 @@ describe(commands.PROPERTYBAG_LIST, () => {
   it('fails validation if the url option is not a valid SharePoint site URL', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: 'foo'
-        }
+      {
+        webUrl: 'foo'
+      }
     });
     assert.notStrictEqual(actual, true);
   });
@@ -411,9 +414,9 @@ describe(commands.PROPERTYBAG_LIST, () => {
   it('passes validation when the url option specified', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com"
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com"
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -421,10 +424,10 @@ describe(commands.PROPERTYBAG_LIST, () => {
   it('passes validation when the url and folder options specified', () => {
     const actual = command.validate({
       options:
-        {
-          webUrl: "https://contoso.sharepoint.com",
-          folder: "/"
-        }
+      {
+        webUrl: "https://contoso.sharepoint.com",
+        folder: "/"
+      }
     });
     assert.strictEqual(actual, true);
   });
@@ -433,9 +436,9 @@ describe(commands.PROPERTYBAG_LIST, () => {
     const actual = command.validate(
       {
         options:
-          {
-            webUrl: "https://contoso.sharepoint.com"
-          }
+        {
+          webUrl: "https://contoso.sharepoint.com"
+        }
       });
     assert.strictEqual(actual, true);
   });

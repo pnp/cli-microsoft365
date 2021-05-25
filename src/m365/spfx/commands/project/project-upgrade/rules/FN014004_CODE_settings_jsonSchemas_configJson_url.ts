@@ -17,7 +17,7 @@ export class FN014004_CODE_settings_jsonSchemas_configJson_url extends JsonRule 
 
   get description(): string {
     return `Update the URL of the config.json JSON schema in .vscode/settings.json`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -30,19 +30,19 @@ export class FN014004_CODE_settings_jsonSchemas_configJson_url extends JsonRule 
     }
   ]
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return '.vscode/settings.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.vsCode ||
@@ -57,7 +57,7 @@ export class FN014004_CODE_settings_jsonSchemas_configJson_url extends JsonRule 
       if (schema.fileMatch.indexOf('/config/config.json') === -1) {
         continue;
       }
-      
+
       if (schema.url !== this.url) {
         const node = this.getAstNodeFromFile(project.vsCode.settingsJson, `json;#schemas[${i}]`);
         this.addFindingWithPosition(findings, node);

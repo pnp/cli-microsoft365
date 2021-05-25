@@ -14,9 +14,9 @@ interface Options extends GlobalOptions {
   teamId: string;
 }
 
-class TeamsUnarchiveCommand extends GraphCommand {
+class TeamsTeamUnarchiveCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_TEAM_UNARCHIVE;
+    return commands.TEAM_UNARCHIVE;
   }
 
   public get description(): string {
@@ -60,4 +60,4 @@ class TeamsUnarchiveCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsUnarchiveCommand();
+module.exports = new TeamsTeamUnarchiveCommand();

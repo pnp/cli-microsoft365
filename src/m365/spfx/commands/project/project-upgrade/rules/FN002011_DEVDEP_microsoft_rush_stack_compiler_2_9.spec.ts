@@ -10,7 +10,7 @@ describe('FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN002011_DEVDEP_microsoft_rush_stack_compiler_2_9('1.0.0', true);
-  })
+  });
 
   it('should not show finding when package is not present', () => {
     const project: Project = {

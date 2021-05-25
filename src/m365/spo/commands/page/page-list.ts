@@ -69,7 +69,7 @@ class SpoPageListCommand extends SpoCommand {
               return {
                 ...clientSidePage,
                 ...p
-              }
+              };
             }
 
             return p;

@@ -17,7 +17,7 @@ export class FN010005_YORC_environment extends JsonRule {
 
   get description(): string {
     return `Update environment in .yo-rc.json`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,19 +25,19 @@ export class FN010005_YORC_environment extends JsonRule {
     "environment": "${this.environment}"
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Recommended';
-  };
+  }
 
   get file(): string {
     return './.yo-rc.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.yoRcJson) {

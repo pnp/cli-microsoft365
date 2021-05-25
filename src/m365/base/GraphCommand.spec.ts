@@ -16,11 +16,11 @@ class MockCommand extends GraphCommand {
     return 'Mock command';
   }
 
-  public commandAction(logger: Logger, args: {}, cb: () => void): void {
+  public commandAction(logger: Logger, args: any, cb: () => void): void {
     cb();
   }
 
-  public commandHelp(args: any, log: (message: string) => void): void {
+  public commandHelp(): void {
   }
 }
 
@@ -41,9 +41,9 @@ describe('GraphCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { },
-      logRaw: (msg: any) => { },
-      logToStderr: (msg: any) => { }
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { }
     };
     command.action(logger, { options: {} } as any, (err?: any) => {
       try {
@@ -60,9 +60,9 @@ describe('GraphCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.reject('An error has occurred'));
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { },
-      logRaw: (msg: any) => { },
-      logToStderr: (msg: any) => { }
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { }
     };
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
     command.action(logger, { options: {} }, () => {
@@ -80,9 +80,9 @@ describe('GraphCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { },
-      logRaw: (msg: any) => { },
-      logToStderr: (msg: any) => { }
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { }
     };
     auth.service.connected = false;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');
@@ -101,9 +101,9 @@ describe('GraphCommand', () => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
     const command = new MockCommand();
     const logger: Logger = {
-      log: (msg: any) => { },
-      logRaw: (msg: any) => { },
-      logToStderr: (msg: any) => { }
+      log: () => { },
+      logRaw: () => { },
+      logToStderr: () => { }
     };
     auth.service.connected = true;
     const commandCommandActionSpy = sinon.spy(command, 'commandAction');

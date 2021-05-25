@@ -17,7 +17,7 @@ export class FN010003_YORC_packageManager extends JsonRule {
 
   get description(): string {
     return `Update packageManager in .yo-rc.json`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,19 +25,19 @@ export class FN010003_YORC_packageManager extends JsonRule {
     "packageManager": "${this.packageManager}"
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Recommended';
-  };
+  }
 
   get file(): string {
     return './.yo-rc.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.yoRcJson) {

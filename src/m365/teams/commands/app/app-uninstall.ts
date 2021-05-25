@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TeamsAppUninstallCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_APP_UNINSTALL;
+    return commands.APP_UNINSTALL;
   }
 
   public get description(): string {
@@ -47,7 +47,7 @@ class TeamsAppUninstallCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to uninstall the app with id ${args.options.appId} from the Microsoft Teams team ${args.options.teamId}?`,
+        message: `Are you sure you want to uninstall the app with id ${args.options.appId} from the Microsoft Teams team ${args.options.teamId}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

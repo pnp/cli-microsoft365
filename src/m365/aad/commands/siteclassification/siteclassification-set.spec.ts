@@ -71,7 +71,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
   it('fails validation if none of the options are specified', () => {
     const actual = command.validate({
       options: {
-        debug: false,
+        debug: false
       }
     });
     assert.notStrictEqual(actual, true);
@@ -201,7 +201,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: true, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, (err: any) => {
+    command.action(logger, { options: { debug: true, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, () => {
       try {
         assert(updateRequestIssued);
         done();
@@ -296,7 +296,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, (err: any) => {
+    command.action(logger, { options: { debug: false, usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, () => {
       try {
         assert(updateRequestIssued);
         done();
@@ -391,7 +391,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { usageGuidelinesUrl: "http://aka.ms/pnp" } } as any, (err: any) => {
+    command.action(logger, { options: { usageGuidelinesUrl: "http://aka.ms/pnp" } } as any, () => {
       try {
         assert(updateRequestIssued);
         done();
@@ -486,7 +486,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { debug: false, guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, (err: any) => {
+    command.action(logger, { options: { debug: false, guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, () => {
       try {
         assert(updateRequestIssued);
         done();
@@ -581,7 +581,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { classifications: "top secret,high,middle,low" } } as any, (err: any) => {
+    command.action(logger, { options: { classifications: "top secret,high,middle,low" } } as any, () => {
       try {
         assert(updateRequestIssued);
         done();
@@ -675,7 +675,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { defaultClassification: "low" } } as any, (err: any) => {
+    command.action(logger, { options: { defaultClassification: "low" } } as any, () => {
       try {
         assert(updateRequestIssued);
         done();
@@ -770,7 +770,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high" } } as any, (err: any) => {
+    command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high" } } as any, () => {
       try {
         assert(updateRequestIssued);
         done();
@@ -865,7 +865,7 @@ describe(commands.SITECLASSIFICATION_SET, () => {
       return Promise.reject();
     });
 
-    command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high", usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, (err: any) => {
+    command.action(logger, { options: { classifications: "area 51,high,middle,low", defaultClassification: "high", usageGuidelinesUrl: "http://aka.ms/pnp", guestUsageGuidelinesUrl: "http://aka.ms/pnp" } } as any, () => {
       try {
         assert(updateRequestIssued);
         done();

@@ -15,7 +15,7 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class GraphSchemaExtensionGet extends GraphCommand {
+class GraphSchemaExtensionGetCommand extends GraphCommand {
   public get name(): string {
     return commands.SCHEMAEXTENSION_GET;
   }
@@ -25,20 +25,20 @@ class GraphSchemaExtensionGet extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-        if (this.verbose) {
-          logger.logToStderr(`Gets the properties of the specified schema extension definition with id '${args.options.id}'...`);
-        }
+    if (this.verbose) {
+      logger.logToStderr(`Gets the properties of the specified schema extension definition with id '${args.options.id}'...`);
+    }
 
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/schemaExtensions/${args.options.id}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/schemaExtensions/${args.options.id}`,
+      headers: {
+        accept: 'application/json;odata.metadata=none',
+        'content-type': 'application/json'
+      },
+      responseType: 'json'
+    };
 
-      request.get(requestOptions)
+    request.get(requestOptions)
       .then((res: any): void => {
         logger.log(res);
         cb();
@@ -56,4 +56,4 @@ class GraphSchemaExtensionGet extends GraphCommand {
     return options.concat(parentOptions);
   }
 }
-module.exports = new GraphSchemaExtensionGet();
+module.exports = new GraphSchemaExtensionGetCommand();

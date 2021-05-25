@@ -29,7 +29,7 @@ class TeamsTabGetCommand extends GraphCommand {
   private channelId: string = "";
 
   public get name(): string {
-    return commands.TEAMS_TAB_GET;
+    return commands.TAB_GET;
   }
 
   public get description(): string {
@@ -114,7 +114,7 @@ class TeamsTabGetCommand extends GraphCommand {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
-    }
+    };
 
     return request
       .get<{ value: Tab[] }>(tabRequestOptions)
@@ -149,7 +149,7 @@ class TeamsTabGetCommand extends GraphCommand {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
-        }
+        };
 
         return request.get<Tab>(requestOptions);
       })

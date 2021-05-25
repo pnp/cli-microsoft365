@@ -85,7 +85,7 @@ class AadSiteClassificationEnableCommand extends GraphCommand {
                 updatedDirSettings.values.push({
                   "name": directorySetting.name,
                   "value": directorySetting.defaultValue as string
-                })
+                });
               }
               break;
             case "GuestUsageGuidelinesUrl":
@@ -99,7 +99,7 @@ class AadSiteClassificationEnableCommand extends GraphCommand {
                 updatedDirSettings.values.push({
                   "name": directorySetting.name,
                   "value": directorySetting.defaultValue as string
-                })
+                });
               }
               break;
             default:
@@ -118,7 +118,7 @@ class AadSiteClassificationEnableCommand extends GraphCommand {
             'content-type': 'application/json'
           },
           responseType: 'json',
-          data: updatedDirSettings,
+          data: updatedDirSettings
         };
 
         return request.post(requestOptions);

@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./user-app-add');
 
-describe(commands.TEAMS_USER_APP_ADD, () => {
+describe(commands.USER_APP_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_USER_APP_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.USER_APP_ADD), true);
   });
 
   it('has a description', () => {
@@ -116,7 +116,7 @@ describe(commands.TEAMS_USER_APP_ADD, () => {
   });
 
   it('correctly handles error while installing teams app', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

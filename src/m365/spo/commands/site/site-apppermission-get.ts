@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   permissionId: string
 }
 
-class SpoSiteApppermissionGetCommand extends GraphCommand {
+class SpoSiteAppPermissionGetCommand extends GraphCommand {
   public get name(): string {
     return commands.SITE_APPPERMISSION_GET;
   }
@@ -57,14 +57,15 @@ class SpoSiteApppermissionGetCommand extends GraphCommand {
       .getSpoSiteId(args)
       .then((siteId: string): Promise<SitePermission> => this.getApplicationPermission(args, siteId))
       .then((permissionObject: SitePermission) => {
-        const transposed: { appDisplayName: string; appId: string; permissionId: string }[] = [];
+        const transposed: { appDisplayName: string; appId: string; permissionId: string, roles: string }[] = [];
 
         permissionObject.grantedToIdentities.forEach((permissionEntity: SitePermissionIdentitySet) => {
           transposed.push(
             {
               appDisplayName: permissionEntity.application.displayName,
               appId: permissionEntity.application.id,
-              permissionId: permissionObject.id
+              permissionId: permissionObject.id,
+              roles: permissionObject.roles.join()
             });
         });
 
@@ -92,4 +93,4 @@ class SpoSiteApppermissionGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new SpoSiteApppermissionGetCommand();
+module.exports = new SpoSiteAppPermissionGetCommand();

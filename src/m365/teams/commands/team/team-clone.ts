@@ -20,9 +20,9 @@ interface Options extends GlobalOptions {
   visibility?: string;
 }
 
-class TeamsCloneCommand extends GraphCommand {
+class TeamsTeamCloneCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_TEAM_CLONE;
+    return commands.TEAM_CLONE;
   }
 
   public get description(): string {
@@ -41,8 +41,8 @@ class TeamsCloneCommand extends GraphCommand {
     const data: any = {
       displayName: args.options.displayName,
       mailNickname: this.generateMailNickname(args.options.displayName),
-      partsToClone: args.options.partsToClone,
-    }
+      partsToClone: args.options.partsToClone
+    };
     if (args.options.description) {
       data.description = args.options.description;
     }
@@ -50,7 +50,7 @@ class TeamsCloneCommand extends GraphCommand {
       data.classification = args.options.classification;
     }
     if (args.options.visibility) {
-      data.visibility = args.options.visibility
+      data.visibility = args.options.visibility;
     }
 
     const requestOptions: any = {
@@ -102,7 +102,7 @@ class TeamsCloneCommand extends GraphCommand {
     }
 
     const partsToClone: string[] = args.options.partsToClone.replace(/\s/g, '').split(',');
-    for (let partToClone of partsToClone) {
+    for (const partToClone of partsToClone) {
       const part: string = partToClone.toLowerCase();
       if (part !== 'apps' &&
         part !== 'channels' &&
@@ -141,4 +141,4 @@ class TeamsCloneCommand extends GraphCommand {
   }
 }
 
-module.exports = new TeamsCloneCommand();
+module.exports = new TeamsTeamCloneCommand();

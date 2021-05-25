@@ -56,9 +56,6 @@ describe(commands.CDN_SET, () => {
     requests = [];
   });
 
-  afterEach(() => {
-    });
-
   after(() => {
     Utils.restore([
       auth.restoreAuth,

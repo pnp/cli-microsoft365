@@ -168,7 +168,7 @@ describe(commands.HUBSITE_DISCONNECT, () => {
   });
 
   it('correctly handles error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {

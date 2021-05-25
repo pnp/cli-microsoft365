@@ -103,7 +103,7 @@ class SpoContentTypeRemoveCommand extends SpoCommand {
         }, (err: any): void => {
           this.handleRejectedODataJsonPromise(err, logger, cb);
         });
-    }
+    };
 
     if (args.options.confirm) {
       removeContentType();

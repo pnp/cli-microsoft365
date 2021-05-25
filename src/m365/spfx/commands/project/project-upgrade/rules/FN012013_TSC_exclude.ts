@@ -22,25 +22,25 @@ export class FN012013_TSC_exclude extends JsonRule {
     else {
       return `Remove tsconfig.json exclude property`;
     }
-  };
+  }
 
   get resolution(): string {
     return JSON.stringify({
       exclude: this.exclude
     }, null, 2);
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './tsconfig.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsConfigJson) {

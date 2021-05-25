@@ -29,7 +29,7 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -168,13 +168,13 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
-    const options: Object = {
+    const options = {
       debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       url: 'https://contoso.sharepoint.com',
       scope: 'Web',
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -202,12 +202,12 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     const postCallsSpy: sinon.SinonStub = defaultPostCallsStub();
 
     const removeScopedCustomActionSpy = sinon.spy((command as any), 'removeScopedCustomAction');
-    const options: Object = {
+    const options = {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       url: 'https://contoso.sharepoint.com',
       scope: 'Site',
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -300,11 +300,11 @@ describe(commands.CUSTOMACTION_REMOVE, () => {
     defaultPostCallsStub();
 
     const searchAllScopesSpy = sinon.spy((command as any), 'searchAllScopes');
-    const options: Object = {
+    const options = {
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       url: 'https://contoso.sharepoint.com',
       confirm: true
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {

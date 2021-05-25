@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./guestsettings-set');
 
-describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
+describe(commands.GUESTSETTINGS_SET, () => {
   let log: string[];
   let logger: Logger;
 
@@ -50,7 +50,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_GUESTSETTINGS_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.GUESTSETTINGS_SET), true);
   });
 
   it('has a description', () => {
@@ -125,7 +125,7 @@ describe(commands.TEAMS_GUESTSETTINGS_SET, () => {
   });
 
   it('correctly handles error when updating guest settings', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

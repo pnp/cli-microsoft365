@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./app-list');
 
-describe(commands.TEAMS_APP_LIST, () => {
+describe(commands.APP_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.TEAMS_APP_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_APP_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.APP_LIST), true);
   });
 
   it('has a description', () => {
@@ -454,7 +454,7 @@ describe(commands.TEAMS_APP_LIST, () => {
   });
 
   it('correctly handles error when retrieving apps', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

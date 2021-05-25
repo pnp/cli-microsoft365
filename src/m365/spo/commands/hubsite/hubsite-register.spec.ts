@@ -137,7 +137,7 @@ describe(commands.HUBSITE_REGISTER, () => {
   });
 
   it('correctly handles error when trying to register site which already is a hub site as a hub site', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {

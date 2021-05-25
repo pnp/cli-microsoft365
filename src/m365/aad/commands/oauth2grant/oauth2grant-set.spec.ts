@@ -111,7 +111,7 @@ describe(commands.OAUTH2GRANT_SET, () => {
   });
   
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

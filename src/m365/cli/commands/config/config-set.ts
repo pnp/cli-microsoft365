@@ -15,6 +15,8 @@ interface Options extends GlobalOptions {
 }
 
 class CliConfigSetCommand extends AnonymousCommand {
+  private static readonly optionNames: string[] = Object.getOwnPropertyNames(settingsNames);
+
   public get name(): string {
     return commands.CONFIG_SET;
   }
@@ -34,6 +36,7 @@ class CliConfigSetCommand extends AnonymousCommand {
 
     switch (args.options.key) {
       case settingsNames.showHelpOnFailure:
+      case settingsNames.printErrorsAsPlainText:
         value = args.options.value === 'true';
         break;
       default:
@@ -49,7 +52,7 @@ class CliConfigSetCommand extends AnonymousCommand {
     const options: CommandOption[] = [
       {
         option: '-k, --key <key>',
-        autocomplete: [settingsNames.showHelpOnFailure, settingsNames.output]
+        autocomplete: CliConfigSetCommand.optionNames
       },
       {
         option: '-v, --value <value>'
@@ -61,15 +64,20 @@ class CliConfigSetCommand extends AnonymousCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (args.options.key !== settingsNames.showHelpOnFailure &&
-      args.options.key !== settingsNames.output) {
-      return `${args.options.key} is not a valid setting. Allowed values: ${settingsNames.showHelpOnFailure}, ${settingsNames.output}`;
+    if (CliConfigSetCommand.optionNames.indexOf(args.options.key) < 0) {
+      return `${args.options.key} is not a valid setting. Allowed values: ${CliConfigSetCommand.optionNames.join(', ')}`;
     }
 
-    const allowedOutputs = ['text', 'json']
+    const allowedOutputs = ['text', 'json'];
     if (args.options.key === settingsNames.output &&
       allowedOutputs.indexOf(args.options.value) === -1) {
       return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${allowedOutputs.join(', ')}`;
+    }
+
+    const allowedErrorOutputs = ['stdout', 'stderr'];
+    if (args.options.key === settingsNames.errorOutput &&
+      allowedErrorOutputs.indexOf(args.options.value) === -1) {
+      return `${args.options.value} is not a valid value for the option ${args.options.key}. Allowed values: ${allowedErrorOutputs.join(', ')}`;
     }
 
     return true;

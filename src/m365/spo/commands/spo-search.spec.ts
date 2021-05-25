@@ -46,17 +46,17 @@ describe(commands.SEARCH, () => {
   let logger: Logger;
   let returnArrayLength = 0;
   let executedTest: TestID = TestID.None;
-  let urlContains = (opts: any, substring: string): boolean => {
+  const urlContains = (opts: any, substring: string): boolean => {
     return opts.url.toUpperCase().indexOf(substring.toUpperCase()) > -1;
-  }
-  let filterRows = (rows: ResultTableRow[], key: string, value: string) => {
+  };
+  const filterRows = (rows: ResultTableRow[], key: string, value: string) => {
     return rows.filter(row => {
       return row.Cells.filter(cell => {
         return (cell.Key.toUpperCase() === key.toUpperCase() && cell.Value.toUpperCase() === value.toUpperCase());
       }).length > 0;
     });
-  }
-  let getFakeRows = (): ResultTableRow[] => {
+  };
+  const getFakeRows = (): ResultTableRow[] => {
     return [
       {
         "Cells": [
@@ -124,8 +124,8 @@ describe(commands.SEARCH, () => {
       }
     ];
   };
-  let fakeRows: ResultTableRow[] = getFakeRows();
-  let getQueryResult = (rows: ResultTableRow[], totalRows?: number): SearchResult => {
+  const fakeRows: ResultTableRow[] = getFakeRows();
+  const getQueryResult = (rows: ResultTableRow[], totalRows?: number): SearchResult => {
     returnArrayLength = totalRows ? totalRows : rows.length;
 
     return {
@@ -167,10 +167,10 @@ describe(commands.SEARCH, () => {
       "SpellingSuggestion": "",
       "TriggeredRules": []
     };
-  }
-  let getFakes = (opts: any) => {
+  };
+  const getFakes = (opts: any) => {
     if (urlContains(opts, 'QUERYTEXT=\'ISDOCUMENT:1\'')) {
-      let rows = filterRows(fakeRows, 'ISDOCUMENT', 'TRUE');
+      const rows = filterRows(fakeRows, 'ISDOCUMENT', 'TRUE');
 
       if (urlContains(opts, 'ROWLIMIT=1')) {
         if (urlContains(opts, 'STARTROW=0')) {
@@ -236,7 +236,7 @@ describe(commands.SEARCH, () => {
       }
       if (urlContains(opts, 'startRow=1')) {
         executedTest = TestID.QueryAll_WithStartRowTest;
-        var rowsToReturn = fakeRows.slice();
+        const rowsToReturn = fakeRows.slice();
         rowsToReturn.splice(0, 1);
         return Promise.resolve(getQueryResult(rowsToReturn));
       }
@@ -291,7 +291,7 @@ describe(commands.SEARCH, () => {
     }
     returnArrayLength = 0;
     return Promise.reject('Invalid request');
-  }
+  };
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -1071,7 +1071,7 @@ describe(commands.SEARCH, () => {
     command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, (error?: any) => {
       try {

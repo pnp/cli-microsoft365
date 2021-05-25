@@ -127,7 +127,7 @@ describe(commands.GROUPSETTINGTEMPLATE_LIST, () => {
   });
 
   it('handles error correctly', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

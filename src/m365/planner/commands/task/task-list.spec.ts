@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./task-list');
 
-describe(commands.PLANNER_TASK_LIST, () => {
+describe(commands.TASK_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.PLANNER_TASK_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.PLANNER_TASK_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.TASK_LIST), true);
   });
 
   it('has a description', () => {
@@ -167,7 +167,7 @@ describe(commands.PLANNER_TASK_LIST, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'get').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: { debug: false } } as any, (err?: any) => {
       try {

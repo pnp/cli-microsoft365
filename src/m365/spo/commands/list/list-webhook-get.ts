@@ -70,7 +70,7 @@ class SpoListWebhookGetCommand extends SpoCommand {
         if (this.verbose) {
           logger.logToStderr('Specified webhook not found');
         }
-        this.handleRejectedODataJsonPromise(err, logger, cb)
+        this.handleRejectedODataJsonPromise(err, logger, cb);
       });
   }
 
@@ -87,7 +87,7 @@ class SpoListWebhookGetCommand extends SpoCommand {
       },
       {
         option: '-i, --id [id]'
-      },
+      }
     ];
 
     const parentOptions: CommandOption[] = super.options();

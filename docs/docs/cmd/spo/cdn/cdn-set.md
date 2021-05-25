@@ -37,31 +37,31 @@ Using the `--noDefaultOrigins` option you can specify to skip the creation of th
 Enable the Microsoft 365 Public CDN on the current tenant
 
 ```sh
-m365 spo cdn set -t Public -e true
+m365 spo cdn set --type Public --enabled true
 ```
 
 Disable the Microsoft 365 Public CDN on the current tenant
 
 ```sh
-m365 spo cdn set -t Public -e false
+m365 spo cdn set --type Public --enabled false
 ```
 
 Enable the Microsoft 365 Private CDN on the current tenant
 
 ```sh
-m365 spo cdn set -t Private -e true
+m365 spo cdn set --type Private --enabled true
 ```
 
 Enable the Microsoft 365 Private and Public CDN on the current tenant with default origins
 
 ```sh
-m365 spo cdn set -t Both -e true
+m365 spo cdn set --type Both --enabled true
 ```
 
 Enable the Microsoft 365 Private and Public CDN on the current tenant without default origins
 
 ```sh
-m365 spo cdn set -t Both -e true --noDefaultOrigins
+m365 spo cdn set --type Both --enabled true --noDefaultOrigins
 ```
 
 ## More information

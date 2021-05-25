@@ -3,7 +3,7 @@ import commands from '../../commands';
 
 class OutlookReportMailActivityUserDetailCommand extends DateAndPeriodBasedReport {
   public get name(): string {
-    return commands.OUTLOOK_REPORT_MAILACTIVITYUSERDETAIL;
+    return commands.REPORT_MAILACTIVITYUSERDETAIL;
   }
 
   public get usageEndpoint(): string {

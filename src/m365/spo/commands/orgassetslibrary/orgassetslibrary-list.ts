@@ -11,13 +11,10 @@ import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../..
 import { OrgAssets, OrgAssetsResponse } from './OrgAssets';
 
 interface CommandArgs {
-  options: Options;
+  options: GlobalOptions;
 }
 
-interface Options extends GlobalOptions {
-}
-
-class SpoOrgNewsSiteListCommand extends SpoCommand {
+class SpoOrgAssetsLibraryListCommand extends SpoCommand {
   public get name(): string {
     return commands.ORGASSETSLIBRARY_LIST;
   }
@@ -60,7 +57,8 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
 
           if (orgAssetsResponse === null || orgAssetsResponse.OrgAssetsLibraries === undefined) {
             logger.log("No libraries in Organization Assets");
-          } else {
+          }
+          else {
             const orgAssets: OrgAssets = {
               Url: orgAssetsResponse.Url.DecodedUrl,
               Libraries: orgAssetsResponse.OrgAssetsLibraries._Child_Items_.map(t => {
@@ -68,10 +66,10 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
                   DisplayName: t.DisplayName,
                   LibraryUrl: t.LibraryUrl.DecodedUrl,
                   ListId: t.ListId,
-                  ThumbnailUrl: t.ThumbnailUrl != null ? t.ThumbnailUrl.DecodedUrl : null
-                }
+                  ThumbnailUrl: t.ThumbnailUrl !== null ? t.ThumbnailUrl.DecodedUrl : null
+                };
               })
-            }
+            };
 
             logger.log(orgAssets);
           }
@@ -87,4 +85,4 @@ class SpoOrgNewsSiteListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoOrgNewsSiteListCommand();
+module.exports = new SpoOrgAssetsLibraryListCommand();

@@ -179,7 +179,7 @@ describe(commands.FILE_LIST, () => {
     command.action(logger, {
       options: {
         debug: true,
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, (error?: any) => {
       try {
@@ -195,7 +195,7 @@ describe(commands.FILE_LIST, () => {
   it('uses correct API url when output json option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('select123=') > -1) {
-        return Promise.resolve('Correct Url1')
+        return Promise.resolve('Correct Url1');
       }
 
       return Promise.reject('Invalid request');

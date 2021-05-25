@@ -45,7 +45,7 @@ class AadGroupSettingSetCommand extends GraphCommand {
 
     request
       .get<GroupSetting>(requestOptions)
-      .then((groupSetting: GroupSetting): Promise<{}> => {
+      .then((groupSetting: GroupSetting): Promise<void> => {
         const requestOptions: any = {
           url: `${this.resource}/v1.0/groupSettings/${args.options.id}`,
           headers: {

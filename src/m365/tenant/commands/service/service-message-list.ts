@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
 
 class TenantServiceMessageListCommand extends Command {
   public get name(): string {
-    return commands.TENANT_SERVICE_MESSAGE_LIST;
+    return commands.SERVICE_MESSAGE_LIST;
   }
 
   public get description(): string {
@@ -34,7 +34,7 @@ class TenantServiceMessageListCommand extends Command {
 
     const serviceUrl: string = 'https://manage.office.com/api/v1.0';
     const statusEndpoint: string = args.options.workload ? `ServiceComms/Messages?$filter=Workload eq '${encodeURIComponent(args.options.workload)}'` : 'ServiceComms/Messages';
-    const tenantId: string = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].value);
+    const tenantId: string = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
 
     const requestOptions: any = {
       url: `${serviceUrl}/${tenantId}/${statusEndpoint}`,

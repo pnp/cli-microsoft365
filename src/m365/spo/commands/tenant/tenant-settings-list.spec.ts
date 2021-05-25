@@ -16,7 +16,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     sinon.stub(command as any, 'getRequestDigest').callsFake(() => Promise.resolve({ FormDigestValue: 'ABC' }));
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
@@ -133,19 +133,19 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
       if ((opts.url as string).indexOf('_vti_bin/client.svc/ProcessQuery') > -1) {
         return Promise.resolve(JSON.stringify([
           {
-          "SchemaVersion":"15.0.0.0","LibraryVersion":"16.0.8015.1218","ErrorInfo":null,"TraceCorrelationId":"6148899e-a042-6000-ee90-5bfa05d08b79"
-          },4,{
-          "IsNull":false
-          },5,{
-          "_ObjectType_":"Microsoft.Online.SharePoint.TenantAdministration.Tenant","_ObjectIdentity_":"6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee\nTenant","AllowDownloadingNonWebViewableFiles":true,"AllowedDomainListForSyncClient":[
-          
-          ],"AllowEditing":true,"AllowLimitedAccessOnUnmanagedDevices":false,"ApplyAppEnforcedRestrictionsToAdHocRecipients":true,"BccExternalSharingInvitations":false,"BccExternalSharingInvitationsList":null,"BlockAccessOnUnmanagedDevices":false,"BlockDownloadOfAllFilesForGuests":false,"BlockDownloadOfAllFilesOnUnmanagedDevices":false,"BlockDownloadOfViewableFilesForGuests":false,"BlockDownloadOfViewableFilesOnUnmanagedDevices":false,"BlockMacSync":false,"CommentsOnSitePagesDisabled":false,"CompatibilityRange":"15,15","ConditionalAccessPolicy":0,"DefaultLinkPermission":1,"DefaultSharingLinkType":1,"DisabledWebPartIds":null,"DisableReportProblemDialog":false,"DisallowInfectedFileDownload":false,"DisplayNamesOfFileViewers":true,"DisplayStartASiteOption":false,"EmailAttestationReAuthDays":30,"EmailAttestationRequired":false,"EnableGuestSignInAcceleration":false,"EnableMinimumVersionRequirement":true,"ExcludedFileExtensionsForSyncClient":[
-          ""
-          ],"ExternalServicesEnabled":true,"FileAnonymousLinkType":2,"FilePickerExternalImageSearchEnabled":true,"FolderAnonymousLinkType":2,"HideSyncButtonOnODB":false,"IPAddressAllowList":"","IPAddressEnforcement":false,"IPAddressWACTokenLifetime":15,"IsHubSitesMultiGeoFlightEnabled":false,"IsMultiGeo":false,"IsUnmanagedSyncClientForTenantRestricted":false,"IsUnmanagedSyncClientRestrictionFlightEnabled":true,"LegacyAuthProtocolsEnabled":true,"LimitedAccessFileType":1,"NoAccessRedirectUrl":null,"NotificationsInOneDriveForBusinessEnabled":true,"NotificationsInSharePointEnabled":true,"NotifyOwnersWhenInvitationsAccepted":true,"NotifyOwnersWhenItemsReshared":true,"ODBAccessRequests":0,"ODBMembersCanShare":0,"OfficeClientADALDisabled":false,"OneDriveForGuestsEnabled":false,"OneDriveStorageQuota":1048576,"OptOutOfGrooveBlock":false,"OptOutOfGrooveSoftBlock":false,"OrphanedPersonalSitesRetentionPeriod":30,"OwnerAnonymousNotification":true,"PermissiveBrowserFileHandlingOverride":false,"PreventExternalUsersFromResharing":true,"ProvisionSharedWithEveryoneFolder":false,"PublicCdnAllowedFileTypes":"CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF","PublicCdnEnabled":false,"PublicCdnOrigins":[
-          
-          ],"RequireAcceptingAccountMatchInvitedAccount":true,"RequireAnonymousLinksExpireInDays":-1,"ResourceQuota":66700,"ResourceQuotaAllocated":13668,"RootSiteUrl":"https:\u002f\u002fprufinancial.sharepoint.com","SearchResolveExactEmailOrUPN":false,"SharingAllowedDomainList":"microsoft.com pramerica.ie pramericacdsdev.com prudential.com prufinancial.onmicrosoft.com","SharingBlockedDomainList":"deloitte.com","SharingCapability":1,"SharingDomainRestrictionMode":1,"ShowAllUsersClaim":false,"ShowEveryoneClaim":false,"ShowEveryoneExceptExternalUsersClaim":false,"ShowNGSCDialogForSyncOnODB":true,"ShowPeoplePickerSuggestionsForGuestUsers":false,"SignInAccelerationDomain":"","SocialBarOnSitePagesDisabled":false,"SpecialCharactersStateInFileFolderNames":1,"StartASiteFormUrl":null,"StorageQuota":4448256,"StorageQuotaAllocated":676508312,"SyncPrivacyProfileProperties":true,"UseFindPeopleInPeoplePicker":false,"UsePersistentCookiesForExplorerView":false,"UserVoiceForFeedbackEnabled":false,"HideDefaultThemes":true
+            "SchemaVersion": "15.0.0.0", "LibraryVersion": "16.0.8015.1218", "ErrorInfo": null, "TraceCorrelationId": "6148899e-a042-6000-ee90-5bfa05d08b79"
+          }, 4, {
+            "IsNull": false
+          }, 5, {
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant", "_ObjectIdentity_": "6648899e-a042-6000-ee90-5bfa05d08b79|908bed80-a04a-4433-b4a0-883d9847d11d:ea1787c6-7ce2-4e71-be47-5e0deb30f9ee\nTenant", "AllowDownloadingNonWebViewableFiles": true, "AllowedDomainListForSyncClient": [
+
+            ], "AllowEditing": true, "AllowLimitedAccessOnUnmanagedDevices": false, "ApplyAppEnforcedRestrictionsToAdHocRecipients": true, "BccExternalSharingInvitations": false, "BccExternalSharingInvitationsList": null, "BlockAccessOnUnmanagedDevices": false, "BlockDownloadOfAllFilesForGuests": false, "BlockDownloadOfAllFilesOnUnmanagedDevices": false, "BlockDownloadOfViewableFilesForGuests": false, "BlockDownloadOfViewableFilesOnUnmanagedDevices": false, "BlockMacSync": false, "CommentsOnSitePagesDisabled": false, "CompatibilityRange": "15,15", "ConditionalAccessPolicy": 0, "DefaultLinkPermission": 1, "DefaultSharingLinkType": 1, "DisabledWebPartIds": null, "DisableReportProblemDialog": false, "DisallowInfectedFileDownload": false, "DisplayNamesOfFileViewers": true, "DisplayStartASiteOption": false, "EmailAttestationReAuthDays": 30, "EmailAttestationRequired": false, "EnableGuestSignInAcceleration": false, "EnableMinimumVersionRequirement": true, "ExcludedFileExtensionsForSyncClient": [
+              ""
+            ], "ExternalServicesEnabled": true, "FileAnonymousLinkType": 2, "FilePickerExternalImageSearchEnabled": true, "FolderAnonymousLinkType": 2, "HideSyncButtonOnODB": false, "IPAddressAllowList": "", "IPAddressEnforcement": false, "IPAddressWACTokenLifetime": 15, "IsHubSitesMultiGeoFlightEnabled": false, "IsMultiGeo": false, "IsUnmanagedSyncClientForTenantRestricted": false, "IsUnmanagedSyncClientRestrictionFlightEnabled": true, "LegacyAuthProtocolsEnabled": true, "LimitedAccessFileType": 1, "NoAccessRedirectUrl": null, "NotificationsInOneDriveForBusinessEnabled": true, "NotificationsInSharePointEnabled": true, "NotifyOwnersWhenInvitationsAccepted": true, "NotifyOwnersWhenItemsReshared": true, "ODBAccessRequests": 0, "ODBMembersCanShare": 0, "OfficeClientADALDisabled": false, "OneDriveForGuestsEnabled": false, "OneDriveStorageQuota": 1048576, "OptOutOfGrooveBlock": false, "OptOutOfGrooveSoftBlock": false, "OrphanedPersonalSitesRetentionPeriod": 30, "OwnerAnonymousNotification": true, "PermissiveBrowserFileHandlingOverride": false, "PreventExternalUsersFromResharing": true, "ProvisionSharedWithEveryoneFolder": false, "PublicCdnAllowedFileTypes": "CSS,EOT,GIF,ICO,JPEG,JPG,JS,MAP,PNG,SVG,TTF,WOFF", "PublicCdnEnabled": false, "PublicCdnOrigins": [
+
+            ], "RequireAcceptingAccountMatchInvitedAccount": true, "RequireAnonymousLinksExpireInDays": -1, "ResourceQuota": 66700, "ResourceQuotaAllocated": 13668, "RootSiteUrl": "https:\u002f\u002fprufinancial.sharepoint.com", "SearchResolveExactEmailOrUPN": false, "SharingAllowedDomainList": "microsoft.com pramerica.ie pramericacdsdev.com prudential.com prufinancial.onmicrosoft.com", "SharingBlockedDomainList": "deloitte.com", "SharingCapability": 1, "SharingDomainRestrictionMode": 1, "ShowAllUsersClaim": false, "ShowEveryoneClaim": false, "ShowEveryoneExceptExternalUsersClaim": false, "ShowNGSCDialogForSyncOnODB": true, "ShowPeoplePickerSuggestionsForGuestUsers": false, "SignInAccelerationDomain": "", "SocialBarOnSitePagesDisabled": false, "SpecialCharactersStateInFileFolderNames": 1, "StartASiteFormUrl": null, "StorageQuota": 4448256, "StorageQuotaAllocated": 676508312, "SyncPrivacyProfileProperties": true, "UseFindPeopleInPeoplePicker": false, "UsePersistentCookiesForExplorerView": false, "UserVoiceForFeedbackEnabled": false, "HideDefaultThemes": true
           }
-          ]));
+        ]));
       }
       return Promise.reject('Invalid request');
     });
@@ -192,7 +192,7 @@ describe(commands.TENANT_SETTINGS_LIST, () => {
           }, 58, {
             "IsNull": false
           }, 59, {
-            "_ObjectType_":"Microsoft.Online.SharePoint.TenantAdministration.Tenant"
+            "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.Tenant"
           }
         ]));
       }

@@ -44,7 +44,7 @@ class AadO365GroupRemoveCommand extends GraphCommand {
         url: `${this.resource}/v1.0/groups/${args.options.id}`,
         headers: {
           'accept': 'application/json;odata.metadata=none'
-        },
+        }
       };
 
       request
@@ -58,7 +58,7 @@ class AadO365GroupRemoveCommand extends GraphCommand {
             url: `${this.resource}/v1.0/directory/deletedItems/${args.options.id}`,
             headers: {
               'accept': 'application/json;odata.metadata=none'
-            },
+            }
           };
           return request.delete(requestOptions2);
         })
@@ -73,7 +73,7 @@ class AadO365GroupRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the group ${args.options.id}?`,
+        message: `Are you sure you want to remove the group ${args.options.id}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();
@@ -90,10 +90,10 @@ class AadO365GroupRemoveCommand extends GraphCommand {
         option: '-i, --id <id>'
       },
       {
-        option: '--confirm',
+        option: '--confirm'
       },
       {
-        option: '--skipRecycleBin',
+        option: '--skipRecycleBin'
       }
     ];
 

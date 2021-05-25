@@ -209,7 +209,7 @@ describe(commands.HUBSITE_DATA_GET, () => {
   });
 
   it('correctly handles error when hub site not found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           "odata.error": {

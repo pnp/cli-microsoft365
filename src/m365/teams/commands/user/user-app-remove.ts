@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class TeamsUserAppRemoveCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_USER_APP_REMOVE;
+    return commands.USER_APP_REMOVE;
   }
 
   public get description(): string {
@@ -33,7 +33,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeApp: () => void = (): void => {
-      const endpoint: string = `${this.resource}/beta`
+      const endpoint: string = `${this.resource}/beta`;
 
       const requestOptions: any = {
         url: `${endpoint}/users/${args.options.userId}/teamwork/installedApps/${args.options.appId}`,
@@ -46,7 +46,7 @@ class TeamsUserAppRemoveCommand extends GraphCommand {
       request
         .delete(requestOptions)
         .then(_ => cb(), (res: any): void => this.handleRejectedODataJsonPromise(res, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       removeApp();

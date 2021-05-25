@@ -173,7 +173,7 @@ describe(commands.TASK_SET, () => {
 
   it('handles error correctly', (done) => {
     Utils.restore(request.patch);
-    sinon.stub(request, 'patch').callsFake((opts) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 
@@ -181,7 +181,7 @@ describe(commands.TASK_SET, () => {
       options: {
         listName: "Tasks List",
         id: 'abc',
-        title:"New task",
+        title:"New task"
       }
     } as any, (err?: any) => {
       try {
@@ -200,7 +200,7 @@ describe(commands.TASK_SET, () => {
         listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA==',
         listName: 'Tasks List',
         title: 'New Task',
-        id: 'abc',
+        id: 'abc'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -210,7 +210,7 @@ describe(commands.TASK_SET, () => {
     const actual = command.validate({
       options: {
         title: 'New Task',
-        id: 'abc',
+        id: 'abc'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -219,7 +219,7 @@ describe(commands.TASK_SET, () => {
     const actual = command.validate({
       options: {
         title: 'New Task',  
-        listName: 'Tasks List',    
+        listName: 'Tasks List'    
       }
     });
     assert.notStrictEqual(actual, true);
@@ -228,7 +228,7 @@ describe(commands.TASK_SET, () => {
     const actual = command.validate({
       options: {
         title: 'New Task',  
-        listName: 'Tasks List',    
+        listName: 'Tasks List'    
       }
     });
     assert.notStrictEqual(actual, true);
@@ -241,17 +241,17 @@ describe(commands.TASK_SET, () => {
       status:"test",
       listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
   
-    }
+    };
     const actual = command.validate({ options: options });
     assert.strictEqual(actual,'test is not a valid value. Allowed values are notStarted|inProgress|completed|waitingOnOthers|deferred');
   });
   it('correctly validates the arguments', () => {
     const actual = command.validate({
       options: {
-      title: 'New Task',
-      id: 'abc',
-      status:"notStarted",
-      listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
+        title: 'New Task',
+        id: 'abc',
+        status:"notStarted",
+        listId: 'AQMkADlhMTRkOGEzLWQ1M2QtNGVkNS04NjdmLWU0NzJhMjZmZWNmMwAuAAADKvwNgAMNPE_zFNRJXVrU1wEAhHKQZHItDEOVCn8U3xuA2AABmQeVPwAAAA=='
   
       }
     });

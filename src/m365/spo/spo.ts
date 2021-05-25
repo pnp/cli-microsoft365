@@ -8,8 +8,7 @@ export interface FormDigestInfo extends ContextInfo {
   FormDigestExpiresAt: Date;
 }
 
-export interface ClientSvcResponse extends Array<any | ClientSvcResponseContents> {
-}
+export type ClientSvcResponse = Array<any | ClientSvcResponseContents>;
 
 export interface ClientSvcResponseContents {
   SchemaVersion: string;

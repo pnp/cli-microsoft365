@@ -10,7 +10,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./mail-send');
 
-describe(commands.OUTLOOK_MAIL_SEND, () => {
+describe(commands.MAIL_SEND, () => {
   let log: string[];
   let logger: Logger;
 
@@ -41,7 +41,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
       request.post,
       fs.readFileSync,
       fs.existsSync,
-      fs.lstatSync,
+      fs.lstatSync
     ]);
   });
 
@@ -54,12 +54,12 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.OUTLOOK_MAIL_SEND), true);
+    assert.strictEqual(command.name.startsWith(commands.MAIL_SEND), true);
   });
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(commands.OUTLOOK_SENDMAIL) > -1), true);
+    assert.strictEqual((alias && alias.indexOf(commands.SENDMAIL) > -1), true);
   });
 
   it('has a description', () => {
@@ -272,7 +272,7 @@ describe(commands.OUTLOOK_MAIL_SEND, () => {
   });
 
   it('correctly handles error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "Error",

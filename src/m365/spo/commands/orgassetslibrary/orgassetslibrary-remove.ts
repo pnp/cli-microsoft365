@@ -72,7 +72,7 @@ class SpoOrgAssetsLibraryRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the library ${args.options.libraryUrl} as a central location for organization assets?`,
+        message: `Are you sure you want to remove the library ${args.options.libraryUrl} as a central location for organization assets?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

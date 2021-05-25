@@ -67,7 +67,7 @@ class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
             cb();
           }
         }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       removeOrgNewsSite();
@@ -77,7 +77,7 @@ class SpoOrgNewsSiteRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove ${args.options.url} from the list of organizational news sites?`,
+        message: `Are you sure you want to remove ${args.options.url} from the list of organizational news sites?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

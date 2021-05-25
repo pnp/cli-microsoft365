@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-    CommandError
+  CommandError
 } from '../../../../Command';
 import config from '../../../../config';
 import request from '../../../../request';
@@ -45,7 +45,7 @@ class SpoTenantSettingsListCommand extends SpoCommand {
           return;
         }
 
-        let result = json[4];
+        const result = json[4];
         delete result['_ObjectIdentity_'];
         delete result['_ObjectType_'];
 

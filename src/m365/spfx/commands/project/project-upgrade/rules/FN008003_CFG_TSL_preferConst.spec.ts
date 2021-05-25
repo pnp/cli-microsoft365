@@ -19,7 +19,7 @@ describe('FN010201_CFG_TSL_preferConst', () => {
         $schema: "https://schema.org/dummy.json",
         lintConfig: {
           rules: {
-            "class-name": false,
+            "class-name": false
           }
         }
       }
@@ -35,14 +35,14 @@ describe('FN010201_CFG_TSL_preferConst', () => {
         $schema: "https://schema.org/dummy.json",
         lintConfig: {
           rules: {
-            "prefer-const": true,
+            "prefer-const": true
           }
         },
         source: JSON.stringify({
           $schema: "https://schema.org/dummy.json",
           lintConfig: {
             rules: {
-              "prefer-const": true,
+              "prefer-const": true
             }
           }
         }, null, 2)

@@ -247,12 +247,12 @@ describe(commands.SOLUTION_REFERENCE_ADD, () => {
       }
       return [];
     });
-    const pathRelative = sinon.stub(path, 'relative').callsFake((from, to) => {
+    const pathRelative = sinon.stub(path, 'relative').callsFake(() => {
       return pathToPcfProject;
     });
-    const fsReadFileSync = sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => '<abc></abc>');
-    const addProjectReferenceStub = sinon.stub(CdsProjectMutator.prototype, 'addProjectReference').callsFake((path) => { });
-    const fsWriteFileSync = sinon.stub(fs, 'writeFileSync').callsFake((path, contents) => { });
+    const fsReadFileSync = sinon.stub(fs, 'readFileSync').callsFake(() => '<abc></abc>');
+    const addProjectReferenceStub = sinon.stub(CdsProjectMutator.prototype, 'addProjectReference').callsFake(() => { });
+    const fsWriteFileSync = sinon.stub(fs, 'writeFileSync').callsFake(() => { });
 
     command.action(logger, { options: { path: pathToDirectory } }, () => {
       assert(pathRelative.calledWith(process.cwd(), pathToPcfProject));

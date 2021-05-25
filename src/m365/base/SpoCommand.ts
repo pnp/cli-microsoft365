@@ -13,6 +13,53 @@ export interface FormDigest {
 }
 
 export default abstract class SpoCommand extends Command {
+  /**
+   * Defines list of options that contain URLs in spo commands. CLI will use
+   * this list to expand server-relative URLs specified in these options to
+   * absolute.
+   * If a command requires one of these options to contain a server-relative
+   * URL, it should override this method and remove the necessary property from
+   * the array before returning it.
+   */
+  protected getNamesOfOptionsWithUrls(): string[] {
+    const namesOfOptionsWithUrls: string[] = [
+      'appCatalogUrl',
+      'siteUrl',
+      'webUrl',
+      'origin',
+      'url',
+      'imageUrl',
+      'actionUrl',
+      'logoUrl',
+      'libraryUrl',
+      'thumbnailUrl',
+      'targetUrl',
+      'newSiteUrl',
+      'previewImageUrl',
+      'NoAccessRedirectUrl',
+      'StartASiteFormUrl',
+      'OrgNewsSiteUrl',
+      'parentWebUrl',
+      'siteLogoUrl'
+    ];
+    const excludedOptionsWithUrls: string[] | undefined = this.getExcludedOptionsWithUrls();
+    if (!excludedOptionsWithUrls) {
+      return namesOfOptionsWithUrls;
+    }
+    else {
+      return namesOfOptionsWithUrls.filter(o => excludedOptionsWithUrls.indexOf(o) < 0);
+    }
+  }
+
+  /**
+   * Array of names of options with URLs that should be excluded
+   * from processing. To be overriden in commands that require
+   * specific options to be a server-relative URL
+   */
+  protected getExcludedOptionsWithUrls(): string[] | undefined {
+    return undefined;
+  }
+
   protected getRequestDigest(siteUrl: string): Promise<FormDigestInfo> {
     const requestOptions: any = {
       url: `${siteUrl}/_api/contextinfo`,
@@ -23,6 +70,30 @@ export default abstract class SpoCommand extends Command {
     };
 
     return request.post(requestOptions);
+  }
+
+  public async processOptions(options: any): Promise<void> {
+    const namesOfOptionsWithUrls: string[] = this.getNamesOfOptionsWithUrls();
+    const optionNames = Object.getOwnPropertyNames(options);
+    for (const optionName of optionNames) {
+      if (namesOfOptionsWithUrls.indexOf(optionName) < 0) {
+        continue;
+      }
+
+      const optionValue: any = options[optionName];
+      if (typeof optionValue !== 'string' ||
+        !optionValue.startsWith('/')) {
+        continue;
+      }
+
+      await auth.restoreAuth();
+
+      if (!auth.service.spoUrl) {
+        throw new Error(`SharePoint URL is not available. Set SharePoint URL using the 'm365 spo set' command or use absolute URLs`);
+      }
+
+      options[optionName] = auth.service.spoUrl + optionValue;
+    }
   }
 
   public static isValidSharePointUrl(url: string): boolean | string {
@@ -81,7 +152,7 @@ export default abstract class SpoCommand extends Command {
     return false;
   }
 
-  protected waitUntilFinished(operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, logger: Logger, currentContext: FormDigestInfo, dots?: string, timeout?: NodeJS.Timer): void {
+  protected waitUntilFinished(operationId: string, siteUrl: string, resolve: () => void, reject: (error: any) => void, logger: Logger, currentContext: FormDigestInfo, dots?: string): void {
     this
       .ensureFormDigest(siteUrl, logger, currentContext, this.debug)
       .then((res: FormDigestInfo): Promise<string> => {
@@ -114,7 +185,7 @@ export default abstract class SpoCommand extends Command {
         }
         else {
           const operation: SpoOperation = json[json.length - 1];
-          let isComplete: boolean = operation.IsComplete;
+          const isComplete: boolean = operation.IsComplete;
           if (isComplete) {
             if (!this.debug && this.verbose) {
               process.stdout.write('\n');
@@ -124,14 +195,14 @@ export default abstract class SpoCommand extends Command {
             return;
           }
 
-          timeout = setTimeout(() => {
+          setTimeout(() => {
             this.waitUntilFinished(JSON.stringify(operation._ObjectIdentity_), siteUrl, resolve, reject, logger, currentContext, dots);
           }, operation.PollingInterval);
         }
       });
   }
 
-  protected waitUntilCopyJobFinished(copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, logger: Logger, dots?: string, timeout?: NodeJS.Timer): void {
+  protected waitUntilCopyJobFinished(copyJobInfo: any, siteUrl: string, pollingInterval: number, resolve: () => void, reject: (error: any) => void, logger: Logger, dots?: string): void {
     const requestUrl: string = `${siteUrl}/_api/site/GetCopyJobProgress`;
     const requestOptions: any = {
       url: requestUrl,
@@ -175,8 +246,9 @@ export default abstract class SpoCommand extends Command {
           }
 
           resolve();
-        } else {
-          timeout = setTimeout(() => {
+        }
+        else {
+          setTimeout(() => {
             this.waitUntilCopyJobFinished(copyJobInfo, siteUrl, pollingInterval, resolve, reject, logger, dots);
           }, pollingInterval);
         }

@@ -8,7 +8,7 @@ import { ClientSvcResponse, ClientSvcResponseContents } from './spo';
 export interface IdentityResponse {
   objectIdentity: string;
   serverRelativeUrl: string;
-};
+}
 
 /**
  * Commonly used Client Svc calls.
@@ -97,7 +97,7 @@ export class ClientSvc {
         }
 
         reject('Cannot proceed. EffectiveBasePermissions not found'); // this is not supposed to happen
-      }, (err: any): void => { reject(err); })
+      }, (err: any): void => { reject(err); });
     });
   }
 
@@ -140,7 +140,7 @@ export class ClientSvc {
         }
 
         reject('Cannot proceed. Folder _ObjectIdentity_ not found'); // this is not suppose to happen
-      }, (err: any): void => { reject(err); })
+      }, (err: any): void => { reject(err); });
     });
   }
 }

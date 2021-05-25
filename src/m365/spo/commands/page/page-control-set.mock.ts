@@ -138,6 +138,6 @@ export const mockPageDataFail = {
     ...CanvasContent,
     id: "fake"
   }])
-}
+};
 
 export const mockCanvasContent = "<div>just some test content</div>";

@@ -72,7 +72,7 @@ class SpoListItemSetCommand extends SpoCommand {
           responseType: 'json'
         };
 
-        return request.get(listRequestOptions)
+        return request.get(listRequestOptions);
       }
       else {
         return Promise.resolve();
@@ -194,14 +194,16 @@ class SpoListItemSetCommand extends SpoCommand {
           });
         }
 
-        const requestOptions: any = args.options.systemUpdate ? {
-          url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'Content-Type': 'text/xml',
-            'X-RequestDigest': formDigestValue,
-          },
-          data: requestBody
-        } : {
+        const requestOptions: any = args.options.systemUpdate ?
+          {
+            url: `${args.options.webUrl}/_vti_bin/client.svc/ProcessQuery`,
+            headers: {
+              'Content-Type': 'text/xml',
+              'X-RequestDigest': formDigestValue
+            },
+            data: requestBody
+          } :
+          {
             url: `${listRestUrl}/items(${args.options.id})/ValidateUpdateListItem()`,
             headers: {
               'accept': 'application/json;odata=nometadata'
@@ -228,10 +230,10 @@ class SpoListItemSetCommand extends SpoCommand {
           const returnedData: any = response.value;
 
           if (!returnedData[0].ItemId) {
-            return Promise.reject(`Item didn't update successfully`)
+            return Promise.reject(`Item didn't update successfully`);
           }
           else {
-            itemId = returnedData[0].ItemId
+            itemId = returnedData[0].ItemId;
           }
         }
 
@@ -284,7 +286,7 @@ class SpoListItemSetCommand extends SpoCommand {
         'listId',
         'listTitle',
         'id',
-        'contentType',
+        'contentType'
       ],
       boolean: [
         'systemUpdate'
@@ -385,7 +387,7 @@ class SpoListItemSetCommand extends SpoCommand {
           reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
         }
 
-        const identityObject = json.find(x => { return x['_ObjectIdentity_'] });
+        const identityObject = json.find(x => { return x['_ObjectIdentity_']; });
         if (identityObject) {
           resolve(identityObject['_ObjectIdentity_']);
         }

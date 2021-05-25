@@ -82,7 +82,7 @@ describe(commands.ORGNEWSSITE_SET, () => {
         verbose: true,
         url: "http://contoso.sharepoint.com/sites/site1"
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(svcListRequest.called);
         done();
@@ -128,7 +128,7 @@ describe(commands.ORGNEWSSITE_SET, () => {
   });
 
   it('correctly handles random API error', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => Promise.reject('An error has occurred'));
+    sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/site1' } } as any, (err?: any) => {
       try {

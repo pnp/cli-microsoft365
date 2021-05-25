@@ -22,7 +22,7 @@ class TeamsChannelGetCommand extends GraphCommand {
   private teamId: string = "";
 
   public get name(): string {
-    return commands.TEAMS_CHANNEL_GET;
+    return commands.CHANNEL_GET;
   }
 
   public get description(): string {
@@ -108,7 +108,7 @@ class TeamsChannelGetCommand extends GraphCommand {
             accept: 'application/json;odata.metadata=none'
           },
           responseType: 'json'
-        }
+        };
 
         return request
           .get<Channel>(requestOptions);

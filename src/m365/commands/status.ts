@@ -13,19 +13,18 @@ class StatusCommand extends Command {
     return 'Shows Microsoft 365 login status';
   }
 
-  public commandAction(logger: Logger, args: {}, cb: (err?: any) => void): void {
+  public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
     if (auth.service.connected) {
       if (this.debug) {
         logger.logToStderr({
-          connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].value),
+          connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken),
           authType: AuthType[auth.service.authType],
-          accessTokens: JSON.stringify(auth.service.accessTokens, null, 2),
-          refreshToken: auth.service.refreshToken
+          accessTokens: JSON.stringify(auth.service.accessTokens, null, 2)
         });
       }
       else {
         logger.log({
-          connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].value)
+          connectedAs: Utils.getUserNameFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)
         });
       }
     }

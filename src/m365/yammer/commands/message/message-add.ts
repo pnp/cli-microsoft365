@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
 
 class YammerMessageAddCommand extends YammerCommand {
   public get name(): string {
-    return commands.YAMMER_MESSAGE_ADD;
+    return commands.MESSAGE_ADD;
   }
 
   public get description(): string {
@@ -60,7 +60,7 @@ class YammerMessageAddCommand extends YammerCommand {
       .post(requestOptions)
       .then((res: any): void => {
         let result = null;
-        if (res.messages && res.messages.length == 1) {
+        if (res.messages && res.messages.length === 1) {
           result = res.messages[0];
         }
 

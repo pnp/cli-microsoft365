@@ -10,7 +10,7 @@ describe('FN014002_CODE_extensions', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN014002_CODE_extensions();
-  })
+  });
 
   it('doesn\'t return notification if extensions.json already exists', () => {
     const project: Project = {

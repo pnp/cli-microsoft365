@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./guestsettings-list');
 
-describe(commands.TEAMS_GUESTSETTINGS_LIST, () => {
+describe(commands.GUESTSETTINGS_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.TEAMS_GUESTSETTINGS_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_GUESTSETTINGS_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.GUESTSETTINGS_LIST), true);
   });
 
   it('has a description', () => {
@@ -116,7 +116,7 @@ describe(commands.TEAMS_GUESTSETTINGS_LIST, () => {
   });
 
   it('correctly handles error when listing guest settings for a Microsoft Team', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

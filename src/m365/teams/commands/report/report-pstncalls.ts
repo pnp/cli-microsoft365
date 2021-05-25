@@ -18,7 +18,7 @@ interface DateTimeOptions extends GlobalOptions {
 }
 class TeamsReportPstncallsCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_REPORT_PSTNCALLS;
+    return commands.REPORT_PSTNCALLS;
   }
 
   public get description(): string {
@@ -79,7 +79,7 @@ class TeamsReportPstncallsCommand extends GraphCommand {
     }
 
     if (Math.ceil((new Date(args.options.toDateTime || new Date().toISOString()).getTime() - new Date(args.options.fromDateTime).getTime()) / (1000 * 3600 * 24)) > 90) {
-      return 'The maximum number of days between fromDateTime and toDateTime cannot exceed 90'
+      return 'The maximum number of days between fromDateTime and toDateTime cannot exceed 90';
     }
 
     return true;

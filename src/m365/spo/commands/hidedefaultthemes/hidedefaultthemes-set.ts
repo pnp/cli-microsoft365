@@ -44,7 +44,7 @@ class SpoHideDefaultThemesSetCommand extends SpoCommand {
             'accept': 'application/json;odata=nometadata'
           },
           data: {
-            hideDefaultThemes: args.options.hideDefaultThemes,
+            hideDefaultThemes: args.options.hideDefaultThemes
           },
           responseType: 'json'
         };

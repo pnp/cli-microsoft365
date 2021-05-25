@@ -32,7 +32,7 @@ class Autocomplete {
   }
 
   public handleAutocomplete(fragment: string, data: EventData): void {
-    let replies: Object | string[] = {};
+    let replies: any | string[] = {};
     let allWords: string[] = [];
 
     if (data.fragment === 1) {
@@ -55,7 +55,7 @@ class Autocomplete {
             return i === allWords.length - 1;
           }
         });
-      let accessor: Function = new Function('_', "return _['" + (words.join("']['")) + "']");
+      let accessor = new Function('_', "return _['" + (words.join("']['")) + "']");
 
       try {
         replies = accessor(this.commands);
@@ -147,7 +147,7 @@ class Autocomplete {
       if (keys.find(c => c.indexOf('-') === 0)) {
         printingArgs = true;
         const tmp: string[] = [];
-        keys.sort().forEach((k, i) => {
+        keys.sort().forEach((k) => {
           if (Object.keys(branch[k]).length > 0) {
             tmp.push(`"${k}"..#${this.getLuaFunctionName(`${luaFunctionName}_${k}`)}#`);
           }
@@ -202,7 +202,7 @@ class Autocomplete {
           const optionsArr: string[] = commandInfo.options
             .map(o => o.short)
             .concat(commandInfo.options.map(o => o.long))
-            .filter(o => o != null)
+            .filter(o => o)
             .map(o => (o as string).length === 1 ? `-${o}` : `--${o}`);
           optionsArr.push('--help');
           optionsArr.push('-h');

@@ -1,6 +1,105 @@
 # Release notes
 
+## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad app role list](../cmd/aad/app/app-role-list.md) - gets Azure AD app registration roles [#2144](https://github.com/pnp/cli-microsoft365/issues/2144)
+
+**CLI:**
+
+- [cli config get](../cmd/cli/config/config-get.md) - gets value of a CLI for Microsoft 365 configuration option [#2343](https://github.com/pnp/cli-microsoft365/issues/2343)
+
+**File:**
+
+- [file add](../cmd/file/file-add.md) - uploads file to the specified site using Microsoft Graph [#2384](https://github.com/pnp/cli-microsoft365/issues/2384)
+
+**Power Apps:**
+
+- [pa app remove](../cmd/pa/app/app-remove.md) - removes the specified Power App [#2133](https://github.com/pnp/cli-microsoft365/issues/2133)
+
+**SharePoint:**
+
+- [spo site apppermission set](../cmd/spo/site/site-apppermission-set.md) - updates a specific application permission for a site [#2210](https://github.com/pnp/cli-microsoft365/issues/2210)
+
+### Changes
+
+- added the 'Replace membership in group or team' sample [#2372](https://github.com/pnp/cli-microsoft365/issues/2372)
+- added the 'Monitor Site Collections Storage Usage' sample script [#2224](https://github.com/pnp/cli-microsoft365/issues/2224)
+- added support for printing errors as JSON in JSON output [#2298](https://github.com/pnp/cli-microsoft365/issues/2298)
+- extended 'spo site apppermission list' with roles [#2412](https://github.com/pnp/cli-microsoft365/issues/2412)
+- fixed removing users from O365 groups [#2368](https://github.com/pnp/cli-microsoft365/issues/2368)
+- fixed printing validation errors as json [#2429](https://github.com/pnp/cli-microsoft365/issues/2429)
+- added the 'Add multiple folders in libraries using a csv file' sample script [#2415](https://github.com/pnp/cli-microsoft365/issues/2415)
+- updated PowerShell samples to use simplified CLI config [#2428](https://github.com/pnp/cli-microsoft365/issues/2428)
+- updated 'aad user list' docs [#2434](https://github.com/pnp/cli-microsoft365/issues/2434)
+- added the 'Replace spo site collection admin' sample [#2221](https://github.com/pnp/cli-microsoft365/issues/2221)
+- extended 'spo site apppermission get' with roles [#2409](https://github.com/pnp/cli-microsoft365/issues/2409)
+- added 'Search flows for connection' sample [#2444](https://github.com/pnp/cli-microsoft365/issues/2444)
+- extended 'spo list get' with properties [#2443](https://github.com/pnp/cli-microsoft365/issues/2443)
+
+## [v3.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.9.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad app role add](../cmd/aad/app/app-role-add.md) - Adds role to the specified Azure AD app registration [#2145](https://github.com/pnp/cli-microsoft365/issues/2145)
+
+**Planner:**
+
+- [planner plan add](../cmd/planner/plan/plan-add.md) - adds a new Microsoft Planner plan [#2253](https://github.com/pnp/cli-microsoft365/issues/2253)
+
+**SharePoint:**
+
+- [spo site apppermission add](../cmd/spo/site/site-apppermission-add.md) - adds a specific application permissions to the site [#2208](https://github.com/pnp/cli-microsoft365/issues/2208)
+- [spo userprofile get](../cmd/spo/userprofile/userprofile-get.md) - gets SharePoint user profile properties for the specified user [#1670](https://github.com/pnp/cli-microsoft365/issues/1670)
+
+**Microsoft Viva:**
+
+- [viva connections app create](../cmd/viva/connections/connections-app-create.md) - creates a Viva Connections desktop app package to upload to Microsoft Teams
+
+### Changes
+
+- moved from adal-node to msal-node [#2156](https://github.com/pnp/cli-microsoft365/issues/2156)
+- added eslint. Fixed code to align with eslint config [#2058](https://github.com/pnp/cli-microsoft365/issues/2058)
+- updated command examples to use long options [#2319](https://github.com/pnp/cli-microsoft365/issues/2319)
+- fixed broken list of command options [#2320](https://github.com/pnp/cli-microsoft365/issues/2320)
+- added support for using relative URLs in spo commands [#2313](https://github.com/pnp/cli-microsoft365/issues/2313)
+- added support for configuring error output [#2325](https://github.com/pnp/cli-microsoft365/issues/2325)
+- fixed docs for 'spo list set' [#2332](https://github.com/pnp/cli-microsoft365/issues/2332)
+- added 'Cleanup completed Microsoft To Do tasks' sample script [#2339](https://github.com/pnp/cli-microsoft365/issues/2339)
+- added the 'Create a Microsoft Teams team and bulk add members from CSV file' sample [#2288](https://github.com/pnp/cli-microsoft365/issues/2288)
+- added the 'Setup example site' sample script [#2328](https://github.com/pnp/cli-microsoft365/issues/2328)
+- added ESLint extension to Remote Development Container [#2327](https://github.com/pnp/cli-microsoft365/issues/2327)
+- fixed MKDocs Tab rendering issue in Remote Development Container [#2341](https://github.com/pnp/cli-microsoft365/issues/2341)
+- added eslint rule to check command's class name [#1819](https://github.com/pnp/cli-microsoft365/issues/1819)
+- added new sample script 'Upload local files and folders to SharePoint Online' [#2302](https://github.com/pnp/cli-microsoft365/issues/2302)
+- added support for upgrading SPFx projects to beta versions of SPFx [#2354](https://github.com/pnp/cli-microsoft365/issues/2354)
+- added support for upgrading SPFx projects to v1.12.1-rc.0 [#2355](https://github.com/pnp/cli-microsoft365/issues/2355)
+- changed order of commands for upgrading SPFx projects [#2358](https://github.com/pnp/cli-microsoft365/issues/2358)
+- added support for creating AAD apps from manifest [#2316](https://github.com/pnp/cli-microsoft365/issues/2316)
+- added support for tracking help usage in telemetry [#2336](https://github.com/pnp/cli-microsoft365/issues/2336)
+- added returning human-readable error on invalid JMESPath queries [#2279](https://github.com/pnp/cli-microsoft365/issues/2279)
+- added support for upgrading SPFx projects to v1.12.1-rc.1 [#2363](https://github.com/pnp/cli-microsoft365/issues/2363)
+- fixed the conflicting documentation around the --withSecret command option in aad app add [#2365](https://github.com/pnp/cli-microsoft365/pull/2365)
+- added the 'Bulk add members to Microsoft Teams team from CSV file' sample script [#2285](https://github.com/pnp/cli-microsoft365/issues/2285)
+- added the 'Copy files to another SharePoint Library in another site' sample script [#2370](https://github.com/pnp/cli-microsoft365/pull/2370)
+- added support for upgrading SPFx projects to v1.12.1-rc.2 [#2378](https://github.com/pnp/cli-microsoft365/issues/2378)
+- extended the `spo contenttype get` command with `name` [#2335](https://github.com/pnp/cli-microsoft365/issues/2335)
+- added the 'Remove a Site Collection Admin User from all Site Collections' sample script [#2223](https://github.com/pnp/cli-microsoft365/issues/2223)
+- added support for upgrading SPFx projects to v1.12.1-rc.3 [#2387](https://github.com/pnp/cli-microsoft365/issues/2387)
+- added the 'Replace an owner in a Microsoft 365 Group or Microsoft Team' sample script [#2348](https://github.com/pnp/cli-microsoft365/issues/2348)
+- fixed typo in docs for 'teams tab get' [#2390](https://github.com/pnp/cli-microsoft365/pull/2390)
+- added the 'Add a site collection admin using csv file' sample [#2220](https://github.com/pnp/cli-microsoft365/issues/2220)
+- fixed API change in 'flow export' [#2398](https://github.com/pnp/cli-microsoft365/issues/2398)
+- added support for upgrading SPFx projects to v1.12.1 [#2401](https://github.com/pnp/cli-microsoft365/issues/2401)
+
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
+
+### New commands
 
 **Azure Active Directory:**
 
@@ -11,6 +110,10 @@
 - added support for configuring default output [#2246](https://github.com/pnp/cli-microsoft365/issues/2246)
 - restored showing original API errors [#2138](https://github.com/pnp/cli-microsoft365/issues/2138)
 - added new sample script for granting API permissions to SharePoint AAD App [#2243](https://github.com/pnp/cli-microsoft365/issues/2243)
+- added the 'List all Microsoft Teams team's Owners and Members' sample [#2284](https://github.com/pnp/cli-microsoft365/issues/2284)
+- fixed the 'spo tenant appcatalog add' command [#2300](https://github.com/pnp/cli-microsoft365/issues/2300)
+- added the 'M365 health status' sample script [#2107](https://github.com/pnp/cli-microsoft365/issues/2107)
+- fixed broken tests when default output configured to JSON [#2305](https://github.com/pnp/cli-microsoft365/issues/2305)
 
 ## [v3.7.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.7.0)
 

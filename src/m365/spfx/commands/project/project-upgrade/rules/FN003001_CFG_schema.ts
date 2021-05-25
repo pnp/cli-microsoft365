@@ -17,25 +17,25 @@ export class FN003001_CFG_schema extends JsonRule {
 
   get description(): string {
     return `Update config.json schema URL`;
-  };
+  }
 
   get resolution(): string {
     return `{
   "$schema": "${this.schema}"
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './config/config.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.configJson) {

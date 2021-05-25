@@ -19,11 +19,11 @@ m365 spo field set [options]
 `--listTitle [listTitle]`
 : Title of the list where the field is located (if list column). Specify `listTitle` or `listId` but not both
 
-`-i
-: --id [id]`|ID of the field to update. Specify `name` or `id` but not both
+`-i, --id [id]`
+: ID of the field to update. Specify `name` or `id` but not both
 
-`-n
-: --name [name]`|Title or internal name of the field to update. Specify `name` or `id` but not both
+`-n, --name [name]`
+: Title or internal name of the field to update. Specify `name` or `id` but not both
 
 `--updateExistingLists`
 : Set, to push the update to existing lists. Otherwise, the changes will apply to new lists only

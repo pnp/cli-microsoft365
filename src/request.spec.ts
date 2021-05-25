@@ -10,9 +10,9 @@ import Utils from './Utils';
 
 describe('Request', () => {
   const logger: Logger = {
-    log: (msg: any) => { },
-    logRaw: (msg: any) => { },
-    logToStderr: (msg: any) => { }
+    log: () => { },
+    logRaw: () => { },
+    logToStderr: () => { }
   };
 
   let _options: AxiosRequestConfig;
@@ -384,7 +384,7 @@ describe('Request', () => {
               'retry-after': 60
             }
           }
-        })
+        });
       }
       else {
         return Promise.resolve({ data: {} });
@@ -406,7 +406,7 @@ describe('Request', () => {
           done();
         }
         catch (err) {
-          done(err)
+          done(err);
         }
       }, (err) => {
         done(err);
@@ -424,7 +424,7 @@ describe('Request', () => {
             status: 429,
             headers: {}
           }
-        })
+        });
       }
       else {
         return Promise.resolve({ data: {} });
@@ -446,7 +446,7 @@ describe('Request', () => {
           done();
         }
         catch (err) {
-          done(err)
+          done(err);
         }
       }, (err) => {
         done(err);
@@ -466,7 +466,7 @@ describe('Request', () => {
               'retry-after': 'a'
             }
           }
-        })
+        });
       }
       else {
         return Promise.resolve({ data: {} });
@@ -488,7 +488,7 @@ describe('Request', () => {
           done();
         }
         catch (err) {
-          done(err)
+          done(err);
         }
       }, (err) => {
         done(err);
@@ -505,13 +505,13 @@ describe('Request', () => {
             status: 429,
             headers: {}
           }
-        })
+        });
       }
       else {
         return Promise.resolve({ data: {} });
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -526,7 +526,7 @@ describe('Request', () => {
           done();
         }
         catch (err) {
-          done(err)
+          done(err);
         }
       }, (err: any) => {
         done(err);
@@ -549,7 +549,7 @@ describe('Request', () => {
               'retry-after': 60
             }
           }
-        })
+        });
       }
       else {
         return Promise.resolve({ data: {} });
@@ -571,7 +571,7 @@ describe('Request', () => {
           done();
         }
         catch (err) {
-          done(err)
+          done(err);
         }
       }, (err) => {
         done(err);
@@ -588,13 +588,13 @@ describe('Request', () => {
             status: 503,
             headers: {}
           }
-        })
+        });
       }
       else {
         return Promise.resolve({ data: {} });
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -609,7 +609,7 @@ describe('Request', () => {
           done();
         }
         catch (err) {
-          done(err)
+          done(err);
         }
       }, (err: any) => {
         done(err);
@@ -626,13 +626,13 @@ describe('Request', () => {
             status: 429,
             headers: {}
           }
-        })
+        });
       }
       else {
         return Promise.reject('Error');
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -642,7 +642,7 @@ describe('Request', () => {
         url: 'https://contoso.sharepoint.com/'
       })
       .then(() => {
-        done('Expected error')
+        done('Expected error');
       }, (err) => {
         try {
           assert.strictEqual(err, 'Error');
@@ -668,13 +668,13 @@ describe('Request', () => {
               'retry-after': 10
             }
           }
-        })
+        });
       }
       else {
         return Promise.resolve({ data: {} });
       }
     });
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn, to) => {
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });

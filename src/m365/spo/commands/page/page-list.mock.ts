@@ -373,7 +373,7 @@ export const mockPagesListOutput = mockPageListData.map(p => {
     return {
       ...clientSidePage,
       ...p
-    }
+    };
   }
 
   return p;

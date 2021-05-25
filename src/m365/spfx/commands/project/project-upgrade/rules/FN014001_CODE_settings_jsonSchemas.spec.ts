@@ -10,7 +10,7 @@ describe('FN014001_CODE_settings_jsonSchemas', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN014001_CODE_settings_jsonSchemas(false);
-  })
+  });
 
   it('doesn\'t return notification if json.schemas should be removed and is not present', () => {
     const project: Project = {

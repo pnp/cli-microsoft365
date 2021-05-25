@@ -13,23 +13,23 @@ export class FN003003_CFG_bundles extends JsonRule {
 
   get description(): string {
     return `In config.json add the 'bundles' property`;
-  };
+  }
 
   get resolution(): string {
     return '';
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './config/config.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.configJson ||

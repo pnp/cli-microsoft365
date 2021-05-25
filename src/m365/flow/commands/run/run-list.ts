@@ -1,6 +1,6 @@
 import { Logger } from '../../../../cli';
 import {
-    CommandOption
+  CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
 
 class FlowRunListCommand extends AzmgmtCommand {
   public get name(): string {
-    return commands.FLOW_RUN_LIST;
+    return commands.RUN_LIST;
   }
 
   public get description(): string {

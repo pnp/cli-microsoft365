@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./channel-set');
 
-describe(commands.TEAMS_CHANNEL_SET, () => {
+describe(commands.CHANNEL_SET, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -53,7 +53,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_CHANNEL_SET), true);
+    assert.strictEqual(command.name.startsWith(commands.CHANNEL_SET), true);
   });
 
   it('has a description', () => {
@@ -156,7 +156,7 @@ describe(commands.TEAMS_CHANNEL_SET, () => {
         newChannelName: 'New Review',
         description: 'New Review'
       }
-    } as any, (err?: any) => {
+    } as any, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();

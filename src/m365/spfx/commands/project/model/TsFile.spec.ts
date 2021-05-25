@@ -43,7 +43,7 @@ describe('TsFile', () => {
 
   it('doesn\'t fail when creating TS file fails', () => {
     (tsFile as any)._source = '123';
-    sinon.stub(ts, 'createSourceFile').callsFake(() => { throw new Error('An exception has occurred'); })
+    sinon.stub(ts, 'createSourceFile').callsFake(() => { throw new Error('An exception has occurred'); });
     assert.strictEqual(tsFile.sourceFile, undefined);
   });
 });

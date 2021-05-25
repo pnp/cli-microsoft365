@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   includeOneDriveSites?: boolean;
 }
 
-class SiteClassicListCommand extends SpoCommand {
+class SpoSiteClassicListCommand extends SpoCommand {
   public get name(): string {
     return commands.SITE_CLASSIC_LIST;
   }
@@ -102,4 +102,4 @@ class SiteClassicListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SiteClassicListCommand();
+module.exports = new SpoSiteClassicListCommand();

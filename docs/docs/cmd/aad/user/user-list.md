@@ -21,6 +21,8 @@ Using the `--properties` option, you can specify a comma-separated list of user 
 
 To filter the list of users, include additional options that match the user property that you want to filter with. For example `--displayName Patt` will return all users whose `displayName` starts with `Patt`. Multiple filters will be combined using the `and` operator.
 
+Certain properties cannot be returned within a user collection. The following properties are only supported when retrieving an single user using: `aboutMe, birthday, hireDate, interests, mySite, pastProjects, preferredName, responsibilities, schools, skills, mailboxSettings`.
+
 ## Examples
 
 List all users in the tenant

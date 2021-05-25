@@ -106,7 +106,7 @@ describe(commands.FEATURE_DISABLE, () => {
   });
 
   it('disables web feature (scope not defined, so defaults to web), no force', (done) => {
-    const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`
+    const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`;
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -142,7 +142,7 @@ describe(commands.FEATURE_DISABLE, () => {
   });
 
   it('disables web feature (scope not defined, so defaults to web), with force', (done) => {
-    const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=true)`
+    const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=true)`;
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -178,7 +178,7 @@ describe(commands.FEATURE_DISABLE, () => {
   });
 
   it('disables site feature (scope explicitly set), no force', (done) => {
-    const requestUrl = `https://contoso.sharepoint.com/_api/site/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`
+    const requestUrl = `https://contoso.sharepoint.com/_api/site/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`;
     sinon.stub(request, 'post').callsFake((opts) => {
       requests.push(opts);
 
@@ -215,7 +215,7 @@ describe(commands.FEATURE_DISABLE, () => {
 
   it('correctly handles disable feature reject request', (done) => {
     const err = 'Invalid disable feature reject request';
-    const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`
+    const requestUrl = `https://contoso.sharepoint.com/_api/web/features/remove(featureId=guid'780ac353-eaf8-4ac2-8c47-536d93c03fd6',force=false)`;
 
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(requestUrl) > -1) {

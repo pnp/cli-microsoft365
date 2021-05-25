@@ -10,11 +10,11 @@ export abstract class TsRule extends Rule {
 
   get resolutionType(): string {
     return 'ts';
-  };
+  }
 
   get file(): string {
     return '';
-  };
+  }
 
   protected addOccurrence(resolution: string, filePath: string, projectPath: string, node: ts.Node, occurrences: Occurrence[]): void {
     const lineChar: ts.LineAndCharacter = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());

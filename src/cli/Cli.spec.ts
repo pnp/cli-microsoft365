@@ -20,7 +20,7 @@ class MockCommand extends AnonymousCommand {
     return 'cli mock';
   }
   public get description(): string {
-    return 'Mock command'
+    return 'Mock command';
   }
   public options(): CommandOption[] {
     const options: CommandOption[] = [
@@ -51,7 +51,7 @@ class MockCommandWithAlias extends AnonymousCommand {
     return 'cli mock alias';
   }
   public get description(): string {
-    return 'Mock command with alias'
+    return 'Mock command with alias';
   }
   public alias(): string[] {
     return ['cli mock alt'];
@@ -66,7 +66,7 @@ class MockCommandWithValidation extends AnonymousCommand {
     return 'cli mock1 validation';
   }
   public get description(): string {
-    return 'Mock command with validation'
+    return 'Mock command with validation';
   }
   public options(): CommandOption[] {
     const options: CommandOption[] = [
@@ -90,15 +90,15 @@ class MockCommandWithPrompt extends AnonymousCommand {
     return 'cli mock prompt';
   }
   public get description(): string {
-    return 'Mock command with prompt'
+    return 'Mock command with prompt';
   }
   public commandAction(logger: Logger, args: any, cb: () => void): void {
     Cli.prompt({
       type: 'confirm',
       name: 'continue',
       default: false,
-      message: `Continue?`,
-    }, (result: { continue: boolean }): void => {
+      message: `Continue?`
+    }, (): void => {
       cb();
     });
   }
@@ -109,7 +109,7 @@ class MockCommandWithOutput extends AnonymousCommand {
     return 'cli mock output';
   }
   public get description(): string {
-    return 'Mock command with output'
+    return 'Mock command with output';
   }
   public commandAction(logger: Logger, args: any, cb: () => void): void {
     logger.log('Command output');
@@ -122,7 +122,7 @@ class MockCommandWithRawOutput extends AnonymousCommand {
     return 'cli mock output';
   }
   public get description(): string {
-    return 'Mock command with output'
+    return 'Mock command with output';
   }
   public commandAction(logger: Logger, args: any, cb: () => void): void {
     if (this.debug) {
@@ -166,7 +166,7 @@ describe('Cli', () => {
         rootFolder = resolvedPath;
         resolve(undefined);
       });
-    })
+    });
   });
 
   beforeEach(() => {
@@ -191,9 +191,12 @@ describe('Cli', () => {
       mockCommandWithValidation.validate,
       mockCommandWithValidation.action,
       inquirer.prompt,
+      // eslint-disable-next-line no-console
       console.log,
+      // eslint-disable-next-line no-console
       console.error,
-      mockCommand.commandAction
+      mockCommand.commandAction,
+      mockCommand.processOptions
     ]);
   });
 
@@ -370,7 +373,7 @@ describe('Cli', () => {
   it(`fails options validation if the command doesn't allow unknown options and specified options match command options`, (done) => {
     cli
       .execute(rootFolder, ['cli', 'mock', '-x', '123', '-z'])
-      .then(_ => {
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(cliErrorStub.calledWith(chalk.red(`Error: Invalid option: 'z'${os.EOL}`)));
           done();
@@ -378,13 +381,13 @@ describe('Cli', () => {
         catch (e) {
           done(e);
         }
-      }, e => done(e));
+      });
   });
 
   it(`doesn't execute command action when option validation failed`, (done) => {
     cli
       .execute(rootFolder, ['cli', 'mock', '-x', '123', '-z'])
-      .then(_ => {
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(mockCommandActionSpy.notCalled);
           done();
@@ -392,13 +395,13 @@ describe('Cli', () => {
         catch (e) {
           done(e);
         }
-      }, e => done(e));
+      });
   });
 
   it(`exits with exit code 1 when option validation failed`, (done) => {
     cli
       .execute(rootFolder, ['cli', 'mock', '-x', '123', '-z'])
-      .then(_ => {
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(processExitStub.calledWith(1));
           done();
@@ -406,13 +409,13 @@ describe('Cli', () => {
         catch (e) {
           done(e);
         }
-      }, e => done(e));
+      });
   });
 
   it(`fails validation if a required option is missing`, (done) => {
     cli
       .execute(rootFolder, ['cli', 'mock'])
-      .then(_ => {
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(cliErrorStub.calledWith(chalk.red(`Error: Required option parameterX not specified`)));
           done();
@@ -420,7 +423,7 @@ describe('Cli', () => {
         catch (e) {
           done(e);
         }
-      }, e => done(e));
+      });
   });
 
   it(`calls command's validation method when defined`, (done) => {
@@ -461,7 +464,7 @@ describe('Cli', () => {
 
     cli
       .execute(rootFolder, ['cli', 'mock1', 'validation', '-x', '123'])
-      .then(_ => {
+      .then(_ => done('Promise fulfilled while error expected'), _ => {
         try {
           assert(mockCommandWithValidationActionSpy.notCalled);
           done();
@@ -469,7 +472,7 @@ describe('Cli', () => {
         catch (e) {
           done(e);
         }
-      }, e => done(e));
+      });
   });
 
   it(`executes command when validation passed`, (done) => {
@@ -705,11 +708,11 @@ describe('Cli', () => {
   it('loads commands from .js files with command definitions', (done) => {
     const cliCommandsFolder: string = path.join(rootFolder, '..', 'm365', 'cli', 'commands');
     cli
-      .execute(cliCommandsFolder, ['cli', 'mock'])
+      .execute(cliCommandsFolder, ['cli', 'mock', '-x', '1'])
       .then(_ => {
         try {
-          // 7 commands from the folder + 3 mocks
-          assert.strictEqual(cli.commands.length, 7 + 3);
+          // 9 commands from the folder + 3 mocks
+          assert.strictEqual(cli.commands.length, 9 + 3);
           done();
         }
         catch (e) {
@@ -720,21 +723,21 @@ describe('Cli', () => {
 
   it('closes with error when loading a command fails', (done) => {
     sinon.stub(cli as any, 'loadCommand').callsFake(() => { throw 'Error'; });
-    const cliStub: sinon.SinonStub = sinon.stub(cli as any, 'closeWithError').callsFake(() => { });
+    const cliStub: sinon.SinonStub = sinon.stub(cli as any, 'closeWithError').callsFake(() => { throw new Error(); });
     const cliCommandsFolder: string = path.join(rootFolder, '..', 'm365', 'cli', 'commands');
-    const promise: Promise<void> = cli.execute(cliCommandsFolder, ['cli', 'mock']);
-    if (promise) {
-      done('CLI ran correctly while exception expected');
-      return;
-    }
-
-    try {
-      assert(cliStub.calledWith('Error'));
-      done();
-    }
-    catch (e) {
-      done(e);
-    }
+    cli
+      .execute(cliCommandsFolder, ['cli', 'mock'])
+      .then(_ => {
+        done('CLI ran correctly while exception expected');
+      }, _ => {
+        try {
+          assert(cliStub.calledWith('Error'));
+          done();
+        }
+        catch (e) {
+          done(e);
+        }
+      });
   });
 
   it('loads all commands when completion requested', (done) => {
@@ -1116,6 +1119,25 @@ describe('Cli', () => {
     }
   });
 
+  it('throws human-readable error when invalid JMESPath query specified', () => {
+    const o = {
+      "locations": [
+        { "name": "Seattle", "state": "WA" },
+        { "name": "New York", "state": "NY" },
+        { "name": "Bellevue", "state": "WA" },
+        { "name": "Olympia", "state": "WA" }
+      ]
+    };
+    assert.throws(() => {
+      (Cli as any).formatOutput(o, {
+        query: `contains(abc)`,
+        output: 'json'
+      });
+
+      assert(cliErrorStub.calledWith(chalk.red('Error: JMESPath query error. ArgumentError: contains() takes 2 arguments but received 1. See https://jmespath.org/specification.html for more information')));
+    });
+  });
+
   it(`prints commands grouped per service when no command specified`, (done) => {
     (cli as any).commandsFolder = path.join(rootFolder, '..', 'm365');
     cli.loadCommandFromArgs(['status']);
@@ -1171,27 +1193,34 @@ describe('Cli', () => {
     }
   });
 
-  it(`exits with the specified exit code`, (done) => {
-    (cli as any)
-      .closeWithError(new CommandError('Error', 5))
-      .then(() => {
-        done('Passed while expected failure');
-      }, () => {
-        try {
-          assert(processExitStub.calledWith(5));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+  it(`exits with the specified exit code`, () => {
+    try {
+      (cli as any).closeWithError(new CommandError('Error', 5), { options: {} });
+      assert.fail(`Didn't fail while expected`);
+    }
+    catch {
+      assert(processExitStub.calledWith(5));
+    }
+  });
+
+  it(`prints error as JSON in JSON output mode and printErrorsAsPlainText set to false`, () => {
+    const config = cli.config;
+    sinon.stub(config, 'get').callsFake(() => false);
+
+    try {
+      (cli as any).closeWithError(new CommandError('Error'), { options: { output: 'json' } });
+      assert.fail(`Didn't fail while expected`);
+    }
+    catch (err) {
+      assert(cliErrorStub.calledWith(JSON.stringify({ error: 'Error' })));
+    }
   });
 
   it(`replaces option value with the content of the specified file when value starts with @ and the specified file exists`, (done) => {
     sinon.stub(fs, 'existsSync').callsFake(_ => true);
     sinon.stub(fs, 'readFileSync').callsFake(_ => 'abc');
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
+      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt', '-o', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith('abc'));
@@ -1224,7 +1253,7 @@ describe('Cli', () => {
   it(`leaves the original value if the file specified in @ value doesn't exist`, (done) => {
     sinon.stub(fs, 'existsSync').callsFake(_ => false);
     cli
-      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt'])
+      .execute(rootFolder, ['cli', 'mock', '-x', '@file.txt', '-o', 'text'])
       .then(_ => {
         try {
           assert(cliLogStub.calledWith('@file.txt'));
@@ -1234,6 +1263,23 @@ describe('Cli', () => {
           done(e);
         }
       }, e => done(`Error: ${e}`));
+  });
+
+  it(`closes with error when processing options failed`, (done) => {
+    sinon.stub(mockCommand, 'processOptions').callsFake(() => Promise.reject('Error'));
+    cli
+      .execute(rootFolder, ['cli', 'mock', '-x', '123'])
+      .then(_ => {
+        done('Passed while error expected');
+      }, e => {
+        try {
+          assert.strictEqual(e.name, 'Error');
+          done();
+        }
+        catch (er) {
+          done(er);
+        }
+      });
   });
 
   it(`logs output to console`, () => {
@@ -1250,17 +1296,29 @@ describe('Cli', () => {
     assert(consoleLogSpy.calledWith());
   });
 
-  it(`logs error to console`, () => {
+  it(`logs error to console stderr`, () => {
     Utils.restore((Cli as any).error);
     const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').callsFake(() => { });
     (Cli as any).error('Message');
     assert(consoleErrorSpy.calledWith('Message'));
   });
 
+  it(`logs error to console stdout when stdout configured as error output`, () => {
+    const config = cli.config;
+    sinon.stub(config, 'get').callsFake(() => 'stdout');
+    Utils.restore((Cli as any).error);
+    const consoleErrorSpy: sinon.SinonSpy = sinon.stub(console, 'error').callsFake(() => { });
+    const consoleLogSpy: sinon.SinonSpy = sinon.stub(console, 'log').callsFake(() => { });
+
+    (Cli as any).error('Message');
+    assert(consoleErrorSpy.notCalled, 'console.error called');
+    assert(consoleLogSpy.calledWith('Message'), 'console.log not called with the right message');
+  });
+
   it(`returns stored configuration value when available`, () => {
     const config = cli.config;
-    sinon.stub(config, 'get').callsFake(key => 'value');
+    sinon.stub(config, 'get').callsFake(() => 'value');
     const actualValue = cli.getSettingWithDefaultValue('key', '');
     assert.strictEqual(actualValue, 'value');
-  })
+  });
 });

@@ -53,7 +53,7 @@ class SpoPageSetCommand extends SpoCommand {
     const resource: string = Auth.getResourceFromUrl(args.options.webUrl);
     let requestDigest: string = '';
     let pageName: string = args.options.name;
-    let fileNameWithoutExtension: string = pageName.replace('.aspx', '');
+    const fileNameWithoutExtension: string = pageName.replace('.aspx', '');
     let bannerImageUrl: string = '';
     let canvasContent1: string = '';
     let layoutWebpartsContent: string = '';
@@ -62,7 +62,7 @@ class SpoPageSetCommand extends SpoCommand {
     let pageDescription: string = args.options.description || "";
     let topicHeader: string = "";
     let authorByline: string[] = [];
-    let pageData: any = {};
+    const pageData: any = {};
 
     if (!pageName.endsWith('.aspx')) {
       pageName += '.aspx';
@@ -154,7 +154,7 @@ class SpoPageSetCommand extends SpoCommand {
             requestOptions.data = {
               PromotedState: 2,
               FirstPublishedDate: new Date().toISOString().replace('Z', '')
-            }
+            };
             break;
           case 'Template':
             requestOptions.url = `${args.options.webUrl}/_api/web/getfilebyserverrelativeurl('${serverRelativeFileUrl}')/ListItemAllFields`;

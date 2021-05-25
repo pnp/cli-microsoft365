@@ -10,7 +10,7 @@ describe('FN012019_TSC_types_es6_promise', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN012019_TSC_types_es6_promise(false);
-  })
+  });
 
   it('doesn\'t return notification if es6-promise should be removed and is not present', () => {
     const project: Project = {

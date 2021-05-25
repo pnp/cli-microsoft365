@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class YammerGroupUserAddCommand extends YammerCommand {
   public get name(): string {
-    return commands.YAMMER_GROUP_USER_ADD;
+    return commands.GROUP_USER_ADD;
   }
 
   public get description(): string {
@@ -49,7 +49,7 @@ class YammerGroupUserAddCommand extends YammerCommand {
     request
       .post(requestOptions)
       .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  };
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

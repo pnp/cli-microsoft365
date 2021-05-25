@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./run-list');
 
-describe(commands.FLOW_RUN_LIST, () => {
+describe(commands.RUN_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -53,7 +53,7 @@ describe(commands.FLOW_RUN_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.FLOW_RUN_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.RUN_LIST), true);
   });
 
   it('has a description', () => {
@@ -465,7 +465,7 @@ describe(commands.FLOW_RUN_LIST, () => {
   });
 
   it('correctly handles no environment found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "EnvironmentAccessDenied",
@@ -486,7 +486,7 @@ describe(commands.FLOW_RUN_LIST, () => {
   });
 
   it('correctly handles no runs for this flow found', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({ value: [] });
     });
 
@@ -502,7 +502,7 @@ describe(commands.FLOW_RUN_LIST, () => {
   });
 
   it('correctly handles no runs for this flow found (debug)', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.resolve({ value: [] });
     });
 
@@ -518,7 +518,7 @@ describe(commands.FLOW_RUN_LIST, () => {
   });
 
   it('correctly handles API OData error', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         error: {
           'odata.error': {

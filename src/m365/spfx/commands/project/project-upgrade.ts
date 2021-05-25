@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
+// uncomment to support upgrading to preview releases
+// import { prerelease } from 'semver';
 import { Logger } from '../../../../cli';
 import { CommandError, CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
@@ -21,6 +23,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   packageManager?: string;
+  preview?: boolean;
   toVersion?: string;
   shell?: string;
 }
@@ -60,7 +63,8 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     '1.9.1',
     '1.10.0',
     '1.11.0',
-    '1.12.0'
+    '1.12.0',
+    '1.12.1'
   ];
   private static packageCommands = {
     npm: {
@@ -81,7 +85,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
       uninstall: 'yarn remove',
       uninstallDev: 'yarn remove'
     }
-  }
+  };
 
   private static copyCommands = {
     bash: {
@@ -96,54 +100,54 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
       copyCommand: 'copy',
       copyDestinationParam: ' '
     }
-  }
+  };
 
   private static createDirectoryCommands = {
     bash: {
       createDirectoryCommand: 'mkdir',
       createDirectoryPathParam: ' "',
       createDirectoryNameParam: '/',
-      createDirectoryItemTypeParam: '"',
+      createDirectoryItemTypeParam: '"'
     },
     powershell: {
       createDirectoryCommand: 'New-Item',
       createDirectoryPathParam: ' -Path "',
       createDirectoryNameParam: '" -Name "',
-      createDirectoryItemTypeParam: '" -ItemType "directory"',
+      createDirectoryItemTypeParam: '" -ItemType "directory"'
     },
     cmd: {
       createDirectoryCommand: 'mkdir',
       createDirectoryPathParam: ' "',
       createDirectoryNameParam: '\\',
-      createDirectoryItemTypeParam: '"',
+      createDirectoryItemTypeParam: '"'
     }
-  }
+  };
 
   private static addFileCommands = {
     bash: {
-      addFileCommand: 'cat > [FILEPATH] << EOF [FILECONTENT]EOF',
+      addFileCommand: 'cat > [FILEPATH] << EOF [FILECONTENT]EOF'
     },
     powershell: {
       addFileCommand: `@"[FILECONTENT]"@ | Out-File -FilePath "[FILEPATH]"
-      `,
+      `
     },
     cmd: {
       addFileCommand: `echo [FILECONTENT] > "[FILEPATH]"
-      `,
+      `
     }
-  }
+  };
 
   private static removeFileCommands = {
     bash: {
-      removeFileCommand: 'rm',
+      removeFileCommand: 'rm'
     },
     powershell: {
-      removeFileCommand: 'Remove-Item',
+      removeFileCommand: 'Remove-Item'
     },
     cmd: {
-      removeFileCommand: 'del',
+      removeFileCommand: 'del'
     }
-  }
+  };
 
   public static ERROR_NO_PROJECT_ROOT_FOLDER: number = 1;
   public static ERROR_UNSUPPORTED_TO_VERSION: number = 2;
@@ -162,8 +166,13 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.toVersion = args.options.toVersion || this.supportedVersions[this.supportedVersions.length - 1];
+    // uncomment to support upgrading to preview releases
+    // if (prerelease(telemetryProps.toVersion) && !args.options.preview) {
+    //   telemetryProps.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
+    // }
     telemetryProps.packageManager = args.options.packageManager || 'npm';
     telemetryProps.shell = args.options.shell || 'bash';
+    telemetryProps.preview = args.options.preview;
     return telemetryProps;
   }
 
@@ -175,6 +184,16 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     }
 
     this.toVersion = args.options.toVersion ? args.options.toVersion : this.supportedVersions[this.supportedVersions.length - 1];
+    // uncomment to support upgrading to preview releases
+    // if (!args.options.toVersion &&
+    //   !args.options.preview &&
+    //   prerelease(this.toVersion)) {
+    //   // no version and no preview specified while the current version to
+    //   // upgrade to is a prerelease so let's grab the first non-preview version
+    //   // since we're supporting only one preview version, it's sufficient for
+    //   // us to take second to last version
+    //   this.toVersion = this.supportedVersions[this.supportedVersions.length - 2];
+    // }
     this.packageManager = args.options.packageManager || 'npm';
     this.shell = args.options.shell || 'bash';
 
@@ -238,7 +257,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     }
 
     // dedupe
-    const findings: Finding[] = this.allFindings.filter((f: Finding, i: number, allFindings: Finding[]) => {
+    const findings: Finding[] = this.allFindings.filter((f: Finding, i: number) => {
       const firstFindingPos: number = this.allFindings.findIndex(f1 => f1.id === f.id);
       return i === firstFindingPos;
     });
@@ -333,7 +352,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         const fileContent: string = f.resolution.substring(contentStart, contentEnd);
 
         f.resolution = this.getAddCommand('addFileCommand');
-        f.resolution = f.resolution.replace('[FILECONTENT]', fileContent)
+        f.resolution = f.resolution.replace('[FILECONTENT]', fileContent);
         f.resolution = f.resolution.replace('[FILEPATH]', filePath);
         f.resolution = f.resolution.replace('[BEFOREPATH]', ' ');
         f.resolution = f.resolution.replace('[AFTERPATH]', ' ');
@@ -353,7 +372,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         logger.log(findingsToReport);
         break;
       case 'tour':
-        this.writeReportTourFolder(this.getTourReport(findingsToReport, project), logger, args.options);
+        this.writeReportTourFolder(this.getTourReport(findingsToReport, project));
         break;
       case 'md':
         logger.log(this.getMdReport(findingsToReport));
@@ -365,7 +384,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
     cb();
   }
 
-  private writeReportTourFolder(findingsToReport: any, logger: Logger, options: Options): void {
+  private writeReportTourFolder(findingsToReport: any): void {
     const toursFolder: string = path.join(this.projectRootPath as string, '.tours');
 
     if (!fs.existsSync(toursFolder)) {
@@ -393,10 +412,10 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         return [
           file, os.EOL,
           '-'.repeat(file.length), os.EOL,
-          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${m.modification}${os.EOL}`).join(os.EOL), os.EOL,
+          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${m.modification}${os.EOL}`).join(os.EOL), os.EOL
         ].join('');
       }).join(os.EOL),
-      os.EOL,
+      os.EOL
     ];
 
     return s.join('').trim();
@@ -470,10 +489,10 @@ ${f.resolution}
         return [
           `#### [${file}](${file})`, os.EOL,
           os.EOL,
-          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${os.EOL}\`\`\`${reportData.modificationTypePerFile[file]}${os.EOL}${m.modification}${os.EOL}\`\`\``).join(os.EOL + os.EOL), os.EOL,
+          reportData.modificationPerFile[file].map((m: ReportDataModification) => `${m.description}:${os.EOL}${os.EOL}\`\`\`${reportData.modificationTypePerFile[file]}${os.EOL}${m.modification}${os.EOL}\`\`\``).join(os.EOL + os.EOL), os.EOL
         ].join('');
       }).join(os.EOL),
-      os.EOL,
+      os.EOL
     ];
 
     return s.join('').trim();
@@ -525,7 +544,8 @@ ${f.resolution}
       // Point to a directory if there is no file
       if (file !== undefined) {
         step.file = file;
-      } else {
+      }
+      else {
         step.directory = "";
       }
 
@@ -592,7 +612,7 @@ ${f.resolution}
       packageManagerCommands: packageManagerCommands,
       modificationPerFile: modificationPerFile,
       modificationTypePerFile: modificationTypePerFile
-    }
+    };
   }
 
   private mapPackageManagerCommand(command: string, packagesDevExact: string[],
@@ -620,20 +640,22 @@ ${f.resolution}
     packagesDepUn: string[], packagesDevUn: string[]): string[] {
     const commandsToExecute: string[] = [];
 
-    if (packagesDepExact.length > 0) {
-      commandsToExecute.push(`${this.getPackageManagerCommand('install')} ${packagesDepExact.join(' ')}`);
-    }
-
-    if (packagesDevExact.length > 0) {
-      commandsToExecute.push(`${this.getPackageManagerCommand('installDev')} ${packagesDevExact.join(' ')}`);
-    }
-
+    // uninstall commands must come first otherwise there is a chance that
+    // whatever we recommended to install, will be immediately uninstalled
     if (packagesDepUn.length > 0) {
       commandsToExecute.push(`${this.getPackageManagerCommand('uninstall')} ${packagesDepUn.join(' ')}`);
     }
 
     if (packagesDevUn.length > 0) {
       commandsToExecute.push(`${this.getPackageManagerCommand('uninstallDev')} ${packagesDevUn.join(' ')}`);
+    }
+
+    if (packagesDepExact.length > 0) {
+      commandsToExecute.push(`${this.getPackageManagerCommand('install')} ${packagesDepExact.join(' ')}`);
+    }
+
+    if (packagesDevExact.length > 0) {
+      commandsToExecute.push(`${this.getPackageManagerCommand('installDev')} ${packagesDevExact.join(' ')}`);
     }
 
     return commandsToExecute;
@@ -671,6 +693,9 @@ ${f.resolution}
       {
         option: '--shell [shell]',
         autocomplete: ['bash', 'powershell', 'cmd']
+      },
+      {
+        option: '--preview'
       }
     ];
 
@@ -679,7 +704,7 @@ ${f.resolution}
       if (o.option.indexOf('--output') > -1) {
         o.autocomplete = ['json', 'text', 'md', 'tour'];
       }
-    })
+    });
     return options.concat(parentOptions);
   }
 

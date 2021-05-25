@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TeamsAppRemoveCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_APP_REMOVE;
+    return commands.APP_REMOVE;
   }
 
   public get description(): string {
@@ -54,7 +54,7 @@ class TeamsAppRemoveCommand extends GraphCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the Teams app ${appId} from the app catalog?`,
+        message: `Are you sure you want to remove the Teams app ${appId} from the app catalog?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

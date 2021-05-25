@@ -61,6 +61,10 @@ describe(commands.FILE_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('excludes options from URL processing', () => {
+    assert.deepStrictEqual((command as any).getExcludedOptionsWithUrls(), ['url']);
+  });
+
   it('command correctly handles file get reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -75,7 +79,7 @@ describe(commands.FILE_GET, () => {
       options: {
         debug: true,
         webUrl: 'https://contoso.sharepoint.com',
-        id: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
+        id: 'f09c4efe-b8c0-4e89-a166-03418661b89b'
       }
     }, (error?: any) => {
       try {
@@ -91,7 +95,7 @@ describe(commands.FILE_GET, () => {
   it('uses correct API url when output json option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('select123=') > -1) {
-        return Promise.resolve('Correct Url1')
+        return Promise.resolve('Correct Url1');
       }
 
       return Promise.reject('Invalid request');
@@ -117,7 +121,7 @@ describe(commands.FILE_GET, () => {
   });
 
   it('retrieves file as binary string object', (done) => {
-    let returnValue: string = 'BinaryFileString';
+    const returnValue: string = 'BinaryFileString';
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
         return Promise.resolve(returnValue);
@@ -231,7 +235,7 @@ describe(commands.FILE_GET, () => {
   it('uses correct API url when id option is passed', (done) => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileById(') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -243,7 +247,7 @@ describe(commands.FILE_GET, () => {
       options: {
         debug: false,
         id: actionId,
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     }, () => {
       try {
@@ -259,7 +263,7 @@ describe(commands.FILE_GET, () => {
   it('uses correct API url when url option is passed', (done) => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -269,7 +273,7 @@ describe(commands.FILE_GET, () => {
       options: {
         debug: false,
         url: '/sites/project-x/Documents/Test1.docx',
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     }, () => {
       try {
@@ -285,7 +289,7 @@ describe(commands.FILE_GET, () => {
   it('uses correct API url when url option is passed to get file as list item', (done) => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -312,7 +316,7 @@ describe(commands.FILE_GET, () => {
   it('uses correct API url when tenant root URL option is passed', (done) => {
     const getStub: any = sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web/GetFileByServerRelativePath(') > -1) {
-        return Promise.resolve('Correct Url')
+        return Promise.resolve('Correct Url');
       }
 
       return Promise.reject('Invalid request');
@@ -322,7 +326,7 @@ describe(commands.FILE_GET, () => {
       options: {
         debug: false,
         url: '/Documents/Test1.docx',
-        webUrl: 'https://contoso.sharepoint.com',
+        webUrl: 'https://contoso.sharepoint.com'
       }
     }, () => {
       try {
@@ -337,14 +341,14 @@ describe(commands.FILE_GET, () => {
 
   it('should handle promise rejection', (done) => {
     const expectedError: any = JSON.stringify({ "odata.error": { "code": "-2130575338, Microsoft.SharePoint.SPException", "message": { "lang": "en-US", "value": "Error: File Not Found." } } });
-    sinon.stub(request, 'get').callsFake((opts) => {
+    sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject(expectedError);
     });
 
     command.action(logger, {
       options: {
         debug: false,
-        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x'
       }
     }, (err: any) => {
       try {
@@ -387,14 +391,14 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    const options: Object = {
+    const options = {
       verbose: true,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       asFile: true,
       path: 'test1.docx',
       fileName: 'Test1.docx'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
@@ -437,14 +441,14 @@ describe(commands.FILE_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    const options: Object = {
+    const options = {
       debug: false,
       id: 'b2307a39-e878-458b-bc90-03bc578531d6',
       webUrl: 'https://contoso.sharepoint.com/sites/project-x',
       asFile: true,
       path: 'test1.docx',
       fileName: 'Test1.docx'
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {

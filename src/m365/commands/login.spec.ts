@@ -13,8 +13,6 @@ const command: Command = require('./login');
 describe(commands.LOGIN, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
-  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -36,14 +34,11 @@ describe(commands.LOGIN, () => {
         log.push(msg);
       }
     };
-    loggerLogSpy = sinon.spy(logger, 'log');
-    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
     sinon.stub(auth.service, 'logout').callsFake(() => { });
   });
 
   afterEach(() => {
     Utils.restore([
-      auth.cancel,
       fs.existsSync,
       fs.readFileSync,
       auth.service.logout,
@@ -278,35 +273,22 @@ describe(commands.LOGIN, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('ignores the error raised by cancelling device code auth flow', (done) => {
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
-    command.action(logger, { options: {} }, () => {
-      try {
-        assert(loggerLogSpy.notCalled);
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('ignores the error raised by cancelling device code auth flow (debug)', (done) => {
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Polling_Request_Cancelled'); });
-    command.action(logger, { options: { debug: true } }, () => {
-      try {
-        assert(loggerLogToStderrSpy.calledWith('Polling_Request_Cancelled'));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('correctly handles error in device code auth flow', (done) => {
-    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject('Error'); });
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
     command.action(logger, { options: {} } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Error')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles error in device code auth flow (debug)', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => { return Promise.reject(new Error('Error')); });
+    command.action(logger, { options: { debug: true } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Error')));
         done();

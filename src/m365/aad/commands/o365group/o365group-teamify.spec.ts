@@ -15,7 +15,7 @@ describe(commands.O365GROUP_TEAMIFY, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -92,18 +92,17 @@ describe(commands.O365GROUP_TEAMIFY, () => {
   });
 
   it('should handle Microsoft graph error response', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
-     
-        return Promise.reject({
-          "error": {
-            "code": "ItemNotFound",
-            "message": "Error: Failed to execute Templates backend request CreateTeamFromGroupWithTemplateRequest.",
-            "innerError": {
-              "request-id": "27b49647-a335-48f8-9a7c-f1ed9b976aaa",
-              "date": "2019-04-05T12:16:48"
-            }
+    sinon.stub(request, 'post').callsFake(() => {
+      return Promise.reject({
+        "error": {
+          "code": "ItemNotFound",
+          "message": "Error: Failed to execute Templates backend request CreateTeamFromGroupWithTemplateRequest.",
+          "innerError": {
+            "request-id": "27b49647-a335-48f8-9a7c-f1ed9b976aaa",
+            "date": "2019-04-05T12:16:48"
           }
-        });
+        }
+      });
     });
 
     command.action(logger, {

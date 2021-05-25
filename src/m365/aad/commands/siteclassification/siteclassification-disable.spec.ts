@@ -100,7 +100,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
         return Promise.resolve({
           value: [
           ]
-        })
+        });
       }
 
       return Promise.reject('Invalid Request');
@@ -453,7 +453,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { confirm: true } } as any, (err: any) => {
+    command.action(logger, { options: { confirm: true } } as any, () => {
       try {
         assert(deleteRequestIssued);
         done();
@@ -550,7 +550,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
       return Promise.reject('Invalid Request');
     });
 
-    command.action(logger, { options: { debug: true, confirm: true } } as any, (err: any) => {
+    command.action(logger, { options: { debug: true, confirm: true } } as any, () => {
       try {
         assert(deleteRequestIssued);
         done();

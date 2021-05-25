@@ -102,7 +102,6 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
   });
 
   it('returns non-filtered list of permissions', (done) => {
-
     const site = {
       "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
       "displayName": "OneDrive Team Site",
@@ -110,7 +109,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       "createdDateTime": "2017-05-09T20:56:00Z",
       "lastModifiedDateTime": "2017-05-09T20:56:01Z",
       "webUrl": "https://contoso.sharepoint.com/teams/1drvteam"
-    }
+    };
 
     const response = {
       "value": [
@@ -137,22 +136,54 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           ]
         }
       ]
-    }
+    };
+
+    const permissionResponse1 = {
+      "id": "aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy",
+      "roles": [
+        "read"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "displayName": "Selected",
+            "id": "fc1534e7-259d-482a-8688-d6a33d9a0a2c"
+          }
+        }
+      ]
+    };
+
+    const permissionResponse2 = {
+      "id": "aTowaS50fG1zLnNwLmV4dHxkMDVhMmRkYi0xZjMzLTRkZTMtOTMzNS0zYmZiZTUwNDExYzVAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy",
+      "roles": [
+        "read"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "displayName": "SPRestSample",
+            "id": "d05a2ddb-1f33-4de3-9335-3bfbe50411c5"
+          }
+        }
+      ]
+    };
 
     const transposed = [
       {
         appDisplayName: 'Selected',
         appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
-        permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy'
+        permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+        roles: ['read']
       },
       {
         appDisplayName: 'SPRestSample',
         appId: 'd05a2ddb-1f33-4de3-9335-3bfbe50411c5',
-        permissionId: 'aTowaS50fG1zLnNwLmV4dHxkMDVhMmRkYi0xZjMzLTRkZTMtOTMzNS0zYmZiZTUwNDExYzVAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy'
+        permissionId: 'aTowaS50fG1zLnNwLmV4dHxkMDVhMmRkYi0xZjMzLTRkZTMtOTMzNS0zYmZiZTUwNDExYzVAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+        roles: ['read']
       }
-    ]
+    ];
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
@@ -163,8 +194,24 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
 
     getRequestStub.onCall(1)
       .callsFake((opts) => {
-        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permission") > - 1) {
+        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions") > - 1) {
           return Promise.resolve(response);
+        }
+        return Promise.reject('Invalid request');
+      });
+
+    getRequestStub.onCall(2)
+      .callsFake((opts) => {
+        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions/aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy") > - 1) {
+          return Promise.resolve(permissionResponse1);
+        }
+        return Promise.reject('Invalid request');
+      });
+
+    getRequestStub.onCall(3)
+      .callsFake((opts) => {
+        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions/aTowaS50fG1zLnNwLmV4dHxkMDVhMmRkYi0xZjMzLTRkZTMtOTMzNS0zYmZiZTUwNDExYzVAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy") > - 1) {
+          return Promise.resolve(permissionResponse2);
         }
         return Promise.reject('Invalid request');
       });
@@ -184,7 +231,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
     });
   });
 
-  it('returns non-filtered list of permissions', (done) => {
+  it('returns non-filtered list of permissions (json)', (done) => {
     const site = {
       "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
       "displayName": "OneDrive Team Site",
@@ -192,7 +239,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       "createdDateTime": "2017-05-09T20:56:00Z",
       "lastModifiedDateTime": "2017-05-09T20:56:01Z",
       "webUrl": "https://contoso.sharepoint.com/teams/1drvteam"
-    }
+    };
 
     const response = {
       "value": [
@@ -219,9 +266,39 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           ]
         }
       ]
-    }
+    };
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const permissionResponse1 = {
+      "id": "aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy",
+      "roles": [
+        "read"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "displayName": "Selected",
+            "id": "fc1534e7-259d-482a-8688-d6a33d9a0a2c"
+          }
+        }
+      ]
+    };
+
+    const permissionResponse2 = {
+      "id": "aTowaS50fG1zLnNwLmV4dHxkMDVhMmRkYi0xZjMzLTRkZTMtOTMzNS0zYmZiZTUwNDExYzVAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy",
+      "roles": [
+        "read"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "displayName": "SPRestSample",
+            "id": "d05a2ddb-1f33-4de3-9335-3bfbe50411c5"
+          }
+        }
+      ]
+    };
+
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
@@ -238,6 +315,22 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         return Promise.reject('Invalid request');
       });
 
+    getRequestStub.onCall(2)
+      .callsFake((opts) => {
+        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions/aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy") > - 1) {
+          return Promise.resolve(permissionResponse1);
+        }
+        return Promise.reject('Invalid request');
+      });
+
+    getRequestStub.onCall(3)
+      .callsFake((opts) => {
+        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions/aTowaS50fG1zLnNwLmV4dHxkMDVhMmRkYi0xZjMzLTRkZTMtOTMzNS0zYmZiZTUwNDExYzVAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy") > - 1) {
+          return Promise.resolve(permissionResponse2);
+        }
+        return Promise.reject('Invalid request');
+      });
+
     command.action(logger, {
       options: {
         siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
@@ -249,12 +342,14 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           {
             appDisplayName: 'Selected',
             appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
-            permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy'
+            permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+            roles: ['read']
           },
           {
             appDisplayName: 'SPRestSample',
             appId: 'd05a2ddb-1f33-4de3-9335-3bfbe50411c5',
-            permissionId: 'aTowaS50fG1zLnNwLmV4dHxkMDVhMmRkYi0xZjMzLTRkZTMtOTMzNS0zYmZiZTUwNDExYzVAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy'
+            permissionId: 'aTowaS50fG1zLnNwLmV4dHxkMDVhMmRkYi0xZjMzLTRkZTMtOTMzNS0zYmZiZTUwNDExYzVAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+            roles: ['read']
           }
         ]));
         done();
@@ -274,7 +369,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       "createdDateTime": "2017-05-09T20:56:00Z",
       "lastModifiedDateTime": "2017-05-09T20:56:01Z",
       "webUrl": "https://contoso.sharepoint.com/teams/1drvteam"
-    }
+    };
 
     const error = {
       "error": {
@@ -286,9 +381,9 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           "client-request-id": "17547be8-a61d-dd38-8007-1c7b8edde0f4"
         }
       }
-    }
+    };
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
@@ -321,8 +416,6 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
   });
 
   it('fails when passing a site that does not exist', (done) => {
-
-
     const siteError = {
       "error": {
         "code": "itemNotFound",
@@ -333,7 +426,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           "client-request-id": "dbd35b28-0ec3-6496-1279-0e1da3d028fe"
         }
       }
-    }
+    };
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('non-existing') === -1) {
         return Promise.resolve({ value: [] });
@@ -364,7 +457,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       "createdDateTime": "2017-05-09T20:56:00Z",
       "lastModifiedDateTime": "2017-05-09T20:56:01Z",
       "webUrl": "https://contoso.sharepoint.com/teams/1drvteam"
-    }
+    };
 
     const response = {
       "value": [
@@ -380,9 +473,24 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           ]
         }
       ]
-    }
+    };
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const permissionResponse = {
+      "id": "aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy",
+      "roles": [
+        "read"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "displayName": "Selected",
+            "id": "fc1534e7-259d-482a-8688-d6a33d9a0a2c"
+          }
+        }
+      ]
+    };
+
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
@@ -395,6 +503,14 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       .callsFake((opts) => {
         if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permission") > - 1) {
           return Promise.resolve(response);
+        }
+        return Promise.reject('Invalid request');
+      });
+
+    getRequestStub.onCall(2)
+      .callsFake((opts) => {
+        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions/aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy") > - 1) {
+          return Promise.resolve(permissionResponse);
         }
         return Promise.reject('Invalid request');
       });
@@ -410,7 +526,8 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         assert(loggerLogSpy.calledWith([{
           appDisplayName: 'Selected',
           appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
-          permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy'
+          permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+          roles: ['read']
         }]));
         done();
       }
@@ -420,8 +537,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
     });
   });
 
-  it('returns list of permissions filtered by appId json', (done) => {
-
+  it('returns list of permissions filtered by appId (json)', (done) => {
     const site = {
       "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
       "displayName": "OneDrive Team Site",
@@ -429,7 +545,7 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
       "createdDateTime": "2017-05-09T20:56:00Z",
       "lastModifiedDateTime": "2017-05-09T20:56:01Z",
       "webUrl": "https://contoso.sharepoint.com/teams/1drvteam"
-    }
+    };
 
     const response = {
       "value": [
@@ -445,9 +561,24 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
           ]
         }
       ]
-    }
+    };
 
-    const getRequestStub = sinon.stub(request, 'get')
+    const permissionResponse = {
+      "id": "aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy",
+      "roles": [
+        "read"
+      ],
+      "grantedToIdentities": [
+        {
+          "application": {
+            "displayName": "Selected",
+            "id": "fc1534e7-259d-482a-8688-d6a33d9a0a2c"
+          }
+        }
+      ]
+    };
+
+    const getRequestStub = sinon.stub(request, 'get');
     getRequestStub.onCall(0)
       .callsFake((opts) => {
         if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
@@ -458,8 +589,16 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
 
     getRequestStub.onCall(1)
       .callsFake((opts) => {
-        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permission") > - 1) {
+        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions") > - 1) {
           return Promise.resolve(response);
+        }
+        return Promise.reject('Invalid request');
+      });
+
+    getRequestStub.onCall(2)
+      .callsFake((opts) => {
+        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions/aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy") > - 1) {
+          return Promise.resolve(permissionResponse);
         }
         return Promise.reject('Invalid request');
       });
@@ -475,8 +614,88 @@ describe(commands.SITE_APPPERMISSION_LIST, () => {
         assert(loggerLogSpy.calledWith([{
           appDisplayName: 'Selected',
           appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c',
-          permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy'
+          permissionId: 'aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy',
+          roles: ['read']
         }]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles error when fails to get permission details', (done) => {
+    const site = {
+      "id": "contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000",
+      "displayName": "OneDrive Team Site",
+      "name": "1drvteam",
+      "createdDateTime": "2017-05-09T20:56:00Z",
+      "lastModifiedDateTime": "2017-05-09T20:56:01Z",
+      "webUrl": "https://contoso.sharepoint.com/teams/1drvteam"
+    };
+
+    const response = {
+      "value": [
+        {
+          "id": "aTowaS50fG1zLnNwLmV4dHxmYzE1MzRlNy0yNTlkLTQ4MmEtODY4OC1kNmEzM2Q5YTBhMmNAZWUyYjdjMGMtZDI1My00YjI3LTk0NmItMDYzZGM4OWNlOGMy",
+          "grantedToIdentities": [
+            {
+              "application": {
+                "displayName": "Selected",
+                "id": "fc1534e7-259d-482a-8688-d6a33d9a0a2c"
+              }
+            }
+          ]
+        }
+      ]
+    };
+
+    const getRequestStub = sinon.stub(request, 'get');
+    getRequestStub.onCall(0)
+      .callsFake((opts) => {
+        if ((opts.url as string).indexOf(":/sites/sitecollection-name") > - 1) {
+          return Promise.resolve(site);
+        }
+        return Promise.reject('Invalid request');
+      });
+
+    getRequestStub.onCall(1)
+      .callsFake((opts) => {
+        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions") > - 1) {
+          return Promise.resolve(response);
+        }
+        return Promise.reject('Invalid request');
+      });
+
+    getRequestStub.onCall(2)
+      .callsFake((opts) => {
+        if ((opts.url as string).indexOf("contoso.sharepoint.com,00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000/permissions") > - 1) {
+          return Promise.reject({
+            "error": {
+              "code": "itemNotFound",
+              "message": "Item not found",
+              "innerError": {
+                "date": "2021-05-06T17:28:44",
+                "request-id": "c4c9ef62-930c-4564-af0d-571399b1849c",
+                "client-request-id": "861a6ecb-0268-260e-2821-4dc570bf3ea9"
+              }
+            }
+          });
+        }
+
+        return Promise.reject('Invalid request');
+      });
+
+    command.action(logger, {
+      options: {
+        siteUrl: 'https://contoso.sharepoint.com/sites/sitecollection-name',
+        output: 'json',
+        appId: 'fc1534e7-259d-482a-8688-d6a33d9a0a2c'
+      }
+    } as any, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('Item not found')));
         done();
       }
       catch (e) {

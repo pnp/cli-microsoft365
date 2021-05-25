@@ -87,8 +87,8 @@ describe(commands.CONVERT_PDF, () => {
     before(() => {
       auth.service.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
-        value: '123.e30=.456' // {} simulating app-only auth
-      }
+        accessToken: '123.e30=.456' // {} simulating app-only auth
+      };
     });
 
     it('converts file from root site collection, root site, default doc lib, root folder to a local file', (done) => {
@@ -1848,8 +1848,8 @@ describe(commands.CONVERT_PDF, () => {
     before(() => {
       auth.service.accessTokens[auth.defaultResource] = {
         expiresOn: '123',
-        value: '123.eyJ1cG4iOiJzdGV2ZUBjb250b3NvLmNvbSJ9.456' // {upn: "steve@contoso.com"}
-      }
+        accessToken: '123.eyJ1cG4iOiJzdGV2ZUBjb250b3NvLmNvbSJ9.456' // {upn: "steve@contoso.com"}
+      };
     });
 
     it('converts local file to a local PDF file, removes the temporarily uploaded file after conversion succeeded', (done) => {
@@ -1922,12 +1922,12 @@ describe(commands.CONVERT_PDF, () => {
         }
       });
     });
-  })
+  });
 
   it('returns error when unable to detect authentication type', (done) => {
     auth.service.accessTokens[auth.defaultResource] = {
       expiresOn: '123',
-      value: '123.YQ==.456' // 'a' simulating invalid token
+      accessToken: '123.YQ==.456' // 'a' simulating invalid token
     };
 
     command.action(logger, {

@@ -9,14 +9,14 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./team-archive');
 
-describe(commands.TEAMS_TEAM_ARCHIVE, () => {
+describe(commands.TEAM_ARCHIVE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -52,7 +52,7 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_TEAM_ARCHIVE), true);
+    assert.strictEqual(command.name.startsWith(commands.TEAM_ARCHIVE), true);
   });
 
   it('has a description', () => {
@@ -155,14 +155,14 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
       if (opts.url === `https://graph.microsoft.com/v1.0/teams/f5dba91d-6494-4d5e-89a7-ad832f6946d6/archive`) {
         return Promise.reject(
           {
-              "error": {
-                  "code": "ItemNotFound",
-                  "message": "No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6",
-                  "innerError": {
-                      "request-id": "ad0c0a4f-a4fc-4567-8ae1-1150db48b620",
-                      "date": "2019-04-05T15:51:43"
-                  }
+            "error": {
+              "code": "ItemNotFound",
+              "message": "No team found with Group Id f5dba91d-6494-4d5e-89a7-ad832f6946d6",
+              "innerError": {
+                "request-id": "ad0c0a4f-a4fc-4567-8ae1-1150db48b620",
+                "date": "2019-04-05T15:51:43"
               }
+            }
           });
       }
 
@@ -185,7 +185,7 @@ describe(commands.TEAMS_TEAM_ARCHIVE, () => {
   });
 
   it('correctly handles error when archiving a team', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

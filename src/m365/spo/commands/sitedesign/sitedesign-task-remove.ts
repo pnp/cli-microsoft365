@@ -51,7 +51,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
           return request.post(requestOptions);
         })
         .then(_ => cb(), (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
+    };
     if (args.options.confirm) {
       removeSiteDesignTask();
     }
@@ -60,7 +60,7 @@ class SpoSiteDesignTaskRemoveCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to remove the site design task ${args.options.taskId}?`,
+        message: `Are you sure you want to remove the site design task ${args.options.taskId}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

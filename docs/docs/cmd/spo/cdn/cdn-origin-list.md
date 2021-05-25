@@ -33,7 +33,7 @@ m365 spo cdn origin list
 Show the list of origins configured for the Private CDN
 
 ```sh
-m365 spo cdn origin list -t Private
+m365 spo cdn origin list --type Private
 ```
 
 ## More information

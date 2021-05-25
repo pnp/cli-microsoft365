@@ -10,7 +10,7 @@ describe('FN012005_TSC_typeRoots_microsoft', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN012005_TSC_typeRoots_microsoft();
-  })
+  });
 
   it('doesn\'t return notification if ./node_modules/@microsoft is already present', () => {
     const project: Project = {

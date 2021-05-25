@@ -16,7 +16,7 @@ describe(commands.LISTITEM_LIST, () => {
   const expectedArrayLength = 2;
   let returnArrayLength = 0;
 
-  let postFakes = (opts: any) => {
+  const postFakes = (opts: any) => {
     if ((opts.url as string).indexOf('/GetItems') > -1) {
       returnArrayLength = 2;
       return Promise.resolve({value: 
@@ -29,7 +29,7 @@ describe(commands.LISTITEM_LIST, () => {
           "GUID": "2b6bd9e0-3c43-4420-891e-20053e3c4664",
           "ID": 1,
           "Modified": "2018-08-15T13:43:12Z",
-          "Title": "Example item 1",
+          "Title": "Example item 1"
         },
         {
           "Attachments": false,
@@ -41,15 +41,15 @@ describe(commands.LISTITEM_LIST, () => {
           "Id": 2,
           "ID": 2,
           "Modified": "2018-08-15T13:44:10Z",
-          "Title": "Example item 2",
+          "Title": "Example item 2"
         }]
       });
     }
     returnArrayLength = 0;
     return Promise.reject('Invalid request');
-  }
+  };
 
-  let getFakes = (opts: any) => {
+  const getFakes = (opts: any) => {
     if ((opts.url as string).indexOf('/items') > -1) {
       returnArrayLength = 2;
       return Promise.resolve({ value: 
@@ -62,7 +62,7 @@ describe(commands.LISTITEM_LIST, () => {
           "GUID": "2b6bd9e0-3c43-4420-891e-20053e3c4664",
           "ID": 1,
           "Modified": "2018-08-15T13:43:12Z",
-          "Title": "Example item 1",
+          "Title": "Example item 1"
         },
         {
           "Attachments": false,
@@ -74,13 +74,13 @@ describe(commands.LISTITEM_LIST, () => {
           "ID": 2,
           "Id": 2,
           "Modified": "2018-08-15T13:44:10Z",
-          "Title": "Example item 2",
+          "Title": "Example item 2"
         }]
       });
     }
     returnArrayLength = 0;
     return Promise.reject('Invalid request');
-  }
+  };
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -220,11 +220,11 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
+    const options: any = { 
       debug: true, 
       title: 'Demo List', 
-      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-    }
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x' 
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -242,7 +242,7 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
+    const options: any = { 
       debug: true, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
@@ -250,7 +250,7 @@ describe(commands.LISTITEM_LIST, () => {
       pageSize: 2,
       filter: "Title eq 'Demo list item",
       fields: "Title,ID"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -268,7 +268,7 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
+    const options: any = { 
       debug: true, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
@@ -277,7 +277,7 @@ describe(commands.LISTITEM_LIST, () => {
       pageNumber: 2,
       filter: "Title eq 'Demo list item",
       fields: "Title,ID"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -295,7 +295,7 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
+    const options: any = { 
       debug: false, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
@@ -303,7 +303,7 @@ describe(commands.LISTITEM_LIST, () => {
       pageSize: 2,
       pageNumber: 2,
       fields: "Title,ID"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -321,12 +321,12 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
+    const options: any = { 
       debug: false, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       fields: "Title,ID"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -344,12 +344,12 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
+    const options: any = { 
       debug: false, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       output: "text"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -367,12 +367,12 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
+    const options: any = { 
       debug: true, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
-      fields: "Title,ID",
-    }
+      fields: "Title,ID"
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -390,13 +390,13 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
+    const options: any = { 
       debug: true, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>",
       output: "json"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -413,12 +413,12 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(postFakes);
 
-    let options: any = { 
+    const options: any = { 
       debug: false, 
       title: 'Demo List', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
-    }
+    };
 
     command.action(logger, { options: options } as any, () => {
       try {
@@ -435,12 +435,12 @@ describe(commands.LISTITEM_LIST, () => {
     sinon.stub(request, 'get').callsFake(getFakes);
     sinon.stub(request, 'post').callsFake(() => Promise.reject('An error has occurred'));
 
-    let options: any = { 
+    const options: any = { 
       debug: false, 
       id: '935c13a0-cc53-4103-8b48-c1d0828eaa7f', 
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       camlQuery: "<View><Query><ViewFields><FieldRef Name='Title' /><FieldRef Name='Id' /></ViewFields><Where><Eq><FieldRef Name='Title' /><Value Type='Text'>Demo List Item 1</Value></Eq></Where></Query></View>"
-    }
+    };
 
     command.action(logger, { options: options } as any, (err?: any) => {
       try {

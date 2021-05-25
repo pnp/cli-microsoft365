@@ -17,7 +17,7 @@ export class FN012002_TSC_moduleResolution extends JsonRule {
 
   get description(): string {
     return `Update moduleResolution in tsconfig.json`;
-  };
+  }
 
   get resolution(): string {
     return `{
@@ -25,19 +25,19 @@ export class FN012002_TSC_moduleResolution extends JsonRule {
     "moduleResolution": "${this.moduleResolution}"
   }
 }`;
-  };
+  }
 
   get resolutionType(): string {
     return 'json';
-  };
+  }
 
   get severity(): string {
     return 'Required';
-  };
+  }
 
   get file(): string {
     return './tsconfig.json';
-  };
+  }
 
   visit(project: Project, findings: Finding[]): void {
     if (!project.tsConfigJson || !project.tsConfigJson.compilerOptions) {

@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./channel-add');
 
-describe(commands.TEAMS_CHANNEL_ADD, () => {
+describe(commands.CHANNEL_ADD, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -53,7 +53,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.TEAMS_CHANNEL_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.CHANNEL_ADD), true);
   });
 
   it('has a description', () => {
@@ -333,7 +333,7 @@ describe(commands.TEAMS_CHANNEL_ADD, () => {
   });
 
   it('correctly handles error when adding a channel', (done) => {
-    sinon.stub(request, 'post').callsFake((opts) => {
+    sinon.stub(request, 'post').callsFake(() => {
       return Promise.reject('An error has occurred');
     });
 

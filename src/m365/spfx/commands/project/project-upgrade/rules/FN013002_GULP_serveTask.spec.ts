@@ -10,7 +10,7 @@ describe('FN013002_GULP_serveTask', () => {
   beforeEach(() => {
     findings = [];
     rule = new FN013002_GULP_serveTask();
-  })
+  });
 
   it('doesn\'t return notification if serve task is already present', () => {
     const project: Project = {

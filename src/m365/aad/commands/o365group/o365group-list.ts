@@ -62,7 +62,7 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
         if (args.options.orphaned) {
           const orphanedGroups: Group[] = [];
 
-          this.items.forEach((group, index) => {
+          this.items.forEach((group) => {
             if (!group.owners || group.owners.length === 0) {
               orphanedGroups.push(group);
             }
@@ -72,7 +72,7 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
         }
 
         if (args.options.includeSiteUrl) {
-          return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id, logger)));
+          return Promise.all(this.items.map(g => this.getGroupSiteUrl(g.id)));
         }
         else {
           return Promise.resolve();
@@ -97,7 +97,7 @@ class AadO365GroupListCommand extends GraphItemsListCommand<Group> {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getGroupSiteUrl(groupId: string, logger: Logger): Promise<{ id: string, url: string }> {
+  private getGroupSiteUrl(groupId: string): Promise<{ id: string, url: string }> {
     return new Promise<{ id: string, url: string }>((resolve: (siteInfo: { id: string, url: string }) => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
         url: `${this.resource}/v1.0/groups/${groupId}/drive?$select=webUrl`,

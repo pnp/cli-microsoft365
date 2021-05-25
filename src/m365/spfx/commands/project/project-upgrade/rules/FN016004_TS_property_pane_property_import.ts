@@ -23,7 +23,7 @@ export class FN016004_TS_property_pane_property_import extends TsRule {
 
   get resolution(): string {
     return '';
-  };
+  }
 
   get resolutionType(): string {
     return 'ts';
@@ -66,7 +66,7 @@ export class FN016004_TS_property_pane_property_import extends TsRule {
           else {
             importsToStay.push(importName);
           }
-        })
+        });
 
         if (importsToBeMoved.length > 0) {
           const newBaseImportDeclaration: string = `import { ${importsToStay.join(', ')} } from "@microsoft/sp-webpart-base";`;

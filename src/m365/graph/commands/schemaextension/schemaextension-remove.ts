@@ -32,41 +32,41 @@ class GraphSchemaExtensionRemoveCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const removeSchemaExtension: () => void = (): void => {
-        if (this.verbose) {
-          logger.logToStderr(`Removes specified Microsoft Graph schema extension with id '${args.options.id}'...`);
-        }
+      if (this.verbose) {
+        logger.logToStderr(`Removes specified Microsoft Graph schema extension with id '${args.options.id}'...`);
+      }
 
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/schemaExtensions/${args.options.id}`,
-          headers: {
-            accept: 'application/json;odata.metadata=none',
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/schemaExtensions/${args.options.id}`,
+        headers: {
+          accept: 'application/json;odata.metadata=none',
+          'content-type': 'application/json'
+        },
+        responseType: 'json'
+      };
 
       request.delete(requestOptions)
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  };
-  if (args.options.confirm) {
-    removeSchemaExtension();
+        .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
+    };
+    if (args.options.confirm) {
+      removeSchemaExtension();
+    }
+    else {
+      Cli.prompt({
+        type: 'confirm',
+        name: 'continue',
+        default: false,
+        message: `Are you sure you want to remove the schema extension with ID ${args.options.id}?`
+      }, (result: { continue: boolean }): void => {
+        if (!result.continue) {
+          cb();
+        }
+        else {
+          removeSchemaExtension();
+        }
+      });
+    }
   }
-  else {
-    Cli.prompt({
-      type: 'confirm',
-      name: 'continue',
-      default: false,
-      message: `Are you sure you want to remove the schema extension with ID ${args.options.id}?`,
-    }, (result: { continue: boolean }): void => {
-      if (!result.continue) {
-        cb();
-      }
-      else {
-        removeSchemaExtension();
-      }
-    });
-  }
-}
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [

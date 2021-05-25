@@ -1,6 +1,8 @@
 const settingsNames = {
-  showHelpOnFailure: 'showHelpOnFailure',
-  output: 'output'
+  errorOutput: 'errorOutput',
+  output: 'output',
+  printErrorsAsPlainText: 'printErrorsAsPlainText',
+  showHelpOnFailure: 'showHelpOnFailure'
 };
 
 export { settingsNames };

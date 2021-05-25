@@ -1,5 +1,5 @@
 export interface OrgAssets {
-  Url: String;
+  Url: string;
   Libraries: OrgAssetsLibrary[];
 }
 

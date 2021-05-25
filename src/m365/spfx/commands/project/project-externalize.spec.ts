@@ -52,7 +52,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       fs.readFileSync,
       fs.writeFileSync,
       request.head,
-      request.post,
+      request.post
     ]);
   });
 
@@ -157,7 +157,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
+    command.action(logger, { options: {} } as any, () => {
       try {
         assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.8.1');
         done();
@@ -196,7 +196,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
+    command.action(logger, { options: {} } as any, () => {
       try {
         assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '0.4.1');
         done();
@@ -257,7 +257,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    command.action(logger, { options: {} } as any, (err?: any) => {
+    command.action(logger, { options: {} } as any, () => {
       try {
         assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
         done();
@@ -343,7 +343,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    command.action(logger, { options: { toVersion: '1.4.1' } } as any, (err?: any) => {
+    command.action(logger, { options: { toVersion: '1.4.1' } } as any, () => {
       assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, '1.4.1');
     });
   });
@@ -360,7 +360,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     const getProjectVersionSpy = sinon.spy(command as any, 'getProjectVersion');
 
-    command.action(logger, { options: { toVersion: '1.4.1' } } as any, (err?: any) => {
+    command.action(logger, { options: { toVersion: '1.4.1' } } as any, () => {
       assert.strictEqual(getProjectVersionSpy.lastCall.returnValue, undefined);
     });
   });
@@ -494,7 +494,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({ scriptType: 'module' })));
 
-    command.action(logger, { options: { output: 'json', debug: true } } as any, (err?: any) => {
+    command.action(logger, { options: { output: 'json', debug: true } } as any, () => {
       try {
         const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[logEntryToCheck + 3]; //because debug is enabled
         assert.strictEqual((findings.externalConfiguration.externals['@pnp/pnpjs'] as unknown as External).path, 'https://unpkg.com/@pnp/pnpjs@1.3.5/dist/pnpjs.es5.umd.min.js');
@@ -537,7 +537,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
       return Promise.resolve(JSON.stringify({ scriptType: 'script' }));
     });
 
-    command.action(logger, { options: { output: 'json', debug: false } } as any, (err?: any) => {
+    command.action(logger, { options: { output: 'json', debug: false } } as any, () => {
       try {
         const findings: { externalConfiguration: { externals: ExternalConfiguration }, edits: FileEdit[] } = log[0];
         assert.notStrictEqual(findings.edits.length, 0);
@@ -593,7 +593,8 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     sinon.stub(request, 'post').callsFake((options: AxiosRequestConfig) => {
       if ((options.data as string).indexOf('tnt') > -1) {
         return Promise.resolve(JSON.stringify({ scriptType: 'module' }));
-      } else {
+      }
+      else {
         return Promise.resolve(JSON.stringify({ scriptType: 'script' }));
       }
     });
@@ -622,7 +623,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('outputs JSON object with output format json', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
 
-    command.action(logger, { options: { output: 'json' } } as any, (err?: any) => {
+    command.action(logger, { options: { output: 'json' } } as any, () => {
       try {
         assert(JSON.stringify(log[0]).startsWith('{'));
         done();
@@ -636,7 +637,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
   it('returns markdown report with output format md', (done) => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-182-webpart-react'));
 
-    command.action(logger, { options: { output: 'md', } } as any, (err?: any) => {
+    command.action(logger, { options: { output: 'md' } } as any, () => {
       try {
         assert(log[logEntryToCheck].indexOf('## Findings') > -1);
         done();
@@ -668,7 +669,7 @@ describe(commands.PROJECT_EXTERNALIZE, () => {
     });
     sinon.stub(request, 'head').callsFake(() => Promise.resolve());
     sinon.stub(request, 'post').callsFake(() => Promise.resolve(JSON.stringify({ scriptType: 'module' })));
-    command.action(logger, { options: {} } as any, (err?: any) => {
+    command.action(logger, { options: {} } as any, () => {
       try {
         assert.notStrictEqual(log[1].indexOf('externalConfiguration'), -1);
         done();

@@ -66,7 +66,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
 
   it('defines correct alias', () => {
     const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(teamsCommands.TEAMS_USER_ADD) > -1), true);
+    assert.strictEqual((alias && alias.indexOf(teamsCommands.USER_ADD) > -1), true);
   });
 
   it('fails validation if the groupId is not a valid guid.', (done) => {
@@ -103,7 +103,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
     const actual = command.validate({
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -115,7 +115,7 @@ describe(commands.O365GROUP_USER_ADD, () => {
       options: {
         groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         userName: 'anne.matthews@contoso.onmicrosoft.com',
-        role: 'Invalid',
+        role: 'Invalid'
       }
     });
     assert.notStrictEqual(actual, true);

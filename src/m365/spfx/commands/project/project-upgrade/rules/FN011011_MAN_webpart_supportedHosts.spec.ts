@@ -96,6 +96,6 @@ describe('FN011011_MAN_webpart_supportedHosts', () => {
     };
     rule.visit(project, findings);
     assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
-    assert.strictEqual(findings[0].occurrences[0].position?.line, 5, 'Incorrect line number')
+    assert.strictEqual(findings[0].occurrences[0].position?.line, 5, 'Incorrect line number');
   });
 });

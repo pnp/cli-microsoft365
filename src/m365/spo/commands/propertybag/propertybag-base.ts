@@ -10,7 +10,7 @@ import { ClientSvcResponse, ClientSvcResponseContents } from "../../spo";
 export interface Property {
   key: string;
   value: any;
-};
+}
 
 export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
   /**
@@ -31,7 +31,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
   protected getFolderPropertyBag(identityResp: IdentityResponse, webUrl: string, folder: string, logger: Logger): Promise<any> {
     let serverRelativeUrl: string = folder;
     if (identityResp.serverRelativeUrl !== '/') {
-      serverRelativeUrl = `${identityResp.serverRelativeUrl}${serverRelativeUrl}`
+      serverRelativeUrl = `${identityResp.serverRelativeUrl}${serverRelativeUrl}`;
     }
 
     const requestOptions: any = {
@@ -42,7 +42,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="10" ObjectPathId="9" /><ObjectIdentityQuery Id="11" ObjectPathId="9" /><Query Id="12" ObjectPathId="9"><Query SelectAllProperties="false"><Properties><Property Name="Properties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Method Id="9" ParentId="5" Name="GetFolderByServerRelativeUrl"><Parameters><Parameter Type="String">${serverRelativeUrl}</Parameter></Parameters></Method><Identity Id="5" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
 
-    return new Promise<Object>((resolve: any, reject: any) => {
+    return new Promise<any>((resolve: any, reject: any) => {
       return request
         .post<string>(requestOptions)
         .then((res: string) => {
@@ -57,13 +57,13 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
             return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
           }
 
-          const propertiesObj = json.find(x => { return x['Properties'] });
+          const propertiesObj = json.find(x => { return x['Properties']; });
           if (propertiesObj) {
             return resolve(propertiesObj['Properties']);
           }
 
           reject('Cannot proceed. Properties not found'); // this is not suppose to happen
-        }, (err: any): void => { reject(err); })
+        }, (err: any): void => { reject(err); });
     });
   }
 
@@ -80,7 +80,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
       data: `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><Query Id="97" ObjectPathId="5"><Query SelectAllProperties="false"><Properties><Property Name="ServerRelativeUrl" ScalarProperty="true" /><Property Name="AllProperties" SelectAll="true"><Query SelectAllProperties="false"><Properties /></Query></Property></Properties></Query></Query></Actions><ObjectPaths><Identity Id="5" Name="${identityResp.objectIdentity}" /></ObjectPaths></Request>`
     };
 
-    return new Promise<Object>((resolve: any, reject: any): void => {
+    return new Promise<any>((resolve: any, reject: any): void => {
       request.post(requestOptions).then((res: any) => {
         if (this.debug) {
           logger.logToStderr('Attempt to get AllProperties key values');
@@ -92,13 +92,13 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
           return reject(contents.ErrorInfo.ErrorMessage || 'ClientSvc unknown error');
         }
 
-        const allPropertiesObj = json.find(x => { return x['AllProperties'] });
+        const allPropertiesObj = json.find(x => { return x['AllProperties']; });
         if (allPropertiesObj) {
           return resolve(allPropertiesObj['AllProperties']);
         }
 
         reject('Cannot proceed. AllProperties not found'); // this is not supposed to happen
-      }, (err: any): void => { reject(err); })
+      }, (err: any): void => { reject(err); });
     });
   }
 
@@ -127,7 +127,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
         // the date returned has the following format ex. /Date(2017,10,7,11,29,31,0)/.
         // That has to be turned into JavaScript Date object
 
-        let date = objValue.replace('/Date(', '').replace(')/', '').split(',').map(Number);
+        const date = objValue.replace('/Date(', '').replace(')/', '').split(',').map(Number);
         objValue = new Date(date[0], date[1], date[2], date[3], date[4], date[5], date[6]);
       }
       else {
@@ -166,7 +166,7 @@ export abstract class SpoPropertyBagBaseCommand extends SpoCommand {
         else {
           resolve(res);
         }
-      }, (err: any): void => { reject(err); })
+      }, (err: any): void => { reject(err); });
     });
   }
 

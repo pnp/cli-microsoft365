@@ -39,7 +39,7 @@ When you log in to Microsoft 365 in the CLI for Microsoft 365, the CLI will pers
 
 Depending on the CLI for Microsoft 365 commands you have used, the CLI might persist some additional information. For example, when using commands that interact with SharePoint Online, the CLI will store the URL of your SharePoint Online tenant as well as its ID.
 
-The CLI for Microsoft 365 stores its connection information in a JSON file located in the home directory of the current user, on MacOS and Linux, this is `~/.cli-m365-tokens.json` and on Windows, this is `<root>\Users\<username>\.cli-m365-tokens.json`. The contents of this file are not encrypted.
+The CLI for Microsoft 365 stores its connection information in two JSON files located in the home directory of the current user. On MacOS and Linux, these are `~/.cli-m365-tokens.json` and `~/.cli-m365-msal.json`. On Windows, this is `<root>\Users\<username>\.cli-m365-tokens.json` and `<root>\Users\<username>\.cli-m365-msal.json`. The `tokens` file serves as a quick lookup of tokens to speed up command execution. The `msal` file is the cache of the `msal-node` library used by CLI for Microsoft 365 to authenticate to Microsoft 365. Contents of both these files are not encrypted.
 
 ## Removing persisted connection information
 

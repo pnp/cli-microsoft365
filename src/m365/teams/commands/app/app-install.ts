@@ -17,7 +17,7 @@ interface Options extends GlobalOptions {
 
 class TeamsAppInstallCommand extends GraphCommand {
   public get name(): string {
-    return commands.TEAMS_APP_INSTALL;
+    return commands.APP_INSTALL;
   }
 
   public get description(): string {
@@ -25,7 +25,7 @@ class TeamsAppInstallCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${this.resource}/v1.0`
+    const endpoint: string = `${this.resource}/v1.0`;
 
     const requestOptions: any = {
       url: `${endpoint}/teams/${args.options.teamId}/installedApps`,

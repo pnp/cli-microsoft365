@@ -82,12 +82,12 @@ class SpoTermListCommand extends SpoCommand {
 
         const result: TermCollection = json[json.length - 1];
         if (result._Child_Items_ && result._Child_Items_.length > 0) {
-            result._Child_Items_.forEach(t => {
-              t.CreatedDate = new Date(Number(t.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-              t.Id = t.Id.replace('/Guid(', '').replace(')/', '');
-              t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
-            });
-            logger.log(result._Child_Items_);
+          result._Child_Items_.forEach(t => {
+            t.CreatedDate = new Date(Number(t.CreatedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
+            t.Id = t.Id.replace('/Guid(', '').replace(')/', '');
+            t.LastModifiedDate = new Date(Number(t.LastModifiedDate.replace('/Date(', '').replace(')/', ''))).toISOString();
+          });
+          logger.log(result._Child_Items_);
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));

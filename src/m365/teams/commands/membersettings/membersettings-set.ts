@@ -31,7 +31,7 @@ class TeamsMemberSettingsSetCommand extends GraphCommand {
   ];
 
   public get name(): string {
-    return commands.TEAMS_MEMBERSETTINGS_SET;
+    return commands.MEMBERSETTINGS_SET;
   }
 
   public get description(): string {

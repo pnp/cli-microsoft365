@@ -44,7 +44,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
         return this.clearAllScopes(args.options);
       })()
         .then(_ => cb(), (err: any): void => this.handleRejectedPromise(err, logger, cb));
-    }
+    };
 
     if (args.options.confirm) {
       clearCustomActions();
@@ -54,7 +54,7 @@ class SpoCustomActionClearCommand extends SpoCommand {
         type: 'confirm',
         name: 'continue',
         default: false,
-        message: `Are you sure you want to clear all the user custom actions with scope ${chalk.yellow(args.options.scope || 'All')}?`,
+        message: `Are you sure you want to clear all the user custom actions with scope ${chalk.yellow(args.options.scope || 'All')}?`
       }, (result: { continue: boolean }): void => {
         if (!result.continue) {
           cb();

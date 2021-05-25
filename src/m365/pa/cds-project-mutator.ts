@@ -24,7 +24,7 @@ export default class CdsProjectMutator {
   public addProjectReference(referencedProjectPath: string): void {
     if (!this.doesProjectReferenceExists(referencedProjectPath)) {
       const projectReferenceElement = this.createProjectReferenceElement(referencedProjectPath);
-      var projectReferenceItemGroup = this.getProjectReferenceItemGroup();
+      let projectReferenceItemGroup = this.getProjectReferenceItemGroup();
       if (projectReferenceItemGroup) {
         this.addProjectReferenceElement(projectReferenceItemGroup, projectReferenceElement);
       }
@@ -58,13 +58,13 @@ export default class CdsProjectMutator {
   }
 
   private createProjectReferenceElement(referencedProjectPath: string): Node {
-    var projectReferenceElement = this._cdsProjectDocument.createElementNS(this._cdsNamespace, 'ProjectReference');
+    const projectReferenceElement = this._cdsProjectDocument.createElementNS(this._cdsNamespace, 'ProjectReference');
     projectReferenceElement.setAttributeNS(this._cdsNamespace, 'Include', referencedProjectPath);
     return projectReferenceElement;
   }
 
   private createProjectReferenceItemGroup(projectReferenceElement: Node): Element {
-    var projectReferenceItemGroup = this._cdsProjectDocument.createElementNS(this._cdsNamespace, 'ItemGroup');
+    const projectReferenceItemGroup = this._cdsProjectDocument.createElementNS(this._cdsNamespace, 'ItemGroup');
     projectReferenceItemGroup.appendChild(this._cdsProjectDocument.createTextNode('\n  '));
     this.addProjectReferenceElement(projectReferenceItemGroup, projectReferenceElement);
     return projectReferenceItemGroup;
