@@ -5,6 +5,7 @@ export default {
   ID_GET: `${prefix} id get`,
   REPORT_ACTIVEUSERCOUNTS: `${prefix} report activeusercounts`,
   REPORT_ACTIVEUSERDETAIL: `${prefix} report activeuserdetail`,
+  REPORT_OFFICE365ACTIVATIONCOUNTS: `${prefix} report office365activationcounts`,
   REPORT_SERVICESUSERCOUNTS: `${prefix} report servicesusercounts`,
   SERVICE_LIST: `${prefix} service list`,
   SERVICE_MESSAGE_LIST: `${prefix} service message list`,

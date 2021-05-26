@@ -522,6 +522,7 @@ nav:
       - report:
         - report activeusercounts: 'cmd/tenant/report/report-activeusercounts.md'
         - report activeuserdetail: 'cmd/tenant/report/report-activeuserdetail.md'
+        - report office365activationcounts: 'cmd/tenant/report/report-office365activationcounts.md'
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
       - service:
         - service list: 'cmd/tenant/service/service-list.md'
