@@ -7,6 +7,7 @@ export default {
   REPORT_ACTIVEUSERDETAIL: `${prefix} report activeuserdetail`,
   REPORT_OFFICE365ACTIVATIONCOUNTS: `${prefix} report office365activationcounts`,
   REPORT_OFFICE365ACTIVATIONSUSERDETAIL: `${prefix} report office365activationsuserdetail`,
+  REPORT_OFFICE365ACTIVATIONSUSERCOUNTS: `${prefix} report office365activationsusercounts`,
   REPORT_SERVICESUSERCOUNTS: `${prefix} report servicesusercounts`,
   SERVICE_LIST: `${prefix} service list`,
   SERVICE_MESSAGE_LIST: `${prefix} service message list`,
