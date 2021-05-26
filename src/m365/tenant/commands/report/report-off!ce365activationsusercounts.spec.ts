@@ -9,7 +9,7 @@ import Utils from '../../../../Utils';
 import commands from '../../commands';
 const command: Command = require('./report-office365activationsusercounts');
 
-describe(commands.REPORT_O365ACTIVATIONSUSERCOUNTS, () => {
+describe(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.REPORT_O365ACTIVATIONSUSERCOUNTS, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.REPORT_O365ACTIVATIONSUSERCOUNTS), true);
+    assert.strictEqual(command.name.startsWith(commands.REPORT_OFFICE365ACTIVATIONSUSERCOUNTS), true);
   });
 
   it('has a description', () => {
