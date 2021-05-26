@@ -8,7 +8,7 @@ interface CommandArgs {
   options: GlobalOptions;
 }
 
-class TenantReportOffice365activationscountsCommand extends GraphCommand {
+class TenantReportOffice365activationcountsCommand extends GraphCommand {
   public get name(): string {
     return commands.REPORT_OFFICE365ACTIVATIONCOUNTS;
   }
@@ -75,4 +75,4 @@ class TenantReportOffice365activationscountsCommand extends GraphCommand {
   }
 }
 
-module.exports = new TenantReportOffice365activationscountsCommand();
+module.exports = new TenantReportOffice365activationcountsCommand();
