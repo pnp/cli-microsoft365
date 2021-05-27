@@ -1,6 +1,6 @@
 # tenant report office365activationcounts
 
-Get the count of Microsoft 365 activations on desktops and devices.
+Get the count of Microsoft 365 activations on desktops and devices
 
 ## Usage
 
@@ -13,6 +13,8 @@ m365 tenant report office365activationcounts [options]
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
+
+Get the count of Microsoft 365 activations on desktops and devices
 
 ```sh
 m365 tenant report office365activationcounts

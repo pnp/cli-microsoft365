@@ -2,6 +2,8 @@
 // sorted alphabetically for easy maintenance
 const dictionary = [
   'access',
+  'activation',
+  'activations',
   'adaptive',
   'app',
   'apply',
@@ -35,6 +37,7 @@ const dictionary = [
   'messaging',
   'news',
   'oauth2',
+  'office365',
   'org',
   'o365',
   'permission',

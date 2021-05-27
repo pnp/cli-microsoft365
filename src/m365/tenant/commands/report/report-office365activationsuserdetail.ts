@@ -8,17 +8,17 @@ interface CommandArgs {
   options: GlobalOptions;
 }
 
-class TenantReportOffice365ActivationCountsCommand extends GraphCommand {
+class TenantReportOffice365ActivationsUserDetailCommand extends GraphCommand {
   public get name(): string {
-    return commands.REPORT_OFFICE365ACTIVATIONCOUNTS;
+    return commands.REPORT_OFFICE365ACTIVATIONSUSERDETAIL;
   }
 
   public get description(): string {
-    return 'Get the count of Microsoft 365 activations on desktops and devices.';
+    return 'Get details about users who have activated Microsoft 365.';
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${this.resource}/v1.0/reports/getOffice365ActivationCounts`;
+    const endpoint: string = `${this.resource}/v1.0/reports/getOffice365ActivationsUserDetail`;
     this.loadReport(endpoint, logger, args.options.output, cb);
   }
 
@@ -76,4 +76,4 @@ class TenantReportOffice365ActivationCountsCommand extends GraphCommand {
   }
 }
 
-module.exports = new TenantReportOffice365ActivationCountsCommand();
+module.exports = new TenantReportOffice365ActivationsUserDetailCommand();
