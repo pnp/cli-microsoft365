@@ -34,7 +34,7 @@ m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --fol
 
 Return all files from folder _Shared Documents_ and all the folders under _Shared Documents_ located in site _https://contoso.sharepoint.com/sites/project-x_
 ```sh
-m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents --recursive'
+m365 spo file list --webUrl https://contoso.sharepoint.com/sites/project-x --folder 'Shared Documents' --recursive
 ```
 
 Example : For the folder structure given below, using the ``--recursive`` option will return all the files : 
