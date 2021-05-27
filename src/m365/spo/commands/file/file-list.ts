@@ -29,49 +29,13 @@ class SpoFileListCommand extends SpoCommand {
     return 'Lists all available files in the specified folder and site';
   }
 
-  
-
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
 
     if (this.verbose) {
       logger.logToStderr(`Retrieving all files in folder ${args.options.folder} at site ${args.options.webUrl}...`);
     }
 
-
-    // Recursive function
-    const getFiles = (folderUrl: string, files: FilePropertiesCollection={value:[]}):Promise<FilePropertiesCollection> => {
-
-      // If --recursive option is specified, retrieve both Files and Folder details, otherwise only Files.
-      const expandParameters:string = args.options.recursive ? 'Files,Folders':'Files';
-      let requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderUrl)}')?$expand=${expandParameters}`;
-      if (args.options.output !== 'json') {
-        requestUrl += '&$select=Files/UniqueId,Files/Name,Files/ServerRelativeUrl';
-      }
-      const requestOptions:any = {
-        url: requestUrl,
-        method: 'GET',
-        headers: {
-          'accept': 'application/json;odata=nometadata'
-        },
-        responseType: 'json'
-      };
-      
-      return request.get<FileFolderCollection>(requestOptions)
-        .then((filesAndFoldersResult: FileFolderCollection) => {
-          return Promise.all(filesAndFoldersResult.Files.map((file:FileProperties) => files.value.push(file)))
-            .then(() => {
-              // If the request is --recursive, call this method for other folders.
-              if(args.options.recursive && filesAndFoldersResult.Folders !== undefined && filesAndFoldersResult.Folders.length !== 0){
-                return Promise.all(filesAndFoldersResult.Folders.map((folder: { ServerRelativeUrl: string; }) => getFiles(folder.ServerRelativeUrl, files)));
-              }
-              else{
-                return;
-              }
-            });
-        }).then(() => files);
-    };
-
-    getFiles(args.options.folder).then((files: FilePropertiesCollection): void => {
+    this.GetFiles(args.options.folder,args).then((files: FilePropertiesCollection): void => {
       logger.log(files.value);      
 
       cb();
@@ -79,6 +43,38 @@ class SpoFileListCommand extends SpoCommand {
     
   }
 
+  // Gets files from a folder recursively.
+  private GetFiles(folderUrl: string, args: CommandArgs,files: FilePropertiesCollection={value:[]}) : Promise<FilePropertiesCollection>{
+
+    // If --recursive option is specified, retrieve both Files and Folder details, otherwise only Files.
+    const expandParameters:string = args.options.recursive ? 'Files,Folders':'Files';
+    let requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderUrl)}')?$expand=${expandParameters}`;
+    if (args.options.output !== 'json') {
+      requestUrl += '&$select=Files/UniqueId,Files/Name,Files/ServerRelativeUrl';
+    }
+    const requestOptions:any = {
+      url: requestUrl,
+      method: 'GET',
+      headers: {
+        'accept': 'application/json;odata=nometadata'
+      },
+      responseType: 'json'
+    };
+    
+    return request.get<FileFolderCollection>(requestOptions)
+      .then((filesAndFoldersResult: FileFolderCollection) => {
+        return Promise.all(filesAndFoldersResult.Files.map((file:FileProperties) => files.value.push(file)))
+          .then(() => {
+            // If the request is --recursive, call this method for other folders.
+            if(args.options.recursive && filesAndFoldersResult.Folders !== undefined && filesAndFoldersResult.Folders.length !== 0){
+              return Promise.all(filesAndFoldersResult.Folders.map((folder: { ServerRelativeUrl: string; }) => this.GetFiles(folder.ServerRelativeUrl, args, files)));
+            }
+            else{
+              return;
+            }
+          });
+      }).then(() => files);
+  }
 
   public options(): CommandOption[] {
     const options: CommandOption[] = [
@@ -89,7 +85,7 @@ class SpoFileListCommand extends SpoCommand {
         option: '-f, --folder <folder>'
       },
       {
-        option: '-r, --recursive [recursive]'
+        option: '-r, --recursive'
       }
     ];
 

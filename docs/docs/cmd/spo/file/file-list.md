@@ -16,7 +16,7 @@ m365 spo file list [options]
 `-f, --folder <folder>`
 : The server- or site-relative URL of the folder from which to retrieve files
 
-`-r, --recursive [recursive]`
+`-r, --recursive`
 : Switch to indicate whether the files should be returned recursively from folder structure.
 
 
