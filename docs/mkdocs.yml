@@ -591,9 +591,11 @@ nav:
     - Microsoft Graph:
       - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
     - Power Automate:
+      - 'Cancel all running flow runs for a flow in an environment': 'sample-scripts/flow/cancel-all-running-flow-runs.md'
       - 'Export a single Flow to a Logic App' : 'sample-scripts/flow/export-flow-logicapp.md'
       - 'Export all Flows in environment' : 'sample-scripts/flow/export-all-flows-in-environment.md'
       - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
+      - 'Resubmit all failed flow runs for a flow in an environment': 'sample-scripts/flow/resubmit-all-failed-flow-runs.md'
       - 'Search flows for connections' : 'sample-scripts/flow/search-flows-for-connection.md'
     - SharePoint Online:
       - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
