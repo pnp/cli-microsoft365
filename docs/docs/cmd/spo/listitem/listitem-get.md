@@ -25,6 +25,9 @@ m365 spo listitem get [options]
 `-f, --fields [fields]`
 : Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested
 
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve from the item.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
@@ -40,4 +43,10 @@ Get an items Title and Created column and with ID _147_ from list with title _De
 
 ```sh
 m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --fields "Title,Created"
+```
+
+Get an item with ID _147_ from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_ with the specified properties
+
+```sh
+m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "DisplayName,Id,HasUniqueRoleAssignments,ContentType"
 ```

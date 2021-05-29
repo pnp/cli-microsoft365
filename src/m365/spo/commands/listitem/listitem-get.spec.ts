@@ -37,6 +37,27 @@ describe(commands.LISTITEM_GET, () => {
     }
     return Promise.reject('Invalid request');
   };
+
+  const getFakesWithProperties = (opts: any) => {
+    if ((opts.url as string).indexOf('/items(') > -1) {
+      actualId = parseInt(opts.url.match(/\/items\((\d+)\)/i)[1]);
+      return Promise.resolve(
+        {
+          "Attachments": false,
+          "AuthorId": 3,
+          "ContentTypeId": "0x0100B21BD271A810EE488B570BE49963EA34",
+          "Created": "2018-03-15T10:43:10Z",
+          "EditorId": 3,
+          "GUID": "ea093c7b-8ae6-4400-8b75-e2d01154dffc",
+          "ID": actualId,
+          "Modified": "2018-03-15T10:43:10Z",
+          "Title": expectedTitle,
+          "HasUniqueRoleAssignments": false
+        }
+      );
+    }
+    return Promise.reject('Invalid request');
+  };
   
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
@@ -97,6 +118,17 @@ describe(commands.LISTITEM_GET, () => {
     let containsTypeOption = false;
     options.forEach(o => {
       if (o.option.indexOf('<webUrl>') > -1) {
+        containsTypeOption = true;
+      }
+    });
+    assert(containsTypeOption);
+  });
+
+  it('supports specifying properties', () => {
+    const options = command.options();
+    let containsTypeOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--properties') > -1) {
         containsTypeOption = true;
       }
     });
@@ -191,6 +223,30 @@ describe(commands.LISTITEM_GET, () => {
     });
   });
 
+  it('returns listItemInstance object when list item is requested with an output type of json, and a list of fields and properties are specified', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakesWithProperties);
+
+    const options: any = { 
+      debug: false, 
+      listTitle: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      id: expectedId,
+      output: "json",
+      fields: "ID,Modified",
+      properties: "HasUniqueRoleAssignments"
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(actualId, expectedId);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('returns listItemInstance object when list item is requested with an output type of text, and no list of fields', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
@@ -215,7 +271,7 @@ describe(commands.LISTITEM_GET, () => {
     });
   });
 
-  it('returns listItemInstance object when list item is requested with an output type of text, and a list of fields specified', (done) => {
+  it('returns listItemInstance object when list item is requested with an output type of json, and a list of fields specified', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
     command.allowUnknownOptions();

@@ -20,6 +20,7 @@ interface Options extends GlobalOptions {
   listTitle?: string;
   id: string;
   fields?: string;
+  properties?: string;
 }
 
 class SpoListItemGetCommand extends SpoCommand {
@@ -39,6 +40,7 @@ class SpoListItemGetCommand extends SpoCommand {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.listId = typeof args.options.listId !== 'undefined';
     telemetryProps.listTitle = typeof args.options.listTitle !== 'undefined';
+    telemetryProps.properties = (!(!args.options.properties)).toString();
     return telemetryProps;
   }
 
@@ -57,8 +59,10 @@ class SpoListItemGetCommand extends SpoCommand {
           ``
       );
 
+    const propertiesSelect: string = args.options.properties ? `,${encodeURIComponent(args.options.properties)}` : ``;
+
     const requestOptions: any = {
-      url: `${listRestUrl}/items(${args.options.id})${fieldSelect}`,
+      url: `${listRestUrl}/items(${args.options.id})${fieldSelect}${propertiesSelect}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -90,6 +94,9 @@ class SpoListItemGetCommand extends SpoCommand {
       },
       {
         option: '-f, --fields [fields]'
+      },
+      {
+        option: '-p, --properties [properties]'
       }
     ];
 
