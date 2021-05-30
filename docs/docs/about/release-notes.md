@@ -39,6 +39,7 @@
 - extended 'spo site apppermission get' with roles [#2409](https://github.com/pnp/cli-microsoft365/issues/2409)
 - added 'Search flows for connection' sample [#2444](https://github.com/pnp/cli-microsoft365/issues/2444)
 - extended 'spo list get' with properties [#2443](https://github.com/pnp/cli-microsoft365/issues/2443)
+- changed 'flow run list' to return all runs [#2458](https://github.com/pnp/cli-microsoft365/issues/2458)
 
 ## [v3.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.9.0)
 
