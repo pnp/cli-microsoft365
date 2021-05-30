@@ -31,10 +31,6 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<Group
     return telemetryProps;
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'displayName', 'mailNickname'];
-  }
-
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
 
     if (args.options.confirm) {

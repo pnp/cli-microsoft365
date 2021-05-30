@@ -13,7 +13,6 @@ const command: Command = require('./o365group-recyclebinitem-clear');
 describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
   let log: string[];
   let logger: Logger;
-  //let loggerLogSpy: sinon.SinonSpy;
   let promptOptions: any;
 
   before(() => {
@@ -40,7 +39,6 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
       promptOptions = options;
       cb({ continue: false });
     });
-    //loggerLogSpy = sinon.spy(logger, 'log');
     promptOptions = undefined;
   });
 
