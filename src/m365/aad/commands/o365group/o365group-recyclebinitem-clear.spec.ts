@@ -143,6 +143,116 @@ describe(commands.O365GROUP_RECYCLEBINITEM_CLEAR, () => {
     });
   });
 
+  it('clears the recycle bin items when deleted items data is served in pages and --confirm option specified', (done) => {
+
+    const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());
+    
+    // Stub representing the get deleted items operation
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100`) {
+        return Promise.resolve({
+          "@odata.nextLink": "https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27",
+          "value": [
+            {
+              "id": "010d2f0a-0c17-4ec8-b694-e85bbe607013",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2017-12-07T13:58:01Z",
+              "description": "Team 1",
+              "displayName": "Team 1",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "team_1@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "team_1",
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesProvisioningErrors": [],
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "proxyAddresses": [
+                "SMTP:team_1@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2017-12-07T13:58:01Z",
+              "securityEnabled": false,
+              "visibility": "Private"
+            },
+            {
+              "id": "0157132c-bf82-48ff-99e4-b19a74950fe0",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2017-12-17T13:30:42Z",
+              "description": "Team 2",
+              "displayName": "Team 2",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "team_2@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "team_2",
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesProvisioningErrors": [],
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "proxyAddresses": [
+                "SMTP:team_2@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2017-12-17T13:30:42Z",
+              "securityEnabled": false,
+              "visibility": "Private"
+            }
+          ]
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified')&$top=100&$skiptoken=X%2744537074090001000000000000000014000000C233BFA08475B84E8BF8C40335F8944D01000000000000000000000000000017312E322E3834302E3131333535362E312E342E32333331020000000000017D06501DC4C194438D57CFE494F81C1E%27`) {
+        return Promise.resolve({
+          "value": [
+            {
+              "id": "310d2f0a-0c17-4ec8-b694-e85bbe607013",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2017-12-07T13:58:01Z",
+              "description": "Team 3",
+              "displayName": "Team 3",
+              "groupTypes": [
+                "Unified"
+              ],
+              "mail": "team_1@contoso.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "team_3",
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesProvisioningErrors": [],
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "proxyAddresses": [
+                "SMTP:team_1@contoso.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2017-12-07T13:58:01Z",
+              "securityEnabled": false,
+              "visibility": "Private"
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false,confirm:true} }, () => {
+      try {
+        assert(deleteStub.calledThrice);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('does not call delete when there are no items in the O365 group recycle bin', (done) => {
 
     const deleteStub = sinon.stub(request, 'delete').callsFake(() => Promise.resolve());

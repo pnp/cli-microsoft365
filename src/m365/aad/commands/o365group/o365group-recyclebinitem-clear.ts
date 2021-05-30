@@ -59,13 +59,10 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<Group
   }
 
   public ClearO365GroupRecycleBinItems(logger: Logger, args: CommandArgs,cb: () => void):Promise<void>{
-    
     const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
-    const displayNameFilter: string = args.options.displayName ? ` and startswith(DisplayName,'${encodeURIComponent(args.options.displayName).replace(/'/g, `''`)}')` : '';
-    const mailNicknameFilter: string = args.options.mailNickname ? ` and startswith(MailNickname,'${encodeURIComponent(args.options.mailNickname).replace(/'/g, `''`)}')` : '';
     const topCount: string = '&$top=100';
 
-    const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${displayNameFilter}${mailNicknameFilter}${topCount}`;
+    const endpoint: string = `${this.resource}/v1.0/directory/deletedItems/Microsoft.Graph.Group${filter}${topCount}`;
 
     return this
       .getAllItems(endpoint, logger, true)
@@ -76,7 +73,7 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<Group
         }
 
         const deletePromises:any[] = [];
-        // Logic to delete group.
+        // Logic to delete a group from recycle bin items.
         this.items.forEach(grp =>{
           deletePromises.push(
             request.delete({
