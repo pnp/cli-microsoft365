@@ -1,5 +1,18 @@
 # Release notes
 
+## [v3.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.11.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad app set](../cmd/aad/app/app-set.md) - updates Azure AD app registration [#2448](https://github.com/pnp/cli-microsoft365/issues/2448)
+
+### Changes
+
+- added encoding password for login [#2466](https://github.com/pnp/cli-microsoft365/issues/2466)
+- added JMESPath docs [#2293](https://github.com/pnp/cli-microsoft365/issues/2293)
+
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
 ### New commands
