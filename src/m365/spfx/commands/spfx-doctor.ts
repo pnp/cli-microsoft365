@@ -348,6 +348,21 @@ class SpfxDoctorCommand extends AnonymousCommand {
         fix: 'npm i react@16.9.0'
       },
       sp: SharePointVersion.SPO
+    },
+    '1.12.1': {
+      gulp: {
+        range: '^4.0.0',
+        fix: 'npm i -g gulp@4'
+      },
+      node: {
+        range: '^12.0.0 || ^14.0.0',
+        fix: 'Install Node.js v12 or v14'
+      },
+      react: {
+        range: '16.9.0',
+        fix: 'npm i react@16.9.0'
+      },
+      sp: SharePointVersion.SPO
     }
   };
 
@@ -589,7 +604,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
         logger.logToStderr(`Executing npm: ${args.join(' ')}...`);
       }
 
-      child_process.execFile(/^win/.test(process.platform) ? 'npm.logger' : 'npm', args, (err: child_process.ExecException | null, stdout: string): void => {
+      child_process.exec(`npm ${args.join(' ')}`, (err: child_process.ExecException | null, stdout: string): void => {
         if (err) {
           reject(err.message);
         }
