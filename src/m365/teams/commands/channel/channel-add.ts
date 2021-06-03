@@ -52,16 +52,23 @@ class TeamsChannelAddCommand extends GraphCommand {
       .get<{ value: Team[] }>(teamRequestOptions)
       .then(response => {
         const teamItem: Team | undefined = response.value[0];
-
         if (!teamItem) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
-
+        let teamId = teamItem.id;
         if (response.value.length > 1) {
-          return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
+          let found = 0;
+          response.value.forEach(team => {
+            if(team.displayName === args.options.teamName){
+              found++;
+              teamId = team.id;
+            }
+          });
+          if(found > 1){
+            return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
+          }
         }
-
-        return Promise.resolve(teamItem.id);
+        return Promise.resolve(teamId);
       });
   }
 
