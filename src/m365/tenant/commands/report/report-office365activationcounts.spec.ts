@@ -97,7 +97,7 @@ describe(commands.REPORT_OFFICE365ACTIVATIONCOUNTS, () => {
       try {
         assert.strictEqual(requestStub.lastCall.args[0].url, "https://graph.microsoft.com/v1.0/reports/getOffice365ActivationCounts");
         assert.strictEqual(requestStub.lastCall.args[0].headers["accept"], 'application/json;odata.metadata=none');
-        assert(loggerLogSpy.calledWith('[{"Report Refresh Date":"2021-05-24","Product Type":"MICROSOFT 365 APPS FOR ENTERPRISE","Windows":"2","Mac":"0","Android":"0","iOS":"0","Windows 10 Mobile":"0"},{"Report Refresh Date":"2021-05-24","Product Type":"MICROSOFT EXCEL ADVANCED ANALYTICS","Windows":"0","Mac":"0","Android":"0","iOS":"0","Windows 10 Mobile":"0"}]'));
+        assert(loggerLogSpy.calledWith([{ "Report Refresh Date": "2021-05-24", "Product Type": "MICROSOFT 365 APPS FOR ENTERPRISE", "Windows": "2", "Mac": "0", "Android": "0", "iOS": "0", "Windows 10 Mobile": "0" }, { "Report Refresh Date": "2021-05-24", "Product Type": "MICROSOFT EXCEL ADVANCED ANALYTICS", "Windows": "0", "Mac": "0", "Android": "0", "iOS": "0", "Windows 10 Mobile": "0" }]));
         done();
       }
       catch (e) {
