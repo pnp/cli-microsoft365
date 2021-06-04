@@ -12,6 +12,11 @@
 
 - added encoding password for login [#2466](https://github.com/pnp/cli-microsoft365/issues/2466)
 - added JMESPath docs [#2293](https://github.com/pnp/cli-microsoft365/issues/2293)
+- added sample script to resubmit failed flow runs [#2440](https://github.com/pnp/cli-microsoft365/issues/2440)
+- added sample script to cancel running flow runs [#2441](https://github.com/pnp/cli-microsoft365/issues/2441)
+- fixed 'spfx doctor' on Windows [#2299](https://github.com/pnp/cli-microsoft365/issues/2299)
+- updated 'spfx doctor' to support SPFx v1.12.1
+- fixed adding channels via team's name [#2419](https://github.com/pnp/cli-microsoft365/issues/2419)
 
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
