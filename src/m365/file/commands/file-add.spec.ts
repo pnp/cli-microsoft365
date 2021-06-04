@@ -42,7 +42,8 @@ describe(commands.ADD, () => {
       request.get,
       request.post,
       request.put,
-      fs.existsSync
+      fs.existsSync,
+      fs.readFileSync
     ]);
     (command as any).sourceFileGraphUrl = undefined;
   });
@@ -114,6 +115,9 @@ describe(commands.ADD, () => {
           return Promise.reject(`Invalid GET request: ${url}`);
       }
     });
+
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
+
     sinon.stub(request, 'post').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -155,6 +159,87 @@ describe(commands.ADD, () => {
       }
     });
   });
+
+  it('uploads empty file to the root site collection, root site, default document library, root folder', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      const url: string = opts.url as string;
+
+      switch (url) {
+        case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/?$select=id':
+          return Promise.resolve({
+            "id": "contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42"
+          });
+        case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/Shared%20Documents?$select=id':
+          return Promise.reject({
+            "error": {
+              "code": "itemNotFound",
+              "message": "The provided path does not exist, or does not represent a site",
+              "innerError": {
+                "date": "2020-12-27T18:08:36",
+                "request-id": "e44abe41-7f08-43d2-92b6-089e3335b47c",
+                "client-request-id": "e44abe41-7f08-43d2-92b6-089e3335b47c"
+              }
+            }
+          });
+        case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives?$select=webUrl,id':
+          return Promise.resolve({
+            "value": [
+              {
+                "id": "b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KAXP5NlvNnQLH92D7KrxA5",
+                "webUrl": "https://contoso.sharepoint.com/DemoDocs"
+              },
+              {
+                "id": "b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU",
+                "webUrl": "https://contoso.sharepoint.com/Shared%20Documents"
+              },
+              {
+                "id": "b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KCswD4M9qeR6qB9K5J5Kvp",
+                "webUrl": "https://contoso.sharepoint.com/JTDesignDocs"
+              },
+              {
+                "id": "b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0LCxmZShRH-S4chwRsWoq23",
+                "webUrl": "https://contoso.sharepoint.com/MCASDemoFiles"
+              },
+              {
+                "id": "b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0LxywkjzYwYSqUtcpywFv6S",
+                "webUrl": "https://contoso.sharepoint.com/RMSDemoLib"
+              }
+            ]
+          });
+        default:
+          return Promise.reject(`Invalid GET request: ${url}`);
+      }
+    });
+
+    sinon.stub(fs, 'readFileSync').callsFake(() => '');
+
+    sinon.stub(request, 'put').callsFake(opts => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,ea49a393-e3e6-4760-a1b2-e96539e15372,66e2861c-96d9-4418-a75c-0ed1bca68b42/drives/b!k6NJ6ubjYEehsullOeFTchyG4mbZlhhEp1wO0bymi0KkhVdx52mJQ5y68EfLYQYU/root:/file.pdf:/content`) {
+        return Promise.resolve({
+          webUrl: "https://contoso.sharepoint.com/Shared%20Documents/file.pdf"
+        });
+      }
+
+      return Promise.reject(`Invalid PUT request: ${opts}`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        filePath: 'file.pdf',
+        folderUrl: 'https://contoso.sharepoint.com/Shared Documents'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
 
   it('uploads file to the root site collection, root site, default document library, root folder with trailing slash', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
@@ -206,6 +291,9 @@ describe(commands.ADD, () => {
           return Promise.reject(`Invalid GET request: ${url}`);
       }
     });
+
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
+
     sinon.stub(request, 'post').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -298,6 +386,9 @@ describe(commands.ADD, () => {
           return Promise.reject(`Invalid GET request: ${url}`);
       }
     });
+
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
+
     sinon.stub(request, 'post').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -390,6 +481,9 @@ describe(commands.ADD, () => {
           return Promise.reject(`Invalid GET request: ${url}`);
       }
     });
+
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
+
     sinon.stub(request, 'post').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -470,6 +564,9 @@ describe(commands.ADD, () => {
           return Promise.reject(`Invalid GET request: ${url}`);
       }
     });
+
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
+
     sinon.stub(request, 'post').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -550,6 +647,9 @@ describe(commands.ADD, () => {
           return Promise.reject(`Invalid GET request: ${url}`);
       }
     });
+
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
+
     sinon.stub(request, 'post').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -642,6 +742,7 @@ describe(commands.ADD, () => {
           return Promise.reject(`Invalid GET request: ${url}`);
       }
     });
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'post').callsFake(_ => Promise.reject('Issued POST request'));
     sinon.stub(request, 'put').callsFake(_ => Promise.reject('Issued PUT request'));
 
@@ -677,6 +778,7 @@ describe(commands.ADD, () => {
           return Promise.reject(`Invalid GET request: ${url}`);
       }
     });
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'post').callsFake(_ => Promise.reject('Issued POST request'));
     sinon.stub(request, 'put').callsFake(_ => Promise.reject('Issued PUT request'));
 
@@ -747,6 +849,7 @@ describe(commands.ADD, () => {
           return Promise.reject(`Invalid GET request: ${url}`);
       }
     });
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'post').callsFake(_ => Promise.reject({
       "error": {
         "message": "An error has occurred"
@@ -821,6 +924,7 @@ describe(commands.ADD, () => {
           return Promise.reject(`Invalid GET request: ${url}`);
       }
     });
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
     sinon.stub(request, 'post').callsFake(opts => {
       const url: string = opts.url as string;
       if (url.startsWith('https://graph.microsoft.com/v1.0/drive/root:/') &&
