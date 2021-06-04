@@ -19,10 +19,10 @@ class TenantReportOffice365activationsusercountsCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const endpoint: string = `${this.resource}/v1.0/reports/getOffice365ActivationsUserCounts`;
-    this.executeReport(endpoint, logger, args.options.output, cb);
+    this.loadReport(endpoint, logger, args.options.output, cb);
   }
 
-  protected executeReport(endPoint: string, logger: Logger, output: string | undefined, cb: () => void): void {
+  private loadReport(endPoint: string, logger: Logger, output: string | undefined, cb: () => void): void {
     const requestOptions: any = {
       url: endPoint,
       headers: {
@@ -39,7 +39,7 @@ class TenantReportOffice365activationsusercountsCommand extends GraphCommand {
 
         if (output && output.toLowerCase() === 'json') {
           const reportData: any = this.getReport(cleanResponse);
-          content = JSON.stringify(reportData);
+          content = reportData;
         }
         else {
           content = cleanResponse;
