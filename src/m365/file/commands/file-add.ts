@@ -48,33 +48,40 @@ class FileAddCommand extends GraphCommand {
    * @returns Absolute URL of the uploaded file
    */
   private uploadFile(localFilePath: string, targetGraphFileUrl: string): Promise<string> {
+    const fileContents = fs.readFileSync(localFilePath);
+    const isEmptyFile = fileContents.length === 0;
     const requestOptions: any = {
-      url: `${targetGraphFileUrl}:/createUploadSession`,
+      url: isEmptyFile ? `${targetGraphFileUrl}:/content` : `${targetGraphFileUrl}:/createUploadSession`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
+    if (isEmptyFile) {
+      return request
+        .put<{ webUrl: string }>(requestOptions)
+        .then((res: { webUrl: string }) => res.webUrl);
+    }
+    else {
+      return request
+        .post<{ uploadUrl: string; expirationDateTime: string }>(requestOptions)
+        .then((res: { uploadUrl: string; expirationDateTime: string }): Promise<{ webUrl: string }> => {
+          const requestOptions: any = {
+            url: res.uploadUrl,
+            headers: {
+              'x-anonymous': true,
+              'accept': 'application/json;odata.metadata=none',
+              'Content-Length': fileContents.length,
+              'Content-Range': `bytes 0-${fileContents.length - 1}/${fileContents.length}`
+            },
+            data: fileContents,
+            responseType: 'json'
+          };
 
-    return request
-      .post<{ uploadUrl: string; expirationDateTime: string }>(requestOptions)
-      .then((res: { uploadUrl: string; expirationDateTime: string }): Promise<{ webUrl: string }> => {
-        const fileContents = fs.readFileSync(localFilePath);
-        const requestOptions: any = {
-          url: res.uploadUrl,
-          headers: {
-            'x-anonymous': true,
-            'accept': 'application/json;odata.metadata=none',
-            'Content-Length': fileContents.length,
-            'Content-Range': `bytes 0-${fileContents.length - 1}/${fileContents.length}`
-          },
-          data: fileContents,
-          responseType: 'json'
-        };
-
-        return request.put<{ webUrl: string }>(requestOptions);
-      })
-      .then((res: { webUrl: string }) => res.webUrl);
+          return request.put<{ webUrl: string }>(requestOptions);
+        })
+        .then((res: { webUrl: string }) => res.webUrl);
+    }
   }
 
   /**
