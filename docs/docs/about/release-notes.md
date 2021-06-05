@@ -8,6 +8,10 @@
 
 - [aad app set](../cmd/aad/app/app-set.md) - updates Azure AD app registration [#2448](https://github.com/pnp/cli-microsoft365/issues/2448)
 
+**CLI:**
+
+- [cli issue](../cmd/cli/cli-issue.md) - returns, or opens a URL that takes the user to the right place in the CLI GitHub repo to create a new issue reporting bug, feedback, ideas, etc. [#1490](https://github.com/pnp/cli-microsoft365/issues/1490)
+
 ### Changes
 
 - added encoding password for login [#2466](https://github.com/pnp/cli-microsoft365/issues/2466)
@@ -17,6 +21,7 @@
 - fixed 'spfx doctor' on Windows [#2299](https://github.com/pnp/cli-microsoft365/issues/2299)
 - updated 'spfx doctor' to support SPFx v1.12.1
 - fixed adding channels via team's name [#2419](https://github.com/pnp/cli-microsoft365/issues/2419)
+- extended 'file add' to handle empty files [#2433](https://github.com/pnp/cli-microsoft365/issues/2433)
 
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
