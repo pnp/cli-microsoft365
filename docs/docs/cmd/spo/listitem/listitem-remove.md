@@ -35,7 +35,7 @@ m365 spo listitem remove [options]
 Remove the list item with ID _1_ from list with ID  _0cd891ef-afce-4e55-b836-fce03286cccf_ located in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo listitem remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf -id 1
+m365 spo listitem remove --webUrl https://contoso.sharepoint.com/sites/project-x --listId 0cd891ef-afce-4e55-b836-fce03286cccf --id 1
 ```
 
 Remove the list item with ID _1_ from list with title _List 1_ located in site _https://contoso.sharepoint.com/sites/project-x_
