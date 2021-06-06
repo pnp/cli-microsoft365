@@ -12,6 +12,10 @@
 
 - [cli issue](../cmd/cli/cli-issue.md) - returns, or opens a URL that takes the user to the right place in the CLI GitHub repo to create a new issue reporting bug, feedback, ideas, etc. [#1490](https://github.com/pnp/cli-microsoft365/issues/1490)
 
+**Microsoft 365:**
+
+- [tenant report getoffice365activationcounts](../cmd/tenant/report/report-getoffice365activationcounts.md) - gets the count of Microsoft 365 activations on desktops and devices [#2257](https://github.com/pnp/cli-microsoft365/issues/2257)
+
 ### Changes
 
 - added encoding password for login [#2466](https://github.com/pnp/cli-microsoft365/issues/2466)
@@ -22,6 +26,7 @@
 - updated 'spfx doctor' to support SPFx v1.12.1
 - fixed adding channels via team's name [#2419](https://github.com/pnp/cli-microsoft365/issues/2419)
 - extended 'file add' to handle empty files [#2433](https://github.com/pnp/cli-microsoft365/issues/2433)
+- fixed docs for 'spo listitem remove' command [#2474](https://github.com/pnp/cli-microsoft365/pull/2474)
 
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
