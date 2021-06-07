@@ -10,7 +10,6 @@ m365 aad o365group recyclebinitem clear [options]
 
 ## Options
 
-
 `--confirm`
 : Don't prompt for confirmation to clear the recycle bin items.
 
