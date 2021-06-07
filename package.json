@@ -186,6 +186,7 @@
     "xmldom": "^0.6.0"
   },
   "devDependencies": {
+    "@microsoft/microsoft-graph-types": "^1.40.0",
     "@types/adm-zip": "^0.4.34",
     "@types/easy-table": "0.0.32",
     "@types/inquirer": "^7.3.0",
