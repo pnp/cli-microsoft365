@@ -14,7 +14,9 @@
 
 **Microsoft 365:**
 
-- [tenant report getoffice365activationcounts](../cmd/tenant/report/report-getoffice365activationcounts.md) - gets the count of Microsoft 365 activations on desktops and devices [#2257](https://github.com/pnp/cli-microsoft365/issues/2257)
+- [tenant report office365activationcounts](../cmd/tenant/report/report-office365activationcounts.md) - gets the count of Microsoft 365 activations on desktops and devices [#2257](https://github.com/pnp/cli-microsoft365/issues/2257)
+- [tenant report office365activationsusercounts](../cmd/tenant/report/report-office365activationsusercounts.md) - gets the count of users that are enabled and those that have activated the Office subscription on desktop or devices or shared computers [#2258](https://github.com/pnp/cli-microsoft365/issues/2258)
+- [tenant report office365activationsuserdetail](../cmd/tenant/report/report-office365activationsuserdetail.md) - Get details about users who have activated Microsoft 365 [#2256](https://github.com/pnp/cli-microsoft365/issues/2256)
 
 ### Changes
 
