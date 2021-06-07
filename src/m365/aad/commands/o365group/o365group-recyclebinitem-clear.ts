@@ -55,7 +55,6 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<Group
         }
       });
     }
- 
   }
 
   public clearO365GroupRecycleBinItems(logger: Logger, args: CommandArgs,cb: () => void):Promise<void>{
