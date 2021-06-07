@@ -59,10 +59,14 @@ class SpoListItemGetCommand extends SpoCommand {
           ``
       );
 
-    const propertiesSelect: string = args.options.properties ? `,${encodeURIComponent(args.options.properties)}` : ``;
+    const propertiesSelect: string = args.options.properties ? `${encodeURIComponent(args.options.properties)}` : ``;
+    const selectClause: string = (fieldSelect === "") ? `?$select=${propertiesSelect}` :
+      (
+        (propertiesSelect === "") ? `${fieldSelect}` : `${fieldSelect},${propertiesSelect}`
+      );
 
     const requestOptions: any = {
-      url: `${listRestUrl}/items(${args.options.id})${fieldSelect}${propertiesSelect}`,
+      url: `${listRestUrl}/items(${args.options.id})${selectClause}`,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },

@@ -271,6 +271,27 @@ describe(commands.LISTITEM_GET, () => {
     });
   });
 
+  it('returns listItemInstance object when list item is requested with an no output type specified, and a list of fields and properties are not specified', (done) => {
+    sinon.stub(request, 'get').callsFake(getFakesWithProperties);
+
+    const options: any = { 
+      debug: false, 
+      listTitle: 'Demo List', 
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
+      id: expectedId
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.strictEqual(actualId, expectedId);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('returns listItemInstance object when list item is requested with an output type of json, and a list of fields specified', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
