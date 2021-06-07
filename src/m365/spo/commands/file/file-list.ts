@@ -35,16 +35,14 @@ class SpoFileListCommand extends SpoCommand {
       logger.logToStderr(`Retrieving all files in folder ${args.options.folder} at site ${args.options.webUrl}...`);
     }
 
-    this.GetFiles(args.options.folder,args).then((files: FilePropertiesCollection): void => {
+    this.getFiles(args.options.folder,args).then((files: FilePropertiesCollection): void => {
       logger.log(files.value);      
-
       cb();
     }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    
   }
 
   // Gets files from a folder recursively.
-  private GetFiles(folderUrl: string, args: CommandArgs,files: FilePropertiesCollection={value:[]}) : Promise<FilePropertiesCollection>{
+  private getFiles(folderUrl: string, args: CommandArgs,files: FilePropertiesCollection={value:[]}) : Promise<FilePropertiesCollection>{
 
     // If --recursive option is specified, retrieve both Files and Folder details, otherwise only Files.
     const expandParameters:string = args.options.recursive ? 'Files,Folders':'Files';
@@ -63,16 +61,16 @@ class SpoFileListCommand extends SpoCommand {
     
     return request.get<FileFolderCollection>(requestOptions)
       .then((filesAndFoldersResult: FileFolderCollection) => {
-        return Promise.all(filesAndFoldersResult.Files.map((file:FileProperties) => files.value.push(file)))
-          .then(() => {
-            // If the request is --recursive, call this method for other folders.
-            if(args.options.recursive && filesAndFoldersResult.Folders !== undefined && filesAndFoldersResult.Folders.length !== 0){
-              return Promise.all(filesAndFoldersResult.Folders.map((folder: { ServerRelativeUrl: string; }) => this.GetFiles(folder.ServerRelativeUrl, args, files)));
-            }
-            else{
-              return;
-            }
-          });
+        filesAndFoldersResult.Files.map((file:FileProperties) => files.value.push(file));
+        // If the request is --recursive, call this method for other folders.
+        if(args.options.recursive && 
+          filesAndFoldersResult.Folders !== undefined && 
+          filesAndFoldersResult.Folders.length !== 0){
+          return Promise.all(filesAndFoldersResult.Folders.map((folder: { ServerRelativeUrl: string; }) => this.getFiles(folder.ServerRelativeUrl, args, files)));
+        }
+        else{
+          return;
+        }
       }).then(() => files);
   }
 
@@ -97,6 +95,5 @@ class SpoFileListCommand extends SpoCommand {
     return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
-
 
 module.exports = new SpoFileListCommand();
