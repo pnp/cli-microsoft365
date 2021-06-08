@@ -1,6 +1,7 @@
 import { Logger } from '../../../../cli';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
+import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
@@ -38,7 +39,7 @@ class TenantReportOffice365ActivationCountsCommand extends GraphCommand {
         const cleanResponse = this.removeEmptyLines(res);
 
         if (output && output.toLowerCase() === 'json') {
-          content = this.getReport(cleanResponse);
+          content = Utils.parseCsvToJson(cleanResponse);
         }
         else {
           content = cleanResponse;
@@ -54,25 +55,6 @@ class TenantReportOffice365ActivationCountsCommand extends GraphCommand {
     const rows: string[] = input.split('\n');
     const cleanRows = rows.filter(Boolean);
     return cleanRows.join('\n');
-  }
-
-  private getReport(res: string): any {
-    const rows: string[] = res.split('\n');
-    const jsonObj: any = [];
-    const headers: string[] = rows[0].split(',');
-
-    for (let i = 1; i < rows.length; i++) {
-      const data: string[] = rows[i].split(',');
-      const obj: any = {};
-      for (let j = 0; j < data.length; j++) {
-        const value = data[j].trim();
-        const numValue = parseInt(value);
-        obj[headers[j].trim()] = isNaN(numValue) || numValue.toString() !== value ? value : numValue;
-      }
-      jsonObj.push(obj);
-    }
-
-    return jsonObj;
   }
 }
 
