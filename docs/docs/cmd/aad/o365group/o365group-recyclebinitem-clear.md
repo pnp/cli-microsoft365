@@ -17,13 +17,13 @@ m365 aad o365group recyclebinitem clear [options]
 
 ## Examples
 
-Clears all deleted Microsoft 365 Groups in the tenant.Will prompt for confirmation before removing the group
+Removes all deleted Microsoft 365 Groups in the tenant. Will prompt for confirmation before removing groups.
 
 ```sh
 m365 aad o365group recyclebinitem clear
 ```
 
-Clears all deleted Microsoft 365 Groups in the tenant. Will NOT prompt for confirmation before removing the group
+Removes all deleted Microsoft 365 Groups in the tenant. Will NOT prompt for confirmation before permanently removing groups.
 
 ```sh
 m365 aad o365group recyclebinitem clear --confirm

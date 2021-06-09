@@ -33,10 +33,12 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<Group
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
 
+    const clearO365GroupRecycleBinItems: () => void = (): void => {
+      this.processRecycleBinItemsClear(logger).then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+    };
+
     if (args.options.confirm) {
-      this.clearO365GroupRecycleBinItems(logger,args,cb).then(()=>{
-        cb();
-      });
+      clearO365GroupRecycleBinItems();
     }
     else {
       Cli.prompt({
@@ -49,15 +51,13 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<Group
           cb();
         }
         else {
-          this.clearO365GroupRecycleBinItems(logger,args,cb).then(()=>{
-            cb();
-          });
+          clearO365GroupRecycleBinItems();
         }
       });
     }
   }
 
-  public clearO365GroupRecycleBinItems(logger: Logger, args: CommandArgs,cb: () => void):Promise<void>{
+  public processRecycleBinItemsClear(logger: Logger):Promise<any>{
     
     const filter: string = `?$filter=groupTypes/any(c:c+eq+'Unified')`;
     const topCount: string = '&$top=100';
@@ -65,13 +65,13 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<Group
 
     return this
       .getAllItems(endpoint, logger, true)
-      .then(():Promise<void> => {
+      .then(():Promise<any> => {
 
         if(this.items.length === 0){
           return Promise.resolve();
         }
 
-        const deletePromises:any[] = [];
+        const deletePromises:Promise<any>[] = [];
         // Logic to delete a group from recycle bin items.
         this.items.forEach(grp =>{
           deletePromises.push(
@@ -83,7 +83,7 @@ class AadO365GroupRecycleBinItemClearCommand extends GraphItemsListCommand<Group
             })
           );
         });
-        return Promise.all(deletePromises).then(_=>Promise.resolve(),(err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+        return Promise.all(deletePromises);
       });
   }
 
