@@ -90,7 +90,7 @@ Get-SPOTenantTaxonomyReplicationParameters|Microsoft.Online.SharePoint.PowerShel
 Get-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme list](../cmd/spo/theme/theme-list.md)
 Get-SPOUnifiedGroup|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOUnifiedGroupMoveState|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOUser|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOUser|Microsoft.Online.SharePoint.PowerShell|[spo user get](../cmd/spo/user/user-get.md), [spo user list](../cmd/spo/user/user-list.md)
 Get-SPOUserAndContentMoveState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOUserOneDriveLocation|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOWebTemplate|Microsoft.Online.SharePoint.PowerShell|
