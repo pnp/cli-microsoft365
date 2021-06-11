@@ -1,5 +1,40 @@
 # Release notes
 
+## [v3.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.11.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad app set](../cmd/aad/app/app-set.md) - updates Azure AD app registration [#2448](https://github.com/pnp/cli-microsoft365/issues/2448)
+- [aad o365group recyclebinitem clear](../cmd/aad/o365group/o365group-recyclebinitem-clear.md) - clears Microsoft 365 Groups from the recycle bin in the current tenant [#2033](https://github.com/pnp/cli-microsoft365/issues/2033)
+
+**CLI:**
+
+- [cli issue](../cmd/cli/cli-issue.md) - returns, or opens a URL that takes the user to the right place in the CLI GitHub repo to create a new issue reporting bug, feedback, ideas, etc. [#1490](https://github.com/pnp/cli-microsoft365/issues/1490)
+
+**Microsoft 365:**
+
+- [tenant report office365activationcounts](../cmd/tenant/report/report-office365activationcounts.md) - gets the count of Microsoft 365 activations on desktops and devices [#2257](https://github.com/pnp/cli-microsoft365/issues/2257)
+- [tenant report office365activationsusercounts](../cmd/tenant/report/report-office365activationsusercounts.md) - gets the count of users that are enabled and those that have activated the Office subscription on desktop or devices or shared computers [#2258](https://github.com/pnp/cli-microsoft365/issues/2258)
+- [tenant report office365activationsuserdetail](../cmd/tenant/report/report-office365activationsuserdetail.md) - Get details about users who have activated Microsoft 365 [#2256](https://github.com/pnp/cli-microsoft365/issues/2256)
+
+### Changes
+
+- added encoding password for login [#2466](https://github.com/pnp/cli-microsoft365/issues/2466)
+- added JMESPath docs [#2293](https://github.com/pnp/cli-microsoft365/issues/2293)
+- added sample script to resubmit failed flow runs [#2440](https://github.com/pnp/cli-microsoft365/issues/2440)
+- added sample script to cancel running flow runs [#2441](https://github.com/pnp/cli-microsoft365/issues/2441)
+- fixed 'spfx doctor' on Windows [#2299](https://github.com/pnp/cli-microsoft365/issues/2299)
+- updated 'spfx doctor' to support SPFx v1.12.1
+- fixed adding channels via team's name [#2419](https://github.com/pnp/cli-microsoft365/issues/2419)
+- extended 'file add' to handle empty files [#2433](https://github.com/pnp/cli-microsoft365/issues/2433)
+- fixed docs for 'spo listitem remove' command [#2474](https://github.com/pnp/cli-microsoft365/pull/2474)
+- centralized converting csv to json [#2481](https://github.com/pnp/cli-microsoft365/issues/2481)
+- extended 'spo file list' with the `recursive` option [#2376](https://github.com/pnp/cli-microsoft365/issues/2376)
+- added the Get-SPOUser CLI equivalents to the docs [#2485](https://github.com/pnp/cli-microsoft365/issues/2485)
+- removed the deprecated Get-TeamHelp cmdlet from the docs [#2486](https://github.com/pnp/cli-microsoft365/issues/2486)
+
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
 ### New commands
@@ -39,6 +74,7 @@
 - extended 'spo site apppermission get' with roles [#2409](https://github.com/pnp/cli-microsoft365/issues/2409)
 - added 'Search flows for connection' sample [#2444](https://github.com/pnp/cli-microsoft365/issues/2444)
 - extended 'spo list get' with properties [#2443](https://github.com/pnp/cli-microsoft365/issues/2443)
+- changed 'flow run list' to return all runs [#2458](https://github.com/pnp/cli-microsoft365/issues/2458)
 
 ## [v3.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.9.0)
 

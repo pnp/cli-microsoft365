@@ -6,6 +6,8 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
+import { FileFolderCollection } from '../folder/FileFolderCollection';
+import { FileProperties } from './FileProperties';
 import { FilePropertiesCollection } from './FilePropertiesCollection';
 
 interface CommandArgs {
@@ -15,6 +17,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   folder: string;
+  recursive?: boolean;
 }
 
 class SpoFileListCommand extends SpoCommand {
@@ -31,12 +34,20 @@ class SpoFileListCommand extends SpoCommand {
       logger.logToStderr(`Retrieving all files in folder ${args.options.folder} at site ${args.options.webUrl}...`);
     }
 
-    let requestUrl: string = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(args.options.folder)}')/Files`;
+    this.getFiles(args.options.folder, args).then((files: FilePropertiesCollection): void => {
+      logger.log(files.value);
+      cb();
+    }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
 
+  // Gets files from a folder recursively.
+  private getFiles(folderUrl: string, args: CommandArgs, files: FilePropertiesCollection = { value: [] }): Promise<FilePropertiesCollection> {
+    // If --recursive option is specified, retrieve both Files and Folder details, otherwise only Files.
+    const expandParameters: string = args.options.recursive ? 'Files,Folders' : 'Files';
+    let requestUrl = `${args.options.webUrl}/_api/web/GetFolderByServerRelativeUrl('${encodeURIComponent(folderUrl)}')?$expand=${expandParameters}`;
     if (args.options.output !== 'json') {
-      requestUrl += '?$select=UniqueId,Name,ServerRelativeUrl';
+      requestUrl += '&$select=Files/UniqueId,Files/Name,Files/ServerRelativeUrl';
     }
-
     const requestOptions: any = {
       url: requestUrl,
       method: 'GET',
@@ -46,13 +57,20 @@ class SpoFileListCommand extends SpoCommand {
       responseType: 'json'
     };
 
-    request
-      .get<FilePropertiesCollection>(requestOptions)
-      .then((fileProperties: FilePropertiesCollection): void => {
-        logger.log(fileProperties.value);
-
-        cb();
-      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+    return request
+      .get<FileFolderCollection>(requestOptions)
+      .then((filesAndFoldersResult: FileFolderCollection) => {
+        filesAndFoldersResult.Files.forEach((file: FileProperties) => files.value.push(file));
+        // If the request is --recursive, call this method for other folders.
+        if (args.options.recursive &&
+          filesAndFoldersResult.Folders !== undefined &&
+          filesAndFoldersResult.Folders.length !== 0) {
+          return Promise.all(filesAndFoldersResult.Folders.map((folder: { ServerRelativeUrl: string; }) => this.getFiles(folder.ServerRelativeUrl, args, files)));
+        }
+        else {
+          return;
+        }
+      }).then(() => files);
   }
 
   public options(): CommandOption[] {
@@ -62,6 +80,9 @@ class SpoFileListCommand extends SpoCommand {
       },
       {
         option: '-f, --folder <folder>'
+      },
+      {
+        option: '-r, --recursive'
       }
     ];
 

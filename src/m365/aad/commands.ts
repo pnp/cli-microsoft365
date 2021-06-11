@@ -2,6 +2,7 @@ const prefix: string = 'aad';
 
 export default {
   APP_ADD: `${prefix} app add`,
+  APP_SET: `${prefix} app set`,
   APP_ROLE_ADD: `${prefix} app role add`,
   APP_ROLE_LIST: `${prefix} app role list`,
   APPROLEASSIGNMENT_ADD: `${prefix} approleassignment add`,
@@ -17,6 +18,7 @@ export default {
   O365GROUP_ADD: `${prefix} o365group add`,
   O365GROUP_GET: `${prefix} o365group get`,
   O365GROUP_LIST: `${prefix} o365group list`,
+  O365GROUP_RECYCLEBINITEM_CLEAR: `${prefix} o365group recyclebinitem clear`,
   O365GROUP_RECYCLEBINITEM_LIST: `${prefix} o365group recyclebinitem list`,
   O365GROUP_SET: `${prefix} o365group set`,
   O365GROUP_TEAMIFY: `${prefix} o365group teamify`,

@@ -90,7 +90,7 @@ Get-SPOTenantTaxonomyReplicationParameters|Microsoft.Online.SharePoint.PowerShel
 Get-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme list](../cmd/spo/theme/theme-list.md)
 Get-SPOUnifiedGroup|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOUnifiedGroupMoveState|Microsoft.Online.SharePoint.PowerShell|
-Get-SPOUser|Microsoft.Online.SharePoint.PowerShell|
+Get-SPOUser|Microsoft.Online.SharePoint.PowerShell|[spo user get](../cmd/spo/user/user-get.md), [spo user list](../cmd/spo/user/user-list.md)
 Get-SPOUserAndContentMoveState|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOUserOneDriveLocation|Microsoft.Online.SharePoint.PowerShell|
 Get-SPOWebTemplate|Microsoft.Online.SharePoint.PowerShell|
@@ -804,7 +804,6 @@ Get-Team|MicrosoftTeams|[teams team list](../cmd/teams/team/team-list.md)
 Get-TeamChannel|MicrosoftTeams|[teams channel list](../cmd/teams/channel/channel-list.md), [teams channel get](../cmd/teams/channel/channel-get.md)
 Get-TeamFunSettings|MicrosoftTeams|[teams funsettings list](../cmd/teams/funsettings/funsettings-list.md)
 Get-TeamGuestSettings|MicrosoftTeams|[teams guestsettings list](../cmd/teams/guestsettings/guestsettings-list.md)
-Get-TeamHelp|MicrosoftTeams|
 Get-TeamMemberSettings|MicrosoftTeams|[teams membersettings list](../cmd/teams/membersettings/membersettings-list.md)
 Get-TeamMessagingSettings|MicrosoftTeams|[teams messagingsettings list](../cmd/teams/messagingsettings/messagingsettings-list.md)
 Get-TeamUser|MicrosoftTeams|[teams user list](../cmd/aad/o365group/o365group-user-list.md)

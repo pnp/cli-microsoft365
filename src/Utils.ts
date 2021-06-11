@@ -596,4 +596,23 @@ export default class Utils {
         return filtered;
       }, {});
   }
+
+  public static parseCsvToJson(s: string): any {
+    const rows: string[] = s.split('\n');
+    const jsonObj: any = [];
+    const headers: string[] = rows[0].split(',');
+
+    for (let i = 1; i < rows.length; i++) {
+      const data: string[] = rows[i].split(',');
+      const obj: any = {};
+      for (let j = 0; j < data.length; j++) {
+        const value = data[j].trim();
+        const numValue = parseInt(value);
+        obj[headers[j].trim()] = isNaN(numValue) || numValue.toString() !== value ? value : numValue;
+      }
+      jsonObj.push(obj);
+    }
+
+    return jsonObj;
+  }
 }

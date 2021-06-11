@@ -1,6 +1,6 @@
 {
   "name": "@pnp/cli-microsoft365",
-  "version": "3.10.0",
+  "version": "3.11.0",
   "description": "Manage Microsoft 365 and SharePoint Framework projects on any platform",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -96,6 +96,7 @@
     "Calabro, David <davej.calabro@gmail.com>",
     "Connell, Andrew <me@andrewconnell.com>",
     "Deshpande, Vardhaman <vardhaman.rd@gmail.com>",
+    "Faleel, Mohamed Ashiq <ashiqf@gmail.com>",
     "Ford, Lee <fordyman@gmail.com>",
     "Freese, Luise <49960482+LuiseFreese@users.noreply.github.com>",
     "Georgiev, Velin <velin.georgiev@gmail.com>",
@@ -145,6 +146,7 @@
     "Sitaraman, Rajesh <rajesh.sitaraman@outlook.com>",
     "Sittler, Laurent <laurent.sittler@lsonline.fr>",
     "Skelly, Pete <peteskelly@gmail.com>",
+    "strafe <strafe@users.noreply.github.com>",
     "Struyf, Elio <info@estruyf.be>",
     "Svenson, Mikael <miksvenson@gmail.com>",
     "Tane, Peter <peter.tane@gmail.come>",

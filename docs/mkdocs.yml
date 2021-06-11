@@ -8,6 +8,7 @@ nav:
     - 'Run CLI in a Docker Container': 'user-guide/run-cli-in-docker-container.md'
     - 'Logging in to Microsoft 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
+    - 'Filter CLI data': 'user-guide/filter-cli-data.md'
     - 'Configuring CLI': 'user-guide/configuring-cli.md'
     - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
     - 'Caveats when working with the CLI and certificate login': 'user-guide/cli-certificate-caveats.md'
@@ -19,6 +20,7 @@ nav:
     - Azure Active Directory (aad):
       - app:
         - app add: 'cmd/aad/app/app-add.md'
+        - app set: 'cmd/aad/app/app-set.md'
         - app role add: 'cmd/aad/app/app-role-add.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
       - approleassignment:
@@ -39,6 +41,7 @@ nav:
         - o365group get: 'cmd/aad/o365group/o365group-get.md'
         - o365group list: 'cmd/aad/o365group/o365group-list.md'
         - o365group recyclebinitem list: 'cmd/aad/o365group/o365group-recyclebinitem-list.md'
+        - o365group recyclebinitem clear: 'cmd/aad/o365group/o365group-recyclebinitem-clear.md'
         - o365group remove: 'cmd/aad/o365group/o365group-remove.md'
         - o365group renew: 'cmd/aad/o365group/o365group-renew.md'
         - o365group restore: 'cmd/aad/o365group/o365group-restore.md'
@@ -74,6 +77,7 @@ nav:
       - send: 'cmd/adaptivecard/adaptivecard-send.md'
     - CLI (cli):
       - consent: 'cmd/cli/cli-consent.md'
+      - issue: 'cmd/cli/cli-issue.md'
       - reconsent: 'cmd/cli/cli-reconsent.md'
       - completion:
         - completion clink update: 'cmd/cli/completion/completion-clink-update.md'
@@ -519,6 +523,9 @@ nav:
       - report:
         - report activeusercounts: 'cmd/tenant/report/report-activeusercounts.md'
         - report activeuserdetail: 'cmd/tenant/report/report-activeuserdetail.md'
+        - report office365activationcounts: 'cmd/tenant/report/report-office365activationcounts.md'
+        - report office365activationsuserdetail: 'cmd/tenant/report/report-office365activationsuserdetail.md'
+        - report office365activationsusercounts: 'cmd/tenant/report/report-office365activationsusercounts.md'
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
       - service:
         - service list: 'cmd/tenant/service/service-list.md'
@@ -589,9 +596,11 @@ nav:
     - Microsoft Graph:
       - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
     - Power Automate:
+      - 'Cancel all running flow runs for a flow in an environment': 'sample-scripts/flow/cancel-all-running-flow-runs.md'
       - 'Export a single Flow to a Logic App' : 'sample-scripts/flow/export-flow-logicapp.md'
       - 'Export all Flows in environment' : 'sample-scripts/flow/export-all-flows-in-environment.md'
       - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
+      - 'Resubmit all failed flow runs for a flow in an environment': 'sample-scripts/flow/resubmit-all-failed-flow-runs.md'
       - 'Search flows for connections' : 'sample-scripts/flow/search-flows-for-connection.md'
     - SharePoint Online:
       - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'

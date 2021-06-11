@@ -9,5 +9,6 @@ export default {
   CONFIG_GET: `${prefix} config get`,
   CONFIG_SET: `${prefix} config set`,
   CONSENT: `${prefix} consent`,
+  ISSUE: `${prefix} issue`,
   RECONSENT: `${prefix} reconsent`
 };

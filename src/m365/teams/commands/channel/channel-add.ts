@@ -41,7 +41,7 @@ class TeamsChannelAddCommand extends GraphCommand {
     }
 
     const teamRequestOptions: any = {
-      url: `${this.resource}/v1.0/me/joinedTeams?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+      url: `${this.resource}/v1.0/me/joinedTeams`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -51,17 +51,19 @@ class TeamsChannelAddCommand extends GraphCommand {
     return request
       .get<{ value: Team[] }>(teamRequestOptions)
       .then(response => {
-        const teamItem: Team | undefined = response.value[0];
+        const matchingTeams: string[] = response.value
+          .filter(team => team.displayName === args.options.teamName)
+          .map(team => team.id);
 
-        if (!teamItem) {
+        if (matchingTeams.length < 1) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 
-        if (response.value.length > 1) {
-          return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${response.value.map(x => x.id)}`);
+        if (matchingTeams.length > 1) {
+          return Promise.reject(`Multiple Microsoft Teams teams with name ${args.options.teamName} found: ${matchingTeams.join(', ')}`);
         }
 
-        return Promise.resolve(teamItem.id);
+        return Promise.resolve(matchingTeams[0]);
       });
   }
 
