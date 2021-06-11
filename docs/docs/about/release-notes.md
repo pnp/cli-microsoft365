@@ -7,6 +7,7 @@
 **Azure Active Directory:**
 
 - [aad app set](../cmd/aad/app/app-set.md) - updates Azure AD app registration [#2448](https://github.com/pnp/cli-microsoft365/issues/2448)
+- [aad o365group recyclebinitem clear](../cmd/aad/o365group/o365group-recyclebinitem-clear.md) - clears Microsoft 365 Groups from the recycle bin in the current tenant [#2033](https://github.com/pnp/cli-microsoft365/issues/2033)
 
 **CLI:**
 
@@ -29,6 +30,10 @@
 - fixed adding channels via team's name [#2419](https://github.com/pnp/cli-microsoft365/issues/2419)
 - extended 'file add' to handle empty files [#2433](https://github.com/pnp/cli-microsoft365/issues/2433)
 - fixed docs for 'spo listitem remove' command [#2474](https://github.com/pnp/cli-microsoft365/pull/2474)
+- centralized converting csv to json [#2481](https://github.com/pnp/cli-microsoft365/issues/2481)
+- extended 'spo file list' with the `recursive` option [#2376](https://github.com/pnp/cli-microsoft365/issues/2376)
+- added the Get-SPOUser CLI equivalents to the docs [#2485](https://github.com/pnp/cli-microsoft365/issues/2485)
+- removed the deprecated Get-TeamHelp cmdlet from the docs [#2486](https://github.com/pnp/cli-microsoft365/issues/2486)
 
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
