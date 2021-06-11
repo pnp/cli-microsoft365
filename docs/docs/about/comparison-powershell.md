@@ -15,7 +15,7 @@ Add-SPOTenantCdnOrigin|Microsoft.Online.SharePoint.PowerShell|[spo cdn origin ad
 Add-SPOTheme|Microsoft.Online.SharePoint.PowerShell|[spo theme set](../cmd/spo/theme/theme-set.md)
 Add-SPOHubToHubAssociation|Microsoft.Online.SharePoint.PowerShell|
 Add-SPOSiteScriptPackage|Microsoft.Online.SharePoint.PowerShell|
-Add-SPOUser|Microsoft.Online.SharePoint.PowerShell|
+Add-SPOUser|Microsoft.Online.SharePoint.PowerShell|[aad o365group user add](../cmd/aad/o365group/o365group-user-add.md)
 Approve-SPOTenantServicePrincipalPermissionGrant|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal grant add](../cmd/spo/serviceprincipal/serviceprincipal-grant-add.md)
 Approve-SPOTenantServicePrincipalPermissionRequest|Microsoft.Online.SharePoint.PowerShell|[spo serviceprincipal permissionrequest approve](../cmd/spo/serviceprincipal/serviceprincipal-permissionrequest-approve.md)
 Connect-SPOService|Microsoft.Online.SharePoint.PowerShell|[spo login](../cmd/login.md)
