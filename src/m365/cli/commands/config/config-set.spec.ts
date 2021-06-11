@@ -69,7 +69,8 @@ describe(commands.CONFIG_SET, () => {
         assert.strictEqual(actualKey, settingsNames.autoOpenBrowserOnLogin, 'Invalid key');
         assert.strictEqual(actualValue, false, 'Invalid value');
         done();
-      } catch (e) {
+      }
+      catch (e) {
         done(e);
       }
     });
