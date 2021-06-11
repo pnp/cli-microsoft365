@@ -13,25 +13,29 @@
 
 To get all the Site Collections in your tenant and export to a .csv file, you can run the following:
 
-```powershell tab="PowerShell"
-$allSites = m365 spo site classic list --query "[?Template!='SRCHCEN#0']" -o json | ConvertFrom-Json
-$results = @()
+=== "PowerShell"
 
-foreach($site in $allSites){
-    $results += [pscustomobject][ordered]@{
-        Title = $site.Title
-        Url = $site.Url
-        Template = $site.Template
+    ```powershell
+    $allSites = m365 spo site classic list --query "[?Template!='SRCHCEN#0']" -o json | ConvertFrom-Json
+    $results = @()
+
+    foreach($site in $allSites){
+        $results += [pscustomobject][ordered]@{
+            Title = $site.Title
+            Url = $site.Url
+            Template = $site.Template
+        }
     }
-}
-$results | Export-Csv -Path "<YOUR-CSV-FILE-PATH>"
-```
+    $results | Export-Csv -Path "<YOUR-CSV-FILE-PATH>"
+    ```
 
 The script above has a query to ignore the _Search_ site collection by filtering with the template code. If for example you wish to only get the sites that have been created with Private Channels, you could amend your query as follows:
 
-```powershell tab="PowerShell"
-$privateChannelSites = m365 spo site classic list --query "[?Template=='TEAMCHANNEL#0']" -o json | ConvertFrom-Json
-```
+=== "PowerShell"
+
+    ```powershell
+    $privateChannelSites = m365 spo site classic list --query "[?Template=='TEAMCHANNEL#0']" -o json | ConvertFrom-Json
+    ```
 
 ## Add the user as Site Collection Admin
 
@@ -40,29 +44,31 @@ Once you've got the .csv file from the script above, filter it to your needs to 
 !!! note
     The script will add the user as a "site admin" on classic and non group-connected sites, or a an "additional admin" in group-connected sites (and not as a group Member).
 
-```powershell tab="PowerShell"
-$csvSites = Import-Csv -Path "<YOUR-CSV-FILE-PATH>"
-$UserToAdd = "john.smith@contoso.com"  ## Change to your user
-$siteCount = $csvSites.Count
+=== "PowerShell"
 
-Write-Host "Processing $siteCount sites..." -f Cyan
+    ```powershell
+    $csvSites = Import-Csv -Path "<YOUR-CSV-FILE-PATH>"
+    $UserToAdd = "john.smith@contoso.com"  ## Change to your user
+    $siteCount = $csvSites.Count
 
-#Loop through the sites in the csv file
-foreach($site in $csvSites){
-    Write-Host "Going through $($site.Title)" 
-    
-    $users = m365 spo user list --webUrl $site.Url -o json | ConvertFrom-Json
-    $admins = $users.value | Where-Object {$_.IsSiteAdmin -eq $true}
+    Write-Host "Processing $siteCount sites..." -f Cyan
+
+    #Loop through the sites in the csv file
+    foreach($site in $csvSites){
+        Write-Host "Going through $($site.Title)" 
         
-        if ($admins.Email -eq $UserToAdd) {
-            Write-Host "User $($UserToAdd) is already an Admin in $($site.Title)." -f Green
-        }
-        else{
-            Write-Host "Adding $($UserToAdd) to $($site.Title). " -f Magenta
-            m365 spo site classic set --url $site.Url --owners $UserToAdd
-        }
-}
-```
+        $users = m365 spo user list --webUrl $site.Url -o json | ConvertFrom-Json
+        $admins = $users.value | Where-Object {$_.IsSiteAdmin -eq $true}
+            
+            if ($admins.Email -eq $UserToAdd) {
+                Write-Host "User $($UserToAdd) is already an Admin in $($site.Title)." -f Green
+            }
+            else{
+                Write-Host "Adding $($UserToAdd) to $($site.Title). " -f Magenta
+                m365 spo site classic set --url $site.Url --owners $UserToAdd
+            }
+    }
+    ```
 
 Keywords
 

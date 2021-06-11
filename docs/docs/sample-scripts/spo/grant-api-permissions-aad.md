@@ -25,117 +25,121 @@ So what if you could bypass all these steps for both Graph and owned API?
 !!! warning
     These permissions will be granted on the whole tenant and could be used by any script running in your tenant. More info [here](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/use-aadhttpclient#considerations).
 
-```powershell tab="PowerShell"
-m365 login # Don't execute that command if you're already logged in
+=== "PowerShell"
 
-# Granting Microsoft Graph permissions
-$resourceName = "Microsoft Graph"
-$msGraphPermissions = @(
-  "Mail.Read",
-  "People.Read",
-  "User.ReadWrite"
-)
+    ```powershell
+    m365 login # Don't execute that command if you're already logged in
 
-$progress = 0
-$total = $msGraphPermissions.Count
+    # Granting Microsoft Graph permissions
+    $resourceName = "Microsoft Graph"
+    $msGraphPermissions = @(
+      "Mail.Read",
+      "People.Read",
+      "User.ReadWrite"
+    )
 
-ForEach ($permission in $msGraphPermissions) {
-  $progress++
-  Write-Host $progress / $total":" $permission
-    
-  # If permission already granted, you'll face an OAuth permission issue
-  # So you can test the presence of the scope for the requested resource to prevent the error
-  $scopeToAdd = m365 spo sp grant list --query "[?Resource == '${resourceName}' && Scope == '${permission}']"
-  if ($scopeToAdd -eq "") {
-    m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
-    Write-Host "Permission '${permission}' for Resource '${resourceName}' granted" -ForegroundColor Green
-  }
-  else {
-    Write-Host "Permission '${permission}' for Resource '${resourceName}' already granted" -ForegroundColor Yellow 
-  }
-}
+    $progress = 0
+    $total = $msGraphPermissions.Count
 
-# Granting custom permissions
-$resourceName = "contoso-api"
-$customPermissions = @(
-  "user_impersonation",
-  "random_permission"
-)
+    ForEach ($permission in $msGraphPermissions) {
+      $progress++
+      Write-Host $progress / $total":" $permission
+        
+      # If permission already granted, you'll face an OAuth permission issue
+      # So you can test the presence of the scope for the requested resource to prevent the error
+      $scopeToAdd = m365 spo sp grant list --query "[?Resource == '${resourceName}' && Scope == '${permission}']"
+      if ($scopeToAdd -eq "") {
+        m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
+        Write-Host "Permission '${permission}' for Resource '${resourceName}' granted" -ForegroundColor Green
+      }
+      else {
+        Write-Host "Permission '${permission}' for Resource '${resourceName}' already granted" -ForegroundColor Yellow 
+      }
+    }
 
-$progress = 0
-$total = $customPermissions.Count
+    # Granting custom permissions
+    $resourceName = "contoso-api"
+    $customPermissions = @(
+      "user_impersonation",
+      "random_permission"
+    )
 
-ForEach ($permission in $customPermissions) {
-  $progress++
-  Write-Host $progress / $total":" $permission
+    $progress = 0
+    $total = $customPermissions.Count
 
-  # If permission already granted, you'll face an OAuth permission issue
-  # So you can test the presence of the scope for the requested resource to prevent the error
-  $scopeToAdd = m365 spo sp grant list --query "[?Resource == '${resourceName}' && Scope == '${permission}']"
-  if ($scopeToAdd -eq "") {
-    m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
-    Write-Host "Permission '${permission}' for Resource '${resourceName}' granted" -ForegroundColor Green
-  }
-  else {
-    Write-Host "Permission '${permission}' for Resource '${resourceName}' already granted" -ForegroundColor Yellow 
-  }
-}
-```
+    ForEach ($permission in $customPermissions) {
+      $progress++
+      Write-Host $progress / $total":" $permission
 
-```bash tab="Bash"
-#!/bin/bash
+      # If permission already granted, you'll face an OAuth permission issue
+      # So you can test the presence of the scope for the requested resource to prevent the error
+      $scopeToAdd = m365 spo sp grant list --query "[?Resource == '${resourceName}' && Scope == '${permission}']"
+      if ($scopeToAdd -eq "") {
+        m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
+        Write-Host "Permission '${permission}' for Resource '${resourceName}' granted" -ForegroundColor Green
+      }
+      else {
+        Write-Host "Permission '${permission}' for Resource '${resourceName}' already granted" -ForegroundColor Yellow 
+      }
+    }
+    ```
 
-# color formatting for echo
-NOCOLOR='\033[0m'
-YELLOW='\033[1;33m'
-GREEN='\033[0;32m'
+=== "Bash"
 
-m365 login # Don't execute that command if you're already logged in
+    ```bash
+    #!/bin/bash
 
-# Granting Microsoft Graph permissions
-resourceName="Microsoft Graph"
-msGraphPermissions=("Mail.Read" "People.Read" "User.ReadWrite")
+    # color formatting for echo
+    NOCOLOR='\033[0m'
+    YELLOW='\033[1;33m'
+    GREEN='\033[0;32m'
 
-progress=0
-total=${#msGraphPermissions[@]}
+    m365 login # Don't execute that command if you're already logged in
 
-for permission in "${msGraphPermissions[@]}"; do
-  ((progress++))
-  printf '%s / %s:%s\n' "$progress" "$total" "$permission"
+    # Granting Microsoft Graph permissions
+    resourceName="Microsoft Graph"
+    msGraphPermissions=("Mail.Read" "People.Read" "User.ReadWrite")
 
-  # If permission already granted, you'll face an OAuth permission issue
-  # So you can test the presence of the scope for the requested resource to prevent the error
-  scopeToAdd=$( m365 spo sp grant list --query "[?Resource == '$resourceName' && Scope == '${permission}']" )
-  if [ "$( [ -z "$scopeToAdd" ] && echo "Empty" )" == "Empty" ]; then
-    m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
-    echo -e "${GREEN}Permission '${permission}' for Resource '${resourceName}' granted${NOCOLOR}"
-  else
-    echo -e "${YELLOW}Permission '${permission}' for Resource '${resourceName}' already granted${NOCOLOR}"
-  fi
-done
+    progress=0
+    total=${#msGraphPermissions[@]}
 
-# Granting custom permissions
-resourceName="contoso-api"
-customPermissions=("user_impersonation" "random_permission")
+    for permission in "${msGraphPermissions[@]}"; do
+      ((progress++))
+      printf '%s / %s:%s\n' "$progress" "$total" "$permission"
 
-progress=0
-total=${#customPermissions[@]}
+      # If permission already granted, you'll face an OAuth permission issue
+      # So you can test the presence of the scope for the requested resource to prevent the error
+      scopeToAdd=$( m365 spo sp grant list --query "[?Resource == '$resourceName' && Scope == '${permission}']" )
+      if [ "$( [ -z "$scopeToAdd" ] && echo "Empty" )" == "Empty" ]; then
+        m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
+        echo -e "${GREEN}Permission '${permission}' for Resource '${resourceName}' granted${NOCOLOR}"
+      else
+        echo -e "${YELLOW}Permission '${permission}' for Resource '${resourceName}' already granted${NOCOLOR}"
+      fi
+    done
 
-for permission in "${customPermissions[@]}"; do
-  ((progress++))
-  printf '%s / %s:%s\n' "$progress" "$total" "$permission"
-  
-  # If permission already granted, you'll face an OAuth permission issue
-  # So you can test the presence of the scope for the requested resource to prevent the error
-  scopeToAdd=$( m365 spo sp grant list --query "[?Resource == '$resourceName' && Scope == '${permission}']" )
-  if [ "$( [ -z "$scopeToAdd" ] && echo "Empty" )" == "Empty" ]; then
-    m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
-    echo -e "${GREEN}Permission '${permission}' for Resource '${resourceName}' granted${NOCOLOR}"
-  else
-    echo -e "${YELLOW}Permission '${permission}' for Resource '${resourceName}' already granted${NOCOLOR}"
-  fi
-done
-```
+    # Granting custom permissions
+    resourceName="contoso-api"
+    customPermissions=("user_impersonation" "random_permission")
+
+    progress=0
+    total=${#customPermissions[@]}
+
+    for permission in "${customPermissions[@]}"; do
+      ((progress++))
+      printf '%s / %s:%s\n' "$progress" "$total" "$permission"
+      
+      # If permission already granted, you'll face an OAuth permission issue
+      # So you can test the presence of the scope for the requested resource to prevent the error
+      scopeToAdd=$( m365 spo sp grant list --query "[?Resource == '$resourceName' && Scope == '${permission}']" )
+      if [ "$( [ -z "$scopeToAdd" ] && echo "Empty" )" == "Empty" ]; then
+        m365 spo serviceprincipal grant add --resource "$resourceName" --scope "$permission"
+        echo -e "${GREEN}Permission '${permission}' for Resource '${resourceName}' granted${NOCOLOR}"
+      else
+        echo -e "${YELLOW}Permission '${permission}' for Resource '${resourceName}' already granted${NOCOLOR}"
+      fi
+    done
+    ```
 
 Keywords:
 

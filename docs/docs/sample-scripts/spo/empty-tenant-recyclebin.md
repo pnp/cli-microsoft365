@@ -4,49 +4,53 @@ Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powersh
 
 Your deleted modern SharePoint sites are not going to disappear from the UI before they have been removed from the tenant recycle bin. You can either wait for three months, delete them manually via the SharePoint admin center, or run the CLI for Microsoft 365 script below.
 
-```powershell tab="PowerShell"
-$deletedSites = m365 spo tenant recyclebinitem list -o json | ConvertFrom-Json
-$deletedSites | Format-Table Url
+=== "PowerShell"
 
-if ($deletedSites.Count -eq 0) { break }
+    ```powershell
+    $deletedSites = m365 spo tenant recyclebinitem list -o json | ConvertFrom-Json
+    $deletedSites | Format-Table Url
 
-Read-Host -Prompt "Press Enter to start deleting (CTRL + C to exit)"
+    if ($deletedSites.Count -eq 0) { break }
 
-$progress = 0
-$total = $deletedSites.Count
+    Read-Host -Prompt "Press Enter to start deleting (CTRL + C to exit)"
 
-foreach ($deletedSite in $deletedSites)
-{
-  $progress++
-  Write-Host $progress / $total":" $deletedSite.Url
-  m365 spo tenant recyclebinitem remove -u $deletedSite.Url --confirm
-}
-```
+    $progress = 0
+    $total = $deletedSites.Count
 
-```bash tab="Bash"
-#!/bin/bash
+    foreach ($deletedSite in $deletedSites)
+    {
+      $progress++
+      Write-Host $progress / $total":" $deletedSite.Url
+      m365 spo tenant recyclebinitem remove -u $deletedSite.Url --confirm
+    }
+    ```
 
-# requires jq: https://stedolan.github.io/jq/
+=== "Bash"
 
-deletedsites=( $(m365 spo tenant recyclebinitem list -o json | jq -r '.[].Url') )
+    ```bash
+    #!/bin/bash
 
-if [ ${#deletedsites[@]} = 0 ]; then
-  exit 1
-fi
+    # requires jq: https://stedolan.github.io/jq/
 
-printf '%s\n' "${deletedsites[@]}"
-echo "Press Enter to start deleting (CTRL + C to exit)"
-read foo
+    deletedsites=( $(m365 spo tenant recyclebinitem list -o json | jq -r '.[].Url') )
 
-progress=0
-total=${#deletedsites[@]}
+    if [ ${#deletedsites[@]} = 0 ]; then
+      exit 1
+    fi
 
-for deletedsite in "${deletedsites[@]}"; do
-  ((progress++))
-  printf '%s / %s:%s\n' "$progress" "$total" "$deletedsite"
-  m365 spo tenant recyclebinitem remove -u $deletedsite --confirm
-done
-```
+    printf '%s\n' "${deletedsites[@]}"
+    echo "Press Enter to start deleting (CTRL + C to exit)"
+    read foo
+
+    progress=0
+    total=${#deletedsites[@]}
+
+    for deletedsite in "${deletedsites[@]}"; do
+      ((progress++))
+      printf '%s / %s:%s\n' "$progress" "$total" "$deletedsite"
+      m365 spo tenant recyclebinitem remove -u $deletedsite --confirm
+    done
+    ```
 
 Keywords:
 

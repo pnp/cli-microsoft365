@@ -13,64 +13,66 @@ Prerequisites:
 - Azure Storage Container
 - Azure Storage Account Key with required permission to upload documents
 
-```powershell tab="PowerShell"
-$spolHostName = "https://tenant-name.sharepoint.com"
-$spolSiteRelativeUrl = "/sites/site-name"
-$spolDocLibTitle = "document-library-title"
-$azStorageAccountKey = "*****************"
-$azStorageAccountName = "azure-storage-account-name"
-$azStorageContainerName = "azure-storage-container-name"
-$localBaseFolderName = "local-base-folder-name"
+=== "PowerShell"
 
-$localFileDownloadFolderPath = $PSScriptRoot
-$spolSiteUrl = $spolHostName + $spolSiteRelativeUrl
+    ```powershell
+    $spolHostName = "https://tenant-name.sharepoint.com"
+    $spolSiteRelativeUrl = "/sites/site-name"
+    $spolDocLibTitle = "document-library-title"
+    $azStorageAccountKey = "*****************"
+    $azStorageAccountName = "azure-storage-account-name"
+    $azStorageContainerName = "azure-storage-container-name"
+    $localBaseFolderName = "local-base-folder-name"
 
-$spolLibItems = o365 spo listitem list --webUrl $spolSiteUrl --title $spolDocLibTitle --fields 'FileRef,FileLeafRef' --filter "FSObjType eq 0" -o json | ConvertFrom-Json
+    $localFileDownloadFolderPath = $PSScriptRoot
+    $spolSiteUrl = $spolHostName + $spolSiteRelativeUrl
 
-if ($spolLibItems.Count -gt 0) {
-  ForEach ($spolLibItem in $spolLibItems) {
-    $spolLibFileRelativeUrl = $spolLibItem.FileRef
-    $spolFileName = $spolLibItem.FileLeafRef
+    $spolLibItems = o365 spo listitem list --webUrl $spolSiteUrl --title $spolDocLibTitle --fields 'FileRef,FileLeafRef' --filter "FSObjType eq 0" -o json | ConvertFrom-Json
 
-    $spolLibFolderRelativeUrl = $spolLibFileRelativeUrl.Substring(0, $spolLibFileRelativeUrl.lastIndexOf('/'))
+    if ($spolLibItems.Count -gt 0) {
+      ForEach ($spolLibItem in $spolLibItems) {
+        $spolLibFileRelativeUrl = $spolLibItem.FileRef
+        $spolFileName = $spolLibItem.FileLeafRef
 
-    $localDownloadFolderPath = Join-Path $localFileDownloadFolderPath $localBaseFolderName $spolLibFolderRelativeUrl
+        $spolLibFolderRelativeUrl = $spolLibFileRelativeUrl.Substring(0, $spolLibFileRelativeUrl.lastIndexOf('/'))
 
-    If (!(test-path $localDownloadFolderPath)) {
-      $message = "Target local folder $localDownloadFolderPath not exist"
-      Write-Host $message -ForegroundColor Yellow
+        $localDownloadFolderPath = Join-Path $localFileDownloadFolderPath $localBaseFolderName $spolLibFolderRelativeUrl
 
-      New-Item -ItemType Directory -Force -Path $localDownloadFolderPath | Out-Null
+        If (!(test-path $localDownloadFolderPath)) {
+          $message = "Target local folder $localDownloadFolderPath not exist"
+          Write-Host $message -ForegroundColor Yellow
 
-      $message = "Created target local folder at $localDownloadFolderPath"
+          New-Item -ItemType Directory -Force -Path $localDownloadFolderPath | Out-Null
+
+          $message = "Created target local folder at $localDownloadFolderPath"
+          Write-Host $message -ForegroundColor Green
+        }
+        else {
+          $message = "Target local folder exist at $localDownloadFolderPath"
+          Write-Host $message -ForegroundColor Blue
+        }
+
+        $localFilePath = Join-Path $localDownloadFolderPath $spolFileName
+
+        $message = "Processing SharePoint file $spolFileName"
+        Write-Host $message -ForegroundColor Green
+
+        o365 spo file get --webUrl $spolSiteUrl --url $spolLibFileRelativeUrl --asFile --path $localFilePath
+
+        $message = "Downloaded SharePoint file at $localFilePath"
+        Write-Host $message -ForegroundColor Green
+      }
+
+      $localFolderToSync = Join-Path $localFileDownloadFolderPath $localBaseFolderName
+      az storage blob sync --account-key $azStorageAccountKey --account-name $azStorageAccountName -c $azStorageContainerName -s $localFolderToSync --only-show-errors | Out-Null
+
+      $message = "Syncing local folder $localFolderToSync with Azure Storage Container $azStorageContainerName is completed"
       Write-Host $message -ForegroundColor Green
     }
     else {
-      $message = "Target local folder exist at $localDownloadFolderPath"
-      Write-Host $message -ForegroundColor Blue
+      Write-Host "No files in $spolDocLibTitle library" -ForegroundColor Yellow
     }
-
-    $localFilePath = Join-Path $localDownloadFolderPath $spolFileName
-
-    $message = "Processing SharePoint file $spolFileName"
-    Write-Host $message -ForegroundColor Green
-
-    o365 spo file get --webUrl $spolSiteUrl --url $spolLibFileRelativeUrl --asFile --path $localFilePath
-
-    $message = "Downloaded SharePoint file at $localFilePath"
-    Write-Host $message -ForegroundColor Green
-  }
-
-  $localFolderToSync = Join-Path $localFileDownloadFolderPath $localBaseFolderName
-  az storage blob sync --account-key $azStorageAccountKey --account-name $azStorageAccountName -c $azStorageContainerName -s $localFolderToSync --only-show-errors | Out-Null
-
-  $message = "Syncing local folder $localFolderToSync with Azure Storage Container $azStorageContainerName is completed"
-  Write-Host $message -ForegroundColor Green
-}
-else {
-  Write-Host "No files in $spolDocLibTitle library" -ForegroundColor Yellow
-}
-```
+    ```
 
 Keywords:
 

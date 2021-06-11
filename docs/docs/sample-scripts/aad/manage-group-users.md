@@ -6,51 +6,55 @@ Companies pursue to hasten profits growth or enter new marketplace through Merge
 
 Note: Refactor the code as per your requirement.
 
-```powershell tab="PowerShell"
-$taskItems = import-csv "sample-input-file.csv" –header mailNickname, userEmail, role, action
-$groups = m365 aad o365group list -o json | ConvertFrom-Json
+=== "PowerShell"
 
-ForEach ($taskItem in $taskItems) {
+    ```powershell
+    $taskItems = import-csv "sample-input-file.csv" –header mailNickname, userEmail, role, action
+    $groups = m365 aad o365group list -o json | ConvertFrom-Json
 
-    $mailNickname = $($taskItem.mailNickname)
-    $userEmail = $($taskItem.userEmail)
-    $role = $($taskItem.role)
-    $action = $($taskItem.action)
+    ForEach ($taskItem in $taskItems) {
 
-    $group = $groups | Where-Object { $_.mailNickname -eq "$mailNickname" }
-    $user = m365 aad user get --userName $userEmail -o json | ConvertFrom-Json
+        $mailNickname = $($taskItem.mailNickname)
+        $userEmail = $($taskItem.userEmail)
+        $role = $($taskItem.role)
+        $action = $($taskItem.action)
 
-    Write-Host "Processing: User --> " $user.mail " Group --> " $group.mailNickname
+        $group = $groups | Where-Object { $_.mailNickname -eq "$mailNickname" }
+        $user = m365 aad user get --userName $userEmail -o json | ConvertFrom-Json
 
-    If ($action -eq "add") {
+        Write-Host "Processing: User --> " $user.mail " Group --> " $group.mailNickname
 
-        If ($role -eq "owner") {
-            m365 aad o365group user add --groupId $group.id --userName $user.mail --role Owner; 
-            Write-Host $user.mail " added as owner in " $group.mailNickname
+        If ($action -eq "add") {
+
+            If ($role -eq "owner") {
+                m365 aad o365group user add --groupId $group.id --userName $user.mail --role Owner; 
+                Write-Host $user.mail " added as owner in " $group.mailNickname
+            }
+            ElseIf ($role -eq "member") {
+                m365 aad o365group user add --groupId $group.id --userName $user.mail
+                Write-Host $user.mail " added as member in " $group.mailNickname
+            }
+            Else {
+                Write-Host "Invalid user role '" $role "'"
+            }
         }
-        ElseIf ($role -eq "member") {
-            m365 aad o365group user add --groupId $group.id --userName $user.mail
-            Write-Host $user.mail " added as member in " $group.mailNickname
+        ElseIf ($action -eq "remove") {
+            m365 aad o365group user remove --groupId $group.id --userName $user.mail --confirm
+            Write-Host $user.mail " removed from " $group.mailNickname
         }
         Else {
-            Write-Host "Invalid user role '" $role "'"
+            Write-Host "Invalid task action '" $action "'"
         }
     }
-    ElseIf ($action -eq "remove") {
-        m365 aad o365group user remove --groupId $group.id --userName $user.mail --confirm
-        Write-Host $user.mail " removed from " $group.mailNickname
-    }
-    Else {
-        Write-Host "Invalid task action '" $action "'"
-    }
-}
-```
+    ```
 
-```csv tab="Input CSV File Format"
-groupMailNickname1, user1@domainname.com, owner, add
-groupMailNickname2, user2@domainname.com, member, add
-groupMailNickname3, user3@domainname.com, , remove
-```
+=== "Input CSV File Format"
+
+    ```csv
+    groupMailNickname1, user1@domainname.com, owner, add
+    groupMailNickname2, user2@domainname.com, member, add
+    groupMailNickname3, user3@domainname.com, , remove
+    ```
 
 Keywords:
 

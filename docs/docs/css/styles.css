@@ -6,15 +6,11 @@
 .md-logo img {
   width: 100% !important;
   height: auto !important;
-  margin-top: -0.25em;
+  margin-top: -0.75em;
 }
 
-.md-header{
+.md-header {
   height: 75px;
-}
-
-.md-container{
-  padding-top: 70px;
 }
 
 .md-sidebar[data-md-state="lock"]{
@@ -35,4 +31,8 @@
   .md-typeset__scrollwrap {
     overflow: visible;
   }
+}
+
+.md-content {
+  overflow: auto;
 }

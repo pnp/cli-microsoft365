@@ -5,7 +5,7 @@
       "label": "Run docs container",
       "type": "docker-run",
       "dockerRun": {
-        "image": "squidfunk/mkdocs-material:3.1.0",
+        "image": "squidfunk/mkdocs-material:7.1.7",
         "ports": [{
           "containerPort": 8000,
           "hostPort": 8000

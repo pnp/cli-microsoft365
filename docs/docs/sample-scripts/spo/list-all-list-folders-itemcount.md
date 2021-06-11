@@ -4,45 +4,47 @@ Author: [Albert-Jan Schot](https://www.cloudappie.nl/lists-file-count-cli-micros
 
 List all Lists, the folders and sub folders in a given site, and output the item count. Each folder is processed recursively. By default only non hidden document libraries are processed. As specified with the filter `$false -eq $list.Hidden -and $list.BaseTemplate -eq "101"`. The output is a CSV that contains the itemcount for each list and folder found in the specified site collection.
 
-```powershell tab="PowerShell"
-$siteUrl = "<PUTYOURURLHERE>"
-$fileExportPath = "<PUTYOURPATHHERE.csv>"
+=== "PowerShell"
 
-$m365Status = m365 status
+    ```powershell
+    $siteUrl = "<PUTYOURURLHERE>"
+    $fileExportPath = "<PUTYOURPATHHERE.csv>"
 
-if ($m365Status -eq "Logged Out") {
-  # Connection to Microsoft 365
-  m365 login
-}
+    $m365Status = m365 status
 
-[System.Collections.ArrayList]$results = @()
+    if ($m365Status -eq "Logged Out") {
+      # Connection to Microsoft 365
+      m365 login
+    }
 
-function Get-Folders($webUrl, $folderUrl) {
-  $folders = m365 spo folder list -u $webUrl --parentFolderUrl $folderUrl -o json | ConvertFrom-Json
+    [System.Collections.ArrayList]$results = @()
 
-  foreach ($folder in $folders) {
-    $folderStats = m365 spo folder get -u $webUrl --folderUrl $folder.ServerRelativeUrl -o json | ConvertFrom-Json
+    function Get-Folders($webUrl, $folderUrl) {
+      $folders = m365 spo folder list -u $webUrl --parentFolderUrl $folderUrl -o json | ConvertFrom-Json
 
-    Write-Output "Processing folder: $($folder.ServerRelativeUrl);"
-    [void]$results.Add([pscustomobject]@{ Url = $folder.ServerRelativeUrl; ItemCount = $folderStats.ItemCount; Type = "Folder"; })
+      foreach ($folder in $folders) {
+        $folderStats = m365 spo folder get -u $webUrl --folderUrl $folder.ServerRelativeUrl -o json | ConvertFrom-Json
 
-    Get-Folders $webUrl $folder.ServerRelativeUrl
-  }
-}
+        Write-Output "Processing folder: $($folder.ServerRelativeUrl);"
+        [void]$results.Add([pscustomobject]@{ Url = $folder.ServerRelativeUrl; ItemCount = $folderStats.ItemCount; Type = "Folder"; })
 
-$allLists = m365 spo list list -u $siteUrl -o json | ConvertFrom-Json
+        Get-Folders $webUrl $folder.ServerRelativeUrl
+      }
+    }
 
-foreach ($list in $allLists) {
-  if ($false -eq $list.Hidden -and $list.BaseTemplate -eq "101") {
-    Write-Output "Processing $($list.Url)"
-    [void]$results.Add([PSCustomObject]@{ Url = $list.Url; ItemCount = $list.ItemCount; Type = "List"; })
+    $allLists = m365 spo list list -u $siteUrl -o json | ConvertFrom-Json
 
-    Get-Folders $siteUrl $list.Url
-  }
-}
+    foreach ($list in $allLists) {
+      if ($false -eq $list.Hidden -and $list.BaseTemplate -eq "101") {
+        Write-Output "Processing $($list.Url)"
+        [void]$results.Add([PSCustomObject]@{ Url = $list.Url; ItemCount = $list.ItemCount; Type = "List"; })
 
-$results | Export-Csv -Path $fileExportPath -NoTypeInformation
-```
+        Get-Folders $siteUrl $list.Url
+      }
+    }
+
+    $results | Export-Csv -Path $fileExportPath -NoTypeInformation
+    ```
 
 Keywords:
 

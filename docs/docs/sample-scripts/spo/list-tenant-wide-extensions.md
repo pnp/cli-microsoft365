@@ -4,23 +4,27 @@ Author: [Shantha Kumar T](https://www.ktskumar.com/2020/04/manage-tenant-wide-ex
 
 The following script lists all tenant-wide extensions deployed in the tenant. The sample returns the Id, Title, Extension Location and Extension Disabled status of each extension.
 
-```powershell tab="PowerShell"
-$listName = "Tenant Wide Extensions"
-$fields = "Id, Title, TenantWideExtensionDisabled, TenantWideExtensionLocation"
+=== "PowerShell"
 
-$appcatalogurl = m365 spo tenant appcatalogurl get
-m365 spo listitem list --title $listName --webUrl $appcatalogurl --fields $fields
-```
+    ```powershell
+    $listName = "Tenant Wide Extensions"
+    $fields = "Id, Title, TenantWideExtensionDisabled, TenantWideExtensionLocation"
 
-```bash tab="Bash"
-#!/bin/bash
+    $appcatalogurl = m365 spo tenant appcatalogurl get
+    m365 spo listitem list --title $listName --webUrl $appcatalogurl --fields $fields
+    ```
 
-listName="Tenant Wide Extensions"
-fields="Id, Title, TenantWideExtensionLocation, TenantWideExtensionDisabled"
+=== "Bash"
 
-appcatalogurl=$(m365 spo tenant appcatalogurl get)
-m365 spo listitem list --title "$listName" --webUrl $appcatalogurl --fields  "$fields"
-```
+    ```bash
+    #!/bin/bash
+
+    listName="Tenant Wide Extensions"
+    fields="Id, Title, TenantWideExtensionLocation, TenantWideExtensionDisabled"
+
+    appcatalogurl=$(m365 spo tenant appcatalogurl get)
+    m365 spo listitem list --title "$listName" --webUrl $appcatalogurl --fields  "$fields"
+    ```
 
 !!! note
     To view more/different properties of the extensions, adjust the internal names in the `fields` variable.

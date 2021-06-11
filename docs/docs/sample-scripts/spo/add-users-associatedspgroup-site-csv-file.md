@@ -32,45 +32,47 @@ Permission Level mapping assumptions are given below
 
 ## Complete Script
 
-```powershell tab="PowerShell"
-#Check the M365 login status for CLI
-$LoginStatus = m365 status
-if($LoginStatus -Match "Logged out"){
-    #Executing login command for CLI
-    m365 login   
-}
+=== "PowerShell"
 
-#Set the URL of the site where the users need to be added
-$siteURL = "https://aum365.sharepoint.com/sites/M365CLI"
+    ```powershell
+    #Check the M365 login status for CLI
+    $LoginStatus = m365 status
+    if($LoginStatus -Match "Logged out"){
+        #Executing login command for CLI
+        m365 login   
+    }
 
-#Getting the Associated Groups for the specific site
-$SiteInformation = m365 spo web get --webUrl $siteURL --withGroups --output json | ConvertFrom-Json
+    #Set the URL of the site where the users need to be added
+    $siteURL = "https://aum365.sharepoint.com/sites/M365CLI"
 
-#Importing the Current permission list from CSV. Adding the equivalent SharePoint Group Id to the imported object.
-#Object will be grouped with multiple users with , seperator since CLI supports adding multiple users in a single command
-$GroupedResult = Import-Csv -Path .\Current-Permission-Migration.csv | Group-Object PermissionLevel | ForEach-Object {
-[PsCustomObject]@{
-    PermissionLevel = $_.Name
-    UsernameValues = $_.Group.Username -join ', '
-    SPGroupId = switch ($_.Name){
-        "Read" {"$($SiteInformation.AssociatedVisitorGroup.Id)"}#Adding to the default Visitor's Group
-        "Member" {"$($SiteInformation.AssociatedMemberGroup.Id)"}#Adding to the default Member's Group
-        "Owner" {"$($SiteInformation.AssociatedOwnerGroup.Id)"}#Adding to the default Owner's Group
-        default {"$($SiteInformation.AssociatedVisitorGroup.Id)"}
+    #Getting the Associated Groups for the specific site
+    $SiteInformation = m365 spo web get --webUrl $siteURL --withGroups --output json | ConvertFrom-Json
+
+    #Importing the Current permission list from CSV. Adding the equivalent SharePoint Group Id to the imported object.
+    #Object will be grouped with multiple users with , seperator since CLI supports adding multiple users in a single command
+    $GroupedResult = Import-Csv -Path .\Current-Permission-Migration.csv | Group-Object PermissionLevel | ForEach-Object {
+    [PsCustomObject]@{
+        PermissionLevel = $_.Name
+        UsernameValues = $_.Group.Username -join ', '
+        SPGroupId = switch ($_.Name){
+            "Read" {"$($SiteInformation.AssociatedVisitorGroup.Id)"}#Adding to the default Visitor's Group
+            "Member" {"$($SiteInformation.AssociatedMemberGroup.Id)"}#Adding to the default Member's Group
+            "Owner" {"$($SiteInformation.AssociatedOwnerGroup.Id)"}#Adding to the default Owner's Group
+            default {"$($SiteInformation.AssociatedVisitorGroup.Id)"}
+            }
         }
     }
-}
 
-#Show the Formatted data table for reference
-$GroupedResult | Format-Table
+    #Show the Formatted data table for reference
+    $GroupedResult | Format-Table
 
-#Read Grouped Permission level and users and add the users to the SharePoint Groups
-Foreach ($PermissionLevel in $GroupedResult) {
-    Write-Host "Adding $($PermissionLevel.PermissionLevel) Permission users to the SharePoint Group ID: $($PermissionLevel.SPGroupId)"
-    #Since the command supports multiple usernames to be added in the single command, script will add users in single command execution
-    m365 spo group user add --webUrl $siteURL --groupId $PermissionLevel.SPGroupId --userName $PermissionLevel.UsernameValues
-}
-```
+    #Read Grouped Permission level and users and add the users to the SharePoint Groups
+    Foreach ($PermissionLevel in $GroupedResult) {
+        Write-Host "Adding $($PermissionLevel.PermissionLevel) Permission users to the SharePoint Group ID: $($PermissionLevel.SPGroupId)"
+        #Since the command supports multiple usernames to be added in the single command, script will add users in single command execution
+        m365 spo group user add --webUrl $siteURL --groupId $PermissionLevel.SPGroupId --userName $PermissionLevel.UsernameValues
+    }
+    ```
 
 Keywords
 

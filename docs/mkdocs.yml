@@ -1,9 +1,10 @@
 site_name: CLI for Microsoft 365
 site_url: https://pnp.github.io/cli-microsoft365/
 nav:
-  - Home: 'index.md'
-  - v4 Upgrade Guidance: 'v4-upgrade-guidance.md'
-  - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
+  - Home:
+    - 'index.md'
+    - v4 Upgrade Guidance: 'v4-upgrade-guidance.md'
+    - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
     - 'Using the CLI': 'user-guide/using-cli.md'
@@ -691,8 +692,8 @@ theme:
   palette:
     primary: 'red'
   logo: 'images/pnp-cli-microsoft365-white.svg'
-  feature:
-    tabs: true
+  features:
+    - navigation.tabs
 google_analytics:
   - 'UA-110480857-1'
   - 'auto'
@@ -700,20 +701,20 @@ extra_css:
   - 'css/styles.css'
 markdown_extensions:
   - admonition
-  - codehilite:
-      guess_lang: false
   - toc:
       permalink: true
-  - pymdownx.superfences
+  - pymdownx.highlight
   - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed
   - def_list
 extra:
   social:
-    - type: 'twitter'
+    - icon: fontawesome/brands/github
       link: 'https://twitter.com/m365pnp'
-    - type: 'youtube'
+    - icon: fontawesome/brands/youtube
       link: 'http://aka.ms/sppnp-videos'
-    - type: 'link'
+    - icon: fontawesome/solid/link
       link: 'https://aka.ms/sppnp'
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs

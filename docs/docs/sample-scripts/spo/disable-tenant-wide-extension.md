@@ -6,45 +6,49 @@ Tenant Wide Extensions list from the App Catalog helps to manage the activation 
 
 Note: TenantWideExtensionDisabled column denotes the extension is enabled or disabled.
 
-```powershell tab="PowerShell"
-$extensionName = Read-Host "Enter the Extension Name"
-$listName = "Tenant Wide Extensions"
+=== "PowerShell"
 
-$appCatalogUrl = m365 spo tenant appcatalogurl get
-$filterQuery = "Title eq '" + $extensionName + "'"
-$appItems = m365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields "Id,Title" --filter $filterQuery --output json
-$extItems = $appItems.Replace("Id", "ExtId") | ConvertFrom-JSON
+    ```powershell
+    $extensionName = Read-Host "Enter the Extension Name"
+    $listName = "Tenant Wide Extensions"
 
-if ($extItems.count -gt 0) {
-  m365 spo listitem set --listTitle $listName --id $extItems.ExtId --webUrl $appCatalogUrl --TenantWideExtensionDisabled "true" >$null 2>&1
-  Write-Host("Extension disabled.");
-}
-else {
-  Write-Host("No extensions found with the name '" + $extensionName + "'.");
-}
-```
+    $appCatalogUrl = m365 spo tenant appcatalogurl get
+    $filterQuery = "Title eq '" + $extensionName + "'"
+    $appItems = m365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields "Id,Title" --filter $filterQuery --output json
+    $extItems = $appItems.Replace("Id", "ExtId") | ConvertFrom-JSON
 
-```bash tab="Bash"
-#!/bin/bash
+    if ($extItems.count -gt 0) {
+      m365 spo listitem set --listTitle $listName --id $extItems.ExtId --webUrl $appCatalogUrl --TenantWideExtensionDisabled "true" >$null 2>&1
+      Write-Host("Extension disabled.");
+    }
+    else {
+      Write-Host("No extensions found with the name '" + $extensionName + "'.");
+    }
+    ```
 
-# requires jq: https://stedolan.github.io/jq/
+=== "Bash"
 
-echo "Enter the extension name to disable: "; read extensionName;
-listName="Tenant Wide Extensions";
+    ```bash
+    #!/bin/bash
 
-appCatalogUrl=$(m365 spo tenant appcatalogurl get)
-filterQuery="Title eq '$extensionName'"
-appItemsJson=$(m365 spo listitem list --title "$listName" --webUrl "$appCatalogUrl" --fields "Id,Title" --filter "$filterQuery" --output json)
-appItemId=( $(jq -r '.[].Id' <<< $appItemsJson))
+    # requires jq: https://stedolan.github.io/jq/
 
-if [[ $appItemId -gt 0 ]]
-then
- m365 spo listitem set --listTitle "$listName" --id "$appItemId" --webUrl "$appCatalogUrl" --TenantWideExtensionDisabled "true" >/dev/null 2>&1
- echo "Extension disabled."
-else
-  echo "No extensions found with the name '$extensionName'."
-fi
-```
+    echo "Enter the extension name to disable: "; read extensionName;
+    listName="Tenant Wide Extensions";
+
+    appCatalogUrl=$(m365 spo tenant appcatalogurl get)
+    filterQuery="Title eq '$extensionName'"
+    appItemsJson=$(m365 spo listitem list --title "$listName" --webUrl "$appCatalogUrl" --fields "Id,Title" --filter "$filterQuery" --output json)
+    appItemId=( $(jq -r '.[].Id' <<< $appItemsJson))
+
+    if [[ $appItemId -gt 0 ]]
+    then
+    m365 spo listitem set --listTitle "$listName" --id "$appItemId" --webUrl "$appCatalogUrl" --TenantWideExtensionDisabled "true" >/dev/null 2>&1
+    echo "Extension disabled."
+    else
+      echo "No extensions found with the name '$extensionName'."
+    fi
+    ```
 
 Keywords:
 
