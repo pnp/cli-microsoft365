@@ -400,7 +400,7 @@ describe('Auth', () => {
 
   it('retrieves access token using device code authentication flow when no refresh token available and no authType specified', (done) => {
     const config = cli.config as Configstore;
-    sinon.stub(config, 'get').callsFake((() => 'value'));
+    sinon.stub(config, 'get').callsFake((() => { }) as any);
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
@@ -438,7 +438,7 @@ describe('Auth', () => {
 
   it('retrieves token using device code authentication flow when authType deviceCode specified', (done) => {
     const config = cli.config as Configstore;
-    sinon.stub(config, 'get').callsFake((() => 'value'));
+    sinon.stub(config, 'get').callsFake((() => { }) as any);
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
