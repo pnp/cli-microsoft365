@@ -512,7 +512,7 @@ nav:
         - team unarchive: 'cmd/teams/team/team-unarchive.md'
       - user:
         - user add: 'cmd/aad/o365group/o365group-user-add.md'
-        - user list: 'cmd/aad/o365group/o365group-user-list.md'
+        - user list: 'cmd/teams/user/user-list.md'
         - user remove: 'cmd/aad/o365group/o365group-user-remove.md'
         - user set: 'cmd/aad/o365group/o365group-user-set.md'
         - user app add: 'cmd/teams/user/user-app-add.md'

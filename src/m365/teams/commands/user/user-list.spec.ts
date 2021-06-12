@@ -7,9 +7,9 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
-const command: Command = require('./o365group-user-list');
+const command: Command = require('./user-list');
 
-describe(commands.O365GROUP_USER_LIST, () => {
+describe(commands.USER_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -52,7 +52,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_USER_LIST), true);
+    assert.strictEqual(command.name.startsWith(commands.USER_LIST), true);
   });
 
   it('has a description', () => {
@@ -152,7 +152,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
     done();
   });
 
-  it('correctly lists all users in a Microsoft 365 group', (done) => {
+  it('correctly lists all users in a Microsoft Team', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -171,7 +171,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
@@ -179,12 +179,6 @@ describe(commands.O365GROUP_USER_LIST, () => {
             "displayName": "Anne Matthews",
             "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
             "userType": "Owner"
-          },
-          {
-            "id": "00000000-0000-0000-0000-000000000000",
-            "displayName": "Anne Matthews",
-            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-            "userType": "Member"
           },
           {
             "id": "00000000-0000-0000-0000-000000000001",
@@ -201,35 +195,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
     });
   });
 
-  it('correctly lists all owners in a Microsoft 365 group', (done) => {
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
-        return Promise.resolve({
-          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Owner" } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith([
-          {
-            "id": "00000000-0000-0000-0000-000000000000",
-            "displayName": "Anne Matthews",
-            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-            "userType": "Owner"
-          }
-        ]));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('correctly lists all members in a Microsoft 365 group', (done) => {
+  it('correctly lists all users in a Microsoft Team (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -248,14 +214,14 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Member" } }, () => {
+    command.action(logger, { options: { debug: true, teamId: "00000000-0000-0000-0000-000000000000" } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
           {
             "id": "00000000-0000-0000-0000-000000000000",
             "displayName": "Anne Matthews",
             "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-            "userType": "Member"
+            "userType": "Owner"
           },
           {
             "id": "00000000-0000-0000-0000-000000000001",
@@ -272,7 +238,35 @@ describe(commands.O365GROUP_USER_LIST, () => {
     });
   });
 
-  it('correctly lists all users in a Microsoft 365 group (debug)', (done) => {
+  it('correctly lists all owners in a Microsoft Team', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
+        return Promise.resolve({
+          "value": [{ "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" }]
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", role: "Owner" } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith([
+          {
+            "id": "00000000-0000-0000-0000-000000000000",
+            "displayName": "Anne Matthews",
+            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
+            "userType": "Owner"
+          }
+        ]));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly lists all members in a Microsoft Team', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/owners?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
@@ -291,21 +285,9 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, groupId: "00000000-0000-0000-0000-000000000000" } }, () => {
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000", role: "Member" } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
-          {
-            "id": "00000000-0000-0000-0000-000000000000",
-            "displayName": "Anne Matthews",
-            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-            "userType": "Owner"
-          },
-          {
-            "id": "00000000-0000-0000-0000-000000000000",
-            "displayName": "Anne Matthews",
-            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
-            "userType": "Member"
-          },
           {
             "id": "00000000-0000-0000-0000-000000000001",
             "displayName": "Karl Matteson",
@@ -326,7 +308,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
