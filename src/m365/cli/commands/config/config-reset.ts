@@ -31,29 +31,11 @@ class CliConfigResetCommand extends AnonymousCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
-    let value: any = undefined;
-
     if (args.options.key) {
-      switch (args.options.key) {
-        case settingsNames.showHelpOnFailure:
-        case settingsNames.printErrorsAsPlainText:
-          value = 'true';
-          break;
-        case settingsNames.errorOutput:
-          value = 'stderr';
-          break;
-        case settingsNames.output:
-          value = 'text';
-          break;
-      }
-
-      Cli.getInstance().config.set(args.options.key, value);
+      Cli.getInstance().config.delete(args.options.key);
     }
     else {
-      Cli.getInstance().config.set(settingsNames.errorOutput, 'stderr');
-      Cli.getInstance().config.set(settingsNames.output, 'text');
-      Cli.getInstance().config.set(settingsNames.printErrorsAsPlainText, 'true');
-      Cli.getInstance().config.set(settingsNames.showHelpOnFailure, 'true');
+      Cli.getInstance().config.clear();
     }
 
     cb();
