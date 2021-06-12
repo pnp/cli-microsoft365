@@ -7,7 +7,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { GroupUser } from './GroupUser';
+import { GroupUser } from '../../../aad/commands/o365group/GroupUser';
 
 interface CommandArgs {
   options: Options;
@@ -19,9 +19,9 @@ interface Options extends GlobalOptions {
   groupId?: string;
 }
 
-class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
+class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
   public get name(): string {
-    return commands.O365GROUP_USER_LIST;
+    return commands.USER_LIST;
   }
 
   public get description(): string {
@@ -50,6 +50,14 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
       })
       .then(
         (): void => {
+          // Filter out duplicate added values for owners (as they are returned as members as well)
+          // this aligns the output with what is displayed in the Teams UI
+          this.items = this.items.filter((groupUser, index, self) =>
+            index === self.findIndex((t) => (
+              t.id === groupUser.id && t.displayName === groupUser.displayName
+            ))
+          );
+
           if (args.options.role) {
             this.items = this.items.filter(i => i.userType === args.options.role);
           }
@@ -130,4 +138,4 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   }
 }
 
-module.exports = new AadO365GroupUserListCommand();
+module.exports = new TeamsUserListCommand();

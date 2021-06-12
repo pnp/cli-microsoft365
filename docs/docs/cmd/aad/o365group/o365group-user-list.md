@@ -8,12 +8,6 @@ Lists users for the specified Microsoft 365 group or Microsoft Teams team
 m365 aad o365group user list [options]
 ```
 
-## Alias
-
-```sh
-m365 teams user list
-```
-
 ## Options
 
 `-i, --groupId [groupId]`
