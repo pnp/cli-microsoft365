@@ -70,28 +70,30 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((res: string): any => {
+      .then((res: string): void => {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
           cb(new CommandError(response.ErrorInfo.ErrorMessage));
-          return Promise.resolve();
+          return;
         }
 
         const options: SpoContentTypeGetCommandOptions = {
           webUrl: args.options.webUrl,
           listTitle: args.options.listTitle,
           id: args.options.id,
+          output: args.options.output,
           debug: this.debug,
           verbose: this.verbose
         };
-        return Cli.executeCommandWithOutput(SpoContentTypeGetCommand as Command, { options: { ...options, _: [] } })
+        Cli.executeCommandWithOutput(SpoContentTypeGetCommand as Command, { options: { ...options, _: [] } })
           .then((res: CommandOutput): void => {
             if (this.debug) {
               logger.logToStderr(res.stderr);
             }
 
             logger.log(res.stdout);
+            cb();
           }, (err: CommandErrorWithOutput) => {
             if (this.debug) {
               logger.logToStderr(err.stderr);
@@ -99,6 +101,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
             cb(err.error);
           });
+        return;
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 

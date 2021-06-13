@@ -98,7 +98,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93' } }, () => {
       try {
-        assert(loggerLogSpy.notCalled);
+        assert(loggerLogSpy.called);
         done();
       }
       catch (e) {
