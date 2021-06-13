@@ -1,5 +1,5 @@
-import { Cli, Logger } from '../../../../cli';
-import Command, { CommandError, CommandOption, CommandTypes } from '../../../../Command';
+import { Cli, CommandOutput, Logger } from '../../../../cli';
+import Command, { CommandError, CommandErrorWithOutput, CommandOption, CommandTypes } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
@@ -70,7 +70,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
 
         return request.post(requestOptions);
       })
-      .then((res: string): Promise<void> => {
+      .then((res: string): any => {
         const json: ClientSvcResponse = JSON.parse(res);
         const response: ClientSvcResponseContents = json[0];
         if (response.ErrorInfo) {
@@ -85,15 +85,21 @@ class SpoContentTypeAddCommand extends SpoCommand {
           debug: this.debug,
           verbose: this.verbose
         };
-        return Cli.executeCommand(SpoContentTypeGetCommand as Command, { options: { ...options, _: [] } });
-      }, (err: any): void => this.handleRejectedPromise(err, logger, cb))
-      .then(_ => cb(), (err: any): void => {
-        if (err instanceof CommandError) {
-          err = (err as CommandError).message;
-        }
+        return Cli.executeCommandWithOutput(SpoContentTypeGetCommand as Command, { options: { ...options, _: [] } })
+          .then((res: CommandOutput): void => {
+            if (this.debug) {
+              logger.logToStderr(res.stderr);
+            }
 
-        this.handleRejectedPromise(err, logger, cb);
-      });
+            logger.log(res.stdout);
+          }, (err: CommandErrorWithOutput) => {
+            if (this.debug) {
+              logger.logToStderr(err.stderr);
+            }
+
+            cb(err.error);
+          });
+      }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
   }
 
   private getParentInfo(listTitle: string | undefined, webUrl: string, logger: Logger): Promise<string> {
