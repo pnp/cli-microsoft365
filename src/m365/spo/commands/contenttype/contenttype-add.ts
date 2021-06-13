@@ -95,10 +95,6 @@ class SpoContentTypeAddCommand extends SpoCommand {
             logger.log(res.stdout);
             cb();
           }, (err: CommandErrorWithOutput) => {
-            if (this.debug) {
-              logger.logToStderr(err.stderr);
-            }
-
             cb(err.error);
           });
         return;
