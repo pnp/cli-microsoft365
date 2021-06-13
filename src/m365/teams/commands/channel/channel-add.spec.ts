@@ -110,7 +110,7 @@ describe(commands.CHANNEL_ADD, () => {
 
   it('fails to get team when team does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/me/joinedTeams`) > -1) {
         return Promise.resolve({ value: [] });
       }
       return Promise.reject('The specified team does not exist in the Microsoft Teams');
@@ -136,7 +136,7 @@ describe(commands.CHANNEL_ADD, () => {
 
   it('fails when multiple teams with same name exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/me/joinedTeams`) > -1) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 2,
@@ -193,7 +193,7 @@ describe(commands.CHANNEL_ADD, () => {
       }
     }, (err?: any) => {
       try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple Microsoft Teams teams with name Team Name found: 00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000000`)));
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple Microsoft Teams teams with name Team Name found: 00000000-0000-0000-0000-000000000000, 00000000-0000-0000-0000-000000000000`)));
         done();
       }
       catch (e) {
@@ -271,7 +271,7 @@ describe(commands.CHANNEL_ADD, () => {
 
   it('creates channel within the Microsoft Teams team in the tenant by team name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/me/joinedTeams?$filter=displayName eq '`) > -1) {
+      if ((opts.url as string).indexOf(`/me/joinedTeams`) > -1) {
         return Promise.resolve({
           "value": [
             {

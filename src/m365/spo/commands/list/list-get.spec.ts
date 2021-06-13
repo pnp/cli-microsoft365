@@ -187,6 +187,263 @@ describe(commands.LIST_GET, () => {
     });
   });
 
+  it('retrieves details of list if title and properties option is passed', (done) => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.resolve(
+        {
+          "AllowContentTypes": true,
+          "BaseTemplate": 109,
+          "BaseType": 1,
+          "ContentTypesEnabled": false,
+          "CrawlNonDefaultViews": false,
+          "Created": null,
+          "CurrentChangeToken": null,
+          "CustomActionElements": null,
+          "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
+          "DefaultItemOpenUseListSetting": false,
+          "Description": "",
+          "Direction": "none",
+          "DocumentTemplateUrl": null,
+          "DraftVersionVisibility": 0,
+          "EnableAttachments": false,
+          "EnableFolderCreation": true,
+          "EnableMinorVersions": false,
+          "EnableModeration": false,
+          "EnableVersioning": false,
+          "EntityTypeName": "Documents",
+          "ExemptFromBlockDownloadOfNonViewableFiles": false,
+          "FileSavePostProcessingEnabled": false,
+          "ForceCheckout": false,
+          "HasExternalDataSource": false,
+          "Hidden": false,
+          "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
+          "ImagePath": null,
+          "ImageUrl": null,
+          "IrmEnabled": false,
+          "IrmExpire": false,
+          "IrmReject": false,
+          "IsApplicationList": false,
+          "IsCatalog": false,
+          "IsPrivate": false,
+          "ItemCount": 69,
+          "LastItemDeletedDate": null,
+          "LastItemModifiedDate": null,
+          "LastItemUserModifiedDate": null,
+          "ListExperienceOptions": 0,
+          "ListItemEntityTypeFullName": null,
+          "MajorVersionLimit": 0,
+          "MajorWithMinorVersionsLimit": 0,
+          "MultipleDataList": false,
+          "NoCrawl": false,
+          "ParentWebPath": null,
+          "ParentWebUrl": null,
+          "ParserDisabled": false,
+          "ServerTemplateCanCreateFolders": true,
+          "TemplateFeatureId": null,
+          "Title": "Documents"
+        }
+      );
+      //}
+      //return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        title: 'Documents',
+        webUrl: 'https://contoso.sharepoint.com',
+        properties:'Title,Id'
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith({
+          AllowContentTypes: true,
+          BaseTemplate: 109,
+          BaseType: 1,
+          ContentTypesEnabled: false,
+          CrawlNonDefaultViews: false,
+          Created: null,
+          CurrentChangeToken: null,
+          CustomActionElements: null,
+          DefaultContentApprovalWorkflowId: '00000000-0000-0000-0000-000000000000',
+          DefaultItemOpenUseListSetting: false,
+          Description: '',
+          Direction: 'none',
+          DocumentTemplateUrl: null,
+          DraftVersionVisibility: 0,
+          EnableAttachments: false,
+          EnableFolderCreation: true,
+          EnableMinorVersions: false,
+          EnableModeration: false,
+          EnableVersioning: false,
+          EntityTypeName: 'Documents',
+          ExemptFromBlockDownloadOfNonViewableFiles: false,
+          FileSavePostProcessingEnabled: false,
+          ForceCheckout: false,
+          HasExternalDataSource: false,
+          Hidden: false,
+          Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
+          ImagePath: null,
+          ImageUrl: null,
+          IrmEnabled: false,
+          IrmExpire: false,
+          IrmReject: false,
+          IsApplicationList: false,
+          IsCatalog: false,
+          IsPrivate: false,
+          ItemCount: 69,
+          LastItemDeletedDate: null,
+          LastItemModifiedDate: null,
+          LastItemUserModifiedDate: null,
+          ListExperienceOptions: 0,
+          ListItemEntityTypeFullName: null,
+          MajorVersionLimit: 0,
+          MajorWithMinorVersionsLimit: 0,
+          MultipleDataList: false,
+          NoCrawl: false,
+          ParentWebPath: null,
+          ParentWebUrl: null,
+          ParserDisabled: false,
+          ServerTemplateCanCreateFolders: true,
+          TemplateFeatureId: null,
+          Title: 'Documents'
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+
+  it('retrieves details of list if list id and properties option is passed', (done) => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.resolve(
+        {
+          "AllowContentTypes": true,
+          "BaseTemplate": 109,
+          "BaseType": 1,
+          "ContentTypesEnabled": false,
+          "CrawlNonDefaultViews": false,
+          "Created": null,
+          "CurrentChangeToken": null,
+          "CustomActionElements": null,
+          "DefaultContentApprovalWorkflowId": "00000000-0000-0000-0000-000000000000",
+          "DefaultItemOpenUseListSetting": false,
+          "Description": "",
+          "Direction": "none",
+          "DocumentTemplateUrl": null,
+          "DraftVersionVisibility": 0,
+          "EnableAttachments": false,
+          "EnableFolderCreation": true,
+          "EnableMinorVersions": false,
+          "EnableModeration": false,
+          "EnableVersioning": false,
+          "EntityTypeName": "Documents",
+          "ExemptFromBlockDownloadOfNonViewableFiles": false,
+          "FileSavePostProcessingEnabled": false,
+          "ForceCheckout": false,
+          "HasExternalDataSource": false,
+          "Hidden": false,
+          "Id": "14b2b6ed-0885-4814-bfd6-594737cc3ae3",
+          "ImagePath": null,
+          "ImageUrl": null,
+          "IrmEnabled": false,
+          "IrmExpire": false,
+          "IrmReject": false,
+          "IsApplicationList": false,
+          "IsCatalog": false,
+          "IsPrivate": false,
+          "ItemCount": 69,
+          "LastItemDeletedDate": null,
+          "LastItemModifiedDate": null,
+          "LastItemUserModifiedDate": null,
+          "ListExperienceOptions": 0,
+          "ListItemEntityTypeFullName": null,
+          "MajorVersionLimit": 0,
+          "MajorWithMinorVersionsLimit": 0,
+          "MultipleDataList": false,
+          "NoCrawl": false,
+          "ParentWebPath": null,
+          "ParentWebUrl": null,
+          "ParserDisabled": false,
+          "ServerTemplateCanCreateFolders": true,
+          "TemplateFeatureId": null,
+          "Title": "Documents"
+        }
+      );
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
+        webUrl: 'https://contoso.sharepoint.com',
+        properties:'Title,Id'
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith({
+          AllowContentTypes: true,
+          BaseTemplate: 109,
+          BaseType: 1,
+          ContentTypesEnabled: false,
+          CrawlNonDefaultViews: false,
+          Created: null,
+          CurrentChangeToken: null,
+          CustomActionElements: null,
+          DefaultContentApprovalWorkflowId: '00000000-0000-0000-0000-000000000000',
+          DefaultItemOpenUseListSetting: false,
+          Description: '',
+          Direction: 'none',
+          DocumentTemplateUrl: null,
+          DraftVersionVisibility: 0,
+          EnableAttachments: false,
+          EnableFolderCreation: true,
+          EnableMinorVersions: false,
+          EnableModeration: false,
+          EnableVersioning: false,
+          EntityTypeName: 'Documents',
+          ExemptFromBlockDownloadOfNonViewableFiles: false,
+          FileSavePostProcessingEnabled: false,
+          ForceCheckout: false,
+          HasExternalDataSource: false,
+          Hidden: false,
+          Id: '14b2b6ed-0885-4814-bfd6-594737cc3ae3',
+          ImagePath: null,
+          ImageUrl: null,
+          IrmEnabled: false,
+          IrmExpire: false,
+          IrmReject: false,
+          IsApplicationList: false,
+          IsCatalog: false,
+          IsPrivate: false,
+          ItemCount: 69,
+          LastItemDeletedDate: null,
+          LastItemModifiedDate: null,
+          LastItemUserModifiedDate: null,
+          ListExperienceOptions: 0,
+          ListItemEntityTypeFullName: null,
+          MajorVersionLimit: 0,
+          MajorWithMinorVersionsLimit: 0,
+          MultipleDataList: false,
+          NoCrawl: false,
+          ParentWebPath: null,
+          ParentWebUrl: null,
+          ParserDisabled: false,
+          ServerTemplateCanCreateFolders: true,
+          TemplateFeatureId: null,
+          Title: 'Documents'
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('command correctly handles list get reject request', (done) => {
     const err = 'Invalid request';
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -267,6 +524,18 @@ describe(commands.LIST_GET, () => {
     assert(containsTypeOption);
   });
 
+  it('supports specifying properties', () => {
+    const options = command.options();
+    let containsTypeOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--properties') > -1) {
+        containsTypeOption = true;
+      }
+    });
+    assert(containsTypeOption);
+  });
+
+  
   it('fails validation if both id and title options are not passed', () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.notStrictEqual(actual, true);
