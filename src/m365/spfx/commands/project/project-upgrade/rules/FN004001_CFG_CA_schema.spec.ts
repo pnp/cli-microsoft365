@@ -24,7 +24,8 @@ describe('FN004001_CFG_CA_schema', () => {
     const project: Project = {
       path: '/usr/tmp',
       copyAssetsJson: {
-        $schema: 'test-schema'
+        $schema: 'test-schema',
+        deployCdnPath: './release/assets/'
       }
     };
     rule.visit(project, findings);
@@ -36,6 +37,7 @@ describe('FN004001_CFG_CA_schema', () => {
       path: '/usr/tmp',
       copyAssetsJson: {
         $schema: 'old-schema',
+        deployCdnPath: './release/assets/',
         source: JSON.stringify({
           $schema: 'old-schema'
         }, null, 2)

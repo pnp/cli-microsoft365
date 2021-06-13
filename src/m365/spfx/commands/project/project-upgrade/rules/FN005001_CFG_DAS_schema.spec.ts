@@ -24,7 +24,8 @@ describe('FN005001_CFG_DAS_schema', () => {
     const project: Project = {
       path: '/usr/tmp',
       deployAzureStorageJson: {
-        $schema: 'test-schema'
+        $schema: 'test-schema',
+        workingDir: './temp/deploy/'
       }
     };
     rule.visit(project, findings);
@@ -36,6 +37,7 @@ describe('FN005001_CFG_DAS_schema', () => {
       path: '/usr/tmp',
       deployAzureStorageJson: {
         $schema: 'old-schema',
+        workingDir: './temp/deploy/',
         source: JSON.stringify({
           $schema: 'old-schema'
         }, null, 2)

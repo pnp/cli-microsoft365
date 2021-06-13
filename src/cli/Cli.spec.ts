@@ -711,8 +711,8 @@ describe('Cli', () => {
       .execute(cliCommandsFolder, ['cli', 'mock', '-x', '1'])
       .then(_ => {
         try {
-          // 8 commands from the folder + 3 mocks
-          assert.strictEqual(cli.commands.length, 8 + 3);
+          // 10 commands from the folder + 3 mocks
+          assert.strictEqual(cli.commands.length, 10 + 3);
           done();
         }
         catch (e) {
@@ -1119,6 +1119,25 @@ describe('Cli', () => {
     }
   });
 
+  it('throws human-readable error when invalid JMESPath query specified', () => {
+    const o = {
+      "locations": [
+        { "name": "Seattle", "state": "WA" },
+        { "name": "New York", "state": "NY" },
+        { "name": "Bellevue", "state": "WA" },
+        { "name": "Olympia", "state": "WA" }
+      ]
+    };
+    assert.throws(() => {
+      (Cli as any).formatOutput(o, {
+        query: `contains(abc)`,
+        output: 'json'
+      });
+
+      assert(cliErrorStub.calledWith(chalk.red('Error: JMESPath query error. ArgumentError: contains() takes 2 arguments but received 1. See https://jmespath.org/specification.html for more information')));
+    });
+  });
+
   it(`prints commands grouped per service when no command specified`, (done) => {
     (cli as any).commandsFolder = path.join(rootFolder, '..', 'm365');
     cli.loadCommandFromArgs(['status']);
@@ -1176,11 +1195,24 @@ describe('Cli', () => {
 
   it(`exits with the specified exit code`, () => {
     try {
-      (cli as any).closeWithError(new CommandError('Error', 5));
+      (cli as any).closeWithError(new CommandError('Error', 5), { options: {} });
       assert.fail(`Didn't fail while expected`);
     }
     catch {
       assert(processExitStub.calledWith(5));
+    }
+  });
+
+  it(`prints error as JSON in JSON output mode and printErrorsAsPlainText set to false`, () => {
+    const config = cli.config;
+    sinon.stub(config, 'get').callsFake(() => false);
+
+    try {
+      (cli as any).closeWithError(new CommandError('Error'), { options: { output: 'json' } });
+      assert.fail(`Didn't fail while expected`);
+    }
+    catch (err) {
+      assert(cliErrorStub.calledWith(JSON.stringify({ error: 'Error' })));
     }
   });
 

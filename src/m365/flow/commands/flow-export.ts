@@ -87,7 +87,7 @@ class FlowExportCommand extends AzmgmtCommand {
         }
 
         const requestOptions: any = {
-          url: `https://api.bap.microsoft.com/providers/${formatArgument === 'json' ?
+          url: `${this.resource}/providers/${formatArgument === 'json' ?
             `Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}?api-version=2016-11-01`
             : `Microsoft.BusinessAppPlatform/environments/${encodeURIComponent(args.options.environment)}/exportPackage?api-version=2016-11-01`}`,
           headers: {
@@ -137,7 +137,7 @@ class FlowExportCommand extends AzmgmtCommand {
 
         const requestOptions: any = {
           url: formatArgument === 'json' ?
-            `https://api.bap.microsoft.com/providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
+            `${this.resource}/providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.id)}/exportToARMTemplate?api-version=2016-11-01`
             : downloadFileUrl,
           // Set responseType to arraybuffer, otherwise binary data will be encoded
           // to utf8 and binary data is corrupt 

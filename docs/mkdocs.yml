@@ -8,6 +8,7 @@ nav:
     - 'Run CLI in a Docker Container': 'user-guide/run-cli-in-docker-container.md'
     - 'Logging in to Microsoft 365': 'user-guide/connecting-office-365.md'
     - 'CLI output mode': 'user-guide/cli-output-mode.md'
+    - 'Filter CLI data': 'user-guide/filter-cli-data.md'
     - 'Configuring CLI': 'user-guide/configuring-cli.md'
     - 'Using your own Azure AD identity': 'user-guide/using-own-identity.md'
     - 'Caveats when working with the CLI and certificate login': 'user-guide/cli-certificate-caveats.md'
@@ -16,9 +17,12 @@ nav:
     - logout: 'cmd/logout.md'
     - status: 'cmd/status.md'
     - version: 'cmd/version.md'
-    - Azure Active Directory Graph (aad):
+    - Azure Active Directory (aad):
       - app:
         - app add: 'cmd/aad/app/app-add.md'
+        - app set: 'cmd/aad/app/app-set.md'
+        - app role add: 'cmd/aad/app/app-role-add.md'
+        - app role list: 'cmd/aad/app/app-role-list.md'
       - approleassignment:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'
@@ -37,6 +41,7 @@ nav:
         - o365group get: 'cmd/aad/o365group/o365group-get.md'
         - o365group list: 'cmd/aad/o365group/o365group-list.md'
         - o365group recyclebinitem list: 'cmd/aad/o365group/o365group-recyclebinitem-list.md'
+        - o365group recyclebinitem clear: 'cmd/aad/o365group/o365group-recyclebinitem-clear.md'
         - o365group remove: 'cmd/aad/o365group/o365group-remove.md'
         - o365group renew: 'cmd/aad/o365group/o365group-renew.md'
         - o365group restore: 'cmd/aad/o365group/o365group-restore.md'
@@ -72,6 +77,7 @@ nav:
       - send: 'cmd/adaptivecard/adaptivecard-send.md'
     - CLI (cli):
       - consent: 'cmd/cli/cli-consent.md'
+      - issue: 'cmd/cli/cli-issue.md'
       - reconsent: 'cmd/cli/cli-reconsent.md'
       - completion:
         - completion clink update: 'cmd/cli/completion/completion-clink-update.md'
@@ -80,8 +86,10 @@ nav:
         - completion sh setup: 'cmd/cli/completion/completion-sh-setup.md'
         - completion sh update: 'cmd/cli/completion/completion-sh-update.md'
       - config:
+        - config get: 'cmd/cli/config/config-get.md'
         - config set: 'cmd/cli/config/config-set.md'
     - File (file):
+      - add: 'cmd/file/file-add.md'
       - convert:
         - convert pdf: 'cmd/file/convert/convert-pdf.md'
     - Microsoft Graph (graph):
@@ -129,6 +137,7 @@ nav:
       - app:
         - app get: 'cmd/pa/app/app-get.md'
         - app list: 'cmd/pa/app/app-list.md'
+        - app remove: 'cmd/pa/app/app-remove.md'
       - connector:
         - connector export: 'cmd/pa/connector/connector-export.md'
         - connector list: 'cmd/pa/connector/connector-list.md'
@@ -369,6 +378,7 @@ nav:
         - site apppermission add: 'cmd/spo/site/site-apppermission-add.md'
         - site apppermission get: 'cmd/spo/site/site-apppermission-get.md'
         - site apppermission list: 'cmd/spo/site/site-apppermission-list.md'
+        - site apppermission set: 'cmd/spo/site/site-apppermission-set.md'
         - site chrome set: 'cmd/spo/site/site-chrome-set.md'
         - site classic add: 'cmd/spo/site/site-classic-add.md'
         - site classic list: 'cmd/spo/site/site-classic-list.md'
@@ -513,6 +523,9 @@ nav:
       - report:
         - report activeusercounts: 'cmd/tenant/report/report-activeusercounts.md'
         - report activeuserdetail: 'cmd/tenant/report/report-activeuserdetail.md'
+        - report office365activationcounts: 'cmd/tenant/report/report-office365activationcounts.md'
+        - report office365activationsuserdetail: 'cmd/tenant/report/report-office365activationsuserdetail.md'
+        - report office365activationsusercounts: 'cmd/tenant/report/report-office365activationsusercounts.md'
         - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
       - service:
         - service list: 'cmd/tenant/service/service-list.md'
@@ -577,16 +590,24 @@ nav:
       - 'Bulk add/remove users to Microsoft Teams and Microsoft 365 Groups' : 'sample-scripts/aad/manage-group-users.md'
       - 'Delete all Microsoft 365 groups' : 'sample-scripts/aad/delete-m365-groups.md'
       - 'Delete all Microsoft 365 groups and SharePoint Online sites' : 'sample-scripts/aad/delete-m365-groups-and-sharepoint-sites.md'
+      - 'Replace a user''s membership in selected Microsoft 365 Groups or Teams' : 'sample-scripts/aad/replace-membership-of-selected-groups.md'
+      - 'Replace an owner in a Microsoft 365 Group or Microsoft Team' : 'sample-scripts/aad/replace-owner-with-a-different-one.md'
       - 'Scan for Microsoft 365 Groups created with user''s first or last name' : 'sample-scripts/aad/flag-groups-with-user-names.md'
     - Microsoft Graph:
       - 'Authenticate with and call the Microsoft Graph' : 'sample-scripts/graph/call-graph.md'
     - Power Automate:
+      - 'Cancel all running flow runs for a flow in an environment': 'sample-scripts/flow/cancel-all-running-flow-runs.md'
       - 'Export a single Flow to a Logic App' : 'sample-scripts/flow/export-flow-logicapp.md'
       - 'Export all Flows in environment' : 'sample-scripts/flow/export-all-flows-in-environment.md'
       - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
+      - 'Resubmit all failed flow runs for a flow in an environment': 'sample-scripts/flow/resubmit-all-failed-flow-runs.md'
+      - 'Search flows for connections' : 'sample-scripts/flow/search-flows-for-connection.md'
     - SharePoint Online:
       - 'Add App Catalog to SharePoint site': 'sample-scripts/spo/add-app-catalog.md'
       - 'Add custom client-side web part to modern page': 'sample-scripts/spo/add-custom-clientside-webpart-to-modern-page.md'
+      - 'Add a Site Collection Admin using a csv file': 'sample-scripts/spo/add-site-collection-admin-using-csv-file.md'
+      - 'Add multiple folders in libraries using a csv file': 'sample-scripts/spo/add-multiple-folders-in-libraries-using-csv-file.md'
+      - 'Copy files to another SharePoint Library in another site': 'sample-scripts/spo/copy-files-to-another-library.md'
       - 'Delete all (non-group connected) modern SharePoint sites': 'sample-scripts/spo/delete-non-group-connected-modern-sites.md'
       - 'Delete custom color themes from SharePoint': 'sample-scripts/spo/remove-custom-themes.md'
       - 'Delete custom SharePoint site designs': 'sample-scripts/spo/remove-site-designs.md'
@@ -604,11 +625,15 @@ nav:
       - 'Lists all tenant-wide extensions': 'sample-scripts/spo/list-tenant-wide-extensions.md'
       - 'List site collections and their lists': 'sample-scripts/spo/list-site-collection-lists.md'
       - 'Lists site collection owners': 'sample-scripts/spo/list-site-collection-owners.md'
+      - 'Monitor site collections storage usage': 'sample-scripts/spo/monitor-site-collection-storage-usage.md'
+      - 'Remove a Site Collection Admin User from all Site Collections': 'sample-scripts/spo/remove-siteCollection-admin-user.md'
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
+      - 'Replace site collection admin with another user': 'sample-scripts/spo/replace-site-collection-admin.md'
       - 'Setup example site': 'sample-scripts/spo/setup-example-site.md'
       - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
       - 'Upload local files and folders to SharePoint Online': 'sample-scripts/spo/upload-local-files-and-folder.md'
     - Microsoft Teams:
+      - 'Bulk add members to Microsoft Teams team from CSV file': 'sample-scripts/teams/add-bulk-users-teams.md'
       - 'Create a Microsoft Team with channels from a Microsoft 365 Group': 'sample-scripts/teams/create-team-from-group.md'
       - 'Create a Microsoft Teams team and bulk add members from CSV file': 'sample-scripts/teams/create-team-and-add-members-and-owners.md'
       - 'Deploy a Microsoft Teams personal app and add it to users': 'sample-scripts/teams/install-personal-app.md'

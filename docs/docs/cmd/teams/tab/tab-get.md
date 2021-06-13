@@ -35,7 +35,7 @@ m365 teams tab get [options]
 You can only retrieve tabs for teams of which you are a member.
 
 ## Examples
-  
+
 Get a Microsoft Teams Tab with ID _1432c9da-8b9c-4602-9248-e0800f3e3f07_
 
 ```sh
@@ -45,5 +45,5 @@ m365 teams tab get --teamId 00000000-0000-0000-0000-000000000000 --channelId 19:
 Get a Microsoft Teams Tab with name _Tab Name_
 
 ```sh
-m365 teams tab list --teamName "Team Name" --channelName "Channel Name" --tabName "Tab Name"
+m365 teams tab get --teamName "Team Name" --channelName "Channel Name" --tabName "Tab Name"
 ```

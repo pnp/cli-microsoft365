@@ -43,8 +43,9 @@ interface Options extends GlobalOptions {
   apisApplication?: string;
   apisDelegated?: string;
   implicitFlow: boolean;
+  manifest?: string;
   multitenant: boolean;
-  name: string;
+  name?: string;
   platform?: string;
   redirectUris?: string;
   scopeAdminConsentDescription?: string;
@@ -58,6 +59,7 @@ interface Options extends GlobalOptions {
 class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
   private static aadApplicationPlatform: string[] = ['spa', 'web', 'publicClient'];
   private static aadAppScopeConsentBy: string[] = ['admins', 'adminsAndUsers'];
+  private manifest: any;
 
   public get name(): string {
     return commands.APP_ADD;
@@ -87,6 +89,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
     this
       .resolveApis(args, logger)
       .then(apis => this.createAppRegistration(args, apis, logger))
+      .then(appInfo => this.updateAppFromManifest(args, appInfo))
       .then(appInfo => this.configureUri(args, appInfo, logger))
       .then(appInfo => this.configureSecret(args, appInfo, logger))
       .then((_appInfo: AppInfo): void => {
@@ -113,6 +116,10 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       displayName: args.options.name,
       signInAudience: args.options.multitenant ? 'AzureADMultipleOrgs' : 'AzureADMyOrg'
     };
+
+    if (!applicationInfo.displayName && this.manifest) {
+      applicationInfo.displayName = this.manifest.name;
+    }
 
     if (apis.length > 0) {
       applicationInfo.requiredResourceAccess = apis;
@@ -148,6 +155,125 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
     };
 
     return request.post<AppInfo>(createApplicationRequestOptions);
+  }
+
+  private updateAppFromManifest(args: CommandArgs, appInfo: AppInfo): Promise<AppInfo> {
+    if (!args.options.manifest) {
+      return Promise.resolve(appInfo);
+    }
+
+    const manifest: any = JSON.parse(args.options.manifest);
+    // remove properties that might be coming from the original app that was
+    // used to create the manifest and which can't be updated
+    delete manifest.id;
+    delete manifest.appId;
+    delete manifest.publisherDomain;
+    // Azure Portal returns v2 manifest whereas the Graph API expects a v1.6
+    const transformedManifest = this.transformManifest(manifest);
+
+    const updateAppRequestOptions: any = {
+      url: `${this.resource}/v1.0/myorganization/applications/${appInfo.id}`,
+      headers: {
+        'content-type': 'application/json'
+      },
+      responseType: 'json',
+      data: transformedManifest
+    };
+
+    return request
+      .patch(updateAppRequestOptions)
+      .then(_ => Promise.resolve(appInfo));
+  }
+
+  private transformManifest(v2Manifest: any): any {
+    const graphManifest = JSON.parse(JSON.stringify(v2Manifest));
+    // add missing properties
+    if (!graphManifest.api) {
+      graphManifest.api = {};
+    }
+    if (!graphManifest.info) {
+      graphManifest.info = {};
+    }
+    if (!graphManifest.web) {
+      graphManifest.web = {
+        implicitGrantSettings: {},
+        redirectUris: []
+      };
+    }
+    if (!graphManifest.spa) {
+      graphManifest.spa = {
+        redirectUris: []
+      };
+    }
+
+    // remove properties that have no equivalent in v1.6
+    const unsupportedProperties = [
+      'accessTokenAcceptedVersion',
+      'disabledByMicrosoftStatus',
+      'errorUrl',
+      'oauth2RequirePostResponse',
+      'oauth2AllowUrlPathMatching',
+      'orgRestrictions',
+      'samlMetadataUrl'
+    ];
+    unsupportedProperties.forEach(p => delete graphManifest[p]);
+
+    graphManifest.api.acceptMappedClaims = v2Manifest.acceptMappedClaims;
+    delete graphManifest.acceptMappedClaims;
+
+    graphManifest.publicClient = v2Manifest.allowPublicClient;
+    delete graphManifest.allowPublicClient;
+
+    graphManifest.info.termsOfServiceUrl = v2Manifest.informationalUrls?.termsOfService;
+    graphManifest.info.supportUrl = v2Manifest.informationalUrls?.support;
+    graphManifest.info.privacyStatementUrl = v2Manifest.informationalUrls?.privacy;
+    graphManifest.info.marketingUrl = v2Manifest.informationalUrls?.marketing;
+    delete graphManifest.informationalUrls;
+
+    graphManifest.api.knownClientApplications = v2Manifest.knownClientApplications;
+    delete graphManifest.knownClientApplications;
+
+    graphManifest.info.logoUrl = v2Manifest.logoUrl;
+    delete graphManifest.logoUrl;
+
+    graphManifest.web.logoutUrl = v2Manifest.logoutUrl;
+    delete graphManifest.logoutUrl;
+
+    graphManifest.displayName = v2Manifest.name;
+    delete graphManifest.name;
+
+    graphManifest.web.implicitGrantSettings.enableAccessTokenIssuance = v2Manifest.oauth2AllowImplicitFlow;
+    delete graphManifest.oauth2AllowImplicitFlow;
+
+    graphManifest.web.implicitGrantSettings.enableIdTokenIssuance = v2Manifest.oauth2AllowIdTokenImplicitFlow;
+    delete graphManifest.oauth2AllowIdTokenImplicitFlow;
+
+    graphManifest.api.oauth2PermissionScopes = v2Manifest.oauth2Permissions;
+    delete graphManifest.oauth2Permissions;
+
+    delete graphManifest.oauth2RequiredPostResponse;
+
+    graphManifest.api.preAuthorizedApplications = v2Manifest.preAuthorizedApplications;
+    delete graphManifest.preAuthorizedApplications;
+
+    if (v2Manifest.replyUrlsWithType) {
+      v2Manifest.replyUrlsWithType.forEach((urlWithType: any) => {
+        if (urlWithType.type === 'Web') {
+          graphManifest.web.redirectUris.push(urlWithType.url);
+          return;
+        }
+        if (urlWithType.type === 'Spa') {
+          graphManifest.spa.redirectUris.push(urlWithType.url);
+          return;
+        }
+      });
+      delete graphManifest.replyUrlsWithType;
+    }
+
+    graphManifest.web.homePageUrl = v2Manifest.signInUrl;
+    delete graphManifest.signInUrl;
+
+    return graphManifest;
   }
 
   private configureUri(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
@@ -320,7 +446,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>'
+        option: '-n, --name [name]'
       },
       {
         option: '--multitenant'
@@ -359,6 +485,9 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       },
       {
         option: '--scopeAdminConsentDescription [scopeAdminConsentDescription]'
+      },
+      {
+        option: '--manifest [manifest]'
       }
     ];
 
@@ -367,6 +496,10 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
   }
 
   public validate(args: CommandArgs): boolean | string {
+    if (!args.options.manifest && !args.options.name) {
+      return 'Specify either the name of the app to create or the manifest';
+    }
+
     if (args.options.platform &&
       AadAppAddCommand.aadApplicationPlatform.indexOf(args.options.platform) < 0) {
       return `${args.options.platform} is not a valid value for platform. Allowed values are ${AadAppAddCommand.aadApplicationPlatform.join(', ')}`;
@@ -393,6 +526,18 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
     if (args.options.scopeConsentBy &&
       AadAppAddCommand.aadAppScopeConsentBy.indexOf(args.options.scopeConsentBy) < 0) {
       return `${args.options.scopeConsentBy} is not a valid value for scopeConsentBy. Allowed values are ${AadAppAddCommand.aadAppScopeConsentBy.join(', ')}`;
+    }
+
+    if (args.options.manifest) {
+      try {
+        this.manifest = JSON.parse(args.options.manifest);
+        if (!args.options.name && !this.manifest.name) {
+          return `Specify the name of the app to create either through the 'name' option or the 'name' property in the manifest`;
+        }
+      }
+      catch (e) {
+        return `Error while parsing the specified manifest: ${e}`;
+      }
     }
 
     return true;

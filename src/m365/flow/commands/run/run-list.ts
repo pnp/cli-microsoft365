@@ -3,8 +3,7 @@ import {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
-import AzmgmtCommand from '../../../base/AzmgmtCommand';
+import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -16,7 +15,7 @@ interface Options extends GlobalOptions {
   flow: string;
 }
 
-class FlowRunListCommand extends AzmgmtCommand {
+class FlowRunListCommand extends AzmgmtItemsListCommand<{ name: string, startTime: string, status: string, properties: { startTime: string, status: string } }> {
   public get name(): string {
     return commands.RUN_LIST;
   }
@@ -34,31 +33,24 @@ class FlowRunListCommand extends AzmgmtCommand {
       logger.logToStderr(`Retrieving list of runs for Microsoft Flow ${args.options.flow}...`);
     }
 
-    const requestOptions: any = {
-      url: `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs?api-version=2016-11-01`,
-      headers: {
-        accept: 'application/json'
-      },
-      responseType: 'json'
-    };
+    const url: string = `${this.resource}providers/Microsoft.ProcessSimple/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs?api-version=2016-11-01`;
 
-    request
-      .get<{ value: [{ name: string; startTime: string; status: string; properties: { startTime: string, status: string } }] }>(requestOptions)
-      .then((res: { value: [{ name: string, startTime: string; status: string; properties: { startTime: string, status: string } }] }): void => {
-        if (res.value && res.value.length > 0) {
-          res.value.forEach(r => {
-            r.startTime = r.properties.startTime;
-            r.status = r.properties.status;
+    this
+      .getAllItems(url, logger, true)
+      .then((): void => {
+        if (this.items.length > 0) {
+          this.items.forEach(i => {
+            i.startTime = i.properties.startTime;
+            i.status = i.properties.status;
           });
 
-          logger.log(res.value);
+          logger.log(this.items);
         }
         else {
           if (this.verbose) {
             logger.logToStderr('No runs found');
           }
         }
-
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }

@@ -1,8 +1,88 @@
 # Release notes
 
+## [v3.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.11.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad app set](../cmd/aad/app/app-set.md) - updates Azure AD app registration [#2448](https://github.com/pnp/cli-microsoft365/issues/2448)
+- [aad o365group recyclebinitem clear](../cmd/aad/o365group/o365group-recyclebinitem-clear.md) - clears Microsoft 365 Groups from the recycle bin in the current tenant [#2033](https://github.com/pnp/cli-microsoft365/issues/2033)
+
+**CLI:**
+
+- [cli issue](../cmd/cli/cli-issue.md) - returns, or opens a URL that takes the user to the right place in the CLI GitHub repo to create a new issue reporting bug, feedback, ideas, etc. [#1490](https://github.com/pnp/cli-microsoft365/issues/1490)
+
+**Microsoft 365:**
+
+- [tenant report office365activationcounts](../cmd/tenant/report/report-office365activationcounts.md) - gets the count of Microsoft 365 activations on desktops and devices [#2257](https://github.com/pnp/cli-microsoft365/issues/2257)
+- [tenant report office365activationsusercounts](../cmd/tenant/report/report-office365activationsusercounts.md) - gets the count of users that are enabled and those that have activated the Office subscription on desktop or devices or shared computers [#2258](https://github.com/pnp/cli-microsoft365/issues/2258)
+- [tenant report office365activationsuserdetail](../cmd/tenant/report/report-office365activationsuserdetail.md) - Get details about users who have activated Microsoft 365 [#2256](https://github.com/pnp/cli-microsoft365/issues/2256)
+
+### Changes
+
+- added encoding password for login [#2466](https://github.com/pnp/cli-microsoft365/issues/2466)
+- added JMESPath docs [#2293](https://github.com/pnp/cli-microsoft365/issues/2293)
+- added sample script to resubmit failed flow runs [#2440](https://github.com/pnp/cli-microsoft365/issues/2440)
+- added sample script to cancel running flow runs [#2441](https://github.com/pnp/cli-microsoft365/issues/2441)
+- fixed 'spfx doctor' on Windows [#2299](https://github.com/pnp/cli-microsoft365/issues/2299)
+- updated 'spfx doctor' to support SPFx v1.12.1
+- fixed adding channels via team's name [#2419](https://github.com/pnp/cli-microsoft365/issues/2419)
+- extended 'file add' to handle empty files [#2433](https://github.com/pnp/cli-microsoft365/issues/2433)
+- fixed docs for 'spo listitem remove' command [#2474](https://github.com/pnp/cli-microsoft365/pull/2474)
+- centralized converting csv to json [#2481](https://github.com/pnp/cli-microsoft365/issues/2481)
+- extended 'spo file list' with the `recursive` option [#2376](https://github.com/pnp/cli-microsoft365/issues/2376)
+- added the Get-SPOUser CLI equivalents to the docs [#2485](https://github.com/pnp/cli-microsoft365/issues/2485)
+- removed the deprecated Get-TeamHelp cmdlet from the docs [#2486](https://github.com/pnp/cli-microsoft365/issues/2486)
+
+## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad app role list](../cmd/aad/app/app-role-list.md) - gets Azure AD app registration roles [#2144](https://github.com/pnp/cli-microsoft365/issues/2144)
+
+**CLI:**
+
+- [cli config get](../cmd/cli/config/config-get.md) - gets value of a CLI for Microsoft 365 configuration option [#2343](https://github.com/pnp/cli-microsoft365/issues/2343)
+
+**File:**
+
+- [file add](../cmd/file/file-add.md) - uploads file to the specified site using Microsoft Graph [#2384](https://github.com/pnp/cli-microsoft365/issues/2384)
+
+**Power Apps:**
+
+- [pa app remove](../cmd/pa/app/app-remove.md) - removes the specified Power App [#2133](https://github.com/pnp/cli-microsoft365/issues/2133)
+
+**SharePoint:**
+
+- [spo site apppermission set](../cmd/spo/site/site-apppermission-set.md) - updates a specific application permission for a site [#2210](https://github.com/pnp/cli-microsoft365/issues/2210)
+
+### Changes
+
+- added the 'Replace membership in group or team' sample [#2372](https://github.com/pnp/cli-microsoft365/issues/2372)
+- added the 'Monitor Site Collections Storage Usage' sample script [#2224](https://github.com/pnp/cli-microsoft365/issues/2224)
+- added support for printing errors as JSON in JSON output [#2298](https://github.com/pnp/cli-microsoft365/issues/2298)
+- extended 'spo site apppermission list' with roles [#2412](https://github.com/pnp/cli-microsoft365/issues/2412)
+- fixed removing users from O365 groups [#2368](https://github.com/pnp/cli-microsoft365/issues/2368)
+- fixed printing validation errors as json [#2429](https://github.com/pnp/cli-microsoft365/issues/2429)
+- added the 'Add multiple folders in libraries using a csv file' sample script [#2415](https://github.com/pnp/cli-microsoft365/issues/2415)
+- updated PowerShell samples to use simplified CLI config [#2428](https://github.com/pnp/cli-microsoft365/issues/2428)
+- updated 'aad user list' docs [#2434](https://github.com/pnp/cli-microsoft365/issues/2434)
+- added the 'Replace spo site collection admin' sample [#2221](https://github.com/pnp/cli-microsoft365/issues/2221)
+- extended 'spo site apppermission get' with roles [#2409](https://github.com/pnp/cli-microsoft365/issues/2409)
+- added 'Search flows for connection' sample [#2444](https://github.com/pnp/cli-microsoft365/issues/2444)
+- extended 'spo list get' with properties [#2443](https://github.com/pnp/cli-microsoft365/issues/2443)
+- changed 'flow run list' to return all runs [#2458](https://github.com/pnp/cli-microsoft365/issues/2458)
+
 ## [v3.9.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.9.0)
 
 ### New commands
+
+**Azure Active Directory:**
+
+- [aad app role add](../cmd/aad/app/app-role-add.md) - Adds role to the specified Azure AD app registration [#2145](https://github.com/pnp/cli-microsoft365/issues/2145)
 
 **Planner:**
 
@@ -35,6 +115,23 @@
 - added new sample script 'Upload local files and folders to SharePoint Online' [#2302](https://github.com/pnp/cli-microsoft365/issues/2302)
 - added support for upgrading SPFx projects to beta versions of SPFx [#2354](https://github.com/pnp/cli-microsoft365/issues/2354)
 - added support for upgrading SPFx projects to v1.12.1-rc.0 [#2355](https://github.com/pnp/cli-microsoft365/issues/2355)
+- changed order of commands for upgrading SPFx projects [#2358](https://github.com/pnp/cli-microsoft365/issues/2358)
+- added support for creating AAD apps from manifest [#2316](https://github.com/pnp/cli-microsoft365/issues/2316)
+- added support for tracking help usage in telemetry [#2336](https://github.com/pnp/cli-microsoft365/issues/2336)
+- added returning human-readable error on invalid JMESPath queries [#2279](https://github.com/pnp/cli-microsoft365/issues/2279)
+- added support for upgrading SPFx projects to v1.12.1-rc.1 [#2363](https://github.com/pnp/cli-microsoft365/issues/2363)
+- fixed the conflicting documentation around the --withSecret command option in aad app add [#2365](https://github.com/pnp/cli-microsoft365/pull/2365)
+- added the 'Bulk add members to Microsoft Teams team from CSV file' sample script [#2285](https://github.com/pnp/cli-microsoft365/issues/2285)
+- added the 'Copy files to another SharePoint Library in another site' sample script [#2370](https://github.com/pnp/cli-microsoft365/pull/2370)
+- added support for upgrading SPFx projects to v1.12.1-rc.2 [#2378](https://github.com/pnp/cli-microsoft365/issues/2378)
+- extended the `spo contenttype get` command with `name` [#2335](https://github.com/pnp/cli-microsoft365/issues/2335)
+- added the 'Remove a Site Collection Admin User from all Site Collections' sample script [#2223](https://github.com/pnp/cli-microsoft365/issues/2223)
+- added support for upgrading SPFx projects to v1.12.1-rc.3 [#2387](https://github.com/pnp/cli-microsoft365/issues/2387)
+- added the 'Replace an owner in a Microsoft 365 Group or Microsoft Team' sample script [#2348](https://github.com/pnp/cli-microsoft365/issues/2348)
+- fixed typo in docs for 'teams tab get' [#2390](https://github.com/pnp/cli-microsoft365/pull/2390)
+- added the 'Add a site collection admin using csv file' sample [#2220](https://github.com/pnp/cli-microsoft365/issues/2220)
+- fixed API change in 'flow export' [#2398](https://github.com/pnp/cli-microsoft365/issues/2398)
+- added support for upgrading SPFx projects to v1.12.1 [#2401](https://github.com/pnp/cli-microsoft365/issues/2401)
 
 ## [v3.8.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.8.0)
 

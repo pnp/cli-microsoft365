@@ -36,6 +36,7 @@ class CliConfigSetCommand extends AnonymousCommand {
 
     switch (args.options.key) {
       case settingsNames.showHelpOnFailure:
+      case settingsNames.printErrorsAsPlainText:
         value = args.options.value === 'true';
         break;
       default:

@@ -12,7 +12,8 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   webUrl: string;
   listTitle?: string;
-  id: string;
+  id?: string;
+  name?: string;
 }
 
 class SpoContentTypeGetCommand extends SpoCommand {
@@ -31,8 +32,17 @@ class SpoContentTypeGetCommand extends SpoCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    let requestUrl: string = `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes`;
+
+    if (args.options.id) {
+      requestUrl += `('${encodeURIComponent(args.options.id)}')`;
+    }
+    else if (args.options.name) {
+      requestUrl += `?$filter=Name eq '${encodeURIComponent(args.options.name)}'`;
+    }
+
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/${(args.options.listTitle ? `lists/getByTitle('${encodeURIComponent(args.options.listTitle)}')/` : '')}contenttypes('${encodeURIComponent(args.options.id)}')`,
+      url: requestUrl,
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -42,8 +52,23 @@ class SpoContentTypeGetCommand extends SpoCommand {
     request
       .get(requestOptions)
       .then((res: any): void => {
-        if (res['odata.null'] === true) {
-          cb(new CommandError(`Content type with ID ${args.options.id} not found`));
+        let errorMessage: string = '';
+
+        if (args.options.name) {
+          if (res.value.length === 0) {
+            errorMessage = `Content type with name ${args.options.name} not found`;
+          }
+          else{
+            res = res.value[0];
+          }
+        }
+
+        if (args.options.id && res['odata.null'] === true) {
+          errorMessage = `Content type with ID ${args.options.id} not found`;
+        }
+
+        if (errorMessage) {
+          cb(new CommandError(errorMessage));
           return;
         }
 
@@ -61,7 +86,10 @@ class SpoContentTypeGetCommand extends SpoCommand {
         option: '-l, --listTitle [listTitle]'
       },
       {
-        option: '-i, --id <id>'
+        option: '-i, --id [id]'
+      },
+      {
+        option: '-n, --name [name]'
       }
     ];
 
@@ -70,7 +98,20 @@ class SpoContentTypeGetCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
+    if (isValidSharePointUrl !== true) {
+      return isValidSharePointUrl;
+    }
+
+    if (args.options.id && args.options.name) {
+      return 'Specify id or name, but not both';
+    }
+
+    if (!args.options.id && !args.options.name) {
+      return 'Specify id or name, one is required';
+    }
+
+    return true;
   }
 }
 
