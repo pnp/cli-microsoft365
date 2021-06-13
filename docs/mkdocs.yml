@@ -632,6 +632,7 @@ nav:
       - 'Monitor site collections storage usage': 'sample-scripts/spo/monitor-site-collection-storage-usage.md'
       - 'Remove a Site Collection Admin User from all Site Collections': 'sample-scripts/spo/remove-siteCollection-admin-user.md'
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
+      - 'Remove pending SharePoint API permission requests': 'sample-scripts/spo/remove-pending-api-permission-requests.md'
       - 'Replace site collection admin with another user': 'sample-scripts/spo/replace-site-collection-admin.md'
       - 'Setup example site': 'sample-scripts/spo/setup-example-site.md'
       - 'Sync SharePoint document library documents with Azure storage container': 'sample-scripts/spo/sync-splib-into-az-storage-container.md'
