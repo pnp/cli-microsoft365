@@ -87,6 +87,7 @@ nav:
         - completion sh update: 'cmd/cli/completion/completion-sh-update.md'
       - config:
         - config get: 'cmd/cli/config/config-get.md'
+        - config reset: 'cmd/cli/config/config-reset.md'
         - config set: 'cmd/cli/config/config-set.md'
     - File (file):
       - add: 'cmd/file/file-add.md'
@@ -174,6 +175,8 @@ nav:
         - report activityuserdetail: 'cmd/skype/report/report-activityuserdetail.md'
     - SharePoint Framework (spfx):
       - doctor: 'cmd/spfx/spfx-doctor.md'
+      - package:
+        - package generate: 'cmd/spfx/package/package-generate.md'
       - project:
         - project externalize: 'cmd/spfx/project/project-externalize.md'
         - project rename: 'cmd/spfx/project/project-rename.md'
