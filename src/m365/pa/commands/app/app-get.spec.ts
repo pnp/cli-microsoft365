@@ -67,23 +67,32 @@ describe(commands.APP_GET, () => {
     assert.deepStrictEqual(command.defaultProperties(), ['name', 'displayName', 'description', 'appVersion', 'owner']);
   });
 
-  it('fails validation if name/GUID not specified', () => {
+  it('fails validation if name or displayName not specified', () => {
     const actual = command.validate({ options: {} });
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation if GUID is specified', () => {
+  it('fails validation if name and displayName are both specified', () => {
+    const actual = command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7", displayName: "Playwright" } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('fails validation if name is not GUID', () => {
+    const actual = command.validate({ options: { name: "TestApp" } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it('passes validation if name is specified', () => {
     const actual = command.validate({ options: { name: "5369f386-e380-46cb-82a4-4e18f9e4f3a7" } });
     assert.strictEqual(actual, true);
   });
 
-  it('passes validation if name is specified', () => {
-    const actual = command.validate({ options: { name: "Playwright" } });
+  it('passes validation if displayName is specified', () => {
+    const actual = command.validate({ options: { displayName: "Playwright" } });
     assert.strictEqual(actual, true);
   });
 
-
-  it('retrieves information about the specified app using GUID (debug)', (done) => {
+  it('retrieves information about the specified app using name (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -107,7 +116,7 @@ describe(commands.APP_GET, () => {
     });
   });
 
-  it('retrieves information about the specified app using GUID', (done) => {
+  it('retrieves information about the specified app using name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -607,7 +616,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'Playwright' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'Playwright' } }, () => {
       try {
         assert(loggerLogSpy.calledWith(
           {
@@ -781,7 +790,7 @@ describe(commands.APP_GET, () => {
     });
   });
 
-  it('renders empty string for missing properties using GUID', (done) => {
+  it('renders empty string for missing properties using name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`providers/Microsoft.PowerApps/apps/5369f386-e380-46cb-82a4-4e18f9e4f3a7?api-version=2016-11-01`) > -1) {
         if (opts.headers &&
@@ -1281,7 +1290,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, name: 'Playwright' } }, () => {
+    command.action(logger, { options: { debug: false, displayName: 'Playwright' } }, () => {
       try {
         assert(loggerLogSpy.calledWith(
           {
@@ -1455,7 +1464,7 @@ describe(commands.APP_GET, () => {
     });
   });
 
-  it('correctly handles App not found using GUID', (done) => {
+  it('correctly handles App not found using name', (done) => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject({
         "error": {
@@ -1953,9 +1962,9 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, name: 'NoAppFound' } }, () => {
+    command.action(logger, { options: { debug: true, displayName: 'NoAppFound' } }, () => {
       try {
-        assert(loggerLogToStderrSpy.calledWith(`No app found with the name 'NoAppFound'`));
+        assert(loggerLogToStderrSpy.calledWith(`No app found with displayName 'NoAppFound'`));
         done();
       }
       catch (e) {
@@ -1972,7 +1981,7 @@ describe(commands.APP_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, name: 'Playwright' } }, () => {
+    command.action(logger, { options: { debug: true, displayName: 'Playwright' } }, () => {
       try {
         assert(loggerLogToStderrSpy.calledWith(`No apps found`));
         done();
@@ -2024,6 +2033,17 @@ describe(commands.APP_GET, () => {
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--name') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying displayName', () => {
+    const options = command.options();
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--displayName') > -1) {
         containsOption = true;
       }
     });

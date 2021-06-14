@@ -14,7 +14,8 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  name: string;
+  name?: string;
+  displayName?: string;
 }
 
 class PaAppGetCommand extends AzmgmtCommand {
@@ -31,13 +32,8 @@ class PaAppGetCommand extends AzmgmtCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (this.verbose) {
-      logger.logToStderr(`Retrieving information about Microsoft Power App ${args.options.name}...`);
-    }
-
-    let requestUrl: string = '';
-    const isValidGuid: boolean = Utils.isValidGuid(args.options.name);
-    if (isValidGuid) {
+    if (args.options.name) {
+      let requestUrl: string = '';
       requestUrl = `${this.resource}providers/Microsoft.PowerApps/apps/${encodeURIComponent(args.options.name)}?api-version=2016-11-01`;
 
       const requestOptions: any = {
@@ -48,6 +44,10 @@ class PaAppGetCommand extends AzmgmtCommand {
         responseType: 'json'
       };
 
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving information about Microsoft Power App with name '${args.options.name}'...`);
+      }
+
       request
         .get(requestOptions)
         .then((res: any): void => {
@@ -56,20 +56,24 @@ class PaAppGetCommand extends AzmgmtCommand {
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
     else {
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving information about Microsoft Power App with displayName '${args.options.displayName}'...`);
+      }
+
       this
         .getApps(args, logger)
         .then((getAppsOutput: CommandOutput): void => {
           const allApps: any = JSON.parse(getAppsOutput.stdout);
           if (allApps.length > 0) {
             const app = allApps.find((a: any) => {
-              return a.properties.displayName.toLowerCase() === `${args.options.name}`.toLowerCase();
+              return a.properties.displayName.toLowerCase() === `${args.options.displayName}`.toLowerCase();
             });
             if (!!app) {
               logger.log(this.setProperties(app));
             }
             else {
               if (this.verbose) {
-                logger.logToStderr(`No app found with the name '${args.options.name}'`);
+                logger.logToStderr(`No app found with displayName '${args.options.displayName}'`);
               }
             }
           }
@@ -108,7 +112,10 @@ class PaAppGetCommand extends AzmgmtCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-n, --name <name>'
+        option: '-n, --name [name]'
+      },
+      {
+        option: '-d, --displayName [displayName]'
       }
     ];
 
@@ -117,8 +124,16 @@ class PaAppGetCommand extends AzmgmtCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.name) {
-      return 'Specify a valid name or GUID';
+    if (!args.options.name && !args.options.displayName) {
+      return 'Specify either name or displayName';
+    }
+
+    if (args.options.name && args.options.displayName) {
+      return 'Specify either name or displayName but not both';
+    }
+
+    if (args.options.name && !Utils.isValidGuid(args.options.name)) {
+      return `${args.options.name} is not a valid GUID`;
     }
 
     return true;
