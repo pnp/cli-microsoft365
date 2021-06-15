@@ -6,7 +6,7 @@ When building SharePoint Framework solutions connected to APIs secured with Azur
 
 This script helps you to quickly remove pending SharePoint API permission requests. 
 
-```powershell tab="PowerShell Core"
+```javascript tab="JavaScript"
 #!/usr/bin/env zx
 $.verbose = false;
 
