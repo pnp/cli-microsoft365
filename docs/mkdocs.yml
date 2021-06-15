@@ -1,4 +1,5 @@
 site_name: CLI for Microsoft 365
+site_url: https://pnp.github.io/cli-microsoft365/
 nav:
   - Home: 'index.md'
   - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
