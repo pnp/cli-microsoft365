@@ -66,9 +66,9 @@ describe(commands.LIST_REMOVE, () => {
 
   it('removes a To Do task list by name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'FooList'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists",
           "value": [
             {
               "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGllw==\"",
@@ -85,7 +85,7 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA=`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA=`) {
         return Promise.resolve();
       }
 
@@ -110,9 +110,9 @@ describe(commands.LIST_REMOVE, () => {
 
   it('removes a To Do task list by name when confirm option is passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'FooList'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists",
           "value": [
             {
               "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGllw==\"",
@@ -129,7 +129,7 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA=`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA=`) {
         return Promise.resolve();
       }
 
@@ -155,9 +155,9 @@ describe(commands.LIST_REMOVE, () => {
 
   it('removes a To Do task list by id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'FooList'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists",
           "value": [
             {
               "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGllw==\"",
@@ -174,7 +174,7 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA=`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA=`) {
         return Promise.resolve();
       }
 
@@ -199,9 +199,9 @@ describe(commands.LIST_REMOVE, () => {
 
   it('handles error correctly when a list is not found for a specific name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'FooList'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists",
           "value": []
         });
       }
@@ -230,9 +230,9 @@ describe(commands.LIST_REMOVE, () => {
 
   it('handles error correctly', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'FooList'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists",
           "value": [
             {
               "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGllw==\"",
@@ -270,9 +270,9 @@ describe(commands.LIST_REMOVE, () => {
 
   it('prompts before removing the list when confirm option not passed', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'FooList'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists",
           "value": [
             {
               "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGllw==\"",
@@ -289,7 +289,7 @@ describe(commands.LIST_REMOVE, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA=`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIiAAA=`) {
         return Promise.resolve();
       }
 
