@@ -27,6 +27,13 @@ class PaAppGetCommand extends AzmgmtCommand {
     return 'Gets information about the specified Microsoft Power App';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.name = typeof args.options.name !== 'undefined';
+    telemetryProps.displayName = typeof args.options.displayName !== 'undefined';
+    return telemetryProps;
+  }
+
   public defaultProperties(): string[] | undefined {
     return ['name', 'displayName', 'description', 'appVersion', 'owner'];
   }
