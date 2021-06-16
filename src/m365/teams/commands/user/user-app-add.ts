@@ -25,7 +25,7 @@ class TeamsUserAppAddCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${this.resource}/beta`;
+    const endpoint: string = `${this.resource}/v1.0`;
 
     const requestOptions: any = {
       url: `${endpoint}/users/${args.options.userId}/teamwork/installedApps`,
