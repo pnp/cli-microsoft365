@@ -2,6 +2,9 @@ export interface WebProperties {
   AllowRssFeeds: boolean;
   AlternateCssUrl: string;
   AppInstanceId: string;
+  AssociatedMemberGroup: AssociatedGroupProperties;
+  AssociatedOwnerGroup: AssociatedGroupProperties;
+  AssociatedVisitorGroup: AssociatedGroupProperties;
   Configuration: number;
   Created: string;
   CurrentChangeToken: CurrentChangeToken;
@@ -39,4 +42,18 @@ export interface CurrentChangeToken {
 
 export interface ResourcePath {
   DecodedUrl: string;
+}
+export interface AssociatedGroupProperties {
+  Id: number;
+  IsHiddenInUI: boolean;
+  LoginName: string;
+  Title: string;
+  PrincipalType: number;
+  AllowMembersEditMembership: boolean;
+  AllowRequestToJoinLeave: boolean;
+  AutoAcceptRequestToJoinLeave: boolean;
+  Description: string;
+  OnlyAllowMembersViewMembership: boolean;
+  OwnerTitle: string;
+  RequestToJoinLeaveEmailSetting: string;
 }

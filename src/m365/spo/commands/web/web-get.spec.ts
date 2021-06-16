@@ -155,6 +155,188 @@ describe(commands.WEB_GET, () => {
     });
   });
 
+  it('retrieves site information - With Associated Groups', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/_api/web') > -1) {
+        return Promise.resolve(
+          {
+            "value": [{
+              "AssociatedMemberGroup": {
+                "Id": 5,
+                "IsHiddenInUI": false,
+                "LoginName": "Contoso Members",
+                "Title": "Contoso Members",
+                "PrincipalType": 8,
+                "AllowMembersEditMembership": true,
+                "AllowRequestToJoinLeave": false,
+                "AutoAcceptRequestToJoinLeave": false,
+                "Description": null,
+                "OnlyAllowMembersViewMembership": false,
+                "OwnerTitle": "Contoso Owners",
+                "RequestToJoinLeaveEmailSetting": ""
+              },
+              "AssociatedOwnerGroup": {
+                "Id": 3,
+                "IsHiddenInUI": false,
+                "LoginName": "Contoso Owners",
+                "Title": "Contoso Owners",
+                "PrincipalType": 8,
+                "AllowMembersEditMembership": false,
+                "AllowRequestToJoinLeave": false,
+                "AutoAcceptRequestToJoinLeave": false,
+                "Description": null,
+                "OnlyAllowMembersViewMembership": false,
+                "OwnerTitle": "Contoso Owners",
+                "RequestToJoinLeaveEmailSetting": ""
+              },
+              "AssociatedVisitorGroup": {
+                "Id": 4,
+                "IsHiddenInUI": false,
+                "LoginName": "Contoso Visitors",
+                "Title": "Contoso Visitors",
+                "PrincipalType": 8,
+                "AllowMembersEditMembership": false,
+                "AllowRequestToJoinLeave": false,
+                "AutoAcceptRequestToJoinLeave": false,
+                "Description": null,
+                "OnlyAllowMembersViewMembership": false,
+                "OwnerTitle": "Contoso Owners",
+                "RequestToJoinLeaveEmailSetting": ""
+              },
+              "AllowRssFeeds": false,
+              "AlternateCssUrl": null,
+              "AppInstanceId": "00000000-0000-0000-0000-000000000000",
+              "Configuration": 0,
+              "Created": null,
+              "CurrentChangeToken": null,
+              "CustomMasterUrl": null,
+              "Description": null,
+              "DesignPackageId": null,
+              "DocumentLibraryCalloutOfficeWebAppPreviewersDisabled": false,
+              "EnableMinimalDownload": false,
+              "HorizontalQuickLaunch": false,
+              "Id": "d8d179c7-f459-4f90-b592-14b08e84accb",
+              "IsMultilingual": false,
+              "Language": 1033,
+              "LastItemModifiedDate": null,
+              "LastItemUserModifiedDate": null,
+              "MasterUrl": null,
+              "NoCrawl": false,
+              "OverwriteTranslationsOnChange": false,
+              "ResourcePath": null,
+              "QuickLaunchEnabled": false,
+              "RecycleBinEnabled": false,
+              "ServerRelativeUrl": null,
+              "SiteLogoUrl": null,
+              "SyndicationEnabled": false,
+              "Title": "Subsite",
+              "TreeViewEnabled": false,
+              "UIVersion": 15,
+              "UIVersionConfigurationEnabled": false,
+              "Url": "https://contoso.sharepoint.com/subsite",
+              "WebTemplate": "STS"
+            }]
+          }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        output: 'json',
+        debug: true,
+        webUrl: 'https://contoso.sharepoint.com',
+        withGroups: true
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith({
+          value: [{
+            AssociatedMemberGroup: {
+              Id: 5,
+              IsHiddenInUI: false,
+              LoginName: "Contoso Members",
+              Title: "Contoso Members",
+              PrincipalType: 8,
+              AllowMembersEditMembership: true,
+              AllowRequestToJoinLeave: false,
+              AutoAcceptRequestToJoinLeave: false,
+              Description: null,
+              OnlyAllowMembersViewMembership: false,
+              OwnerTitle: "Contoso Owners",
+              RequestToJoinLeaveEmailSetting: ""
+            },
+            AssociatedOwnerGroup: {
+              Id: 3,
+              IsHiddenInUI: false,
+              LoginName: "Contoso Owners",
+              Title: "Contoso Owners",
+              PrincipalType: 8,
+              AllowMembersEditMembership: false,
+              AllowRequestToJoinLeave: false,
+              AutoAcceptRequestToJoinLeave: false,
+              Description: null,
+              OnlyAllowMembersViewMembership: false,
+              OwnerTitle: "Contoso Owners",
+              RequestToJoinLeaveEmailSetting: ""
+            },
+            AssociatedVisitorGroup: {
+              Id: 4,
+              IsHiddenInUI: false,
+              LoginName: "Contoso Visitors",
+              Title: "Contoso Visitors",
+              PrincipalType: 8,
+              AllowMembersEditMembership: false,
+              AllowRequestToJoinLeave: false,
+              AutoAcceptRequestToJoinLeave: false,
+              Description: null,
+              OnlyAllowMembersViewMembership: false,
+              OwnerTitle: "Contoso Owners",
+              RequestToJoinLeaveEmailSetting: ""
+            },
+            AllowRssFeeds: false,
+            AlternateCssUrl: null,
+            AppInstanceId: "00000000-0000-0000-0000-000000000000",
+            Configuration: 0,
+            Created: null,
+            CurrentChangeToken: null,
+            CustomMasterUrl: null,
+            Description: null,
+            DesignPackageId: null,
+            DocumentLibraryCalloutOfficeWebAppPreviewersDisabled: false,
+            EnableMinimalDownload: false,
+            HorizontalQuickLaunch: false,
+            Id: "d8d179c7-f459-4f90-b592-14b08e84accb",
+            IsMultilingual: false,
+            Language: 1033,
+            LastItemModifiedDate: null,
+            LastItemUserModifiedDate: null,
+            MasterUrl: null,
+            NoCrawl: false,
+            OverwriteTranslationsOnChange: false,
+            ResourcePath: null,
+            QuickLaunchEnabled: false,
+            RecycleBinEnabled: false,
+            ServerRelativeUrl: null,
+            SiteLogoUrl: null,
+            SyndicationEnabled: false,
+            Title: "Subsite",
+            TreeViewEnabled: false,
+            UIVersion: 15,
+            UIVersionConfigurationEnabled: false,
+            Url: "https://contoso.sharepoint.com/subsite",
+            WebTemplate: "STS"
+          }]
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('retrieves all site information with output option text', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/_api/web') > -1) {
