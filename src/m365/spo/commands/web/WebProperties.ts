@@ -2,6 +2,9 @@ export interface WebProperties {
   AllowRssFeeds: boolean;
   AlternateCssUrl: string;
   AppInstanceId: string;
+  AssociatedMemberGroup: any;
+  AssociatedOwnerGroup: any;
+  AssociatedVisitorGroup: any;
   Configuration: number;
   Created: string;
   CurrentChangeToken: CurrentChangeToken;
