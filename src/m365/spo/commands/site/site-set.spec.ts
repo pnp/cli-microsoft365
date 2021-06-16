@@ -702,6 +702,41 @@ describe(commands.SITE_SET, () => {
         const options = {
           url: 'https://contoso.sharepoint.com/sites/Sales',
           title: 'New title',
+          description: undefined,
+          owners: undefined,
+          wait: true,
+          debug: false,
+          verbose: false,
+          _: []
+        };
+        assert(executeCommandSpy.calledWith(spoSiteClassicSetCommand, { options: options }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('updates description of the specified site', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
+        return Promise.resolve({
+          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          GroupId: '00000000-0000-0000-0000-000000000000'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+    executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
+
+    command.action(logger, { options: { debug: false, title: 'New title', description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+      try {
+        const options = {
+          url: 'https://contoso.sharepoint.com/sites/Sales',
+          title: 'New title',
+          description: 'Some description',
           owners: undefined,
           wait: true,
           debug: false,
@@ -735,6 +770,7 @@ describe(commands.SITE_SET, () => {
         const options = {
           url: 'https://contoso.sharepoint.com/sites/Sales',
           title: undefined,
+          description: undefined,
           owners: 'admin@contoso.onmicrosoft.com',
           wait: true,
           debug: false,
@@ -810,6 +846,29 @@ describe(commands.SITE_SET, () => {
     });
   });
 
+  it('updates description of the specified groupified site', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
+        return Promise.resolve({
+          Id: '255a50b2-527f-4413-8485-57f4c17a24d1',
+          GroupId: 'e10a459e-60c8-4000-8240-a68d6a12d39e'
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, title: 'New title', description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
+      try {
+        assert(loggerLogSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('updates isPublic property of the specified groupified site', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
@@ -822,8 +881,15 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
     executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/e10a459e-60c8-4000-8240-a68d6a12d39e') {
+        return Promise.resolve();
+      }
 
-    command.action(logger, { options: { debug: false, isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, isPublic: true, description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
       try {
         const options = {
           id: 'e10a459e-60c8-4000-8240-a68d6a12d39e',
