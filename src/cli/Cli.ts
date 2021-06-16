@@ -280,6 +280,7 @@ export class Cli {
 
     files.forEach(file => {
       if (file.indexOf(`${path.sep}commands${path.sep}`) > -1 &&
+        file.indexOf(`${path.sep}assets${path.sep}`) < 0 &&
         file.endsWith('.js') &&
         !file.endsWith('.spec.js')) {
         try {

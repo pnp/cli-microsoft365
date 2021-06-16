@@ -40,6 +40,8 @@
 - added the Get-SPOUser CLI equivalents to the docs [#2485](https://github.com/pnp/cli-microsoft365/issues/2485)
 - removed the deprecated Get-TeamHelp cmdlet from the docs [#2486](https://github.com/pnp/cli-microsoft365/issues/2486)
 - added the Remove-PowerApp CLI equivalent to the docs [#2491](https://github.com/pnp/cli-microsoft365/issues/2491)
+- excluded /assets/ path from loading commands [#2512](https://github.com/pnp/cli-microsoft365/issues/2512)
+- fixed the 'o365group user list' command [#2374](https://github.com/pnp/cli-microsoft365/issues/2374)
 
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
