@@ -60,9 +60,9 @@ describe(commands.LIST_ADD, () => {
 
   it('adds To Do task list', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists/$entity",
           "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGlTQ==\"",
           "displayName": "FooList",
           "isOwner": true,
@@ -83,7 +83,7 @@ describe(commands.LIST_ADD, () => {
     } as any, () => {
       try {
         assert.strictEqual(JSON.stringify(log[0]), JSON.stringify({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists/$entity",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists/$entity",
           "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGlTQ==\"",
           "displayName": "FooList",
           "isOwner": true,
