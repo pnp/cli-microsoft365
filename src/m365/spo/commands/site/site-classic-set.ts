@@ -16,7 +16,6 @@ interface CommandArgs {
 export interface Options extends GlobalOptions {
   url: string;
   title?: string;
-  description?: string;
   sharing?: string;
   resourceQuota?: string | number;
   resourceQuotaWarningLevel?: string | number;
@@ -46,7 +45,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.title = typeof args.options.title !== 'undefined';
-    telemetryProps.description = typeof args.options.description !== 'undefined';
     telemetryProps.sharing = args.options.sharing;
     telemetryProps.resourceQuota = typeof args.options.resourceQuota !== 'undefined';
     telemetryProps.resourceQuotaWarningLevel = typeof args.options.resourceQuotaWarningLevel !== 'undefined';
@@ -193,30 +191,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
             });
         });
       })
-      .then((): Promise<FormDigestInfo> => {
-        return this.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
-      })
-      .then((res: FormDigestInfo): Promise<void> => {
-        this.context = res;
-        
-        if (!args.options.description) {
-          return Promise.resolve(undefined as any);
-        }
-
-        const requestOptions: any = {
-          url: `${args.options.url}/_api/web`,
-          headers: {
-            'IF-MATCH': '*',
-            'Accept': 'application/json;odata=verbose',
-            'content-type': 'application/json;odata=verbose',
-            'X-RequestDigest': (this.context as FormDigestInfo).FormDigestValue,
-            'X-HTTP-Method': 'MERGE'
-          },
-          data: `{ '__metadata': { 'type': 'SP.Web' }, 'Description': '${args.options.description}' }`
-        };
-        
-        return request.post(requestOptions);
-      })
       .then((): Promise<string> => {
         if (!args.options.lockState) {
           return Promise.resolve(undefined as any);
@@ -299,9 +273,6 @@ class SpoSiteClassicSetCommand extends SpoCommand {
       },
       {
         option: '-t, --title [title]'
-      },
-      {
-        option: '-d, --description [description]'
       },
       {
         option: '--sharing [sharing]',
