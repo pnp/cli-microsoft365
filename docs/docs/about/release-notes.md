@@ -42,6 +42,9 @@
 - added the Remove-PowerApp CLI equivalent to the docs [#2491](https://github.com/pnp/cli-microsoft365/issues/2491)
 - excluded /assets/ path from loading commands [#2512](https://github.com/pnp/cli-microsoft365/issues/2512)
 - fixed the 'o365group user list' command [#2374](https://github.com/pnp/cli-microsoft365/issues/2374)
+- added the 'Remove pending SharePoint API permission requests' sample script [#2478](https://github.com/pnp/cli-microsoft365/issues/2478)
+- added the 'Remove SharePoint API permissions' sample script [#2487](https://github.com/pnp/cli-microsoft365/issues/2487)
+- extended 'pa app get' to allow retrieving apps by their display name [#2174](https://github.com/pnp/cli-microsoft365/issues/2174)
 
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
