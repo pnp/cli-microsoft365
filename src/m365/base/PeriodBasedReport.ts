@@ -39,7 +39,7 @@ export default abstract class PeriodBasedReport extends GraphCommand {
 
         if (output && output.toLowerCase() === 'json') {
           const reportData: any = this.getReport(cleanResponse);
-          content = JSON.stringify(reportData);
+          content = reportData;
         }
         else {
           content = cleanResponse;
