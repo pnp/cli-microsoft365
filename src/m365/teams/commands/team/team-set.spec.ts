@@ -69,7 +69,7 @@ describe(commands.TEAM_SET, () => {
 
   it('sets the visibility settings correctly', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
         JSON.stringify(opts.data) === JSON.stringify({
           visibility: 'Public'
         })) {
@@ -94,7 +94,7 @@ describe(commands.TEAM_SET, () => {
 
   it('sets the mailNickName correctly', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
         JSON.stringify(opts.data) === JSON.stringify({
           mailNickName: 'NewNickName'
         })) {
@@ -119,7 +119,7 @@ describe(commands.TEAM_SET, () => {
 
   it('sets the description settings correctly', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
         JSON.stringify(opts.data) === JSON.stringify({
           description: 'desc'
         })) {
@@ -143,7 +143,7 @@ describe(commands.TEAM_SET, () => {
 
   it('sets the classification settings correctly', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee` &&
         JSON.stringify(opts.data) === JSON.stringify({
           classification: 'MBI'
         })) {
@@ -167,7 +167,7 @@ describe(commands.TEAM_SET, () => {
 
   it('should handle Microsoft graph error response', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/8231f9f2-701f-4c6e-93ce-ecb563e3c1ee`) {
         return Promise.reject({
           "error": {
             "code": "ItemNotFound",
