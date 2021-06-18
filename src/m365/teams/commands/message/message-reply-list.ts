@@ -32,7 +32,7 @@ class TeamsMessageReplyListCommand extends GraphItemsListCommand<Reply>  {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const endpoint: string = `${this.resource}/beta/teams/${args.options.teamId}/channels/${args.options.channelId}/messages/${args.options.messageId}/replies`;
+    const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/messages/${args.options.messageId}/replies`;
 
     this
       .getAllItems(endpoint, logger, true)
