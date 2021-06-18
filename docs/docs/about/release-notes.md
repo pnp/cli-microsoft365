@@ -45,6 +45,12 @@
 - added the 'Remove pending SharePoint API permission requests' sample script [#2478](https://github.com/pnp/cli-microsoft365/issues/2478)
 - added the 'Remove SharePoint API permissions' sample script [#2487](https://github.com/pnp/cli-microsoft365/issues/2487)
 - extended 'pa app get' to allow retrieving apps by their display name [#2174](https://github.com/pnp/cli-microsoft365/issues/2174)
+- removed double `JSON.stringify` [#2534](https://github.com/pnp/cli-microsoft365/issues/2534)
+- updated sample and removes double / [#2449](https://github.com/pnp/cli-microsoft365/issues/2449)
+- updated 'todo list add' to Graph v1.0 [#2515](https://github.com/pnp/cli-microsoft365/issues/2515)
+- updated 'todo list list' to Graph v1.0 [#2516](https://github.com/pnp/cli-microsoft365/issues/2516)
+- updated 'todo list remove' to Graph v1.0 [#2517](https://github.com/pnp/cli-microsoft365/issues/2517)
+- updated 'todo list set' to Graph v1.0 [#2518](https://github.com/pnp/cli-microsoft365/issues/2518)
 
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
