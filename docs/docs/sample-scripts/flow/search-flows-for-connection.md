@@ -17,17 +17,19 @@ ForEach ($env in $environments) {
     $flows = m365 flow list --environment $env.name --asAdmin -o json | ConvertFrom-Json
 
     ForEach ($flow in $flows) {
-
+        Write-Output "Processing $($flow.displayName)..."
         m365 flow export --id $flow.name --environment $env.name --format json --path $path
 
-        $flowData = Get-Content -Path $path
+        $flowData = Get-Content -Path $path -ErrorAction SilentlyContinue
 
-        if ($flowData.Contains($searchString)) {
-            Write-Output $($flow.displayName + "contains your search string" + $searchString)
-            Write-Output $flow.id
+        if ($null -ne $flowData) {
+            if ($flowData.Contains($searchString)) {
+                Write-Output $($flow.displayName + "contains your search string" + $searchString)
+                Write-Output $flow.id
+            }
+
+            Remove-Item $path -Confirm:$false
         }
-
-        Remove-Item $path -Confirm:$false
     }
 }
 ```
