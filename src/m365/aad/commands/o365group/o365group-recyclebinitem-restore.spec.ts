@@ -7,9 +7,9 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
-const command: Command = require('./o365group-restore');
+const command: Command = require('./o365group-recyclebinitem-restore');
 
-describe(commands.O365GROUP_RESTORE, () => {
+describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
@@ -54,7 +54,7 @@ describe(commands.O365GROUP_RESTORE, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.O365GROUP_RESTORE), true);
+    assert.strictEqual(command.name.startsWith(commands.O365GROUP_RECYCLEBINITEM_RESTORE), true);
   });
 
   it('has a description', () => {
@@ -63,7 +63,7 @@ describe(commands.O365GROUP_RESTORE, () => {
 
   it('restores the specified group', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/directory/deleteditems/28beab62-7540-4db1-a23f-29a6018a3848/restore/') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/directory/deleteditems/28beab62-7540-4db1-a23f-29a6018a3848/restore') {
         return Promise.resolve();
       }
 
@@ -83,7 +83,7 @@ describe(commands.O365GROUP_RESTORE, () => {
 
   it('restores the specified group (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.url === 'https://graph.microsoft.com/v1.0/directory/deleteditems/28beab62-7540-4db1-a23f-29a6018a3848/restore/') {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/directory/deleteditems/28beab62-7540-4db1-a23f-29a6018a3848/restore') {
         return Promise.resolve();
       }
 

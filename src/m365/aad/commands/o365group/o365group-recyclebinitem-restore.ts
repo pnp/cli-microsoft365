@@ -16,9 +16,9 @@ interface Options extends GlobalOptions {
   id: string;
 }
 
-class AadO365GroupRestoreCommand extends GraphCommand {
+class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
   public get name(): string {
-    return commands.O365GROUP_RESTORE;
+    return commands.O365GROUP_RECYCLEBINITEM_RESTORE;
   }
 
   public get description(): string {
@@ -37,9 +37,9 @@ class AadO365GroupRestoreCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/directory/deleteditems/${args.options.id}/restore/`,
+      url: `${this.resource}/v1.0/directory/deleteditems/${args.options.id}/restore`,
       headers: {
-        'accept': 'application/json;odata.metadata=none'
+        'Content-type': 'application/json'
       }
     };
 
@@ -68,4 +68,4 @@ class AadO365GroupRestoreCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadO365GroupRestoreCommand();
+module.exports = new AadO365GroupRecycleBinItemRestoreCommand();
