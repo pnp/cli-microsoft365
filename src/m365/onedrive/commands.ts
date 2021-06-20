@@ -1,6 +1,7 @@
 const prefix: string = 'onedrive';
 
 export default {
+  LIST:`${prefix} list`,
   REPORT_ACTIVITYFILECOUNTS: `${prefix} report activityfilecounts`,
   REPORT_ACTIVITYUSERCOUNTS: `${prefix} report activityusercounts`,
   REPORT_ACTIVITYUSERDETAIL: `${prefix} report activityuserdetail`,

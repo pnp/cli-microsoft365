@@ -105,6 +105,7 @@ nav:
       - subscription:
         - subscription add: 'cmd/graph/subscription/subscription-add.md'
     - OneDrive (onedrive):
+      - list: 'cmd/onedrive/onedrive-list.md'
       - report:
         - report activityfilecounts: 'cmd/onedrive/report/report-activityfilecounts.md'
         - report activityusercounts: 'cmd/onedrive/report/report-activityusercounts.md'

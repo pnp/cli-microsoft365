@@ -38,6 +38,7 @@ const dictionary = [
   'news',
   'oauth2',
   'office365',
+  'one',
   'org',
   'o365',
   'permission',
