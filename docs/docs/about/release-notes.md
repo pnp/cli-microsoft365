@@ -51,6 +51,11 @@
 - updated 'todo list list' to Graph v1.0 [#2516](https://github.com/pnp/cli-microsoft365/issues/2516)
 - updated 'todo list remove' to Graph v1.0 [#2517](https://github.com/pnp/cli-microsoft365/issues/2517)
 - updated 'todo list set' to Graph v1.0 [#2518](https://github.com/pnp/cli-microsoft365/issues/2518)
+- updated 'teams user app remove' to Graph v1.0 [#2514](https://github.com/pnp/cli-microsoft365/issues/2514)
+- updated 'teams user app add' to Graph v1.0 [#2513](https://github.com/pnp/cli-microsoft365/issues/2513)
+- updated 'teams team set' to Graph v1.0 [#2511](https://github.com/pnp/cli-microsoft365/issues/2511)
+- added documentation for JMESPath sort [#2536](https://github.com/pnp/cli-microsoft365/issues/2536)
+- updated 'teams message reply list' to Graph v1.0 [#2509](https://github.com/pnp/cli-microsoft365/issues/2509)
 
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
