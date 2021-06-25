@@ -23,6 +23,7 @@ nav:
         - app set: 'cmd/aad/app/app-set.md'
         - app role add: 'cmd/aad/app/app-role-add.md'
         - app role list: 'cmd/aad/app/app-role-list.md'
+        - app role delete: 'cmd/aad/app/app-role-delete.md'
       - approleassignment:
         - approleassignment add: 'cmd/aad/approleassignment/approleassignment-add.md'
         - approleassignment list: 'cmd/aad/approleassignment/approleassignment-list.md'

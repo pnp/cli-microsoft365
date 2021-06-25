@@ -19,14 +19,14 @@ m365 aad app role delete [options]
 `--appName [appName]`
 : Name of the Azure AD application registration from which role should be deleted. Specify either `appId`, `appObjectId` or `appName`
 
-`-n, --name <name>`
-: Name of the role to delete
+`-n, --name [name]`
+: Name of the role to delete. Specify either `name`, `id` or `claim`
 
-`-i, --id <id>`
-: Id of the role to delete
+`-i, --id [id]`
+: Id of the role to delete. Specify either `name`, `id` or `claim`
 
-`-c, --claim <claim>`
-: Claim value of the role to delete
+`-c, --claim [claim]`
+: Claim value of the role to delete. Specify either `name`, `id` or `claim`
 
 `--confirm`
 : Don't prompt for confirmation to delete the role.

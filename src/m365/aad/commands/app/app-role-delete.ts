@@ -6,7 +6,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import {Application, AppRole} from "@microsoft/microsoft-graph-types";
+import { Application, AppRole } from "@microsoft/microsoft-graph-types";
 import Utils from '../../../../Utils';
 
 interface CommandArgs {
@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   appName?: string;
   claim?: string;
   name?: string;
-  id?:string;
+  id?: string;
 }
 
 class AadAppRoleDeleteCommand extends GraphCommand {
@@ -45,8 +45,8 @@ class AadAppRoleDeleteCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
 
-    const deleteAppRole: () => void = (): void => { 
-      this.processAppRoleDelete(logger,args).then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+    const deleteAppRole: () => void = (): void => {
+      this.processAppRoleDelete(logger, args).then(_ => cb(), (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
     };
 
     if (args.options.confirm) {
@@ -69,52 +69,52 @@ class AadAppRoleDeleteCommand extends GraphCommand {
     }
   }
 
-  private processAppRoleDelete(logger: Logger, args: CommandArgs):Promise<void>{
+  private processAppRoleDelete(logger: Logger, args: CommandArgs): Promise<void> {
     return this
       .getAppObjectId(args, logger)
-      .then((appId: string) => this.getAADApp(appId, logger))
-      .then((aadApp: Application): Promise<any> => {
-        
-        const appRoleDeleteIdentifierNameValue = args.options.name ? `name '${args.options.name}'` : (args.options.claim ? `claim '${args.options.claim}'`:`id '${args.options.id}'`) ;
+      .then((appObjectId: string) => this.getAADApp(appObjectId, logger))
+      .then((aadApp: Application): Promise<void> => {
+
+        const appRoleDeleteIdentifierNameValue = args.options.name ? `name '${args.options.name}'` : (args.options.claim ? `claim '${args.options.claim}'` : `id '${args.options.id}'`);
         if (this.verbose) {
           logger.logToStderr(`Deleting role with ${appRoleDeleteIdentifierNameValue} from Azure AD app ${aadApp.id}...`);
         }
 
         // Find the role search criteria provided by the user.     
-        const appRoleDeleteIdentifierProperty = args.options.name ? `displayName` : (args.options.claim ? `value`:`id`) ;
-        const appRoleDeleteIdentifierValue = args.options.name ? args.options.name : (args.options.claim ? args.options.claim:args.options.id) ;
-      
-        const appRoleToDelete:AppRole[] = aadApp.appRoles!.filter((role:AppRole) => role[appRoleDeleteIdentifierProperty] === appRoleDeleteIdentifierValue);
+        const appRoleDeleteIdentifierProperty = args.options.name ? `displayName` : (args.options.claim ? `value` : `id`);
+        const appRoleDeleteIdentifierValue = args.options.name ? args.options.name : (args.options.claim ? args.options.claim : args.options.id);
 
-        if(args.options.name && 
-          appRoleToDelete !== undefined && 
-          appRoleToDelete.length > 1){
+        const appRoleToDelete: AppRole[] = aadApp.appRoles!.filter((role: AppRole) => role[appRoleDeleteIdentifierProperty] === appRoleDeleteIdentifierValue);
+
+        if (args.options.name &&
+          appRoleToDelete !== undefined &&
+          appRoleToDelete.length > 1) {
           return Promise.reject(`Multiple roles with the provided 'name' were found. Please disambiguate using the claims : ${appRoleToDelete.map(role => `${role.value}`).join(', ')}`);
-          
+
         }
-        if(appRoleToDelete.length === 0){
+        if (appRoleToDelete.length === 0) {
           return Promise.reject(`No app role with ${appRoleDeleteIdentifierNameValue} found.`);
         }
-          
-        const roleToDelete:AppRole = appRoleToDelete[0];
-        
-        if(roleToDelete.isEnabled){
-          return this.disableAppRole(logger,aadApp,roleToDelete.id!).then(() =>{
-            return this.deleteAppRole(logger,aadApp,roleToDelete.id!);
-          });
+
+        const roleToDelete: AppRole = appRoleToDelete[0];
+
+        if (roleToDelete.isEnabled) {
+          return this
+            .disableAppRole(logger, aadApp, roleToDelete.id!)
+            .then(_ => this.deleteAppRole(logger, aadApp, roleToDelete.id!));
         }
-        else{
-          return this.deleteAppRole(logger,aadApp,roleToDelete.id!);
+        else {
+          return this.deleteAppRole(logger, aadApp, roleToDelete.id!);
         }
       });
   }
 
 
-  private disableAppRole(logger:Logger,aadApp:Application,roleId:string):Promise<void>{
+  private disableAppRole(logger: Logger, aadApp: Application, roleId: string): Promise<void> {
 
-    const roleIndex = aadApp.appRoles!.findIndex((role:AppRole) => role.id === roleId);
+    const roleIndex = aadApp.appRoles!.findIndex((role: AppRole) => role.id === roleId);
 
-    if(this.verbose){
+    if (this.verbose) {
       logger.logToStderr(`Disabling the app role`);
     }
 
@@ -130,17 +130,17 @@ class AadAppRoleDeleteCommand extends GraphCommand {
         appRoles: aadApp.appRoles
       }
     };
-    
+
     return request.patch(requestOptions);
   }
 
-  private deleteAppRole(logger:Logger,aadApp:Application,roleId:string):Promise<void>{
-    
-    if(this.verbose){
+  private deleteAppRole(logger: Logger, aadApp: Application, roleId: string): Promise<void> {
+
+    if (this.verbose) {
       logger.logToStderr(`Deleting the app role.`);
     }
 
-    const updatedAppRoles = aadApp.appRoles!.filter((role:AppRole) => role.id !== roleId);
+    const updatedAppRoles = aadApp.appRoles!.filter((role: AppRole) => role.id !== roleId);
     const requestOptions: any = {
       url: `${this.resource}/v1.0/myorganization/applications/${aadApp.id}`,
       headers: {
@@ -240,14 +240,14 @@ class AadAppRoleDeleteCommand extends GraphCommand {
       return `Specify either name, claim or id of the role but not multiple`;
     }
 
-    if (!appId && 
-      !appObjectId && 
+    if (!appId &&
+      !appObjectId &&
       !appName) {
       return `Specify either appId, appObjectId or appName`;
     }
 
-    if (!name && 
-      !claim && 
+    if (!name &&
+      !claim &&
       !id) {
       return `Specify either name, claim or id of the role`;
     }
