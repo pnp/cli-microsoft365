@@ -56,6 +56,8 @@
 - updated 'teams team set' to Graph v1.0 [#2511](https://github.com/pnp/cli-microsoft365/issues/2511)
 - added documentation for JMESPath sort [#2536](https://github.com/pnp/cli-microsoft365/issues/2536)
 - updated 'teams message reply list' to Graph v1.0 [#2509](https://github.com/pnp/cli-microsoft365/issues/2509)
+- added remarks to 'spo theme set' docs [#1633](https://github.com/pnp/cli-microsoft365/issues/1633)
+- extended 'spo site set' and 'spo site classic set' with description [#2334](https://github.com/pnp/cli-microsoft365/issues/2334)
 
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
