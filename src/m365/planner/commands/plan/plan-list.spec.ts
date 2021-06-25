@@ -170,20 +170,26 @@ describe(commands.PLAN_LIST, () => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/planner/plans`) {
         return Promise.resolve({
-          "createdDateTime": "2021-03-10T17:39:43.1045549Z",
-          "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-          "title": "My Planner Plan",
-          "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
-          "createdBy": {
-            "user": {
-              "displayName": null,
-              "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
-            },
-            "application": {
-              "displayName": null,
-              "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerPlan)",
+          "@odata.count": 1,
+          "value": [
+            {
+              "createdDateTime": "2021-03-10T17:39:43.1045549Z",
+              "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
+              "title": "My Planner Plan",
+              "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
+              "createdBy": {
+                "user": {
+                  "displayName": null,
+                  "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
+                },
+                "application": {
+                  "displayName": null,
+                  "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
+                }
+              }
             }
-          }
+          ]
         });
       }
 
@@ -197,7 +203,7 @@ describe(commands.PLAN_LIST, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith({
+        assert(loggerLogSpy.calledWith([{
           "createdDateTime": "2021-03-10T17:39:43.1045549Z",
           "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
           "title": "My Planner Plan",
@@ -212,7 +218,7 @@ describe(commands.PLAN_LIST, () => {
               "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
             }
           }
-        }));
+        }]));
         done();
       }
       catch (e) {
@@ -281,20 +287,26 @@ describe(commands.PLAN_LIST, () => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/planner/plans`) {
         return Promise.resolve({
-          "createdDateTime": "2021-03-10T17:39:43.1045549Z",
-          "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
-          "title": "My Planner Plan",
-          "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
-          "createdBy": {
-            "user": {
-              "displayName": null,
-              "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
-            },
-            "application": {
-              "displayName": null,
-              "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerPlan)",
+          "@odata.count": 1,
+          "value": [
+            {
+              "createdDateTime": "2021-03-10T17:39:43.1045549Z",
+              "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
+              "title": "My Planner Plan",
+              "id": "opb7bchfZUiFbVWEPL7jPGUABW7f",
+              "createdBy": {
+                "user": {
+                  "displayName": null,
+                  "id": "eded3a2a-8f01-40aa-998a-e4f02ec693ba"
+                },
+                "application": {
+                  "displayName": null,
+                  "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
+                }
+              }
             }
-          }
+          ]
         });
       }
 
@@ -308,7 +320,7 @@ describe(commands.PLAN_LIST, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith({
+        assert(loggerLogSpy.calledWith([{
           "createdDateTime": "2021-03-10T17:39:43.1045549Z",
           "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
           "title": "My Planner Plan",
@@ -323,7 +335,7 @@ describe(commands.PLAN_LIST, () => {
               "id": "31359c7f-bd7e-475c-86db-fdb8c937548e"
             }
           }
-        }));
+        }]));
         done();
       }
       catch (e) {
@@ -348,6 +360,91 @@ describe(commands.PLAN_LIST, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified owner group does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles no plan found with given ownerGroupId', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf('/groups?$filter=ID') > -1) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
+          "value": [
+            {
+              "id": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
+              "deletedDateTime": null,
+              "classification": null,
+              "createdDateTime": "2021-01-23T17:58:03Z",
+              "creationOptions": [
+                "Team",
+                "ExchangeProvisioningFlags:3552"
+              ],
+              "description": "Check here for organization announcements and important info.",
+              "displayName": "spridermvp",
+              "expirationDateTime": null,
+              "groupTypes": [
+                "Unified"
+              ],
+              "isAssignableToRole": null,
+              "mail": "spridermvp@spridermvp.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "spridermvp",
+              "membershipRule": null,
+              "membershipRuleProcessingState": null,
+              "onPremisesDomainName": null,
+              "onPremisesLastSyncDateTime": null,
+              "onPremisesNetBiosName": null,
+              "onPremisesSamAccountName": null,
+              "onPremisesSecurityIdentifier": null,
+              "onPremisesSyncEnabled": null,
+              "preferredDataLocation": null,
+              "preferredLanguage": null,
+              "proxyAddresses": [
+                "SPO:SPO_fe66856a-ca60-457c-9215-cef02b57bf01@SPO_b30f2eac-f6b4-4f87-9dcb-cdf7ae1f8923",
+                "SMTP:spridermvp@spridermvp.onmicrosoft.com"
+              ],
+              "renewedDateTime": "2021-01-23T17:58:03Z",
+              "resourceBehaviorOptions": [
+                "HideGroupInOutlook",
+                "SubscribeMembersToCalendarEventsDisabled",
+                "WelcomeEmailDisabled"
+              ],
+              "resourceProvisioningOptions": [
+                "Team"
+              ],
+              "securityEnabled": false,
+              "securityIdentifier": "S-1-12-1-591283152-1211030634-3876408987-3035217063",
+              "theme": null,
+              "visibility": "Public",
+              "onPremisesProvisioningErrors": []
+            }
+          ]
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/planner/plans`) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerPlan)",
+          "@odata.count": 0,
+          "value": []
+        });
+      }
+
+      return Promise.reject(`Invalid request ${opts.url}`);
+    });
+
+    const options: any = {
+      debug: false,
+      ownerGroupId: '233e43d0-dc6a-482e-9b4e-0de7a7bce9b4'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogSpy.notCalled);
         done();
       }
       catch (e) {

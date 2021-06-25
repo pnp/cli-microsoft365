@@ -132,7 +132,7 @@ nav:
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
     - Microsoft Planner (planner):
       - plan:
-        - plan add: 'cmd/planner/plan/plan-add.md',
+        - plan add: 'cmd/planner/plan/plan-add.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
       - task:
         - task list: 'cmd/planner/task/task-list.md'
