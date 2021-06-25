@@ -63,9 +63,9 @@ describe(commands.LIST_LIST, () => {
 
   it('lists To Do task lists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists",
           "value": [
             {
               "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/hqrpQ==\"",

@@ -20,9 +20,6 @@ m365 teams user app add [options]
 
 ## Remarks
 
-!!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
-
 The `appId` has to be the ID of the app from the Microsoft Teams App Catalog. Do not use the ID from the manifest of the zip app package. Use the [teams app list](../app/app-list.md) command to get this ID.
 
 ## Examples

@@ -10,8 +10,11 @@ pa app get [options]
 
 ## Options
 
-`-n, --name <name>`
+`-n, --name [name]`
 : The name of the Microsoft Power App to get information about
+
+`-d, --displayName [displayName]`
+: The display name of the Microsoft Power App to get information about
 
 --8<-- "docs/cmd/_global.md"
 
@@ -24,8 +27,14 @@ If you try to retrieve a non-existing Microsoft Power App, you will get the `Req
 
 ## Examples
 
-Get information about the specified Microsoft Power App
+Get information about the specified Microsoft Power App by the app's name
 
 ```sh
 m365 pa app get --name 3989cb59-ce1a-4a5c-bb78-257c5c39381d
+```
+
+Get information about the specified Microsoft Power App by the app's display name
+
+```sh
+m365 pa app get --displayName App
 ```

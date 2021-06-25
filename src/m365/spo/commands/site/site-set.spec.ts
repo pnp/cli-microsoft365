@@ -560,7 +560,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('sets sharingCapabilities for Site - Disabled', (done) => {
+  it('sets sharingCapabilities for Site - Disabled', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -568,7 +568,7 @@ describe(commands.SITE_SET, () => {
           GroupId: '00000000-0000-0000-0000-000000000000'
         });
       }
-      return Promise.reject('Invalid request');
+      return Promise.reject('Invalid request');
     });
     sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
     sinon.stub(request, 'post').callsFake((opts) => {
@@ -597,7 +597,7 @@ describe(commands.SITE_SET, () => {
           ]
         ));
       }
-      return Promise.reject('Invalid request');
+      return Promise.reject('Invalid request');
     });
     command.action(logger, { options: { debug: false, sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
@@ -610,7 +610,7 @@ describe(commands.SITE_SET, () => {
     });
   });
 
-  it('sets sharingCapabilities for Site - (Debug) -  Disabled', (done) => {
+  it('sets sharingCapabilities for Site - (Debug) -  Disabled', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/Sales/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -618,12 +618,12 @@ describe(commands.SITE_SET, () => {
           GroupId: '00000000-0000-0000-0000-000000000000'
         });
       }
-      return Promise.reject('Invalid request');
+      return Promise.reject('Invalid request');
     });
 
     sinon.stub(command as any, 'getSpoAdminUrl').callsFake(() => Promise.resolve('https://contoso-admin.sharepoint.com'));
     sinon.stub(request, 'post').callsFake((opts) => {
-      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1"/><ObjectPath Id="4" ObjectPathId="3"/><SetProperty Id="5" ObjectPathId="3" Name="SharingCapability"><Parameter Type="Enum">0</Parameter></SetProperty><ObjectPath Id="7" ObjectPathId="6"/><ObjectIdentityQuery Id="8" ObjectPathId="3"/></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/Sales</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="6" ParentId="3" Name="Update"/></ObjectPaths></Request>`) {
+      if (opts.data === `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1"/><ObjectPath Id="4" ObjectPathId="3"/><SetProperty Id="5" ObjectPathId="3" Name="SharingCapability"><Parameter Type="Enum">0</Parameter></SetProperty><ObjectPath Id="7" ObjectPathId="6"/><ObjectIdentityQuery Id="8" ObjectPathId="3"/></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/Sales</Parameter><Parameter Type="Boolean">false</Parameter></Parameters></Method><Method Id="6" ParentId="3" Name="Update"/></ObjectPaths></Request>`) {
         return Promise.resolve(JSON.stringify(
           [
             {
@@ -648,7 +648,7 @@ describe(commands.SITE_SET, () => {
           ]
         ));
       }
-      return Promise.reject('Invalid request');
+      return Promise.reject('Invalid request');
     });
     command.action(logger, { options: { debug: true, sharingCapability: 'Disabled', url: 'https://contoso.sharepoint.com/sites/Sales' } }, () => {
       try {
@@ -702,6 +702,7 @@ describe(commands.SITE_SET, () => {
         const options = {
           url: 'https://contoso.sharepoint.com/sites/Sales',
           title: 'New title',
+          description: undefined,
           owners: undefined,
           wait: true,
           debug: false,
@@ -735,6 +736,7 @@ describe(commands.SITE_SET, () => {
         const options = {
           url: 'https://contoso.sharepoint.com/sites/Sales',
           title: undefined,
+          description: undefined,
           owners: 'admin@contoso.onmicrosoft.com',
           wait: true,
           debug: false,
@@ -822,8 +824,15 @@ describe(commands.SITE_SET, () => {
       return Promise.reject('Invalid request');
     });
     executeCommandSpy = sinon.stub(Cli, 'executeCommand').callsFake(() => Promise.resolve());
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/e10a459e-60c8-4000-8240-a68d6a12d39e') {
+        return Promise.resolve();
+      }
 
-    command.action(logger, { options: { debug: false, isPublic: true, url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, isPublic: true, description: 'Some description', url: 'https://contoso.sharepoint.com/sites/Sales' } } as any, (err?: any) => {
       try {
         const options = {
           id: 'e10a459e-60c8-4000-8240-a68d6a12d39e',
@@ -1199,7 +1208,7 @@ describe(commands.SITE_SET, () => {
 
   it('applies site absolute logo url to the specified site', (done) => {
     let data: any = {};
-    
+
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/site?$select=GroupId,Id') {
         return Promise.resolve({
@@ -1233,7 +1242,7 @@ describe(commands.SITE_SET, () => {
 
   it('correctly handles unsetting the logo from the specified site', (done) => {
     let data: any = {};
-    
+
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === 'https://contoso.sharepoint.com/sites/logo/_api/site?$select=GroupId,Id') {
         return Promise.resolve({

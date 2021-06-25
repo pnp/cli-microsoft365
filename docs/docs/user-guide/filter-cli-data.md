@@ -1,8 +1,8 @@
 # Filter CLI data using JMESPath queries
 
-CLI for Microsoft 365 supports filtering, sorting and querying data using [JMESPath](http://jmespath.org/) queries. By specifying the `--query` option on each command you can create complex queries.
+CLI for Microsoft 365 supports filtering, sorting, and querying data using [JMESPath](http://jmespath.org/) queries. By specifying the `--query` option on each command you can create complex queries.
 
-There are two types of data returned by the CLI for Microsoft 365 when retrieving data as JSON. In most cases it returns an array of items, but some of the older commands the response is encapsulated in a `value` object. For both scenario's you can use JMESPath to filter, but the queries are a bit different.
+There are two types of data returned by the CLI for Microsoft 365 when retrieving data as JSON. In most cases, it returns an array of items, but some of the older commands the response is encapsulated in a `value` object. For both scenario's you can use JMESPath to filter, but the queries are a bit different.
 
 ## Testing JMESPath queries
 
@@ -51,7 +51,7 @@ Using JMESPath queries you can do basic filtering as well as more complex scenar
 - `[?ends_with(Title, '1')]` returns the **first and last item**, as the title ends with a **1**
 - `[?contains(Title, 'Demo') && AllowDownloadingNonWebViewableFiles]` returns only the **first item** as it **combines a title filter, and a check on AllowDownloadingNonWebViewableFiles** two filters.
 
-Besides filtering you can also scope what will be returned as a result:
+Besides filtering, you can also scope what will be returned as a result:
 
 - `[*].Title` returns only the Title for all items.
 - `[*].{Title: Title}` returns all items as array with a Title property.
@@ -110,5 +110,65 @@ Some commands in the CLI still return their data wrapped in a `value` object. Yo
 
 !!! important
     All JMESPath queries are case sensitive
+
+## Ordering the dataset
+
+Besides filtering, there are several use cases where it makes sense to order the returned result set. Lets say you want to retrieve SharePoint Online user activity, something that can be achieved using the following command `m365 spo report activityuserdetail --period D7 --output json`. You then might want to filter, but perhaps you want to also sort the result set based on dates or activity. The returned result looks similar to the `json` sample:
+
+```json
+[
+  {
+    "Report Refresh Date": "2021-06-15",
+    "User Principal Name": "garthf@contoso.com",
+    "Is Deleted": "False",
+    "Deleted Date": "",
+    "Last Activity Date": "2020-07-07",
+    "Viewed Or Edited File Count": "0",
+    "Synced File Count": "0",
+    "Shared Internally File Count": "0",
+    "Shared Externally File Count": "0",
+    "Visited Page Count": "0",
+    "Assigned Products": "OFFICE 365 E3",
+    "Report Period": "7"
+  },
+  {
+    "Report Refresh Date": "2021-06-15",
+    "User Principal Name": "sands@contoso.com",
+    "Is Deleted": "False",
+    "Deleted Date": "",
+    "Last Activity Date": "",
+    "Viewed Or Edited File Count": "152",
+    "Synced File Count": "0",
+    "Shared Internally File Count": "0",
+    "Shared Externally File Count": "0",
+    "Visited Page Count": "0",
+    "Assigned Products": "OFFICE 365 E3",
+    "Report Period": "7"
+  },
+  {
+    "Report Refresh Date": "2021-06-15",
+    "User Principal Name": "janets@contoso.com",
+    "Is Deleted": "True",
+    "Deleted Date": "2021-05-15",
+    "Last Activity Date": "",
+    "Viewed Or Edited File Count": "0",
+    "Synced File Count": "0",
+    "Shared Internally File Count": "0",
+    "Shared Externally File Count": "0",
+    "Visited Page Count": "0",
+    "Assigned Products": "OFFICE 365 E3",
+    "Report Period": "7"
+  }
+]
+```
+
+- `sort_by(@, &"Last Activity Date")` would return the result set with the first **Last Activity Date** on top. That means empty dates first.
+- `reverse(sort_by(@, &"Last Activity Date"))` returns the result in reversed order, it thus shows the most recent last activity date on top.
+- `reverse(sort_by(@, &"Viewed Or Edited File Count"))` return the user with the most edited items on top.
+- `reverse(sort_by(@, &"Viewed Or Edited File Count"))[*]."User Principal Name` would sort and only return the **User Principal Name** property. The result is sorted to show the username ordered by the most edited files on top.
+- `reverse(sort_by(@, &"Viewed Or Edited File Count")) | [0]."User Principal Name"` would sort and return the **User Principal Name** for the user with the most edited files. It thus only returns one name.
+- `reverse(sort_by(@, &"Viewed Or Edited File Count")) | [?"Is Deleted" == 'False']."User Principal Name"` sorts by then **Viewed Or Edited File Count**, then filters out deleted users and finally returns the **User Principal Name**
+
+Combining sorting and filtering makes for a powerful cross-platform way of presenting your data. You are not dependent on `PowerShell` or `Bash` to get the result you are looking for.
 
 For complete list of filter options check out the [JMESPath Examples](https://jmespath.org/examples.html).

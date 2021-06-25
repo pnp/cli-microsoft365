@@ -23,9 +23,6 @@ m365 teams user app remove [options]
 
 ## Remarks
 
-!!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
-
 The `appId` has to be the id of the app instance installed for the user.
 Do not use the ID from the manifest of the zip app package or the id from the Microsoft Teams App Catalog.
 
