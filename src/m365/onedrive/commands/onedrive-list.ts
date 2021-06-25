@@ -7,7 +7,7 @@ import { SPOSitePropertiesEnumerable } from "../../spo/commands/site/SPOSiteProp
 import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from "../../spo/spo";
 import commands from "../commands";
 
-class OnedriveListCommand extends SpoCommand{
+class OnedriveListCommand extends SpoCommand {
 
   public get name(): string {
     return commands.LIST;
@@ -24,7 +24,7 @@ class OnedriveListCommand extends SpoCommand{
   public commandAction(logger: Logger, args: any, cb: (err?: any) => void): void {
 
     let spoAdminUrl: string = '';
-    
+
     this
       .getSpoAdminUrl(logger, this.debug)
       .then((_spoAdminUrl: string): Promise<ContextInfo> => {
@@ -55,8 +55,8 @@ class OnedriveListCommand extends SpoCommand{
           return;
         }
         else {
-          const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
-          logger.log(sites._Child_Items_);
+          const onedriveSites: SPOSitePropertiesEnumerable = json[json.length - 1];
+          logger.log(onedriveSites._Child_Items_);
         }
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
