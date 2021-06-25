@@ -23,7 +23,7 @@ class TodoListListCommand extends GraphItemsListCommand<ToDoList> {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     this
-      .getAllItems(`${this.resource}/beta/me/todo/lists`, logger, true)
+      .getAllItems(`${this.resource}/v1.0/me/todo/lists`, logger, true)
       .then((): void => {
         logger.log(this.items);
         cb();

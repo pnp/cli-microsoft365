@@ -16,6 +16,7 @@ interface CommandArgs {
 export interface Options extends GlobalOptions {
   url: string;
   title?: string;
+  description?: string;
   sharing?: string;
   resourceQuota?: string | number;
   resourceQuotaWarningLevel?: string | number;
@@ -45,6 +46,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.title = typeof args.options.title !== 'undefined';
+    telemetryProps.description = typeof args.options.description !== 'undefined';
     telemetryProps.sharing = args.options.sharing;
     telemetryProps.resourceQuota = typeof args.options.resourceQuota !== 'undefined';
     telemetryProps.resourceQuotaWarningLevel = typeof args.options.resourceQuotaWarningLevel !== 'undefined';
@@ -170,9 +172,7 @@ class SpoSiteClassicSetCommand extends SpoCommand {
           }
         });
       })
-      .then((): Promise<FormDigestInfo> => {
-        return this.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug);
-      })
+      .then(_ => this.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug))
       .then((res: FormDigestInfo): Promise<void> => {
         this.context = res;
         return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
@@ -190,6 +190,31 @@ class SpoSiteClassicSetCommand extends SpoCommand {
               reject(err);
             });
         });
+      })
+      .then(_ => this.ensureFormDigest(this.spoAdminUrl as string, logger, this.context, this.debug))
+      .then((res: FormDigestInfo): Promise<void> => {
+        this.context = res;
+
+        if (!args.options.description) {
+          return Promise.resolve(undefined as any);
+        }
+
+        const requestOptions: any = {
+          url: `${args.options.url}/_api/web`,
+          headers: {
+            'IF-MATCH': '*',
+            'Accept': 'application/json;odata=nometadata',
+            'content-type': 'application/json;odata=nometadata',
+            'X-RequestDigest': this.context.FormDigestValue,
+            'X-HTTP-Method': 'MERGE'
+          },
+          data: {
+            Description: args.options.description
+          },
+          json: true
+        };
+
+        return request.post(requestOptions);
       })
       .then((): Promise<string> => {
         if (!args.options.lockState) {
@@ -273,6 +298,9 @@ class SpoSiteClassicSetCommand extends SpoCommand {
       },
       {
         option: '-t, --title [title]'
+      },
+      {
+        option: '-d, --description [description]'
       },
       {
         option: '--sharing [sharing]',

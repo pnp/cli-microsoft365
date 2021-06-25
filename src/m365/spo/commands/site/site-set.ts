@@ -30,6 +30,7 @@ export interface Options extends GlobalOptions {
   shareByEmailEnabled?: string;
   siteDesignId?: string;
   title?: string;
+  description?: string;
   url: string;
   sharingCapability?: string;
   siteLogoUrl?: string;
@@ -56,6 +57,7 @@ class SpoSiteSetCommand extends SpoCommand {
     telemetryProps.owners = typeof args.options.owners !== 'undefined';
     telemetryProps.shareByEmailEnabled = args.options.shareByEmailEnabled;
     telemetryProps.title = typeof args.options.title === 'string';
+    telemetryProps.description = typeof args.options.description === 'string';
     telemetryProps.siteDesignId = typeof args.options.siteDesignId !== undefined;
     telemetryProps.sharingCapabilities = args.options.sharingCapability;
     telemetryProps.siteLogoUrl = typeof args.options.siteLogoUrl !== 'undefined';
@@ -125,24 +127,28 @@ class SpoSiteSetCommand extends SpoCommand {
     }
 
     if (!args.options.title &&
-      !args.options.owners) {
+      !args.options.owners &&
+      !args.options.description) {
       return Promise.resolve();
     }
 
     const options: SpoSiteClassicSetCommandOptions = {
       url: args.options.url,
       title: args.options.title,
+      description: args.options.description,
       owners: args.options.owners,
       wait: true,
       debug: this.debug,
       verbose: this.verbose
     };
+
     return Cli.executeCommand(spoSiteClassicSetCommand as Command, { options: { ...options, _: [] } });
   }
 
   private updateGroupifiedSite(logger: Logger, args: CommandArgs): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       if (typeof args.options.title === 'undefined' &&
+        typeof args.options.description === 'undefined' &&
         typeof args.options.isPublic === 'undefined' &&
         typeof args.options.owners === 'undefined') {
         return resolve();
@@ -189,6 +195,10 @@ class SpoSiteSetCommand extends SpoCommand {
         promises.push(Cli.executeCommand(aadO365GroupSetCommand as Command, { options: { ...commandOptions, _: [] } }));
       }
 
+      if (args.options.description) {
+        promises.push(this.setGroupifiedSiteDescription(args.options.description));
+      }
+
       promises.push(this.setGroupifiedSiteOwners(logger, args));
 
       Promise
@@ -199,6 +209,20 @@ class SpoSiteSetCommand extends SpoCommand {
           reject(error);
         });
     });
+  }
+
+  private setGroupifiedSiteDescription(description: string): Promise<void> {
+    const requestOptions: any = {
+      url: `https://graph.microsoft.com/v1.0/groups/${this.groupId}`,
+      headers: {
+        'content-type': 'application/json;odata.metadata=none'
+      },
+      data: {
+        description: description
+      }
+    };
+
+    return request.patch(requestOptions);
   }
 
   private setGroupifiedSiteOwners(logger: Logger, args: CommandArgs): Promise<void> {
@@ -441,6 +465,9 @@ class SpoSiteSetCommand extends SpoCommand {
         option: '--title [title]'
       },
       {
+        option: '--description [description]'
+      },
+      {
         option: '--siteLogoUrl [siteLogoUrl]'
       },
       {
@@ -462,6 +489,7 @@ class SpoSiteSetCommand extends SpoCommand {
     if (typeof args.options.classification === 'undefined' &&
       typeof args.options.disableFlows === 'undefined' &&
       typeof args.options.title === 'undefined' &&
+      typeof args.options.description === 'undefined' &&
       typeof args.options.isPublic === 'undefined' &&
       typeof args.options.owners === 'undefined' &&
       typeof args.options.shareByEmailEnabled === 'undefined' &&

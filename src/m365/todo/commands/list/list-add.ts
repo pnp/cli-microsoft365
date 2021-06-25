@@ -30,7 +30,7 @@ class TodoListAddCommand extends GraphCommand {
     };
 
     const requestOptions: any = {
-      url: `${this.resource}/beta/me/todo/lists`,
+      url: `${this.resource}/v1.0/me/todo/lists`,
       headers: {
         accept: 'application/json;odata.metadata=none',
         'content-type': 'application/json'
