@@ -57,6 +57,16 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
     assert.strictEqual(command.name.startsWith(commands.O365GROUP_RECYCLEBINITEM_RESTORE), true);
   });
 
+  it('defines alias', () => {
+    const alias = command.alias();
+    assert.notStrictEqual(typeof alias, 'undefined');
+  });
+
+  it('defines correct alias', () => {
+    const alias = command.alias();
+    assert.strictEqual((alias && alias.indexOf(commands.O365GROUP_RESTORE) > -1), true);
+  });
+
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });

@@ -25,6 +25,10 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
     return 'Restores a deleted Microsoft 365 Group';
   }
 
+  public alias(): string[] | undefined {
+    return [commands.O365GROUP_RESTORE];
+  }
+
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.id = (!(!args.options.id)).toString();
@@ -39,7 +43,7 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/directory/deleteditems/${args.options.id}/restore`,
       headers: {
-        'Content-type': 'application/json'
+        'Content-type': 'application/json;odata.metadata=none'
       }
     };
 
