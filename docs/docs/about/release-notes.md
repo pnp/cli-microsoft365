@@ -6,6 +6,7 @@
 
 **Azure Active Directory:**
 
+- [aad app role delete](../cmd/aad/app/app-role-delete.md) - deletes role from the specified Azure AD app registration [#2150](https://github.com/pnp/cli-microsoft365/issues/2150)
 - [aad app set](../cmd/aad/app/app-set.md) - updates Azure AD app registration [#2448](https://github.com/pnp/cli-microsoft365/issues/2448)
 - [aad o365group recyclebinitem clear](../cmd/aad/o365group/o365group-recyclebinitem-clear.md) - clears Microsoft 365 Groups from the recycle bin in the current tenant [#2033](https://github.com/pnp/cli-microsoft365/issues/2033)
 
