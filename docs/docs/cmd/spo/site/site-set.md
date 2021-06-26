@@ -34,6 +34,9 @@ m365 spo site set [options]
 `--title [title]`
 : The new title for the site collection
 
+`--description [description]`
+: The site description
+
 `--sharingCapability [sharingCapability]`
 : The sharing capability for the site. Allowed values:  `Disabled`, `ExternalUserSharingOnly`, `ExternalUserAndGuestSharing`, `ExistingExternalUserSharingOnly`.
 
@@ -101,6 +104,12 @@ Update site collection's title
 
 ```sh
 m365 spo site set --url https://contoso.sharepoint.com/sites/sales --title "My new site"
+```
+
+Update site collection's description
+
+```sh
+m365 spo site set --url https://contoso.sharepoint.com/sites/sales --description "my description"
 ```
 
 Restrict external sharing to already available external users only

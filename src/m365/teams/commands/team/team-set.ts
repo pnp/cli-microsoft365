@@ -70,7 +70,7 @@ class TeamsTeamSetCommand extends GraphCommand {
     const data: any = this.mapRequestBody(args.options);
 
     const requestOptions: any = {
-      url: `${this.resource}/beta/groups/${encodeURIComponent(args.options.teamId)}`,
+      url: `${this.resource}/v1.0/groups/${encodeURIComponent(args.options.teamId)}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

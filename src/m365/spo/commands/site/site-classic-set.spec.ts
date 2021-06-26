@@ -107,6 +107,31 @@ describe(commands.SITE_CLASSIC_SET, () => {
     });
   });
 
+  it('updates site description.', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/team/_api/web`) > -1) {
+        if (opts.headers &&
+          opts.headers['X-RequestDigest'] === 'abc' &&
+          opts.headers['X-HTTP-Method'] === 'MERGE' &&
+          JSON.stringify(opts.data) === JSON.stringify({ Description: 'New description' })) {
+          return Promise.resolve();
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, url: 'https://contoso.sharepoint.com/sites/team', description: 'New description' } }, (err) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('updates site title. doesn\'t wait for completion (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
