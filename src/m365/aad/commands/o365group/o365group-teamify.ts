@@ -44,7 +44,7 @@ class AadO365GroupTeamifyCommand extends GraphCommand {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/groups/${encodeURIComponent(args.options.groupId)}/team`,
       headers: {
-        accept: 'application/json'
+        accept: 'application/json;odata.metadata=none'
       },
       data: data,
       responseType: 'json'
