@@ -52,12 +52,15 @@ class TeamsChannelGetCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: [{ id: string }] }>(requestOptions)
+      .get<{ value: [{ id: string, resourceProvisioningOptions: string[] }] }>(requestOptions)
       .then(response => {
-        const groupItem: { id: string } | undefined = response.value[0];
+        const groupItem: { id: string, resourceProvisioningOptions: string[] } | undefined = response.value[0];
 
         if (!groupItem) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
+        }
+        else if (groupItem && groupItem.resourceProvisioningOptions.indexOf("Team") === -1) {
+          return Promise.reject(`The specified team does not exist in the Microsoft Teams Team`);
         }
 
         if (response.value.length > 1) {
