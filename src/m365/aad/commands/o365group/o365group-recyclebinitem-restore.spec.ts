@@ -55,6 +55,7 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
 
   it('has correct name', () => {
     assert.strictEqual(command.name.startsWith(commands.O365GROUP_RECYCLEBINITEM_RESTORE), true);
+<<<<<<< HEAD:src/m365/aad/commands/o365group/o365group-recyclebinitem-restore.spec.ts
   });
 
   it('defines alias', () => {
@@ -65,6 +66,8 @@ describe(commands.O365GROUP_RECYCLEBINITEM_RESTORE, () => {
   it('defines correct alias', () => {
     const alias = command.alias();
     assert.strictEqual((alias && alias.indexOf(commands.O365GROUP_RESTORE) > -1), true);
+=======
+>>>>>>> 77bc1e70642158a67473eaa7a076169c77015fc1:src/m365/aad/commands/o365group/o365group-recyclebinitem-restore.spec.ts
   });
 
   it('has a description', () => {

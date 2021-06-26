@@ -29,8 +29,12 @@ export default {
   O365GROUP_REPORT_ACTIVITYDETAIL: `${prefix} o365group report activitydetail`,
   O365GROUP_REPORT_ACTIVITYFILECOUNTS: `${prefix} o365group report activityfilecounts`,
   O365GROUP_REPORT_ACTIVITYGROUPCOUNTS: `${prefix} o365group report activitygroupcounts`,
+<<<<<<< HEAD
   O365GROUP_REPORT_ACTIVITYSTORAGE: `${prefix} o365group report activitystorage`,
   O365GROUP_RESTORE: `${prefix} o365group restore`,  
+=======
+  O365GROUP_REPORT_ACTIVITYSTORAGE: `${prefix} o365group report activitystorage`,  
+>>>>>>> 77bc1e70642158a67473eaa7a076169c77015fc1
   O365GROUP_USER_ADD: `${prefix} o365group user add`,
   O365GROUP_USER_LIST: `${prefix} o365group user list`,
   O365GROUP_USER_REMOVE: `${prefix} o365group user remove`,

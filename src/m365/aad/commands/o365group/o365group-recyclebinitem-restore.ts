@@ -43,7 +43,11 @@ class AadO365GroupRecycleBinItemRestoreCommand extends GraphCommand {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/directory/deleteditems/${args.options.id}/restore`,
       headers: {
+<<<<<<< HEAD:src/m365/aad/commands/o365group/o365group-recyclebinitem-restore.ts
         'Content-type': 'application/json;odata.metadata=none'
+=======
+        'Content-type': 'application/json'
+>>>>>>> 77bc1e70642158a67473eaa7a076169c77015fc1:src/m365/aad/commands/o365group/o365group-recyclebinitem-restore.ts
       }
     };
 
