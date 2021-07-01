@@ -1,5 +1,17 @@
 # Release notes
 
+## [v3.12.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.12.0)
+
+### New commands
+
+**OneDrive:**
+
+- [onedrive list](../cmd/onedrive/onedrive-list.md) - retrieves a list of OneDrive sites [#2230](https://github.com/pnp/cli-microsoft365/issues/2230)
+
+**Planner:**
+
+- [planner plan list](../cmd/planner/plan/plan-list.md) - returns a list of plans associated with a specified group [#2499](https://github.com/pnp/cli-microsoft365/issues/2499)
+
 ## [v3.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.11.0)
 
 ### New commands
