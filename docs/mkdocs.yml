@@ -135,6 +135,7 @@ nav:
     - Microsoft Planner (planner):
       - bucket:
         - bucket add: 'cmd/planner/bucket/bucket-add.md'
+        - bucket list: 'cmd/planner/bucket/bucket-list.md'
       - plan:
         - plan add: 'cmd/planner/plan/plan-add.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
