@@ -28,7 +28,7 @@ m365 aad user hibp [options]
 
 If the user with the specified user name doesn't involved in any breach, you will get a `Good news — no pwnage found!` message.
 
-If `API Key` is invalid, you will get a `` error.
+If `API Key` is invalid, you will get a `Error: Request failed with status code 401` error.
 
 ## Examples
 
