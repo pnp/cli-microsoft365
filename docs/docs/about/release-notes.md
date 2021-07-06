@@ -11,6 +11,7 @@
 **Planner:**
 
 - [planner bucket add](../cmd/planner/bucket/bucket-add.md) - adds a new Microsoft Planner bucket [#2254](https://github.com/pnp/cli-microsoft365/issues/2254)
+- [planner bucket list](../cmd/planner/bucket/bucket-list.md) - lists the Microsoft Planner buckets in a plan [#2556](https://github.com/pnp/cli-microsoft365/issues/2556)
 - [planner plan list](../cmd/planner/plan/plan-list.md) - returns a list of plans associated with a specified group [#2499](https://github.com/pnp/cli-microsoft365/issues/2499)
 
 ### Changes
@@ -19,6 +20,7 @@
 - updated 'teams user app list' to Graph v1.0 [#2510](https://github.com/pnp/cli-microsoft365/issues/2510)
 - added the 'List failed site designs' sample [#2539](https://github.com/pnp/cli-microsoft365/issues/2539)
 - extended 'spo web get' with groups [#2493](https://github.com/pnp/cli-microsoft365/issues/2493)
+- fixed 'yammer message add' [#2557](https://github.com/pnp/cli-microsoft365/issues/2557)
 
 ## [v3.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.11.0)
 
