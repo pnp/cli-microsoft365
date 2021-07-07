@@ -1,4 +1,5 @@
 import type * as Msal from '@azure/msal-node';
+import { DeviceCodeResponse } from "@azure/msal-common";
 import type * as NodeForge from 'node-forge';
 import { FileTokenStorage } from './auth/FileTokenStorage';
 import { msalCachePlugin } from './auth/msalCachePlugin';
@@ -9,7 +10,6 @@ import { CommandError } from './Command';
 import config from './config';
 import request from './request';
 import { settingsNames } from './settingsNames';
-import * as open from 'open';
 
 export interface Hash<TValue> {
   [key: string]: TValue;
@@ -85,7 +85,6 @@ export enum CertificateType {
 }
 
 export class Auth {
-  private open = open;
   private _authServer: AuthServer | undefined;
   private deviceCodeRequest?: Msal.DeviceCodeRequest;
   private _service: Service;
@@ -342,23 +341,26 @@ export class Auth {
 
     this.deviceCodeRequest = {
       // deviceCodeCallback is called by MSAL which we're not testing
-      /* c8 ignore next 9 */
-      deviceCodeCallback: response => {
-        if (debug) {
-          logger.logToStderr('Response:');
-          logger.logToStderr(response);
-          logger.logToStderr('');
-        }
-
-        logger.log(response.message);
-
-        if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenBrowserOnLogin, false)) {
-          this.open('https://aka.ms/devicelogin');
-        }
-      },
+      /* c8 ignore next 1 */
+      deviceCodeCallback: response => this.getDeviceCodeResponse(response, logger, debug),
       scopes: [`${resource}/.default`]
     };
     return (this.clientApplication as Msal.PublicClientApplication).acquireTokenByDeviceCode(this.deviceCodeRequest) as Promise<AccessToken | null>;
+  }
+
+  public getDeviceCodeResponse(response: DeviceCodeResponse, logger: Logger, debug: boolean): void {
+    if (debug) {
+      logger.logToStderr('Response:');
+      logger.logToStderr(response);
+      logger.logToStderr('');
+    }
+
+    logger.log(response.message);
+
+    if (Cli.getInstance().getSettingWithDefaultValue<boolean>(settingsNames.autoOpenBrowserOnLogin, false)) {
+      const open = require('open') as typeof import('open');
+      open(response.verificationUri);
+    }
   }
 
   private async ensureAccessTokenWithPassword(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
