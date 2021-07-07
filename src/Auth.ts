@@ -10,7 +10,6 @@ import { CommandError } from './Command';
 import config from './config';
 import request from './request';
 import { settingsNames } from './settingsNames';
-import * as open from 'open';
 
 export interface Hash<TValue> {
   [key: string]: TValue;

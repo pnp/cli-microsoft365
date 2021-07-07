@@ -43,7 +43,7 @@ describe('Auth', () => {
   let auth: Auth;
   let cli: Cli;
   let response: DeviceCodeResponse;
-  let openStub: sinon.SinonStub;
+  // let openStub: sinon.SinonStub;
   const resource: string = 'https://contoso.sharepoint.com';
   let loggerSpy: sinon.SinonSpy;
   const logger: Logger = {
@@ -98,7 +98,7 @@ describe('Auth', () => {
       resolve(httpServerResponse);
     });
     loggerSpy = sinon.spy(logger, 'log');
-    openStub = sinon.stub(auth as any, 'open').callsFake(() => { });
+    // openStub = sinon.stub(auth as any, 'open').callsFake(() => { });
   });
 
   afterEach(() => {
@@ -115,8 +115,6 @@ describe('Auth', () => {
       publicApplication.acquireTokenByCode,
       tokenCache.getAllAccounts
     ]);
-
-    openStub.restore();
   });
 
   it('returns existing access token if still valid', (done) => {
@@ -400,7 +398,7 @@ describe('Auth', () => {
 
   it('retrieves access token using device code authentication flow when no refresh token available and no authType specified', (done) => {
     const config = cli.config as Configstore;
-    sinon.stub(config, 'get').callsFake((() => { }) as any);
+    sinon.stub(config, 'get').callsFake((() => 'value'));
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
@@ -438,7 +436,7 @@ describe('Auth', () => {
 
   it('retrieves token using device code authentication flow when authType deviceCode specified', (done) => {
     const config = cli.config as Configstore;
-    sinon.stub(config, 'get').callsFake((() => { }) as any);
+    sinon.stub(config, 'get').callsFake((() => 'value'));
     sinon.stub(auth as any, 'getClientApplication').callsFake(_ => publicApplication);
     sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
     sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
