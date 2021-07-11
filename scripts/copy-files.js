@@ -43,3 +43,10 @@ const paSolutionInitAssetsDir = 'dist/m365/pa/commands/solution/solution-init/as
 mkdirNotExistsSync(paSolutionInitCmdDir);
 mkdirNotExistsSync(paSolutionInitAssetsDir);
 getFilePaths(paSolutionInitAssetsSourceDir).forEach(file => copyFile(file, paSolutionInitAssetsSourceDir, paSolutionInitAssetsDir));
+
+const spfxPackageGenerateAssetsSourceDir = 'src/m365/spfx/commands/package/package-generate/assets';
+const spfxPackageGenerateCmdDir = 'dist/m365/spfx/commands/package/package-generate';
+const spfxPackageGenerateAssetsDir = 'dist/m365/spfx/commands/package/package-generate/assets';
+mkdirNotExistsSync(spfxPackageGenerateCmdDir);
+mkdirNotExistsSync(spfxPackageGenerateAssetsDir);
+getFilePaths(spfxPackageGenerateAssetsSourceDir).forEach(file => copyFile(file, spfxPackageGenerateAssetsSourceDir, spfxPackageGenerateAssetsDir));

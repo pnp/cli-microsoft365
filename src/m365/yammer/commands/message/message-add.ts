@@ -47,7 +47,7 @@ class YammerMessageAddCommand extends YammerCommand {
         'content-type': 'application/json;odata=nometadata'
       },
       responseType: 'json',
-      body: {
+      data: {
         body: args.options.body,
         replied_to_id: args.options.repliedToId,
         direct_to_user_ids: args.options.directToUserIds,
@@ -103,6 +103,12 @@ class YammerMessageAddCommand extends YammerCommand {
 
     if (args.options.repliedToId && typeof args.options.repliedToId !== 'number') {
       return `${args.options.repliedToId} is not a number`;
+    }
+
+    if (args.options.groupId === undefined &&
+      args.options.directToUserIds === undefined &&
+      args.options.repliedToId === undefined) {
+      return "You must either specify groupId, repliedToId or directToUserIds";
     }
 
     return true;

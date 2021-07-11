@@ -276,10 +276,11 @@ export class Cli {
   }
 
   public loadAllCommands(): void {
-    const files: string[] = Cli.readdirR(this.commandsFolder) as string[];
+    const files: string[] = Utils.readdirR(this.commandsFolder) as string[];
 
     files.forEach(file => {
       if (file.indexOf(`${path.sep}commands${path.sep}`) > -1 &&
+        file.indexOf(`${path.sep}assets${path.sep}`) < 0 &&
         file.endsWith('.js') &&
         !file.endsWith('.spec.js')) {
         try {
@@ -354,12 +355,6 @@ export class Cli {
     catch {
       this.loadAllCommands();
     }
-  }
-
-  private static readdirR(dir: string): string | string[] {
-    return fs.statSync(dir).isDirectory()
-      ? Array.prototype.concat(...fs.readdirSync(dir).map(f => Cli.readdirR(path.join(dir, f))))
-      : dir;
   }
 
   private loadCommand(command: Command): void {

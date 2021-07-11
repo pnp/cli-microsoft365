@@ -39,7 +39,7 @@ class TodoListRemoveCommand extends GraphCommand {
       if (args.options.name) {
         // Search list by its name
         const requestOptions: any = {
-          url: `${this.resource}/beta/me/todo/lists?$filter=displayName eq '${escape(args.options.name)}'`,
+          url: `${this.resource}/v1.0/me/todo/lists?$filter=displayName eq '${escape(args.options.name)}'`,
           headers: {
             accept: "application/json;odata.metadata=none"
           },
@@ -61,7 +61,7 @@ class TodoListRemoveCommand extends GraphCommand {
           }
 
           const requestOptions: any = {
-            url: `${this.resource}/beta/me/todo/lists/${listId}`,
+            url: `${this.resource}/v1.0/me/todo/lists/${listId}`,
             headers: {
               accept: "application/json;odata.metadata=none"
             },

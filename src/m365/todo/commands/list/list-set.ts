@@ -34,6 +34,7 @@ class TodoListSetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+    const endpoint: string = `${this.resource}/v1.0`;
     const data: any = {
       displayName: args.options.newName
     };
@@ -46,7 +47,7 @@ class TodoListSetCommand extends GraphCommand {
         }
 
         const requestOptions: any = {
-          url: `${this.resource}/beta/me/todo/lists/${listId}`,
+          url: `${endpoint}/me/todo/lists/${listId}`,
           headers: {
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
@@ -61,12 +62,13 @@ class TodoListSetCommand extends GraphCommand {
   }
 
   private getListId(args: CommandArgs): Promise<string> {
+    const endpoint: string = `${this.resource}/v1.0`;
     if (args.options.id) {
       return Promise.resolve(args.options.id);
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/beta/me/todo/lists?$filter=displayName eq '${escape(args.options.name as string)}'`,
+      url: `${endpoint}/me/todo/lists?$filter=displayName eq '${escape(args.options.name as string)}'`,
       headers: {
         accept: "application/json;odata.metadata=none"
       },

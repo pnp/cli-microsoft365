@@ -60,12 +60,12 @@ describe(commands.LIST_SET, () => {
 
   it('updates a To Do list by ID', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists",
           "value": [
             {
-              "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists/$entity",
+              "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists/$entity",
               "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/hqngw==\"",
               "displayName": "Bar",
               "isOwner": true,
@@ -99,9 +99,9 @@ describe(commands.LIST_SET, () => {
 
   it('updates a To Do list by Name', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'FooList'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'FooList'`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists",
           "value": [
             {
               "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/ZGllw==\"",
@@ -119,12 +119,12 @@ describe(commands.LIST_SET, () => {
     });
 
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists",
           "value": [
             {
-              "@odata.context": "https://graph.microsoft.com/beta/$metadata#lists/$entity",
+              "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#lists/$entity",
               "@odata.etag": "W/\"m1fdwWoFiE2YS9yegTKoYwAA/hqngw==\"",
               "displayName": "foo",
               "isOwner": true,
@@ -158,9 +158,9 @@ describe(commands.LIST_SET, () => {
 
   it('Handles error when List name is not available', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists?$filter=displayName eq 'InvalidFooList'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists?$filter=displayName eq 'InvalidFooList'`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/beta/$metadata#users('8bc5c293-4208-414e-9837-718a0385be6b')/todo/lists",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('8bc5c293-4208-414e-9837-718a0385be6b')/todo/lists",
           "value": []
         });
       }
@@ -191,7 +191,7 @@ describe(commands.LIST_SET, () => {
 
   it('handles error correctly', (done) => {
     sinon.stub(request, 'patch').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/me/todo/lists/AAMkAGI3NDhlZmQzLWQxYjAtNGJjNy04NmYwLWQ0M2IzZTNlMDUwNAAuAAAAAACQ1l2jfH6VSZraktP8Z7auAQCbV93BagWITZhL3J6BMqhjAAD9pHIjAAA=`) {
         return Promise.reject('An error has occurred');
       }
 

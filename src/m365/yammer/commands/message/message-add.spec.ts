@@ -79,8 +79,28 @@ describe(commands.MESSAGE_ADD, () => {
   });
 
   it('has all fields', () => {
-    const actual = command.validate({ options: { body: "test" } });
+    const actual = command.validate({ options: { body: "test", groupId: 1234123 } });
     assert.strictEqual(actual, true);
+  });
+
+  it('has all fields', () => {
+    const actual = command.validate({ options: { body: "test", repliedToId: 1234122 } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('has all fields', () => {
+    const actual = command.validate({ options: { body: "test", directToUserIds: 1234125 } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('has all fields', () => {
+    const actual = command.validate({ options: { body: "test", groupId: 1234123 } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('fails if no groupId, directToUserId, or repliedToId is specified', () => {
+    const actual = command.validate({ options: { body: "test" } });
+    assert.notStrictEqual(actual, true);
   });
 
   it('posts a message', function (done) {
@@ -90,7 +110,7 @@ describe(commands.MESSAGE_ADD, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { body: "send a letter to me", debug: true } } as any, () => {
+    command.action(logger, { options: { body: "send a letter to me", groupId: 13114941440, debug: true } } as any, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 470839661887488);
         done();
@@ -108,7 +128,7 @@ describe(commands.MESSAGE_ADD, () => {
       }
       return Promise.reject('Invalid request');
     });
-    command.action(logger, { options: { body: "send a letter to me", debug: true, output: "json" } } as any, () => {
+    command.action(logger, { options: { body: "send a letter to me", groupId: 13114941440, debug: true, output: "json" } } as any, () => {
       try {
         assert.strictEqual(loggerLogSpy.lastCall.args[0].id, 470839661887488);
         done();

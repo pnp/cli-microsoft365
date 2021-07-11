@@ -38,6 +38,7 @@ const dictionary = [
   'news',
   'oauth2',
   'office365',
+  'one',
   'org',
   'o365',
   'permission',
@@ -95,6 +96,7 @@ module.exports = {
   "ignorePatterns": [
     "**/pcf-init/assets/**",
     "**/solution-init/assets/**",
+    "**/package-generate/assets/**",
     "**/test-projects/**",
     "clientsidepages.ts",
     "*.js"

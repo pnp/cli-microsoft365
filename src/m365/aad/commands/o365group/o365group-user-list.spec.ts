@@ -6,7 +6,6 @@ import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import teamsCommands from '../../../teams/commands';
 import commands from '../../commands';
 const command: Command = require('./o365group-user-list');
 
@@ -54,16 +53,6 @@ describe(commands.O365GROUP_USER_LIST, () => {
 
   it('has correct name', () => {
     assert.strictEqual(command.name.startsWith(commands.O365GROUP_USER_LIST), true);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(teamsCommands.USER_LIST) > -1), true);
   });
 
   it('has a description', () => {
@@ -172,7 +161,10 @@ describe(commands.O365GROUP_USER_LIST, () => {
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
-          "value": [{ "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "userType": "Member" }]
+          "value": [
+            { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" },
+            { "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "userType": "Member" }
+          ]
         });
       }
 
@@ -187,6 +179,12 @@ describe(commands.O365GROUP_USER_LIST, () => {
             "displayName": "Anne Matthews",
             "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
             "userType": "Owner"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000000",
+            "displayName": "Anne Matthews",
+            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
+            "userType": "Member"
           },
           {
             "id": "00000000-0000-0000-0000-000000000001",
@@ -240,7 +238,10 @@ describe(commands.O365GROUP_USER_LIST, () => {
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
-          "value": [{ "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "userType": "Member" }]
+          "value": [
+            { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" },
+            { "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "userType": "Member" }
+          ]
         });
       }
 
@@ -250,6 +251,12 @@ describe(commands.O365GROUP_USER_LIST, () => {
     command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000", role: "Member" } }, () => {
       try {
         assert(loggerLogSpy.calledWith([
+          {
+            "id": "00000000-0000-0000-0000-000000000000",
+            "displayName": "Anne Matthews",
+            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
+            "userType": "Member"
+          },
           {
             "id": "00000000-0000-0000-0000-000000000001",
             "displayName": "Karl Matteson",
@@ -274,7 +281,10 @@ describe(commands.O365GROUP_USER_LIST, () => {
       }
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/00000000-0000-0000-0000-000000000000/members?$select=id,displayName,userPrincipalName,userType`) {
         return Promise.resolve({
-          "value": [{ "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "userType": "Member" }]
+          "value": [
+            { "id": "00000000-0000-0000-0000-000000000000", "displayName": "Anne Matthews", "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com", "userType": "Member" },
+            { "id": "00000000-0000-0000-0000-000000000001", "displayName": "Karl Matteson", "userPrincipalName": "karl.matteson@contoso.onmicrosoft.com", "userType": "Member" }
+          ]
         });
       }
 
@@ -289,6 +299,12 @@ describe(commands.O365GROUP_USER_LIST, () => {
             "displayName": "Anne Matthews",
             "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
             "userType": "Owner"
+          },
+          {
+            "id": "00000000-0000-0000-0000-000000000000",
+            "displayName": "Anne Matthews",
+            "userPrincipalName": "anne.matthews@contoso.onmicrosoft.com",
+            "userType": "Member"
           },
           {
             "id": "00000000-0000-0000-0000-000000000001",

@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><Feature xmlns="http://schemas.microsoft.com/sharepoint/" Title="$webPartFeatureName$" Description="$webPartFeatureDescription$" Id="$webPartId$" Version="1.0.0.0" Scope="Web" Hidden="FALSE"></Feature>

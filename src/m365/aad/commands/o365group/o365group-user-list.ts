@@ -6,7 +6,6 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
-import teamsCommands from '../../../teams/commands';
 import commands from '../../commands';
 import { GroupUser } from './GroupUser';
 
@@ -27,10 +26,6 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
 
   public get description(): string {
     return "Lists users for the specified Microsoft 365 group or Microsoft Teams team";
-  }
-
-  public alias(): string[] | undefined {
-    return [teamsCommands.USER_LIST];
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -55,13 +50,6 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
       })
       .then(
         (): void => {
-          // Filter out duplicate added values for owners (as they are returned as members as well)
-          this.items = this.items.filter((groupUser, index, self) =>
-            index === self.findIndex((t) => (
-              t.id === groupUser.id && t.displayName === groupUser.displayName
-            ))
-          );
-
           if (args.options.role) {
             this.items = this.items.filter(i => i.userType === args.options.role);
           }

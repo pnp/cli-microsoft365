@@ -1,16 +1,40 @@
 # Release notes
 
+## [v3.12.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.12.0)
+
+### New commands
+
+**OneDrive:**
+
+- [onedrive list](../cmd/onedrive/onedrive-list.md) - retrieves a list of OneDrive sites [#2230](https://github.com/pnp/cli-microsoft365/issues/2230)
+
+**Planner:**
+
+- [planner bucket add](../cmd/planner/bucket/bucket-add.md) - adds a new Microsoft Planner bucket [#2254](https://github.com/pnp/cli-microsoft365/issues/2254)
+- [planner bucket list](../cmd/planner/bucket/bucket-list.md) - lists the Microsoft Planner buckets in a plan [#2556](https://github.com/pnp/cli-microsoft365/issues/2556)
+- [planner plan list](../cmd/planner/plan/plan-list.md) - returns a list of plans associated with a specified group [#2499](https://github.com/pnp/cli-microsoft365/issues/2499)
+
+### Changes
+
+- added the 'Add multiple lists in multiple sites' sample [#2562](https://github.com/pnp/cli-microsoft365/pull/2562)
+- updated 'teams user app list' to Graph v1.0 [#2510](https://github.com/pnp/cli-microsoft365/issues/2510)
+- added the 'List failed site designs' sample [#2539](https://github.com/pnp/cli-microsoft365/issues/2539)
+- extended 'spo web get' with groups [#2493](https://github.com/pnp/cli-microsoft365/issues/2493)
+- fixed 'yammer message add' [#2557](https://github.com/pnp/cli-microsoft365/issues/2557)
+
 ## [v3.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.11.0)
 
 ### New commands
 
 **Azure Active Directory:**
 
+- [aad app role delete](../cmd/aad/app/app-role-delete.md) - deletes role from the specified Azure AD app registration [#2150](https://github.com/pnp/cli-microsoft365/issues/2150)
 - [aad app set](../cmd/aad/app/app-set.md) - updates Azure AD app registration [#2448](https://github.com/pnp/cli-microsoft365/issues/2448)
 - [aad o365group recyclebinitem clear](../cmd/aad/o365group/o365group-recyclebinitem-clear.md) - clears Microsoft 365 Groups from the recycle bin in the current tenant [#2033](https://github.com/pnp/cli-microsoft365/issues/2033)
 
 **CLI:**
 
+- [cli config reset](../cmd/cli/config/config-reset.md) - resets the specified CLI configuration option to its default value [#2344](https://github.com/pnp/cli-microsoft365/issues/2344)
 - [cli issue](../cmd/cli/cli-issue.md) - returns, or opens a URL that takes the user to the right place in the CLI GitHub repo to create a new issue reporting bug, feedback, ideas, etc. [#1490](https://github.com/pnp/cli-microsoft365/issues/1490)
 
 **Microsoft 365:**
@@ -18,6 +42,10 @@
 - [tenant report office365activationcounts](../cmd/tenant/report/report-office365activationcounts.md) - gets the count of Microsoft 365 activations on desktops and devices [#2257](https://github.com/pnp/cli-microsoft365/issues/2257)
 - [tenant report office365activationsusercounts](../cmd/tenant/report/report-office365activationsusercounts.md) - gets the count of users that are enabled and those that have activated the Office subscription on desktop or devices or shared computers [#2258](https://github.com/pnp/cli-microsoft365/issues/2258)
 - [tenant report office365activationsuserdetail](../cmd/tenant/report/report-office365activationsuserdetail.md) - Get details about users who have activated Microsoft 365 [#2256](https://github.com/pnp/cli-microsoft365/issues/2256)
+
+**SharePoint Framework:**
+
+- [spfx package generate](../cmd/spfx/package/package-generate.md) - generates SharePoint Framework solution package with a no-framework web part rendering the specified HTML snippet [#2367](https://github.com/pnp/cli-microsoft365/issues/2367)
 
 ### Changes
 
@@ -34,6 +62,25 @@
 - extended 'spo file list' with the `recursive` option [#2376](https://github.com/pnp/cli-microsoft365/issues/2376)
 - added the Get-SPOUser CLI equivalents to the docs [#2485](https://github.com/pnp/cli-microsoft365/issues/2485)
 - removed the deprecated Get-TeamHelp cmdlet from the docs [#2486](https://github.com/pnp/cli-microsoft365/issues/2486)
+- added the Remove-PowerApp CLI equivalent to the docs [#2491](https://github.com/pnp/cli-microsoft365/issues/2491)
+- excluded /assets/ path from loading commands [#2512](https://github.com/pnp/cli-microsoft365/issues/2512)
+- fixed the 'o365group user list' command [#2374](https://github.com/pnp/cli-microsoft365/issues/2374)
+- added the 'Remove pending SharePoint API permission requests' sample script [#2478](https://github.com/pnp/cli-microsoft365/issues/2478)
+- added the 'Remove SharePoint API permissions' sample script [#2487](https://github.com/pnp/cli-microsoft365/issues/2487)
+- extended 'pa app get' to allow retrieving apps by their display name [#2174](https://github.com/pnp/cli-microsoft365/issues/2174)
+- removed double `JSON.stringify` [#2534](https://github.com/pnp/cli-microsoft365/issues/2534)
+- updated sample and removes double / [#2449](https://github.com/pnp/cli-microsoft365/issues/2449)
+- updated 'todo list add' to Graph v1.0 [#2515](https://github.com/pnp/cli-microsoft365/issues/2515)
+- updated 'todo list list' to Graph v1.0 [#2516](https://github.com/pnp/cli-microsoft365/issues/2516)
+- updated 'todo list remove' to Graph v1.0 [#2517](https://github.com/pnp/cli-microsoft365/issues/2517)
+- updated 'todo list set' to Graph v1.0 [#2518](https://github.com/pnp/cli-microsoft365/issues/2518)
+- updated 'teams user app remove' to Graph v1.0 [#2514](https://github.com/pnp/cli-microsoft365/issues/2514)
+- updated 'teams user app add' to Graph v1.0 [#2513](https://github.com/pnp/cli-microsoft365/issues/2513)
+- updated 'teams team set' to Graph v1.0 [#2511](https://github.com/pnp/cli-microsoft365/issues/2511)
+- added documentation for JMESPath sort [#2536](https://github.com/pnp/cli-microsoft365/issues/2536)
+- updated 'teams message reply list' to Graph v1.0 [#2509](https://github.com/pnp/cli-microsoft365/issues/2509)
+- added remarks to 'spo theme set' docs [#1633](https://github.com/pnp/cli-microsoft365/issues/1633)
+- extended 'spo site set' and 'spo site classic set' with description [#2334](https://github.com/pnp/cli-microsoft365/issues/2334)
 
 ## [v3.10.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.10.0)
 
