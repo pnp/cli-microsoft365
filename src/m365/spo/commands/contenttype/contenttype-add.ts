@@ -1,7 +1,7 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, { CommandError, CommandErrorWithOutput, CommandOption, CommandTypes } from '../../../../Command';
 import config from '../../../../config';
-import GlobalOptions from '../../../../GlobalOptions';
+import GlobalOptions, { Output } from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
@@ -91,8 +91,12 @@ class SpoContentTypeAddCommand extends SpoCommand {
             if (this.debug) {
               logger.logToStderr(res.stderr);
             }
+            let result = res.stdout;
+            if (options.output === Output[Output.json]) {
+              result = JSON.parse(result);
+            }
 
-            logger.log(res.stdout);
+            logger.log(result);
             cb();
           }, (err: CommandErrorWithOutput) => {
             cb(err.error);
