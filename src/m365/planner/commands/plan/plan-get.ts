@@ -66,12 +66,13 @@ class PlannerPlanGetCommand extends GraphCommand {
         })
         .then((res: any): void => {
           const filteredPlan = res.value.filter((obj: any) => obj.title === args.options.title);
-          logger.log(filteredPlan);
+          if (filteredPlan && filteredPlan.length > 0 ) {
+            logger.log(filteredPlan); 
+          }
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
     }
   }
-
 
   private getGroupId(args: CommandArgs): Promise<string> {
     if (args.options.ownerGroupId) {
