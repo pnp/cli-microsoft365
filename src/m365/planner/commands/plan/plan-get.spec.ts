@@ -147,8 +147,6 @@ describe(commands.PLAN_GET, () => {
   it('correctly get planner plan with given id', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/opb7bchfZUiFbVWEPL7jPGUABW7f`) {
-      // "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity",
-      //  "@odata.etag": "W/\"BzEtUGxmbiAgQEBTQEBAQEBVQEBAQEBASCc\"",
         return Promise.resolve({
           "createdDateTime": "2021-03-10T17:39:43.1045549Z",
           "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",

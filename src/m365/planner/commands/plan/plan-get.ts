@@ -65,9 +65,9 @@ class PlannerPlanGetCommand extends GraphCommand {
           return request.get(requestOptions);
         })
         .then((res: any): void => {
-          const filteredPlan = res.value.filter((obj: any) => obj.title === args.options.title);
-          if (filteredPlan && filteredPlan.length > 0 ) {
-            logger.log(filteredPlan); 
+          const filteredPlan = res.value.filter((plan: any) => plan.title === args.options.title);
+          if (filteredPlan && filteredPlan.length > 0) {
+            logger.log(filteredPlan);
           }
           cb();
         }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
@@ -148,10 +148,6 @@ class PlannerPlanGetCommand extends GraphCommand {
     if (args.options.title && args.options.ownerGroupId && args.options.ownerGroupName) {
       return 'Specify either ownerGroupId or ownerGroupName but not both';
     }
-
-    /*if (args.options.id && !Utils.isValidGuid(args.options.id as string)) {
-      return `${args.options.id} is not a valid GUID`;
-    }*/
 
     if (args.options.ownerGroupId && !Utils.isValidGuid(args.options.ownerGroupId as string)) {
       return `${args.options.ownerGroupId} is not a valid GUID`;
