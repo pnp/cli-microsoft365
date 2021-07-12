@@ -14,6 +14,7 @@ interface CommandArgs {
 
 export interface Options extends GlobalOptions {
   webUrl: string;
+  withGroups?: boolean;
 }
 
 class SpoWebGetCommand extends SpoCommand {
@@ -25,9 +26,19 @@ class SpoWebGetCommand extends SpoCommand {
     return 'Retrieve information about the specified site';
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.withGroups = typeof args.options.withGroups !== 'undefined';
+    return telemetryProps;
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    let url: string = `${args.options.webUrl}/_api/web`;
+    if (args.options.withGroups) {
+      url += '?$expand=AssociatedMemberGroup,AssociatedOwnerGroup,AssociatedVisitorGroup';
+    }
     const requestOptions: any = {
-      url: `${args.options.webUrl}/_api/web/`,
+      url,
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -46,6 +57,9 @@ class SpoWebGetCommand extends SpoCommand {
     const options: CommandOption[] = [
       {
         option: '-u, --webUrl <webUrl>'
+      },
+      {
+        option: '--withGroups'
       }
     ];
 
