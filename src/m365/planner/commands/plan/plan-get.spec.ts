@@ -105,6 +105,7 @@ describe(commands.PLAN_GET, () => {
   it('fails validation if the ownerGroupId is not a valid guid.', (done) => {
     const actual = command.validate({
       options: {
+        title: 'MyPlan',
         ownerGroupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
@@ -115,7 +116,7 @@ describe(commands.PLAN_GET, () => {
   it('passes validation when id specified', (done) => {
     const actual = command.validate({
       options: {
-        id: 'opb7bchfZUiFbVWEPL7jPGUABW7f',
+        id: 'opb7bchfZUiFbVWEPL7jPGUABW7f'
       }
     });
     assert.strictEqual(actual, true);
