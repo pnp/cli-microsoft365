@@ -13,7 +13,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  environment: string;dasdsa
+  environment: string;
   flow: string;
   name: string;
 }
