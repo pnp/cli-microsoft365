@@ -2394,6 +2394,62 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
   //#endregion
 
+  //#region 1.12.1
+  it('e2e: shows correct number of findings for upgrading application customizer 1.12.1 project to 1.13.0-beta.13', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1121-applicationcustomizer'));
+
+    command.action(logger, { options: { toVersion: '1.13.0-beta.13', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 15);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.12.1 project to 1.13.0-beta.13', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1121-fieldcustomizer-react'));
+
+    command.action(logger, { options: { toVersion: '1.13.0-beta.13', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 14);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.12.1 project to 1.13.0-beta.13', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1121-listviewcommandset'));
+
+    command.action(logger, { options: { toVersion: '1.13.0-beta.13', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 15);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.12.1 project to 1.13.0-beta.13', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1121-webpart-nolib'));
+
+    command.action(logger, { options: { toVersion: '1.13.0-beta.13', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 17);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.12.1 project to 1.13.0-beta.13', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1121-webpart-react'));
+
+    command.action(logger, { options: { toVersion: '1.13.0-beta.13', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 17);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.12.1 project to 1.13.0-beta.13', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1121-webpart-optionaldeps'));
+
+    command.action(logger, { options: { toVersion: '1.13.0-beta.13', output: 'json' } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 27);
+    });
+  });
+  //#endregion
+
   //#region superseded rules
   it('ignores superseded findings (1.1.0 > 1.2.0)', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-110-webpart-react'));
@@ -2444,7 +2500,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1120-webpart-nolib'));
 
     command.action(logger, { options: { preview: true } } as any, () => {
-      assert(log[0].indexOf('1.12.1') > -1);
+      assert(log[0].indexOf('1.13.0-beta.13') > -1);
     });
   });
 

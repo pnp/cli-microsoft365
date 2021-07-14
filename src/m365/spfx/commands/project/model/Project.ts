@@ -1,4 +1,5 @@
 import { ConfigJson, CopyAssetsJson, DeployAzureStorageJson, Gitignore, GulpfileJs, Manifest, PackageJson, PackageSolutionJson, ScssFile, ServeJson, TsConfigJson, TsFile, TsLintJson, VsCode, WriteManifestsJson, YoRcJson } from ".";
+import { Npmignore } from "./Npmignore";
 
 export interface Project {
   path: string;
@@ -9,6 +10,7 @@ export interface Project {
   gitignore?: Gitignore;
   gulpfileJs?: GulpfileJs;
   manifests?: Manifest[];
+  npmignore?: Npmignore;
   packageJson?: PackageJson;
   packageSolutionJson?: PackageSolutionJson;
   serveJson?: ServeJson;

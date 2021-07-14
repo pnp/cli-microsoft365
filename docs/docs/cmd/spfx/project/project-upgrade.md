@@ -32,7 +32,7 @@ m365 spfx project upgrade [options]
 
 ## Remarks
 
-The `spfx project upgrade` command helps you upgrade your SharePoint Framework project to the specified version. If no version is specified, the command will upgrade to the latest version of the SharePoint Framework it supports (v1.12.1).
+The `spfx project upgrade` command helps you upgrade your SharePoint Framework project to the specified version. If no version is specified, the command will upgrade to the latest version of the SharePoint Framework it supports (v1.12.1). If you specify the `preview` option without a specific version, the command will upgrade your project to the latest preview version v1.13.0-beta.13.
 
 This command doesn't change your project files. Instead, it gives you a report with all steps necessary to upgrade your project to the specified version of the SharePoint Framework. Changing project files is error-prone, especially when it comes to updating your solution's code. This is why at this moment, this command produces a report that you can use yourself to perform the necessary updates and verify that everything is working as expected.
 
@@ -56,7 +56,7 @@ Get instructions to upgrade the current SharePoint Framework project to the late
 m365 spfx project upgrade --preview
 ```
 
-Get instructions to upgrade the current SharePoint Framework project to the latest preview version
+Get instructions to upgrade the current SharePoint Framework project to the specified preview version
 
 ```sh
 m365 spfx project upgrade --toVersion 1.12.1-rc.0

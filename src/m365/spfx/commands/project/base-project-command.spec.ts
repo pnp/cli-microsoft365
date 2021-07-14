@@ -52,4 +52,29 @@ describe('BaseProjectCommand', () => {
     const project = command.getProjectPublic();
     assert.notStrictEqual(typeof project, 'undefined');
   });
+
+  it(`doesn't fail if reading .npmignore file contents failed`, () => {
+    const readFileSyncOriginal = fs.readFileSync;
+    const existsSyncOriginal = fs.existsSync;
+    sinon.stub(fs, 'existsSync').callsFake(path => {
+      if (path.toString().indexOf('.npmignore') > -1) {
+        return true;
+      }
+      else {
+        return existsSyncOriginal(path);
+      }
+    });
+    sinon.stub(fs, 'readFileSync').callsFake((path, encoding) => {
+      if (path.toString().indexOf('.npmignore') > -1) {
+        throw new Error();
+      }
+      else {
+        return readFileSyncOriginal(path, encoding);
+      }
+    });
+
+    const command = new MockCommand();
+    const project = command.getProjectPublic();
+    assert.notStrictEqual(typeof project, 'undefined');
+  });
 });

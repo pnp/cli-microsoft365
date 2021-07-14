@@ -23,6 +23,16 @@ export abstract class BaseProjectCommand extends AnonymousCommand {
       catch { }
     }
 
+    const npmignorePath: string = path.join(projectRootPath, '.npmignore');
+    if (fs.existsSync(npmignorePath)) {
+      try {
+        project.npmignore = {
+          source: fs.readFileSync(npmignorePath, 'utf-8')
+        };
+      }
+      catch { }
+    }
+
     const configJsonPath: string = path.join(projectRootPath, 'config/config.json');
     if (fs.existsSync(configJsonPath)) {
       try {
