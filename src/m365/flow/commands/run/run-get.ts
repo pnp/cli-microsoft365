@@ -28,7 +28,7 @@ class FlowRunGetCommand extends AzmgmtCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['name', 'startTime', 'endTime', 'status', 'triggerName', 'duration', 'runUrl','triggerInformation'];
+    return ['name', 'startTime', 'endTime', 'status', 'triggerName', 'runUrl','triggerInformation'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -51,7 +51,6 @@ class FlowRunGetCommand extends AzmgmtCommand {
         res.endTime = res.properties.endTime || '';
         res.properties = res.properties;
         res.status = res.properties.status;
-        res.duration = (new Date(res.properties.endTime).getTime() - new Date(res.properties.startTime).getTime()).toLocaleString;
         res.runUrl = `https://emea.flow.microsoft.com/manage/environments/${encodeURIComponent(args.options.environment)}/flows/${encodeURIComponent(args.options.flow)}/runs/${encodeURIComponent(args.options.name)}`;
         await fetch( res.properties.trigger.outputsLink.uri)
             .then((response: { text: () => Json; }) => response.text())
