@@ -21,6 +21,8 @@
 - added the 'List failed site designs' sample [#2539](https://github.com/pnp/cli-microsoft365/issues/2539)
 - extended 'spo web get' with groups [#2493](https://github.com/pnp/cli-microsoft365/issues/2493)
 - fixed 'yammer message add' [#2557](https://github.com/pnp/cli-microsoft365/issues/2557)
+- fixed 'spo site set' code coverage [#2586](https://github.com/pnp/cli-microsoft365/issues/2586)
+- updated 'teams channel get' to Graph v1.0 [#2505](https://github.com/pnp/cli-microsoft365/issues/2505)
 
 ## [v3.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.11.0)
 
