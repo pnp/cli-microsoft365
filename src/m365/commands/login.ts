@@ -21,6 +21,7 @@ interface Options extends GlobalOptions {
   thumbprint?: string;
   appId?: string;
   tenant?: string;
+  secret?: string;
 }
 
 class LoginCommand extends Command {
@@ -72,6 +73,10 @@ class LoginCommand extends Command {
           break;        
         case 'browser':
           auth.service.authType = AuthType.Browser;
+          break;
+        case 'secret':
+          auth.service.authType = AuthType.Secret;
+          auth.service.secret = args.options.secret;
           break;
       }
 
@@ -143,6 +148,9 @@ class LoginCommand extends Command {
       },
       {
         option: '--tenant [tenant]'
+      },
+      {
+        option: '--secret [secret]'
       }
     ];
 
@@ -174,6 +182,12 @@ class LoginCommand extends Command {
         if (!fs.existsSync(args.options.certificateFile)) {
           return `File '${args.options.certificateFile}' does not exist`;
         }
+      }
+    }
+
+    if (args.options.authType === 'secret') {
+      if (!args.options.secret) {
+        return 'Required option secret missing';
       }
     }
 
