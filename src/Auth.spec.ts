@@ -2039,4 +2039,43 @@ describe('Auth', () => {
     const actualClientApp = (auth as any).getClientApplication(logger, false);
     assert(actualClientApp instanceof msal.ConfidentialClientApplication);
   });
+
+  it('returns confidential client for secret auth', () => {
+    auth.service.authType = AuthType.Secret;
+    auth.service.secret = 'sOmeToPsecRetValue';
+    const actualClientApp = (auth as any).getClientApplication(logger, false);
+    assert(actualClientApp instanceof msal.ConfidentialClientApplication);
+  });
+  
+  it('retrieves token using client secret flow when authType "secret" specified', (done) => {
+    auth.service.authType = AuthType.Secret;
+    auth.service.secret = "SomeSecretValue";
+
+    let acquireTokenByClientCredentialStub: any;
+    let originalGetConfidentialClient = (auth as any).getConfidentialClient;
+    originalGetConfidentialClient = originalGetConfidentialClient.bind(auth);
+    sinon.stub(auth as any, 'getConfidentialClient').callsFake((logger, debug, thumbprint, cert, clientSecret) => {
+      const confidentialApplication = originalGetConfidentialClient(logger, debug, undefined, undefined, clientSecret);
+      acquireTokenByClientCredentialStub = sinon.stub(confidentialApplication, 'acquireTokenByClientCredential').callsFake(_ => Promise.resolve({
+        expiresOn: new Date(),
+        accessToken: 'acc'
+      } as any));
+      return confidentialApplication;
+    });
+    sinon.stub(tokenCache, 'getAllAccounts').callsFake(() => []);
+    sinon.stub(auth, 'storeConnectionInfo').callsFake(() => Promise.resolve());
+
+    auth.ensureAccessToken(resource, logger).then(() => {
+      try {
+        assert(acquireTokenByClientCredentialStub.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    }, (err) => {
+      done(err);
+    });
+  });
+
 });

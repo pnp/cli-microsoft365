@@ -33,6 +33,7 @@ export class Service {
   authType: AuthType = AuthType.DeviceCode;
   userName?: string;
   password?: string;
+  secret?: string;
   certificateType: CertificateType = CertificateType.Unknown;
   certificate?: string;
   thumbprint?: string;
@@ -71,7 +72,8 @@ export enum AuthType {
   Password,
   Certificate,
   Identity,
-  Browser
+  Browser,
+  Secret
 }
 
 export enum CertificateType {
@@ -171,6 +173,9 @@ export class Auth {
         case AuthType.Browser:
           getTokenPromise = this.ensureAccessTokenWithBrowser.bind(this);
           break;
+        case AuthType.Secret:
+          getTokenPromise = this.ensureAccessTokenWithSecret.bind(this);
+          break;
       }
     }
 
@@ -214,26 +219,34 @@ export class Auth {
       case AuthType.Browser:
         return this.getPublicClient(logger, debug);
       case AuthType.Certificate:
-        return this.getConfidentialClient(logger, debug, this.service.thumbprint as string, this.service.password);
+        return this.getConfidentialClient(logger, debug, this.service.thumbprint as string, this.service.password, undefined);
       case AuthType.Identity:
         // msal-node doesn't support managed identity so we need to do it manually
         return undefined;
+      case AuthType.Secret:
+        return this.getConfidentialClient(logger, debug, undefined, undefined, this.service.secret);
     }
   }
 
-  private getAuthClientConfiguration(logger: Logger, debug: boolean, certificateThumbprint?: string, certificatePrivateKey?: string): Msal.Configuration {
+  private getAuthClientConfiguration(logger: Logger, debug: boolean, certificateThumbprint?: string, certificatePrivateKey?: string, clientSecret?: string): Msal.Configuration {
     const msal: typeof Msal = require('@azure/msal-node');
     const { LogLevel } = msal;
     const cert = !certificateThumbprint ? undefined : {
       thumbprint: certificateThumbprint,
       privateKey: certificatePrivateKey as string
     };
+
+    const config = { 
+      clientId: this.service.appId, 
+      authority: `https://login.microsoftonline.com/${this.service.tenant}` 
+    };
+
+    const authConfig = cert 
+      ? { ...config, clientCertificate: cert } 
+      : { ...config, clientSecret};
+
     return {
-      auth: {
-        clientId: this.service.appId,
-        authority: `https://login.microsoftonline.com/${this.service.tenant}`,
-        clientCertificate: cert
-      },
+      auth: authConfig,
       cache: {
         cachePlugin: msalCachePlugin
       },
@@ -267,11 +280,11 @@ export class Auth {
     return new PublicClientApplication(this.getAuthClientConfiguration(logger, debug));
   }
 
-  private getConfidentialClient(logger: Logger, debug: boolean, certificateThumbprint: string, certificatePrivateKey?: string) {
+  private getConfidentialClient(logger: Logger, debug: boolean, certificateThumbprint?: string, certificatePrivateKey?: string, clientSecret?: string) {
     const msal: typeof Msal = require('@azure/msal-node');
     const { ConfidentialClientApplication } = msal;
 
-    return new ConfidentialClientApplication(this.getAuthClientConfiguration(logger, debug, certificateThumbprint, certificatePrivateKey));
+    return new ConfidentialClientApplication(this.getAuthClientConfiguration(logger, debug, certificateThumbprint, certificatePrivateKey, clientSecret));
   }
 
   private retrieveAuthCodeWithBrowser(resource: string, logger: Logger, debug: boolean): Promise<InteractiveAuthorizationCodeResponse> {
@@ -565,6 +578,13 @@ export class Auth {
         }
       }
     }
+  }
+
+  private async ensureAccessTokenWithSecret(resource: string, logger: Logger, debug: boolean): Promise<AccessToken | null> {
+    this.clientApplication = this.getConfidentialClient(logger, debug, undefined, undefined, this.service.secret);
+    return (this.clientApplication as Msal.ConfidentialClientApplication).acquireTokenByClientCredential({
+      scopes: [`${resource}/.default`]
+    });
   }
 
   private calculateThumbprint(certificate: NodeForge.pki.Certificate): string {

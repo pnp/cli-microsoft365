@@ -11,7 +11,7 @@ m365 login [options]
 ## Options
 
 `-t, --authType [authType]`
-: The type of authentication to use. Allowed values `certificate,deviceCode,password,identity,browser`. Default `deviceCode`
+: The type of authentication to use. Allowed values `certificate,deviceCode,password,identity,browser,secret`. Default `deviceCode`
 
 `-u, --userName [userName]`
 : Name of the user to authenticate. Required when `authType` is set to `password`
@@ -27,6 +27,9 @@ m365 login [options]
 
 `--thumbprint [thumbprint]`
 : Certificate thumbprint. If not specified, and `authType` is set to `certificate`, it will be automatically calculated based on the specified certificate
+
+`-s, --secret [secret]`
+: Client Secret of the Azure AD application to use for authentication. Required when `authType` is set to `secret`.
 
 `--appId [appId]`
 : App ID of the Azure AD application to use for authentication. If not specified, use the app specified in the `CLIMICROSOFT365_AADAPPID` environment variable. If the environment variable is not defined, use the multitenant PnP Management Shell app
@@ -48,7 +51,7 @@ When logging in to Microsoft 365 using the user name and password, next to the a
 
 When logging in to Microsoft 365 using a certificate, the CLI for Microsoft 365 will store the contents of the certificate so that it can automatically re-authenticate if necessary. The contents of the certificate are removed by re-authenticating using the device code or by calling the [logout](logout.md) command.  
 
-To log in to Microsoft 365 using a certificate, you will typically [create a custom Azure AD application](../user-guide/using-own-identity.md). To use this application with the CLI for Microsoft 365, you will set the `CLIMICROSOFT365_AADAPPID` environment variable to the application's ID and the `CLIMICROSOFT365_TENANT` environment variable to the ID of the Azure AD tenant, where you created the Azure AD application. Also, please make sure to read about [the caveats when using the certificate login option](../user-guide/cli-certificate-caveats.md).
+To log in to Microsoft 365 using a certificate or secret, you will typically [create a custom Azure AD application](../user-guide/using-own-identity.md). To use this application with the CLI for Microsoft 365, you will set the `CLIMICROSOFT365_AADAPPID` environment variable to the application's ID and the `CLIMICROSOFT365_TENANT` environment variable to the ID of the Azure AD tenant, where you created the Azure AD application. Also, please make sure to read about [the caveats when using the certificate login option](../user-guide/cli-certificate-caveats.md).
 
 Managed identity in Azure Cloud Shell is the identity of the user. It is neither system- nor user-assigned and it can't be configured. To log in to Microsoft 365 using managed identity in Azure Cloud Shell, set `authType` to `identity` and don't specify the `userName` option.
 
@@ -149,4 +152,10 @@ Log in to Microsoft 365 using the interactive browser authentication. Uses the i
 
 ```sh
 m365 login --authType browser
+```
+
+Log in to Microsoft 365 using a client secret.
+
+```sh
+m365 login --authType secret --secret topSeCr3t@007
 ```

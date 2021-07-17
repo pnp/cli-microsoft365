@@ -182,6 +182,22 @@ describe(commands.LOGIN, () => {
     });
   });
 
+  
+  it('logs in to Microsoft 365 using client secret authType "secret" set', (done) => {
+    sinon.stub(auth, 'ensureAccessToken').callsFake(() => Promise.resolve(''));
+    command.action(logger, { options: { debug: false, authType: 'secret', secret: 'unBrEakaBle@123' } }, () => {
+      try {
+        assert.strictEqual(auth.service.authType, AuthType.Secret, 'Incorrect authType set');
+        assert.strictEqual(auth.service.secret, 'unBrEakaBle@123', 'Incorrect secret set');
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+
   it('supports specifying authType', () => {
     const options = command.options();
     let containsOption = false;
@@ -369,4 +385,10 @@ describe(commands.LOGIN, () => {
       }
     });
   });
+
+  it('fails validation if authType is set to secret and secret option is not specified', () => {
+    const actual = command.validate({ options: { authType: 'secret' } });
+    assert.notStrictEqual(actual, true);
+  });
+
 });

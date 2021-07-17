@@ -98,6 +98,31 @@ openssl pkcs12 -in protected.pfx -out privateKeyWithPassphrase.pem -nodes
 
 At this point the `privateKeyWithPassphrase.pem` file can be used to log in the CLI for Microsoft 365 following the instructions above for logging in using a PEM certificate.
 
+#### Log in using a secret
+
+CLI for Microsoft 365 also supports login using a secret. To use this authentication method, set the `CLIMICROSOFT365_AADAPPID` environment variable to the ID of the Azure AD application that you want to use to authenticate the CLI for Microsoft 365 and the `CLIMICROSOFT365_TENANT` environment variable to the ID of your Azure AD directory. When calling the login command, set the `authType` option to `secret` and specify the client secret value. 
+
+To log in to Microsoft 365 using a secret, execute:
+
+```sh
+m365 login --authType secret --secret topSeCr3t@007
+```
+
+Logging in to Microsoft 365 using a secret is convenient for automation scenarios where you cannot authenticate interactively but also don't want to use credentials.
+
+Because there is no user context when logging in using a secret, you will typically create a new Azure AD application, specific to your organization and grant it the required permissions.
+
+!!! attention
+    You should keep in mind, that because the CLI for Microsoft 365 will be accessing these APIs with app-only context, you need to grant the correct application permissions rather than delegated permissions that would be used in other authentication methods.
+
+Logging in using a secret gives the CLI for Microsoft 365 app-only access to Microsoft 365 services. Not all operations support app-only access so it is possible, that some CLI commands will fail when executed while logged in to Microsoft 365 using a secret.
+
+!!! attention
+    Currently, SharePoint does not support authentication using Azure AD App ID and Secret. CLI for Microsoft 365 commands that call the SharePoint APIs will fail while logged in to Microsoft 365 using a Secret.
+
+!!! attention
+    When logging in to Microsoft 365 using a secret, CLI for Microsoft 365 will persist not only the retrieved access token but also the secret. This is necessary for the CLI to be able to retrieve a new access token in case of the previously retrieved access token expired or has been invalidated.
+
 #### Log in using a browser authentication
 
 Yet another way to log in to Microsoft 365 in the CLI for Microsoft 365 is by using a an interactive browser authentication. To use this authentication method, call the login command with the `authType` option set to `browser`:
