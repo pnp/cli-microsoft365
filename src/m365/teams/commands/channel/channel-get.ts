@@ -44,7 +44,7 @@ class TeamsChannelGetCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -52,11 +52,15 @@ class TeamsChannelGetCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: [{ id: string }] }>(requestOptions)
+      .get<{ value: [{ id: string, resourceProvisioningOptions: string[] }] }>(requestOptions)
       .then(response => {
-        const groupItem: { id: string } | undefined = response.value[0];
+        const groupItem: { id: string, resourceProvisioningOptions: string[] } | undefined = response.value[0];
 
         if (!groupItem) {
+          return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
+        }
+
+        if (groupItem.resourceProvisioningOptions.indexOf('Team') === -1) {
           return Promise.reject(`The specified team does not exist in the Microsoft Teams`);
         }
 

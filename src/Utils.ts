@@ -53,7 +53,7 @@ export default class Utils {
   }
 
   public static isValidTeamsChannelId(guid: string): boolean {
-    const guidRegEx: RegExp = new RegExp(/^19:[0-9a-zA-Z]+@thread\.(skype|tacv2)$/i);
+    const guidRegEx: RegExp = new RegExp(/^19:[0-9a-zA-Z-_]+@thread\.(skype|tacv2)$/i);
 
     return guidRegEx.test(guid);
   }
