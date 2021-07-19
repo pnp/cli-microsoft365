@@ -1,4 +1,4 @@
-import { ChildProcess } from 'node:child_process';
+import { ChildProcess } from 'child_process';
 import * as open from 'open';
 import { Logger } from '../../../cli';
 import {
