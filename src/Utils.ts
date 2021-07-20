@@ -173,56 +173,6 @@ export default class Utils {
     return userName;
   }
 
-  public static getRolesFromAccessToken(accessToken: string): string[] {
-    let roles: string[] = [];
-
-    if (!accessToken || accessToken.length === 0) {
-      return roles;
-    }
-
-    const chunks = accessToken.split('.');
-    if (chunks.length !== 3) {
-      return roles;
-    }
-
-    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
-    try {
-      const token: any = JSON.parse(tokenString);
-      if(token.roles !== undefined){
-        roles = token.roles;
-      }
-    }
-    catch {
-    }
-
-    return roles;
-  }
-
-  public static getScopesFromAccessToken(accessToken: string): string[] {
-    let scopes: string[] = [];
-
-    if (!accessToken || accessToken.length === 0) {
-      return scopes;
-    }
-
-    const chunks = accessToken.split('.');
-    if (chunks.length !== 3) {
-      return scopes;
-    }
-
-    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
-    try {
-      const token: any = JSON.parse(tokenString);
-      if(token.scp?.length > 0){
-        scopes = token.scp.split(' ');
-      }
-    }
-    catch {
-    }
-
-    return scopes;
-  }
-
   /**
    * Returns server relative path.
    * @param webUrl web full or web relative url e.g. https://contoso.sharepoint.com/sites/team1

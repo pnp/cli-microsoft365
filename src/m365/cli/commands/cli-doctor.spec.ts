@@ -40,8 +40,6 @@ describe(commands.DOCTOR, () => {
 
   afterEach(() => {
     Utils.restore([
-      Utils.getRolesFromAccessToken,
-      Utils.getScopesFromAccessToken,
       os.platform,
       os.version,
       os.release,
@@ -65,49 +63,15 @@ describe(commands.DOCTOR, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fetches roles and scopes from access token', (done) => {
-    sinon.stub(auth.service,'accessTokens').value({
-      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."}
-    });
-
-    const getRolesFromAccessTokenSpy = sinon.spy(Utils,'getRolesFromAccessToken');
-    const getScopesFromAccessTokenSpy = sinon.spy(Utils,'getScopesFromAccessToken');
-
-    command.action(logger,{options:{}},() => {
-      try{
-        assert(getRolesFromAccessTokenSpy.called && getScopesFromAccessTokenSpy.called);
-        done();
-      }
-      catch(e){
-        done(e);
-      }
-    });
-  });
-
-  it('fetches roles and scopes from multiple access tokens', (done) => {
-    sinon.stub(auth.service,'accessTokens').value({
-      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."},
-      "https://mydev.sharepoint.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."},
-      "https://something.sharepoint.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."}
-    });
-    
-    const getRolesFromAccessTokenSpy = sinon.spy(Utils,'getRolesFromAccessToken');
-    const getScopesFromAccessTokenSpy = sinon.spy(Utils,'getScopesFromAccessToken');
-    
-    command.action(logger,{options:{}},() => {
-      try{
-        assert(getRolesFromAccessTokenSpy.calledThrice && getScopesFromAccessTokenSpy.calledThrice);
-        done();
-      }
-      catch(e){
-        done(e);
-      }
-    });
-  });
-
   it('retrieves "scopes" in the diagnostic information about the current environment', (done) => {
+    const jwt = JSON.stringify({
+      scp: "AllSites.FullControl AppCatalog.ReadWrite.All"
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
+
     sinon.stub(auth.service,'accessTokens').value({
-      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."}
+      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken}`}
     });
     sinon.stub(os,'platform').returns("win32");
     sinon.stub(os,'version').returns("Windows 10 Pro");
@@ -117,23 +81,68 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
     sinon.stub(auth.service,'tenant').value("common");
     sinon.stub(auth.service,'authType').value(0);
-    
-    sinon.stub(Utils,'getRolesFromAccessToken').returns([]);
-    sinon.stub(Utils,'getScopesFromAccessToken').returns(["AllSites.FullControl","AppCatalog.ReadWrite.All"]);
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
   
     command.action(logger,{options:{}},() => {
       try{
         assert(loggerLogSpy.calledWith({
-          AuthMode: "DeviceCode",
-          CliAadAppId:"31359c7f-bd7e-475c-86db-fdb8c937548e",
-          CliAadAppTenant:"common",
-          CliEnvironment:"",
-          CliVersion: "3.11.0",
-          NodeVersion: "v14.17.0",
-          OS: {"Platform":"win32","Version":"Windows 10 Pro","Release":"10.0.19043"},
-          Roles: [],
-          Scopes: ["AllSites.FullControl","AppCatalog.ReadWrite.All"],
-          Shell: ""
+          authMode: "DeviceCode",
+          cliAadAppId:"31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant:"common",
+          cliEnvironment:"",
+          cliVersion: "3.11.0",
+          nodeVersion: "v14.17.0",
+          os: {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles: [],
+          scopes: ["AllSites.FullControl","AppCatalog.ReadWrite.All"]
+        }));
+        done();
+      }
+      catch(e){
+        done(e);
+      }
+    });
+  });
+
+  it('retrieves "scopes" from multiple access tokens in the diagnostic information about the current environment', (done) => {
+    const jwt1 = JSON.stringify({
+      scp: "AllSites.FullControl AppCatalog.ReadWrite.All"
+    });
+    let jwt64 = Buffer.from(jwt1).toString('base64');
+    const accessToken1 = `abc.${jwt64}.def`;
+
+    const jwt2 = JSON.stringify({
+      scp: "TermStore.Read.All"
+    });
+    jwt64 = Buffer.from(jwt2).toString('base64');
+    const accessToken2 = `abc.${jwt64}.def`;
+
+    sinon.stub(auth.service,'accessTokens').value({
+      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken1}`},
+      "https://mydev.sharepoint.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken2}`}
+    });
+    sinon.stub(os,'platform').returns("win32");
+    sinon.stub(os,'version').returns("Windows 10 Pro");
+    sinon.stub(os,'release').returns("10.0.19043");
+    sinon.stub(packageJSON,'version').value("3.11.0");
+    sinon.stub(process,'version').value("v14.17.0");
+    sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
+    sinon.stub(auth.service,'tenant').value("common");
+    sinon.stub(auth.service,'authType').value(0);
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
+    
+    command.action(logger,{options:{}},() => {
+      try{
+        assert(loggerLogSpy.calledWith({
+          authMode: "DeviceCode",
+          cliAadAppId:"31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant:"common",
+          cliEnvironment:"",
+          cliVersion: "3.11.0",
+          nodeVersion: "v14.17.0",
+          os: {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles: [],
+          scopes: ["AllSites.FullControl","AppCatalog.ReadWrite.All","TermStore.Read.All"]
         }));
         done();
       }
@@ -144,8 +153,14 @@ describe(commands.DOCTOR, () => {
   });
 
   it('retrieves "roles" in the diagnostic information about the current environment', (done) => {
+    const jwt = JSON.stringify({
+      roles: ["Sites.Read.All","Files.ReadWrite.All"]
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
+
     sinon.stub(auth.service,'accessTokens').value({
-      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."}
+      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken}`}
     });
     sinon.stub(os,'platform').returns("win32");
     sinon.stub(os,'version').returns("Windows 10 Pro");
@@ -155,29 +170,68 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
     sinon.stub(auth.service,'tenant').value("common");
     sinon.stub(auth.service,'authType').value(0);
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    sinon.stub(Utils,'getRolesFromAccessToken').callsFake(()=>{
-      return ["Sites.Read.All","Files.ReadWrite.All"];
+    command.action(logger,{options:{}},() => {
+      try{
+        assert(loggerLogSpy.calledWith({
+          authMode: "DeviceCode",
+          cliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant: "common",
+          cliEnvironment: "",
+          cliVersion: "3.11.0",
+          nodeVersion: "v14.17.0",
+          os: {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles: ["Sites.Read.All","Files.ReadWrite.All"],
+          scopes: []
+        }));
+        done();
+      }
+      catch(e){
+        done(e);
+      }
     });
+  });
 
-    sinon.stub(Utils,'getScopesFromAccessToken').callsFake(()=>{
-      return [];
+  it('retrieves "roles" from multiple access tokens in the diagnostic information about the current environment', (done) => {
+    const jwt1 = JSON.stringify({
+      roles: ["Sites.Read.All","Files.ReadWrite.All"]
     });
-    
+    let jwt64 = Buffer.from(jwt1).toString('base64');
+    const accessToken1 = `abc.${jwt64}.def`;
+
+    const jwt2 = JSON.stringify({
+      roles: ["TermStore.Read.All"]
+    });
+    jwt64 = Buffer.from(jwt2).toString('base64');
+    const accessToken2 = `abc.${jwt64}.def`;
+
+    sinon.stub(auth.service,'accessTokens').value({
+      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken1}`},
+      "https://mydev.sharepoint.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken2}`}
+    });
+    sinon.stub(os,'platform').returns("win32");
+    sinon.stub(os,'version').returns("Windows 10 Pro");
+    sinon.stub(os,'release').returns("10.0.19043");
+    sinon.stub(packageJSON,'version').value("3.11.0");
+    sinon.stub(process,'version').value("v14.17.0");
+    sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
+    sinon.stub(auth.service,'tenant').value("common");
+    sinon.stub(auth.service,'authType').value(0);
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
   
     command.action(logger,{options:{}},() => {
       try{
         assert(loggerLogSpy.calledWith({
-          AuthMode: "DeviceCode",
-          CliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
-          CliAadAppTenant: "common",
-          CliEnvironment: "",
-          CliVersion: "3.11.0",
-          NodeVersion: "v14.17.0",
-          OS: {"Platform":"win32","Version":"Windows 10 Pro","Release":"10.0.19043"},
-          Roles: ["Sites.Read.All","Files.ReadWrite.All"],
-          Scopes: [],
-          Shell: ""
+          authMode: "DeviceCode",
+          cliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant: "common",
+          cliEnvironment: "",
+          cliVersion: "3.11.0",
+          nodeVersion: "v14.17.0",
+          os: {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles: ["Sites.Read.All","Files.ReadWrite.All","TermStore.Read.All"],
+          scopes: []
         }));
         done();
       }
@@ -188,8 +242,15 @@ describe(commands.DOCTOR, () => {
   });
 
   it('retrieves "roles" and "scopes" in the diagnostic information about the current environment', (done) => {
+    const jwt = JSON.stringify({
+      roles: ["Sites.Read.All","Files.ReadWrite.All"],
+      scp:"Sites.Read.All Files.ReadWrite.All"
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
+
     sinon.stub(auth.service,'accessTokens').value({
-      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."}
+      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken}`}
     });
     sinon.stub(os,'platform').returns("win32");
     sinon.stub(os,'version').returns("Windows 10 Pro");
@@ -199,28 +260,20 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
     sinon.stub(auth.service,'tenant').value("common");
     sinon.stub(auth.service,'authType').value(0);
-
-    sinon.stub(Utils,'getRolesFromAccessToken').callsFake(()=>{
-      return ["Sites.Read.All","Files.ReadWrite.All"];
-    });
-
-    sinon.stub(Utils,'getScopesFromAccessToken').callsFake(()=>{
-      return ["Sites.Read.All","Files.ReadWrite.All"];
-    });
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
   
     command.action(logger,{options:{}},() => {
       try{
         assert(loggerLogSpy.calledWith({
-          AuthMode: "DeviceCode",
-          CliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
-          CliAadAppTenant: "common",
-          CliEnvironment: "",
-          CliVersion: "3.11.0",
-          NodeVersion: "v14.17.0",
-          OS: {"Platform":"win32","Version":"Windows 10 Pro","Release":"10.0.19043"},
-          Roles: ["Sites.Read.All","Files.ReadWrite.All"],
-          Scopes: ["Sites.Read.All","Files.ReadWrite.All"],
-          Shell: ""
+          authMode: "DeviceCode",
+          cliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant: "common",
+          cliEnvironment: "",
+          cliVersion: "3.11.0",
+          nodeVersion: "v14.17.0",
+          os: {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles: ["Sites.Read.All","Files.ReadWrite.All"],
+          scopes: ["Sites.Read.All","Files.ReadWrite.All"]
         }));
         done();
       }
@@ -231,9 +284,17 @@ describe(commands.DOCTOR, () => {
   });
 
   it('retrieves diagnostic information about the current environment when there are no roles or scopes available', (done) => {
-    sinon.stub(auth.service,'accessTokens').value({
-      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."}
+    const jwt = JSON.stringify({
+      roles: [],
+      scp:""
     });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
+    
+    sinon.stub(auth.service,'accessTokens').value({
+      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken}`}
+    });
+    
     sinon.stub(os,'platform').returns("win32");
     sinon.stub(os,'version').returns("Windows 10 Pro");
     sinon.stub(os,'release').returns("10.0.19043");
@@ -242,28 +303,20 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
     sinon.stub(auth.service,'tenant').value("common");
     sinon.stub(auth.service,'authType').value(0);
-
-    sinon.stub(Utils,'getRolesFromAccessToken').callsFake(()=>{
-      return [];
-    });
-
-    sinon.stub(Utils,'getScopesFromAccessToken').callsFake(()=>{
-      return [];
-    });
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
   
     command.action(logger,{options:{}},() => {
       try{
         assert(loggerLogSpy.calledWith({
-          AuthMode: "DeviceCode",
-          CliAadAppId:"31359c7f-bd7e-475c-86db-fdb8c937548e",
-          CliAadAppTenant:"common",
-          CliEnvironment:"",
-          CliVersion: "3.11.0",
-          NodeVersion: "v14.17.0",
-          OS: {"Platform":"win32","Version":"Windows 10 Pro","Release":"10.0.19043"},
-          Roles: [],
-          Scopes: [],
-          Shell: ""
+          authMode: "DeviceCode",
+          cliAadAppId:"31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant:"common",
+          cliEnvironment:"",
+          cliVersion: "3.11.0",
+          nodeVersion: "v14.17.0",
+          os: {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles: [],
+          scopes: []
         }));
         done();
       }
@@ -274,8 +327,14 @@ describe(commands.DOCTOR, () => {
   });
 
   it('retrieves diagnostic information about the current environment with auth type "Certificate"', (done) => {
+    const jwt = JSON.stringify({
+      roles: ["Sites.Read.All","Files.ReadWrite.All"]
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
+
     sinon.stub(auth.service,'accessTokens').value({
-      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."}
+      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken}`}
     });
     sinon.stub(os,'platform').returns("win32");
     sinon.stub(os,'version').returns("Windows 10 Pro");
@@ -285,28 +344,20 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
     sinon.stub(auth.service,'tenant').value("common");
     sinon.stub(auth.service,'authType').value(2);
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
  
-    sinon.stub(Utils,'getRolesFromAccessToken').callsFake(()=>{
-      return ["Sites.Read.All","Files.ReadWrite.All"];
-    });
-
-    sinon.stub(Utils,'getScopesFromAccessToken').callsFake(()=>{
-      return [];
-    });
-
     command.action(logger,{options:{}},() => {
       try{
         assert(loggerLogSpy.calledWith({
-          AuthMode: "Certificate",
-          CliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
-          CliAadAppTenant: "common",
-          CliEnvironment: "",
-          CliVersion: "3.11.0",
-          NodeVersion: "v14.17.0",
-          OS: {"Platform":"win32","Version":"Windows 10 Pro","Release":"10.0.19043"},
-          Roles: ["Sites.Read.All","Files.ReadWrite.All"],
-          Scopes: [],
-          Shell: ""
+          authMode: "Certificate",
+          cliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant: "common",
+          cliEnvironment: "",
+          cliVersion: "3.11.0",
+          nodeVersion: "v14.17.0",
+          os: {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles: ["Sites.Read.All","Files.ReadWrite.All"],
+          scopes: []
         }));
         done();
       }
@@ -317,8 +368,14 @@ describe(commands.DOCTOR, () => {
   });
 
   it('retrieves tenant information as "single" when TenantID is a GUID', (done) => {
+    const jwt = JSON.stringify({
+      roles: ["Sites.Read.All","Files.ReadWrite.All"]
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
+    
     sinon.stub(auth.service,'accessTokens').value({
-      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."}
+      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken}`}
     });
     sinon.stub(os,'platform').returns("win32");
     sinon.stub(os,'version').returns("Windows 10 Pro");
@@ -328,28 +385,20 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
     sinon.stub(auth.service,'tenant').value("923d42f0-6d23-41eb-b68d-c036d242654f");
     sinon.stub(auth.service,'authType').value(2);
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
 
-    sinon.stub(Utils,'getRolesFromAccessToken').callsFake(()=>{
-      return ["Sites.Read.All","Files.ReadWrite.All"];
-    });
-
-    sinon.stub(Utils,'getScopesFromAccessToken').callsFake(()=>{
-      return [];
-    });
-  
     command.action(logger,{options:{debug:true}},() => {
       try{
         assert(loggerLogSpy.calledWith({
-          AuthMode: "Certificate",
-          CliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
-          CliAadAppTenant: "single",
-          CliEnvironment:"",
-          CliVersion: "3.11.0",
-          NodeVersion: "v14.17.0",
-          OS: {"Platform":"win32","Version":"Windows 10 Pro","Release":"10.0.19043"},
-          Roles: ["Sites.Read.All","Files.ReadWrite.All"],
-          Scopes: [],
-          Shell: ""
+          authMode: "Certificate",
+          cliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant: "single",
+          cliEnvironment:"",
+          cliVersion: "3.11.0",
+          nodeVersion: "v14.17.0",
+          os: {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles: ["Sites.Read.All","Files.ReadWrite.All"],
+          scopes: []
         }));
         done();
       }
@@ -360,8 +409,14 @@ describe(commands.DOCTOR, () => {
   });
 
   it('retrieves diagnostic information about the current environment (debug)', (done) => {
+    const jwt = JSON.stringify({
+      roles: ["Sites.Read.All","Files.ReadWrite.All"]
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
+
     sinon.stub(auth.service,'accessTokens').value({
-      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."}
+      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken}`}
     });
     sinon.stub(os,'platform').returns("win32");
     sinon.stub(os,'version').returns("Windows 10 Pro");
@@ -371,28 +426,20 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
     sinon.stub(auth.service,'tenant').value("common");
     sinon.stub(auth.service,'authType').value(2);
-  
-    sinon.stub(Utils,'getRolesFromAccessToken').callsFake(()=>{
-      return ["Sites.Read.All","Files.ReadWrite.All"];
-    });
-
-    sinon.stub(Utils,'getScopesFromAccessToken').callsFake(()=>{
-      return [];
-    });
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
   
     command.action(logger,{options:{debug:true}},() => {
       try{
         assert(loggerLogSpy.calledWith({
-          AuthMode: "Certificate",
-          CliAadAppId:"31359c7f-bd7e-475c-86db-fdb8c937548e",
-          CliAadAppTenant:"common",
-          CliEnvironment :"",
-          CliVersion     : "3.11.0",
-          NodeVersion    : "v14.17.0",
-          OS             : {"Platform":"win32","Version":"Windows 10 Pro","Release":"10.0.19043"},
-          Roles          : ["Sites.Read.All","Files.ReadWrite.All"],
-          Scopes         : [],
-          Shell          : ""
+          authMode : "Certificate",
+          cliAadAppId : "31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant : "common",
+          cliEnvironment :"",
+          cliVersion : "3.11.0",
+          nodeVersion : "v14.17.0",
+          os : {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles : ["Sites.Read.All","Files.ReadWrite.All"],
+          scopes : []
         }));
         done();
       }
@@ -403,8 +450,14 @@ describe(commands.DOCTOR, () => {
   });
 
   it('retrieves diagnostic information of the current environment when executing in docker', (done) => {
+    const jwt = JSON.stringify({
+      roles: ["Sites.Read.All","Files.ReadWrite.All"]
+    });
+    const jwt64 = Buffer.from(jwt).toString('base64');
+    const accessToken = `abc.${jwt64}.def`;
+
     sinon.stub(auth.service,'accessTokens').value({
-      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."}
+      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":`${accessToken}`}
     });
     sinon.stub(os,'platform').returns("win32");
     sinon.stub(os,'version').returns("Windows 10 Pro");
@@ -416,27 +469,18 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service,'authType').value(2);
     sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': 'docker' });
 
-    sinon.stub(Utils,'getRolesFromAccessToken').callsFake(()=>{
-      return ["Sites.Read.All","Files.ReadWrite.All"];
-    });
-
-    sinon.stub(Utils,'getScopesFromAccessToken').callsFake(()=>{
-      return [];
-    });
-  
     command.action(logger,{options:{debug:true}},() => {
       try{
         assert(loggerLogSpy.calledWith({
-          AuthMode: "Certificate",
-          CliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
-          CliAadAppTenant: "common",
-          CliEnvironment: "docker",
-          CliVersion: "3.11.0",
-          NodeVersion: "v14.17.0",
-          OS: {"Platform":"win32","Version":"Windows 10 Pro","Release":"10.0.19043"},
-          Roles: ["Sites.Read.All","Files.ReadWrite.All"],
-          Scopes: [],
-          Shell: ""
+          authMode: "Certificate",
+          cliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant: "common",
+          cliEnvironment: "docker",
+          cliVersion: "3.11.0",
+          nodeVersion: "v14.17.0",
+          os: {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles: ["Sites.Read.All","Files.ReadWrite.All"],
+          scopes: []
         }));
         done();
       }
@@ -445,52 +489,6 @@ describe(commands.DOCTOR, () => {
       }
     });
   });
-
-  it('retrieves the "shell" in diagnostic information of the current environment', (done) => {
-    sinon.stub(auth.service,'accessTokens').value({
-      "https://graph.microsoft.com":{"expiresOn":"2021-07-04T09:52:18.000Z","accessToken":"eyJ0..."}
-    });
-    sinon.stub(os,'platform').returns("win32");
-    sinon.stub(os,'version').returns("Windows 10 Pro");
-    sinon.stub(os,'release').returns("10.0.19043");
-    sinon.stub(packageJSON,'version').value("3.11.0");
-    sinon.stub(process,'version').value("v14.17.0");
-    sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
-    sinon.stub(auth.service,'tenant').value("common");
-    sinon.stub(auth.service,'authType').value(2);
-    sinon.stub(process, 'env').value({ 'SHELL': 'bash' });
-
-    sinon.stub(Utils,'getRolesFromAccessToken').callsFake(()=>{
-      return ["Sites.Read.All","Files.ReadWrite.All"];
-    });
-
-    sinon.stub(Utils,'getScopesFromAccessToken').callsFake(()=>{
-      return [];
-    });
-  
-    command.action(logger,{options:{debug:true}},() => {
-      try{
-        assert(loggerLogSpy.calledWith({
-          AuthMode: "Certificate",
-          CliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
-          CliAadAppTenant: "common",
-          CliEnvironment: "",
-          CliVersion: "3.11.0",
-          NodeVersion: "v14.17.0",
-          OS: {"Platform":"win32","Version":"Windows 10 Pro","Release":"10.0.19043"},
-          Roles: ["Sites.Read.All","Files.ReadWrite.All"],
-          Scopes: [],
-          Shell: "bash"
-        }));
-        done();
-      }
-      catch(e){
-        done(e);
-      }
-    });
-  });
-
-
 
   it('returns empty roles and scopes in diagnostic information when access token is empty', (done) => {
     sinon.stub(auth.service,'accessTokens').value({
@@ -504,21 +502,20 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
     sinon.stub(auth.service,'tenant').value("common");
     sinon.stub(auth.service,'authType').value(2);
-    sinon.stub(process, 'env').value({ 'SHELL': 'bash' });
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
     
     command.action(logger,{options:{debug:true}},() => {
       try{
         assert(loggerLogSpy.calledWith({
-          AuthMode: "Certificate",
-          CliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
-          CliAadAppTenant: "common",
-          CliEnvironment: "",
-          CliVersion: "3.11.0",
-          NodeVersion: "v14.17.0",
-          OS: {"Platform":"win32","Version":"Windows 10 Pro","Release":"10.0.19043"},
-          Roles: [],
-          Scopes: [],
-          Shell: "bash"
+          authMode: "Certificate",
+          cliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant: "common",
+          cliEnvironment: "",
+          cliVersion: "3.11.0",
+          nodeVersion: "v14.17.0",
+          os: {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles: [],
+          scopes: []
         }));
         done();
       }
@@ -541,21 +538,20 @@ describe(commands.DOCTOR, () => {
     sinon.stub(auth.service,'appId').value("31359c7f-bd7e-475c-86db-fdb8c937548e");
     sinon.stub(auth.service,'tenant').value("common");
     sinon.stub(auth.service,'authType').value(2);
-    sinon.stub(process, 'env').value({ 'SHELL': 'bash' });
+    sinon.stub(process, 'env').value({ 'CLIMICROSOFT365_ENV': '' });
   
     command.action(logger,{options:{debug:true}},() => {
       try{
         assert(loggerLogSpy.calledWith({
-          AuthMode: "Certificate",
-          CliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
-          CliAadAppTenant: "common",
-          CliEnvironment: "",
-          CliVersion: "3.11.0",
-          NodeVersion: "v14.17.0",
-          OS: {"Platform":"win32","Version":"Windows 10 Pro","Release":"10.0.19043"},
-          Roles: [],
-          Scopes: [],
-          Shell: "bash"
+          authMode: "Certificate",
+          cliAadAppId: "31359c7f-bd7e-475c-86db-fdb8c937548e",
+          cliAadAppTenant: "common",
+          cliEnvironment: "",
+          cliVersion: "3.11.0",
+          nodeVersion: "v14.17.0",
+          os: {"platform":"win32","version":"Windows 10 Pro","release":"10.0.19043"},
+          roles: [],
+          scopes: []
         }));
         done();
       }

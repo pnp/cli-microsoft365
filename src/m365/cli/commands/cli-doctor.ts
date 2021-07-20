@@ -7,20 +7,19 @@ import Utils from '../../../Utils';
 const packageJSON = require('../../../../package.json');
 
 interface CliDiagnosticInfo {
-  OS: {
-    Platform: string;
-    Version: string;
-    Release: string;
+  os: {
+    platform: string;
+    version: string;
+    release: string;
   };
-  AuthMode: string;
-  CliAadAppId: string;
-  CliAadAppTenant: string;
-  CliEnvironment: string;
-  NodeVersion: string;
-  CliVersion: string;
-  Roles:string[];
-  Scopes:string[];
-  Shell: string;
+  authMode: string;
+  cliAadAppId: string;
+  cliAadAppTenant: string;
+  cliEnvironment: string;
+  nodeVersion: string;
+  cliVersion: string;
+  roles:string[];
+  scopes:string[];
 }
 
 class CliDoctorCommand extends Command {
@@ -40,29 +39,71 @@ class CliDoctorCommand extends Command {
     Object.keys(auth.service.accessTokens).forEach((tokenKey) => {
       const accessToken:string = auth.service.accessTokens[tokenKey].accessToken;
 
-      Utils.getRolesFromAccessToken(accessToken).forEach(role => roles.push(role));
-      Utils.getScopesFromAccessToken(accessToken).forEach(scope => scopes.push(scope));
+      this.getRolesFromAccessToken(accessToken).forEach(role => roles.push(role));
+      this.getScopesFromAccessToken(accessToken).forEach(scope => scopes.push(scope));
     });
-
+    
     const diagnosticInfo: CliDiagnosticInfo = {
-      Shell: process.env.SHELL || "",
-      OS: {
-        Platform: os.platform(),
-        Version: os.version(),
-        Release: os.release()
+      os: {
+        platform: os.platform(),
+        version: os.version(),
+        release: os.release()
       },
-      CliVersion: packageJSON.version,
-      NodeVersion: process.version,
-      CliAadAppId: auth.service.appId,
-      CliAadAppTenant: Utils.isValidGuid(auth.service.tenant) ? "single" : auth.service.tenant,
-      AuthMode: AuthType[auth.service.authType],
-      CliEnvironment: process.env.CLIMICROSOFT365_ENV ? process.env.CLIMICROSOFT365_ENV : "",
-      Roles:roles,
-      Scopes:scopes
+      cliVersion: packageJSON.version,
+      nodeVersion: process.version,
+      cliAadAppId: auth.service.appId,
+      cliAadAppTenant: Utils.isValidGuid(auth.service.tenant) ? "single" : auth.service.tenant,
+      authMode: AuthType[auth.service.authType],
+      cliEnvironment: process.env.CLIMICROSOFT365_ENV ? process.env.CLIMICROSOFT365_ENV : "",
+      roles:roles,
+      scopes:scopes
     };
 
     logger.log(diagnosticInfo);
     cb();
+  }
+
+  private getRolesFromAccessToken(accessToken: string): string[] {
+    let roles: string[] = [];
+
+    if (!accessToken || accessToken.length === 0) {
+      return roles;
+    }
+
+    const chunks = accessToken.split('.');
+    if (chunks.length !== 3) {
+      return roles;
+    }
+
+    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
+    const token: any = JSON.parse(tokenString);
+    if(token.roles !== undefined){
+      roles = token.roles;
+    }
+
+    return roles;
+  }
+
+  private getScopesFromAccessToken(accessToken: string): string[] {
+    let scopes: string[] = [];
+
+    if (!accessToken || accessToken.length === 0) {
+      return scopes;
+    }
+
+    const chunks = accessToken.split('.');
+    if (chunks.length !== 3) {
+      return scopes;
+    }
+
+    const tokenString: string = Buffer.from(chunks[1], 'base64').toString();
+    
+    const token: any = JSON.parse(tokenString);
+    if(token.scp?.length > 0){
+      scopes = token.scp.split(' ');
+    }
+
+    return scopes;
   }
 }
 
