@@ -3,7 +3,7 @@ import { Project } from "../../model";
 import { Rule } from "./Rule";
 
 export class FN023001_GITIGNORE_release extends Rule {
-  constructor() {
+  constructor(private add: boolean = true) {
     super();
   }
 
@@ -16,7 +16,12 @@ export class FN023001_GITIGNORE_release extends Rule {
   }
 
   get description(): string {
-    return `To .gitignore add the 'release' folder`;
+    if (this.add) {
+      return `To .gitignore add the 'release' folder`;
+    }
+    else {
+      return `From .gitignore remove the 'release' folder`;
+    }
   }
 
   get resolution(): string {
@@ -40,7 +45,7 @@ export class FN023001_GITIGNORE_release extends Rule {
       return;
     }
 
-    if (!/^release$/m.test(project.gitignore.source)) {
+    if (/^release$/m.test(project.gitignore.source) !== this.add) {
       this.addFinding(findings);
     }
   }

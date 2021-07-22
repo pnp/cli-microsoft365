@@ -1,0 +1,18 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "version": "1.12.1",
+    "libraryName": "spfx",
+    "libraryId": "30adc429-9e7b-4fed-907f-1c1f935de9f7",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "spfx",
+    "skipFeatureDeployment": false,
+    "componentType": "extension",
+    "extensionType": "FieldCustomizer",
+    "framework": "react",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "isCreatingSolution": true,
+    "isDomainIsolated": false
+  }
+}
