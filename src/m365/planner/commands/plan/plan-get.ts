@@ -5,7 +5,7 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import GraphCommand from '../../../base/GraphCommand';
+import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   ownerGroupName?: string;
 }
 
-class PlannerPlanGetCommand extends GraphCommand {
+class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
   public get name(): string {
     return commands.PLAN_GET;
   }
@@ -53,19 +53,9 @@ class PlannerPlanGetCommand extends GraphCommand {
     else {
       this
         .getGroupId(args)
-        .then((groupId: string): Promise<any> => {
-          const requestOptions: any = {
-            url: `${this.resource}/v1.0/groups/${groupId}/planner/plans`,
-            headers: {
-              'accept': 'application/json;odata.metadata=none'
-            },
-            responseType: 'json'
-          };
-
-          return request.get(requestOptions);
-        })
-        .then((res: any): void => {
-          const filteredPlan = res.value.filter((plan: any) => plan.title === args.options.title);
+        .then((groupId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/groups/${groupId}/planner/plans`, logger, true))
+        .then((): void => {
+          const filteredPlan = this.items.filter((plan: any) => plan.title === args.options.title);
           if (filteredPlan && filteredPlan.length > 0) {
             logger.log(filteredPlan);
           }
@@ -121,10 +111,10 @@ class PlannerPlanGetCommand extends GraphCommand {
         option: '-t, --title [title]'
       },
       {
-        option: "--ownerGroupId [ownerGroupId]"
+        option: '--ownerGroupId [ownerGroupId]'
       },
       {
-        option: "--ownerGroupName [ownerGroupName]"
+        option: '--ownerGroupName [ownerGroupName]'
       }
     ];
 
