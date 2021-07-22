@@ -69,39 +69,10 @@ describe(commands.USER_LIST, () => {
     done();
   });
 
-  it('fails validation if the groupId is not a valid guid.', (done) => {
-    const actual = command.validate({
-      options: {
-        groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the groupId is not provided.', (done) => {
-    const actual = command.validate({
-      options: {}
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation when both groupId and teamId are specified', (done) => {
-    const actual = command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
   it('fails validation when invalid role specified', (done) => {
     const actual = command.validate({
       options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Invalid'
       }
     });
@@ -109,20 +80,20 @@ describe(commands.USER_LIST, () => {
     done();
   });
 
-  it('passes validation when valid groupId and no role specified', (done) => {
+  it('passes validation when valid teamId and no role specified', (done) => {
     const actual = command.validate({
       options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.strictEqual(actual, true);
     done();
   });
 
-  it('passes validation when valid groupId and Owner role specified', (done) => {
+  it('passes validation when valid teamId and Owner role specified', (done) => {
     const actual = command.validate({
       options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Owner'
       }
     });
@@ -130,10 +101,10 @@ describe(commands.USER_LIST, () => {
     done();
   });
 
-  it('passes validation when valid groupId and Member role specified', (done) => {
+  it('passes validation when valid teamId and Member role specified', (done) => {
     const actual = command.validate({
       options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Member'
       }
     });
@@ -141,10 +112,10 @@ describe(commands.USER_LIST, () => {
     done();
   });
 
-  it('passes validation when valid groupId and Guest role specified', (done) => {
+  it('passes validation when valid teamId and Guest role specified', (done) => {
     const actual = command.validate({
       options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
+        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
         role: 'Guest'
       }
     });
@@ -308,7 +279,7 @@ describe(commands.USER_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
