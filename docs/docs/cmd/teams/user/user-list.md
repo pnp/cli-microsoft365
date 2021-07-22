@@ -1,6 +1,6 @@
 # teams user list
 
-Lists users for the specified Microsoft 365 group or Microsoft Teams team
+Lists users for the specified Microsoft Teams team
 
 ## Usage
 
@@ -10,10 +10,7 @@ m365 teams user list [options]
 
 ## Options
 
-`-i, --groupId [groupId]`
-: The ID of the Microsoft 365 group for which to list users
-
-`--teamId [teamId]`
+`-i, --teamId <teamId>`
 : The ID of the Microsoft Teams team for which to list users
 
 `-r, --role [role]`
@@ -33,22 +30,4 @@ List all owners and their role in the specified Microsoft teams team
 
 ```sh
 m365 teams user list --teamId '00000000-0000-0000-0000-000000000000' --role Owner
-```
-
-List all users and their role in the specified Microsoft 365 group
-
-```sh
-m365 teams user list --groupId '00000000-0000-0000-0000-000000000000'
-```
-
-List all owners and their role in the specified Microsoft 365 group
-
-```sh
-m365 teams user list --groupId '00000000-0000-0000-0000-000000000000' --role Owner
-```
-
- List all guests and their role in the specified Microsoft 365 group
-
-```sh
-m365 teams user list --groupId '00000000-0000-0000-0000-000000000000' --role Guest
 ```

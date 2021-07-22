@@ -59,39 +59,10 @@ describe(commands.O365GROUP_USER_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('fails validation if the teamId is not a valid guid.', (done) => {
-    const actual = command.validate({
-      options: {
-        teamId: 'not-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
   it('fails validation if the groupId is not a valid guid.', (done) => {
     const actual = command.validate({
       options: {
         groupId: 'not-c49b-4fd4-8223-28f0ac3a6402'
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation if the groupId is not provided.', (done) => {
-    const actual = command.validate({
-      options: {}
-    });
-    assert.notStrictEqual(actual, true);
-    done();
-  });
-
-  it('fails validation when both groupId and teamId are specified', (done) => {
-    const actual = command.validate({
-      options: {
-        groupId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402',
-        teamId: '6703ac8a-c49b-4fd4-8223-28f0ac3a6402'
       }
     });
     assert.notStrictEqual(actual, true);
@@ -326,7 +297,7 @@ describe(commands.O365GROUP_USER_LIST, () => {
       return Promise.reject('An error has occurred');
     });
 
-    command.action(logger, { options: { debug: false, teamId: "00000000-0000-0000-0000-000000000000" } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, groupId: "00000000-0000-0000-0000-000000000000" } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
         done();
