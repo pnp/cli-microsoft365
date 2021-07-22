@@ -597,7 +597,7 @@ describe('Cli', () => {
   it('returns command output when executing command with output', (done) => {
     const commandWithOutput: MockCommandWithOutput = new MockCommandWithOutput();
     Cli
-      .executeCommandWithOutput(commandWithOutput, { options: { _: [] } })
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } })
       .then((output: CommandOutput) => {
         try {
           assert.strictEqual(output.stdout, 'Command output');
@@ -612,7 +612,7 @@ describe('Cli', () => {
   it('returns raw command output when executing command with output', (done) => {
     const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
     Cli
-      .executeCommandWithOutput(commandWithOutput, { options: { _: [] } })
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [], output: 'text' } })
       .then((output: CommandOutput) => {
         try {
           assert.strictEqual(output.stdout, 'Raw output');
@@ -627,7 +627,7 @@ describe('Cli', () => {
   it('returns debug command output when executing command with output in debug mode', (done) => {
     const commandWithOutput: MockCommandWithRawOutput = new MockCommandWithRawOutput();
     Cli
-      .executeCommandWithOutput(commandWithOutput, { options: { _: [], debug: true } })
+      .executeCommandWithOutput(commandWithOutput, { options: { _: [], debug: true, output: 'text' } })
       .then((output: CommandOutput) => {
         try {
           assert.strictEqual(output.stdout, 'Raw output');
@@ -802,18 +802,18 @@ describe('Cli', () => {
   });
 
   it('doesn\'t fail when undefined object is passed to the log', () => {
-    const actual = (Cli as any).formatOutput(undefined);
+    const actual = (Cli as any).formatOutput(undefined, { output: 'text' });
     assert.strictEqual(actual, undefined);
   });
 
   it('returns the same object if non-array is passed to the log', () => {
     const s = 'foo';
-    const actual = (Cli as any).formatOutput(s, {});
+    const actual = (Cli as any).formatOutput(s, { output: 'text' });
     assert.strictEqual(actual, s);
   });
 
   it('doesn\'t fail when an array with undefined object is passed to the log', () => {
-    const actual = (Cli as any).formatOutput([undefined], {});
+    const actual = (Cli as any).formatOutput([undefined], { output: 'text' });
     assert.strictEqual(actual, '');
   });
 
@@ -831,7 +831,7 @@ describe('Cli', () => {
 
   it('formats simple output as text', (done) => {
     const o = false;
-    const actual = (Cli as any).formatOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, { output: 'text' });
     try {
       assert.strictEqual(actual, `${o}`);
       done();
@@ -843,13 +843,13 @@ describe('Cli', () => {
 
   it('formats date output as text', () => {
     const d = new Date();
-    const actual = (Cli as any).formatOutput(d, {});
+    const actual = (Cli as any).formatOutput(d, { output: 'text' });
     assert.strictEqual(actual, d.toString());
   });
 
   it('formats object output as transposed table', (done) => {
     const o = { prop1: 'value1', prop2: 'value2' };
-    const actual = (Cli as any).formatOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, { output: 'text' });
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop2', 'value2');
@@ -868,7 +868,7 @@ describe('Cli', () => {
 
   it('formats object output as transposed table', (done) => {
     const o = { prop1: 'value1 ', prop12: 'value12' };
-    const actual = (Cli as any).formatOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, { output: 'text' });
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop12', 'value12');
@@ -887,7 +887,7 @@ describe('Cli', () => {
 
   it('formats array values as JSON', (done) => {
     const o = { prop1: ['value1', 'value2'] };
-    const actual = (Cli as any).formatOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, { output: 'text' });
     const expected = 'prop1: ["value1","value2"]' + '\n';
     try {
       assert.strictEqual(actual, expected);
@@ -903,7 +903,7 @@ describe('Cli', () => {
       ['value1', 'value2'],
       ['value3', 'value4']
     ];
-    const actual = (Cli as any).formatOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, { output: 'text' });
     const expected = [o[0].join(','), o[1].join(',')].join(os.EOL);
     try {
       assert.strictEqual(actual, expected);
@@ -919,7 +919,7 @@ describe('Cli', () => {
       { prop1: 'value1', prop2: 'value2' },
       { prop1: 'value3', prop2: 'value4' }
     ];
-    const actual = (Cli as any).formatOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, { output: 'text' });
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop2', 'value2');
@@ -939,7 +939,7 @@ describe('Cli', () => {
 
   it('formats command error as error message', (done) => {
     const o = new CommandError('An error has occurred');
-    const actual = (Cli as any).formatOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, { output: 'text' });
     const expected = chalk.red('Error: An error has occurred');
     try {
       assert.strictEqual(actual, expected);
@@ -952,7 +952,7 @@ describe('Cli', () => {
 
   it('sets array type to the first non-undefined value', (done) => {
     const o = [undefined, 'lorem', 'ipsum'];
-    const actual = (Cli as any).formatOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, { output: 'text' });
     const expected = `${os.EOL}lorem${os.EOL}ipsum`;
     try {
       assert.strictEqual(actual, expected);
@@ -969,7 +969,7 @@ describe('Cli', () => {
       'lorem',
       { prop1: 'value3', prop2: 'value4' }
     ];
-    const actual = (Cli as any).formatOutput(o, {});
+    const actual = (Cli as any).formatOutput(o, { output: 'text' });
     const t = new Table();
     t.cell('prop1', 'value1');
     t.cell('prop2', 'value2');
