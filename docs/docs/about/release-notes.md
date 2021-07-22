@@ -4,6 +4,10 @@
 
 ### New commands
 
+**CLI:**
+
+- [cli doctor](../cmd/cli/cli-doctor.md) - retrieves diagnostic information about the current environment [#2157](https://github.com/pnp/cli-microsoft365/issues/2157)
+
 **OneDrive:**
 
 - [onedrive list](../cmd/onedrive/onedrive-list.md) - retrieves a list of OneDrive sites [#2230](https://github.com/pnp/cli-microsoft365/issues/2230)
@@ -25,6 +29,7 @@
 - updated 'teams channel get' to Graph v1.0 [#2505](https://github.com/pnp/cli-microsoft365/issues/2505)
 - added missing 'chalk' dependency [#2592](https://github.com/pnp/cli-microsoft365/issues/2592)
 - extended Teams channel ID validation with - and _ [#2594](https://github.com/pnp/cli-microsoft365/issues/2594)
+- added file count sample [#2576](https://github.com/pnp/cli-microsoft365/issues/2576)
 
 ## [v3.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.11.0)
 
