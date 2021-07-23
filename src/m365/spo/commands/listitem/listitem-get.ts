@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   listId?: string;
   listTitle?: string;
   id: string;
-  fields?: string;
+  properties?: string;
 }
 
 class SpoListItemGetCommand extends SpoCommand {
@@ -49,8 +49,8 @@ class SpoListItemGetCommand extends SpoCommand {
       `${args.options.webUrl}/_api/web/lists(guid'${encodeURIComponent(listIdArgument)}')`
       : `${args.options.webUrl}/_api/web/lists/getByTitle('${encodeURIComponent(listTitleArgument)}')`);
 
-    const fieldSelect: string = args.options.fields ?
-      `?$select=${encodeURIComponent(args.options.fields)}` :
+    const fieldSelect: string = args.options.properties ?
+      `?$select=${encodeURIComponent(args.options.properties)}` :
       (
         (!args.options.output || args.options.output === 'text') ?
           `?$select=Id,Title` :
@@ -89,7 +89,7 @@ class SpoListItemGetCommand extends SpoCommand {
         option: '-t, --listTitle [listTitle]'
       },
       {
-        option: '-f, --fields [fields]'
+        option: '-f, --properties [properties]'
       }
     ];
 
@@ -104,7 +104,7 @@ class SpoListItemGetCommand extends SpoCommand {
         'listId',
         'listTitle',
         'id',
-        'fields'
+        'properties'
       ]
     };
   }
