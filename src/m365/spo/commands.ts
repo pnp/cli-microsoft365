@@ -167,6 +167,7 @@ export default {
   SITE_APPPERMISSION_ADD: `${prefix} site apppermission add`,
   SITE_APPPERMISSION_GET: `${prefix} site apppermission get`,
   SITE_APPPERMISSION_LIST: `${prefix} site apppermission list`,
+  SITE_APPPERMISSION_REMOVE: `${prefix} site apppermission remove`,
   SITE_APPPERMISSION_SET: `${prefix} site apppermission set`,
   SITE_CLASSIC_ADD: `${prefix} site classic add`,
   SITE_CLASSIC_LIST: `${prefix} site classic list`,
