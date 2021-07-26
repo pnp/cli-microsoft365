@@ -51,7 +51,7 @@ module.exports = [
   new FN001032_DEP_microsoft_sp_page_context('1.13.0-beta.13'),
   new FN002001_DEVDEP_microsoft_sp_build_web('1.13.0-beta.13'),
   new FN002002_DEVDEP_microsoft_sp_module_interfaces('1.13.0-beta.13'),
-  new FN002003_DEVDEP_microsoft_sp_webpart_workbench('1.13.0-beta.13'),
+  new FN002003_DEVDEP_microsoft_sp_webpart_workbench('', false),
   new FN002009_DEVDEP_microsoft_sp_tslint_rules('1.13.0-beta.13'),
   new FN004002_CFG_CA_deployCdnPath('temp/deploy'),
   new FN007002_CFG_S_initialPage('https://enter-your-SharePoint-site/_layouts/workbench.aspx'),
