@@ -661,6 +661,7 @@ nav:
       - 'List app usage in Microsoft Teams': 'sample-scripts/teams/list-teams-app-usage.md'
       - 'Remove a Microsoft Teams personal app': 'sample-scripts/teams/remove-personal-app.md'
       - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'
+      - 'Share social champions to Teams': 'sample-scripts/teams/share-socialchampions.md'
     - Microsoft To Do:
       - 'Cleanup completed Microsoft To Do tasks': 'sample-scripts/todo/cleanup-completed-todos.md'
     - Microsoft 365 tenant:
