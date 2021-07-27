@@ -94,7 +94,7 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/planner/plans/${args.options.id}`,
       headers: {
-        'accept': 'application/json;odata.metadata=none'
+        'accept': 'application/json'
       },
       responseType: 'json'
     };

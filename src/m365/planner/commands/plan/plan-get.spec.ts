@@ -149,6 +149,8 @@ describe(commands.PLAN_GET, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans/opb7bchfZUiFbVWEPL7jPGUABW7f`) {
         return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity",
+          "@odata.etag": "W/\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\"",
           "createdDateTime": "2021-03-10T17:39:43.1045549Z",
           "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
           "title": "My Planner Plan",
@@ -177,6 +179,8 @@ describe(commands.PLAN_GET, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(loggerLogSpy.calledWith({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#planner/plans/$entity",
+          "@odata.etag": "W/\"JzEtUZxhbiAgQEBAQEBAMEBAQEBAVEBAUCc=\"",
           "createdDateTime": "2021-03-10T17:39:43.1045549Z",
           "owner": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
           "title": "My Planner Plan",
@@ -204,7 +208,7 @@ describe(commands.PLAN_GET, () => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf('/groups?$filter=ID') > -1) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
+          //"@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
           "value": [
             {
               "id": "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4",
@@ -260,8 +264,8 @@ describe(commands.PLAN_GET, () => {
 
       if (opts.url === `https://graph.microsoft.com/v1.0/groups/233e43d0-dc6a-482e-9b4e-0de7a7bce9b4/planner/plans`) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerPlan)",
-          "@odata.count": 1,
+          //"@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Collection(microsoft.graph.plannerPlan)",
+          //"@odata.count": 1,
           "value": [
             {
               "createdDateTime": "2021-03-10T17:39:43.1045549Z",
