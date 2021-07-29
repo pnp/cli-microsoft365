@@ -4,7 +4,7 @@ Inspired by: [Alan Eardley](https://blog.eardley.org.uk/2021/04/managing-teams-m
 
 This script can be used to replace the membership of a user for a selected list of Groups. It might be useful when a person changes role in an organization or is about to leave it.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $fileInput = "<PUTYOURPATHHERE.csv>"
 $oldUser = "upnOfOldUser"
 $newUser = "upnOfNewUser"

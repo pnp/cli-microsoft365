@@ -8,7 +8,7 @@ This sample script scans the Microsoft 365 groups that may contain user’s firs
 
 Note: The filter condition can be changed as per your requirement.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $groupsToFlag = @()
 
 $users = m365 aad user list --properties 'displayName,givenName,surname' -o json | ConvertFrom-Json

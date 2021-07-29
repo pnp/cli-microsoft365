@@ -6,7 +6,7 @@ Companies pursue to hasten profits growth or enter new marketplace through Merge
 
 Note: Refactor the code as per your requirement.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $taskItems = import-csv "sample-input-file.csv" –header mailNickname, userEmail, role, action
 $groups = m365 aad o365group list -o json | ConvertFrom-Json
 

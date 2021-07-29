@@ -4,7 +4,7 @@ Author: [Patrick Lamber](https://www.nubo.eu/Retrieve-All-Site-Collection-Owners
 
 This script helps you to list and export all site collection owners in your SharePoint Online sites.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $fileExportPath = "<PUTYOURPATHHERE.csv>"
 
 $m365Status = m365 status

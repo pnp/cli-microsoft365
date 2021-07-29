@@ -148,4 +148,4 @@ Open a new PowerShell session and execute `$env:CLIMICROSOFT365_AADAPPID` and `$
 
 If you are on Linux or MacOS, depending on your terminal, add the  `export` lines to `.bashrc` or `.zshrc` file in your home directory.
 
-If you are using PowerShell Core, it is worth noting that environment variables set in `bash` or `zsh` will persist to the `pwsh` session and the same applies to Windows.
+If you are using PowerShell, it is worth noting that environment variables set in `bash` or `zsh` will persist to the `pwsh` session and the same applies to Windows.

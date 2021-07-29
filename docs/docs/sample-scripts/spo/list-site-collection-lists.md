@@ -4,7 +4,7 @@ Author: [Albert-Jan Schot](https://www.cloudappie.nl/migration-report-climicroso
 
 This script helps you to list and export all site collection and their lists SharePoint Online sites, ideal for getting insights into the size of your environment.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $fileExportPath = "<PUTYOURPATHHERE.csv>"
 
 $m365Status = m365 status

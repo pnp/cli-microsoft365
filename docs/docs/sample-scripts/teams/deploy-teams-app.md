@@ -4,7 +4,7 @@ Author: [Garry Trinder](https://github.com/garrytrinder)
 
 Installs or updates a Microsoft Teams app from an Azure DevOps pipeline. Deploys the app if it hasn't been deployed yet or updates the existing package if it's been previously deployed.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 m365 login -t password -u $(username) -p $(password)
 
 $apps = m365 teams app list -o json | ConvertFrom-Json

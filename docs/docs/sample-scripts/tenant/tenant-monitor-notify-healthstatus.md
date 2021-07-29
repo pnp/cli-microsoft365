@@ -20,7 +20,7 @@ All the pre-requisites would be completed by the script. Script checks whether S
 
 If you want to schedule the script directly, you can go ahead without the need of any other configurations.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 #Ensure that you are logged in to the site mentioned in the webURL as a user who has Edit Permission
 $webURL = "https://contoso.sharepoint.com/sites/contososite"
 $listName = "M365HealthStatus"

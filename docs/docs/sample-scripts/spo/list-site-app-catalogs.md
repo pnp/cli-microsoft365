@@ -6,7 +6,7 @@ A sample that shows how to find all installed site collection application catalo
 
 Note, because the sample uses the SharePoint search API to identify the site collection application catalogs, a newly created one might not be indexed right away. The sample output would not list the newly created app catalog until the search crawler indexes it; this usually does not take longer than a few minutes.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $appCatalogs = m365 spo search --query "contentclass:STS_List_336" --selectProperties SPSiteURL --allResults --output json | ConvertFrom-Json
 
 $appCatalogs | ForEach-Object { Write-Host $_.SPSiteURL }

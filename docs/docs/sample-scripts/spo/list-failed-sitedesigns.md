@@ -4,7 +4,7 @@ Author: [Albert-Jan Schot](https://www.cloudappie.nl/failed-sitedesigns-clim365/
 
 The following script iterates through all site collections and lists all site design runs with errors. By filtering on `OutcomeCode == '1'` it will return all sites and runs with explicit errors. By filtering on `OutcomeCode != '0'` you can also return any result that is not marked as successful.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $allSPOSites = m365 spo site classic list -o json | ConvertFrom-Json
 $siteCount = $allSPOSites.Count
 Write-Output "Processing $siteCount sites..."

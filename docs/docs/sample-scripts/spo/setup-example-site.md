@@ -11,7 +11,7 @@ This script is a good starting point for a setup script to create site with some
 - modifies the all items view of the document library,
 - modifies the site navigation links
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 Write-host 'setup script example'
 
 Write-host 'ensure logged in'

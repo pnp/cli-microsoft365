@@ -13,7 +13,7 @@ Prerequisites
 !!! note
     If you don't already have an [Azure Cognitive Services instance and key](https://azure.microsoft.com/try/cognitive-services/), create a cognitive service instance and get API key from there.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $resultDir = "Output"
 $azureVisionApiInstance = "azure-vision-api-instance-name"
 $azureVisionApiKey = "azure-vision-api-key"

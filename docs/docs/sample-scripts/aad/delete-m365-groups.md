@@ -4,7 +4,7 @@ Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powersh
 
 There are so many different ways to create Microsoft 365 groups. Teams, Planner, SharePoint team sites, etc. — you can accumulate a lot of them very fast. Use this script below to delete the ones you no longer need.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $sparksjoy = "All Company", "TEMPLATE Project", "We have cats in this team! Join!"
 $groups = m365 aad o365group list -o json | ConvertFrom-Json
 $groups = $groups | where {-not ($sparksjoy -contains $_.displayName)}

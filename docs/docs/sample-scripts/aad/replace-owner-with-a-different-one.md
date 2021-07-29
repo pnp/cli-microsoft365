@@ -4,7 +4,7 @@ Inspired by: [Alan Eardley](https://blog.eardley.org.uk/2021/04/managing-teams-m
 
 Find all the Microsoft 365 Groups that a user is an Owner of and replace them with someone else useful for when an employee leaves and ownership needs to be updated.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 # This script replaces an owner with a different person in all Microsoft 365 Groups
 $oldUser = "oldUserUpn"
 $newUser = "newUserUpn"

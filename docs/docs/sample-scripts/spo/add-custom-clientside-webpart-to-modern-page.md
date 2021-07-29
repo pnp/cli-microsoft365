@@ -4,7 +4,7 @@ Author: [Yannick Plenevaux](https://ypcode.wordpress.com)
 
 You've built an amazing new web part and now you want to programmatically add it to a modern page. This sample helps you add your web part to the page with your custom properties that might be dynamic according to your script.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $site = "https://contoso.sharepoint.com/sites/site1"
 $pageName = "AModernPage.aspx"
 $webPartId = "af660fc1-c09b-4c15-b093-2b74b047286b"
