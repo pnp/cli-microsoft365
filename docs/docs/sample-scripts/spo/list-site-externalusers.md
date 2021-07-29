@@ -4,7 +4,7 @@ Author: [Albert-Jan Schot](https://www.cloudappie.nl/migration-report-external-u
 
 This script helps you to list all external users in all SharePoint Online sites. It provides insights in who the users are, and if available who they where invited by.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $fileExportPath = "<PUTYOURPATHHERE.csv>"
 
 $m365Status = m365 status

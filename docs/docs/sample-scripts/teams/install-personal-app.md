@@ -4,7 +4,7 @@ Author: [Sébastien Levert](https://github.com/sebastienlevert)
 
 Installs or updates a Microsoft Teams app from a provided zipped manifest and then, based on the parameters, add it to the current users and / or to a set of users.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 <#
   .SYNOPSIS
     Installs an app to Microsoft Teams and potentially to a set of users

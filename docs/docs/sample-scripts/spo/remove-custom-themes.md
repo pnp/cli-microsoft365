@@ -4,7 +4,7 @@ Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powersh
 
 Have you been creating a lot of beautiful themes lately and testing them in your dev tenant, but don’t want to keep them anymore? If yes, then this PowerShell script is for you.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $sparksjoy = "Cat Lovers United", "Multicolored theme"
 $themes = m365 spo theme list -o json | ConvertFrom-Json
 $themes = $themes | where {-not ($sparksjoy -contains $_.name)}

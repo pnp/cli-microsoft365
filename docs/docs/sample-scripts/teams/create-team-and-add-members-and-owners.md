@@ -4,7 +4,7 @@ Inspired by: [Rakesh Pandey](https://www.flexmind.co/blog/how-to-add-bulk-users-
 
 This sample script shows you how to create a Team and add members and owners using a CSV.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 # This script provisions a Group with owners and members and Teamifies it
 # The owners and members can be specified using a CSV file following this format
 ## upn,type

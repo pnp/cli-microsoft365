@@ -4,7 +4,7 @@ Author: [Albert-Jan Schot](https://www.cloudappie.nl/lists-file-count-cli-micros
 
 List all Lists, the folders and sub folders in a given site, and output the item count. Each folder is processed recursively. By default only non hidden document libraries are processed. As specified with the filter `$false -eq $list.Hidden -and $list.BaseTemplate -eq "101"`. The output is a CSV that contains the itemcount for each list and folder found in the specified site collection.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $siteUrl = "<PUTYOURURLHERE>"
 $fileExportPath = "<PUTYOURPATHHERE.csv>"
 

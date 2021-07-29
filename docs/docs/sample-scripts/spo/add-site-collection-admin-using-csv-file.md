@@ -13,7 +13,7 @@
 
 To get all the Site Collections in your tenant and export to a .csv file, you can run the following:
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $allSites = m365 spo site classic list --query "[?Template!='SRCHCEN#0']" -o json | ConvertFrom-Json
 $results = @()
 
@@ -29,7 +29,7 @@ $results | Export-Csv -Path "<YOUR-CSV-FILE-PATH>"
 
 The script above has a query to ignore the _Search_ site collection by filtering with the template code. If for example you wish to only get the sites that have been created with Private Channels, you could amend your query as follows:
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $privateChannelSites = m365 spo site classic list --query "[?Template=='TEAMCHANNEL#0']" -o json | ConvertFrom-Json
 ```
 
@@ -40,7 +40,7 @@ Once you've got the .csv file from the script above, filter it to your needs to 
 !!! note
     The script will add the user as a "site admin" on classic and non group-connected sites, or a an "additional admin" in group-connected sites (and not as a group Member).
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $csvSites = Import-Csv -Path "<YOUR-CSV-FILE-PATH>"
 $UserToAdd = "john.smith@contoso.com"  ## Change to your user
 $siteCount = $csvSites.Count

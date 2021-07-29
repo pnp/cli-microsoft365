@@ -2,7 +2,7 @@
 
 Author: [Sudharsan Kesavanarayanan](https://twitter.com/sudharsank)
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 <#
 .SYNOPSIS
     Create multiple lists in multiple sites.

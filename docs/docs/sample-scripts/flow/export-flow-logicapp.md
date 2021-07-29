@@ -11,7 +11,7 @@ By combining the CLI for Microsoft 365 and PowerShell we can make this task easy
 This script will export the Power Automate flow *Your sample test flow*, make sure to pass the correct name in the script, and your flow will be exported right away.
 !!!
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 Write-Output "Getting environment info..."
 $environmentId = $(m365 flow environment list --query "[?displayName == '(default)']" -o json | ConvertFrom-Json).Name
 $flowId = $(m365 flow list --environment $environmentId --query "[?displayName == 'Your sample test flow']" -o json | ConvertFrom-Json)[0].Name

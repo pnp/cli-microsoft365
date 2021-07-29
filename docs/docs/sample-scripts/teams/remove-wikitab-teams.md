@@ -4,7 +4,7 @@ Inspired by: [Garry Trinder](https://gist.github.com/garrytrinder/4df2aeaf9dd66c
 
 Removes the wiki tab of a Microsoft Teams Team's channel.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $groupMailNickname = "Architecture"
 $channelName = "General"
 

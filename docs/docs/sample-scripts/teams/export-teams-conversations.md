@@ -16,7 +16,7 @@ This script uses CLI for Microsoft 365 to export the conversations from Microsof
 !!! attention
     Commands `m365 teams message list` and `m365 teams message reply list` are based on an API that is currently in preview and is subject to change once the API reached general availability.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 function  Get-Teams {
   $teams = m365 teams team list -o json | ConvertFrom-Json -AsHashtable
   return $teams

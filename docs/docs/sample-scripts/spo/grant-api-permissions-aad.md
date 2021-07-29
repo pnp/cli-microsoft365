@@ -25,7 +25,7 @@ So what if you could bypass all these steps for both Graph and owned API?
 !!! warning
     These permissions will be granted on the whole tenant and could be used by any script running in your tenant. More info [here](https://docs.microsoft.com/en-us/sharepoint/dev/spfx/use-aadhttpclient#considerations).
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 m365 login # Don't execute that command if you're already logged in
 
 # Granting Microsoft Graph permissions

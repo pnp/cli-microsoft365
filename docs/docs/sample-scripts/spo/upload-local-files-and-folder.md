@@ -4,7 +4,7 @@ Author: [Patrick Lamber](https://github.com/plamber), [Adam](https://github.com/
 
 This script shows how you can use the CLI to upload files located on a local folder to a SharePoint Online library or subfolder. This is a simple script that could be used for simple data migration scenarios. The given example uploads to the given site to Shared Documents library all files and sub folders of ./import local folder
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 Write-host 'upload files and folders from directory example'
 
 function Import-FilesAndFolders(

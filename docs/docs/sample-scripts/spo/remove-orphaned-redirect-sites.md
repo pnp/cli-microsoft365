@@ -4,7 +4,7 @@ Author: [Albert-Jan Schot](https://www.cloudappie.nl/remove-orphaned-redirectsit
 
 Changing the URL of a site results in a new site type: a Redirect Site. However this redirect site does not get removed if you delete the newly renamed site. This could result in orphaned redirect site collections that redirect to nothing. This script provides you with an overview of all orphaned redirect sites and allows you to quickly delete them.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $sites = m365 spo site classic list --t "REDIRECTSITE#0" --output json | ConvertFrom-Json
 
 $sites | ForEach-Object {

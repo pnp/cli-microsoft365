@@ -15,7 +15,7 @@ Below is an example of the format needed for your .csv file:
 !!! important
     Make sure your target libraries contained in the file do exist in SharePoint Online.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 <#
 .SYNOPSIS
     Create multiple folders in different libraries.
@@ -64,7 +64,7 @@ Below is an example of the format needed for your .csv file:
 !!! important
     Make sure your target libraries & sites contained in the file do exist in SharePoint Online.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 <#
 .SYNOPSIS
     Create multiple folders in different libraries and in different sites.

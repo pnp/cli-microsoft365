@@ -4,7 +4,7 @@ Author: [Matti Paukkonen](https://mattipaukkonen.com/2019/10/09/govern-orphaned-
 
 Every team needs an owner, at least one. Common best practice is that you should have at least two users in owner role. Teams is not allowing the last owner to leave the team, but there might occasions when last owner is removed, example when people are leaving the organization and account gets deleted. This script finds those teams that no longer have an owner.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $availableTeams = m365 teams team list -o json | ConvertFrom-Json
 $teams = @()
 foreach ($team in $availableTeams) {

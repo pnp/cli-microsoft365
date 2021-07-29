@@ -4,7 +4,7 @@ Inspired by: [Patrick Lamber](https://www.nubo.eu/Provision-A-Team-With-CLI-For-
 
 A sample script which creates a Microsoft 365 Group, associates a logo to it and some members. Afterward, it teamyfies the Group and creates two public channels.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 # this examples searches the users in a directory by displayname
 $memberDisplayName = "A"
 # Group settings
