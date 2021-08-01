@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   siteUrl: string;
 }
 
-class SpoAppInstanceListCommand extends SpoAppBaseCommand {
+class SpoAppInStanceListCommand extends SpoAppBaseCommand {
   public get name(): string {
     return commands.APP_INSTANCE_LIST;
   }
@@ -79,4 +79,4 @@ class SpoAppInstanceListCommand extends SpoAppBaseCommand {
   }
 }
 
-module.exports = new SpoAppInstanceListCommand();
+module.exports = new SpoAppInStanceListCommand();
