@@ -5,6 +5,7 @@ export default {
   APP_DEPLOY: `${prefix} app deploy`,
   APP_GET: `${prefix} app get`,
   APP_INSTALL: `${prefix} app install`,
+  APP_INSTANCE_LIST: `${prefix} app instance list`,
   APP_LIST: `${prefix} app list`,
   APP_REMOVE: `${prefix} app remove`,
   APP_RETRACT: `${prefix} app retract`,
