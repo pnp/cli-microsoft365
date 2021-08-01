@@ -199,6 +199,7 @@ nav:
         - app deploy: 'cmd/spo/app/app-deploy.md'
         - app get: 'cmd/spo/app/app-get.md'
         - app install: 'cmd/spo/app/app-install.md'
+        - app instance list: 'cmd/spo/app/app-instance-list.md'
         - app list: 'cmd/spo/app/app-list.md'
         - app remove: 'cmd/spo/app/app-remove.md'
         - app retract: 'cmd/spo/app/app-retract.md'
