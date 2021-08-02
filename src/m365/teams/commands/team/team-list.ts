@@ -32,9 +32,9 @@ class TeamsTeamListCommand extends GraphItemsListCommand<Team> {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    let endpoint: string = `${this.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team')&$select=id,displayName,description`;
+    let endpoint: string = `${this.resource}/v1.0/groups?$select=id,displayName,description,resourceProvisioningOptions`;
     if (args.options.joined) {
-      endpoint = `${this.resource}/beta/me/joinedTeams`;
+      endpoint = `${this.resource}/v1.0/me/joinedTeams`;
     }
     this
       .getAllItems(endpoint, logger, true)
@@ -43,7 +43,13 @@ class TeamsTeamListCommand extends GraphItemsListCommand<Team> {
           return Promise.resolve();
         }
         else {
-          return Promise.all(this.items.map(g => this.getTeamFromGroup(g)));
+          return Promise.all(
+            this.items.filter((e: any) => {
+              return e.resourceProvisioningOptions.indexOf('Team') > -1;
+            }).map(
+              g => this.getTeamFromGroup(g)
+            )
+          );
         }
       })
       .then((res?: Team[]): void => {
@@ -59,7 +65,7 @@ class TeamsTeamListCommand extends GraphItemsListCommand<Team> {
   private getTeamFromGroup(group: { id: string, displayName: string, description: string }): Promise<Team> {
     return new Promise<Team>((resolve: (team: Team) => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
-        url: `${this.resource}/beta/teams/${group.id}`,
+        url: `${this.resource}/v1.0/teams/${group.id}`,
         headers: {
           accept: 'application/json;odata.metadata=none'
         },
