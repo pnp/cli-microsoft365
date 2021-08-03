@@ -663,6 +663,7 @@ nav:
       - 'List all tabs in Microsoft Teams teams in the tenant': 'sample-scripts/teams/list-all-tabs-teams.md'
       - 'List all Microsoft Teams team''s Owners and Members': 'sample-scripts/teams/list-teams-owners-and-members.md'
       - 'List app usage in Microsoft Teams': 'sample-scripts/teams/list-teams-app-usage.md'
+      - 'Recognize most active users for a specific Team': 'sample-scripts/teams/recognize-most-active-users-specific-team.md'
       - 'Remove a Microsoft Teams personal app': 'sample-scripts/teams/remove-personal-app.md'
       - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'
       - 'Share social champions to Teams': 'sample-scripts/teams/share-socialchampions.md'
