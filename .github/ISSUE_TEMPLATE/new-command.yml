@@ -1,0 +1,59 @@
+name: New command
+description: Create a specification for a new command
+title: "New command: <short description>"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new command to be added to this project.
+        
+        Please complete the below template to ensure we have the necessary details.
+  - type: input
+    id: usage
+    attributes:
+      label: Usage
+      description: |
+        This should describe how the command will be used.
+        
+        Commands should follow a pattern of `service` `entity` `verb`. 
+        
+        Approved verbs include `get`, `set`, `remove`, `add` and `list`.
+      placeholder: e.g. m365 spo web get [options]
+    validations:
+      required: true
+  - type: input
+    id: description
+    attributes:
+      label: Description
+      description: |
+        Provide a short description of what the command does
+      placeholder: e.g. Retrieve information about the specified site
+    validations:
+      required: true
+  - type: textarea
+    id: options
+    attributes:
+      label: Options
+      description: |
+        Amend and complete the table below to describe the options that are to be implemented on this this command.
+        
+        You should provide a long version, e.g. `--teamId`, and where possible provide a short option, e.g. `-i`, as the option name. 
+        
+        Take care to avoid using option names which conflict with global options, such as `-h`, `--help`, `-o`, `--output`, `--debug` and `--verbose`
+        
+        Use `<>` to denote a required option and `[]` to denote an optional option.
+      value: |
+        Option | Description
+        -- | --
+        `-i, --teamId <teamId>` | The Id of the Microsoft Team
+        `-r, --role [role]` | Filter the results to only users with the given role: `Owner` or `Member`.
+    validations:
+      required: true
+  - type: textarea
+    id: info
+    attributes:
+      label: Additional Info
+      description: |
+        Provide additional information or links to resources that can help with the creation of this command.
+    validations:
+      required: false
