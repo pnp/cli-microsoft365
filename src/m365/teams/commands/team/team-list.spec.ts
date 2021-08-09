@@ -212,19 +212,13 @@ describe(commands.TEAM_LIST, () => {
               "description": "Team 2 description",
               "displayName": "Team 2",
               "resourceProvisioningOptions": ["Team"]
-            },
-            {
-              "id": "8090c93e-ba7c-433e-9f39-08c7ba07c0b3",
-              "description": "Team 3 description",
-              "displayName": "Team 3",
-              "resourceProvisioningOptions": ["Stream"]
             }
           ]
         });
       }
       else if ((opts.url as string).startsWith(`https://graph.microsoft.com/v1.0/teams/`)) {
         const id: string = (<string>opts.url).substring((<string>opts.url).lastIndexOf(`/`) + 1);
-        return Promise.resolve([{
+        return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
           "id": id,
           "webUrl": "https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
@@ -253,37 +247,7 @@ describe(commands.TEAM_LIST, () => {
             "allowStickersAndMemes": true,
             "allowCustomMemes": false
           }
-        },
-        {
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams/$entity",
-          "id": id,
-          "webUrl": "https://teams.microsoft.com/l/team/19:a5c6eccad3fb401997756a1501d561aa%40thread.skype/conversations?groupId=8090c93e-ba7c-433e-9f39-08c7ba07c0b3&tenantId=dcd219dd-bc68-4b9b-bf0b-4a33a796be35",
-          "isArchived": false,
-          "memberSettings": {
-            "allowCreateUpdateChannels": true,
-            "allowDeleteChannels": true,
-            "allowAddRemoveApps": true,
-            "allowCreateUpdateRemoveTabs": true,
-            "allowCreateUpdateRemoveConnectors": true
-          },
-          "guestSettings": {
-            "allowCreateUpdateChannels": false,
-            "allowDeleteChannels": false
-          },
-          "messagingSettings": {
-            "allowUserEditMessages": false,
-            "allowUserDeleteMessages": false,
-            "allowOwnerDeleteMessages": false,
-            "allowTeamMentions": true,
-            "allowChannelMentions": true
-          },
-          "funSettings": {
-            "allowGiphy": true,
-            "giphyContentRating": "moderate",
-            "allowStickersAndMemes": true,
-            "allowCustomMemes": false
-          }
-        }]);
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -302,12 +266,6 @@ describe(commands.TEAM_LIST, () => {
             "id": "13be6971-79db-4f33-9d41-b25589ca25af",
             "displayName": "Team 2",
             "description": "Team 2 description",
-            "isArchived": false
-          },
-          {
-            "id": "8090c93e-ba7c-433e-9f39-08c7ba07c0b3",
-            "displayName": "Team 3",
-            "description": "Team 3 description",
             "isArchived": false
           }
         ]));
@@ -335,12 +293,6 @@ describe(commands.TEAM_LIST, () => {
               "description": "Team 2 description",
               "displayName": "Team 2",
               "resourceProvisioningOptions": ["Team"]
-            },
-            {
-              "id": "8090c93e-ba7c-433e-9f39-08c7ba07c0b3",
-              "description": "Team 3 description",
-              "displayName": "Team 3",
-              "resourceProvisioningOptions": ["Stream"]
             }
           ]
         });
@@ -391,12 +343,6 @@ describe(commands.TEAM_LIST, () => {
               "id": "13be6971-79db-4f33-9d41-b25589ca25af",
               "displayName": "Team 2",
               "description": "Team 2 description",
-              "isArchived": false
-            },
-            {
-              "id": "8090c93e-ba7c-433e-9f39-08c7ba07c0b3",
-              "displayName": "Team 3",
-              "description": "Team 3 description",
               "isArchived": false
             }
           ]
@@ -420,12 +366,6 @@ describe(commands.TEAM_LIST, () => {
             "displayName": "Team 2",
             "description": "Team 2 description",
             "isArchived": false
-          },
-          {
-            "id": "8090c93e-ba7c-433e-9f39-08c7ba07c0b3",
-            "displayName": "Team 3",
-            "description": "Team 3 description",
-            "isArchived": false
           }
         ]));
         done();
@@ -444,17 +384,14 @@ describe(commands.TEAM_LIST, () => {
             {
               "id": "02bd9fd6-8f93-4758-87c3-1fb73740a315",
               "description": "Team 1 description",
-              "displayName": "Team 1"
+              "displayName": "Team 1",
+              "resourceProvisioningOptions": ["Team"]
             },
             {
               "id": "13be6971-79db-4f33-9d41-b25589ca25af",
               "description": "Team 2 description",
-              "displayName": "Team 2"
-            },
-            {
-              "id": "8090c93e-ba7c-433e-9f39-08c7ba07c0b3",
-              "description": "Team 3 description",
-              "displayName": "Team 3"
+              "displayName": "Team 2",
+              "resourceProvisioningOptions": ["Team"]
             }
           ]
         });
@@ -506,12 +443,6 @@ describe(commands.TEAM_LIST, () => {
               "displayName": "Team 2",
               "description": "Team 2 description",
               "isArchived": false
-            },
-            {
-              "id": "8090c93e-ba7c-433e-9f39-08c7ba07c0b3",
-              "displayName": "Team 3",
-              "description": "Team 3 description",
-              "isArchived": false
             }
           ]
         });
@@ -533,12 +464,6 @@ describe(commands.TEAM_LIST, () => {
             "id": "13be6971-79db-4f33-9d41-b25589ca25af",
             "displayName": "Team 2",
             "description": "Team 2 description",
-            "isArchived": false
-          },
-          {
-            "id": "8090c93e-ba7c-433e-9f39-08c7ba07c0b3",
-            "displayName": "Team 3",
-            "description": "Team 3 description",
             "isArchived": false
           }
         ]));
