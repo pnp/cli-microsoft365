@@ -11,12 +11,12 @@ export abstract class GraphItemsListCommand<T> extends GraphCommand {
     this.items = [];
   }
 
-  protected getAllItems(url: string, logger: Logger, firstRun: boolean): Promise<void> {
+  protected getAllItems(url: string, logger: Logger, firstRun: boolean, metadata?: 'none' | 'minimal' | 'full'): Promise<void> {
     return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
       const requestOptions: any = {
         url: url,
         headers: {
-          accept: 'application/json;odata.metadata=none'
+          accept: `application/json;odata.metadata=${metadata || 'none'}`
         },
         responseType: 'json'
       };
