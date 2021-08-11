@@ -1,5 +1,13 @@
 # Release notes
 
+## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
+
+### Changes
+
+- updated 'teams message reply list' to Graph v1.0 [#2608](https://github.com/pnp/cli-microsoft365/pull/2608)
+- extendedd 'getAllItems' with an optional metadata argument.[#2621](https://github.com/pnp/cli-microsoft365/pull/2621)
+- added 'social champion' sample.[#2616](https://github.com/pnp/cli-microsoft365/pull/2616)
+
 ## [v3.12.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.12.0)
 
 ### New commands
@@ -870,7 +878,7 @@
 - [outlook report mailappusageusercounts](../cmd/outlook/report/report-mailappusageusercounts.md) - gets the count of unique users that connected to Exchange Online using any email app [#1214](https://github.com/pnp/cli-microsoft365/issues/1214)
 - [outlook report mailactivityusercounts](../cmd/outlook/report/report-mailactivityusercounts.md) - enables you to understand trends on the number of unique users who are performing email activities like send, read, and receive [#1211](https://github.com/pnp/cli-microsoft365/issues/1211)
 - [outlook report mailactivitycounts](../cmd/outlook/report/report-mailactivitycounts.md) - enables you to understand the trends of email activity (like how many were sent, read, and received) in your organization [#1210](https://github.com/pnp/cli-microsoft365/issues/1210)
-- [outlook report mailboxusagedetail](../cmd/outlook/report/report-mailboxusagedetail.md) - gets details about mailbox usage [#1216](https://github.com/pnp/cli-microsoft365/issues/1216) 
+- [outlook report mailboxusagedetail](../cmd/outlook/report/report-mailboxusagedetail.md) - gets details about mailbox usage [#1216](https://github.com/pnp/cli-microsoft365/issues/1216)
 - [outlook report mailappusageuserdetail](../cmd/outlook/report/report-mailappusageuserdetail.md) - gets details about which activities users performed on the various email apps [#1212](https://github.com/pnp/cli-microsoft365/issues/1212)
 - [outlook report mailactivityuserdetail](../cmd/outlook/report/report-mailactivityuserdetail.md) - gets details about email activity users have performed [#1209](https://github.com/pnp/cli-microsoft365/issues/1209)
 - [outlook report mailappusageappsusercounts](../cmd/outlook/report/report-mailappusageappsusercounts.md) - gets the count of unique users per email app [#1213](https://github.com/pnp/cli-microsoft365/issues/1213)
