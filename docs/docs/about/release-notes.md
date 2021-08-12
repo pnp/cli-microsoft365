@@ -2,11 +2,18 @@
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
+### New commands
+
+**SharePoint:**
+
+- added the 'spo group user add' command [#2483](https://github.com/pnp/cli-microsoft365/issues/2483)
+
 ### Changes
 
-- updated 'teams message reply list' to Graph v1.0 [#2608](https://github.com/pnp/cli-microsoft365/pull/2608)
-- extendedd 'getAllItems' with an optional metadata argument.[#2621](https://github.com/pnp/cli-microsoft365/pull/2621)
-- added 'social champion' sample.[#2616](https://github.com/pnp/cli-microsoft365/pull/2616)
+- updated 'teams message reply list' to Graph v1.0 [#2509](https://github.com/pnp/cli-microsoft365/issues/2509)
+- extended 'getAllItems' with an optional metadata argument [#2613](https://github.com/pnp/cli-microsoft365/issues/2613)
+- added the 'social champion' sample [#2532](https://github.com/pnp/cli-microsoft365/issues/2532)
+- renamed 'PowerShell Core' to 'PowerShell' in docs [#2620](https://github.com/pnp/cli-microsoft365/issues/2620)
 
 ## [v3.12.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.12.0)
 
