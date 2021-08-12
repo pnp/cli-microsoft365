@@ -6,7 +6,7 @@ Tenant Wide Extensions list from the App Catalog helps to manage the activation 
 
 Note: TenantWideExtensionDisabled column denotes the extension is enabled or disabled.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $extensionName = Read-Host "Enter the Extension Name"
 $listName = "Tenant Wide Extensions"
 

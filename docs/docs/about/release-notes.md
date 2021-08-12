@@ -1,5 +1,20 @@
 # Release notes
 
+## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
+
+### New commands
+
+**SharePoint:**
+
+- added the 'spo group user add' command [#2483](https://github.com/pnp/cli-microsoft365/issues/2483)
+
+### Changes
+
+- updated 'teams message reply list' to Graph v1.0 [#2509](https://github.com/pnp/cli-microsoft365/issues/2509)
+- extended 'getAllItems' with an optional metadata argument [#2613](https://github.com/pnp/cli-microsoft365/issues/2613)
+- added the 'social champion' sample [#2532](https://github.com/pnp/cli-microsoft365/issues/2532)
+- renamed 'PowerShell Core' to 'PowerShell' in docs [#2620](https://github.com/pnp/cli-microsoft365/issues/2620)
+
 ## [v3.12.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.12.0)
 
 ### New commands
@@ -31,6 +46,8 @@
 - extended Teams channel ID validation with - and _ [#2594](https://github.com/pnp/cli-microsoft365/issues/2594)
 - added file count sample [#2576](https://github.com/pnp/cli-microsoft365/issues/2576)
 - added support for upgrading SPFx projects to v1.13.0-beta.13 [#2604](https://github.com/pnp/cli-microsoft365/issues/2604)
+- updated upgrade rule for SPFx v1.13.0-beta.13 [#2611](https://github.com/pnp/cli-microsoft365/issues/2611)
+- added support for upgrading SPFx projects to v1.13.0-beta.15 [#2614](https://github.com/pnp/cli-microsoft365/issues/2614)
 
 ## [v3.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.11.0)
 
@@ -868,7 +885,7 @@
 - [outlook report mailappusageusercounts](../cmd/outlook/report/report-mailappusageusercounts.md) - gets the count of unique users that connected to Exchange Online using any email app [#1214](https://github.com/pnp/cli-microsoft365/issues/1214)
 - [outlook report mailactivityusercounts](../cmd/outlook/report/report-mailactivityusercounts.md) - enables you to understand trends on the number of unique users who are performing email activities like send, read, and receive [#1211](https://github.com/pnp/cli-microsoft365/issues/1211)
 - [outlook report mailactivitycounts](../cmd/outlook/report/report-mailactivitycounts.md) - enables you to understand the trends of email activity (like how many were sent, read, and received) in your organization [#1210](https://github.com/pnp/cli-microsoft365/issues/1210)
-- [outlook report mailboxusagedetail](../cmd/outlook/report/report-mailboxusagedetail.md) - gets details about mailbox usage [#1216](https://github.com/pnp/cli-microsoft365/issues/1216) 
+- [outlook report mailboxusagedetail](../cmd/outlook/report/report-mailboxusagedetail.md) - gets details about mailbox usage [#1216](https://github.com/pnp/cli-microsoft365/issues/1216)
 - [outlook report mailappusageuserdetail](../cmd/outlook/report/report-mailappusageuserdetail.md) - gets details about which activities users performed on the various email apps [#1212](https://github.com/pnp/cli-microsoft365/issues/1212)
 - [outlook report mailactivityuserdetail](../cmd/outlook/report/report-mailactivityuserdetail.md) - gets details about email activity users have performed [#1209](https://github.com/pnp/cli-microsoft365/issues/1209)
 - [outlook report mailappusageappsusercounts](../cmd/outlook/report/report-mailappusageappsusercounts.md) - gets the count of unique users per email app [#1213](https://github.com/pnp/cli-microsoft365/issues/1213)

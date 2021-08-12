@@ -5,7 +5,7 @@ Inspired By: [Salaudeen Rajack](https://www.sharepointdiary.com/2015/08/sharepoi
 
 The script removes a user from a site collection and adds a new one as site collection admin.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $userToAdd = "<upnOfUserToAdd>"
 $userToRemove = "<upnOfUserToRemove>"
 $webUrl = "<spoUrl>"

@@ -2,7 +2,7 @@
 
 Inspired by [Salaudeen Rajack](https://www.sharepointdiary.com/2020/08/sharepoint-online-monitor-site-storage-usage-with-powershell.html)
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 <#
 .SYNOPSIS
     Monitor Site Collections storage usage and send an email.

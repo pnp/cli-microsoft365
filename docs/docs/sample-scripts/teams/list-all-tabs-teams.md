@@ -4,7 +4,7 @@ Inspired by: [Patrick Lamber](https://www.nubo.eu/List-all-tabs-in-Microsoft-Tea
 
 List all tabs in Microsoft Teams teams in the tenant and exports the results in a CSV.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $fileExportPath = "<PUTYOURPATHHERE.csv>"
 $m365Status = m365 status
 if ($m365Status -eq "Logged Out") {

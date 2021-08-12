@@ -33,7 +33,7 @@ class TeamsMessageListCommand extends GraphItemsListCommand<Message> {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const deltaExtension: string = args.options.since !== undefined ? `/delta?$filter=lastModifiedDateTime gt ${args.options.since}` : '';
-    const endpoint: string = `${this.resource}/beta/teams/${args.options.teamId}/channels/${args.options.channelId}/messages${deltaExtension}`;
+    const endpoint: string = `${this.resource}/v1.0/teams/${args.options.teamId}/channels/${args.options.channelId}/messages${deltaExtension}`;
 
     this
       .getAllItems(endpoint, logger, true)

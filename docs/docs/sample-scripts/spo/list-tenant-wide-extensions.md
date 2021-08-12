@@ -4,7 +4,7 @@ Author: [Shantha Kumar T](https://www.ktskumar.com/2020/04/manage-tenant-wide-ex
 
 The following script lists all tenant-wide extensions deployed in the tenant. The sample returns the Id, Title, Extension Location and Extension Disabled status of each extension.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $listName = "Tenant Wide Extensions"
 $fields = "Id, Title, TenantWideExtensionDisabled, TenantWideExtensionLocation"
 

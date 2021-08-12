@@ -4,7 +4,7 @@ Author: [David Ramalho](https://sharepoint-tricks.com/hide-sharepoint-list-from-
 
 If you need to hide the SharePoint list from the UI this simple PowerShell script will hide a specific list from the site contents. This will prevent users from easily accessing the list while, for example, you are still setting it up.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $listName = "listName"
 $site = "https://contoso.sharepoint.com/"
 

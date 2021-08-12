@@ -8,7 +8,7 @@ Microsoft 365 CLI cmdlets will help you to cancel all the running flow runs.
 
 This script will cancel all running flow runs of a Power Automate flow created in an environment. Pass the Flow environment id and the flow guid as parameter while running the script.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $flowEnvironment = $args[0]
 $flowGUID = $args[1]
 $flowRuns = m365 flow run list --environment $flowEnvironment --flow $flowGUID --output json | ConvertFrom-Json

@@ -4,7 +4,7 @@ Inspired by: [Thomy Goelles](https://thomy.tech/list-teams-app-usage/)
 
 A sample script which iterates through all the teams in your tenant and lists all apps in each team. This script will be handy if you want to generate a report of available apps in Teams across your tenant.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $availableTeams = m365 teams team list -o json | ConvertFrom-Json
 
 if ($availableTeams.count -gt 15) {

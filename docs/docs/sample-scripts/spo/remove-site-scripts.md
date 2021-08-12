@@ -4,7 +4,7 @@ Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powersh
 
 Site designs and especially site scripts can be something that ends up just hanging around in your tenant for a long time even though you no longer need them for anything. Use the scripts below to get rid of them. You might also find some site scripts that are not linked to any site design and hence never get executed!
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $sparksjoy = "Project Site", "Issues List"
 $siteScripts = m365 spo sitescript list -o json | ConvertFrom-Json
 $siteScripts = $siteScripts | where {  -not ($sparksjoy -contains $_.Title)}

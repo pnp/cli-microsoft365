@@ -13,7 +13,7 @@ Prerequisites:
 - Azure Storage Container
 - Azure Storage Account Key with required permission to upload documents
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $spolHostName = "https://tenant-name.sharepoint.com"
 $spolSiteRelativeUrl = "/sites/site-name"
 $spolDocLibTitle = "document-library-title"

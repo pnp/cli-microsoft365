@@ -23,9 +23,6 @@ m365 teams message list [options]
 
 ## Remarks
 
-!!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
-
 You can only retrieve a message from a Microsoft Teams team if you are a member of that team.
 
 ## Examples
