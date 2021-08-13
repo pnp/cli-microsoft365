@@ -38,7 +38,7 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'title', 'createdDateTime', 'owner'];
+    return ['id', 'title', 'createdDateTime', 'owner', '@odata.etag'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
@@ -53,7 +53,7 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
     else {
       this
         .getGroupId(args)
-        .then((groupId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/groups/${groupId}/planner/plans`, logger, true))
+        .then((groupId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/groups/${groupId}/planner/plans`, logger, true, 'minimal'))
         .then((): void => {
           const filteredPlan = this.items.filter((plan: any) => plan.title === args.options.title);
           if (filteredPlan && filteredPlan.length > 0) {
