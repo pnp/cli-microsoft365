@@ -265,6 +265,7 @@ nav:
         - group list: 'cmd/spo/group/group-list.md'
         - group remove: 'cmd/spo/group/group-remove.md'
         - group user add: 'cmd/spo/group/group-user-add.md'
+        - group user list: 'cmd/spo/group/group-user-list.md'
       - hidedefaultthemes:
         - hidedefaultthemes get: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-get.md'
         - hidedefaultthemes set: 'cmd/spo/hidedefaultthemes/hidedefaultthemes-set.md'
