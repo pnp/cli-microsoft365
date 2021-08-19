@@ -6,7 +6,11 @@
 
 **SharePoint:**
 
-- added the 'spo group user add' command [#2483](https://github.com/pnp/cli-microsoft365/issues/2483)
+- [spo group user add](../cmd/spo/group/group-user-add.md) - add a user or multiple users to SharePoint Group [#2483](https://github.com/pnp/cli-microsoft365/issues/2483)
+
+**Planner:**
+
+- [planner plan get](../cmd/planner/plan/plan-get.md) - retrieves a Microsoft Planner plan [#2528](https://github.com/pnp/cli-microsoft365/issues/2528)
 
 ### Changes
 
