@@ -18,7 +18,7 @@ function Get-Channels(
     if($teamName) {
         $channels = m365 teams channel list --teamName $teamName -o 'json' | ConvertFrom-Json
     }
-    Write-Output $channels.length
+    Write-Host "Retrieving the channels.."
     if($channels.length -gt 0) {
         $results = @()
         foreach($channel in $channels) {
@@ -34,7 +34,7 @@ function Get-Channels(
         $results | Export-Csv -Path "Channels.csv" -NoTypeInformation
         Write-Host "Completed."
     } else {
-        Write-Information "No channesl found!"
+        Write-Host "No channesl found!"
     }
 }
 
