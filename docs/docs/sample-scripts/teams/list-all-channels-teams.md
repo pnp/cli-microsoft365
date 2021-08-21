@@ -30,7 +30,7 @@ function Get-Channels(
                 WebURL = $channel.weburl
             }
         }
-        Write-Host "Exporting file to $fileExportPath.."
+        Write-Host "Exporting the results.."
         $results | Export-Csv -Path "Channels.csv" -NoTypeInformation
         Write-Host "Completed."
     } else {
