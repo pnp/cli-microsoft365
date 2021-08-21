@@ -7,6 +7,7 @@
 **SharePoint:**
 
 - [spo group user add](../cmd/spo/group/group-user-add.md) - add a user or multiple users to SharePoint Group [#2483](https://github.com/pnp/cli-microsoft365/issues/2483)
+- [spo site apppermission remove](../cmd/spo/site/site-apppermission-remove.md) - removes a specific application permission from a site [#2209](https://github.com/pnp/cli-microsoft365/issues/2209)
 
 **Planner:**
 
@@ -18,6 +19,7 @@
 - extended 'getAllItems' with an optional metadata argument [#2613](https://github.com/pnp/cli-microsoft365/issues/2613)
 - added the 'social champion' sample [#2532](https://github.com/pnp/cli-microsoft365/issues/2532)
 - renamed 'PowerShell Core' to 'PowerShell' in docs [#2620](https://github.com/pnp/cli-microsoft365/issues/2620)
+- added support for upgrading SPFx projects to 1.13.0-beta.17 [#2644](https://github.com/pnp/cli-microsoft365/issues/2644)
 
 ## [v3.12.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.12.0)
 
