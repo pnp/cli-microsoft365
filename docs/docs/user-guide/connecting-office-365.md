@@ -105,7 +105,7 @@ CLI for Microsoft 365 also supports login using a secret. To use this authentica
 To log in to Microsoft 365 using a secret, execute:
 
 ```sh
-m365 login --authType secret --secret '<secret-value>'
+m365 login --authType secret --secret topSeCr3t@007
 ```
 
 Logging in to Microsoft 365 using a secret is convenient for automation scenarios where you cannot authenticate interactively but also don't want to use credentials.
@@ -118,7 +118,7 @@ Because there is no user context when logging in using a secret, you will typica
 Logging in using a secret gives the CLI for Microsoft 365 app-only access to Microsoft 365 services. Not all operations support app-only access so it is possible, that some CLI commands will fail when executed while logged in to Microsoft 365 using a secret.
 
 !!! attention
-    Currently, SharePoint does not support authentication using Azure AD App ID and Secret. Microsoft 365 CLI commands that call the SharePoint APIs will fail while logged in to Microsoft 365 using a Secret.
+    Currently, SharePoint does not support authentication using Azure AD App ID and Secret. CLI for Microsoft 365 commands that call the SharePoint APIs will fail while logged in to Microsoft 365 using a Secret.
 
 !!! attention
     When logging in to Microsoft 365 using a secret, CLI for Microsoft 365 will persist not only the retrieved access token but also the secret. This is necessary for the CLI to be able to retrieve a new access token in case of the previously retrieved access token expired or has been invalidated.
