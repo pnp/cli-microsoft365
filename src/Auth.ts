@@ -236,15 +236,14 @@ export class Auth {
       privateKey: certificatePrivateKey as string
     };
 
-    const authConfig = cert ? {
-      clientId: this.service.appId,
-      authority: `https://login.microsoftonline.com/${this.service.tenant}`,
-      clientCertificate: cert
-    } : {
-      clientId: this.service.appId,
-      authority: `https://login.microsoftonline.com/${this.service.tenant}`,
-      clientSecret: clientSecret
+    const config = { 
+      clientId: this.service.appId, 
+      authority: `https://login.microsoftonline.com/${this.service.tenant}` 
     };
+
+    const authConfig = cert 
+      ? { ...config, clientCertificate: cert } 
+      : { ...config, clientSecret};
 
     return {
       auth: authConfig,
