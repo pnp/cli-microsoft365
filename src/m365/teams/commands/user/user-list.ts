@@ -67,6 +67,10 @@ class TeamsUserListCommand extends GraphItemsListCommand<GroupUser> {
           logger.logToStderr(chalk.green("DONE"));
         }
 
+        if(this.debug){
+        
+        }
+
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
