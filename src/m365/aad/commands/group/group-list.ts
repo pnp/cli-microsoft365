@@ -6,7 +6,7 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { Group } from './group';
+import { Group } from './Group';
 
 interface CommandArgs {
   options: Options;
