@@ -22,6 +22,8 @@
 - renamed 'PowerShell Core' to 'PowerShell' in docs [#2620](https://github.com/pnp/cli-microsoft365/issues/2620)
 - added support for upgrading SPFx projects to 1.13.0-beta.17 [#2644](https://github.com/pnp/cli-microsoft365/issues/2644)
 - added support for using AAD client secret to authenticate [#2171](https://github.com/pnp/cli-microsoft365/issues/2171)
+- updated 'teams team list' to Graph v1.0 [#2507](https://github.com/pnp/cli-microsoft365/issues/2507)
+- added the 'Recognize most active users for a specific Team' sample [#2619](https://github.com/pnp/cli-microsoft365/issues/2619)
 
 ## [v3.12.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.12.0)
 
