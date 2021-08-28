@@ -76,6 +76,7 @@ nav:
       - user:
         - user get: 'cmd/aad/user/user-get.md'
         - user list: 'cmd/aad/user/user-list.md'
+        - user set: 'cmd/aad/user/user-set.md'
     - Adaptive Card (adaptivecard):
       - send: 'cmd/adaptivecard/adaptivecard-send.md'
     - CLI (cli):
