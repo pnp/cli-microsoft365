@@ -84,8 +84,8 @@ describe(commands.USER_SET, () => {
     assert.strictEqual(allowUnknownOptions, true);
   });
 
-  it('correctly handles user not found', (done) => {
-    sinon.stub(request, 'get').callsFake(() => {
+  it('correctly handles user or property not found', (done) => {
+    sinon.stub(request, 'patch').callsFake(() => {
       return Promise.reject({
         "error": {
           "code": "Request_ResourceNotFound",
@@ -98,7 +98,7 @@ describe(commands.USER_SET, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, objectId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, objectId: '1caf7dcd-7e83-4c3a-94f7-932a1299c844', NonExistingProperty: 'Value' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '1caf7dcd-7e83-4c3a-94f7-932a1299c844' does not exist or one of its queried reference-property objects are not present.`)));
         done();
