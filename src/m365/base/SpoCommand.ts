@@ -1,6 +1,6 @@
-import auth from '../../Auth';
+import auth, { AuthType } from '../../Auth';
 import { Logger } from '../../cli';
-import Command from '../../Command';
+import Command, { CommandArgs, CommandError } from '../../Command';
 import config from '../../config';
 import request from '../../request';
 import { SpoOperation } from '../spo/commands/site/SpoOperation';
@@ -405,5 +405,21 @@ export default abstract class SpoCommand extends Command {
     }
 
     return `${baseUrl}/${relativeUrl}`;
+  }
+
+  public action(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
+
+    auth
+      .restoreAuth()
+      .then((): void => {
+        if (auth.service.connected && AuthType[auth.service.authType] === AuthType[AuthType.Secret]) {
+          cb(new CommandError(`SharePoint does not support authentication using AAD Client ID and 'Secret' at the moment. Please use an alternate login type to connect to CLI for Microsoft 365 to work with SharePoint commands.`));
+          return;
+        }
+
+        super.action(logger,args,cb);
+      }, (error: any): void => {
+        cb(new CommandError(error));
+      });
   }
 }

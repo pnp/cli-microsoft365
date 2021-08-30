@@ -786,4 +786,20 @@ describe('SpoCommand', () => {
         done('Options resolved while error expected');
       }, _ => done());
   });
+
+  it('Shows an error when CLI is connected with authType "Secret"',(done) => {
+
+    sinon.stub(auth.service, 'authType').value(5);
+
+    const mock = new MockCommand();
+    mock.action(logger, { options: {} }, (err?:any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError("SharePoint does not support authentication using AAD Client ID and 'Secret' at the moment. Please use an alternate login type to connect to CLI for Microsoft 365 to work with SharePoint commands.")));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 });
