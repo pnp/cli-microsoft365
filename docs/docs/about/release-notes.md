@@ -2,12 +2,23 @@
 
 ## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
 
+### New commands
+
+**SharePoint:**
+
+- [spo group user list](../cmd/spo/group/group-user-list.md) - list members of a SharePoint Group [#2640](https://github.com/pnp/cli-microsoft365/issues/2640)
+
 ### Changes
 
 - removed duplicate ID in 'spo listitem' commands [#2024](https://github.com/pnp/cli-microsoft365/issues/2024)
 - removed the 'value' wrapper in the output [#2292](https://github.com/pnp/cli-microsoft365/issues/2292)
 - updated JMESPath docs [#2553](https://github.com/pnp/cli-microsoft365/issues/2553)
 - removed obsolete file path options [#2309](https://github.com/pnp/cli-microsoft365/issues/2309)
+- aligned 'aad o365group user list' and 'teams user list' [#2520](https://github.com/pnp/cli-microsoft365/issues/2520)
+- in 'spo listitem get' renames fields to properties [#2533](https://github.com/pnp/cli-microsoft365/issues/2533)
+- changed default output to JSON [#2599](https://github.com/pnp/cli-microsoft365/issues/2599)
+- added SPO auto-discovery remark to 'Using your own Azure AD identity' [#2639](https://github.com/pnp/cli-microsoft365/issues/2639)
+- added the 'Export all the team members from the Teams team' sample [#2648](https://github.com/pnp/cli-microsoft365/pull/2648)
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
