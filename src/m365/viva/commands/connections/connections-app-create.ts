@@ -152,7 +152,7 @@ class VivaConnectionsAppCreateCommand extends AnonymousCommand {
           this.archive.writeZip(`${args.options.appName}.zip`);
           cb();
         }
-        catch (ex) {
+        catch (ex: any) {
           cb(ex.message);
         }
       }, (err: CommandErrorWithOutput) => {
