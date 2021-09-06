@@ -172,7 +172,7 @@ export class Cli {
       // process options before passing them on to validation stage
       await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
     }
-    catch (e) {
+    catch (e: any) {
       return this.closeWithError(e.message, optionsWithoutShorts, false);
     }
 
@@ -445,7 +445,7 @@ export class Cli {
       try {
         logStatement = jmespath.search(logStatement, options.query);
       }
-      catch (e) {
+      catch (e: any) {
         const message = `JMESPath query error. ${e.message}. See https://jmespath.org/specification.html for more information`;
         Cli.getInstance().closeWithError(message, { options }, false);
       }

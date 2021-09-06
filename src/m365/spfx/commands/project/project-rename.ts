@@ -77,7 +77,7 @@ class SpfxProjectRenameCommand extends BaseProjectCommand {
       this.replaceDeployAzureStorageJsonContent(path.join(this.projectRootPath, 'config', 'deploy-azure-storage.json'), args, logger);
       this.replaceReadMeContent(path.join(this.projectRootPath, 'README.md'), projectName, args, logger);
     }
-    catch (error) {
+    catch (error: any) {
       cb(new CommandError(error));
       return;
     }

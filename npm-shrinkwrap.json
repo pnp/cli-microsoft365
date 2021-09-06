@@ -9027,6 +9027,17 @@
         "side-channel": "^1.0.4"
       }
     },
+    "internal-slot": {
+      "version": "1.0.3",
+      "resolved": "https://registry.npmjs.org/internal-slot/-/internal-slot-1.0.3.tgz",
+      "integrity": "sha512-O0DB1JC/sPyZl7cIo78n5dR7eUSwwpYPiXRhTzNxZVAMUuB8vlnRFyLxdrVToks6XPLVnFfbzaVd5WLjhgg+vA==",
+      "dev": true,
+      "requires": {
+        "get-intrinsic": "^1.1.0",
+        "has": "^1.0.3",
+        "side-channel": "^1.0.4"
+      }
+    },
     "is-arrayish": {
       "version": "0.2.1",
       "resolved": "https://registry.npmjs.org/is-arrayish/-/is-arrayish-0.2.1.tgz",
