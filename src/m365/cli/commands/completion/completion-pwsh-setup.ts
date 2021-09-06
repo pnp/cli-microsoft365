@@ -59,7 +59,7 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
 
           fs.mkdirSync(dirname, { recursive: true });
         }
-        catch (e) {
+        catch (e: any) {
           cb(new CommandError(e));
           return;
         }
@@ -72,7 +72,7 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
       try {
         fs.writeFileSync(args.options.profile, '', 'utf8');
       }
-      catch (e) {
+      catch (e: any) {
         cb(new CommandError(e));
         return;
       }
@@ -87,7 +87,7 @@ class CliCompletionPwshSetupCommand extends AnonymousCommand {
       fs.appendFileSync(args.options.profile, os.EOL + completionScriptPath, 'utf8');
       cb();
     }
-    catch (e) {
+    catch (e: any) {
       cb(new CommandError(e));
     }
   }

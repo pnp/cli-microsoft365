@@ -248,7 +248,7 @@ class SpfxProjectUpgradeCommand extends BaseProjectCommand {
         });
       });
     }
-    catch (e) {
+    catch (e: any) {
       cb(new CommandError(e.message));
       return;
     }
