@@ -24,7 +24,7 @@ class AadSiteClassificationGetCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const requestOptions: any = {
-      url: `${this.resource}/beta/settings`,
+      url: `${this.resource}/v1.0/groupSettings`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -66,7 +66,7 @@ class AadSiteClassificationGetCommand extends GraphCommand {
         });
 
         siteClassificationsSettings.UsageGuidelinesUrl = "";
-        if (guidanceUrl !==null && guidanceUrl.length > 0) {
+        if (guidanceUrl !== null && guidanceUrl.length > 0) {
           siteClassificationsSettings.UsageGuidelinesUrl = guidanceUrl[0].value;
         }
 
