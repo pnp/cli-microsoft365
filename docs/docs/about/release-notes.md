@@ -20,6 +20,7 @@
 - added SPO auto-discovery remark to 'Using your own Azure AD identity' [#2639](https://github.com/pnp/cli-microsoft365/issues/2639)
 - added the 'Export all the team members from the Teams team' sample [#2648](https://github.com/pnp/cli-microsoft365/pull/2648)
 - updated 'aad o365group teamify' to Graph v1.0 [#2504](https://github.com/pnp/cli-microsoft365/pull/2504)
+- extended 'planner task list' with support for listing tasks in a bucket or a plan [#2575](https://github.com/pnp/cli-microsoft365/issues/2575)
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
