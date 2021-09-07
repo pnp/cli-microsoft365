@@ -192,6 +192,7 @@
     "@types/adm-zip": "^0.4.34",
     "@types/easy-table": "^0.0.33",
     "@types/inquirer": "^7.3.3",
+    "@types/jest": "^27.0.1",
     "@types/jmespath": "^0.15.0",
     "@types/json-to-ast": "^2.1.2",
     "@types/minimist": "^1.2.2",
