@@ -96,7 +96,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('handles Microsoft 365 Tenant siteclassification is not enabled', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
           ]
@@ -120,7 +120,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('handles Microsoft 365 Tenant siteclassification missing DirectorySettingTemplate', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
             {
@@ -203,7 +203,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('handles Microsoft 365 Tenant siteclassification missing UnifiedGroupSetting ID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
             {
@@ -286,7 +286,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
 
   it('handles Microsoft 365 Tenant siteclassification empty UnifiedGroupSetting ID', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
             {
@@ -370,7 +370,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
   it('handles disabling site classification without prompting', (done) => {
     let deleteRequestIssued = false;
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
             {
@@ -440,7 +440,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     });
 
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings/d20c475c-6f96-449a-aee8-08146be187d3`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/d20c475c-6f96-449a-aee8-08146be187d3`) {
         deleteRequestIssued = true;
 
         return Promise.resolve({
@@ -468,7 +468,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
   it('handles disabling site classification without prompting (debug)', (done) => {
     let deleteRequestIssued = false;
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
             {
@@ -538,7 +538,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     });
 
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings/d20c475c-6f96-449a-aee8-08146be187d3`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/d20c475c-6f96-449a-aee8-08146be187d3`) {
         deleteRequestIssued = true;
 
         return Promise.resolve({
@@ -583,7 +583,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     let deleteRequestIssued = false;
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
             {
@@ -653,7 +653,7 @@ describe(commands.SITECLASSIFICATION_DISABLE, () => {
     });
 
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings/d20c475c-6f96-449a-aee8-08146be187d3`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings/d20c475c-6f96-449a-aee8-08146be187d3`) {
         deleteRequestIssued = true;
 
         return Promise.resolve({
