@@ -660,6 +660,7 @@ nav:
       - 'Deploy a Microsoft Teams personal app and add it to users': 'sample-scripts/teams/install-personal-app.md'
       - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
       - 'Export conversations from Microsoft Teams Channels': 'sample-scripts/teams/export-teams-conversations.md'
+      - 'Get all the Teams a specific user is part of': 'sample-scripts/teams/get-all-teams-specific-user-is-part-of.md'
       - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
       - 'List all tabs in Microsoft Teams teams in the tenant': 'sample-scripts/teams/list-all-tabs-teams.md'
       - 'List all Microsoft Teams team''s Owners and Members': 'sample-scripts/teams/list-teams-owners-and-members.md'
