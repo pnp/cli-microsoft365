@@ -1,12 +1,13 @@
 import { Logger } from '../../../../cli';
-import { CommandError, CommandOption } from '../../../../Command';
+import { CommandOption } from '../../../../Command';
 import config from '../../../../config';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
-import { ClientSvcResponse, ClientSvcResponseContents, ContextInfo } from '../../spo';
+import { ClientSvcResponse, ClientSvcResponseContents, FormDigestInfo } from '../../spo';
+import { SiteProperties } from './SiteProperties';
 import { SPOSitePropertiesEnumerable } from './SPOSitePropertiesEnumerable';
 
 interface CommandArgs {
@@ -20,6 +21,8 @@ interface Options extends GlobalOptions {
 }
 
 class SpoSiteListCommand extends SpoCommand {
+  private allSites?: SiteProperties[];
+
   public get name(): string {
     return commands.SITE_LIST;
   }
@@ -43,49 +46,69 @@ class SpoSiteListCommand extends SpoCommand {
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const siteType: string = args.options.type || 'TeamSite';
     const webTemplate: string = siteType === 'TeamSite' ? 'GROUP#0' : 'SITEPAGEPUBLISHING#0';
-    const startIndex: string = '0';
     let spoAdminUrl: string;
 
     this
       .getSpoAdminUrl(logger, this.debug)
-      .then((_spoAdminUrl: string): Promise<ContextInfo> => {
+      .then((_spoAdminUrl: string): Promise<void> => {
         spoAdminUrl = _spoAdminUrl;
 
-        return this.getRequestDigest(spoAdminUrl);
-      })
-      .then((res: ContextInfo): Promise<string> => {
         if (this.verbose) {
           logger.logToStderr(`Retrieving list of site collections...`);
         }
 
-        let requestBody: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${Utils.escapeXml(args.options.filter || '')}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`;
-        if (args.options.deleted) {
-          requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="5"><Query SelectAllProperties="true"><Properties><Property Name="NextStartIndexFromSharePoint" ScalarProperty="true" /></Properties></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="GetDeletedSitePropertiesFromSharePoint"><Parameters><Parameter Type="Null" /></Parameters></Method></ObjectPaths></Request>`;
-        }
+        this.allSites = [];
 
-        const requestOptions: any = {
-          url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
-          headers: {
-            'X-RequestDigest': res.FormDigestValue
-          },
-          data: requestBody
-        };
-
-        return request.post(requestOptions);
+        return this.getAllSites(spoAdminUrl, Utils.escapeXml(args.options.filter || ''), '0', webTemplate, undefined, args.options.deleted, logger);
       })
-      .then((res: string): void => {
-        const json: ClientSvcResponse = JSON.parse(res);
-        const response: ClientSvcResponseContents = json[0];
-        if (response.ErrorInfo) {
-          cb(new CommandError(response.ErrorInfo.ErrorMessage));
-          return;
-        }
-        else {
-          const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
-          logger.log(sites._Child_Items_);
-        }
+      .then(_ => {
+        logger.log(this.allSites);
         cb();
       }, (err: any): void => this.handleRejectedPromise(err, logger, cb));
+  }
+
+  private getAllSites(spoAdminUrl: string, filter: string | undefined, startIndex: string | undefined, webTemplate: string, formDigest: FormDigestInfo | undefined, deleted: boolean | undefined, logger: Logger): Promise<void> {
+    return new Promise<void>((resolve: () => void, reject: (error: any) => void): void => {
+      this
+        .ensureFormDigest(spoAdminUrl, logger, formDigest, this.debug)
+        .then((res: FormDigestInfo): Promise<string> => {
+          let requestBody: string = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="2" ObjectPathId="1" /><ObjectPath Id="4" ObjectPathId="3" /><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="true"><Properties /></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="3" ParentId="1" Name="GetSitePropertiesFromSharePointByFilters"><Parameters><Parameter TypeId="{b92aeee2-c92c-4b67-abcc-024e471bc140}"><Property Name="Filter" Type="String">${filter}</Property><Property Name="IncludeDetail" Type="Boolean">false</Property><Property Name="IncludePersonalSite" Type="Enum">0</Property><Property Name="StartIndex" Type="String">${startIndex}</Property><Property Name="Template" Type="String">${webTemplate}</Property></Parameter></Parameters></Method></ObjectPaths></Request>`;
+          if (deleted) {
+            requestBody = `<Request AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}" xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009"><Actions><ObjectPath Id="4" ObjectPathId="3" /><ObjectPath Id="6" ObjectPathId="5" /><Query Id="7" ObjectPathId="5"><Query SelectAllProperties="true"><Properties><Property Name="NextStartIndexFromSharePoint" ScalarProperty="true" /></Properties></Query><ChildItemQuery SelectAllProperties="true"><Properties /></ChildItemQuery></Query></Actions><ObjectPaths><Constructor Id="3" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}" /><Method Id="5" ParentId="3" Name="GetDeletedSitePropertiesFromSharePoint"><Parameters><Parameter Type="String">${startIndex}</Parameter></Parameters></Method></ObjectPaths></Request>`;
+          }
+
+          const requestOptions: any = {
+            url: `${spoAdminUrl}/_vti_bin/client.svc/ProcessQuery`,
+            headers: {
+              'X-RequestDigest': res.FormDigestValue
+            },
+            data: requestBody
+          };
+
+          return request.post(requestOptions);
+        })
+        .then((res: string): void => {
+          const json: ClientSvcResponse = JSON.parse(res);
+          const response: ClientSvcResponseContents = json[0];
+          if (response.ErrorInfo) {
+            reject(response.ErrorInfo.ErrorMessage);
+            return;
+          }
+          else {
+            const sites: SPOSitePropertiesEnumerable = json[json.length - 1];
+            this.allSites!.push(...sites._Child_Items_);
+
+            if (sites.NextStartIndexFromSharePoint) {
+              this
+                .getAllSites(spoAdminUrl, filter, sites.NextStartIndexFromSharePoint, webTemplate, formDigest, deleted, logger)
+                .then(_ => resolve(), err => reject(err));
+            }
+            else {
+              resolve();
+            }
+          }
+        }, err => reject(err));
+    });
   }
 
   public options(): CommandOption[] {
