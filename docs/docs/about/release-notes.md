@@ -21,6 +21,7 @@
 - added the 'Export all the team members from the Teams team' sample [#2648](https://github.com/pnp/cli-microsoft365/pull/2648)
 - updated 'aad o365group teamify' to Graph v1.0 [#2504](https://github.com/pnp/cli-microsoft365/pull/2504)
 - extended 'planner task list' with support for listing tasks in a bucket or a plan [#2575](https://github.com/pnp/cli-microsoft365/issues/2575)
+- added support for upgrading SPFx projects to 1.13.0-beta.20 [#2697](https://github.com/pnp/cli-microsoft365/issues/2644)
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
