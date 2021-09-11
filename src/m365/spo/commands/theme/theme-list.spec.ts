@@ -17,7 +17,7 @@ describe(commands.THEME_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -63,7 +63,7 @@ describe(commands.THEME_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['Name']);
+    assert.deepStrictEqual(command.defaultProperties(), ['name']);
   });
 
   it('uses correct API url', (done) => {
