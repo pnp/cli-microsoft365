@@ -1,6 +1,6 @@
 # aad user set
 
-Updates information about the specified user in Azure Active Directory AD
+Updates information of the specified user
 
 ## Usage
 
@@ -17,13 +17,13 @@ m365 aad user set [options]
 : User principal name of the user to update. Specify `objectId` or `userPrincipalName` but not both
 
 `--accountEnabled [accountEnabled]`
-: Indicates whether the account is enabled
+: Boolean value specifying whether the account is enabled. Valid values are `true,false`
 
 --8<-- "docs/cmd/_global.md"
 
 ## Remarks
 
-You can retrieve information about a user, either by specifying that user's id or user name (`userPrincipalName`), but not both.
+You can update information of a user, either by specifying that user's id (`objectId`) or user name (`userPrincipalName`), but not both.
 
 If the user with the specified id or user name doesn't exist, you will get a `Resource 'xyz' does not exist or one of its queried reference-property objects are not present.` error.
 
