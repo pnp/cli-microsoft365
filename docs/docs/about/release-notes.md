@@ -24,6 +24,9 @@
 - added support for upgrading SPFx projects to 1.13.0-beta.20 [#2697](https://github.com/pnp/cli-microsoft365/issues/2697)
 - fixed 'spo theme list' command [#2700](https://github.com/pnp/cli-microsoft365/issues/2700)
 - added support for paging in 'spo site classic list', 'spo site list' and 'onedrive list' [#2692](https://github.com/pnp/cli-microsoft365/issues/2692)
+- fixed 'spo page control list' and '- get' commands [#2667](https://github.com/pnp/cli-microsoft365/issues/2667)
+- added the 'Get all the Teams a specific user is part of' sample [#2688](https://github.com/pnp/cli-microsoft365/issues/2688)
+- extended 'spo sitedesign set' with support for thumbnailUrl option [#2651](https://github.com/pnp/cli-microsoft365/issues/2651)
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
