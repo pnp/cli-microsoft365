@@ -40,7 +40,7 @@ class AadSiteClassificationSetCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     const requestOptions: any = {
-      url: `${this.resource}/beta/settings`,
+      url: `${this.resource}/v1.0/groupSettings`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -129,7 +129,7 @@ class AadSiteClassificationSetCommand extends GraphCommand {
         });
 
         const requestOptions: any = {
-          url: `${this.resource}/beta/settings/${unifiedGroupSetting[0].id}`,
+          url: `${this.resource}/v1.0/groupSettings/${unifiedGroupSetting[0].id}`,
           headers: {
             accept: 'application/json;odata.metadata=none',
             'content-type': 'application/json'
