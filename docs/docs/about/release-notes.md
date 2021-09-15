@@ -27,6 +27,8 @@
 - fixed 'spo page control list' and '- get' commands [#2667](https://github.com/pnp/cli-microsoft365/issues/2667)
 - added the 'Get all the Teams a specific user is part of' sample [#2688](https://github.com/pnp/cli-microsoft365/issues/2688)
 - extended 'spo sitedesign set' with support for thumbnailUrl option [#2651](https://github.com/pnp/cli-microsoft365/issues/2651)
+- extended base SPO command when using secret auth type [#2591](https://github.com/pnp/cli-microsoft365/issues/2591)
+- updated 'teams channel list' command to Graph v1.0 [#2670](https://github.com/pnp/cli-microsoft365/issues/2670)
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
