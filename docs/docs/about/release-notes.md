@@ -29,6 +29,9 @@
 - extended 'spo sitedesign set' with support for thumbnailUrl option [#2651](https://github.com/pnp/cli-microsoft365/issues/2651)
 - extended base SPO command when using secret auth type [#2591](https://github.com/pnp/cli-microsoft365/issues/2591)
 - updated 'teams channel list' command to Graph v1.0 [#2670](https://github.com/pnp/cli-microsoft365/issues/2670)
+- upgraded 'teams conversationmember list' to Graph v1.0 [#2672](https://github.com/pnp/cli-microsoft365/issues/2672)
+- upgraded 'teams conversationmember add' to Graph v1.0 [#2671](https://github.com/pnp/cli-microsoft365/issues/2671)
+- upgraded 'aad siteclassification disable' to Graph v1.0 [#2674](https://github.com/pnp/cli-microsoft365/issues/2674)
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
