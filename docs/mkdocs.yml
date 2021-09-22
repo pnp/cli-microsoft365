@@ -398,7 +398,6 @@ nav:
         - site chrome set: 'cmd/spo/site/site-chrome-set.md'
         - site classic add: 'cmd/spo/site/site-classic-add.md'
         - site classic list: 'cmd/spo/site/site-classic-list.md'
-        - site classic remove: 'cmd/spo/site/site-remove.md'
         - site classic set: 'cmd/spo/site/site-classic-set.md'
         - site commsite enable: 'cmd/spo/site/site-commsite-enable.md'
         - site inplacerecordsmanagement set: 'cmd/spo/site/site-inplacerecordsmanagement-set.md'
