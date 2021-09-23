@@ -1,10 +1,8 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import AadCommand from '../../../base/AadCommand';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -15,7 +13,7 @@ interface Options extends GlobalOptions {
   grantId: string;
 }
 
-class AadOAuth2GrantRemoveCommand extends AadCommand {
+class AadOAuth2GrantRemoveCommand extends GraphCommand {
   public get name(): string {
     return commands.OAUTH2GRANT_REMOVE;
   }
@@ -30,7 +28,10 @@ class AadOAuth2GrantRemoveCommand extends AadCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/myorganization/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}?api-version=1.6`,
+      url: `${this.resource}/v1.0/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none'
+      },
       responseType: 'json'
     };
 

@@ -17,7 +17,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -62,7 +62,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
 
   it('removes OAuth2 permission grant (debug)', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek?api-version=1.6`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek`) > -1) {
         return Promise.resolve();
       }
 
@@ -82,7 +82,7 @@ describe(commands.OAUTH2GRANT_REMOVE, () => {
 
   it('removes OAuth2 permission grant', (done) => {
     sinon.stub(request, 'delete').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek?api-version=1.6`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants/YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-ek`) > -1) {
         return Promise.resolve();
       }
 
