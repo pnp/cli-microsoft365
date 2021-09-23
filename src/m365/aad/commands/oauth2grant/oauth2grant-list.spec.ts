@@ -16,7 +16,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -64,33 +64,24 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   it('retrieves OAuth2 permission grants for the specified service principal (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({
-            value: [{
-              "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-              "consentType": "AllPrincipals",
-              "expiryTime": "9999-12-31T23:59:59.9999999",
-              "objectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw",
-              "principalId": null,
-              "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
-              "scope": "Group.ReadWrite.All",
-              "startTime": "0001-01-01T00:00:00"
-            },
-            {
-              "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-              "consentType": "AllPrincipals",
-              "expiryTime": "9999-12-31T23:59:59.9999999",
-              "objectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg",
-              "principalId": null,
-              "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
-              "scope": "MyFiles.Read",
-              "startTime": "0001-01-01T00:00:00"
-            }]
-          });
-        }
+      if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants?$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
+        return Promise.resolve({
+          value: [{
+            "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+            "consentType": "AllPrincipals",
+            "principalId": null,
+            "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
+            "scope": "Group.ReadWrite.All"
+          },
+          {
+            "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+            "consentType": "AllPrincipals",
+            "principalId": null,
+            "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
+            "scope": "MyFiles.Read"
+          }]
+        });
+
       }
 
       return Promise.reject('Invalid request');
@@ -101,22 +92,16 @@ describe(commands.OAUTH2GRANT_LIST, () => {
         assert(loggerLogSpy.calledWith([{
           "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
           "consentType": "AllPrincipals",
-          "expiryTime": "9999-12-31T23:59:59.9999999",
-          "objectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw",
           "principalId": null,
           "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
-          "scope": "Group.ReadWrite.All",
-          "startTime": "0001-01-01T00:00:00"
+          "scope": "Group.ReadWrite.All"
         },
         {
           "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
           "consentType": "AllPrincipals",
-          "expiryTime": "9999-12-31T23:59:59.9999999",
-          "objectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg",
           "principalId": null,
           "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
-          "scope": "MyFiles.Read",
-          "startTime": "0001-01-01T00:00:00"
+          "scope": "MyFiles.Read"
         }]));
         done();
       }
@@ -128,33 +113,29 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   it('retrieves OAuth2 permission grants for the specified service principal', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({
-            value: [{
-              "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-              "consentType": "AllPrincipals",
-              "expiryTime": "9999-12-31T23:59:59.9999999",
-              "objectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw",
-              "principalId": null,
-              "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
-              "scope": "Group.ReadWrite.All",
-              "startTime": "0001-01-01T00:00:00"
-            },
-            {
-              "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-              "consentType": "AllPrincipals",
-              "expiryTime": "9999-12-31T23:59:59.9999999",
-              "objectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg",
-              "principalId": null,
-              "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
-              "scope": "MyFiles.Read",
-              "startTime": "0001-01-01T00:00:00"
-            }]
-          });
-        }
+      if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants?$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
+        return Promise.resolve({
+          value: [{
+            "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+            "consentType": "AllPrincipals",
+            "expiryTime": "9999-12-31T23:59:59.9999999",
+            "objectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw",
+            "principalId": null,
+            "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
+            "scope": "Group.ReadWrite.All",
+            "startTime": "0001-01-01T00:00:00"
+          },
+          {
+            "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+            "consentType": "AllPrincipals",
+            "expiryTime": "9999-12-31T23:59:59.9999999",
+            "objectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg",
+            "principalId": null,
+            "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
+            "scope": "MyFiles.Read",
+            "startTime": "0001-01-01T00:00:00"
+          }]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -192,33 +173,29 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   it('outputs all properties when output is JSON', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({
-            value: [{
-              "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-              "consentType": "AllPrincipals",
-              "expiryTime": "9999-12-31T23:59:59.9999999",
-              "objectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw",
-              "principalId": null,
-              "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
-              "scope": "Group.ReadWrite.All",
-              "startTime": "0001-01-01T00:00:00"
-            },
-            {
-              "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
-              "consentType": "AllPrincipals",
-              "expiryTime": "9999-12-31T23:59:59.9999999",
-              "objectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg",
-              "principalId": null,
-              "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
-              "scope": "MyFiles.Read",
-              "startTime": "0001-01-01T00:00:00"
-            }]
-          });
-        }
+      if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants?$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
+        return Promise.resolve({
+          value: [{
+            "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+            "consentType": "AllPrincipals",
+            "expiryTime": "9999-12-31T23:59:59.9999999",
+            "objectId": "50NAzUm3C0K9B6p8ORLtIhpPRByju_JCmZ9BBsWxwgw",
+            "principalId": null,
+            "resourceId": "1c444f1a-bba3-42f2-999f-4106c5b1c20c",
+            "scope": "Group.ReadWrite.All",
+            "startTime": "0001-01-01T00:00:00"
+          },
+          {
+            "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
+            "consentType": "AllPrincipals",
+            "expiryTime": "9999-12-31T23:59:59.9999999",
+            "objectId": "50NAzUm3C0K9B6p8ORLtIvNe8tzf4ndKg51reFehHHg",
+            "principalId": null,
+            "resourceId": "dcf25ef3-e2df-4a77-839d-6b7857a11c78",
+            "scope": "MyFiles.Read",
+            "startTime": "0001-01-01T00:00:00"
+          }]
+        });
       }
 
       return Promise.reject('Invalid request');
@@ -256,7 +233,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
 
   it('correctly handles no OAuth2 permission grants for the specified service principal found', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants?$filter=clientId eq '141f7648-0c71-4752-9cdb-c7d5305b7e68'`) > -1) {
         if (opts.headers &&
           opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&

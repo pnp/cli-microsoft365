@@ -1,11 +1,9 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import AadCommand from '../../../base/AadCommand';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -16,7 +14,7 @@ interface Options extends GlobalOptions {
   clientId: string;
 }
 
-class AadOAuth2GrantListCommand extends AadCommand {
+class AadOAuth2GrantListCommand extends GraphCommand {
   public get name(): string {
     return commands.OAUTH2GRANT_LIST;
   }
@@ -35,9 +33,9 @@ class AadOAuth2GrantListCommand extends AadCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/myorganization/oauth2PermissionGrants?api-version=1.6&$filter=clientId eq '${encodeURIComponent(args.options.clientId)}'`,
+      url: `${this.resource}/v1.0/oauth2PermissionGrants?$filter=clientId eq '${encodeURIComponent(args.options.clientId)}'`,
       headers: {
-        accept: 'application/json;odata=nometadata'
+        accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
