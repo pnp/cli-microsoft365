@@ -517,7 +517,7 @@ nav:
         - team add: 'cmd/teams/team/team-add.md'
         - team archive: 'cmd/teams/team/team-archive.md'
         - team clone: 'cmd/teams/team/team-clone.md'
-        - team get: 'cmd/aad/o365group/o365group-get.md'
+        - team get: 'cmd/teams/team/team-get.md'
         - team list: 'cmd/teams/team/team-list.md'
         - team remove: 'cmd/teams/team/team-remove.md'
         - team set: 'cmd/teams/team/team-set.md'
