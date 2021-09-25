@@ -40,6 +40,7 @@ describe('Lazy loading commands', () => {
       yammerCommands.default
     ];
     const aliases: string[] = [
+      'aad o365group restore',
       'consent',
       'flow connector export',
       'flow connector list',
