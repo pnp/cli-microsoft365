@@ -1641,7 +1641,7 @@
 **Microsoft Graph:**
 
 - [graph o365group remove](../cmd/aad/o365group/o365group-remove.md) - removes an Microsoft 365 Group [#309](https://github.com/pnp/cli-microsoft365/issues/309)
-- [graph o365group restore](../cmd/aad/o365group/o365group-restore.md) - restores a deleted Microsoft 365 Group [#346](https://github.com/pnp/cli-microsoft365/issues/346)
+- [graph o365group restore](../cmd/aad/o365group/o365group-recyclebinitem-restore.md) - restores a deleted Microsoft 365 Group [#346](https://github.com/pnp/cli-microsoft365/issues/346)
 - [graph siteclassification get](../cmd/aad/siteclassification/siteclassification-get.md) - gets site classification configuration [#303](https://github.com/pnp/cli-microsoft365/issues/303)
 
 **Azure Management Service:**
