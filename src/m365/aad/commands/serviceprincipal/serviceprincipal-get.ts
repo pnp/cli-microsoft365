@@ -19,7 +19,7 @@ interface Options extends GlobalOptions {
   name?: string;
 }
 
-class AadservicePrincipalGetCommand extends GraphCommand {
+class AadServicePrincipalGetCommand extends GraphCommand {
   public get name(): string {
     return commands.SERVICEPRINCIPAL_GET;
   }
@@ -156,4 +156,4 @@ class AadservicePrincipalGetCommand extends GraphCommand {
   }
 }
 
-module.exports = new AadservicePrincipalGetCommand();
+module.exports = new AadServicePrincipalGetCommand();
