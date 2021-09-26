@@ -41,6 +41,7 @@ export default {
   OAUTH2GRANT_REMOVE: `${prefix} oauth2grant remove`,
   OAUTH2GRANT_SET: `${prefix} oauth2grant set`,
   POLICY_LIST: `${prefix} policy list`,
+  SERVICEPRINCIPAL_GET: `${prefix} serviceprincipal get`,
   SITECLASSIFICATION_DISABLE: `${prefix} siteclassification disable`,
   SITECLASSIFICATION_ENABLE: `${prefix} siteclassification enable`,
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,

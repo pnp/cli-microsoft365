@@ -67,6 +67,8 @@ nav:
         - oauth2grant set: 'cmd/aad/oauth2grant/oauth2grant-set.md'
       - policy:
         - policy list: 'cmd/aad/policy/policy-list.md'
+      - serviceprincipal:
+        - serviceprincipal get: 'cmd/aad/serviceprincipal/serviceprincipal-get.md'
       - siteclassification:
         - siteclassification disable: 'cmd/aad/siteclassification/siteclassification-disable.md'
         - siteclassification enable: 'cmd/aad/siteclassification/siteclassification-enable.md'
