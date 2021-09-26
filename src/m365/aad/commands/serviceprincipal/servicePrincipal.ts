@@ -1,0 +1,38 @@
+export interface servicePrincipal {
+  id: string;
+  deletedDateTime?: string;
+  accountEnabled?: boolean;
+  alternativeNames?: string[];
+  appDisplayName?: string;
+  appDescription?: string;
+  appId?: string;
+  applicationTemplateId?: string;
+  appOwnerOrganizationId?: string;
+  appRoleAssignmentRequired?: boolean;
+  createdDateTime?: string;
+  description?: string;
+  disabledByMicrosoftStatus?: string;
+  displayName?: string;
+  homepage?: string;
+  loginUrl?: string;
+  logoutUrl?: string;
+  notes?: string;
+  notificationEmailAddresses?: string[];
+  preferredSingleSignOnMode?: string;
+  preferredTokenSigningKeyThumbprint?: string;
+  replyUrls?: string[];
+  servicePrincipalNames?: string[];
+  servicePrincipalType?: string;
+  signInAudience?: string;
+  tags?: string[];
+  tokenEncryptionKeyId?: string;
+  resourceSpecificApplicationPermissions?: string[];
+  samlSingleSignOnSettings?: string;
+  addIns?: string[];
+  appRoles?: string[];
+  keyCredentials?: string[];
+  oauth2PermissionScopes?: string[];
+  passwordCredentials?: string;
+  info?:any;
+  verifiedPublisher?:any;
+}
