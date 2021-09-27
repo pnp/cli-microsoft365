@@ -4,7 +4,7 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import AadCommand from '../../../base/AadCommand';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   scope: string;
 }
 
-class AadOAuth2GrantSetCommand extends AadCommand {
+class AadOAuth2GrantSetCommand extends GraphCommand {
   public get name(): string {
     return commands.OAUTH2GRANT_SET;
   }
@@ -31,7 +31,7 @@ class AadOAuth2GrantSetCommand extends AadCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/myorganization/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}?api-version=1.6`,
+      url: `${this.resource}/v1.0/oauth2PermissionGrants/${encodeURIComponent(args.options.grantId)}`,
       headers: {
         'content-type': 'application/json'
       },
