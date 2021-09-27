@@ -82,7 +82,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
           webUrl: args.options.webUrl,
           listTitle: args.options.listTitle,
           id: args.options.id,
-          output: args.options.output,
+          output: args.options.output ?? 'json',
           debug: this.debug,
           verbose: this.verbose
         };

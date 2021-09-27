@@ -135,7 +135,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', description: 'A tile', group: 'PnP Content Types' } }, () => {
+    command.action(logger, { options: { output: 'text', debug: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', description: 'A tile', group: 'PnP Content Types' } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -243,7 +243,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { debug: false, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list', description: 'A tile' } }, () => {
+    command.action(logger, { options: { output: 'test', debug: false, verbose: true, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: 'PnP Tile', id: '0x0100FF0B2E33A3718B46A3909298D240FD93', listTitle: 'My list', description: 'A tile' } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -281,7 +281,7 @@ describe(commands.CONTENTTYPE_ADD, () => {
       return Promise.reject(new CommandError('Unknown case'));
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: '<PnP Tile', id: '<0x0100FF0B2E33A3718B46A3909298D240FD93', description: '<A tile', group: '<PnP Content Types' } }, () => {
+    command.action(logger, { options: { output: 'text', debug: false, webUrl: 'https://contoso.sharepoint.com/sites/sales', name: '<PnP Tile', id: '<0x0100FF0B2E33A3718B46A3909298D240FD93', description: '<A tile', group: '<PnP Content Types' } }, () => {
       try {
         assert(loggerLogSpy.called);
         done();
