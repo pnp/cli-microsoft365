@@ -12,7 +12,7 @@ Reference: ['ensure' commands #1427](https://github.com/pnp/cli-microsoft365/dis
   - calls the _api/web/Lists/EnsureSiteAssetsLibrary REST endpoint to create the Site Assets library
 - returns the existing or created SPList as a JSON object
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 function EnsureSiteAssetsLibrary {
   param (
     [Parameter(Mandatory)][string]$siteUrl

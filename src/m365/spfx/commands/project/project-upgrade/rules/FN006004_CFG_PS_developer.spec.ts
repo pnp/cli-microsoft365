@@ -36,4 +36,21 @@ describe('FN006004_CFG_PS_developer', () => {
     assert.strictEqual(findings.length, 1, 'Incorrect number of findings');
     assert.strictEqual(findings[0].occurrences[0].position?.line, 3, 'Incorrect line number');
   });
+
+  it('returns versioned mpnId when version specified', () => {
+    rule = new FN006004_CFG_PS_developer('1.13.0-beta.20');
+    const project: Project = {
+      path: '/usr/tmp',
+      packageSolutionJson: {
+        $schema: 'test-schema',
+        solution: {},
+        source: JSON.stringify({
+          $schema: 'test-schema',
+          solution: {}
+        }, null, 2)
+      }
+    };
+    rule.visit(project, findings);
+    assert(findings[0].occurrences[0].resolution.indexOf('1.13.0-beta.20') > -1);
+  });
 });

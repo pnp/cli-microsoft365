@@ -148,6 +148,16 @@ describe('Utils', () => {
     assert.strictEqual(result, true);
   });
 
+  it('isValidTeamsChannelId returns true if channelId contains -', () => {
+    const result = Utils.isValidTeamsChannelId('19:ABZTZ00000000-0000000000000rstfv@thread.tacv2');
+    assert.strictEqual(result, true);
+  });
+
+  it('isValidTeamsChannelId returns true if channelId contains _', () => {
+    const result = Utils.isValidTeamsChannelId('19:ABZTZ00000000_0000000000000rstfv@thread.tacv2');
+    assert.strictEqual(result, true);
+  });
+
   it('isValidTeamsChannelId returns false if invalid channelId (missing colon)', () => {
     const result = Utils.isValidTeamsChannelId('190000000000000000000000000000000@thread.skype');
     assert.strictEqual(result, false);

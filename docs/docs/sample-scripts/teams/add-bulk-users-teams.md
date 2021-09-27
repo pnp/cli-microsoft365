@@ -2,7 +2,7 @@
 
 Inspired by: [Rakesh Pandey](https://www.flexmind.co/blog/how-to-add-bulk-users-from-csv-file-to-ms-teams-using-powershell/)
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 <#
 .SYNOPSIS
     Add users to a Microsoft 365 group linked to Teams.

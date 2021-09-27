@@ -4,7 +4,7 @@ Author: [Albert-Jan Schot](https://www.cloudappie.nl/search-flows-connections/)
 
 Search all flows as, an administrator, for a specific search string and report results. This sample allows you to get a report of all flows that are connected to a specific site or list. The `$searchString` can be any value but results are the best when using a GUID or site collection URL.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 Write-Output "Retrieving all environments"
 
 $environments = m365 flow environment list -o json | ConvertFrom-Json

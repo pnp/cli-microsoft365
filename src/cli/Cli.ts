@@ -172,7 +172,7 @@ export class Cli {
       // process options before passing them on to validation stage
       await this.commandToExecute.command.processOptions(optionsWithoutShorts.options);
     }
-    catch (e) {
+    catch (e: any) {
       return this.closeWithError(e.message, optionsWithoutShorts, false);
     }
 
@@ -445,7 +445,7 @@ export class Cli {
       try {
         logStatement = jmespath.search(logStatement, options.query);
       }
-      catch (e) {
+      catch (e: any) {
         const message = `JMESPath query error. ${e.message}. See https://jmespath.org/specification.html for more information`;
         Cli.getInstance().closeWithError(message, { options }, false);
       }
@@ -455,7 +455,7 @@ export class Cli {
       logStatementType = typeof logStatement;
     }
 
-    if (options.output === 'json') {
+    if (!options.output || options.output === 'json') {
       return JSON.stringify(logStatement, null, 2);
     }
 
@@ -488,11 +488,11 @@ export class Cli {
       return logStatement.join(os.EOL);
     }
 
-    // if output type has not been set or set to 'text', process the retrieved
+    // if output type has been set to 'text', process the retrieved
     // data so that returned objects contain only default properties specified
     // on the current command. If there is no current command or the
     // command doesn't specify default properties, return original data
-    if (!options.output || options.output === 'text') {
+    if (options.output === 'text') {
       const cli: Cli = Cli.getInstance();
       const currentCommand: CommandInfo | undefined = cli.commandToExecute;
 
@@ -748,7 +748,7 @@ export class Cli {
     let exitCode: number = 1;
 
     let errorMessage: string = error instanceof CommandError ? error.message : error;
-    if (args.options.output === 'json' &&
+    if ((!args.options.output || args.options.output === 'json') &&
       !this.getSettingWithDefaultValue<boolean>(settingsNames.printErrorsAsPlainText, true)) {
       errorMessage = JSON.stringify({ error: errorMessage });
     }

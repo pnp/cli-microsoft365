@@ -80,6 +80,13 @@ You will be presented with the `Configured permissions` section again but this t
 
 [![SharePoint Online Configured permissions](../images/using-own-identity/spo-configured-permissions.png)](../images/using-own-identity/spo-configured-permissions.png)
 
+!!! attention
+    Note that when executing tenant level SharePoint Online commands, the CLI will attempt to autodiscover your tenant URL.
+
+    It will first check for the presence of an environment variable containing the tenant URL, which can be set by using [`m365 spo set`](../../cmd/spo/spo-set/) command.
+    
+    If this cannot be found, a request will be made to the Microsoft Graph. For this request to be successful, you must ensure that you have at least the `Sites.Read.All` permission granted to your application.
+
 This completes the configuration required in the Azure portal. We can now move onto configuring the CLI for Microsoft 365 to use our custom application to login to Microsoft 365.
 
 ## Create environment variables
@@ -148,4 +155,4 @@ Open a new PowerShell session and execute `$env:CLIMICROSOFT365_AADAPPID` and `$
 
 If you are on Linux or MacOS, depending on your terminal, add the  `export` lines to `.bashrc` or `.zshrc` file in your home directory.
 
-If you are using PowerShell Core, it is worth noting that environment variables set in `bash` or `zsh` will persist to the `pwsh` session and the same applies to Windows.
+If you are using PowerShell, it is worth noting that environment variables set in `bash` or `zsh` will persist to the `pwsh` session and the same applies to Windows.

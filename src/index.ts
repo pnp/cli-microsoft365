@@ -26,7 +26,7 @@ fs.realpath(__dirname, (err: NodeJS.ErrnoException | null, resolvedPath: string)
     const cli: Cli = Cli.getInstance();
     cli.execute(path.join(resolvedPath, 'm365'), process.argv.slice(2));
   }
-  catch (e) {
+  catch (e: any) {
     appInsights.trackException({
       exception: e
     });

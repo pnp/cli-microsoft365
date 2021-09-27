@@ -17,7 +17,7 @@ Prerequisites:
 - Folder to download the images
 - Blank Word document to add the images
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 Write-Host "Execution started"
 
 $imagesDownloadFolderPath = "C:\Users\username\Downloads\Temp\images"

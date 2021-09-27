@@ -4,7 +4,7 @@ Author: [Sébastien Levert](https://github.com/sebastienlevert)
 
 Uninstalls an app from the specified users and / or unpublish it from the Microsoft Teams app catalog based on the App Id available in the `manifest.json` of the Teams app.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 <#
   .SYNOPSIS
     Removes an app from the personal scope of a set of users

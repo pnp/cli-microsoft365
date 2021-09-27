@@ -4,7 +4,7 @@ Author: [Laura Kokkarinen](https://laurakokkarinen.com/does-it-spark-joy-powersh
 
 Your deleted modern SharePoint sites are not going to disappear from the UI before they have been removed from the tenant recycle bin. You can either wait for three months, delete them manually via the SharePoint admin center, or run the CLI for Microsoft 365 script below.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $deletedSites = m365 spo tenant recyclebinitem list -o json | ConvertFrom-Json
 $deletedSites | Format-Table Url
 

@@ -1,8 +1,70 @@
 # Release notes
 
+## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo group user list](../cmd/spo/group/group-user-list.md) - list members of a SharePoint Group [#2640](https://github.com/pnp/cli-microsoft365/issues/2640)
+
+### Changes
+
+- removed duplicate ID in 'spo listitem' commands [#2024](https://github.com/pnp/cli-microsoft365/issues/2024)
+- removed the 'value' wrapper in the output [#2292](https://github.com/pnp/cli-microsoft365/issues/2292)
+- updated JMESPath docs [#2553](https://github.com/pnp/cli-microsoft365/issues/2553)
+- removed obsolete file path options [#2309](https://github.com/pnp/cli-microsoft365/issues/2309)
+- aligned 'aad o365group user list' and 'teams user list' [#2520](https://github.com/pnp/cli-microsoft365/issues/2520)
+- in 'spo listitem get' renames fields to properties [#2533](https://github.com/pnp/cli-microsoft365/issues/2533)
+- changed default output to JSON [#2599](https://github.com/pnp/cli-microsoft365/issues/2599)
+- added SPO auto-discovery remark to 'Using your own Azure AD identity' [#2639](https://github.com/pnp/cli-microsoft365/issues/2639)
+- added the 'Export all the team members from the Teams team' sample [#2648](https://github.com/pnp/cli-microsoft365/pull/2648)
+- updated 'aad o365group teamify' to Graph v1.0 [#2504](https://github.com/pnp/cli-microsoft365/pull/2504)
+- extended 'planner task list' with support for listing tasks in a bucket or a plan [#2575](https://github.com/pnp/cli-microsoft365/issues/2575)
+- added support for upgrading SPFx projects to 1.13.0-beta.20 [#2697](https://github.com/pnp/cli-microsoft365/issues/2697)
+- fixed 'spo theme list' command [#2700](https://github.com/pnp/cli-microsoft365/issues/2700)
+- added support for paging in 'spo site classic list', 'spo site list' and 'onedrive list' [#2692](https://github.com/pnp/cli-microsoft365/issues/2692)
+- fixed 'spo page control list' and '- get' commands [#2667](https://github.com/pnp/cli-microsoft365/issues/2667)
+- added the 'Get all the Teams a specific user is part of' sample [#2688](https://github.com/pnp/cli-microsoft365/issues/2688)
+- extended 'spo sitedesign set' with support for thumbnailUrl option [#2651](https://github.com/pnp/cli-microsoft365/issues/2651)
+- extended base SPO command when using secret auth type [#2591](https://github.com/pnp/cli-microsoft365/issues/2591)
+- updated 'teams channel list' command to Graph v1.0 [#2670](https://github.com/pnp/cli-microsoft365/issues/2670)
+- upgraded 'teams conversationmember list' to Graph v1.0 [#2672](https://github.com/pnp/cli-microsoft365/issues/2672)
+- upgraded 'teams conversationmember add' to Graph v1.0 [#2671](https://github.com/pnp/cli-microsoft365/issues/2671)
+- upgraded 'aad siteclassification disable' to Graph v1.0 [#2674](https://github.com/pnp/cli-microsoft365/issues/2674)
+
+## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo group user add](../cmd/spo/group/group-user-add.md) - add a user or multiple users to SharePoint Group [#2483](https://github.com/pnp/cli-microsoft365/issues/2483)
+- [spo site apppermission remove](../cmd/spo/site/site-apppermission-remove.md) - removes a specific application permission from a site [#2209](https://github.com/pnp/cli-microsoft365/issues/2209)
+- [spo app instance list](../cmd/spo/app/app-instance-list.md) - retrieves apps installed in a site [#2025](https://github.com/pnp/cli-microsoft365/issues/2209)
+
+**Planner:**
+
+- [planner plan get](../cmd/planner/plan/plan-get.md) - retrieves a Microsoft Planner plan [#2528](https://github.com/pnp/cli-microsoft365/issues/2528)
+
+### Changes
+
+- updated 'teams message reply list' to Graph v1.0 [#2509](https://github.com/pnp/cli-microsoft365/issues/2509)
+- extended 'getAllItems' with an optional metadata argument [#2613](https://github.com/pnp/cli-microsoft365/issues/2613)
+- added the 'social champion' sample [#2532](https://github.com/pnp/cli-microsoft365/issues/2532)
+- renamed 'PowerShell Core' to 'PowerShell' in docs [#2620](https://github.com/pnp/cli-microsoft365/issues/2620)
+- added support for upgrading SPFx projects to 1.13.0-beta.17 [#2644](https://github.com/pnp/cli-microsoft365/issues/2644)
+- added support for using AAD client secret to authenticate [#2171](https://github.com/pnp/cli-microsoft365/issues/2171)
+- updated 'teams team list' to Graph v1.0 [#2507](https://github.com/pnp/cli-microsoft365/issues/2507)
+- added the 'Recognize most active users for a specific Team' sample [#2619](https://github.com/pnp/cli-microsoft365/issues/2619)
+
 ## [v3.12.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.12.0)
 
 ### New commands
+
+**CLI:**
+
+- [cli doctor](../cmd/cli/cli-doctor.md) - retrieves diagnostic information about the current environment [#2157](https://github.com/pnp/cli-microsoft365/issues/2157)
 
 **OneDrive:**
 
@@ -21,6 +83,14 @@
 - added the 'List failed site designs' sample [#2539](https://github.com/pnp/cli-microsoft365/issues/2539)
 - extended 'spo web get' with groups [#2493](https://github.com/pnp/cli-microsoft365/issues/2493)
 - fixed 'yammer message add' [#2557](https://github.com/pnp/cli-microsoft365/issues/2557)
+- fixed 'spo site set' code coverage [#2586](https://github.com/pnp/cli-microsoft365/issues/2586)
+- updated 'teams channel get' to Graph v1.0 [#2505](https://github.com/pnp/cli-microsoft365/issues/2505)
+- added missing 'chalk' dependency [#2592](https://github.com/pnp/cli-microsoft365/issues/2592)
+- extended Teams channel ID validation with - and _ [#2594](https://github.com/pnp/cli-microsoft365/issues/2594)
+- added file count sample [#2576](https://github.com/pnp/cli-microsoft365/issues/2576)
+- added support for upgrading SPFx projects to v1.13.0-beta.13 [#2604](https://github.com/pnp/cli-microsoft365/issues/2604)
+- updated upgrade rule for SPFx v1.13.0-beta.13 [#2611](https://github.com/pnp/cli-microsoft365/issues/2611)
+- added support for upgrading SPFx projects to v1.13.0-beta.15 [#2614](https://github.com/pnp/cli-microsoft365/issues/2614)
 
 ## [v3.11.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.11.0)
 
@@ -858,7 +928,7 @@
 - [outlook report mailappusageusercounts](../cmd/outlook/report/report-mailappusageusercounts.md) - gets the count of unique users that connected to Exchange Online using any email app [#1214](https://github.com/pnp/cli-microsoft365/issues/1214)
 - [outlook report mailactivityusercounts](../cmd/outlook/report/report-mailactivityusercounts.md) - enables you to understand trends on the number of unique users who are performing email activities like send, read, and receive [#1211](https://github.com/pnp/cli-microsoft365/issues/1211)
 - [outlook report mailactivitycounts](../cmd/outlook/report/report-mailactivitycounts.md) - enables you to understand the trends of email activity (like how many were sent, read, and received) in your organization [#1210](https://github.com/pnp/cli-microsoft365/issues/1210)
-- [outlook report mailboxusagedetail](../cmd/outlook/report/report-mailboxusagedetail.md) - gets details about mailbox usage [#1216](https://github.com/pnp/cli-microsoft365/issues/1216) 
+- [outlook report mailboxusagedetail](../cmd/outlook/report/report-mailboxusagedetail.md) - gets details about mailbox usage [#1216](https://github.com/pnp/cli-microsoft365/issues/1216)
 - [outlook report mailappusageuserdetail](../cmd/outlook/report/report-mailappusageuserdetail.md) - gets details about which activities users performed on the various email apps [#1212](https://github.com/pnp/cli-microsoft365/issues/1212)
 - [outlook report mailactivityuserdetail](../cmd/outlook/report/report-mailactivityuserdetail.md) - gets details about email activity users have performed [#1209](https://github.com/pnp/cli-microsoft365/issues/1209)
 - [outlook report mailappusageappsusercounts](../cmd/outlook/report/report-mailappusageappsusercounts.md) - gets the count of unique users per email app [#1213](https://github.com/pnp/cli-microsoft365/issues/1213)

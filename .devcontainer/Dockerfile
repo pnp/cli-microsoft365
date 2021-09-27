@@ -8,8 +8,8 @@ LABEL name="CLI for Microsoft 365 Development" \
   Garry Trinder <garry.trinder@live.com>, \
   Albert-Jan Schot <appie@digiwijs.nl>, \
   Rabia Williams <rabiawilliams@gmail.com>, \
-  Mark Powney <mpowney@icloud.com>, \
-  Patrick Lamber <patrick@nubo.eu>"
+  Patrick Lamber <patrick@nubo.eu>, \
+  Arjun Menon <arjun.umenon@gmail.com>"
 
 ENV NPM_CONFIG_PREFIX=/home/cli-microsoft365-dev/.npm-global \
   PATH=$PATH:/home/cli-microsoft365-dev/.npm-global/bin

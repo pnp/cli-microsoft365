@@ -1,0 +1,17 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "version": "1.12.1",
+    "libraryName": "spfx",
+    "libraryId": "37239baf-1751-494e-81de-5ec72078f637",
+    "environment": "spo",
+    "packageManager": "npm",
+    "solutionName": "spfx",
+    "skipFeatureDeployment": false,
+    "componentType": "extension",
+    "extensionType": "ListViewCommandSet",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "isCreatingSolution": true,
+    "isDomainIsolated": false
+  }
+}

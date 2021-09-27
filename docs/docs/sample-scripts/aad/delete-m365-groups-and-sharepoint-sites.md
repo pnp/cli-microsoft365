@@ -4,7 +4,7 @@ Author: [Patrick Lamber](https://www.nubo.eu/Delete-All-SPO-Sites-And-M365-Group
 
 Another example how you can delete all Microsoft 365 Groups and SharePoint Online sites in your development environment.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 ### Warning. Use with caution. This script deletes all M365 Groups and SPO Sites in your tenant
 $devAccount = "<putyourupnhereforsecuritycheck>"
 ### Deletes the resources from the recyclebin. The CLI does not support this feature yet

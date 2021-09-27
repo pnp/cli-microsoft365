@@ -6,7 +6,7 @@ Microsoft To Do is my task management tool of choice, I use it for tracking ever
 
 This script iterates across all of the task lists and removes the tasks that have been marked as complete.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 Write-Output "Getting Microsoft To Do task lists ..."
 $lists = m365 todo list list -o json | ConvertFrom-Json
 

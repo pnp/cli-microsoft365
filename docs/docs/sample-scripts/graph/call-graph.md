@@ -4,7 +4,7 @@ Author: [Garry Trinder](https://github.com/garrytrinder)
 
 Obtain a new access token for the Microsoft Graph and use it an HTTP request.
 
-```powershell tab="PowerShell Core"
+```powershell tab="PowerShell"
 $token = m365 util accesstoken get --resource https://graph.microsoft.com --new
 $me = Invoke-RestMethod -Uri https://graph.microsoft.com/v1.0/me -Headers @{"Authorization"="Bearer $token"}
 $me
