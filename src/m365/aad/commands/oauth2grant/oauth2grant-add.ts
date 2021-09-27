@@ -1,11 +1,9 @@
 import { Logger } from '../../../../cli';
-import {
-  CommandOption
-} from '../../../../Command';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import AadCommand from '../../../base/AadCommand';
+import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
@@ -18,7 +16,7 @@ interface Options extends GlobalOptions {
   scope: string;
 }
 
-class AadOAuth2GrantAddCommand extends AadCommand {
+class AadOAuth2GrantAddCommand extends GraphCommand {
   public get name(): string {
     return commands.OAUTH2GRANT_ADD;
   }
@@ -33,20 +31,17 @@ class AadOAuth2GrantAddCommand extends AadCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/myorganization/oauth2PermissionGrants?api-version=1.6`,
+      url: `${this.resource}/v1.0/oauth2PermissionGrants`,
       headers: {
-        'content-type': 'application/json'
+        'content-type': 'application/json;odata.metadata=none'
       },
       responseType: 'json',
       data: {
-        "odata.type": "Microsoft.DirectoryServices.OAuth2PermissionGrant",
         "clientId": args.options.clientId,
         "consentType": "AllPrincipals",
         "principalId": null,
         "resourceId": args.options.resourceId,
-        "scope": args.options.scope,
-        "startTime": "0001-01-01T00:00:00",
-        "expiryTime": "9000-01-01T00:00:00"
+        "scope": args.options.scope
       }
     };
 
