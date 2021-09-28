@@ -1,7 +1,7 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, { CommandError, CommandErrorWithOutput, CommandOption, CommandTypes } from '../../../../Command';
 import config from '../../../../config';
-import GlobalOptions, { Output } from '../../../../GlobalOptions';
+import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import SpoCommand from '../../../base/SpoCommand';
@@ -82,7 +82,7 @@ class SpoContentTypeAddCommand extends SpoCommand {
           webUrl: args.options.webUrl,
           listTitle: args.options.listTitle,
           id: args.options.id,
-          output: args.options.output ?? 'json',
+          output: 'json',
           debug: this.debug,
           verbose: this.verbose
         };
@@ -91,12 +91,8 @@ class SpoContentTypeAddCommand extends SpoCommand {
             if (this.debug) {
               logger.logToStderr(res.stderr);
             }
-            let result = res.stdout;
-            if (options.output === Output[Output.json]) {
-              result = JSON.parse(result);
-            }
 
-            logger.log(result);
+            logger.log(JSON.parse(res.stdout));
             cb();
           }, (err: CommandErrorWithOutput) => {
             cb(err.error);
