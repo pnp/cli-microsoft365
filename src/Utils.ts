@@ -647,4 +647,12 @@ export default class Utils {
 
     return jsonObj;
   }
+
+  public static encodeQueryParameter(value: string): string {
+    if (!value) {
+      return value;
+    }
+
+    return encodeURIComponent(value).replace(/'/g, "''");
+  }
 }
