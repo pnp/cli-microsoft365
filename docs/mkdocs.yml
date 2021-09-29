@@ -639,6 +639,7 @@ nav:
       - 'Add multiple lists in multiple sites': 'sample-scripts/spo/add-multiple-lists-in-multiple-sites.md'
       - 'Add users to the Associated SharePoint Groups from a CSV File': 'sample-scripts/spo/add-users-associatedspgroup-site-csv-file.md'
       - 'Copy files to another SharePoint Library in another site': 'sample-scripts/spo/copy-files-to-another-library.md'
+      - 'Copy list items between SharePoint lists': 'sample-scripts/spo/copy-listitems-sharepointlist.md'
       - 'Delete all (non-group connected) modern SharePoint sites': 'sample-scripts/spo/delete-non-group-connected-modern-sites.md'
       - 'Delete custom color themes from SharePoint': 'sample-scripts/spo/remove-custom-themes.md'
       - 'Delete custom SharePoint site designs': 'sample-scripts/spo/remove-site-designs.md'
