@@ -649,6 +649,7 @@ nav:
       - 'Lists number of files in all lists and folders for the given site': 'sample-scripts/spo/list-all-list-folders-itemcount.md'
       - 'Lists site collection owners': 'sample-scripts/spo/list-site-collection-owners.md'
       - 'Monitor site collections storage usage': 'sample-scripts/spo/monitor-site-collection-storage-usage.md'
+      - 'How to perform operations not covered by the CLI for Microsoft 365': 'sample-scripts/spo/perform-operations-not-covered-by-cli-for-microsoft-365.md'
       - 'Remove a Site Collection Admin User from all Site Collections': 'sample-scripts/spo/remove-siteCollection-admin-user.md'
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
       - 'Remove pending SharePoint API permission requests': 'sample-scripts/spo/remove-pending-api-permission-requests.md'
