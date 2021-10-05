@@ -619,6 +619,7 @@ nav:
       - 'Cancel all running flow runs for a flow in an environment': 'sample-scripts/flow/cancel-all-running-flow-runs.md'
       - 'Export a single Flow to a Logic App' : 'sample-scripts/flow/export-flow-logicapp.md'
       - 'Export all Flows in environment' : 'sample-scripts/flow/export-all-flows-in-environment.md'
+      - 'Flow runs current day summary' : 'sample-scripts/flow/flow-runs-day-summary.md'
       - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
       - 'Resubmit all failed flow runs for a flow in an environment': 'sample-scripts/flow/resubmit-all-failed-flow-runs.md'
       - 'Search flows for connections' : 'sample-scripts/flow/search-flows-for-connection.md'
