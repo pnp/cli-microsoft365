@@ -8,6 +8,10 @@
 
 - [spo group user list](../cmd/spo/group/group-user-list.md) - list members of a SharePoint Group [#2640](https://github.com/pnp/cli-microsoft365/issues/2640)
 
+**Teams:**
+
+- [teams team get](../cmd/teams/team/team-get.md) - gets information about the specified Microsoft Teams team [#2506](https://github.com/pnp/cli-microsoft365/issues/2506)
+
 ### Changes
 
 - removed duplicate ID in 'spo listitem' commands [#2024](https://github.com/pnp/cli-microsoft365/issues/2024)
@@ -32,6 +36,10 @@
 - upgraded 'teams conversationmember list' to Graph v1.0 [#2672](https://github.com/pnp/cli-microsoft365/issues/2672)
 - upgraded 'teams conversationmember add' to Graph v1.0 [#2671](https://github.com/pnp/cli-microsoft365/issues/2671)
 - upgraded 'aad siteclassification disable' to Graph v1.0 [#2674](https://github.com/pnp/cli-microsoft365/issues/2674)
+- removed 'spo site classic remove' link from nav [#2707](https://github.com/pnp/cli-microsoft365/issues/2707)
+- fixed escaping single quotes in folder names in 'spo file list' [#2704](https://github.com/pnp/cli-microsoft365/issues/2704)
+- added privacy settings remark [#2727](https://github.com/pnp/cli-microsoft365/issues/2727)
+- added v4 upgrade guidance [#2659](https://github.com/pnp/cli-microsoft365/issues/2659)
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
