@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad user set](../cmd/aad/user/user-set.md ) - updates information of the specified user [#1933](https://github.com/pnp/cli-microsoft365/issues/1933)
+
 **SharePoint:**
 
 - [spo group user list](../cmd/spo/group/group-user-list.md) - list members of a SharePoint Group [#2640](https://github.com/pnp/cli-microsoft365/issues/2640)
@@ -40,6 +44,7 @@
 - fixed escaping single quotes in folder names in 'spo file list' [#2704](https://github.com/pnp/cli-microsoft365/issues/2704)
 - added privacy settings remark [#2727](https://github.com/pnp/cli-microsoft365/issues/2727)
 - added v4 upgrade guidance [#2659](https://github.com/pnp/cli-microsoft365/issues/2659)
+- upgraded 'aad siteclassification get' to Graph v1.0 [#2676](https://github.com/pnp/cli-microsoft365/issues/2676)
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
