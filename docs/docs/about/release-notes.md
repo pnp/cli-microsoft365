@@ -1,12 +1,23 @@
 # Release notes
 
-## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
+## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 
 ### New commands
 
 **Azure Active Directory:**
 
 - [aad user set](../cmd/aad/user/user-set.md ) - updates information of the specified user [#1933](https://github.com/pnp/cli-microsoft365/issues/1933)
+
+### Changes
+
+- upgraded the 'aad siteclassification get' command to Microsoft Graph v1.0 [#2676](https://github.com/pnp/cli-microsoft365/issues/2676)
+- upgraded the 'aad siteclassification enable' command to Microsoft Graph v1.0 [#2675](https://github.com/pnp/cli-microsoft365/issues/2675)
+- upgraded the 'aad siteclassification set' command to Microsoft Graph v1.0 [#2677](https://github.com/pnp/cli-microsoft365/issues/2677)
+- extended 'aad o365group teamify' with mailNickname [#2669](https://github.com/pnp/cli-microsoft365/issues/2669)
+
+## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
+
+### New commands
 
 **SharePoint:**
 
@@ -44,7 +55,6 @@
 - fixed escaping single quotes in folder names in 'spo file list' [#2704](https://github.com/pnp/cli-microsoft365/issues/2704)
 - added privacy settings remark [#2727](https://github.com/pnp/cli-microsoft365/issues/2727)
 - added v4 upgrade guidance [#2659](https://github.com/pnp/cli-microsoft365/issues/2659)
-- upgraded 'aad siteclassification get' to Graph v1.0 [#2676](https://github.com/pnp/cli-microsoft365/issues/2676)
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
