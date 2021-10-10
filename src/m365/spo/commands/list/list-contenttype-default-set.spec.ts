@@ -62,6 +62,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   it('configures specified visible content type as default. List specified using Title. UniqueContentTypeOrder null', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
+        opts.headers &&
         opts.headers['x-http-method'] === 'MERGE' &&
         JSON.stringify(opts.data) === JSON.stringify({
           UniqueContentTypeOrder: [
@@ -116,6 +117,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   it('configures specified visible content type as default. List specified using Title. UniqueContentTypeOrder null. Debug', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
+        opts.headers &&
         opts.headers['x-http-method'] === 'MERGE' &&
         JSON.stringify(opts.data) === JSON.stringify({
           UniqueContentTypeOrder: [
@@ -172,6 +174,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   it('configures specified visible content type as default. List specified using ID. UniqueContentTypeOrder not null', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder` &&
+        opts.headers &&
         opts.headers['x-http-method'] === 'MERGE' &&
         JSON.stringify(opts.data) === JSON.stringify({
           UniqueContentTypeOrder: [
@@ -233,6 +236,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   it('configures specified visible content type as default. List specified using ID. UniqueContentTypeOrder not null. Debug', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists(guid'dfddade1-4729-428d-881e-7fedf3cae50d')/RootFolder` &&
+        opts.headers &&
         opts.headers['x-http-method'] === 'MERGE' &&
         JSON.stringify(opts.data) === JSON.stringify({
           UniqueContentTypeOrder: [
@@ -296,6 +300,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   it('configures specified invisible content type as default. List specified using Title. UniqueContentTypeOrder null', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
+        opts.headers &&
         opts.headers['x-http-method'] === 'MERGE' &&
         JSON.stringify(opts.data) === JSON.stringify({
           UniqueContentTypeOrder: [
@@ -360,6 +365,7 @@ describe(commands.LIST_CONTENTTYPE_DEFAULT_SET, () => {
   it('configures specified invisible content type as default. List specified using Title. UniqueContentTypeOrder null. Debug', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if (opts.url === `https://contoso.sharepoint.com/_api/web/lists/GetByTitle('My%20List')/RootFolder` &&
+        opts.headers &&
         opts.headers['x-http-method'] === 'MERGE' &&
         JSON.stringify(opts.data) === JSON.stringify({
           UniqueContentTypeOrder: [

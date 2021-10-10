@@ -63,7 +63,7 @@ describe('AuthServer', () => {
       assert(server.listening);
       assert(serverUrl.indexOf("http://localhost:") > -1);
 
-      Axios.get(`${serverUrl}/?code=1111`).then((response) => {
+      Axios.get<string>(`${serverUrl}/?code=1111`).then((response) => {
         assert(response.data.indexOf("You have logged into CLI for Microsoft 365!") > -1);
         assert(callbackResolveStub.called);
         assert(callbackResolveStub.args[0][0].code === "1111");
@@ -82,7 +82,7 @@ describe('AuthServer', () => {
 
   it('successfully returns error message only', (done) => {
     try {
-      Axios.get(`${serverUrl}/?error=an error has occurred`).then((response) => {
+      Axios.get<string>(`${serverUrl}/?error=an error has occurred`).then((response) => {
         assert(response.data.indexOf("Oops! Azure Active Directory replied with an error message.") > -1);
         assert(callbackResolveStub.notCalled);
         assert(callbackRejectStub.called);
@@ -101,7 +101,7 @@ describe('AuthServer', () => {
 
   it('successfully returns error message and error description', (done) => {
     try {
-      Axios.get(`${serverUrl}/?error=an error has occurred&error_description=error description`).then((response) => {
+      Axios.get<string>(`${serverUrl}/?error=an error has occurred&error_description=error description`).then((response) => {
         assert(response.data.indexOf("Oops! Azure Active Directory replied with an error message.") > -1);
         assert(callbackResolveStub.notCalled);
         assert(callbackRejectStub.called);
@@ -120,7 +120,7 @@ describe('AuthServer', () => {
 
   it('fails if there is an invalid request', (done) => {
     try {
-      Axios.get(`${serverUrl}/?requestingSomthingElse=true`).then((response) => {
+      Axios.get<string>(`${serverUrl}/?requestingSomthingElse=true`).then((response) => {
         assert(response.data.indexOf("Oops! This is an invalid request.") > -1);
         assert(callbackResolveStub.notCalled);
         assert(callbackRejectStub.called);
