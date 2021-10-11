@@ -36,3 +36,4 @@ m365 aad oauth2grant remove --grantId YgA60KYa4UOPSdc-lpxYEnQkr8KVLDpCsOXkiV8i-e
 ## More information
 
 - Application and service principal objects in Azure Active Directory (Azure AD): [https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-application-objects](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-application-objects)
+- Delete a delegated permission grant (oAuth2PermissionGrant): [https://docs.microsoft.com/en-us/graph/api/oauth2permissiongrant-delete?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/oauth2permissiongrant-delete?view=graph-rest-1.0)
