@@ -14,6 +14,7 @@
 - upgraded the 'aad siteclassification enable' command to Microsoft Graph v1.0 [#2675](https://github.com/pnp/cli-microsoft365/issues/2675)
 - upgraded the 'aad siteclassification set' command to Microsoft Graph v1.0 [#2677](https://github.com/pnp/cli-microsoft365/issues/2677)
 - extended 'aad o365group teamify' with mailNickname [#2669](https://github.com/pnp/cli-microsoft365/issues/2669)
+- renamed 'aad o365group restore' to 'aad o365group recyclebinitem restore' [#1987](https://github.com/pnp/cli-microsoft365/issues/1987)
 
 ## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
 
