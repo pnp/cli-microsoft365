@@ -74,6 +74,7 @@ nav:
         - siteclassification get: 'cmd/aad/siteclassification/siteclassification-get.md'
         - siteclassification set: 'cmd/aad/siteclassification/siteclassification-set.md'
       - service principal (sp):
+        - sp add: 'cmd/aad/sp/sp-add.md'
         - sp get: 'cmd/aad/sp/sp-get.md'
       - user:
         - user get: 'cmd/aad/user/user-get.md'
