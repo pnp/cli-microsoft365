@@ -17,6 +17,7 @@
 - extended 'aad o365group teamify' with mailNickname [#2669](https://github.com/pnp/cli-microsoft365/issues/2669)
 - renamed 'aad o365group restore' to 'aad o365group recyclebinitem restore' [#1987](https://github.com/pnp/cli-microsoft365/issues/1987)
 - added support for upgrading SPFx projects to v1.13.0-rc.1 [#2758](https://github.com/pnp/cli-microsoft365/issues/2758)
+- extended 'teams user app list' with teamsAppDefinition [#2719](https://github.com/pnp/cli-microsoft365/issues/2719)
 
 ## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
 
