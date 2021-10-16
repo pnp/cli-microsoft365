@@ -32,3 +32,4 @@ m365 aad oauth2grant list --clientId b2307a39-e878-458b-bc90-03bc578531d6
 ## More information
 
 - Application and service principal objects in Azure Active Directory (Azure AD): [https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-application-objects](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-application-objects)
+- List oauth2PermissionGrants: [https://docs.microsoft.com/en-us/graph/api/oauth2permissiongrant-list?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/oauth2permissiongrant-list?view=graph-rest-1.0)
