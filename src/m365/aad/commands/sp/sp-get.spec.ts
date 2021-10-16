@@ -14,9 +14,25 @@ describe(commands.SP_GET, () => {
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
+  const spAppInfo = {
+    "value": [
+      {
+        "id": "59e617e5-e447-4adc-8b88-00af644d7c92",
+        "appId": "65415bb1-9267-4313-bbf5-ae259732ee12",
+        "displayName": "foo",
+        "createdDateTime": "2021-03-07T15:04:11Z",
+        "description": null,
+        "homepage": null,
+        "loginUrl": null,
+        "logoutUrl": null,
+        "notes": null
+      }
+    ]
+  };
+
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -58,50 +74,22 @@ describe(commands.SP_GET, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('retrieves information about the specified service principal using its display name (debug)', (done) => {
-    const sp: any = { "objectType": "ServicePrincipal", "objectId": "d03a0062-1aa6-43e1-8f49-d73e969c5812", "deletionTimestamp": null, "accountEnabled": true, "addIns": [], "alternativeNames": [], "appDisplayName": "SharePoint Online Client", "appId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "appOwnerTenantId": null, "appRoleAssignmentRequired": false, "appRoles": [], "displayName": "SharePoint Online Client", "errorUrl": null, "homepage": null, "keyCredentials": [], "logoutUrl": null, "oauth2Permissions": [], "passwordCredentials": [], "preferredTokenSigningKeyThumbprint": null, "publisherName": null, "replyUrls": [], "samlMetadataUrl": null, "servicePrincipalNames": ["57fb890c-0dab-4253-a5e0-7188c88b2bb4"], "servicePrincipalType": "Application", "tags": [], "tokenEncryptionKeyId": null };
-
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=displayName eq 'SharePoint%20Online%20Client'`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ value: [sp] });
-        }
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-    command.action(logger, { options: { debug: true, displayName: 'SharePoint Online Client' } }, () => {
-      try {
-        assert(loggerLogSpy.calledWith(sp));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
   it('retrieves information about the specified service principal using its display name', (done) => {
-    const sp: any = { "objectType": "ServicePrincipal", "objectId": "d03a0062-1aa6-43e1-8f49-d73e969c5812", "deletionTimestamp": null, "accountEnabled": true, "addIns": [], "alternativeNames": [], "appDisplayName": "SharePoint Online Client", "appId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "appOwnerTenantId": null, "appRoleAssignmentRequired": false, "appRoles": [], "displayName": "SharePoint Online Client", "errorUrl": null, "homepage": null, "keyCredentials": [], "logoutUrl": null, "oauth2Permissions": [], "passwordCredentials": [], "preferredTokenSigningKeyThumbprint": null, "publisherName": null, "replyUrls": [], "samlMetadataUrl": null, "servicePrincipalNames": ["57fb890c-0dab-4253-a5e0-7188c88b2bb4"], "servicePrincipalType": "Application", "tags": [], "tokenEncryptionKeyId": null };
-
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=displayName eq 'SharePoint%20Online%20Client'`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ value: [sp] });
-        }
+      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
+        return Promise.resolve(spAppInfo);
+      }
+
+      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals`) > -1) {
+        return Promise.resolve(spAppInfo);
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, displayName: 'SharePoint Online Client' } }, () => {
+    command.action(logger, { options: { debug: true, displayName: 'foo' } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(sp));
+        assert(loggerLogSpy.calledWith(spAppInfo));
         done();
       }
       catch (e) {
@@ -111,23 +99,21 @@ describe(commands.SP_GET, () => {
   });
 
   it('retrieves information about the specified service principal using its appId', (done) => {
-    const sp: any = { "objectType": "ServicePrincipal", "objectId": "d03a0062-1aa6-43e1-8f49-d73e969c5812", "deletionTimestamp": null, "accountEnabled": true, "addIns": [], "alternativeNames": [], "appDisplayName": "SharePoint Online Client", "appId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "appOwnerTenantId": null, "appRoleAssignmentRequired": false, "appRoles": [], "displayName": "SharePoint Online Client", "errorUrl": null, "homepage": null, "keyCredentials": [], "logoutUrl": null, "oauth2Permissions": [], "passwordCredentials": [], "preferredTokenSigningKeyThumbprint": null, "publisherName": null, "replyUrls": [], "samlMetadataUrl": null, "servicePrincipalNames": ["57fb890c-0dab-4253-a5e0-7188c88b2bb4"], "servicePrincipalType": "Application", "tags": [], "tokenEncryptionKeyId": null };
-
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=appId eq '57fb890c-0dab-4253-a5e0-7188c88b2bb4'`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ value: [sp] });
-        }
+      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=appId eq `) > -1) {
+        return Promise.resolve(spAppInfo);
+      }
+
+      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals`) > -1) {
+        return Promise.resolve(spAppInfo);
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, appId: '57fb890c-0dab-4253-a5e0-7188c88b2bb4' } }, () => {
+    command.action(logger, { options: { debug: false, appId: '65415bb1-9267-4313-bbf5-ae259732ee12' } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(sp));
+        assert(loggerLogSpy.calledWith(spAppInfo));
         done();
       }
       catch (e) {
@@ -137,23 +123,21 @@ describe(commands.SP_GET, () => {
   });
 
   it('retrieves information about the specified service principal using its objectId', (done) => {
-    const sp: any = { "objectType": "ServicePrincipal", "objectId": "d03a0062-1aa6-43e1-8f49-d73e969c5812", "deletionTimestamp": null, "accountEnabled": true, "addIns": [], "alternativeNames": [], "appDisplayName": "SharePoint Online Client", "appId": "57fb890c-0dab-4253-a5e0-7188c88b2bb4", "appOwnerTenantId": null, "appRoleAssignmentRequired": false, "appRoles": [], "displayName": "SharePoint Online Client", "errorUrl": null, "homepage": null, "keyCredentials": [], "logoutUrl": null, "oauth2Permissions": [], "passwordCredentials": [], "preferredTokenSigningKeyThumbprint": null, "publisherName": null, "replyUrls": [], "samlMetadataUrl": null, "servicePrincipalNames": ["57fb890c-0dab-4253-a5e0-7188c88b2bb4"], "servicePrincipalType": "Application", "tags": [], "tokenEncryptionKeyId": null };
-
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/servicePrincipals?api-version=1.6&$filter=objectId eq '57fb890c-0dab-4253-a5e0-7188c88b2bb4'`) > -1) {
-        if (opts.headers &&
-          opts.headers.accept &&
-          opts.headers.accept.indexOf('application/json') === 0) {
-          return Promise.resolve({ value: [sp] });
-        }
+      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=objectId eq `) > -1) {
+        return Promise.resolve(spAppInfo);
+      }
+
+      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals`) > -1) {
+        return Promise.resolve(spAppInfo);
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, objectId: '57fb890c-0dab-4253-a5e0-7188c88b2bb4' } }, () => {
+    command.action(logger, { options: { debug: false, objectId: '59e617e5-e447-4adc-8b88-00af644d7c92' } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(sp));
+        assert(loggerLogSpy.calledWith(spAppInfo));
         done();
       }
       catch (e) {
@@ -203,6 +187,86 @@ describe(commands.SP_GET, () => {
     command.action(logger, { options: { debug: false, id: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  
+  it('fails when Azure AD app with same name exists', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals",
+          "value": [
+            {
+              "id": "be559819-b036-470f-858b-281c4e808403",
+              "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
+              "displayName": "foo",
+              "createdDateTime": "2021-03-07T15:04:11Z",
+              "description": null,
+              "homepage": null,
+              "loginUrl": null,
+              "logoutUrl": null,
+              "notes": null
+            },
+            {
+              "id": "93d75ef9-ba9b-4361-9a47-1f6f7478f05f",
+              "appId": "e9fd0957-049f-40d0-8d1d-112320fb1cbd",
+              "displayName": "foo",
+              "createdDateTime": "2021-03-07T15:04:11Z",
+              "description": null,
+              "homepage": null,
+              "loginUrl": null,
+              "logoutUrl": null,
+              "notes": null
+            }
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        displayName: 'foo'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Multiple Azure AD apps with name foo found: be559819-b036-470f-858b-281c4e808403,93d75ef9-ba9b-4361-9a47-1f6f7478f05f`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails when the specified Azure AD app does not exist', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals",
+          "value": []
+        });
+      }
+
+      return Promise.reject(`Invalid request`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        displayName: 'Test App'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified Azure AD app does not exist`)));
         done();
       }
       catch (e) {

@@ -48,3 +48,4 @@ m365 aad sp get --objectId b2307a39-e878-458b-bc90-03bc578531dd
 ## More information
 
 - Application and service principal objects in Azure Active Directory (Azure AD): [https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-application-objects](https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-application-objects)
+- Get servicePrincipal: [https://docs.microsoft.com/en-us/graph/api/serviceprincipal-get?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/serviceprincipal-get?view=graph-rest-1.0)
