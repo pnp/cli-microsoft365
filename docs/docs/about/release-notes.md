@@ -18,6 +18,9 @@
 - renamed 'aad o365group restore' to 'aad o365group recyclebinitem restore' [#1987](https://github.com/pnp/cli-microsoft365/issues/1987)
 - added support for upgrading SPFx projects to v1.13.0-rc.1 [#2758](https://github.com/pnp/cli-microsoft365/issues/2758)
 - extended 'teams user app list' with teamsAppDefinition [#2719](https://github.com/pnp/cli-microsoft365/issues/2719)
+- added the 'Flow runs day summary report' sample [#2740](https://github.com/pnp/cli-microsoft365/issues/2740)
+- added the 'Add users to groups' sample [#2719](https://github.com/pnp/cli-microsoft365/issues/2741)
+- added the 'List Teams, channels, and tabs in the tenant' sample [#2734](https://github.com/pnp/cli-microsoft365/issues/2734)
 
 ## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
 
