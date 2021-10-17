@@ -240,7 +240,6 @@ describe(commands.ADD, () => {
     });
   });
 
-
   it('uploads file to the root site collection, root site, default document library, root folder with trailing slash', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
@@ -526,7 +525,7 @@ describe(commands.ADD, () => {
     });
   });
 
-  it('uploads file to One Drive for Business, default doc lib, root folder to', (done) => {
+  it('uploads file to One Drive for Business, default doc lib, root folder', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -609,7 +608,7 @@ describe(commands.ADD, () => {
     });
   });
 
-  it('converts file from non-root site collection, root site, default doc lib, root folder to a local file', (done) => {
+  it('uploads file to a non-root site collection, doc lib, root folder', (done) => {
     sinon.stub(request, 'get').callsFake(opts => {
       const url: string = opts.url as string;
 
@@ -680,6 +679,74 @@ describe(commands.ADD, () => {
         debug: false,
         filePath: 'file.pdf',
         folderUrl: 'https://contoso.sharepoint.com/sites/Contoso/Shared Documents'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined', JSON.stringify(err));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('uploads file to a non-root site collection, doc lib, root folder without site lookup with siteUrl specified', (done) => {
+    sinon.stub(request, 'get').callsFake(opts => {
+      const url: string = opts.url as string;
+
+      switch (url) {
+        case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com:/sites/Contoso?$select=id':
+          return Promise.resolve({
+            "id": "contoso.sharepoint.com,9d1b2174-9906-43ec-8c9e-f8589de047af,bf674ab6-4b20-4368-8516-d71e6002d4b9"
+          });
+        case 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,9d1b2174-9906-43ec-8c9e-f8589de047af,bf674ab6-4b20-4368-8516-d71e6002d4b9/drives?$select=webUrl,id':
+          return Promise.resolve({
+            "value": [
+              {
+                "id": "b!dCEbnQaZ7EOMnvhYneBHr7ZKZ78gS2hDhRbXHmAC1LnkVKXD20dsSYInKHJxx08q",
+                "webUrl": "https://contoso.sharepoint.com/sites/Contoso/Shared%20Documents"
+              }
+            ]
+          });
+        default:
+          return Promise.reject(`Invalid GET request: ${url}`);
+      }
+    });
+
+    sinon.stub(fs, 'readFileSync').callsFake(() => 'abc');
+
+    sinon.stub(request, 'post').callsFake(opts => {
+      const url: string = opts.url as string;
+
+      if (url === 'https://graph.microsoft.com/v1.0/sites/contoso.sharepoint.com,9d1b2174-9906-43ec-8c9e-f8589de047af,bf674ab6-4b20-4368-8516-d71e6002d4b9/drives/b!dCEbnQaZ7EOMnvhYneBHr7ZKZ78gS2hDhRbXHmAC1LnkVKXD20dsSYInKHJxx08q/root:/file.pdf:/createUploadSession') {
+        return Promise.resolve({
+          "expirationDateTime": "2020-12-27T18:23:37.078Z",
+          "nextExpectedRanges": [
+            "0-"
+          ],
+          "uploadUrl": "https://contoso.sharepoint.com/_api/v2.0/drives/b!dCEbnQaZ7EOMnvhYneBHr7ZKZ78gS2hDhRbXHmAC1LnkVKXD20dsSYInKHJxx08q/items/01AH65SIN6Y2GOVW7725BZO354PWSELRRZ/uploadSession?guid='19a2b995-5b72-4460-980a-a564ff63108c'&path='~tmpEF_file.pdf'&overwrite=True&rename=False&dc=0&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXgyNzE1MzQuc2hhcmVwb2ludC5jb21AZjczMjIzODAtZjIwMy00MmZmLTkzZTgtNjZlMjY2ZjZkMmU0IiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYwOTA5MjUxNyIsImV4cCI6IjE2MDkxNzg5MTciLCJlbmRwb2ludHVybCI6Ild5dUNlVWluMHBaQmUvTGI1WXQ1SDY2RGQzSDVzOFhZWUF6eU1KZ0VJcFE9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIyNzMiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6Ik4ySmlObUkyWldRdE9ETXhOQzAwTnpaaExXRmlPVEF0TVRjNVpHVTFZemxoWlRFMCIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJaV0UwT1dFek9UTXRaVE5sTmkwME56WXdMV0V4WWpJdFpUazJOVE01WlRFMU16Y3kiLCJhcHBfZGlzcGxheW5hbWUiOiJDTEkgdGVzdCIsIm5hbWVpZCI6IjgxYzZkODNhLWViYzYtNDM5Ni1hZTYwLTk1NDhiMmRlZTQ2ZEBmNzMyMjM4MC1mMjAzLTQyZmYtOTNlOC02NmUyNjZmNmQyZTQiLCJyb2xlcyI6ImFsbGZpbGVzLndyaXRlIiwidHQiOiIxIiwidXNlUGVyc2lzdGVudENvb2tpZSI6bnVsbH0.N2d0Tll4WFlqVWJmNWxnMHZTMjBaaEdJVXpUWC9NaDBrM1NRNlNYTXZzWT0"
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${url}`);
+    });
+    sinon.stub(request, 'put').callsFake(opts => {
+      if (opts.url === `https://contoso.sharepoint.com/_api/v2.0/drives/b!dCEbnQaZ7EOMnvhYneBHr7ZKZ78gS2hDhRbXHmAC1LnkVKXD20dsSYInKHJxx08q/items/01AH65SIN6Y2GOVW7725BZO354PWSELRRZ/uploadSession?guid='19a2b995-5b72-4460-980a-a564ff63108c'&path='~tmpEF_file.pdf'&overwrite=True&rename=False&dc=0&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXgyNzE1MzQuc2hhcmVwb2ludC5jb21AZjczMjIzODAtZjIwMy00MmZmLTkzZTgtNjZlMjY2ZjZkMmU0IiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTYwOTA5MjUxNyIsImV4cCI6IjE2MDkxNzg5MTciLCJlbmRwb2ludHVybCI6Ild5dUNlVWluMHBaQmUvTGI1WXQ1SDY2RGQzSDVzOFhZWUF6eU1KZ0VJcFE9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIyNzMiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6Ik4ySmlObUkyWldRdE9ETXhOQzAwTnpaaExXRmlPVEF0TVRjNVpHVTFZemxoWlRFMCIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJaV0UwT1dFek9UTXRaVE5sTmkwME56WXdMV0V4WWpJdFpUazJOVE01WlRFMU16Y3kiLCJhcHBfZGlzcGxheW5hbWUiOiJDTEkgdGVzdCIsIm5hbWVpZCI6IjgxYzZkODNhLWViYzYtNDM5Ni1hZTYwLTk1NDhiMmRlZTQ2ZEBmNzMyMjM4MC1mMjAzLTQyZmYtOTNlOC02NmUyNjZmNmQyZTQiLCJyb2xlcyI6ImFsbGZpbGVzLndyaXRlIiwidHQiOiIxIiwidXNlUGVyc2lzdGVudENvb2tpZSI6bnVsbH0.N2d0Tll4WFlqVWJmNWxnMHZTMjBaaEdJVXpUWC9NaDBrM1NRNlNYTXZzWT0`) {
+        return Promise.resolve({
+          webUrl: "https://contoso.sharepoint.com/sites/Contoso/Shared Documents/file.pdf"
+        });
+      }
+
+      return Promise.reject(`Invalid PUT request: ${opts}`);
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        filePath: 'file.pdf',
+        folderUrl: 'https://contoso.sharepoint.com/sites/Contoso/Shared Documents',
+        siteUrl: 'https://contoso.sharepoint.com/sites/Contoso'
       }
     }, (err?: any) => {
       try {
@@ -976,6 +1043,16 @@ describe(commands.ADD, () => {
   it(`fails validation if the specified local source file doesn't exist`, () => {
     sinon.stub(fs, 'existsSync').callsFake(() => false);
     const actual = command.validate({ options: { filePath: 'file.pdf', folderUrl: 'https://contoso.sharepoint.com/Shared Documents' } });
+    assert.notStrictEqual(actual, true);
+  });
+
+  it(`fails validation if the specified siteUrl is invalid`, () => {
+    sinon.stub(fs, 'existsSync').callsFake(() => true);
+    const actual = command.validate({ options: {
+      filePath: 'file.pdf',
+      folderUrl: 'https://contoso.sharepoint.com/Shared Documents',
+      siteUrl: '/'
+    } });
     assert.notStrictEqual(actual, true);
   });
 
