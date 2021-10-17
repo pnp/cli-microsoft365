@@ -82,6 +82,7 @@
 - Supported authentication methods
   - Azure Managed Identity
   - Certificate
+  - Client Secret
   - Device Code
   - Username and Password
 - Manage your SharePoint Framework projects
@@ -156,22 +157,22 @@ Get command information and example usage using the global `--help` option.
 m365 spo site get --help
 ```
 
-Execute a command and output response as text.
+Execute a command and output response as JSON.
 
 ```sh
 m365 spo site get --url https://contoso.sharepoint.com
 ```
 
-Execute a command and output response as JSON using the global `--output` option.
-
-```sh
-m365 spo site get --url https://contoso.sharepoint.com --output json
-```
-
 Filter responses and return custom objects using [JMESPath](https://jmespath.org/) queries using the global `--query`  option.
 
 ```sh
-m365 spo site list --output json --query '[?Template==`GROUP#0`].{Title:Title, Url:Url}'
+m365 spo site list --query '[?Template==`GROUP#0`].{Title:Title, Url:Url}'
+```
+
+Execute a command and output response as text using the global `--output` option.
+
+```sh
+m365 spo site get --url https://contoso.sharepoint.com --output text
 ```
 
 > For more examples and usage, refer to the [command](https://pnp.github.io/cli-microsoft365/cmd/login/) and  [sample scripts](https://pnp.github.io/cli-microsoft365/sample-scripts/) documentation.
