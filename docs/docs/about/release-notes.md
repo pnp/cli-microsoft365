@@ -21,6 +21,7 @@
 - added the 'Flow runs day summary report' sample [#2740](https://github.com/pnp/cli-microsoft365/issues/2740)
 - added the 'Add users to groups' sample [#2719](https://github.com/pnp/cli-microsoft365/issues/2741)
 - added the 'List Teams, channels, and tabs in the tenant' sample [#2734](https://github.com/pnp/cli-microsoft365/issues/2734)
+- extended 'spo contenttype add' to return created object by default [#2333](https://github.com/pnp/cli-microsoft365/issues/2333)
 
 ## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
 
