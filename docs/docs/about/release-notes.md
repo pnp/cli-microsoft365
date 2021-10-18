@@ -22,6 +22,8 @@
 - added the 'Add users to groups' sample [#2719](https://github.com/pnp/cli-microsoft365/issues/2741)
 - added the 'List Teams, channels, and tabs in the tenant' sample [#2734](https://github.com/pnp/cli-microsoft365/issues/2734)
 - extended 'spo contenttype add' to return created object by default [#2333](https://github.com/pnp/cli-microsoft365/issues/2333)
+- excluded parsing strings for formatting [#2760](https://github.com/pnp/cli-microsoft365/issues/2760)
+- added launch config to debug CLI and tests [#2766](https://github.com/pnp/cli-microsoft365/issues/2766)
 
 ## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
 
