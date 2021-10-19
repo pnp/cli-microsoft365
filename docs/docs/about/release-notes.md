@@ -22,10 +22,16 @@
 - added the 'Add users to groups' sample [#2719](https://github.com/pnp/cli-microsoft365/issues/2741)
 - added the 'List Teams, channels, and tabs in the tenant' sample [#2734](https://github.com/pnp/cli-microsoft365/issues/2734)
 - extended 'spo contenttype add' to return created object by default [#2333](https://github.com/pnp/cli-microsoft365/issues/2333)
+- excluded parsing strings for formatting [#2760](https://github.com/pnp/cli-microsoft365/issues/2760)
+- added launch config to debug CLI and tests [#2766](https://github.com/pnp/cli-microsoft365/issues/2766)
 
 ## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
 
 ### New commands
+
+**Azure Active Directory:**
+
+- [aad user set](../cmd/aad/user/user-set.md ) - updates information of the specified user [#1933](https://github.com/pnp/cli-microsoft365/issues/1933)
 
 **SharePoint:**
 
@@ -63,6 +69,7 @@
 - fixed escaping single quotes in folder names in 'spo file list' [#2704](https://github.com/pnp/cli-microsoft365/issues/2704)
 - added privacy settings remark [#2727](https://github.com/pnp/cli-microsoft365/issues/2727)
 - added v4 upgrade guidance [#2659](https://github.com/pnp/cli-microsoft365/issues/2659)
+- upgraded 'aad siteclassification get' to Graph v1.0 [#2676](https://github.com/pnp/cli-microsoft365/issues/2676)
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
