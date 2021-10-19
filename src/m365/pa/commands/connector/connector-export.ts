@@ -107,7 +107,7 @@ class PaConnectorExportCommand extends AzmgmtCommand {
             .get({
               url: connector.properties.apiDefinitions.originalSwaggerUrl,
               headers: {
-                'x-anonymous': true
+                'x-anonymous': 'true'
               }
             });
         }
@@ -139,7 +139,7 @@ class PaConnectorExportCommand extends AzmgmtCommand {
               url: connector.properties.iconUri,
               responseType: 'arraybuffer',
               headers: {
-                'x-anonymous': true
+                'x-anonymous': 'true'
               }
             });
         }

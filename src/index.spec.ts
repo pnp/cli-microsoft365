@@ -38,6 +38,7 @@ describe('Lazy loading commands', () => {
       yammerCommands.default
     ];
     const aliases: string[] = [
+      'aad o365group restore',
       'consent',
       'flow connector export',
       'flow connector list',
@@ -49,8 +50,7 @@ describe('Lazy loading commands', () => {
       'spo sp permissionrequest approve',
       'spo sp permissionrequest deny',
       'spo sp permissionrequest list',
-      'spo sp set',
-      'teams team get',
+      'spo sp set',      
       'teams user add',
       'teams user list',
       'teams user remove',
