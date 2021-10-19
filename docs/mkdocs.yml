@@ -177,6 +177,9 @@ nav:
         - run get: 'cmd/flow/run/run-get.md'
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
+    - Search (externalconnection):
+      - add: 'cmd/externalconnection/externalconnection-add.md'
+      - list: 'cmd/externalconnection/externalconnection-list.md'
     - Skype (skype):
       - report:
         - report activitycounts: 'cmd/skype/report/report-activitycounts.md'
