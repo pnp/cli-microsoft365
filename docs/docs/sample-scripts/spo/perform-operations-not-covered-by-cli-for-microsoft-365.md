@@ -35,7 +35,7 @@ Function Get-ListAttachments() {
         return $ListItemAttachments.d.results
     }
     Catch {
-        Write-Host -f Red "Error Getting List Item Attachments!" $_.Exception.Message
+        throw "Error Getting List Item Attachments! $($_.Exception.Message)" 
     }
 }
 Function Download-ListAttachments() {
@@ -47,46 +47,50 @@ Function Download-ListAttachments() {
         [Parameter(Mandatory = $true)] [string] $DownloadDirectory
     )   
     Try {
- 
+
         #Get All Items from the List
         $ListItems = m365 spo listitem list --webUrl $SiteURL --title $ListTitle -o json | ConvertFrom-Json -AsHashtable
          
         #Iterate through each list item
         Foreach ($Item in $ListItems) {
             Try {
-                Write-Host -f Green "Processing Item Id $($Item.ID)"
-
-                #Create directory for each list item if it doesn't exist
-                $TargetDownloadDirectory = "$($DownloadDirectory)/$($Item.ID)"
-                If (!(Test-Path -path $TargetDownloadDirectory)) { New-Item $TargetDownloadDirectory -type Directory | Out-Null }
+                Write-Output "Processing Item Id $($Item.Id)"
 
                 # Right now AttachmentFiles property is not available in cli-microsoft365 so we need to execute a separate query to /_api/web/lists/getByTitle('list-title')/items(item-id)/AttachmentFiles to get the item attachments. 
                 # AttachmentFiles endpoint requires access token 
                 $AccessToken = m365 util accesstoken get --resource "https://$($TenantName).sharepoint.com" --new 
 
                 #Get All attachments from the List Item
-                $Attachments = Get-ListAttachments -AccessToken $AccessToken -SiteURL $SiteURL -ListTitle $ListTitle -ItemId $Item.ID
-                foreach ($Attachment in $Attachments) {
-                    Try {
-                        Write-Host -f Green "Downloading $($Attachment.FileName)"
-                        $TargetFilePath = "$($TargetDownloadDirectory)/$($Attachment.FileName)"
-                        #Download attachment
-                        m365 spo file get --webUrl $SiteURL --url $Attachment.ServerRelativeUrl --asFile --path $TargetFilePath
+                $Attachments = Get-ListAttachments -AccessToken $AccessToken -SiteURL $SiteURL -ListTitle $ListTitle -ItemId $Item.Id
+
+                If ($Attachments.Length -gt 0) {
+                    #Create directory for each list item if it doesn't exist
+                    $TargetDownloadDirectory = "$($DownloadDirectory)/$($Item.Id)"
+                    If (!(Test-Path -path $TargetDownloadDirectory)) { New-Item $TargetDownloadDirectory -type Directory | Out-Null }
+
+                    foreach ($Attachment in $Attachments) {
+                        Try {
+                            Write-Output "Downloading $($Attachment.FileName)"
+                            $TargetFilePath = "$($TargetDownloadDirectory)/$($Attachment.FileName)"
+                            #Download attachment
+                            m365 spo file get --webUrl $SiteURL --url $Attachment.ServerRelativeUrl --asFile --path $TargetFilePath
+                        }
+                        Catch {
+                            Write-Error "Error Downloading This Attachment! $($_.Exception.Message)" 
+                        }
                     }
-                    Catch {
-                        Write-Host -f Red "Error Downloading This Attachment!" $_.Exception.Message
-                    }
+                }
+                else {
+                    Write-Warning "Attachments Not Found For This List Item!"
                 }
             }
             Catch {
-                Write-Host -f Red "Error Downloading This List Item Attachments!" $_.Exception.Message
+                Write-Error "Error Downloading This List Item Attachments! $($_.Exception.Message)"
             }
         }
- 
-        Write-Host  -f Green "List Attachments Downloaded Successfully!"
     }
     Catch {
-        Write-Host -f Red "Error Downloading List Attachments!" $_.Exception.Message
+        Write-Error "Error Downloading List Attachments! $($_.Exception.Message)"
     }
 }
 
