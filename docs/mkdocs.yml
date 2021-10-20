@@ -81,6 +81,7 @@ nav:
         - sp get: 'cmd/aad/sp/sp-get.md'
       - user:
         - user get: 'cmd/aad/user/user-get.md'
+        - user hibp: 'cmd/aad/user/user-hibp.md'
         - user list: 'cmd/aad/user/user-list.md'
         - user password validate: 'cmd/aad/user/user-password-validate.md'
         - user set: 'cmd/aad/user/user-set.md'
