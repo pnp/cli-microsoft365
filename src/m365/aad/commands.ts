@@ -49,6 +49,7 @@ export default {
   SP_ADD: `${prefix} sp add`,
   SP_GET: `${prefix} sp get`,
   USER_GET: `${prefix} user get`,
+  USER_HIBP: `${prefix} user hibp`,
   USER_LIST: `${prefix} user list`,
   USER_SET: `${prefix} user set`
 };
