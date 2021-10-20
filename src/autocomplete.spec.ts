@@ -237,7 +237,7 @@ describe('autocomplete', () => {
     try {
       assert(readFileSyncStub.calledWith(path.join(__dirname, `..${path.sep}commands.json`), 'utf-8'));
     }
-    catch (e) {
+    catch (e: any) {
       fail(e);
     }
     finally {
@@ -257,7 +257,7 @@ describe('autocomplete', () => {
     try {
       assert.strictEqual(JSON.stringify((autocomplete as any).commands), JSON.stringify({}));
     }
-    catch (e) {
+    catch (e: any) {
       fail(e);
     }
     finally {

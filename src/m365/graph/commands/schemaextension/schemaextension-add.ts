@@ -119,7 +119,7 @@ class GraphSchemaExtensionAddCommand extends GraphCommand {
         }
       }
     }
-    catch (e) {
+    catch (e: any) {
       result = e;
     }
 

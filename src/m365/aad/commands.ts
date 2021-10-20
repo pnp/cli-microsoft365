@@ -21,6 +21,7 @@ export default {
   O365GROUP_LIST: `${prefix} o365group list`,
   O365GROUP_RECYCLEBINITEM_CLEAR: `${prefix} o365group recyclebinitem clear`,
   O365GROUP_RECYCLEBINITEM_LIST: `${prefix} o365group recyclebinitem list`,
+  O365GROUP_RECYCLEBINITEM_RESTORE: `${prefix} o365group recyclebinitem restore`,
   O365GROUP_SET: `${prefix} o365group set`,
   O365GROUP_TEAMIFY: `${prefix} o365group teamify`,
   O365GROUP_REMOVE: `${prefix} o365group remove`,
@@ -46,5 +47,6 @@ export default {
   SITECLASSIFICATION_SET: `${prefix} siteclassification set`,
   SP_GET: `${prefix} sp get`,
   USER_GET: `${prefix} user get`,
-  USER_LIST: `${prefix} user list`
+  USER_LIST: `${prefix} user list`,
+  USER_SET: `${prefix} user set`
 };

@@ -595,8 +595,8 @@ Reset-PnPFileVersion|SharePointPnPPowerShellOnline|
 Reset-PnPMicrosoft365GroupExpiration|SharePointPnPPowerShellOnline|[aad o365group renew](../cmd/aad/o365group/o365group-renew.md)
 Reset-PnPUnifiedGroupExpiration|SharePointPnPPowerShellOnline|[aad o365group renew](../cmd/aad/o365group/o365group-renew.md)
 Reset-PnPUserOneDriveQuotaToDefault|SharePointPnPPowerShellOnline|
-Restore-PnPDeletedMicrosoft365Group|SharePointPnPPowerShellOnline|[aad o365group restore](../cmd/aad/o365group/o365group-restore.md)
-Restore-PnPDeletedUnifiedGroup|SharePointPnPPowerShellOnline|[aad o365group restore](../cmd/aad/o365group/o365group-restore.md)
+Restore-PnPDeletedMicrosoft365Group|SharePointPnPPowerShellOnline|[aad o365group restore](../cmd/aad/o365group/o365group-recyclebinitem-restore.md)
+Restore-PnPDeletedUnifiedGroup|SharePointPnPPowerShellOnline|[aad o365group restore](../cmd/aad/o365group/o365group-recyclebinitem-restore.md)
 Restore-PnPFileVersion|SharePointPnPPowerShellOnline|
 Restore-PnPRecycleBinItem|SharePointPnPPowerShellOnline|
 Restore-PnPTenantRecycleBinItem|SharePointPnPPowerShellOnline|[spo tenant recyclebinitem restore](../cmd/spo/tenant/tenant-recyclebinitem-restore.md)

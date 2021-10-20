@@ -1,6 +1,40 @@
 # Release notes
 
+## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad user set](../cmd/aad/user/user-set.md ) - updates information of the specified user [#1933](https://github.com/pnp/cli-microsoft365/issues/1933)
+
+### Changes
+
+- upgraded the 'aad siteclassification get' command to Microsoft Graph v1.0 [#2676](https://github.com/pnp/cli-microsoft365/issues/2676)
+- upgraded the 'aad siteclassification enable' command to Microsoft Graph v1.0 [#2675](https://github.com/pnp/cli-microsoft365/issues/2675)
+- upgraded the 'aad siteclassification set' command to Microsoft Graph v1.0 [#2677](https://github.com/pnp/cli-microsoft365/issues/2677)
+- extended 'aad o365group teamify' with mailNickname [#2669](https://github.com/pnp/cli-microsoft365/issues/2669)
+- renamed 'aad o365group restore' to 'aad o365group recyclebinitem restore' [#1987](https://github.com/pnp/cli-microsoft365/issues/1987)
+- added support for upgrading SPFx projects to v1.13.0-rc.1 [#2758](https://github.com/pnp/cli-microsoft365/issues/2758)
+- extended 'teams user app list' with teamsAppDefinition [#2719](https://github.com/pnp/cli-microsoft365/issues/2719)
+- added the 'Flow runs day summary report' sample [#2740](https://github.com/pnp/cli-microsoft365/issues/2740)
+- added the 'Add users to groups' sample [#2719](https://github.com/pnp/cli-microsoft365/issues/2741)
+- added the 'List Teams, channels, and tabs in the tenant' sample [#2734](https://github.com/pnp/cli-microsoft365/issues/2734)
+- extended 'spo contenttype add' to return created object by default [#2333](https://github.com/pnp/cli-microsoft365/issues/2333)
+- excluded parsing strings for formatting [#2760](https://github.com/pnp/cli-microsoft365/issues/2760)
+- added launch config to debug CLI and tests [#2766](https://github.com/pnp/cli-microsoft365/issues/2766)
+
 ## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
+
+### New commands
+
+**SharePoint:**
+
+- [spo group user list](../cmd/spo/group/group-user-list.md) - list members of a SharePoint Group [#2640](https://github.com/pnp/cli-microsoft365/issues/2640)
+
+**Teams:**
+
+- [teams team get](../cmd/teams/team/team-get.md) - gets information about the specified Microsoft Teams team [#2506](https://github.com/pnp/cli-microsoft365/issues/2506)
 
 ### Changes
 
@@ -8,6 +42,28 @@
 - removed the 'value' wrapper in the output [#2292](https://github.com/pnp/cli-microsoft365/issues/2292)
 - updated JMESPath docs [#2553](https://github.com/pnp/cli-microsoft365/issues/2553)
 - removed obsolete file path options [#2309](https://github.com/pnp/cli-microsoft365/issues/2309)
+- aligned 'aad o365group user list' and 'teams user list' [#2520](https://github.com/pnp/cli-microsoft365/issues/2520)
+- in 'spo listitem get' renames fields to properties [#2533](https://github.com/pnp/cli-microsoft365/issues/2533)
+- changed default output to JSON [#2599](https://github.com/pnp/cli-microsoft365/issues/2599)
+- added SPO auto-discovery remark to 'Using your own Azure AD identity' [#2639](https://github.com/pnp/cli-microsoft365/issues/2639)
+- added the 'Export all the team members from the Teams team' sample [#2648](https://github.com/pnp/cli-microsoft365/pull/2648)
+- updated 'aad o365group teamify' to Graph v1.0 [#2504](https://github.com/pnp/cli-microsoft365/pull/2504)
+- extended 'planner task list' with support for listing tasks in a bucket or a plan [#2575](https://github.com/pnp/cli-microsoft365/issues/2575)
+- added support for upgrading SPFx projects to 1.13.0-beta.20 [#2697](https://github.com/pnp/cli-microsoft365/issues/2697)
+- fixed 'spo theme list' command [#2700](https://github.com/pnp/cli-microsoft365/issues/2700)
+- added support for paging in 'spo site classic list', 'spo site list' and 'onedrive list' [#2692](https://github.com/pnp/cli-microsoft365/issues/2692)
+- fixed 'spo page control list' and '- get' commands [#2667](https://github.com/pnp/cli-microsoft365/issues/2667)
+- added the 'Get all the Teams a specific user is part of' sample [#2688](https://github.com/pnp/cli-microsoft365/issues/2688)
+- extended 'spo sitedesign set' with support for thumbnailUrl option [#2651](https://github.com/pnp/cli-microsoft365/issues/2651)
+- extended base SPO command when using secret auth type [#2591](https://github.com/pnp/cli-microsoft365/issues/2591)
+- updated 'teams channel list' command to Graph v1.0 [#2670](https://github.com/pnp/cli-microsoft365/issues/2670)
+- upgraded 'teams conversationmember list' to Graph v1.0 [#2672](https://github.com/pnp/cli-microsoft365/issues/2672)
+- upgraded 'teams conversationmember add' to Graph v1.0 [#2671](https://github.com/pnp/cli-microsoft365/issues/2671)
+- upgraded 'aad siteclassification disable' to Graph v1.0 [#2674](https://github.com/pnp/cli-microsoft365/issues/2674)
+- removed 'spo site classic remove' link from nav [#2707](https://github.com/pnp/cli-microsoft365/issues/2707)
+- fixed escaping single quotes in folder names in 'spo file list' [#2704](https://github.com/pnp/cli-microsoft365/issues/2704)
+- added privacy settings remark [#2727](https://github.com/pnp/cli-microsoft365/issues/2727)
+- added v4 upgrade guidance [#2659](https://github.com/pnp/cli-microsoft365/issues/2659)
 
 ## [v3.13.0](https://github.com/pnp/cli-microsoft365/releases/tag/v3.13.0)
 
@@ -1594,7 +1650,7 @@
 **Microsoft Graph:**
 
 - [graph o365group remove](../cmd/aad/o365group/o365group-remove.md) - removes an Microsoft 365 Group [#309](https://github.com/pnp/cli-microsoft365/issues/309)
-- [graph o365group restore](../cmd/aad/o365group/o365group-restore.md) - restores a deleted Microsoft 365 Group [#346](https://github.com/pnp/cli-microsoft365/issues/346)
+- [graph o365group restore](../cmd/aad/o365group/o365group-recyclebinitem-restore.md) - restores a deleted Microsoft 365 Group [#346](https://github.com/pnp/cli-microsoft365/issues/346)
 - [graph siteclassification get](../cmd/aad/siteclassification/siteclassification-get.md) - gets site classification configuration [#303](https://github.com/pnp/cli-microsoft365/issues/303)
 
 **Azure Management Service:**

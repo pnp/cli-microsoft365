@@ -18,7 +18,7 @@ class SpoThemeListCommand extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['Name'];
+    return ['name'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {

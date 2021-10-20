@@ -8,7 +8,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
 import { ClientSidePage } from './clientsidepages';
-import { mockControlListDataOutput, mockControlListData, mockControlListDataWithUnknownType, mockControlListDataWithUnknownTypeOutput, mockControlListDataWithTextWebPart, mockControlListDataWithTextWebPartOutput } from './page-control-list.mock';
+import { mockControlListDataOutput, mockControlListData, mockControlListDataWithUnknownType, mockControlListDataWithUnknownTypeOutput, mockControlListDataWithText, mockControlListDataWithTextOutput } from './page-control-list.mock';
 const command: Command = require('./page-control-list');
 
 describe(commands.PAGE_CONTROL_LIST, () => {
@@ -134,7 +134,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, () => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } }, () => {
       try {
         assert(loggerLogSpy.calledWith(mockControlListDataWithUnknownTypeOutput));
         done();
@@ -148,7 +148,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
   it('handles text web part correctly', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return Promise.resolve(mockControlListDataWithTextWebPart);
+        return Promise.resolve(mockControlListDataWithText);
       }
 
       return Promise.reject('Invalid request');
@@ -156,7 +156,7 @@ describe(commands.PAGE_CONTROL_LIST, () => {
 
     command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx' } } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(mockControlListDataWithTextWebPartOutput));
+        assert(loggerLogSpy.calledWith(mockControlListDataWithTextOutput));
         done();
       }
       catch (e) {
