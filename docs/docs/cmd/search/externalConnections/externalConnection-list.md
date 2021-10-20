@@ -5,7 +5,7 @@ Lists the Microsoft Search External Connections defined
 ## Usage
 
 ```sh
-m365 searcg externalConnection list
+m365 search externalConnection list
 ```
 
 ## Examples
