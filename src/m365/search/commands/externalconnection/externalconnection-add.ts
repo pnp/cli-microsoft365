@@ -13,10 +13,10 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
+  id: string;
   name: string;
-  connectionId?: string;
-  connectionDescription?: string;
-  authorisedAppIds?: string[];
+  description?: string;
+  authorizedAppIds?: string;
 }
 
 class SearchExternalConnectionAddCommand extends GraphCommand {
@@ -30,31 +30,47 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.externalConnectionId = typeof args.options.externalConnectionId !== 'undefined';
-    telemetryProps.externalConnectionName = typeof args.options.externalConnectionName !== 'undefined';
-    telemetryProps.externalConnectionDescription = typeof args.options.externalConnectionDescription !== 'undefined';
+    telemetryProps.id = typeof args.options.id !== 'undefined';
+    telemetryProps.name = typeof args.options.name !== 'undefined';
+    telemetryProps.description = typeof args.options.description !== 'undefined';
     return telemetryProps;
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['externalConnectionId', 'externalConnectionName', 'externalConnectionDescription'];
+    return ['id', 'name', 'description'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     if (this.verbose) {
       logger.logToStderr(`Adding new external connections...`);
     }
+
+    const appIds:string[] = [];
+
+    if (args.options.authorizedAppIds !== undefined && args.options.authorizedAppIds !== '') {
+      const splitAppIds = args.options.authorizedAppIds?.split(',');
+      
+      splitAppIds.forEach(appId => {
+        appIds.push(appId);
+      });
+    }
+
+    const commandData = {
+      id: args.options.id,
+      name: args.options.name,
+      description: args.options.description,
+      configuration: {
+        authorizedAppIds: appIds
+      }
+    };
+
     const requestOptions: any = {
       url: `${this.resource}/v1.0/external/connections`,
       headers: {
         'accept': 'application/json;odata.metadata=none'
       },
       responseType: 'json',
-      data: {
-        id: args.options.externalConnectionId,
-        name: args.options.externalConnectionName,
-        description: args.options.externalConnectionDescription
-      }
+      data: commandData
     };
     logger.logToStderr(`Adding new external connections...`);
     request
@@ -70,13 +86,16 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "--externalConnectionId [externalConnectionId]"
+        option: "--id [id]"
       },
       {
-        option: "--externalConnectionName [externalConnectionName]"
+        option: "--name [name]"
       },
       {
-        option: "--externalConnectionDescription [externalConnectionDescription]"
+        option: "--description [description]"
+      },
+      {
+        option: "--authorizedAppIds [authorizedAppIds]"
       }
     ];
 
@@ -85,8 +104,8 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.externalConnectionId || !args.options.externalConnectionName || !args.options.externalConnectionDescription) {
-      return 'Specify externalConnectionId, externalConnectionName and externalConnectionDescription';
+    if (!args.options.id || !args.options.name || !args.options.description) {
+      return 'Specify id, name and description';
     }
 
 

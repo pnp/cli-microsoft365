@@ -22,7 +22,7 @@ class SearchExternalConnectionListCommand extends GraphItemsListCommand<any> {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'name', 'description'];
+    return ['id', 'name'];
   }
 
 
