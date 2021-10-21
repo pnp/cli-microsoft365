@@ -6,7 +6,6 @@
 
 **Azure Active Directory:**
 
-- [aad serviceprincipal get](../cmd/aad/serviceprincipal/serviceprincipal-get.md ) - retrieves a service principal from Azure AD directory [#2558](https://github.com/pnp/cli-microsoft365/issues/2558)
 - [aad user set](../cmd/aad/user/user-set.md ) - updates information of the specified user [#1933](https://github.com/pnp/cli-microsoft365/issues/1933)
 
 ### Changes
