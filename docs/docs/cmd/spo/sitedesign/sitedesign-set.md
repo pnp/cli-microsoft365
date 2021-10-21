@@ -31,6 +31,9 @@ m365 spo sitedesign set [options]
 `-a, --previewImageAltText [previewImageAltText]`
 : The new alt text description of the image for accessibility
 
+`--thumbnailUrl [thumbnailUrl]`
+: The new URL of a thumbnail image. If none is specified SharePoint will use a generic image
+
 `-v, --version [version]`
 : The new version number for the site design
 

@@ -8,7 +8,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
 import { ClientSidePage } from './clientsidepages';
-import { mockControlGetData, mockControlGetDataEmptyColumn, mockControlGetDataEmptyColumnOutput, mockControlGetDataOutput, mockControlGetDataWithoutAnId, mockControlGetDataWithTextWebPart, mockControlGetDataWithTextWebPartOutput, mockControlGetDataWithUnknownType, mockControlGetDataWithUnknownTypeOutput } from './page-control-get.mock';
+import { mockControlGetData, mockControlGetDataEmptyColumn, mockControlGetDataEmptyColumnOutput, mockControlGetDataOutput, mockControlGetDataWithoutAnId, mockControlGetDataWithText, mockControlGetDataWithTextOutput, mockControlGetDataWithUnknownType, mockControlGetDataWithUnknownTypeOutput } from './page-control-get.mock';
 const command: Command = require('./page-control-get');
 
 describe(commands.PAGE_CONTROL_GET, () => {
@@ -72,7 +72,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'af92a21f-a0ec-4668-ba2c-951a2b5d6f94' } }, () => {
       try {
         assert(loggerLogSpy.calledWith(mockControlGetDataOutput));
         done();
@@ -92,7 +92,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, () => {
+    command.action(logger, { options: { debug: true, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'af92a21f-a0ec-4668-ba2c-951a2b5d6f94' } }, () => {
       try {
         assert(loggerLogSpy.calledWith(mockControlGetDataOutput));
         done();
@@ -112,7 +112,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home', id: 'af92a21f-a0ec-4668-ba2c-951a2b5d6f94' } }, () => {
       try {
         assert(loggerLogSpy.calledWith(mockControlGetDataOutput));
         done();
@@ -146,15 +146,15 @@ describe(commands.PAGE_CONTROL_GET, () => {
   it('handles text controls', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_api/SitePages/Pages/GetByUrl('sitepages/home.aspx')`) > -1) {
-        return Promise.resolve(mockControlGetDataWithTextWebPart);
+        return Promise.resolve(mockControlGetDataWithText);
       }
 
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: '1212fc8d-dd6b-408a-8d5d-9f1cc787efbb' } }, () => {
       try {
-        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(mockControlGetDataWithTextWebPartOutput));
+        assert.strictEqual(JSON.stringify(log[0]), JSON.stringify(mockControlGetDataWithTextOutput));
         done();
       }
       catch (e) {
@@ -172,7 +172,7 @@ describe(commands.PAGE_CONTROL_GET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'ede2ee65-157d-4523-b4ed-87b9b64374a6' } }, () => {
+    command.action(logger, { options: { debug: false, webUrl: 'https://contoso.sharepoint.com/sites/team-a', name: 'home.aspx', id: 'af92a21f-a0ec-4668-ba2c-951a2b5d6f94' } }, () => {
       try {
         assert(loggerLogSpy.calledWith(mockControlGetDataWithUnknownTypeOutput));
         done();

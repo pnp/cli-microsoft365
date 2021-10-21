@@ -76,7 +76,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
             }
           });
         }
-        catch (err) {
+        catch (err: any) {
           // the 404 error is accepted
           if (err.response.status !== 404) {
             throw err.response.data;
@@ -92,7 +92,7 @@ class AadO365GroupUserRemoveCommand extends GraphCommand {
             }
           });
         }
-        catch (err) {
+        catch (err: any) {
           // the 404 error is accepted
           if (err.response.status !== 404) {
             throw err.response.data;

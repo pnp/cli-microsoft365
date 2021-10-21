@@ -1,4 +1,3 @@
-import * as chalk from 'chalk';
 import { Logger } from '../../../../cli';
 import {
   CommandOption
@@ -15,8 +14,7 @@ interface CommandArgs {
 
 interface Options extends GlobalOptions {
   role?: string;
-  teamId?: string;
-  groupId?: string;
+  groupId: string;
 }
 
 class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
@@ -25,28 +23,24 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   public get description(): string {
-    return "Lists users for the specified Microsoft 365 group or Microsoft Teams team";
+    return "Lists users for the specified Microsoft 365 group";
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
     telemetryProps.role = args.options.role;
-    telemetryProps.teamId = typeof args.options.teamId !== 'undefined';
-    telemetryProps.groupId = typeof args.options.groupId !== 'undefined';
     return telemetryProps;
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const providedGroupId: string = (typeof args.options.groupId !== 'undefined') ? args.options.groupId : args.options.teamId as string;
-
     this
-      .getOwners(logger, providedGroupId)
+      .getOwners(logger, args.options.groupId)
       .then((): Promise<void> => {
         if (args.options.role === "Owner") {
           return Promise.resolve();
         }
 
-        return this.getMembersAndGuests(logger, providedGroupId);
+        return this.getMembersAndGuests(logger, args.options.groupId);
       })
       .then(
         (): void => {
@@ -55,11 +49,6 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
           }
 
           logger.log(this.items);
-
-          if (this.verbose) {
-            logger.logToStderr(chalk.green("DONE"));
-          }
-
           cb();
         },
         (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb)
@@ -88,10 +77,7 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "-i, --groupId [groupId]"
-      },
-      {
-        option: "--teamId [teamId]"
+        option: "-i, --groupId <groupId>"
       },
       {
         option: "-r, --role [type]",
@@ -104,19 +90,7 @@ class AadO365GroupUserListCommand extends GraphItemsListCommand<GroupUser> {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.groupId && !args.options.teamId) {
-      return 'Please provide one of the following parameters: groupId or teamId';
-    }
-
-    if (args.options.groupId && args.options.teamId) {
-      return 'You cannot provide both a groupId and teamId parameter, please provide only one';
-    }
-
-    if (args.options.teamId && !Utils.isValidGuid(args.options.teamId as string)) {
-      return `${args.options.teamId} is not a valid GUID`;
-    }
-
-    if (args.options.groupId && !Utils.isValidGuid(args.options.groupId as string)) {
+    if (!Utils.isValidGuid(args.options.groupId as string)) {
       return `${args.options.groupId} is not a valid GUID`;
     }
 

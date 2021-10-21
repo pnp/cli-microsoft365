@@ -16,7 +16,7 @@ describe(commands.SITEDESIGN_SET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
     auth.service.spoUrl = 'https://contoso.sharepoint.com';
   });
@@ -75,6 +75,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "New title",
           "Version": 1,
@@ -93,6 +94,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "New title",
           "Version": 1,
@@ -121,6 +123,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -139,6 +142,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -167,6 +171,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -185,6 +190,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -213,6 +219,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -231,6 +238,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -259,6 +267,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24", "449c0c6d-5380-4df2-b84b-622e0ac8ec25"],
           "Title": "Title",
           "Version": 1,
@@ -277,6 +286,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24", "449c0c6d-5380-4df2-b84b-622e0ac8ec25"],
           "Title": "Title",
           "Version": 1,
@@ -305,6 +315,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -323,6 +334,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -351,6 +363,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": "https://contoso.com/image.png",
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -369,6 +382,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": "https://contoso.com/image.png",
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -397,6 +411,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": "Logo image",
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -415,6 +430,55 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": "Logo image",
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
+          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+          "Title": "Title",
+          "Version": 1,
+          "WebTemplate": 64
+        }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('updates site design thumbnailUrl', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/Microsoft.Sharepoint.Utilities.WebTemplateExtensions.SiteScriptUtility.UpdateSiteDesign`) > -1 &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          updateInfo: {
+            Id: '2a9f178a-4d1d-449c-9296-df509ab4702c',
+            ThumbnailUrl: 'https://contoso.com/assets/team-site-thumbnail.png'
+          }
+        })) {
+        return Promise.resolve({
+          "Description": null,
+          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+          "IsDefault": false,
+          "PreviewImageUrl": null,
+          "PreviewImageAltText": null,
+          "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
+          "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
+          "Title": "Title",
+          "Version": 1,
+          "WebTemplate": 64
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', thumbnailUrl: 'https://contoso.com/assets/team-site-thumbnail.png' } }, () => {
+      try {
+        assert(loggerLogSpy.calledWith({
+          "Description": null,
+          "Id": "2a9f178a-4d1d-449c-9296-df509ab4702c",
+          "IsDefault": false,
+          "PreviewImageUrl": null,
+          "PreviewImageAltText": null,
+          "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -443,6 +507,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 2,
@@ -461,6 +526,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 2,
@@ -489,6 +555,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": true,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -507,6 +574,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": true,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -535,6 +603,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -553,6 +622,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -580,6 +650,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -598,6 +669,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": false,
           "PreviewImageAltText": null,
           "PreviewImageUrl": null,
+          "ThumbnailUrl": null,
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Title",
           "Version": 1,
@@ -624,6 +696,7 @@ describe(commands.SITEDESIGN_SET, () => {
             ],
             "PreviewImageUrl": "https://contoso.com/assets/team-site-preview.png",
             "PreviewImageAltText": "Contoso team site preview",
+            "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
             "WebTemplate": "64",
             "Version": 2,
             "IsDefault": true
@@ -635,6 +708,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": true,
           "PreviewImageAltText": 'Contoso team site preview',
           "PreviewImageUrl": 'https://contoso.com/assets/team-site-preview.png',
+          "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Contoso",
           "Version": 2,
@@ -645,7 +719,7 @@ describe(commands.SITEDESIGN_SET, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', previewImageAltText: 'Contoso team site preview', version: 2, isDefault: 'true' } }, () => {
+    command.action(logger, { options: { debug: true, id: '2a9f178a-4d1d-449c-9296-df509ab4702c', title: 'Contoso', webTemplate: 'TeamSite', siteScripts: "449c0c6d-5380-4df2-b84b-622e0ac8ec24", description: 'Contoso team site', previewImageUrl: 'https://contoso.com/assets/team-site-preview.png', thumbnailUrl: "https://contoso.com/assets/team-site-thumbnail.png", previewImageAltText: 'Contoso team site preview', version: 2, isDefault: 'true' } }, () => {
       try {
         assert(loggerLogSpy.calledWith({
           "Description": 'Contoso team site',
@@ -653,6 +727,7 @@ describe(commands.SITEDESIGN_SET, () => {
           "IsDefault": true,
           "PreviewImageAltText": 'Contoso team site preview',
           "PreviewImageUrl": 'https://contoso.com/assets/team-site-preview.png',
+          "ThumbnailUrl": "https://contoso.com/assets/team-site-thumbnail.png",
           "SiteScriptIds": ["449c0c6d-5380-4df2-b84b-622e0ac8ec24"],
           "Title": "Contoso",
           "Version": 2,
@@ -764,6 +839,17 @@ describe(commands.SITEDESIGN_SET, () => {
     let containsOption = false;
     options.forEach(o => {
       if (o.option.indexOf('--previewImageAltText') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying thumbnailUrl', () => {
+    const options = command.options();
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--thumbnailUrl') > -1) {
         containsOption = true;
       }
     });

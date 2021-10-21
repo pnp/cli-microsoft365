@@ -202,7 +202,7 @@ export class Auth {
     try {
       await this.storeConnectionInfo();
     }
-    catch (ex) {
+    catch (ex: any) {
       // error could happen due to an issue with persisting the access
       // token which shouldn't fail the overall token retrieval process
       if (debug) {
@@ -527,7 +527,7 @@ export class Auth {
         expiresOn: new Date(parseInt(accessTokenResponse.expires_on) * 1000)
       };
     }
-    catch (e) {
+    catch (e: any) {
       if (!userName) {
         throw e;
       }
@@ -565,7 +565,7 @@ export class Auth {
           expiresOn: new Date(parseInt(accessTokenResponse.expires_on) * 1000)
         };
       }
-      catch (err) {
+      catch (err: any) {
         // will give up and not try any further with the 'msi_res_id' (resource id) query string param
         // since it does not work with the Azure Functions api, but just with the Azure VM api
         if (err.error.code === 'EACCES') {

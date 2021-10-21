@@ -81,7 +81,7 @@ class PaPcfInitCommand extends AnonymousCommand {
 
       cb();
     }
-    catch (err) {
+    catch (err: any) {
       cb(new CommandError(err));
     }
   }

@@ -4,13 +4,11 @@ import {
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
-import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
-import commands from '../../commands';
-import { Channel } from '../../Channel';
-import { Team } from '../../Team';
 import Utils from '../../../../Utils';
+import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { Channel } from '../../Channel';
+import commands from '../../commands';
 import { ConversationMember } from '../../ConversationMember';
-import * as os from 'os';
 
 interface CommandArgs {
   options: Options;
@@ -123,32 +121,31 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
     if (args.options.teamId) {
       return Promise.resolve(args.options.teamId);
     }
-    
-    return new Promise<string>((resolve: (channelId: string) => void, reject: (error: any) => void): void => {
-      const teamRequestOptions: any = {
-        url: `${this.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
-        headers: {
-          accept: 'application/json;odata.metadata=none'
-        },
-        responseType: 'json'
-      };
 
-      request
-        .get<{ value: Team[] }>(teamRequestOptions)
-        .then(response => {
-          const teamItem: Team | undefined = response.value[0];
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+      headers: {
+        accept: 'application/json;odata.metadata=none'
+      },
+      responseType: 'json'
+    };
 
-          if (!teamItem) {
-            return reject(`The specified team '${args.options.teamName}' does not exist in Microsoft Teams`);
-          }
+    return request
+      .get<{ value: [{ id: string, resourceProvisioningOptions: string[] }] }>(requestOptions)
+      .then(response => {
+        const filteredResponseByTeam: { id: string, resourceProvisioningOptions: string[] }[] = response.value.filter(t => t.resourceProvisioningOptions.includes('Team'));
+        const groupItem: { id: string } | undefined = filteredResponseByTeam[0];
 
-          if (response.value.length > 1) {
-            return reject(`Multiple Microsoft Teams with name '${args.options.teamName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`);
-          }
+        if (!groupItem) {
+          return Promise.reject(`The specified team '${args.options.teamName}' does not exist in the Microsoft Teams`);
+        }
 
-          return resolve(teamItem.id);
-        }, err => { reject(err); });
-    });
+        if (filteredResponseByTeam.length > 1) {
+          return Promise.reject(`Multiple Microsoft Teams teams with name '${args.options.teamName}' found: ${filteredResponseByTeam.map(x => x.id)}`);
+        }
+
+        return Promise.resolve(groupItem.id);
+      });
   }
 
   private getChannelId(teamId: string, args: CommandArgs): Promise<string> {
@@ -168,12 +165,12 @@ class TeamsConversationMemberListCommand extends GraphItemsListCommand<any> {
             const channelItem: Channel | undefined = response;
             return resolve(channelItem.id);
           }, (err: any) => {
-            if(err.error && err.error.code === "NotFound") {
+            if (err.error && err.error.code === "NotFound") {
               return reject(`The specified channel '${args.options.channelId}' does not exist or is invalid in the Microsoft Teams team with ID '${teamId}'`);
             }
             else {
               return reject(err);
-            }            
+            }
           });
       });
     }

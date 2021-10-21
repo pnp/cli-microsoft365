@@ -694,7 +694,7 @@ describe('SpoCommand', () => {
       'siteLogoUrl'
     ];
     const command = new MockCommand();
-    sinon.stub(command as any,  'getExcludedOptionsWithUrls').callsFake(() => ['url']);
+    sinon.stub(command as any, 'getExcludedOptionsWithUrls').callsFake(() => ['url']);
     const actual = command.getNamesOfOptionsWithUrlsPublic();
     assert.deepStrictEqual(actual, expected);
   });
@@ -785,5 +785,20 @@ describe('SpoCommand', () => {
       .then(_ => {
         done('Options resolved while error expected');
       }, _ => done());
+  });
+
+  it('Shows an error when CLI is connected with authType "Secret"', (done) => {
+    sinon.stub(auth.service, 'authType').value(5);
+
+    const mock = new MockCommand();
+    mock.action(logger, { options: {} }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('SharePoint does not support authentication using client ID and secret. Please use a different login type to use SharePoint commands.')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
   });
 });

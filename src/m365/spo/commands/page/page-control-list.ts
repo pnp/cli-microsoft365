@@ -8,6 +8,7 @@ import SpoCommand from '../../../base/SpoCommand';
 import commands from '../../commands';
 import { Control } from './canvasContent';
 import { ClientSidePageProperties } from './ClientSidePageProperties';
+import { getControlTypeDisplayName } from './pageMethods';
 
 interface CommandArgs {
   options: Options;
@@ -51,14 +52,16 @@ class SpoPageControlListCommand extends SpoCommand {
         const canvasData: Control[] = clientSidePage.CanvasContent1 ? JSON.parse(clientSidePage.CanvasContent1) : [];
         const controls: any[] = canvasData.filter(c => c.position).map(c => {
           return {
+            id: c.id,
+            type: getControlTypeDisplayName(
+              c.controlType || 0
+            ),
+            title: c.webPartData?.title,
             controlType: c.controlType,
             order: c.position.sectionIndex,
-            id: c.id,
             controlData: {
               ...c
-            },
-            ...c.webPartData || {},
-            type: SpoPageControlListCommand.getControlTypeDisplayName(c.controlType || 0)
+            }
           };
         });
 
@@ -67,20 +70,7 @@ class SpoPageControlListCommand extends SpoCommand {
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
-
-  private static getControlTypeDisplayName(controlType: number): string {
-    switch (controlType) {
-      case 0:
-        return 'Empty column';
-      case 3:
-        return 'Client-side web part';
-      case 4:
-        return 'Client-side text';
-      default:
-        return '' + controlType;
-    }
-  }
-
+  
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {

@@ -20,6 +20,7 @@ interface Options extends GlobalOptions {
   description?: string;
   previewImageUrl?: string;
   previewImageAltText?: string;
+  thumbnailUrl?: string;
   version?: number | string;
   isDefault?: string;
 }
@@ -41,6 +42,7 @@ class SpoSiteDesignSetCommand extends SpoCommand {
     telemetryProps.description = typeof args.options.description !== 'undefined';
     telemetryProps.previewImageUrl = typeof args.options.previewImageUrl !== 'undefined';
     telemetryProps.previewImageAltText = typeof args.options.previewImageAltText !== 'undefined';
+    telemetryProps.thumbnailUrl = typeof args.options.thumbnailUrl !== 'undefined';
     telemetryProps.version = typeof args.options.version !== 'undefined';
     telemetryProps.isDefault = typeof args.options.isDefault !== 'undefined';
     return telemetryProps;
@@ -68,6 +70,9 @@ class SpoSiteDesignSetCommand extends SpoCommand {
         }
         if (args.options.previewImageAltText) {
           updateInfo.PreviewImageAltText = args.options.previewImageAltText;
+        }
+        if (args.options.thumbnailUrl) {
+          updateInfo.ThumbnailUrl = args.options.thumbnailUrl;
         }
         if (args.options.webTemplate) {
           updateInfo.WebTemplate = args.options.webTemplate === 'TeamSite' ? '64' : '68';
@@ -121,6 +126,9 @@ class SpoSiteDesignSetCommand extends SpoCommand {
       },
       {
         option: '-a, --previewImageAltText [previewImageAltText]'
+      },
+      {
+        option: '--thumbnailUrl [thumbnailUrl]'
       },
       {
         option: '-v, --version [version]'

@@ -115,14 +115,36 @@ describe(commands.USER_APP_LIST, () => {
 
   it('list apps from the catalog for the specified user (userId)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps?$expand=teamsAppDefinition`) {
         return Promise.resolve({
           "value": [
             {
-              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY="
+              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
+              "teamsAppDefinition": {
+                "id": "MzT1NWIxZjktODUwNy00ZjU3LWLmNDktZGI5YXRiNGMyZWRkIyMxLjAuMS4wIyNQpWJsaXNoZDQ=",
+                "teamsAppId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+                "displayName": "Whiteboard",
+                "version": "1.0.5",
+                "publishingState": "published",
+                "shortDescription": "Use Microsoft Whiteboard to collaborate, visualize ideas, and work creatively",
+                "description": "Create a new whiteboard and collaborate with others in real time.",
+                "lastModifiedDateTime": null,
+                "createdBy": null
+              }
             },
             {
-              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE="
+              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
+              "teamsAppDefinition": {
+                "id": "MoT1NVIxZjktODUwNy033ZjU3LWLmNDktZGI5YXTiNGMyZWRkIyMxLjAuMS4wIyNQpWJsqXNoZLQ=",
+                "teamsAppId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+                "displayName": "Evernote",
+                "version": "1.0.1",
+                "publishingState": "published",
+                "shortDescription": "Capture, organize, and share notes",
+                "description": "Unlock the power of teamwork—collect, organize and share the information, documents and ideas you encounter every day.",
+                "lastModifiedDateTime": null,
+                "createdBy": null
+              }
             }
           ]
         });
@@ -140,11 +162,15 @@ describe(commands.USER_APP_LIST, () => {
         assert(loggerLogSpy.calledWith([
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
-            "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef"
+            "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+            "displayName": "Whiteboard",
+            "version": "1.0.5"
           },
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
-            "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a"
+            "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+            "displayName": "Evernote",
+            "version": "1.0.1"
           }
         ]));
         done();
@@ -157,14 +183,36 @@ describe(commands.USER_APP_LIST, () => {
 
   it('list apps from the catalog for the specified user (userName)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps?$expand=teamsAppDefinition`) {
         return Promise.resolve({
           "value": [
             {
-              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY="
+              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
+              "teamsAppDefinition": {
+                "id": "MzT1NWIxZjktODUwNy00ZjU3LWLmNDktZGI5YXRiNGMyZWRkIyMxLjAuMS4wIyNQpWJsaXNoZDQ=",
+                "teamsAppId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+                "displayName": "Whiteboard",
+                "version": "1.0.5",
+                "publishingState": "published",
+                "shortDescription": "Use Microsoft Whiteboard to collaborate, visualize ideas, and work creatively",
+                "description": "Create a new whiteboard and collaborate with others in real time.",
+                "lastModifiedDateTime": null,
+                "createdBy": null
+              }
             },
             {
-              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE="
+              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
+              "teamsAppDefinition": {
+                "id": "MoT1NVIxZjktODUwNy033ZjU3LWLmNDktZGI5YXTiNGMyZWRkIyMxLjAuMS4wIyNQpWJsqXNoZLQ=",
+                "teamsAppId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+                "displayName": "Evernote",
+                "version": "1.0.1",
+                "publishingState": "published",
+                "shortDescription": "Capture, organize, and share notes",
+                "description": "Unlock the power of teamwork—collect, organize and share the information, documents and ideas you encounter every day.",
+                "lastModifiedDateTime": null,
+                "createdBy": null
+              }
             }
           ]
         });
@@ -186,11 +234,15 @@ describe(commands.USER_APP_LIST, () => {
         assert(loggerLogSpy.calledWith([
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
-            "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef"
+            "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+            "displayName": "Whiteboard",
+            "version": "1.0.5"
           },
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
-            "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a"
+            "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+            "displayName": "Evernote",
+            "version": "1.0.1"
           }
         ]));
         done();
@@ -203,14 +255,36 @@ describe(commands.USER_APP_LIST, () => {
 
   it('list apps from the catalog for the specified user (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps?$expand=teamsAppDefinition`) {
         return Promise.resolve({
           "value": [
             {
-              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY="
+              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
+              "teamsAppDefinition": {
+                "id": "MzT1NWIxZjktODUwNy00ZjU3LWLmNDktZGI5YXRiNGMyZWRkIyMxLjAuMS4wIyNQpWJsaXNoZDQ=",
+                "teamsAppId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+                "displayName": "Whiteboard",
+                "version": "1.0.5",
+                "publishingState": "published",
+                "shortDescription": "Use Microsoft Whiteboard to collaborate, visualize ideas, and work creatively",
+                "description": "Create a new whiteboard and collaborate with others in real time.",
+                "lastModifiedDateTime": null,
+                "createdBy": null
+              }
             },
             {
-              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE="
+              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
+              "teamsAppDefinition": {
+                "id": "MoT1NVIxZjktODUwNy033ZjU3LWLmNDktZGI5YXTiNGMyZWRkIyMxLjAuMS4wIyNQpWJsqXNoZLQ=",
+                "teamsAppId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+                "displayName": "Evernote",
+                "version": "1.0.1",
+                "publishingState": "published",
+                "shortDescription": "Capture, organize, and share notes",
+                "description": "Unlock the power of teamwork—collect, organize and share the information, documents and ideas you encounter every day.",
+                "lastModifiedDateTime": null,
+                "createdBy": null
+              }
             }
           ]
         });
@@ -229,11 +303,15 @@ describe(commands.USER_APP_LIST, () => {
         assert(loggerLogSpy.calledWith([
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
-            "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef"
+            "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+            "displayName": "Whiteboard",
+            "version": "1.0.5"
           },
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
-            "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a"
+            "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+            "displayName": "Evernote",
+            "version": "1.0.1"
           }
         ]));
         done();
@@ -246,14 +324,36 @@ describe(commands.USER_APP_LIST, () => {
 
   it('list apps from the catalog for the specified user (json)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users/5c705288-ed7f-44fc-af0a-ac164419901c/teamwork/installedApps?$expand=teamsAppDefinition`) {
         return Promise.resolve({
           "value": [
             {
-              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY="
+              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
+              "teamsAppDefinition": {
+                "id": "MzT1NWIxZjktODUwNy00ZjU3LWLmNDktZGI5YXRiNGMyZWRkIyMxLjAuMS4wIyNQpWJsaXNoZDQ=",
+                "teamsAppId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+                "displayName": "Whiteboard",
+                "version": "1.0.5",
+                "publishingState": "published",
+                "shortDescription": "Use Microsoft Whiteboard to collaborate, visualize ideas, and work creatively",
+                "description": "Create a new whiteboard and collaborate with others in real time.",
+                "lastModifiedDateTime": null,
+                "createdBy": null
+              }
             },
             {
-              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE="
+              "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
+              "teamsAppDefinition": {
+                "id": "MoT1NVIxZjktODUwNy033ZjU3LWLmNDktZGI5YXTiNGMyZWRkIyMxLjAuMS4wIyNQpWJsqXNoZLQ=",
+                "teamsAppId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+                "displayName": "Evernote",
+                "version": "1.0.1",
+                "publishingState": "published",
+                "shortDescription": "Capture, organize, and share notes",
+                "description": "Unlock the power of teamwork—collect, organize and share the information, documents and ideas you encounter every day.",
+                "lastModifiedDateTime": null,
+                "createdBy": null
+              }
             }
           ]
         });
@@ -272,10 +372,32 @@ describe(commands.USER_APP_LIST, () => {
         assert(loggerLogSpy.calledWith([
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyMwOTg5ZjNhNC0yNWY3LTQ2YWItYTNjMC1iY2MwZWNmY2E2ZWY=",
+            "teamsAppDefinition": {
+              "id": "MzT1NWIxZjktODUwNy00ZjU3LWLmNDktZGI5YXRiNGMyZWRkIyMxLjAuMS4wIyNQpWJsaXNoZDQ=",
+              "teamsAppId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef",
+              "displayName": "Whiteboard",
+              "version": "1.0.5",
+              "publishingState": "published",
+              "shortDescription": "Use Microsoft Whiteboard to collaborate, visualize ideas, and work creatively",
+              "description": "Create a new whiteboard and collaborate with others in real time.",
+              "lastModifiedDateTime": null,
+              "createdBy": null
+            },
             "appId": "0989f3a4-25f7-46ab-a3c0-bcc0ecfca6ef"
           },
           {
             "id": "NWM3MDUyODgtZWQ3Zi00NGZjLWFmMGEtYWMxNjQ0MTk5MDFjIyM5OTlhNTViOS00OTFlLTQ1NGEtODA4Yy1jNzVjNWM3NWZjMGE=",
+            "teamsAppDefinition": {
+              "id": "MoT1NVIxZjktODUwNy033ZjU3LWLmNDktZGI5YXTiNGMyZWRkIyMxLjAuMS4wIyNQpWJsqXNoZLQ=",
+              "teamsAppId": "999a55b9-491e-454a-808c-c75c5c75fc0a",
+              "displayName": "Evernote",
+              "version": "1.0.1",
+              "publishingState": "published",
+              "shortDescription": "Capture, organize, and share notes",
+              "description": "Unlock the power of teamwork—collect, organize and share the information, documents and ideas you encounter every day.",
+              "lastModifiedDateTime": null,
+              "createdBy": null
+            },
             "appId": "999a55b9-491e-454a-808c-c75c5c75fc0a"
           }
         ]));

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { Project } from '../model';
-const stripJsonComments = require('strip-json-comments');
+import * as stripJsonComments from 'strip-json-comments';
 
 export class Utils {
   public static removeSingleLineComments(s: string): string {

@@ -6,7 +6,6 @@ import { Logger } from '../../../../cli';
 import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
-import teamsCommands from '../../../teams/commands';
 import commands from '../../commands';
 const command: Command = require('./o365group-get');
 
@@ -53,16 +52,6 @@ describe(commands.O365GROUP_GET, () => {
 
   it('has correct name', () => {
     assert.strictEqual(command.name.startsWith(commands.O365GROUP_GET), true);
-  });
-
-  it('defines alias', () => {
-    const alias = command.alias();
-    assert.notStrictEqual(typeof alias, 'undefined');
-  });
-
-  it('defines correct alias', () => {
-    const alias = command.alias();
-    assert.strictEqual((alias && alias.indexOf(teamsCommands.TEAM_GET) > -1), true);
   });
 
   it('has a description', () => {

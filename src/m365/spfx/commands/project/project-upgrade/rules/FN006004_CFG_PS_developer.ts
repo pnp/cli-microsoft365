@@ -3,7 +3,7 @@ import { Project } from "../../model";
 import { JsonRule } from "./JsonRule";
 
 export class FN006004_CFG_PS_developer extends JsonRule {
-  constructor() {
+  constructor(private version?: string) {
     super();
   }
 
@@ -23,11 +23,11 @@ export class FN006004_CFG_PS_developer extends JsonRule {
     return `{
   "solution": {
     "developer": {
-      "name": "Contoso",
-      "privacyUrl": "https://contoso.com/privacy",
-      "termsOfUseUrl": "https://contoso.com/terms-of-use",
-      "websiteUrl": "https://contoso.com/my-app",
-      "mpnId": "000000"
+      "name": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "websiteUrl": "",
+      "mpnId": "${this.version ? `Undefined-${this.version}` : ''}"
     }
   }
 }`;

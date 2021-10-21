@@ -22,8 +22,8 @@ m365 spo listitem get [options]
 `-t, --listTitle [listTitle]`
 : Title of the list from which to retrieve the item. Specify `listId` or `listTitle` but not both
 
-`-f, --fields [fields]`
-: Comma-separated list of fields to retrieve. Will retrieve all fields if not specified and json output is requested
+`-p, --properties [properties]`
+: Comma-separated list of properties to retrieve. Will retrieve all properties if not specified and json output is requested
 
 --8<-- "docs/cmd/_global.md"
 
@@ -39,5 +39,5 @@ m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.
 Get an items Title and Created column and with ID _147_ from list with title _Demo List_ in site _https://contoso.sharepoint.com/sites/project-x_
 
 ```sh
-m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --fields "Title,Created"
+m365 spo listitem get --listTitle "Demo List" --id 147 --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Created"
 ```

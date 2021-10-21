@@ -1,0 +1,113 @@
+name: Bug report
+description: Let us know about functionality that is not working as expected
+title: "Bug report: <short description>"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting the issue you are facing.
+        
+        Please complete the below form to ensure we have the necessary details to assist you.
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Provide a short description of the issue you are facing
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide the steps you have taken so that we can reproduce the error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected results
+      description: Provide a description of what you expect to happen
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual results
+      description: Provide a description of what actually happens
+    validations:
+      required: true
+  - type: textarea
+    id: debug
+    attributes:
+      label: Diagnostics
+      description: |
+        Provide the output from the command when using the `--debug` option
+
+        *IMPORTANT: You should be careful to sanitise any sensitive output such as tenant information and access tokens before sharing*
+    validations:
+      required: false
+  - type: input
+    id: cliversion
+    attributes:
+      label: CLI for Microsoft 365 version
+      description: |
+        Provide the version of the CLI you are using
+        
+        Execute `m365 version` in your terminal to identify your version
+    validations:
+      required: true
+  - type: input
+    id: nodeversion
+    attributes:
+      label: nodejs version
+      description: |
+        Provide the version of nodejs you are using
+        
+        Execute `node -v` in your terminal to identify your version
+    validations:
+      required: true   
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system (environment)
+      description: Provide the operating system that you are using
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Azure Cloud Shell
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: shell
+    attributes:
+      label: Shell
+      description: Provide the shell that you are using
+      options:
+        - PowerShell
+        - Windows PowerShell
+        - cmd
+        - bash
+        - zsh
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: cli doctor
+      description: |
+        Provide the output of the `cli doctor` command
+        
+        *NOTE: You must be using CLI for Microsoft v3.12 or higher, to use the `m365 cli doctor` command*
+    validations:
+      required: false
+  - type: textarea
+    id: info
+    attributes:
+      label: Additional Info
+      description: |
+        Provide any additional information that may help with the identification of the root cause of this issue
+    validations:
+      required: false

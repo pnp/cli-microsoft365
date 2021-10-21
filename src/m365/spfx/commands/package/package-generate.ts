@@ -158,7 +158,7 @@ class SpfxPackageGenerateCommand extends AnonymousCommand {
       }
       this.archive.writeZip(`${args.options.packageName}.sppkg`);
     }
-    catch (err) {
+    catch (err: any) {
       error = err.message;
     }
     finally {

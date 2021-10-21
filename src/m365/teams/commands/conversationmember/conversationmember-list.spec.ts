@@ -7,13 +7,12 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
-import * as os from 'os';
 const command: Command = require('./conversationmember-list');
 
 describe(commands.CONVERSATIONMEMBER_LIST, () => {
   //#region Mocked Responses 
   const multipleTeamsResponse: any = {
-    "@odata.context": "https://graph.microsoft.com/beta/$metadata#groups",
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
     "value": [
       {
         "id": "47d6625d-a540-4b59-a4ab-19b787e40593",
@@ -115,7 +114,7 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
   };
 
   const singleTeamResponse: any = {
-    "@odata.context": "https://graph.microsoft.com/beta/$metadata#groups",
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
     "value": [
       {
         "id": "47d6625d-a540-4b59-a4ab-19b787e40593",
@@ -517,7 +516,7 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
         return Promise.resolve(conversationMembersResponse);
       }
 
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
 
@@ -564,7 +563,7 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
         return Promise.resolve(conversationMembersResponse);
       }
 
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
 
@@ -607,7 +606,7 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
 
   it('fails listing conversation members with invalid teamName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Other Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Other Human Resources')}'`) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 0,
@@ -627,7 +626,7 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
       try {
         assert.strictEqual(
           JSON.stringify(err),
-          JSON.stringify(new CommandError(`The specified team 'Other Human Resources' does not exist in Microsoft Teams`)));
+          JSON.stringify(new CommandError(`The specified team 'Other Human Resources' does not exist in the Microsoft Teams`)));
         done();
       }
       catch (e) {
@@ -638,7 +637,7 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
 
   it('fails listing conversation members with invalid channelName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
 
@@ -673,7 +672,7 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
 
   it('fails listing conversation members with invalid channelId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
 
@@ -708,7 +707,7 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
         return Promise.resolve(conversationMembersResponse);
       }
 
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
 
@@ -751,7 +750,7 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
 
   it('lists conversation members with multiple teamName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(multipleTeamsResponse);
       }
 
@@ -767,9 +766,7 @@ describe(commands.CONVERSATIONMEMBER_LIST, () => {
       try {
         assert.strictEqual(
           JSON.stringify(err),
-          JSON.stringify(new CommandError(`Multiple Microsoft Teams with name 'Human Resources' found. Please disambiguate:${os.EOL}${[
-            '- 47d6625d-a540-4b59-a4ab-19b787e40593',
-            '- 5b1fac18-4ae3-43b4-9ca8-e27c7f44b65f'].join(os.EOL)}`)));
+          JSON.stringify(new CommandError(`Multiple Microsoft Teams teams with name 'Human Resources' found: 47d6625d-a540-4b59-a4ab-19b787e40593,5b1fac18-4ae3-43b4-9ca8-e27c7f44b65f`)));
         done();
       }
       catch (e) {

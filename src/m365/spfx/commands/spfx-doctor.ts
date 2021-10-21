@@ -626,7 +626,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
             reject('Package not found');
           }
         }
-        catch (ex) {
+        catch (ex: any) {
           return reject(ex);
         }
       });

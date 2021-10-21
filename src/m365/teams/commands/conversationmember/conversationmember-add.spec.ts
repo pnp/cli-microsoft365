@@ -13,7 +13,7 @@ const command: Command = require('./conversationmember-add');
 describe(commands.CONVERSATIONMEMBER_ADD, () => {
   //#region Mocked Responses 
   const multipleTeamsResponse: any = {
-    "@odata.context": "https://graph.microsoft.com/beta/$metadata#groups",
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
     "value": [
       {
         "id": "47d6625d-a540-4b59-a4ab-19b787e40593",
@@ -115,7 +115,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   };
 
   const singleTeamResponse: any = {
-    "@odata.context": "https://graph.microsoft.com/beta/$metadata#groups",
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#groups",
     "value": [
       {
         "id": "47d6625d-a540-4b59-a4ab-19b787e40593",
@@ -299,7 +299,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
         return Promise.resolve(channelIdResponse);
       }
 
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
 
@@ -703,7 +703,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   it('fails adding conversation members with invalid teamName', (done) => {
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Other Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Other Human Resources')}'`) {
         return Promise.resolve({
           "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#teams",
           "@odata.count": 0,
@@ -735,7 +735,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   it('fails adding conversation members with invalid channelName', (done) => {
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(singleTeamResponse);
       }
 
@@ -771,7 +771,7 @@ describe(commands.CONVERSATIONMEMBER_ADD, () => {
   it('fails adding conversation members with multiple teamName', (done) => {
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent('Human Resources')}'`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groups?$filter=displayName eq '${encodeURIComponent('Human Resources')}'`) {
         return Promise.resolve(multipleTeamsResponse);
       }
 

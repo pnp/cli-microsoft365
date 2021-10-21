@@ -92,7 +92,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       }
       else if (opts.url === 'https://paeu2weu8.blob.core.windows.net/api-swagger-files/connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa.json_original?sv=2018-03-28&sr=b&sig=I5b3U5OxbeVYEfjosIU43HJbLqRB7mvZnE1E%2B1Hfeoc%3D&se=2020-01-15T10%3A43%3A38Z&sp=r') {
         if (opts.headers &&
-          opts.headers['x-anonymous'] === true) {
+          opts.headers['x-anonymous'] === 'true') {
           retrievedSwagger = true;
           return Promise.resolve("{\r\n  \"swagger\": \"2.0\",\r\n  \"info\": {\r\n    \"title\": \"Connector 1\",\r\n    \"description\": \"\",\r\n    \"version\": \"1.0\"\r\n  },\r\n  \"host\": \"api.contoso.com\",\r\n  \"basePath\": \"/\",\r\n  \"schemes\": [\r\n    \"https\"\r\n  ],\r\n  \"consumes\": [],\r\n  \"produces\": [],\r\n  \"paths\": {},\r\n  \"definitions\": {},\r\n  \"parameters\": {},\r\n  \"responses\": {},\r\n  \"securityDefinitions\": {},\r\n  \"security\": [],\r\n  \"tags\": []\r\n}");
         }
@@ -102,7 +102,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       }
       else if (opts.url === 'https://az787822.vo.msecnd.net/defaulticons/api-dedicated.png') {
         if (opts.headers &&
-          opts.headers['x-anonymous'] === true) {
+          opts.headers['x-anonymous'] === 'true') {
           retrievedIcon = true;
           return Promise.resolve('123');
         }
@@ -158,7 +158,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       }
       else if (opts.url === 'https://paeu2weu8.blob.core.windows.net/api-swagger-files/connector-201-5f20a1f2d8d6777a75-5fa602f410652f4dfa.json_original?sv=2018-03-28&sr=b&sig=I5b3U5OxbeVYEfjosIU43HJbLqRB7mvZnE1E%2B1Hfeoc%3D&se=2020-01-15T10%3A43%3A38Z&sp=r') {
         if (opts.headers &&
-          opts.headers['x-anonymous'] === true) {
+          opts.headers['x-anonymous'] === 'true') {
           return Promise.resolve("{\r\n  \"swagger\": \"2.0\",\r\n  \"info\": {\r\n    \"title\": \"Connector 1\",\r\n    \"description\": \"\",\r\n    \"version\": \"1.0\"\r\n  },\r\n  \"host\": \"api.contoso.com\",\r\n  \"basePath\": \"/\",\r\n  \"schemes\": [\r\n    \"https\"\r\n  ],\r\n  \"consumes\": [],\r\n  \"produces\": [],\r\n  \"paths\": {},\r\n  \"definitions\": {},\r\n  \"parameters\": {},\r\n  \"responses\": {},\r\n  \"securityDefinitions\": {},\r\n  \"security\": [],\r\n  \"tags\": []\r\n}");
         }
         else {
@@ -167,7 +167,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       }
       else if (opts.url === 'https://az787822.vo.msecnd.net/defaulticons/api-dedicated.png') {
         if (opts.headers &&
-          opts.headers['x-anonymous'] === true) {
+          opts.headers['x-anonymous'] === 'true') {
           return Promise.resolve('123');
         }
         else {
@@ -304,7 +304,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       }
       else if (opts.url === 'https://az787822.vo.msecnd.net/defaulticons/api-dedicated.png') {
         if (opts.headers &&
-          opts.headers['x-anonymous'] === true) {
+          opts.headers['x-anonymous'] === 'true') {
           return Promise.resolve('123');
         }
         else {
@@ -416,7 +416,7 @@ describe(commands.CONNECTOR_EXPORT, () => {
       }
       else if (opts.url === 'https://az787822.vo.msecnd.net/defaulticons/api-dedicated.png') {
         if (opts.headers &&
-          opts.headers['x-anonymous'] === true) {
+          opts.headers['x-anonymous'] === 'true') {
           return Promise.resolve('123');
         }
         else {

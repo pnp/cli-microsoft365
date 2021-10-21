@@ -9,7 +9,6 @@ import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
 import { Channel } from '../../Channel';
 import commands from '../../commands';
-import { Team } from '../../Team';
 
 interface CommandArgs {
   options: Options;
@@ -163,8 +162,8 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
       return Promise.resolve(args.options.teamId);
     }
 
-    const teamRequestOptions: any = {
-      url: `${this.resource}/beta/groups?$filter=resourceProvisioningOptions/Any(x:x eq 'Team') and displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.teamName as string)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -172,20 +171,21 @@ class TeamsConversationMemberAddCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: Team[] }>(teamRequestOptions)
+      .get<{ value: [{ id: string, resourceProvisioningOptions: string[] }] }>(requestOptions)
       .then(response => {
-        const teamItem: Team | undefined = response.value[0];
+        const filteredResponseByTeam: { id: string, resourceProvisioningOptions: string[] }[] = response.value.filter(t => t.resourceProvisioningOptions.includes('Team'));
+        const groupItem: { id: string } | undefined = filteredResponseByTeam[0];
 
-        if (!teamItem) {
+        if (!groupItem) {
           return Promise.reject(`The specified team '${args.options.teamName}' does not exist in Microsoft Teams`);
         }
 
-        if (response.value.length > 1) {
+        if (filteredResponseByTeam.length > 1) {
           return Promise.reject(`Multiple Microsoft Teams with name '${args.options.teamName}' found. Please disambiguate:${os.EOL}${response.value.map(x => `- ${x.id}`).join(os.EOL)}`);
         }
 
-        return Promise.resolve(teamItem.id);
-      }, err => { return Promise.reject(err); });
+        return Promise.resolve(groupItem.id);
+      });
   }
 
   private getChannelId(teamId: string, args: CommandArgs): Promise<string> {

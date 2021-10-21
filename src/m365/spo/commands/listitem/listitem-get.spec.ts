@@ -177,7 +177,7 @@ describe(commands.LISTITEM_GET, () => {
       webUrl: 'https://contoso.sharepoint.com/sites/project-x', 
       id: expectedId,
       output: "json",
-      fields: "ID,Modified"
+      properties: "ID,Modified"
     };
 
     command.action(logger, { options: options } as any, () => {

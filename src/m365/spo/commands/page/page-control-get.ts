@@ -52,14 +52,16 @@ class SpoPageControlGetCommand extends SpoCommand {
 
         if (control) {
           const controlData = {
+            id: control.id,
+            type: getControlTypeDisplayName(
+              control.controlType || 0
+            ),
+            title: control.webPartData?.title,
             controlType: control.controlType,
             order: control.position.sectionIndex,
-            id: control.id,
             controlData: {
               ...control
-            },
-            type: getControlTypeDisplayName(control.controlType || 0),
-            ...control.webPartData || {}
+            }
           };
 
           logger.log(controlData);

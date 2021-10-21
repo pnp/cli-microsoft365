@@ -4,6 +4,9 @@ Author: [Albert-Jan Schot](https://www.cloudappie.nl/recognize-contributions-cli
 
 Retrieves activities for SharePoint Online, Teams and Yammer and shares the top 3 contributors for each category as an adaptive card to the specified webhook url.
 
+!!! note
+    As of September 1st 2021 reports pseudonymize user-level information. In order to use the user display name make sure to disable this option to provide the report with the UPN value [Privacy changes to Microsoft 365 Usage Analytics](https://techcommunity.microsoft.com/t5/microsoft-365-blog/privacy-changes-to-microsoft-365-usage-analytics/ba-p/2694137). Without changing this value the sample will work but will return a hashed value that is not recognizable.
+
 ```powershell tab="PowerShell"
 $m365Status = m365 status
 
