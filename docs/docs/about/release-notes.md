@@ -23,6 +23,7 @@
 - extended 'spo contenttype add' to return created object by default [#2333](https://github.com/pnp/cli-microsoft365/issues/2333)
 - excluded parsing strings for formatting [#2760](https://github.com/pnp/cli-microsoft365/issues/2760)
 - added launch config to debug CLI and tests [#2766](https://github.com/pnp/cli-microsoft365/issues/2766)
+- added support for upgrading SPFx projects to v1.13.0 [#2780](https://github.com/pnp/cli-microsoft365/issues/2780)
 
 ## [v4.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.0.0)
 
