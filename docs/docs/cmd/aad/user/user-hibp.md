@@ -10,10 +10,10 @@ m365 aad user hibp [options]
 
 ## Options
 
-`-n, --userName [userName]`
+`-n, --userName <userName>`
 : The name of the user to retrieve information for.
 
-`--apiKey, [apiKey]`
+`--apiKey, <apiKey>`
 : Have I been pwned `API Key`. You can buy it from [https://haveibeenpwned.com/API/Key](https://haveibeenpwned.com/API/Key)
 
 `--domain, [domain]`
@@ -23,9 +23,9 @@ m365 aad user hibp [options]
 
 ## Remarks
 
-If the user with the specified user name doesn't involved in any breach, you will get a `Good news — no pwnage found!` message.
+If the user with the specified user name doesn't involved in any breach, you will get a `No pwnage found` message when running in debug or verbose mode.
 
-If `API Key` is invalid, you will get a `` error.
+If `API Key` is invalid, you will get a `Required option apiKey not specified` error.
 
 ## Examples
 

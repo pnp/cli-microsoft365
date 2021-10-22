@@ -2,7 +2,7 @@ import { Logger } from '../../../../cli';
 import {
   CommandOption
 } from '../../../../Command';
-import Command from '../../../../Command';
+import AnonymousCommand from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import commands from '../../commands';
@@ -18,7 +18,7 @@ interface Options extends GlobalOptions {
   domain?: string
 }
 
-class AadUserHIBPCommand extends Command {
+class AadUserHIBPCommand extends AnonymousCommand {
   public get name(): string {
     return commands.USER_HIBP;
   }
@@ -45,14 +45,15 @@ class AadUserHIBPCommand extends Command {
         logger.log(res);
 
         cb();
-      }, (err: any) => {
-        if ((err.response !== undefined && err.response.status === 404) && (this.debug || this.verbose)) {
+      })
+      .catch((err: any): void => {
+        if ((err && err.response !== undefined && err.response.status === 404) && (this.debug || this.verbose)) {
           logger.log('No pwnage found');
           cb();
+          return;
         }
-        else {
-          this.handleRejectedODataJsonPromise(err, logger, cb);
-        }
+
+        return this.handleRejectedODataJsonPromise(err, logger, cb);
       });
   }
 
