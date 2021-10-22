@@ -13,6 +13,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
   let log: any[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
+  let loggerLogToStderrSpy: sinon.SinonSpy;
 
   const itemId = 147;
 
@@ -67,6 +68,7 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
       }
     };
     loggerLogSpy = sinon.spy(logger, 'log');
+    loggerLogToStderrSpy = sinon.spy(logger, 'logToStderr');
   });
 
   afterEach(() => {
@@ -148,6 +150,10 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['FileName', 'ServerRelativeUrl']);
+  });
+
   it('returns attachments associated to a list item by listId', (done) => {
     sinon.stub(request, 'get').callsFake(getFakes);
 
@@ -204,6 +210,29 @@ describe(commands.LISTITEM_ATTACHMENT_LIST, () => {
     command.action(logger, { options: options } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError('An error has occurred')));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly handles No attachments found (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake(() => {
+      return Promise.resolve({ AttachmentFiles: [] });
+    });
+
+    const options: any = {
+      debug: true,
+      webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+      listId: '0cd891ef-afce-4e55-b836-fce03286cccf',
+      itemId: itemId
+    };
+
+    command.action(logger, { options: options }, () => {
+      try {
+        assert(loggerLogToStderrSpy.calledWith('No attachments found'));
         done();
       }
       catch (e) {

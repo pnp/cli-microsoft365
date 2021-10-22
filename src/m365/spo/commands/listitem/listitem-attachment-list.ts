@@ -33,6 +33,10 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
     return telemetryProps;
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['FileName', 'ServerRelativeUrl'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     const listIdArgument = args.options.listId || '';
     const listTitleArgument = args.options.listTitle || '';
@@ -50,15 +54,15 @@ class SpoListItemAttachmentListCommand extends SpoCommand {
     };
 
     request
-      .get<{ AttachmentFiles: { FileName: string; ServerRelativeUrl: string }[] }>(requestOptions)
-      .then((response: { AttachmentFiles: { FileName: string; ServerRelativeUrl: string }[] }): void => {
-        if (response.AttachmentFiles && response.AttachmentFiles.length > 0) {
-          logger.log(response.AttachmentFiles.map(r => {
-            return {
-              FileName: r.FileName,
-              ServerRelativeUrl: r.ServerRelativeUrl
-            };
-          }));
+      .get(requestOptions)
+      .then((attachmentFiles: any): void => {
+        if (attachmentFiles.AttachmentFiles && attachmentFiles.AttachmentFiles.length > 0) {
+          logger.log(attachmentFiles.AttachmentFiles);
+        }
+        else {
+          if (this.verbose) {
+            logger.logToStderr('No attachments found');
+          }
         }
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
