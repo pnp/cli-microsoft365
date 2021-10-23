@@ -1,5 +1,11 @@
 # Release notes
 
+## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
+
+### Changes
+
+- updated the 'aad oauth2grant remove' command to MS Graph v1.0 [#2713](https://github.com/pnp/cli-microsoft365/issues/2713)
+
 ## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 
 ### New commands
