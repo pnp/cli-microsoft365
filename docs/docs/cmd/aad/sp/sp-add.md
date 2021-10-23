@@ -25,7 +25,7 @@ m365 aad sp add [options]
 
 Specify either the `appId`, `appName` or `objectId`. If you specify more than one option value, the command will fail with an error.
 
-If you register an application in the portal, an application object as well as a service principal object are automatically created in your home tenant. If you register an application using CLI for Microsoft 365 or the Microsoft Graph, you'll need to create the service principal separately. To register/create an application using the CLI for Microsoft 365, use the [m365 aad app add](../cmd/aad/app/app-add.md) command.
+If you register an application in the portal, an application object as well as a service principal object are automatically created in your home tenant. If you register an application using CLI for Microsoft 365 or the Microsoft Graph, you'll need to create the service principal separately. To register/create an application using the CLI for Microsoft 365, use the [m365 aad app add](../app/app-add.md) command.
 
 ## Examples
 

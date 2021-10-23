@@ -20,17 +20,17 @@ The SharePoint Admin Center provides various governance features, but there is n
         New-Item -ItemType Directory -Path "$outputDir"
     }
 
-    $appCatalogUrl = o365 spo tenant appcatalogurl get
+    $appCatalogUrl = m365 spo tenant appcatalogurl get
 
     if ($appCatalogUrl) {
-        $spolItems = o365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields $fields  -o json | ConvertFrom-Json
+        $spolItems = m365 spo listitem list --title $listName --webUrl $appCatalogUrl --fields $fields  -o json | ConvertFrom-Json
 
         if ($spolItems.Count -gt 0) {
             $configurations = @()
 
             foreach ($spolItem in $spolItems) {
-                $author = o365 spo user get --webUrl $appCatalogUrl --id $spolItem.AuthorId -o json | ConvertFrom-Json
-                $editor = o365 spo user get --webUrl $appCatalogUrl --id $spolItem.EditorId -o json | ConvertFrom-Json
+                $author = m365 spo user get --webUrl $appCatalogUrl --id $spolItem.AuthorId -o json | ConvertFrom-Json
+                $editor = m365 spo user get --webUrl $appCatalogUrl --id $spolItem.EditorId -o json | ConvertFrom-Json
 
                 $configurationObject = New-Object -TypeName PSObject
 

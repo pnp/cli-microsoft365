@@ -43,7 +43,7 @@ A sample script which iterates through all the teams in your tenant and lists al
     fi
 
     for team in $(echo $availableTeams | jq -c '.[]'); do
-        apps=$(o365 teams app list -i $(echo $team | jq ''.id) -a)
+        apps=$(m365 teams app list -i $(echo $team | jq ''.id) -a)
         echo "All apps in team are given below: " $(echo $team | jq ''.displayName) " " $(echo $team | jq ''.id)
         echo $apps
     done

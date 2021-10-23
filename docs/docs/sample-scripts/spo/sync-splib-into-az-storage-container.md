@@ -2,7 +2,7 @@
 
 Author: [Joseph Velliah](https://sprider.blog/sync-sp-library-with-az-storage-container)
 
-This PowerShell script shows how to download and sync documents in a SharePoint Document Library into an Azure Storage Container using Office 365 CLI and Azure CLI commands.
+This PowerShell script shows how to download and sync documents in a SharePoint Document Library into an Azure Storage Container using CLI for Microsoft 365 and Azure CLI commands.
 
 Prerequisites:
 
@@ -27,7 +27,7 @@ Prerequisites:
     $localFileDownloadFolderPath = $PSScriptRoot
     $spolSiteUrl = $spolHostName + $spolSiteRelativeUrl
 
-    $spolLibItems = o365 spo listitem list --webUrl $spolSiteUrl --title $spolDocLibTitle --fields 'FileRef,FileLeafRef' --filter "FSObjType eq 0" -o json | ConvertFrom-Json
+    $spolLibItems = m365 spo listitem list --webUrl $spolSiteUrl --title $spolDocLibTitle --fields 'FileRef,FileLeafRef' --filter "FSObjType eq 0" -o json | ConvertFrom-Json
 
     if ($spolLibItems.Count -gt 0) {
       ForEach ($spolLibItem in $spolLibItems) {
@@ -57,7 +57,7 @@ Prerequisites:
         $message = "Processing SharePoint file $spolFileName"
         Write-Host $message -ForegroundColor Green
 
-        o365 spo file get --webUrl $spolSiteUrl --url $spolLibFileRelativeUrl --asFile --path $localFilePath
+        m365 spo file get --webUrl $spolSiteUrl --url $spolLibFileRelativeUrl --asFile --path $localFilePath
 
         $message = "Downloaded SharePoint file at $localFilePath"
         Write-Host $message -ForegroundColor Green
@@ -78,6 +78,5 @@ Keywords:
 
 - Azure
 - Azure CLI
-- Office 365 CLI
 - SharePoint Online
 - Storage

@@ -6,7 +6,7 @@ Information in this section will help you understand how the CLI for Microsoft 3
 
 To use CLI for Microsoft 365, execute specific commands directly from the command line.
 
-<script src="https://asciinema.org/a/158207.js" id="asciicast-158207" async></script>
+<script id="asciicast-445654" src="https://asciinema.org/a/445654.js" async></script>
 
 !!! attention
     When using the CLI for Microsoft 365, each CLI command must be prepended with `microsoft365` or `m365` for short. Without this, your shell will not know how the particular command should be executed.
@@ -19,7 +19,7 @@ To list commands available with the CLI for Microsoft 365 type `help` in the CLI
 
 Commands in the CLI for Microsoft 365 are combined into groups. You can list the commands available in the particular group by typing `help <group>`, for example `help spo` to list all commands related to SharePoint Online, or `m365 help spo` directly in your shell.
 
-<script src="https://asciinema.org/a/158209.js" id="asciicast-158209" async></script>
+<script id="asciicast-445655" src="https://asciinema.org/a/445655.js" async></script>
 
 ## Get command help
 
@@ -27,7 +27,7 @@ Each command in the CLI for Microsoft 365 comes with help describing the command
 
 To get the complete help information including background information, examples and links to related information, use the `--help` option, for example `m365 spo cdn get --help`. This ability is also useful if you've already typed some options and don't want to lose your input but want to access the help, for example: `m365 spo cdn get --type Private --help`.
 
-<script src="https://asciinema.org/a/158212.js" id="asciicast-158212" async></script>
+<script id="asciicast-445656" src="https://asciinema.org/a/445656.js" async></script>
 
 ## Required and optional command options
 

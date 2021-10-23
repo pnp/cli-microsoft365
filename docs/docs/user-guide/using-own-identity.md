@@ -139,8 +139,6 @@ The JSON representation of the SharePoint Online site will be returned to the co
 
 Congratulations! You have just configured the CLI for Microsoft 365 to use your own custom application with custom permissions from your own Azure Active Directory.
 
-[![Congratulations](../images/using-own-identity/congratulations.png)](../images/using-own-identity/congratulations.png)
-
 ## Persisting environment variables
 
 As mentioned earlier, the way in which we set the environment variables meant that they are only set for the lifetime of the session, if the terminal session is closed, you will need to repeat those steps, which may be undesirable.

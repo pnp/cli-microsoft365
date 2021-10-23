@@ -18,8 +18,6 @@ The default way to log in to Microsoft 365 using the CLI for Microsoft 365 is th
 
 After executing the `login` command, you will be prompted to navigate to _https://aka.ms/devicelogin_ in your web browser and enter the login code presented to you by the CLI for Microsoft 365 in the command line. After entering the code, you will see the prompt that you are about to authenticate the _PnP Microsoft 365 Management Shell_ application to access your tenant on your behalf.
 
-[![Signing in to Azure Active Directory](../images/login.png)](../images/login.png)
-
 If you are using the CLI for Microsoft 365 for the first time, you will be also prompted to verify the permissions you are about to grant the CLI for Microsoft 365. This is referred to as _consent_.
 
 [![Granting the CLI for Microsoft 365 the necessary permissions](../images/consent.png)](../images/consent.png)
@@ -143,7 +141,7 @@ If you're logged in to Microsoft 365 using a certificate, the `status` command w
 
 To log out from Microsoft 365, use the `logout` command. Executing the `logout` command removes all connection information such as user name, refresh or access tokens stored on your computer.
 
-<script src="https://asciinema.org/a/158294.js" id="asciicast-158294" async></script>
+<script id="asciicast-445658" src="https://asciinema.org/a/445658.js" async></script>
 
 ### Working with SharePoint Online
 
