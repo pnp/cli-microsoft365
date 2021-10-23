@@ -25,7 +25,7 @@ $localBaseFolderName = "local-base-folder-name"
 $localFileDownloadFolderPath = $PSScriptRoot
 $spolSiteUrl = $spolHostName + $spolSiteRelativeUrl
 
-$spolLibItems = o365 spo listitem list --webUrl $spolSiteUrl --title $spolDocLibTitle --fields 'FileRef,FileLeafRef' --filter "FSObjType eq 0" -o json | ConvertFrom-Json
+$spolLibItems = m365 spo listitem list --webUrl $spolSiteUrl --title $spolDocLibTitle --fields 'FileRef,FileLeafRef' --filter "FSObjType eq 0" -o json | ConvertFrom-Json
 
 if ($spolLibItems.Count -gt 0) {
   ForEach ($spolLibItem in $spolLibItems) {
@@ -55,7 +55,7 @@ if ($spolLibItems.Count -gt 0) {
     $message = "Processing SharePoint file $spolFileName"
     Write-Host $message -ForegroundColor Green
 
-    o365 spo file get --webUrl $spolSiteUrl --url $spolLibFileRelativeUrl --asFile --path $localFilePath
+    m365 spo file get --webUrl $spolSiteUrl --url $spolLibFileRelativeUrl --asFile --path $localFilePath
 
     $message = "Downloaded SharePoint file at $localFilePath"
     Write-Host $message -ForegroundColor Green

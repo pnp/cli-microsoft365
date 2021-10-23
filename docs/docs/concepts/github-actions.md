@@ -119,7 +119,7 @@ These guides presuppose some familiarity with using GitHub Actions and CLI for M
 Create a `.yaml` file within the `.github/workflow` folder with the below build definition to deploy an app to a tenant level app catalog.
 
 ```yaml
-name: SPFx CI/CD with O365 CLI
+name: SPFx CI/CD with CLI for Microsoft 365
 
 on: [push]
 
