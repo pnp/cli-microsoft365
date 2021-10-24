@@ -1,5 +1,11 @@
 # Release notes
 
+## [v5.0.0](https://github.com/pnp/cli-microsoft365/releases/tag/v5.0.0)
+
+### Changes
+
+- updates 'aad oauth2grant list' to use MS Graph [#2710](https://github.com/pnp/cli-microsoft365/issues/2710)
+
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
 ### New commands
