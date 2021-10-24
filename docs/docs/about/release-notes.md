@@ -2,9 +2,18 @@
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
+### New commands
+
+**SharePoint:**
+
+- [spo listitem attachment list](../cmd/spo/listitem/listitem-attachment-list.md) - gets the attachments associated to a list item [#2730](https://github.com/pnp/cli-microsoft365/issues/2730)
+
 ### Changes
 
 - updated the 'aad oauth2grant remove' command to MS Graph v1.0 [#2713](https://github.com/pnp/cli-microsoft365/issues/2713)
+- updated 'aad oauth2grant add' to use MS Graph [#2712](https://github.com/pnp/cli-microsoft365/issues/2712)
+- updated 'aad oauth2grant set' to use MS Graph [#2711](https://github.com/pnp/cli-microsoft365/issues/2711)
+- added the 'Use CLI for Microsoft 365 access token' sample [#2731](https://github.com/pnp/cli-microsoft365/issues/2731)
 
 ## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 
@@ -12,7 +21,7 @@
 
 **Azure Active Directory:**
 
-- [aad user set](../cmd/aad/user/user-set.md ) - updates information of the specified user [#1933](https://github.com/pnp/cli-microsoft365/issues/1933)
+- [aad user set](../cmd/aad/user/user-set.md) - updates information of the specified user [#1933](https://github.com/pnp/cli-microsoft365/issues/1933)
 
 ### Changes
 
