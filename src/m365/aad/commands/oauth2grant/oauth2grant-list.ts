@@ -11,7 +11,7 @@ interface CommandArgs {
 }
 
 interface Options extends GlobalOptions {
-  clientId: string;
+  spObjectId: string;
 }
 
 class AadOAuth2GrantListCommand extends GraphCommand {
@@ -33,7 +33,7 @@ class AadOAuth2GrantListCommand extends GraphCommand {
     }
 
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/oauth2PermissionGrants?$filter=clientId eq '${encodeURIComponent(args.options.clientId)}'`,
+      url: `${this.resource}/v1.0/oauth2PermissionGrants?$filter=clientId eq '${encodeURIComponent(args.options.spObjectId)}'`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -54,7 +54,7 @@ class AadOAuth2GrantListCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-i, --clientId <clientId>'
+        option: '-i, --spObjectId <spObjectId>'
       }
     ];
 
@@ -63,8 +63,8 @@ class AadOAuth2GrantListCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!Utils.isValidGuid(args.options.clientId)) {
-      return `${args.options.clientId} is not a valid GUID`;
+    if (!Utils.isValidGuid(args.options.spObjectId)) {
+      return `${args.options.spObjectId} is not a valid GUID`;
     }
 
     return true;

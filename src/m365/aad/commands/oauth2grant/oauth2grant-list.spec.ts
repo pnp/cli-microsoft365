@@ -87,7 +87,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
+    command.action(logger, { options: { debug: true, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([{
           "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
@@ -141,7 +141,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
+    command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([{
           "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
@@ -201,7 +201,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } }, () => {
+    command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68', output: 'json' } }, () => {
       try {
         assert(loggerLogSpy.calledWith([{
           "clientId": "cd4043e7-b749-420b-bd07-aa7c3912ed22",
@@ -248,7 +248,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: false, clientId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
+    command.action(logger, { options: { debug: false, spObjectId: '141f7648-0c71-4752-9cdb-c7d5305b7e68' } }, () => {
       try {
         assert(loggerLogSpy.notCalled);
         done();
@@ -273,7 +273,7 @@ describe(commands.OAUTH2GRANT_LIST, () => {
       });
     });
 
-    command.action(logger, { options: { debug: false, clientId: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
+    command.action(logger, { options: { debug: false, spObjectId: 'b2307a39-e878-458b-bc90-03bc578531d6' } } as any, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Resource '' does not exist or one of its queried reference-property objects are not present`)));
         done();
@@ -284,13 +284,13 @@ describe(commands.OAUTH2GRANT_LIST, () => {
     });
   });
 
-  it('fails validation if the clientId is not a valid GUID', () => {
-    const actual = command.validate({ options: { clientId: '123' } });
+  it('fails validation if the spObjectId is not a valid GUID', () => {
+    const actual = command.validate({ options: { spObjectId: '123' } });
     assert.notStrictEqual(actual, true);
   });
 
-  it('passes validation when the clientId option specified', () => {
-    const actual = command.validate({ options: { clientId: '6a7b1395-d313-4682-8ed4-65a6265a6320' } });
+  it('passes validation when the spObjectId option specified', () => {
+    const actual = command.validate({ options: { spObjectId: '6a7b1395-d313-4682-8ed4-65a6265a6320' } });
     assert.strictEqual(actual, true);
   });
 
@@ -305,11 +305,11 @@ describe(commands.OAUTH2GRANT_LIST, () => {
     assert(containsOption);
   });
 
-  it('supports specifying clientId', () => {
+  it('supports specifying spObjectId', () => {
     const options = command.options();
     let containsOption = false;
     options.forEach(o => {
-      if (o.option.indexOf('--clientId') > -1) {
+      if (o.option.indexOf('--spObjectId') > -1) {
         containsOption = true;
       }
     });
