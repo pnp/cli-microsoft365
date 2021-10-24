@@ -7,14 +7,14 @@ import Command, { CommandError } from '../../../../Command';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import commands from '../../commands';
-const command: Command = require('./externalconnection-add');
+const command: Command = require('./externalconnection-list');
 
-describe(commands.EXTERNALCONNECTION_ADD, () => {
+describe(commands.EXTERNALCONNECTION_LIST, () => {
   let log: string[];
   let logger: Logger;
   let loggerLogSpy: sinon.SinonSpy;
 
-  const externalConnectionAddResponse: any = {
+  const externalConnectionListResponse: any = {
     "@odata.context": "https://graph.microsoft.com/beta/$metadata#connections/$entity",
     "id": "TestConnectionForCLI",
     "name": "Twitter Connector",
@@ -73,14 +73,14 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   });
 
   it('has correct name', () => {
-    assert.strictEqual(command.name.startsWith(commands.EXTERNALCONNECTION_ADD), true);
+    assert.strictEqual(command.name.startsWith(commands.EXTERNALCONNECTION_LIST), true);
   });
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds an external connection', (done) => {
+  it('lists an external connection', (done) => {
       const options: any = {
         debug: false,
         externalConnectionId: 'TestConnectionForCLI',
@@ -90,7 +90,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   
       command.action(logger, { options: options } as any, () => {
         try {
-          assert(loggerLogSpy.calledWith(externalConnectionAddResponse));
+          assert(loggerLogSpy.calledWith(externalConnectionListResponse));
           done();
         }
         catch (e) {
