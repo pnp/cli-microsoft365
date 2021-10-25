@@ -47,7 +47,7 @@ class AadSpAddCommand extends GraphCommand {
     }
 
     const appIdRequestOptions: any = {
-      url: `${this.resource}/v1.0/servicePrincipals?$filter=${spMatchQuery}`,
+      url: `${this.resource}/v1.0/applications?$filter=${spMatchQuery}`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

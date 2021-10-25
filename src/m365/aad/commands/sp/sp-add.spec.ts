@@ -187,142 +187,50 @@ describe(commands.SP_ADD, () => {
     });
   });
 
+  it('fails when the specified Azure AD app not exist', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/v1.0/applications?$filter=id eq `) > -1) {
+        return Promise.resolve({
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications",
+          "value": [
+          ]
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        objectId: '59e617e5-e447-4adc-8b88-00af644d7c92'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified Azure AD app not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('fails when Azure AD app with same name exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/applications?$filter=displayName eq `) > -1) {
         return Promise.resolve({
-          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals",
+          "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications",
           "value": [
             {
               "id": "be559819-b036-470f-858b-281c4e808403",
-              "deletedDateTime": null,
-              "accountEnabled": true,
-              "alternativeNames": [],
-              "appDisplayName": null,
-              "appDescription": null,
               "appId": "ee091f63-9e48-4697-8462-7cfbf7410b8e",
-              "applicationTemplateId": null,
-              "appOwnerOrganizationId": null,
-              "appRoleAssignmentRequired": false,
-              "createdDateTime": "2021-03-07T15:04:11Z",
-              "description": null,
-              "disabledByMicrosoftStatus": null,
-              "displayName": "Test App",
-              "homepage": null,
-              "loginUrl": null,
-              "logoutUrl": null,
-              "notes": null,
-              "notificationEmailAddresses": [],
-              "preferredSingleSignOnMode": null,
-              "preferredTokenSigningKeyThumbprint": null,
-              "replyUrls": [
-                "https://localhost/"
-              ],
-              "servicePrincipalNames": [
-                "ee091f63-9e48-4697-8462-7cfbf7410b8e",
-                "ee091f63-9e48-4697-8462-7cfbf7410b8e/localhost"
-              ],
-              "servicePrincipalType": "Legacy",
-              "signInAudience": null,
-              "tags": [],
-              "tokenEncryptionKeyId": null,
-              "info": null,
-              "resourceSpecificApplicationPermissions": [],
-              "samlSingleSignOnSettings": null,
-              "verifiedPublisher": {
-                "displayName": null,
-                "verifiedPublisherId": null,
-                "addedDateTime": null
-              },
-              "addIns": [],
-              "appRoles": [],
-              "keyCredentials": [
-                {
-                  "customKeyIdentifier": null,
-                  "displayName": null,
-                  "endDateTime": "2022-03-07T15:04:11.0580414Z",
-                  "key": null,
-                  "keyId": "c535f925-afd5-498b-9e72-ee4c12822755",
-                  "startDateTime": "2021-03-07T15:04:11.0580414Z",
-                  "type": "Symmetric",
-                  "usage": "Verify"
-                },
-                {
-                  "customKeyIdentifier": null,
-                  "displayName": null,
-                  "endDateTime": "2022-03-07T15:04:11.0580414Z",
-                  "key": null,
-                  "keyId": "2bba7eac-b190-4df5-bcd6-78e9b3404be5",
-                  "startDateTime": "2021-03-07T15:04:11.0580414Z",
-                  "type": "Symmetric",
-                  "usage": "Sign"
-                }
-              ],
-              "oauth2PermissionScopes": [],
-              "passwordCredentials": [
-                {
-                  "customKeyIdentifier": null,
-                  "displayName": null,
-                  "endDateTime": "2022-03-07T15:04:11.0580414Z",
-                  "hint": null,
-                  "keyId": "7aa974b3-083a-40b2-92db-cae026ab4482",
-                  "secretText": null,
-                  "startDateTime": "2021-03-07T15:04:11.0580414Z"
-                }
-              ]
+              "displayName": "Test App"
             },
             {
               "id": "93d75ef9-ba9b-4361-9a47-1f6f7478f05f",
-              "deletedDateTime": null,
-              "accountEnabled": true,
-              "alternativeNames": [],
-              "appDisplayName": "Test App",
-              "appDescription": null,
               "appId": "e9fd0957-049f-40d0-8d1d-112320fb1cbd",
-              "applicationTemplateId": null,
-              "appOwnerOrganizationId": "de348bc7-1aeb-4406-8cb3-97db021cadb4",
-              "appRoleAssignmentRequired": false,
-              "createdDateTime": "2021-10-12T10:41:23Z",
-              "description": null,
-              "disabledByMicrosoftStatus": null,
-              "displayName": "Test App",
-              "homepage": null,
-              "loginUrl": null,
-              "logoutUrl": null,
-              "notes": null,
-              "notificationEmailAddresses": [],
-              "preferredSingleSignOnMode": null,
-              "preferredTokenSigningKeyThumbprint": null,
-              "replyUrls": [],
-              "servicePrincipalNames": [
-                "e9fd0957-049f-40d0-8d1d-112320fb1cbd"
-              ],
-              "servicePrincipalType": "Application",
-              "signInAudience": "AzureADMyOrg",
-              "tags": [
-                "HideApp",
-                "WindowsAzureActiveDirectoryIntegratedApp"
-              ],
-              "tokenEncryptionKeyId": null,
-              "resourceSpecificApplicationPermissions": [],
-              "samlSingleSignOnSettings": null,
-              "verifiedPublisher": {
-                "displayName": null,
-                "verifiedPublisherId": null,
-                "addedDateTime": null
-              },
-              "addIns": [],
-              "appRoles": [],
-              "info": {
-                "logoUrl": null,
-                "marketingUrl": null,
-                "privacyStatementUrl": null,
-                "supportUrl": null,
-                "termsOfServiceUrl": null
-              },
-              "keyCredentials": [],
-              "oauth2PermissionScopes": [],
-              "passwordCredentials": []
+              "displayName": "Test App"
             }
           ]
         });
@@ -380,19 +288,13 @@ describe(commands.SP_ADD, () => {
 
   it('adds a service principal to a registered Azure AD app by appName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=displayName eq `) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/applications?$filter=displayName eq `) > -1) {
         return Promise.resolve({
           "value": [
             {
               "id": "59e617e5-e447-4adc-8b88-00af644d7c92",
               "appId": "65415bb1-9267-4313-bbf5-ae259732ee12",
-              "displayName": "foo",
-              "createdDateTime": "2021-03-07T15:04:11Z",
-              "description": null,
-              "homepage": null,
-              "loginUrl": null,
-              "logoutUrl": null,
-              "notes": null
+              "displayName": "foo"
             }
           ]
         });
@@ -435,19 +337,13 @@ describe(commands.SP_ADD, () => {
 
   it('adds a service principal to a registered Azure AD app by objectId', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/v1.0/servicePrincipals?$filter=id eq `) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/applications?$filter=id eq `) > -1) {
         return Promise.resolve({
           "value": [
             {
               "id": "59e617e5-e447-4adc-8b88-00af644d7c92",
               "appId": "65415bb1-9267-4313-bbf5-ae259732ee12",
-              "displayName": "foo",
-              "createdDateTime": "2021-03-07T15:04:11Z",
-              "description": null,
-              "homepage": null,
-              "loginUrl": null,
-              "logoutUrl": null,
-              "notes": null
+              "displayName": "foo"
             }
           ]
         });

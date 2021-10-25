@@ -25,6 +25,12 @@ m365 aad sp add [options]
 
 Specify either the `appId`, `appName` or `objectId`. If you specify more than one option value, the command will fail with an error.
 
+If you register an application in the portal, an application object as well as a service principal object are automatically created in your home tenant. 
+If you register/create an application using the Microsoft Graph APIs, creating the service principal object is a separate step.
+
+To register/create an application using the CLI for Microsoft 365, use the command [m365 aad app add](../cmd/aad/app/app-add.md)
+
+
 ## Examples
 
 Adds a service principal to a registered Azure AD app with appId _b2307a39-e878-458b-bc90-03bc578531d6_.
