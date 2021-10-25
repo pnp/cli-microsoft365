@@ -65,7 +65,7 @@ describe(commands.USER_HIBP, () => {
 
   it('checks user is pwned using userName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/account-exists%40hibp-integration-tests.com`) {
+      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent('account-exists@hibp-integration-tests.com')}`) {
         // this is the actual truncated response as the API would return
         return Promise.resolve([{ "Name": "Adobe" }]);
       }
@@ -86,7 +86,7 @@ describe(commands.USER_HIBP, () => {
 
   it('checks user is pwned using userName and multiple breaches', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/account-exists%40hibp-integration-tests.com`) {
+      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent('account-exists@hibp-integration-tests.com')}`) {
         // this is the actual truncated response as the API would return
         return Promise.resolve([{ "Name": "Adobe" }, { "Name": "Gawker" }, { "Name": "Stratfor" }]);
       }
@@ -107,7 +107,7 @@ describe(commands.USER_HIBP, () => {
 
   it('checks user is pwned using userName and domain', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/account-exists%40hibp-integration-tests.com?domain=adobe.com`) {
+      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent('account-exists@hibp-integration-tests.com')}?domain=adobe.com`) {
         // this is the actual truncated response as the API would return
         return Promise.resolve([{ "Name": "Adobe" }]);
       }
@@ -128,7 +128,7 @@ describe(commands.USER_HIBP, () => {
 
   it('checks user is pwned using userName and domain with a domain that does not exists', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/account-exists%40hibp-integration-tests.com?domain=adobe.xxx`) {
+      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent('account-exists@hibp-integration-tests.com')}?domain=adobe.xxx`) {
         // this is the actual truncated response as the API would return
         return Promise.reject({
           "response": {
@@ -154,7 +154,7 @@ describe(commands.USER_HIBP, () => {
 
   it('checks user is pwned using userName (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/account-exists%40hibp-integration-tests.com`) {
+      if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent('account-exists@hibp-integration-tests.com')}`) {
         return Promise.resolve([{ "Name": "Adobe" }]);
       }
 
