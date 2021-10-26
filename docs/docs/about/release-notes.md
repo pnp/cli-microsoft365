@@ -4,7 +4,8 @@
 
 ### Changes
 
-- updates 'aad oauth2grant list' to use MS Graph [#2710](https://github.com/pnp/cli-microsoft365/issues/2710)
+- updated 'aad oauth2grant list' to use MS Graph [#2710](https://github.com/pnp/cli-microsoft365/issues/2710)
+- updated the 'aad sp get' command to use MS Graph [#2754](https://github.com/pnp/cli-microsoft365/issues/2754)
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
@@ -20,6 +21,7 @@
 - updated 'aad oauth2grant add' to use MS Graph [#2712](https://github.com/pnp/cli-microsoft365/issues/2712)
 - updated 'aad oauth2grant set' to use MS Graph [#2711](https://github.com/pnp/cli-microsoft365/issues/2711)
 - added the 'Use CLI for Microsoft 365 access token' sample [#2731](https://github.com/pnp/cli-microsoft365/issues/2731)
+- updated the 'teams report pstncalls' command to MS Graph v1.0 [#2679](https://github.com/pnp/cli-microsoft365/issues/2679)
 
 ## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 

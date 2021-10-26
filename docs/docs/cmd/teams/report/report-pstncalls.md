@@ -24,9 +24,6 @@ This command only works with app-only permissions. You will need to create your 
 
 The difference between `fromDateTime` and `toDateTime` cannot exceed a period of 90 days
 
-!!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
-
 ## Examples
 
 Get details about PSTN calls made between 2020-10-31 and today
@@ -46,3 +43,7 @@ Get details about PSTN calls made between 2020-10-31 and 2020-12-31 and exports 
 ```sh
 m365 teams report pstncalls --fromDateTime 2020-10-31 --toDateTime 2020-12-31 --output json > "pstncalls.json"
 ```
+
+## More information
+
+- List PSTN calls: [https://docs.microsoft.com/en-us/graph/api/callrecords-callrecord-getpstncalls?view=graph-rest-1.0](https://docs.microsoft.com/en-us/graph/api/callrecords-callrecord-getpstncalls?view=graph-rest-1.0)
