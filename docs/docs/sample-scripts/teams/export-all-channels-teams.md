@@ -1,5 +1,7 @@
 # Export all channels in Microsoft Teams teams in the tenant
 
+Author: [Sudharsan Kesavanarayanan](https://twitter.com/sudharsank)
+
 Export all the channels from Microsoft Team in a CSV.
 
 ```powershell tab="PowerShell"
