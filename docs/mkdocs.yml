@@ -698,7 +698,7 @@ google_analytics:
   - 'UA-110480857-1'
   - 'auto'
 extra_css:
-  - 'css/styles.css'
+  - 'css/styles2.css'
 markdown_extensions:
   - admonition
   - toc:
