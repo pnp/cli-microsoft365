@@ -18,7 +18,7 @@ To install the CLI for Microsoft 365, in the command line execute:
 npm install -g @pnp/cli-microsoft365
 ```
 
-<script id="asciicast-444109" src="https://asciinema.org/a/444109.js" async></script>
+[![Install the CLI for Microsoft 365](../images/installingcli.gif)](../images/installingcli.gif)
 
 If you're using Yarn, you can install the CLI for Microsoft 365 by executing:
 

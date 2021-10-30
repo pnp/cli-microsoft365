@@ -141,7 +141,7 @@ If you're logged in to Microsoft 365 using a certificate, the `status` command w
 
 To log out from Microsoft 365, use the `logout` command. Executing the `logout` command removes all connection information such as user name, refresh or access tokens stored on your computer.
 
-<script id="asciicast-444115" src="https://asciinema.org/a/444115.js" async></script>
+[![Connecting to CLI](../images/clilogin.gif)](../images/clilogin.gif)
 
 ### Working with SharePoint Online
 
