@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js 14
+      - name: Use Node.js 16
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 16
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
@@ -25,7 +25,7 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-14-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-ubuntu-latest-16-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -49,10 +49,10 @@ jobs:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js 14
+      - name: Use Node.js 16
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 16
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
@@ -60,7 +60,7 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-14-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-ubuntu-latest-16-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -87,10 +87,10 @@ jobs:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js 14
+      - name: Use Node.js 16
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 16
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
@@ -98,7 +98,7 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-14-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-ubuntu-latest-16-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -117,10 +117,10 @@ jobs:
           name: build
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js 14
+      - name: Use Node.js 16
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 16
           registry-url: 'https://registry.npmjs.org'
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1

@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
-        node: [14]
+        node: [16]
 
     steps:
       - uses: actions/checkout@v2
@@ -51,16 +51,16 @@ jobs:
       matrix:
         os: [macos-latest, windows-latest, ubuntu-latest]
         # node versions to run tests on
-        nodeRun: [14]
+        nodeRun: [16]
         # node versions on which code was built and should be tested
-        nodeBuild: [14]
+        nodeBuild: [16]
         include:
           - os: ubuntu-latest
             nodeRun: 12
-            nodeBuild: 14
+            nodeBuild: 16
           - os: ubuntu-latest
-            nodeRun: 16
-            nodeBuild: 14
+            nodeRun: 14
+            nodeBuild: 16
 
     steps:
       - name: Configure pagefile
@@ -95,21 +95,21 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
       - name: Test with coverage
-        # we run coverage only on Node@14 because older version report it incorrectly
-        if: matrix.nodeRun == 14
+        # we run coverage only on Node@16
+        if: matrix.nodeRun == 16
         run: npm test
       - name: Test without coverage
         # we want to run tests on older Node versions to ensure that code works
-        if: matrix.nodeRun != 14
+        if: matrix.nodeRun != 16
         run: npm run test:test
       - name: Compress output (non-Windows)
-        if: matrix.nodeRun == 14 && matrix.os != 'windows-latest' && always()
+        if: matrix.nodeRun == 16 && matrix.os != 'windows-latest' && always()
         run: tar -cvf coverage.tar coverage
       - name: Compress output (Windows)
-        if: matrix.nodeRun == 14 && matrix.os == 'windows-latest' && always()
+        if: matrix.nodeRun == 16 && matrix.os == 'windows-latest' && always()
         run: 7z a -ttar -r coverage.tar coverage
       - uses: actions/upload-artifact@v2
-        if: matrix.nodeRun == 14 && always()
+        if: matrix.nodeRun == 16 && always()
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.nodeRun }}
           path: coverage.tar
@@ -121,13 +121,13 @@ jobs:
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: build-ubuntu-latest-14
+          name: build-ubuntu-latest-16
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js 14
+      - name: Use Node.js 16
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 16
           registry-url: 'https://registry.npmjs.org'
       - name: Cache node modules
         id: cache
@@ -135,7 +135,7 @@ jobs:
         with:
           path: |
             **/node_modules
-          key: node_modules-ubuntu-latest-14-${{ hashFiles('**/npm-shrinkwrap.json') }}
+          key: node_modules-ubuntu-latest-16-${{ hashFiles('**/npm-shrinkwrap.json') }}
       - name: Restore dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
@@ -150,7 +150,7 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
-          name: build-ubuntu-latest-14
+          name: build-ubuntu-latest-16
           path: build.tar
   deploy_docs:
     if: github.repository_owner == 'pnp'
@@ -174,13 +174,13 @@ jobs:
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: build-ubuntu-latest-14
+          name: build-ubuntu-latest-16
       - name: Unpack build artifact
         run: tar -xvf build.tar && rm build.tar
-      - name: Use Node.js 14
+      - name: Use Node.js 16
         uses: actions/setup-node@v1
         with:
-          node-version: 14
+          node-version: 16
           registry-url: 'https://registry.npmjs.org'
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1

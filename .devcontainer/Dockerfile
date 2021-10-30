@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y \
   vim \
   python3.8 \
   python3-pip \
-  && curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash - \
+  && curl -sL https://deb.nodesource.com/setup_16.x | sudo -E bash - \
   && apt-get install nodejs -y \
   && rm -rf /var/lib/apt/lists/*
 
