@@ -357,7 +357,7 @@ class FileConvertPdfCommand extends GraphCommand {
    * @param fileResponse Response with stream file contents
    * @param localFilePath Local file path where to store the file
    */
-  private writeFileToDisk(logger: Logger, fileResponse: AxiosResponse, localFilePath: string): Promise<void> {
+  private writeFileToDisk(logger: Logger, fileResponse: AxiosResponse<any>, localFilePath: string): Promise<void> {
     if (this.verbose) {
       logger.logToStderr(`Writing converted PDF file to ${localFilePath}...`);
     }

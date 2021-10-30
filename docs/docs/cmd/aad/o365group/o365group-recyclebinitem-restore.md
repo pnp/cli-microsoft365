@@ -5,6 +5,12 @@ Restores a deleted Microsoft 365 Group
 ## Usage
 
 ```sh
+m365 aad o365group recyclebinitem restore [options]
+```
+
+## Alias
+
+```sh
 m365 aad o365group restore [options]
 ```
 
@@ -20,5 +26,5 @@ m365 aad o365group restore [options]
 Restores the Microsoft 365 Group with id _28beab62-7540-4db1-a23f-29a6018a3848_
 
 ```sh
-m365 aad o365group restore --id 28beab62-7540-4db1-a23f-29a6018a3848
+m365 aad o365group recyclebinitem restore --id 28beab62-7540-4db1-a23f-29a6018a3848
 ```

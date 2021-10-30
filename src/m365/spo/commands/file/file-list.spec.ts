@@ -522,6 +522,57 @@ describe(commands.FILE_LIST, () => {
     });
   });
 
+  it('properly escapes single quotes in folder name', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_api/web/GetFolderByServerRelativeUrl('Shared%20Documents%2FFo''lde''r')`) > -1) {
+        return Promise.resolve(
+          {
+            "Files": [
+              {
+                "UniqueId": "f09c4efe-b8c0-4e89-a166-03418661b89b",
+                "Name": "Test.docx",
+                "ServerRelativeUrl": "/sites/project-x/Shared documents/Test.docx"
+              }
+            ],
+            "Exists": true,
+            "IsWOPIEnabled": false,
+            "ItemCount": 3,
+            "Name": "Shared Documents",
+            "ProgID": null,
+            "ServerRelativeUrl": "/sites/project-x/Shared Documents",
+            "TimeCreated": "2021-05-22T08:58:37Z",
+            "TimeLastModified": "2021-05-22T09:00:33Z",
+            "UniqueId": "dee34261-95f0-49c0-9090-f8d2d581787c",
+            "WelcomePage": ""
+          }
+        );
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, {
+      options: {
+        output: 'text',
+        debug: false,
+        webUrl: 'https://contoso.sharepoint.com/sites/project-x',
+        folder: `Shared Documents/Fo'lde'r`
+      }
+    }, () => {
+      try {
+        assert(loggerLogSpy.calledWith(
+          [{
+            UniqueId: 'f09c4efe-b8c0-4e89-a166-03418661b89b',
+            Name: 'Test.docx',
+            ServerRelativeUrl: '/sites/project-x/Shared documents/Test.docx'
+          }]
+        ));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
 
   it('command correctly handles files list reject request', (done) => {
     const err = 'Invalid request';

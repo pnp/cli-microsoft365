@@ -1,8 +1,10 @@
 site_name: CLI for Microsoft 365
 site_url: https://pnp.github.io/cli-microsoft365/
 nav:
-  - Home: 'index.md'
-  - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
+  - Home:
+    - 'index.md'
+    - v4 Upgrade Guidance: 'v4-upgrade-guidance.md'
+    - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
     - 'Using the CLI': 'user-guide/using-cli.md'
@@ -44,9 +46,10 @@ nav:
         - o365group list: 'cmd/aad/o365group/o365group-list.md'
         - o365group recyclebinitem list: 'cmd/aad/o365group/o365group-recyclebinitem-list.md'
         - o365group recyclebinitem clear: 'cmd/aad/o365group/o365group-recyclebinitem-clear.md'
+        - o365group recyclebinitem restore: 'cmd/aad/o365group/o365group-recyclebinitem-restore.md'
         - o365group remove: 'cmd/aad/o365group/o365group-remove.md'
         - o365group renew: 'cmd/aad/o365group/o365group-renew.md'
-        - o365group restore: 'cmd/aad/o365group/o365group-restore.md'
+        - o365group restore: 'cmd/aad/o365group/o365group-recyclebinitem-restore.md'
         - o365group set: 'cmd/aad/o365group/o365group-set.md'
         - o365group teamify: 'cmd/aad/o365group/o365group-teamify.md'
         - o365group report activitycounts: 'cmd/aad/o365group/o365group-report-activitycounts.md'
@@ -75,6 +78,7 @@ nav:
       - user:
         - user get: 'cmd/aad/user/user-get.md'
         - user list: 'cmd/aad/user/user-list.md'
+        - user set: 'cmd/aad/user/user-set.md'
     - Adaptive Card (adaptivecard):
       - send: 'cmd/adaptivecard/adaptivecard-send.md'
     - CLI (cli):
@@ -317,6 +321,7 @@ nav:
         - list webhook set: 'cmd/spo/list/list-webhook-set.md'
       - listitem:
         - listitem add: 'cmd/spo/listitem/listitem-add.md'
+        - listitem attachment list: 'cmd/spo/listitem/listitem-attachment-list.md'
         - listitem get: 'cmd/spo/listitem/listitem-get.md'
         - listitem isrecord: 'cmd/spo/listitem/listitem-isrecord.md'
         - listitem list: 'cmd/spo/listitem/listitem-list.md'
@@ -399,7 +404,6 @@ nav:
         - site chrome set: 'cmd/spo/site/site-chrome-set.md'
         - site classic add: 'cmd/spo/site/site-classic-add.md'
         - site classic list: 'cmd/spo/site/site-classic-list.md'
-        - site classic remove: 'cmd/spo/site/site-remove.md'
         - site classic set: 'cmd/spo/site/site-classic-set.md'
         - site commsite enable: 'cmd/spo/site/site-commsite-enable.md'
         - site inplacerecordsmanagement set: 'cmd/spo/site/site-inplacerecordsmanagement-set.md'
@@ -519,7 +523,7 @@ nav:
         - team add: 'cmd/teams/team/team-add.md'
         - team archive: 'cmd/teams/team/team-archive.md'
         - team clone: 'cmd/teams/team/team-clone.md'
-        - team get: 'cmd/aad/o365group/o365group-get.md'
+        - team get: 'cmd/teams/team/team-get.md'
         - team list: 'cmd/teams/team/team-list.md'
         - team remove: 'cmd/teams/team/team-remove.md'
         - team set: 'cmd/teams/team/team-set.md'
@@ -616,6 +620,7 @@ nav:
       - 'Cancel all running flow runs for a flow in an environment': 'sample-scripts/flow/cancel-all-running-flow-runs.md'
       - 'Export a single Flow to a Logic App' : 'sample-scripts/flow/export-flow-logicapp.md'
       - 'Export all Flows in environment' : 'sample-scripts/flow/export-all-flows-in-environment.md'
+      - 'Flow runs current day summary' : 'sample-scripts/flow/flow-runs-day-summary.md'
       - 'Inventory Flows By Owner' : 'sample-scripts/flow/inventory-flows-by-author.md'
       - 'Resubmit all failed flow runs for a flow in an environment': 'sample-scripts/flow/resubmit-all-failed-flow-runs.md'
       - 'Search flows for connections' : 'sample-scripts/flow/search-flows-for-connection.md'
@@ -625,6 +630,7 @@ nav:
       - 'Add a Site Collection Admin using a csv file': 'sample-scripts/spo/add-site-collection-admin-using-csv-file.md'
       - 'Add multiple folders in libraries using a csv file': 'sample-scripts/spo/add-multiple-folders-in-libraries-using-csv-file.md'
       - 'Add multiple lists in multiple sites': 'sample-scripts/spo/add-multiple-lists-in-multiple-sites.md'
+      - 'Add users to the Associated SharePoint Groups from a CSV File': 'sample-scripts/spo/add-users-associatedspgroup-site-csv-file.md'
       - 'Copy files to another SharePoint Library in another site': 'sample-scripts/spo/copy-files-to-another-library.md'
       - 'Delete all (non-group connected) modern SharePoint sites': 'sample-scripts/spo/delete-non-group-connected-modern-sites.md'
       - 'Delete custom color themes from SharePoint': 'sample-scripts/spo/remove-custom-themes.md'
@@ -646,6 +652,7 @@ nav:
       - 'Lists number of files in all lists and folders for the given site': 'sample-scripts/spo/list-all-list-folders-itemcount.md'
       - 'Lists site collection owners': 'sample-scripts/spo/list-site-collection-owners.md'
       - 'Monitor site collections storage usage': 'sample-scripts/spo/monitor-site-collection-storage-usage.md'
+      - 'How to perform operations not covered by the CLI for Microsoft 365': 'sample-scripts/spo/perform-operations-not-covered-by-cli-for-microsoft-365.md'
       - 'Remove a Site Collection Admin User from all Site Collections': 'sample-scripts/spo/remove-siteCollection-admin-user.md'
       - 'Remove orphaned redirect sites': 'sample-scripts/spo/remove-orphaned-redirect-sites.md'
       - 'Remove pending SharePoint API permission requests': 'sample-scripts/spo/remove-pending-api-permission-requests.md'
@@ -667,6 +674,7 @@ nav:
       - 'List all Microsoft Teams team''s Owners and Members': 'sample-scripts/teams/list-teams-owners-and-members.md'
       - 'List app usage in Microsoft Teams': 'sample-scripts/teams/list-teams-app-usage.md'
       - 'List all team members in Microsoft Teams team': 'sample-scripts/teams/list-all-teammembers-teams.md'
+      - 'List Microsoft Teams teams, channels, and tabs in the tenant': 'sample-scripts/teams/list-teams-channels-tabs-for-tenant.md'
       - 'Recognize most active users for a specific Team': 'sample-scripts/teams/recognize-most-active-users-specific-team.md'
       - 'Remove a Microsoft Teams personal app': 'sample-scripts/teams/remove-personal-app.md'
       - 'Remove Wiki tab in a Microsoft Teams channel': 'sample-scripts/teams/remove-wikitab-teams.md'
@@ -685,29 +693,29 @@ theme:
   palette:
     primary: 'red'
   logo: 'images/pnp-cli-microsoft365-white.svg'
-  feature:
-    tabs: true
+  features:
+    - navigation.tabs
 google_analytics:
   - 'UA-110480857-1'
   - 'auto'
 extra_css:
-  - 'css/styles.css'
+  - 'css/styles2.css'
 markdown_extensions:
   - admonition
-  - codehilite:
-      guess_lang: false
   - toc:
       permalink: true
-  - pymdownx.superfences
+  - pymdownx.highlight
   - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed
   - def_list
 extra:
   social:
-    - type: 'twitter'
+    - icon: fontawesome/brands/github
       link: 'https://twitter.com/m365pnp'
-    - type: 'youtube'
+    - icon: fontawesome/brands/youtube
       link: 'http://aka.ms/sppnp-videos'
-    - type: 'link'
+    - icon: fontawesome/solid/link
       link: 'https://aka.ms/sppnp'
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs

@@ -144,7 +144,7 @@ jobs:
       - name: Publish @next
         run: npm publish --tag next --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
       - name: Compress output
         run: tar -cvf build.tar --exclude node_modules ./
       - name: Upload build artifact
@@ -162,8 +162,8 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.x
-      - run: pip install mkdocs-material==3.1.0
-      - run: pip install pymdown-extensions==6.0
+      - run: pip install mkdocs-material==7.1.7
+      - run: pip install pymdown-extensions==9.0
       - run: mkdocs gh-deploy --force -m "[ci skip]"
         working-directory: docs
   deploy_docker:

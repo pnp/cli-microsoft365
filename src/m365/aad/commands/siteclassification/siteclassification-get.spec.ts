@@ -16,7 +16,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
 
   before(() => {
     sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => {});
+    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
     auth.service.connected = true;
   });
 
@@ -60,7 +60,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
 
   it('handles Microsoft 365 Tenant siteclassification is not enabled', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
           ]
@@ -83,7 +83,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
 
   it('handles Microsoft 365 Tenant siteclassification missing DirectorySettingTemplate', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
             {
@@ -166,7 +166,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
 
   it('retrieves information about the Microsoft 365 Tenant siteclassification (single siteclassification)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
             {
@@ -253,7 +253,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
 
   it('retrieves information about the Microsoft 365 Tenant siteclassification (multi siteclassification)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
             {
@@ -340,7 +340,7 @@ describe(commands.SITECLASSIFICATION_GET, () => {
 
   it('Handles Microsoft 365 Tenant siteclassification DirectorySettings Key does not exist', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/beta/settings`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/groupSettings`) {
         return Promise.resolve({
           value: [
             {

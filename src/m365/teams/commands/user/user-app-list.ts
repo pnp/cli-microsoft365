@@ -5,7 +5,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { UserTeamsApp } from '../../UserTeamsApp';
+import { TeamsAppDefinition, TeamsAppInstallation } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   userName: string;
 }
 
-class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
+class TeamsUserAppListCommand extends GraphItemsListCommand<TeamsAppInstallation> {
   public get name(): string {
     return commands.USER_APP_LIST;
   }
@@ -39,15 +39,15 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
       .getUserId(args)
       .then((_userId): Promise<void> => {
         userId = _userId.value;
-        const endpoint: string = `${this.resource}/v1.0/users/${encodeURIComponent(userId)}/teamwork/installedApps`;
+        const endpoint: string = `${this.resource}/v1.0/users/${encodeURIComponent(userId)}/teamwork/installedApps?$expand=teamsAppDefinition`;
 
         return this.getAllItems(endpoint, logger, true);
       })
       .then((): void => {
         this.items.map(i => {
-          const userAppId: string = Buffer.from(i.id, 'base64').toString('ascii');
+          const userAppId: string = Buffer.from(i.id as string, 'base64').toString('ascii');
           const appId: string = userAppId.substr(userAppId.indexOf("##") + 2, userAppId.length - userId.length - 2);
-          i.appId = appId;
+          (i as any).appId = appId;
         });
         
         if (args.options.output === 'json') {
@@ -57,7 +57,9 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
           logger.log(this.items.map(i => {
             return {
               id: i.id,
-              appId: i.appId
+              appId: (i as any).appId,
+              displayName: (i.teamsAppDefinition as TeamsAppDefinition).displayName,
+              version: (i.teamsAppDefinition as TeamsAppDefinition).version
             };
           }));
         }
@@ -85,10 +87,10 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '--userId'
+        option: '--userId [userId]'
       },
       {
-        option: '--userName'
+        option: '--userName [userName]'
       }
     ];
 
@@ -98,11 +100,11 @@ class TeamsUserAppListCommand extends GraphItemsListCommand<UserTeamsApp> {
 
   public validate(args: CommandArgs): boolean | string {
     if (!args.options.userId && !args.options.userName) {
-      return `--userId or --userName need to be provided`;
+      return `userId or userName need to be provided`;
     }
 
     if (args.options.userId && args.options.userName) {
-      return `Please specify either --userId or --userName, not both`;
+      return `Please specify either userId or userName, not both`;
     }
 
     if (args.options.userId && !Utils.isValidGuid(args.options.userId)) {

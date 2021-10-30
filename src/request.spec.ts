@@ -67,7 +67,7 @@ describe('Request', () => {
         done('Error expected');
       }, () => {
         try {
-          assert(_options.headers['user-agent'].indexOf('NONISV|SharePointPnP|CLIMicrosoft365') > -1);
+          assert((_options as any).headers['user-agent'].indexOf('NONISV|SharePointPnP|CLIMicrosoft365') > -1);
           done();
         }
         catch (err) {
@@ -90,7 +90,7 @@ describe('Request', () => {
         done('Error expected');
       }, () => {
         try {
-          assert(_options.headers['accept-encoding'].indexOf('gzip') > -1);
+          assert((_options as any).headers['accept-encoding'].indexOf('gzip') > -1);
           done();
         }
         catch (err) {
@@ -114,7 +114,7 @@ describe('Request', () => {
         done('Error expected');
       }, () => {
         try {
-          assert(_options.headers['authorization'].indexOf('Bearer ABC') > -1);
+          assert((_options as any).headers['authorization'].indexOf('Bearer ABC') > -1);
           done();
         }
         catch (err) {
@@ -133,14 +133,14 @@ describe('Request', () => {
       .get({
         url: 'https://contoso.sharepoint.com/',
         headers: {
-          'x-anonymous': true
+          'x-anonymous': 'true'
         }
       })
       .then(() => {
         done('Error expected');
       }, () => {
         try {
-          assert.strictEqual(typeof _options.headers['authorization'], 'undefined');
+          assert.strictEqual(typeof (_options as any).headers['authorization'], 'undefined');
           done();
         }
         catch (err) {
@@ -159,14 +159,14 @@ describe('Request', () => {
       .get({
         url: 'https://contoso.sharepoint.com/',
         headers: {
-          'x-anonymous': true
+          'x-anonymous': 'true'
         }
       })
       .then(() => {
         done('Error expected');
       }, () => {
         try {
-          assert.strictEqual(typeof _options.headers['x-anonymous'], 'undefined');
+          assert.strictEqual(typeof (_options as any).headers['x-anonymous'], 'undefined');
           done();
         }
         catch (err) {

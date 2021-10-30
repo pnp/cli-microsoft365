@@ -437,7 +437,7 @@ export class Cli {
     // know this in order to decide if we should use default command's
     // properties or custom ones from JMESPath
     const originalObject: any = Array.isArray(logStatement) ? Cli.getFirstNonUndefinedArrayItem(logStatement) : logStatement;
-    const originalProperties: string[] = originalObject ? Object.getOwnPropertyNames(originalObject) : [];
+    const originalProperties: string[] = originalObject && typeof originalObject !== 'string' ? Object.getOwnPropertyNames(originalObject) : [];
 
     if (options.query &&
       !options.help) {

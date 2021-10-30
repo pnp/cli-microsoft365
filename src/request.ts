@@ -90,7 +90,7 @@ class Request {
     /* c8 ignore next 15 */
     this.req.interceptors.response.use(
       (response: AxiosResponse) => response,
-      (error: AxiosError): void => {
+      (error: AxiosError<any>): void => {
         if (error &&
           error.response &&
           error.response.data &&
