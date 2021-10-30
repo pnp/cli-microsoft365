@@ -62,7 +62,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
 
   it('adds OAuth2 permission grant (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants`) > -1) {
         if (opts.headers &&
           opts.headers['content-type'] &&
           opts.headers['content-type'].indexOf('application/json') === 0 &&
@@ -89,7 +89,7 @@ describe(commands.OAUTH2GRANT_ADD, () => {
 
   it('adds OAuth2 permission grant', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`/myorganization/oauth2PermissionGrants?api-version=1.6`) > -1) {
+      if ((opts.url as string).indexOf(`/v1.0/oauth2PermissionGrants`) > -1) {
         if (opts.headers &&
           opts.headers.authorization &&
           opts.headers.authorization.indexOf('Bearer ') === 0 &&

@@ -29,9 +29,8 @@ The SharePoint Admin Center provides various governance features, but there is n
             $configurations = @()
 
             foreach ($spolItem in $spolItems) {
-                $author = m365 spo user get --webUrl $appCatalogUrl --id $spolItem.AuthorId -o json | ConvertFrom-Json
-                $editor = m365 spo user get --webUrl $appCatalogUrl --id $spolItem.EditorId -o json | ConvertFrom-Json
-
+                $author = o365 spo user get --webUrl $appCatalogUrl --id $spolItem.AuthorId -o json | ConvertFrom-Json
+                $editor = o365 spo user get --webUrl $appCatalogUrl --id $spolItem.EditorId -o json | ConvertFrom-Json
                 $configurationObject = New-Object -TypeName PSObject
 
                 $configurationObject | Add-Member -MemberType NoteProperty -Name "Title" -Value $spolItem.Title
