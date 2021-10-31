@@ -30,9 +30,6 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
 
   public getTelemetryProperties(args: CommandArgs): any {
     const telemetryProps: any = super.getTelemetryProperties(args);
-    telemetryProps.id = typeof args.options.id !== 'undefined';
-    telemetryProps.name = typeof args.options.name !== 'undefined';
-    telemetryProps.description = typeof args.options.description !== 'undefined';
     return telemetryProps;
   }
 
@@ -45,14 +42,10 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
       logger.logToStderr(`Adding new external connections...`);
     }
 
-    const appIds:string[] = [];
+    let appIds:string[] = [];
 
     if (args.options.authorizedAppIds !== undefined && args.options.authorizedAppIds !== '') {
-      const splitAppIds = args.options.authorizedAppIds?.split(',');
-      
-      splitAppIds.forEach(appId => {
-        appIds.push(appId);
-      });
+      appIds = args.options.authorizedAppIds?.split(',');
     }
 
     const commandData = {
@@ -72,12 +65,10 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
       responseType: 'json',
       data: commandData
     };
-    logger.logToStderr(`Adding new external connections...`);
+    if (this.verbose) { logger.logToStderr(`Adding new external connections...`); }
     request
       .post(requestOptions)
       .then(_ => cb(), (err: any) => {
-        logger.logToStderr(`Errored adding new external connections...`);
-        logger.logToStderr(err);
         this.handleRejectedODataJsonPromise(err, logger, cb);
       });
   }
@@ -86,13 +77,13 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "--id [id]"
+        option: "--id <id>"
       },
       {
-        option: "--name [name]"
+        option: "--name <name>"
       },
       {
-        option: "--description [description]"
+        option: "--description <description>"
       },
       {
         option: "--authorizedAppIds [authorizedAppIds]"
@@ -104,10 +95,40 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.id || !args.options.name || !args.options.description) {
-      return 'Specify id, name and description';
+    if (args.options.id.length < 3 || args.options.id.length > 32) {
+      return 'ID field must be between 3 and 32 characters in length.';
     }
 
+    //var alphanumeric = "someStringHere";
+    const alphaNumericRegEx  = /[^\w]|_/g;
+
+    if (alphaNumericRegEx.test(args.options.id)) {
+      return 'ID field must only contain alphanumeric characters.';
+    }
+
+    if (args.options.id.length > 9 && args.options.id.startsWith('Microsoft')) {
+      return 'ID field cannot begin with Microsoft';
+    }
+
+    if (args.options.id === 'None'
+        || args.options.id === 'Directory'
+        || args.options.id === 'Exchange'
+        || args.options.id === 'ExchangeArchive'
+        || args.options.id === 'LinkedIn'
+        || args.options.id === 'Mailbox'
+        || args.options.id === 'OneDriveBusiness'
+        || args.options.id === 'SharePoint'
+        || args.options.id === 'Teams'
+        || args.options.id === 'Yammer'
+        || args.options.id === 'Connectors'
+        || args.options.id === 'TaskFabric'
+        || args.options.id === 'PowerBI'
+        || args.options.id === 'Assistant'
+        || args.options.id === 'TopicEngine'
+        || args.options.id === 'MSFT_All_Connectors'
+    ) {
+      return 'ID field cannot be one of the following values: None, Directory, Exchange, ExchangeArchive, LinkedIn, Mailbox, OneDriveBusiness, SharePoint, Teams, Yammer, Connectors, TaskFabric, PowerBI, Assistant, TopicEngine, MSFT_All_Connectors.';
+    }
 
     return true;
   }
