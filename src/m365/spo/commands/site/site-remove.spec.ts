@@ -1055,7 +1055,6 @@ describe(commands.SITE_REMOVE, () => {
     
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true } }, () => {
       try {
-        assert(loggerLogSpy.called);
         assert(loggerLogToStderrSpy.called);
         done();
       }
@@ -1148,7 +1147,6 @@ describe(commands.SITE_REMOVE, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, wait: true } }, () => {
       try {
-        assert(loggerLogSpy.called);
         assert(loggerLogToStderrSpy.called);
         done();
       }
@@ -1205,7 +1203,7 @@ describe(commands.SITE_REMOVE, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$select=id&$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
         return Promise.resolve({ 
           value: []
         });
@@ -1221,7 +1219,6 @@ describe(commands.SITE_REMOVE, () => {
 
     command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true, wait: true } }, () => {
       try {
-        assert(loggerLogSpy.called);
         assert(loggerLogToStderrSpy.called);
         done();
       }
@@ -1323,37 +1320,15 @@ describe(commands.SITE_REMOVE, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$select=id&$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
         return Promise.resolve({ 
           value: [{
-            "id": "58587cc9-560c-4adb-a849-e669bd37c5f8",
-            "deletedDateTime": null,
-            "classification": null,
-            "createdDateTime": "2017-11-29T03:27:05Z",
-            "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
-            "displayName": "Finance",
-            "groupTypes": [
-              "Unified"
-            ],
-            "mail": "finance@contoso.onmicrosoft.com",
-            "mailEnabled": true,
-            "mailNickname": "finance",
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesProvisioningErrors": [],
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "proxyAddresses": [
-              "SMTP:finance@contoso.onmicrosoft.com"
-            ],
-            "renewedDateTime": "2017-11-29T03:27:05Z",
-            "securityEnabled": false,
-            "visibility": "Public"
+            "id": "58587cc9-560c-4adb-a849-e669bd37c5f8"
           }]
         });
       }
 
-      return Promise.reject('Invalid request');
+      return Promise.reject("Site group still exists in the deleted groups. The site won't be removed.");
     });
 
     sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
@@ -1361,9 +1336,10 @@ describe(commands.SITE_REMOVE, () => {
       return {} as any;
     });
 
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true, confirm: true, wait: true } }, () => {
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true, confirm: true, wait: true } }, (err: any) => {
       try {
-        assert(loggerLogToStderrSpy.called);
+        // assert(loggerLogToStderrSpy.called);
+        assert.deepStrictEqual(err, new CommandError("Site group still exists in the deleted groups. The site won't be removed."));
         done();
       }
       catch (e) {
