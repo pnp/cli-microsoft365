@@ -182,7 +182,7 @@ nav:
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Search:
       -externalConnections:
-        - externalConnections add: 'cmd/search/externalConnections/externalConnections-add.md'
+        - externalConnections list: 'cmd/search/externalConnections/externalConnections-list.md'
     - Skype (skype):
       - report:
         - report activitycounts: 'cmd/skype/report/report-activitycounts.md'
