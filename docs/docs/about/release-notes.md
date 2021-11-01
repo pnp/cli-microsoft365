@@ -4,6 +4,10 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad sp add](../cmd/aad/sp/sp-add.md) - adds a service principal to a registered Azure AD app [#2583](https://github.com/pnp/cli-microsoft365/issues/2583)
+
 **SharePoint:**
 
 - [spo listitem attachment list](../cmd/spo/listitem/listitem-attachment-list.md) - gets the attachments associated to a list item [#2730](https://github.com/pnp/cli-microsoft365/issues/2730)
