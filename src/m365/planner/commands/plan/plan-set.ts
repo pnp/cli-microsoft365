@@ -1,27 +1,30 @@
-import { Logger } from '../../../../cli';
-import {
+import { Cli, CommandOutput, Logger } from '../../../../cli';
+import Command, {
   CommandOption
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
-import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
+import request from '../../../../request';
+import { Options as PlanGetCommandOptions } from '../plan/plan-get';
+import * as planGetCommand from '../plan/plan-get';
 
 interface CommandArgs {
   options: Options;
 }
 
-export interface Options extends GlobalOptions {
+interface Options extends GlobalOptions {
   id?: string;
   title?: string;
+  newTitle: string;
   ownerGroupId?: string;
   ownerGroupName?: string;
 }
 
-class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
+class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
   public get name(): string {
-    return commands.PLAN_GET;
+    return commands.PLAN_SET;
   }
 
   public get description(): string {
@@ -37,69 +40,45 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
     return telemetryProps;
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['id', 'title', 'createdDateTime', 'owner', '@odata.etag'];
-  }
-
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    if (args.options.id) {
-      this
-        .getPlan(args)
-        .then((res: any): void => {
-          logger.log(res);
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
-    else {
-      this
-        .getGroupId(args)
-        .then((groupId: string): Promise<void> => this.getAllItems(`${this.resource}/v1.0/groups/${groupId}/planner/plans`, logger, true, 'minimal'))
-        .then((): void => {
-          const filteredPlan = this.items.filter((plan: any) => plan.title === args.options.title);
-          if (filteredPlan && filteredPlan.length > 0) {
-            logger.log(filteredPlan);
-          }
-          cb();
-        }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-    }
-  }
-
-  private getGroupId(args: CommandArgs): Promise<string> {
-    if (args.options.ownerGroupId) {
-      return Promise.resolve(args.options.ownerGroupId);
-    }
-
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/groups?$filter=displayName eq '${encodeURIComponent(args.options.ownerGroupName as string)}'`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get<{ value: { id: string; }[] }>(requestOptions)
-      .then(response => {
-        const group: { id: string; } | undefined = response.value[0];
-
-        if (!group) {
-          return Promise.reject(`The specified owner group does not exist`);
+    this
+      .getPlan(args, logger)
+      .then((output: CommandOutput): Promise<void> => {
+        const plan: any = JSON.parse(output.stdout);
+        if (this.verbose) {
+          logger.logToStderr(`Updating plan with id ${plan['id']} ...`);
         }
-
-        return Promise.resolve(group.id);
-      });
+    
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/planner/plans/${plan['id']}`,
+          headers: {
+            'accept': 'application/json',
+            'If-Match': `${plan["@odata.etag"]}`
+          },
+          responseType: 'json',
+          data: {
+            title: args.options.newTitle
+          }
+        };
+    
+        return request.patch(requestOptions);
+      })
+      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getPlan(args: CommandArgs): Promise<any> {
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/plans/${args.options.id}`,
-      headers: {
-        'accept': 'application/json'
-      },
-      responseType: 'json'
+  private getPlan(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving a plan...`);
+    }
+
+    const options: PlanGetCommandOptions = {
+      ...args.options,
+      output: 'json',
+      debug: this.debug,
+      verbose: this.verbose
     };
 
-    return request.get(requestOptions);
+    return Cli.executeCommandWithOutput(planGetCommand as Command, { options: { ...options, _: [] } });
   }
 
   public options(): CommandOption[] {
@@ -109,6 +88,9 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
       },
       {
         option: '-t, --title [title]'
+      },
+      {
+        option: '--newTitle [newTitle]'
       },
       {
         option: '--ownerGroupId [ownerGroupId]'
@@ -123,6 +105,10 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
   }
 
   public validate(args: CommandArgs): boolean | string {
+    if (!args.options.newTitle) {
+      return 'Specify the new title';
+    }
+
     if (!args.options.id && !args.options.title) {
       return 'Specify either id or title';
     }
@@ -147,4 +133,4 @@ class PlannerPlanGetCommand extends GraphItemsListCommand<any> {
   }
 }
 
-module.exports = new PlannerPlanGetCommand();
+module.exports = new PlannerPlanSetCommand();
