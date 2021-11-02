@@ -12,7 +12,7 @@ This script will get all flows in your default environment and export them as bo
 
     ```powershell
     Write-Output "Getting environment info..."
-    $environment = m365 flow environment list --query '[?contains(displayName,`default`)] .name'
+    $environment = m365 flow environment list --query '[?properties.isDefault==`true`].name' --output json | ConvertFrom-JSON
 
     Write-Output "Getting Flows info..."
     $flows = m365 flow list --environment $environment --asAdmin --output json | ConvertFrom-JSON
