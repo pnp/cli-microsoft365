@@ -21,6 +21,9 @@
 - updated the 'teams report pstncalls' command to MS Graph v1.0 [#2679](https://github.com/pnp/cli-microsoft365/issues/2679)
 - added siteUrl to 'file add' [#2655](https://github.com/pnp/cli-microsoft365/issues/2655)
 - upgraded MkDocs to 7.1.7 [#2498](https://github.com/pnp/cli-microsoft365/issues/2498)
+- added the 'Export all channels from a team' sample [#2793](https://github.com/pnp/cli-microsoft365/pull/2793)
+- updated main Node.js version to v16 [#2799](https://github.com/pnp/cli-microsoft365/pull/2799)
+- updated asciinema video on all pages [#2663](https://github.com/pnp/cli-microsoft365/issues/2663)
 
 ## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 
