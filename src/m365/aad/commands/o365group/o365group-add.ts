@@ -37,6 +37,8 @@ class AadO365GroupAddCommand extends GraphCommand {
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
     let group: Group;
+    let ownerIds: [] = [];
+    let memberIds: [] = [];
 
     if (this.verbose) {
       logger.logToStderr(`Creating Microsoft 365 Group...`);
@@ -61,8 +63,15 @@ class AadO365GroupAddCommand extends GraphCommand {
       }
     };
 
-    request
-      .post<Group>(requestOptions)
+    this.validateOwners(logger, args)
+      .then((ownerIdsRes: []): Promise<any> => {
+        ownerIds = ownerIdsRes;
+        return this.validateMembers(logger, args);
+      })
+      .then((memberIdsRes: []): Promise<Group> => {
+        memberIds = memberIdsRes;
+        return request.post<Group>(requestOptions);
+      })
       .then((res: Group): Promise<void> => {
         group = res;
 
@@ -91,85 +100,35 @@ class AadO365GroupAddCommand extends GraphCommand {
           this.setGroupLogo(requestOptions, AadO365GroupAddCommand.numRepeat, resolve, reject, logger);
         });
       })
-      .then((): Promise<{ value: { id: string; }[] }> => {
-        if (!args.options.owners) {
-          if (this.debug) {
-            logger.logToStderr('Owners not set. Skipping');
-          }
-
-          return Promise.resolve(undefined as any);
-        }
-
-        const owners: string[] = args.options.owners.split(',').map(o => o.trim());
-
-        if (this.verbose) {
-          logger.logToStderr('Retrieving user information to set group owners...');
-        }
-
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/users?$filter=${owners.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
-          headers: {
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
-
-        return request.get(requestOptions);
-      })
-      .then((res?: { value: { id: string; }[] }): Promise<any> => {
-        if (!res) {
+      .then((): Promise<any> => {
+        if (!ownerIds || ownerIds.length === 0) {
           return Promise.resolve();
         }
 
-        return Promise.all(res.value.map(u => request.post({
+        return Promise.all(ownerIds.map(ownrId => request.post({
           url: `${this.resource}/v1.0/groups/${group.id}/owners/$ref`,
           headers: {
             'content-type': 'application/json'
           },
           responseType: 'json',
           data: {
-            "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
+            "@odata.id": `https://graph.microsoft.com/v1.0/users/${ownrId}`
           }
         })));
       })
-      .then((): Promise<{ value: { id: string; }[] }> => {
-        if (!args.options.members) {
-          if (this.debug) {
-            logger.logToStderr('Members not set. Skipping');
-          }
-
-          return Promise.resolve(undefined as any);
-        }
-
-        const members: string[] = args.options.members.split(',').map(o => o.trim());
-
-        if (this.verbose) {
-          logger.logToStderr('Retrieving user information to set group members...');
-        }
-
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/users?$filter=${members.map(o => `userPrincipalName eq '${o}'`).join(' or ')}&$select=id`,
-          headers: {
-            'content-type': 'application/json'
-          },
-          responseType: 'json'
-        };
-
-        return request.get(requestOptions);
-      })
-      .then((res?: { value: { id: string; }[] }): Promise<any> => {
-        if (!res) {
+      .then((): Promise<any> => {
+        if (!memberIds || memberIds.length === 0) {
           return Promise.resolve();
         }
 
-        return Promise.all(res.value.map(u => request.post({
+        return Promise.all(memberIds.map(memberId => request.post({
           url: `${this.resource}/v1.0/groups/${group.id}/members/$ref`,
           headers: {
             'content-type': 'application/json'
           },
           responseType: 'json',
           data: {
-            "@odata.id": `https://graph.microsoft.com/v1.0/users/${u.id}`
+            "@odata.id": `https://graph.microsoft.com/v1.0/users/${memberId}`
           }
         })));
       })
@@ -177,6 +136,95 @@ class AadO365GroupAddCommand extends GraphCommand {
         logger.log(group);
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
+  }
+
+
+  private validateOwners(logger: Logger, args: CommandArgs): Promise<any> {
+    if (!args.options.owners) {
+      if (this.debug) {
+        logger.logToStderr('Owners not set. Skipping');
+      }
+      return Promise.resolve(undefined as any);
+    }
+
+    if (this.verbose) {
+      logger.logToStderr('Retrieving user information to set group owners...');
+    }
+
+    const owners: string[] = args.options.owners.split(',').map(o => o.trim());
+    const promises: any[] = [];
+    let ownerIds: any[] = [];
+
+    owners.forEach(owner => {
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/users?$filter=${`userPrincipalName eq '${owner}'`}&$select=id,userPrincipalName`,
+        headers: {
+          'content-type': 'application/json'
+        },
+        responseType: 'json'
+      };
+
+      promises.push(request.get(requestOptions));
+    });
+
+    return Promise.all(promises).then((ownersRes: { value: { id: string; userPrincipalName: string }[] }[]): Promise<any> => {
+      let ownerUpns: any[] = [];
+
+      ownerUpns = ownersRes.map(res => res.value[0]?.userPrincipalName);
+      ownerIds = ownersRes.map(res => res.value[0]?.id);
+
+      // Find the owners where no graph response was found
+      const invalidUsers = owners.filter(ownr => !ownerUpns.some((upn) => upn === ownr));
+
+      if (invalidUsers && invalidUsers.length > 0) {
+        return Promise.reject(`Cannot proceed with group creation. The following Owners provided are invalid : ${invalidUsers.join(',')}`);
+      }
+      return Promise.resolve(ownerIds);
+    });
+  }
+
+  private validateMembers(logger: Logger, args: CommandArgs): Promise<any> {
+    if (!args.options.members) {
+      if (this.debug) {
+        logger.logToStderr('members not set. Skipping');
+      }
+      return Promise.resolve(undefined as any);
+    }
+
+    if (this.verbose) {
+      logger.logToStderr('Retrieving user information to set group members...');
+    }
+
+    const members: string[] = args.options.members.split(',').map(o => o.trim());
+    const promises: any[] = [];
+    let memberIds: any[] = [];
+
+    members.forEach(member => {
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/users?$filter=${`userPrincipalName eq '${member}'`}&$select=id,userPrincipalName`,
+        headers: {
+          'content-type': 'application/json'
+        },
+        responseType: 'json'
+      };
+
+      promises.push(request.get(requestOptions));
+    });
+
+    return Promise.all(promises).then((membersRes: { value: { id: string; userPrincipalName: string }[] }[]): Promise<any> => {
+      let memberUpns: any[] = [];
+
+      memberUpns = membersRes.map(res => res.value[0]?.userPrincipalName);
+      memberIds = membersRes.map(res => res.value[0]?.id);
+
+      // Find the members where no graph response was found
+      const invalidUsers = members.filter(ownr => !memberUpns.some((upn) => upn === ownr));
+
+      if (invalidUsers && invalidUsers.length > 0) {
+        return Promise.reject(`Cannot proceed with group creation. The following Members provided are invalid : ${invalidUsers.join(',')}`);
+      }
+      return Promise.resolve(memberIds);
+    });
   }
 
   private setGroupLogo(requestOptions: any, retryLeft: number, resolve: () => void, reject: (err: any) => void, logger: Logger): void {
