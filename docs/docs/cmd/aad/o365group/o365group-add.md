@@ -36,6 +36,7 @@ m365 aad o365group add [options]
 ## Remarks
 
 When specifying the path to the logo image you can use both relative and absolute paths. Note, that ~ in the path, will not be resolved and will most likely result in an error.
+If an invalid user is provided in the comma-separated list or Owners or Members, the command operation will fail and the Micrsoft 365 Group will not be created.
 
 ## Examples
 
