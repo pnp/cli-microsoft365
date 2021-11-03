@@ -20,10 +20,10 @@ m365 aad o365group add [options]
 : Name to use in the group e-mail (part before the `@`)
 
 `--owners [owners]`
-: Comma-separated list of Microsoft 365 Group owners
+: Comma-separated list of valid Microsoft 365 Group owners
 
 `--members [members]`
-: Comma-separated list of Microsoft 365 Group members
+: Comma-separated list of valid Microsoft 365 Group members
 
 `--isPrivate [isPrivate]`
 : Set to `true` if the Microsoft 365 Group should be private and to `false` if it should be public (default)
@@ -36,6 +36,7 @@ m365 aad o365group add [options]
 ## Remarks
 
 When specifying the path to the logo image you can use both relative and absolute paths. Note, that ~ in the path, will not be resolved and will most likely result in an error.
+The Owners and Members should be valid Microsoft 365 Users. If an invalid user is provided in the comma-separated list, the command operation will fail.
 
 ## Examples
 
