@@ -81,23 +81,45 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   });
 
   it('adds an external connection', (done) => {
-      const options: any = {
-        debug: false,
-        externalConnectionId: 'TestConnectionForCLI',
-        externalConnectionName: 'Test Connection for CLI',
-        externalConnectionDescription: 'Test connection that will not do anything',
-      };
-  
-      command.action(logger, { options: options } as any, () => {
-        try {
-          assert(loggerLogSpy.calledWith(externalConnectionAddResponse));
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      });
+    const options: any = {
+      debug: false,
+      id: 'TestConnectionForCLI',
+      name: 'Test Connection for CLI',
+      description: 'Test connection that will not do anything'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(externalConnectionAddResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
     });
+    done();
+  });
+
+  it('adds an external connection with authorised app IDs', (done) => {
+    const options: any = {
+      debug: false,
+      id: 'TestConnectionForCLI',
+      name: 'Test Connection for CLI',
+      description: 'Test connection that will not do anything',
+      authorizedAppIds: '00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'
+    };
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(externalConnectionAddResponse));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+    done();
+  });
 
 
   it('correctly handles error', (done) => {
@@ -125,9 +147,92 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
     });
   });
 
-  it('fails validation if externalConnectionId is not set', () => {
-    const actual = command.validate({ options: { subject: 'Lorem ipsum', to: 'mail@domain.com', bodyContents: 'Lorem ipsum', bodyContentType: 'Invalid' } });
-    assert.notStrictEqual(actual, true);
+  it('fails validation if id is not set', (done) => {
+    const actual = command.validate({
+      options: {
+        name: 'Test Connection for CLI',
+        description: 'Test connection that will not do anything'
+      }
+    });
+    assert.notStrictEqual(actual, false);
+    done();
+  });
+
+  it('fails validation if name is not set', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'TestConnectionForCLI',
+        description: 'Test connection that will not do anything'
+      }
+    });
+    assert.notStrictEqual(actual, false);
+    done();
+  });
+
+  it('fails validation if description is not set', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'TestConnectionForCLI',
+        name: 'Test Connection for CLI'
+      }
+    });
+    assert.notStrictEqual(actual, false);
+    done();
+  });
+
+  it('fails validation if id is less than 3 characters', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'T',
+        name: 'Test Connection for CLI'
+      }
+    });
+    assert.notStrictEqual(actual, false);
+    done();
+  });
+
+  it('fails validation if id is more than 32 characters', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'TestConnectionForCLIXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        name: 'Test Connection for CLI'
+      }
+    });
+    assert.notStrictEqual(actual, false);
+    done();
+  });
+
+  it('fails validation if id is not alphanumeric', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'Test_Connection!',
+        name: 'Test Connection for CLI'
+      }
+    });
+    assert.notStrictEqual(actual, false);
+    done();
+  });
+
+  it('fails validation if id starts with Microsoft', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'MicrosoftTestConnectionForCLI',
+        name: 'Test Connection for CLI'
+      }
+    });
+    assert.notStrictEqual(actual, false);
+    done();
+  });
+
+  it('fails validation if id is SharePoint', (done) => {
+    const actual = command.validate({
+      options: {
+        id: 'SharePoint',
+        name: 'Test Connection for CLI'
+      }
+    });
+    assert.notStrictEqual(actual, false);
+    done();
   });
 
 });
