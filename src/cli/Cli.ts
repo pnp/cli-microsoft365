@@ -456,7 +456,10 @@ export class Cli {
     }
 
     if (!options.output || options.output === 'json') {
-      return JSON.stringify(logStatement, null, 2);
+      return JSON
+        .stringify(logStatement, null, 2)
+        // replace unescaped newlines with escaped newlines #2807
+        .replace(/([^\\])\\n/g, '$1\\\\\\n');
     }
 
     if (logStatement instanceof CommandError) {
