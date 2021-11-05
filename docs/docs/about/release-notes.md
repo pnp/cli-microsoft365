@@ -6,6 +6,8 @@
 
 - updated 'aad oauth2grant list' to use MS Graph [#2710](https://github.com/pnp/cli-microsoft365/issues/2710)
 - updated the 'aad sp get' command to use MS Graph [#2754](https://github.com/pnp/cli-microsoft365/issues/2754)
+- extended 'aad oauth2grant remove' with confirm [#2785](https://github.com/pnp/cli-microsoft365/issues/2785)
+- renamed clientId to spObjectId in aad oauth2grant list [#2786](https://github.com/pnp/cli-microsoft365/issues/2786)
 
 ## [v4.4.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.4.0)
 
