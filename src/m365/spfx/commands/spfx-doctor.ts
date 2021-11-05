@@ -74,295 +74,391 @@ interface SpfxVersionPrerequisites {
   gulp: VersionCheck;
   node: VersionCheck;
   react: VersionCheck;
-  sp: SharePointVersion
+  sp: SharePointVersion;
+  yo: VersionCheck;
 }
 
 class SpfxDoctorCommand extends AnonymousCommand {
   private readonly versions: { [version: string]: SpfxVersionPrerequisites } = {
     '1.0.0': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^6.0.0',
+        range: '^6',
         fix: 'Install Node.js v6'
       },
       react: {
         range: '^15',
         fix: 'npm i react@15'
       },
-      sp: SharePointVersion.All
+      sp: SharePointVersion.All,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.1.0': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^6.0.0',
+        range: '^6',
         fix: 'Install Node.js v6'
       },
       react: {
         range: '^15',
         fix: 'npm i react@15'
       },
-      sp: SharePointVersion.All
+      sp: SharePointVersion.All,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.2.0': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^6.0.0',
+        range: '^6',
         fix: 'Install Node.js v6'
       },
       react: {
         range: '^15',
         fix: 'npm i react@15'
       },
-      sp: SharePointVersion.SP2019 | SharePointVersion.SPO
+      sp: SharePointVersion.SP2019 | SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.4.0': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^6.0.0',
+        range: '^6',
         fix: 'Install Node.js v6'
       },
       react: {
         range: '^15',
         fix: 'npm i react@15'
       },
-      sp: SharePointVersion.SP2019 | SharePointVersion.SPO
+      sp: SharePointVersion.SP2019 | SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.4.1': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^6.0.0 || ^8.0.0',
+        range: '^6 || ^8',
         fix: 'Install Node.js v8'
       },
       react: {
         range: '^15',
         fix: 'npm i react@15'
       },
-      sp: SharePointVersion.SP2019 | SharePointVersion.SPO
+      sp: SharePointVersion.SP2019 | SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.5.0': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^6.0.0 || ^8.0.0',
+        range: '^6 || ^8',
         fix: 'Install Node.js v8'
       },
       react: {
         range: '^15',
         fix: 'npm i react@15'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.5.1': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^6.0.0 || ^8.0.0',
+        range: '^6 || ^8',
         fix: 'Install Node.js v8'
       },
       react: {
         range: '^15',
         fix: 'npm i react@15'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.6.0': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^6.0.0 || ^8.0.0',
+        range: '^6 || ^8',
         fix: 'Install Node.js v8'
       },
       react: {
         range: '^15',
         fix: 'npm i react@15'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.7.0': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^8.0.0',
+        range: '^8',
         fix: 'Install Node.js v8'
       },
       react: {
         range: '16.3.2',
         fix: 'npm i react@16.3.2'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.7.1': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^8.0.0',
+        range: '^8',
         fix: 'Install Node.js v8'
       },
       react: {
         range: '16.3.2',
         fix: 'npm i react@16.3.2'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.8.0': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^8.0.0',
+        range: '^8',
         fix: 'Install Node.js v8'
       },
       react: {
         range: '16.7.0',
         fix: 'npm i react@16.7.0'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.8.1': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^8.0.0',
+        range: '^8',
         fix: 'Install Node.js v8'
       },
       react: {
         range: '16.7.0',
         fix: 'npm i react@16.7.0'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.8.2': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^8.0.0 || ^10.0.0',
+        range: '^8 || ^10',
         fix: 'Install Node.js v10'
       },
       react: {
         range: '16.7.0',
         fix: 'npm i react@16.7.0'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.9.0': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^8.0.0 || ^10.0.0',
+        range: '^8 || ^10',
         fix: 'Install Node.js v10'
       },
       react: {
         range: '16.8.5',
         fix: 'npm i react@16.8.5'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.9.1': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^10.0.0',
+        range: '^10',
         fix: 'Install Node.js v10'
       },
       react: {
         range: '16.8.5',
         fix: 'npm i react@16.8.5'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.10.0': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^10.0.0',
+        range: '^10',
         fix: 'Install Node.js v10'
       },
       react: {
         range: '16.8.5',
         fix: 'npm i react@16.8.5'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.11.0': {
       gulp: {
-        range: '^3.0.0',
+        range: '^3',
         fix: 'npm i -g gulp@3'
       },
       node: {
-        range: '^10.0.0',
+        range: '^10',
         fix: 'Install Node.js v10'
       },
       react: {
         range: '16.8.5',
         fix: 'npm i react@16.8.5'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.12.0': {
       gulp: {
-        range: '^4.0.0',
+        range: '^4',
         fix: 'npm i -g gulp@4'
       },
       node: {
-        range: '^12.0.0',
+        range: '^12',
         fix: 'Install Node.js v12'
       },
       react: {
         range: '16.9.0',
         fix: 'npm i react@16.9.0'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
     },
     '1.12.1': {
       gulp: {
-        range: '^4.0.0',
+        range: '^4',
         fix: 'npm i -g gulp@4'
       },
       node: {
-        range: '^12.0.0 || ^14.0.0',
+        range: '^12 || ^14',
         fix: 'Install Node.js v12 or v14'
       },
       react: {
         range: '16.9.0',
         fix: 'npm i react@16.9.0'
       },
-      sp: SharePointVersion.SPO
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^3',
+        fix: 'npm i -g yo@3'
+      }
+    },
+    '1.13.0': {
+      gulp: {
+        range: '^4',
+        fix: 'npm i -g gulp@4'
+      },
+      node: {
+        range: '^12 || ^14',
+        fix: 'Install Node.js v12 or v14'
+      },
+      react: {
+        range: '16.9.0',
+        fix: 'npm i react@16.9.0'
+      },
+      sp: SharePointVersion.SPO,
+      yo: {
+        range: '^4',
+        fix: 'npm i -g yo@4'
+      }
     }
   };
 
@@ -405,7 +501,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
       })
       .then(_ => this.checkSharePointCompatibility(spfxVersion, prerequisites, args, fixes, logger))
       .then(_ => this.checkNodeVersion(prerequisites, fixes, logger))
-      .then(_ => this.checkYo(fixes, logger))
+      .then(_ => this.checkYo(prerequisites, fixes, logger))
       .then(_ => this.checkGulp(prerequisites, fixes, logger))
       .then(_ => this.checkReact(prerequisites, fixes, logger))
       .then(_ => this.checkTypeScript(fixes, logger))
@@ -462,16 +558,16 @@ class SpfxDoctorCommand extends AnonymousCommand {
       });
   }
 
-  private checkYo(fixes: string[], logger: Logger): Promise<void> {
+  private checkYo(prerequisites: SpfxVersionPrerequisites, fixes: string[], logger: Logger): Promise<void> {
     return this
       .getPackageVersion('yo', PackageSearchMode.GlobalOnly, HandlePromise.Continue, logger)
       .then((yoVersion: string): void => {
         if (yoVersion) {
-          logger.log(this.getStatus(CheckStatus.Success, `yo v${yoVersion}`));
+          this.checkStatus('yo', yoVersion, prerequisites.yo, OptionalOrRequired.Required, fixes, logger);
         }
         else {
           logger.log(this.getStatus(CheckStatus.Failure, `yo not found`));
-          fixes.push('npm i -g yo');
+          fixes.push(prerequisites.yo.fix);
         }
       });
   }
@@ -485,7 +581,7 @@ class SpfxDoctorCommand extends AnonymousCommand {
         }
         else {
           logger.log(this.getStatus(CheckStatus.Failure, `gulp not found`));
-          fixes.push('npm i -g gulp');
+          fixes.push(prerequisites.gulp.fix);
         }
       });
   }
