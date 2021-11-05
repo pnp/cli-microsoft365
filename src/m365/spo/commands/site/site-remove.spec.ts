@@ -51,6 +51,7 @@ describe(commands.SITE_REMOVE, () => {
   afterEach(() => {
     (command as any).currentContext = undefined;
     Utils.restore([
+      request.get,
       request.post,
       request.delete,
       global.setTimeout,
@@ -315,7 +316,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site, skip recyclebin doesn\'t wait for completion (debug)', (done) => {
+  it('removes site, skip recycle bin doesn\'t wait for completion (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -401,7 +402,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site, skip recyclebin doesn\'t wait for completion', (done) => {
+  it('removes site, skip recycle bin doesn\'t wait for completion', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -487,7 +488,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site from recyclebin doesn\'t wait for completion (debug)', (done) => {
+  it('removes site from recycle bin doesn\'t wait for completion (debug)', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -551,7 +552,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site from recyclebin doesn\'t wait for completion', (done) => {
+  it('removes site from recycle bin doesn\'t wait for completion', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -692,7 +693,7 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes site from recyclebin, wait for completion, error occured', (done) => {
+  it('removes site from recycle bin, wait for completion, error occured', (done) => {
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demosite</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -979,7 +980,39 @@ describe(commands.SITE_REMOVE, () => {
     });
   });
 
-  it('removes the site - Groupified Site', (done) => {
+  it('removes the site - Groupified Site - Entered with \'fromRecycleBin\' OR \'skipRecycleBin\' ', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
+        return Promise.resolve({
+          "id": "58587cc9-560c-4adb-a849-e669bd37c5f8",
+          "deletedDateTime": null,
+          "classification": null,
+          "createdDateTime": "2017-11-29T03:27:05Z",
+          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+          "displayName": "Finance",
+          "groupTypes": [
+            "Unified"
+          ],
+          "mail": "finance@contoso.onmicrosoft.com",
+          "mailEnabled": true,
+          "mailNickname": "finance",
+          "onPremisesLastSyncDateTime": null,
+          "onPremisesProvisioningErrors": [],
+          "onPremisesSecurityIdentifier": null,
+          "onPremisesSyncEnabled": null,
+          "preferredDataLocation": null,
+          "proxyAddresses": [
+            "SMTP:finance@contoso.onmicrosoft.com"
+          ],
+          "renewedDateTime": "2017-11-29T03:27:05Z",
+          "securityEnabled": false,
+          "visibility": "Public"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -1006,6 +1039,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
+    
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
         return Promise.resolve();
@@ -1018,7 +1052,8 @@ describe(commands.SITE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true } }, () => {
+    
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();
@@ -1028,12 +1063,43 @@ describe(commands.SITE_REMOVE, () => {
       }
       finally {
         Utils.restore(request.post);
-        Utils.restore(request.delete);
       }
     });
   });
 
-  it('removes the site - Groupified Site - Entered with \'fromRecycleBin\' OR \'skipRecycleBin\' ', (done) => {
+  it('removes the site - Groupified Site - Entered with \'wait\'', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
+        return Promise.resolve({
+          "id": "58587cc9-560c-4adb-a849-e669bd37c5f8",
+          "deletedDateTime": null,
+          "classification": null,
+          "createdDateTime": "2017-11-29T03:27:05Z",
+          "description": "This is the Contoso Finance Group. Please come here and check out the latest news, posts, files, and more.",
+          "displayName": "Finance",
+          "groupTypes": [
+            "Unified"
+          ],
+          "mail": "finance@contoso.onmicrosoft.com",
+          "mailEnabled": true,
+          "mailNickname": "finance",
+          "onPremisesLastSyncDateTime": null,
+          "onPremisesProvisioningErrors": [],
+          "onPremisesSecurityIdentifier": null,
+          "onPremisesSyncEnabled": null,
+          "preferredDataLocation": null,
+          "proxyAddresses": [
+            "SMTP:finance@contoso.onmicrosoft.com"
+          ],
+          "renewedDateTime": "2017-11-29T03:27:05Z",
+          "securityEnabled": false,
+          "visibility": "Public"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
     sinon.stub(request, 'post').callsFake((opts) => {
       if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
         if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
@@ -1060,6 +1126,7 @@ describe(commands.SITE_REMOVE, () => {
 
       return Promise.reject('Invalid request');
     });
+    
     sinon.stub(request, 'delete').callsFake((opts) => {
       if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
         return Promise.resolve();
@@ -1072,7 +1139,268 @@ describe(commands.SITE_REMOVE, () => {
     sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
       cb({ continue: true });
     });
-    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true } }, () => {
+
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+      fn();
+      return {} as any;
+    });
+
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, wait: true } }, () => {
+      try {
+        assert(loggerLogToStderrSpy.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('removes the site - Groupified Site, group is permanently deleted', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
+          return Promise.resolve(JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0",
+              "LibraryVersion": "16.0.20530.12001",
+              "ErrorInfo": null,
+              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
+            },
+            4,
+            {
+              "IsNull": false
+            },
+            5,
+            {
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
+              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%demositeGrouped",
+              "GroupId": "/Guid(58587cc9-560c-4adb-a849-e669bd37c5f8)/"
+            }
+          ]));
+        }
+
+        if (opts.url === "https://contoso-admin.sharepoint.com/_api/GroupSiteManager/Delete?siteUrl='https://contoso.sharepoint.com/sites/demositeGrouped'") {
+          return Promise.resolve({
+            "data": {
+              "odata.null": true
+            }
+          });
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
+        return Promise.reject({ 
+          response: { 
+            status: 404,
+            data: {
+              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } } }
+          }
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$select=id&$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
+        return Promise.resolve({ 
+          value: []
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+      fn();
+      return {} as any;
+    });
+
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true, wait: true } }, () => {
+      try {
+        assert(loggerLogToStderrSpy.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('does not remove the site - Groupified Site, bad request (getting the site group)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
+          return Promise.resolve(JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0",
+              "LibraryVersion": "16.0.20530.12001",
+              "ErrorInfo": null,
+              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
+            },
+            4,
+            {
+              "IsNull": false
+            },
+            5,
+            {
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
+              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
+              "GroupId": "/Guid(58587cc9-560c-4adb-a849-e669bd37c5f8)/"
+            }
+          ]));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
+        return Promise.reject({ 
+          response: { 
+            status: 400,
+            data: {
+              error: { 'odata.error': { message: { value: "Invalid object identifier '0z013f997-c1aa-424d-a530-c4e3a05de704'." } } } }
+          }
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } }, () => {
+      try {
+        assert(loggerLogToStderrSpy.called);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('does not remove the site - Groupified Site, group is in the deleted groups', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
+          return Promise.resolve(JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0",
+              "LibraryVersion": "16.0.20530.12001",
+              "ErrorInfo": null,
+              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
+            },
+            4,
+            {
+              "IsNull": false
+            },
+            5,
+            {
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
+              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
+              "GroupId": "/Guid(58587cc9-560c-4adb-a849-e669bd37c5f8)/"
+            }
+          ]));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
+        return Promise.reject({ 
+          response: { 
+            status: 404,
+            data: {
+              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } } }
+          }
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$select=id&$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
+        return Promise.resolve({ 
+          value: [{
+            "id": "58587cc9-560c-4adb-a849-e669bd37c5f8"
+          }]
+        });
+      }
+
+      return Promise.reject("Site group still exists in the deleted groups. The site won't be removed.");
+    });
+
+    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+      fn();
+      return {} as any;
+    });
+
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, skipRecycleBin: true, confirm: true, wait: true } }, (err: any) => {
+      try {
+        // assert(loggerLogToStderrSpy.called);
+        assert.deepStrictEqual(err, new CommandError("Site group still exists in the deleted groups. The site won't be removed."));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('does not remove the site - Groupified Site, bad request (getting the site group in the deleted groups)', (done) => {
+    sinon.stub(request, 'post').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`/_vti_bin/client.svc/ProcessQuery`) > -1) {
+        if (opts.data === `<Request xmlns="http://schemas.microsoft.com/sharepoint/clientquery/2009" AddExpandoFieldTypeSuffix="true" SchemaVersion="15.0.0.0" LibraryVersion="16.0.0.0" ApplicationName="${config.applicationName}"><Actions><ObjectPath Id="4" ObjectPathId="3"/><Query Id="5" ObjectPathId="3"><Query SelectAllProperties="false"><Properties><Property Name="GroupId" ScalarProperty="true"/></Properties></Query></Query></Actions><ObjectPaths><Constructor Id="1" TypeId="{268004ae-ef6b-4e9b-8425-127220d84719}"/><Method Id="3" ParentId="1" Name="GetSitePropertiesByUrl"><Parameters><Parameter Type="String">https://contoso.sharepoint.com/sites/demositeGrouped</Parameter></Parameters></Method></ObjectPaths></Request>`) {
+          return Promise.resolve(JSON.stringify([
+            {
+              "SchemaVersion": "15.0.0.0",
+              "LibraryVersion": "16.0.20530.12001",
+              "ErrorInfo": null,
+              "TraceCorrelationId": "10f1829f-d000-0000-5962-1110d33e2cf2"
+            },
+            4,
+            {
+              "IsNull": false
+            },
+            5,
+            {
+              "_ObjectType_": "Microsoft.Online.SharePoint.TenantAdministration.SiteProperties",
+              "_ObjectIdentity_": "10f1829f-d000-0000-5962-1110d33e2cf2|908bed80-a04a-4433-b4a0-883d9847d110:095efa67-57fa-40c7-b7cc-e96dc3e5780c\nSiteProperties\nhttps%3a%2f%2fcontoso.sharepoint.com%2fsites%2fdemosite",
+              "GroupId": "/Guid(58587cc9-560c-4adb-a849-e669bd37c5f8)/"
+            }
+          ]));
+        }
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/groups/58587cc9-560c-4adb-a849-e669bd37c5f8') {
+        return Promise.reject({ 
+          response: { 
+            status: 404,
+            data: {
+              error: { 'odata.error': { message: { value: "Resource '58587cc9-560c-4adb-a849-e669bd37c5f8' does not exist or one of its queried reference-property objects are not present." } } } }
+          }
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/directory/deletedItems/Microsoft.Graph.Group?$filter=groupTypes/any(c:c+eq+'Unified') and startswith(id, '58587cc9-560c-4adb-a849-e669bd37c5f8')`) {
+        return Promise.reject({ 
+          response: { 
+            status: 400,
+            data: {
+              error: { 'odata.error': { message: { value: "Invalid object identifier '0z013f997-c1aa-424d-a530-c4e3a05de704'." } } } }
+          }
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { url: 'https://contoso.sharepoint.com/sites/demositeGrouped', debug: true, verbose: true, confirm: true } }, () => {
       try {
         assert(loggerLogToStderrSpy.called);
         done();

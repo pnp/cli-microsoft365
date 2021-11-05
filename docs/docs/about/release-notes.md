@@ -24,6 +24,9 @@
 - added the 'Export all channels from a team' sample [#2793](https://github.com/pnp/cli-microsoft365/pull/2793)
 - updated main Node.js version to v16 [#2799](https://github.com/pnp/cli-microsoft365/pull/2799)
 - updated asciinema video on all pages [#2663](https://github.com/pnp/cli-microsoft365/issues/2663)
+- fixed 'spo site remove' to remove orphaned groupified sites [#2706](https://github.com/pnp/cli-microsoft365/issues/2706)
+- extended spfx doctor with support for SPFx@1.13.0 [#2802](https://github.com/pnp/cli-microsoft365/issues/2802)
+- fixed issue with \n in JSON output [#2807](https://github.com/pnp/cli-microsoft365/issues/2807)
 
 ## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 
