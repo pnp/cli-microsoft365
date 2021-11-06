@@ -6,7 +6,7 @@ The cli script helps you to copy list items from one list to another list.
 I have written script logics to migrate list items from one site collection to another site collection
 
 - Prerequisites: List and metadata should be created in the destination site collection site as it's in the source site collection
-- Please update columns as per your requirement in the line number 23
+- Please update columns as per your needs in the line number 24
 
 ```powershell tab="PowerShell"
 $SourceSite = Read-Host -Prompt 'Source site Url'
@@ -25,7 +25,7 @@ foreach($item in $listItems)
 	  Write-Host $count 'item has been migrated to destination list. Reference item id is' $item.Id -fore Magenta
 	  Write-output "Id:" $item.ID " - Firstname: " $item.Firstname | Out-File $reportLocation\test.txt -Append
 }
-Write-Host 'Report has been generated in .csv format, please check your drive' -fore Cyan
+Write-Host 'Report has been generated in .txt format, please check your drive' -fore Cyan
 ```
 
 Keywords:
