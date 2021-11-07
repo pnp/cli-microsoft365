@@ -12,13 +12,21 @@ const command: Command = require('./externalconnection-add');
 describe(commands.EXTERNALCONNECTION_ADD, () => {
   let log: string[];
   let logger: Logger;
-  let loggerLogSpy: sinon.SinonSpy;
 
   const externalConnectionAddResponse: any = {
+    configuration: {
+      authorizedAppIds: []
+    },
+    description: 'Test connection that will not do anything',
+    id: 'TestConnectionForCLI',
+    name: 'Test Connection for CLI'
+  };
+
+  const externalConnectionAddResponseWithAppIDs: any = {
     "@odata.context": "https://graph.microsoft.com/beta/$metadata#connections/$entity",
     "id": "TestConnectionForCLI",
-    "name": "Twitter Connector",
-    "description": "Connector for showing key tweets",
+    "name": "Test Connection for CLI",
+    "description": "Test connection that will not do anything",
     "connectorId": null,
     "state": null,
     "ingestedItemsCount": null,
@@ -26,11 +34,10 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
     "activitySettings": null,
     "complianceSettings": null,
     "configuration": {
-      "authorizedApps": [
-        "00000000-0000-0000-0000-000000000000"
-      ],
       "authorizedAppIds": [
-        "00000000-0000-0000-0000-000000000000"
+        "00000000-0000-0000-0000-000000000000",
+        "00000000-0000-0000-0000-000000000001",
+        "00000000-0000-0000-0000-000000000002"
       ]
     }
   };
@@ -55,7 +62,6 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       }
     };
     (command as any).items = [];
-    loggerLogSpy = sinon.spy(logger, 'log');
   });
 
   afterEach(() => {
@@ -80,27 +86,37 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
     assert.notStrictEqual(command.description, null);
   });
 
-  it('adds an external connection', (done) => {
+  it('adds an external connection', (done: any) => {
+    const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
+        return Promise.resolve(externalConnectionAddResponse);
+      }
+      return Promise.reject('Invalid request');
+    });
     const options: any = {
       debug: false,
       id: 'TestConnectionForCLI',
       name: 'Test Connection for CLI',
       description: 'Test connection that will not do anything'
     };
-
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(externalConnectionAddResponse));
+        assert.strictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponse);
         done();
       }
       catch (e) {
         done(e);
       }
     });
-    done();
   });
 
-  it('adds an external connection with authorised app IDs', (done) => {
+  it('adds an external connection with authorised app IDs', (done: any) => {
+    const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
+        return Promise.resolve(externalConnectionAddResponseWithAppIDs);
+      }
+      return Promise.reject('Invalid request');
+    });
     const options: any = {
       debug: false,
       id: 'TestConnectionForCLI',
@@ -108,17 +124,15 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       description: 'Test connection that will not do anything',
       authorizedAppIds: '00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'
     };
-
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(externalConnectionAddResponse));
+        assert.strictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
         done();
       }
       catch (e) {
         done(e);
       }
     });
-    done();
   });
 
 
