@@ -2,5 +2,6 @@ const prefix: string = 'file';
 
 export default {
   ADD: `${prefix} add`,
-  CONVERT_PDF: `${prefix} convert pdf`
+  CONVERT_PDF: `${prefix} convert pdf`,
+  LIST: `${prefix} list`
 };

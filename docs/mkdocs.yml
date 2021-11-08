@@ -101,6 +101,7 @@ nav:
       - add: 'cmd/file/file-add.md'
       - convert:
         - convert pdf: 'cmd/file/convert/convert-pdf.md'
+      - list: 'cmd/file/file-list.md'
     - Microsoft Graph (graph):
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
