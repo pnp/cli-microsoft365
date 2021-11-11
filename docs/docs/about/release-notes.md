@@ -27,6 +27,8 @@
 - fixed 'spo site remove' to remove orphaned groupified sites [#2706](https://github.com/pnp/cli-microsoft365/issues/2706)
 - extended spfx doctor with support for SPFx@1.13.0 [#2802](https://github.com/pnp/cli-microsoft365/issues/2802)
 - fixed issue with \n in JSON output [#2807](https://github.com/pnp/cli-microsoft365/issues/2807)
+- updated 'teams report directroutingcalls' to Graph v1.0 [#2680](https://github.com/pnp/cli-microsoft365/issues/2680)
+- fixed the 'Export all flows in environment' sample [#2805](https://github.com/pnp/cli-microsoft365/issues/2805)
 
 ## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 
