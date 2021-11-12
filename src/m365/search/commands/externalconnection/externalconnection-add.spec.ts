@@ -101,7 +101,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
     };
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponse);
+        assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponse);
         done();
       }
       catch (e) {
@@ -126,7 +126,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
     };
     command.action(logger, { options: options } as any, () => {
       try {
-        assert.strictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
+        assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
         done();
       }
       catch (e) {

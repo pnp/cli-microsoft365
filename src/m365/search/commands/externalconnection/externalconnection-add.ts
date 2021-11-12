@@ -4,6 +4,7 @@ import GlobalOptions from "../../../../GlobalOptions";
 import request from "../../../../request";
 import GraphCommand from "../../../base/GraphCommand";
 import commands from "../../commands";
+import { ExternalConnectors } from "@microsoft/microsoft-graph-types/microsoft-graph";
 
 interface CommandArgs {
   options: Options;
@@ -49,7 +50,7 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
       appIds = args.options.authorizedAppIds?.split(",");
     }
 
-    const commandData = {
+    const commandData: ExternalConnectors.ExternalConnection  = {
       id: args.options.id,
       name: args.options.name,
       description: args.options.description,
@@ -61,9 +62,9 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/external/connections`,
       headers: {
-        accept: "application/json;odata.metadata=none"
+        accept: 'application/json;odata.metadata=none'
       },
-      responseType: "json",
+      responseType: 'json',
       data: commandData
     };
 
