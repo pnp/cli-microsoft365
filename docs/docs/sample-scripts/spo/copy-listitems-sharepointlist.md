@@ -21,7 +21,7 @@ $reportLocation = Get-Location
 foreach($item in $listItems)
 {
 	  $count++
-		m365 spo listitem add --listTitle $DesitnationList --webUrl $DestinationSite --Title $item.Title --Firstname $item.Firstname --Lastname $item.Lastname
+		m365 spo listitem add --listTitle $DestinationList --webUrl $DestinationSite --Title $item.Title --Firstname $item.Firstname --Lastname $item.Lastname
 	  Write-Host $count 'item has been migrated to destination list. Reference item id is' $item.Id -fore Magenta
 	  Write-output "Id:" $item.ID " - Firstname: " $item.Firstname | Out-File $reportLocation\test.txt -Append
 }
