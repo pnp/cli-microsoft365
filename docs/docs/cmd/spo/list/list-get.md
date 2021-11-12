@@ -22,6 +22,9 @@ m365 spo list get [options]
 `-p, --properties [properties]`
 : Comma-separated list of properties to retrieve from the list. Will retrieve all properties possible from default response, if not specified.
 
+`--withPermissions`
+: Set if you want to return associated roles and permissions of the list.
+
 --8<-- "docs/cmd/_global.md"
 
 ## Examples
@@ -42,6 +45,12 @@ Get information about a list returning the specified list properties
 
 ```sh
 m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x --properties "Title,Id,HasUniqueRoleAssignments,AllowContentTypes"
+```
+
+Get information about a list along with the roles and permissions
+
+```sh
+m365 spo list get --title Documents --webUrl https://contoso.sharepoint.com/sites/project-x --withPermissions
 ```
 
 ## More information
