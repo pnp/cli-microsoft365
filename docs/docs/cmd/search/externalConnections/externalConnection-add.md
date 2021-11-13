@@ -10,14 +10,14 @@ m365 search externalconnection add [options]
 
 ## Options
 
-`--id [id]`
+`-i --id [id]`
 : Developer-provided unique ID of the connection within the Azure Active Directory tenant. Required.
 
-`--name [name]`
+`-n --name [name]`
 : The display name of the connection to be displayed in the Microsoft 365 admin center. Maximum length of 128 characters. Required.
 
-`--description [description]`
-: Description of the connection displayed in the Microsoft 365 admin center. Optional.
+`-d --description [description]`
+: Description of the connection displayed in the Microsoft 365 admin center. Required.
 
 `--authorisedAppIds [authorisedAppIds]`
 : Comma-separated collection of application IDs for registered Azure Active Directory apps that are allowed to manage the externalconnection and to index content in the externalconnection.

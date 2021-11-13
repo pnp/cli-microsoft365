@@ -23,23 +23,16 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
   };
 
   const externalConnectionAddResponseWithAppIDs: any = {
-    "@odata.context": "https://graph.microsoft.com/beta/$metadata#connections/$entity",
-    "id": "TestConnectionForCLI",
-    "name": "Test Connection for CLI",
-    "description": "Test connection that will not do anything",
-    "connectorId": null,
-    "state": null,
-    "ingestedItemsCount": null,
-    "searchSettings": null,
-    "activitySettings": null,
-    "complianceSettings": null,
-    "configuration": {
-      "authorizedAppIds": [
-        "00000000-0000-0000-0000-000000000000",
-        "00000000-0000-0000-0000-000000000001",
-        "00000000-0000-0000-0000-000000000002"
+    configuration: {
+      'authorizedAppIds': [
+        '00000000-0000-0000-0000-000000000000',
+        '00000000-0000-0000-0000-000000000001',
+        '00000000-0000-0000-0000-000000000002'
       ]
-    }
+    },
+    description: 'Test connection that will not do anything',
+    id: 'TestConnectionForCLI',
+    name: 'Test Connection for CLI'
   };
 
   before(() => {
@@ -227,7 +220,7 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
     done();
   });
 
-  it('fails validation if id starts with Microsoft', (done) => {
+  it('fails validation if id starts with Microsoft', () => {
     const actual = command.validate({
       options: {
         id: 'MicrosoftTestConnectionForCLI',
@@ -235,10 +228,9 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       }
     });
     assert.notStrictEqual(actual, false);
-    done();
   });
 
-  it('fails validation if id is SharePoint', (done) => {
+  it('fails validation if id is SharePoint', () => {
     const actual = command.validate({
       options: {
         id: 'SharePoint',
@@ -246,7 +238,43 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
       }
     });
     assert.notStrictEqual(actual, false);
-    done();
+  });
+
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'name', 'description']);
+  });
+
+  it('supports specifying id', () => {
+    const options = command.options();
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--id') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying name', () => {
+    const options = command.options();
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--name') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
+  });
+
+  it('supports specifying description', () => {
+    const options = command.options();
+    let containsOption = false;
+    options.forEach(o => {
+      if (o.option.indexOf('--description') > -1) {
+        containsOption = true;
+      }
+    });
+    assert(containsOption);
   });
 
 });

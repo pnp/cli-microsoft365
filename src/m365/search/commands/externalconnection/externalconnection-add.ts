@@ -79,13 +79,13 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: "--id <id>"
+        option: "-i --id <id>"
       },
       {
-        option: "--name <name>"
+        option: "-n --name <name>"
       },
       {
-        option: "--description <description>"
+        option: "-d --description <description>"
       },
       {
         option: "--authorizedAppIds [authorizedAppIds]"
