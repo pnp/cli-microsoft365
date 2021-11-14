@@ -42,12 +42,11 @@ class SearchExternalConnectionAddCommand extends GraphCommand {
   ): void {
 
     let appIds: string[] = [];
-
     if (
       args.options.authorizedAppIds !== undefined &&
       args.options.authorizedAppIds !== ""
     ) {
-      appIds = args.options.authorizedAppIds?.split(",");
+      appIds = args.options.authorizedAppIds.split(',');
     }
 
     const commandData: ExternalConnectors.ExternalConnection  = {

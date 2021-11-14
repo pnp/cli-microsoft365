@@ -103,6 +103,31 @@ describe(commands.EXTERNALCONNECTION_ADD, () => {
     });
   });
 
+  it('adds an external connection with authorized app id', (done: any) => {
+    const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
+        return Promise.resolve(externalConnectionAddResponse);
+      }
+      return Promise.reject('Invalid request');
+    });
+    const options: any = {
+      debug: false,
+      id: 'TestConnectionForCLI',
+      name: 'Test Connection for CLI',
+      description: 'Test connection that will not do anything',
+      authorizedAppIds: '00000000-0000-0000-0000-000000000000,00000000-0000-0000-0000-000000000001,00000000-0000-0000-0000-000000000002'
+    };
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert.deepStrictEqual(postStub.getCall(0).args[0].data, externalConnectionAddResponseWithAppIDs);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('adds an external connection with authorised app IDs', (done: any) => {
     const postStub = sinon.stub(request, 'post').callsFake((opts: any) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/external/connections`) {
