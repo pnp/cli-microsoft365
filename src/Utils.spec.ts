@@ -1,24 +1,7 @@
 import * as assert from 'assert';
-import * as sinon from 'sinon';
-import appInsights from './appInsights';
-import auth from './Auth';
 import Utils from './Utils';
 
 describe('Utils', () => {
-  before(() => {
-    sinon.stub(auth, 'restoreAuth').callsFake(() => Promise.resolve());
-    sinon.stub(appInsights, 'trackEvent').callsFake(() => { });
-    auth.service.connected = true;
-  });
-
-  after(() => {
-    Utils.restore([
-      auth.restoreAuth,
-      appInsights.trackEvent
-    ]);
-    auth.service.connected = false;
-  });
-
   it('isValidISODate returns true if value is in ISO Date format with - separator', () => {
     const result = Utils.isValidISODate("2019-03-22");
     assert.strictEqual(result, true);

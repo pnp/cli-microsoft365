@@ -171,7 +171,7 @@
     "adaptivecards": "^2.10.0",
     "adaptivecards-templating": "^2.2.0",
     "adm-zip": "^0.5.9",
-    "applicationinsights": "^2.1.8",
+    "applicationinsights": "^2.1.9",
     "axios": "^0.24.0",
     "chalk": "^4.1.2",
     "easy-table": "^1.2.0",
