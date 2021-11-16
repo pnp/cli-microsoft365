@@ -8,6 +8,10 @@
 
 - [aad sp add](../cmd/aad/sp/sp-add.md) - adds a service principal to a registered Azure AD app [#2583](https://github.com/pnp/cli-microsoft365/issues/2583)
 
+**File:**
+
+- [file list](../cmd/file/file-list.md) - Retrieves files from the specified folder and site [#2804](https://github.com/pnp/cli-microsoft365/issues/2804)
+
 **SharePoint:**
 
 - [spo listitem attachment list](../cmd/spo/listitem/listitem-attachment-list.md) - gets the attachments associated to a list item [#2730](https://github.com/pnp/cli-microsoft365/issues/2730)
@@ -29,6 +33,8 @@
 - fixed issue with \n in JSON output [#2807](https://github.com/pnp/cli-microsoft365/issues/2807)
 - updated 'teams report directroutingcalls' to Graph v1.0 [#2680](https://github.com/pnp/cli-microsoft365/issues/2680)
 - fixed the 'Export all flows in environment' sample [#2805](https://github.com/pnp/cli-microsoft365/issues/2805)
+- extended 'spo list get' with --withPermissions [#2796](https://github.com/pnp/cli-microsoft365/issues/2796)
+- fixed slow tests [#2825](https://github.com/pnp/cli-microsoft365/issues/2825)
 
 ## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 
