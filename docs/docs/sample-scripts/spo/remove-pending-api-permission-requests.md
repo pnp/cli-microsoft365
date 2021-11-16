@@ -6,25 +6,27 @@ When building SharePoint Framework solutions connected to APIs secured with Azur
 
 This script helps you to quickly remove pending SharePoint API permission requests.
 
-```javascript tab="JavaScript (Google zx)"
-#!/usr/bin/env zx
-$.verbose = false;
+=== "JavaScript (Google zx)"
 
-console.log('Retrieving permission requests...');
-const permissionRequests = JSON.parse(await $`m365 spo sp permissionrequest list -o json`);
+    ```javascript
+    #!/usr/bin/env zx
+    $.verbose = false;
 
-for (let i = 0; i < permissionRequests.length; i++) {
-  const request = permissionRequests[i];
-  console.log(`Removing request ${request.Resource}/${request.Scope} (${request.Id})...`);
-  try {
-    await $`m365 spo sp permissionrequest deny --requestId ${request.Id}`
-    console.log(chalk.green('DONE'));
-  }
-  catch (err) {
-    console.error(err.stderr);
-  }
-}
-```
+    console.log('Retrieving permission requests...');
+    const permissionRequests = JSON.parse(await $`m365 spo sp permissionrequest list -o json`);
+
+    for (let i = 0; i < permissionRequests.length; i++) {
+      const request = permissionRequests[i];
+      console.log(`Removing request ${request.Resource}/${request.Scope} (${request.Id})...`);
+      try {
+        await $`m365 spo sp permissionrequest deny --requestId ${request.Id}`
+        console.log(chalk.green('DONE'));
+      }
+      catch (err) {
+        console.error(err.stderr);
+      }
+    }
+    ```
 
 Using [CLI for Microsoft 365](https://aka.ms/cli-m365), the script first retrieves the list of pending SharePoint API permission requests. Then, it iterates through the requests and removes (denies) each one of them using CLI for Microsoft 365. After running this script, your list of pending SharePoint API permission requests will be empty.
 

@@ -4,54 +4,56 @@ Author: [Patrick Lamber](https://www.nubo.eu/Delete-All-SPO-Sites-And-M365-Group
 
 Another example how you can delete all Microsoft 365 Groups and SharePoint Online sites in your development environment.
 
-```powershell tab="PowerShell"
-### Warning. Use with caution. This script deletes all M365 Groups and SPO Sites in your tenant
-$devAccount = "<putyourupnhereforsecuritycheck>"
-### Deletes the resources from the recyclebin. The CLI does not support this feature yet
-$skipRecycleBin = $true
+=== "PowerShell"
 
-$m365Status = m365 status
-Write-Host $m365Status
-if ($m365Status -eq "Logged Out") {
-  # Connection to Microsoft 365
-  m365 login
-  $m365Status = m365 status
-}
+    ```powershell
+    ### Warning. Use with caution. This script deletes all M365 Groups and SPO Sites in your tenant
+    $devAccount = "<putyourupnhereforsecuritycheck>"
+    ### Deletes the resources from the recyclebin. The CLI does not support this feature yet
+    $skipRecycleBin = $true
 
-# Check added as security measure
-if ($m365Status[0].ToString().IndexOf($devAccount) -eq -1) {
-  Write-Host "The user does not match the target development account. Stopping..." -ForegroundColor Red
-  return;
-}
+    $m365Status = m365 status
+    Write-Host $m365Status
+    if ($m365Status -eq "Logged Out") {
+      # Connection to Microsoft 365
+      m365 login
+      $m365Status = m365 status
+    }
 
-Write-host "Retrieving all groups..."
-$allGroups = m365 aad o365group list -o json | ConvertFrom-Json
-$groupCount = $allGroups.Count
+    # Check added as security measure
+    if ($m365Status[0].ToString().IndexOf($devAccount) -eq -1) {
+      Write-Host "The user does not match the target development account. Stopping..." -ForegroundColor Red
+      return;
+    }
 
-Write-Host "Processing $groupCount sites..."
-#Loop through each site
-$groupCounter = 0
+    Write-host "Retrieving all groups..."
+    $allGroups = m365 aad o365group list -o json | ConvertFrom-Json
+    $groupCount = $allGroups.Count
 
-foreach ($group in $allGroups) {
-  $groupCounter++
-  Write-Host "Deleting $($group.displayName)... ($groupCounter/$groupCount)"
-  m365 aad o365group remove --id $group.id --confirm $true
-}
+    Write-Host "Processing $groupCount sites..."
+    #Loop through each site
+    $groupCounter = 0
 
-Write-host "Retrieving all SPO sites..."
-$allSites = m365 spo site classic list -o json --query "[?contains(Template,'SITEPAGEPUBLISHING') || contains(Template,'STS')]" | ConvertFrom-Json
-$siteCount = $allSites.Count
+    foreach ($group in $allGroups) {
+      $groupCounter++
+      Write-Host "Deleting $($group.displayName)... ($groupCounter/$groupCount)"
+      m365 aad o365group remove --id $group.id --confirm $true
+    }
 
-Write-Host "Processing $siteCount sites..."
-#Loop through each site
-$siteCounter = 0
+    Write-host "Retrieving all SPO sites..."
+    $allSites = m365 spo site classic list -o json --query "[?contains(Template,'SITEPAGEPUBLISHING') || contains(Template,'STS')]" | ConvertFrom-Json
+    $siteCount = $allSites.Count
 
-foreach ($site in $allSites) {
-  $siteCounter++
-  Write-Host "Deleting $($site.Url)... ($siteCounter/$siteCount)"
-  m365 spo site remove --url $site.Url --skipRecycleBin $skipRecycleBin --confirm $true
-}
-```
+    Write-Host "Processing $siteCount sites..."
+    #Loop through each site
+    $siteCounter = 0
+
+    foreach ($site in $allSites) {
+      $siteCounter++
+      Write-Host "Deleting $($site.Url)... ($siteCounter/$siteCount)"
+      m365 spo site remove --url $site.Url --skipRecycleBin $skipRecycleBin --confirm $true
+    }
+    ```
 
 Keywords:
 

@@ -18,6 +18,7 @@ interface CommandArgs {
 interface Options extends GlobalOptions {
   folderUrl: string;
   filePath: string;
+  siteUrl?: string;
 }
 
 class FileAddCommand extends GraphCommand {
@@ -36,7 +37,7 @@ class FileAddCommand extends GraphCommand {
     }
 
     this
-      .getGraphFileUrl(logger, `${folderUrlWithoutTrailingSlash}/${path.basename(args.options.filePath)}`)
+      .getGraphFileUrl(logger, `${folderUrlWithoutTrailingSlash}/${path.basename(args.options.filePath)}`, args.options.siteUrl)
       .then(graphFileUrl => this.uploadFile(args.options.filePath, graphFileUrl))
       .then(_ => cb(), rawRes => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
@@ -99,21 +100,24 @@ class FileAddCommand extends GraphCommand {
    * 
    * @param logger Logger instance
    * @param fileWebUrl Web URL of the file for which to get drive item URL
+   * @param siteUrl URL of the site to which upload the file. Optional. Specify to suppress lookup.
    * @returns Graph's drive item URL for the specified file
    */
-  private getGraphFileUrl(logger: Logger, fileWebUrl: string): Promise<string> {
+  private getGraphFileUrl(logger: Logger, fileWebUrl: string, siteUrl?: string): Promise<string> {
     if (this.debug) {
       logger.logToStderr(`Resolving Graph drive item URL for ${fileWebUrl}`);
     }
 
-    const _url = url.parse(fileWebUrl);
+    const _fileWebUrl = url.parse(fileWebUrl);
+    const _siteUrl = url.parse(siteUrl || fileWebUrl);
+    const isSiteUrl = typeof siteUrl !== 'undefined';
     let siteId: string = '';
     let driveRelativeFileUrl: string = '';
     return this
-      .getGraphSiteInfoFromFullUrl(_url.host as string, _url.path as string)
+      .getGraphSiteInfoFromFullUrl(_siteUrl.host as string, _siteUrl.path as string, isSiteUrl)
       .then(siteInfo => {
         siteId = siteInfo.id;
-        let siteRelativeFileUrl: string = (_url.path as string).replace(siteInfo.serverRelativeUrl, '');
+        let siteRelativeFileUrl: string = (_fileWebUrl.path as string).replace(siteInfo.serverRelativeUrl, '');
         // normalize site-relative URLs for root site collections and root sites
         if (!siteRelativeFileUrl.startsWith('/')) {
           siteRelativeFileUrl = '/' + siteRelativeFileUrl;
@@ -137,13 +141,14 @@ class FileAddCommand extends GraphCommand {
    * Automatically detects which path chunks correspond to (sub)site.
    * @param hostName SharePoint host name, eg. contoso.sharepoint.com
    * @param urlPath Server-relative file URL, eg. /sites/site/docs/file1.aspx
+   * @param isSiteUrl Set to true to indicate that the specified URL is a site URL
    * @returns ID and server-relative URL of the site denoted by urlPath
    */
-  private getGraphSiteInfoFromFullUrl(hostName: string, urlPath: string): Promise<{ id: string, serverRelativeUrl: string }> {
+  private getGraphSiteInfoFromFullUrl(hostName: string, urlPath: string, isSiteUrl: boolean): Promise<{ id: string, serverRelativeUrl: string }> {
     const siteId: string = '';
     const urlChunks: string[] = urlPath.split('/');
     return new Promise((resolve: (siteInfo: { id: string; serverRelativeUrl: string }) => void, reject: (err: any) => void): void => {
-      this.getGraphSiteInfo(hostName, urlChunks, 0, siteId, resolve, reject);
+      this.getGraphSiteInfo(hostName, urlChunks, isSiteUrl ? urlChunks.length - 1 : 0, siteId, resolve, reject);
     });
   }
 
@@ -178,21 +183,29 @@ class FileAddCommand extends GraphCommand {
       },
       responseType: 'json'
     };
+    const getResult = (id: string, serverRelativeUrl: string) => {
+      return {
+        id,
+        serverRelativeUrl
+      };
+    };
 
     request
       .get<{ id: string }>(requestOptions)
       .then((res: { id: string }) => {
-        this.getGraphSiteInfo(hostName, urlChunks, ++currentChunk, res.id, resolve, reject);
+        if (currentChunk === urlChunks.length - 1) {
+          resolve(getResult(res.id, currentPath));
+        }
+        else {
+          this.getGraphSiteInfo(hostName, urlChunks, ++currentChunk, res.id, resolve, reject);
+        }
       }, err => {
         if (lastSiteId) {
           let serverRelativeUrl: string = `${urlChunks.slice(0, currentChunk).join('/')}`;
           if (!serverRelativeUrl.startsWith('/')) {
             serverRelativeUrl = '/' + serverRelativeUrl;
           }
-          resolve({
-            id: lastSiteId,
-            serverRelativeUrl: serverRelativeUrl
-          });
+          resolve(getResult(lastSiteId, serverRelativeUrl));
         }
         else {
           reject(err);
@@ -233,7 +246,8 @@ class FileAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       { option: '-u, --folderUrl <folderUrl>' },
-      { option: '-p, --filePath <filePath>' }
+      { option: '-p, --filePath <filePath>' },
+      { option: '--siteUrl [siteUrl]' }
     ];
 
     const parentOptions: CommandOption[] = super.options();
@@ -243,6 +257,13 @@ class FileAddCommand extends GraphCommand {
   public validate(args: CommandArgs): boolean | string {
     if (!fs.existsSync(args.options.filePath)) {
       return `Specified source file ${args.options.sourceFile} doesn't exist`;
+    }
+
+    if (args.options.siteUrl) {
+      const isValidSiteUrl = SpoCommand.isValidSharePointUrl(args.options.siteUrl);
+      if (isValidSiteUrl !== true) {
+        return isValidSiteUrl;
+      }
     }
 
     return SpoCommand.isValidSharePointUrl(args.options.folderUrl);
