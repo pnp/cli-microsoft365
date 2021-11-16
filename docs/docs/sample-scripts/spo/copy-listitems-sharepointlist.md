@@ -18,7 +18,6 @@ $listItems = m365 spo listitem list --title $SourceList --webUrl $SourceSite --o
 Write-Host 'Total count in the source list is'-> -fore Green $listItems.Count
 $count = 0
 $reportLocation = Get-Location 
-
 foreach($item in $listItems)
 {
 	  $count++
