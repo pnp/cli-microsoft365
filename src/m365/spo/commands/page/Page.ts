@@ -6,6 +6,9 @@ import { CanvasColumn, CanvasSection, ClientSidePage, ClientSidePart } from './c
 import { PageItem } from './PageItem';
 import { getControlTypeDisplayName } from './pageMethods';
 
+export const supportedPageLayouts = ['Article', 'Home', 'SingleWebPartAppPage', 'RepostPage', 'HeaderlessSearchResults', 'Spaces', 'Topic'];
+export const supportedPromoteAs = ['HomePage', 'NewsPage', 'Template'];
+
 export class Page {
   public static getPage(name: string, webUrl: string, logger: Logger, debug: boolean, verbose: boolean): Promise<ClientSidePage> {
     return new Promise((resolve: (page: ClientSidePage) => void, reject: (error: any) => void): void => {
