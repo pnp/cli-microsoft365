@@ -1033,7 +1033,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
       try {
-        assert.strictEqual(err.message, "Cannot proceed with group creation. The following Owners provided are invalid : user2@contoso.onmicrosoft.com");
+        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
         done();
       }
       catch (e) {
@@ -1066,7 +1066,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
       try {
-        assert.strictEqual(err.message, "Cannot proceed with group creation. The following Owners provided are invalid : user2@contoso.onmicrosoft.com");
+        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
         done();
       }
       catch (e) {
@@ -1099,7 +1099,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
       try {
-        assert.strictEqual(err.message, "Cannot proceed with group creation. The following Members provided are invalid : user2@contoso.onmicrosoft.com");
+        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
         done();
       }
       catch (e) {
@@ -1132,7 +1132,7 @@ describe(commands.O365GROUP_ADD, () => {
 
     command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
       try {
-        assert.strictEqual(err.message, "Cannot proceed with group creation. The following Members provided are invalid : user2@contoso.onmicrosoft.com");
+        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
         done();
       }
       catch (e) {
