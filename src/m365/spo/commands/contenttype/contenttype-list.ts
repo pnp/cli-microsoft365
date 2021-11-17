@@ -23,16 +23,19 @@ class SpoContentTypeListCommand extends SpoCommand {
     return 'Lists all available content types in the specified site';
   }
 
+  public defaultProperties(): string[] | undefined {
+    return ['StringId', 'Name', 'Hidden', 'ReadOnly', 'Sealed'];
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
     let requestUrl: string = `${args.options.webUrl}/_api/web/ContentTypes`;
 
     if (args.options.category){
-      requestUrl += `?$filter=Group eq '${args.options.category}'`;
+      requestUrl += `?$filter=Group eq '${encodeURIComponent(args.options.category as string)}'`;
     }
 
     const requestOptions: any = {
       url: requestUrl,
-      method: 'GET',
       headers: {
         accept: 'application/json;odata=nometadata'
       },
@@ -62,12 +65,7 @@ class SpoContentTypeListCommand extends SpoCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    const isValidSharePointUrl: boolean | string = SpoCommand.isValidSharePointUrl(args.options.webUrl);
-    if (isValidSharePointUrl !== true) {
-      return isValidSharePointUrl;
-    }
-
-    return true;
+    return SpoCommand.isValidSharePointUrl(args.options.webUrl);
   }
 }
 

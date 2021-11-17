@@ -58,6 +58,10 @@ describe(commands.CONTENTTYPE_LIST, () => {
     assert.notStrictEqual(command.description, null);
   });
 
+  it('defines correct properties for the default output', () => {
+    assert.deepStrictEqual(command.defaultProperties(), ['StringId', 'Name', 'Hidden', 'ReadOnly', 'Sealed']);
+  });
+
   it('supports debug mode', () => {
     const options = command.options();
     let containsDebugOption = false;
@@ -386,7 +390,7 @@ describe(commands.CONTENTTYPE_LIST, () => {
 
   it('retrieves all content types by category (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/test/_api/web/ContentTypes?$filter=Group eq 'List Content Types'`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/test/_api/web/ContentTypes?$filter=Group eq 'List%20Content%20Types'`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
@@ -524,7 +528,7 @@ describe(commands.CONTENTTYPE_LIST, () => {
 
   it('retrieves all content types by category', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/test/_api/web/ContentTypes?$filter=Group eq 'List Content Types'`) > -1) {
+      if ((opts.url as string).indexOf(`https://contoso.sharepoint.com/sites/test/_api/web/ContentTypes?$filter=Group eq 'List%20Content%20Types'`) > -1) {
         if (opts.headers &&
           opts.headers.accept &&
           opts.headers.accept.indexOf('application/json') === 0) {
