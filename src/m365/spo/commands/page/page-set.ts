@@ -333,7 +333,7 @@ class SpoPageSetCommand extends SpoCommand {
       },
       {
         option: '-l, --layoutType [layoutType]',
-        autocomplete: ['Article', 'Home']
+        autocomplete: ['Article', 'Home', 'SingleWebPartAppPage', 'RepostPage', 'HeaderlessSearchResults', 'Spaces', 'Topic']
       },
       {
         option: '-p, --promoteAs [promoteAs]',
@@ -369,8 +369,13 @@ class SpoPageSetCommand extends SpoCommand {
 
     if (args.options.layoutType &&
       args.options.layoutType !== 'Article' &&
-      args.options.layoutType !== 'Home') {
-      return `${args.options.layoutType} is not a valid option for layoutType. Allowed values Article|Home`;
+      args.options.layoutType !== 'Home' &&
+      args.options.layoutType !== 'SingleWebPartAppPage' &&
+      args.options.layoutType !== 'RepostPage' &&
+      args.options.layoutType !== 'HeaderlessSearchResults' &&
+      args.options.layoutType !== 'Spaces' &&
+      args.options.layoutType !== 'Topic') {
+      return `${args.options.layoutType} is not a valid option for layoutType. Allowed values Article|Home|SingleWebPartAppPage|RepostPage|HeaderlessSearchResults|Spaces|Topic`;
     }
 
     if (args.options.promoteAs &&
@@ -384,7 +389,7 @@ class SpoPageSetCommand extends SpoCommand {
       return 'You can only promote home pages as site home page';
     }
 
-    if (args.options.promoteAs === 'NewsPage' && args.options.layoutType === 'Home') {
+    if (args.options.promoteAs === 'NewsPage' && args.options.layoutType && args.options.layoutType !== 'Article') {
       return 'You can only promote article pages as news article';
     }
 
