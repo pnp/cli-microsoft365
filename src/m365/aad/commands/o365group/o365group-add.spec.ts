@@ -695,7 +695,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -793,7 +793,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -804,7 +804,7 @@ describe(commands.O365GROUP_ADD, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -875,7 +875,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -973,7 +973,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -984,7 +984,7 @@ describe(commands.O365GROUP_ADD, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -1011,7 +1011,7 @@ describe(commands.O365GROUP_ADD, () => {
 
   it('fails when an invalid user is specified as owner', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -1022,7 +1022,7 @@ describe(commands.O365GROUP_ADD, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: []
         });
@@ -1044,7 +1044,7 @@ describe(commands.O365GROUP_ADD, () => {
 
   it('fails when an invalid user is specified as owner (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -1055,7 +1055,7 @@ describe(commands.O365GROUP_ADD, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: []
         });
@@ -1077,7 +1077,7 @@ describe(commands.O365GROUP_ADD, () => {
 
   it('fails when an invalid user is specified as member', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -1088,7 +1088,7 @@ describe(commands.O365GROUP_ADD, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: []
         });
@@ -1110,7 +1110,7 @@ describe(commands.O365GROUP_ADD, () => {
 
   it('fails when an invalid user is specified as member (debug)', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
@@ -1121,7 +1121,7 @@ describe(commands.O365GROUP_ADD, () => {
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: []
         });
