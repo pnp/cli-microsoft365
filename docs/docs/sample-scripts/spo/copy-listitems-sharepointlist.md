@@ -1,6 +1,6 @@
 # Copy list items between SharePoint lists
 
-Author: [SekThang](https://github.com/SekThang), Inspired by [Ruud](https://lazyadmin.nl/it/copy-sharepoint-list-items-to-another-list-with-powershell-and-pnp/)
+Author: [SekThang](https://twitter.com/SekThang), Inspired by [Ruud](https://lazyadmin.nl/it/copy-sharepoint-list-items-to-another-list-with-powershell-and-pnp/)
 
 The cli script helps you to copy list items from one list to another list.
 I have written script logics to migrate list items from one site collection to another site collection
@@ -21,9 +21,9 @@ $reportLocation = Get-Location
 foreach($item in $listItems)
 {
 	  $count++
-		m365 spo listitem add --listTitle $DesitnationList --webUrl $DestinationSite --Title $item.Title --Firstname $item.Firstname --Lastname $item.Lastname
+		m365 spo listitem add --listTitle $DestinationList --webUrl $DestinationSite --Title $item.Title --Firstname $item.Firstname --Lastname $item.Lastname
 	  Write-Host $count 'item has been migrated to destination list. Reference item id is' $item.Id -fore Magenta
-	  Write-output "Id:" $item.ID " - Firstname: " $item.Firstname | Out-File $reportLocation\test.txt -Append
+	  Write-output "Id:" $item.ID " - Firstname: " $item.Firstname "____________________" | Out-File $reportLocation\Report.txt -Append
 }
 Write-Host 'Report has been generated in .txt format, please check your drive' -fore Cyan
 ```
