@@ -28,7 +28,7 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
   }
 
   public get description(): string {
-    return 'Get a Microsoft Planner plan';
+    return 'Set a Microsoft Planner plan';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -90,7 +90,7 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
         option: '-t, --title [title]'
       },
       {
-        option: '--newTitle [newTitle]'
+        option: '--newTitle <newTitle>'
       },
       {
         option: '--ownerGroupId [ownerGroupId]'
