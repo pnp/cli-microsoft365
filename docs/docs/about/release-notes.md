@@ -14,6 +14,7 @@
 
 **SharePoint:**
 
+- [spo contenttype list](../cmd/spo/contenttype/contenttype-list.md) - lists content types from specified site [#2777](https://github.com/pnp/cli-microsoft365/issues/2777)
 - [spo listitem attachment list](../cmd/spo/listitem/listitem-attachment-list.md) - gets the attachments associated to a list item [#2730](https://github.com/pnp/cli-microsoft365/issues/2730)
 
 ### Changes
@@ -35,6 +36,9 @@
 - fixed the 'Export all flows in environment' sample [#2805](https://github.com/pnp/cli-microsoft365/issues/2805)
 - extended 'spo list get' with --withPermissions [#2796](https://github.com/pnp/cli-microsoft365/issues/2796)
 - fixed slow tests [#2825](https://github.com/pnp/cli-microsoft365/issues/2825)
+- updated 'aad o365group add' to fail for invalid values [#2654](https://github.com/pnp/cli-microsoft365/issues/2654)
+- added more layouts to spo page add/set [#2821](https://github.com/pnp/cli-microsoft365/issues/2821)
+- extended 'aad app add' with save [#2815](https://github.com/pnp/cli-microsoft365/issues/2815)
 
 ## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 
