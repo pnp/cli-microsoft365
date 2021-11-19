@@ -60,7 +60,7 @@ describe(commands.GROUP_LIST, () => {
   });
 
   it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'visibility']);
+    assert.deepStrictEqual(command.defaultProperties(), ['id', 'displayName', 'groupTypes']);
   });
 
   it('lists aad Groups in the tenant', (done) => {

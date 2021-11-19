@@ -18,7 +18,7 @@ class AadGroupListCommand extends GraphItemsListCommand<Group>   {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['id', 'displayName', 'visibility'];
+    return ['id', 'displayName', 'groupTypes'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
