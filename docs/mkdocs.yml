@@ -147,6 +147,7 @@ nav:
         - plan add: 'cmd/planner/plan/plan-add.md'
         - plan get: 'cmd/planner/plan/plan-get.md'
         - plan list: 'cmd/planner/plan/plan-list.md'
+        - plan set: 'cmd/planner/plan/plan-set.md'
       - task:
         - task list: 'cmd/planner/task/task-list.md'
     - Power Apps (pa):
