@@ -43,3 +43,9 @@ export interface CurrentChangeToken {
 export interface ResourcePath {
   DecodedUrl: string;
 }
+
+export interface WebInstalledLanguageProperties {
+  DisplayName: string;
+  LanguageTag: string;
+  Lcid: number;
+}

@@ -245,6 +245,7 @@ export default {
   WEB_ADD: `${prefix} web add`,
   WEB_CLIENTSIDEWEBPART_LIST: `${prefix} web clientsidewebpart list`,
   WEB_GET: `${prefix} web get`,
+  WEB_INSTALLEDLANGUAGE_LIST: `${prefix} web installedlanguage list`,
   WEB_LIST: `${prefix} web list`,
   WEB_REINDEX: `${prefix} web reindex`,
   WEB_REMOVE: `${prefix} web remove`,
