@@ -11,6 +11,7 @@ import { Logger } from '.';
 import appInsights from '../appInsights';
 import Command, { CommandArgs, CommandError } from '../Command';
 import config from '../config';
+import request from '../request';
 import { settingsNames } from '../settingsNames';
 import Utils from '../Utils';
 import { CommandInfo } from './CommandInfo';
@@ -247,7 +248,7 @@ export class Cli {
       };
 
       if (args.options.debug) {
-        Cli.log(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
+        logErr.push(`Executing command ${command.name} with options ${JSON.stringify(args)}`);
       }
 
       // store the current command name, if any and set the name to the name of
@@ -255,10 +256,14 @@ export class Cli {
       const cli = Cli.getInstance();
       const parentCommandName: string | undefined = cli.currentCommandName;
       cli.currentCommandName = command.getCommandName();
+      // store the current logger if any
+      const currentLogger: Logger | undefined = request.logger;
 
       command.action(logger, args as any, (err: any): void => {
         // restore the original command name
         cli.currentCommandName = parentCommandName;
+        // restore the original logger
+        request.logger = currentLogger;
 
         if (err) {
           return reject({

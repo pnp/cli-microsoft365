@@ -60,7 +60,11 @@ class Request {
     }
   }
 
-  public set logger(logger: Logger) {
+  public get logger(): Logger | undefined {
+    return this._logger;
+  }
+
+  public set logger(logger: Logger | undefined) {
     this._logger = logger;
   }
 
