@@ -631,7 +631,7 @@ describe('Cli', () => {
       .then((output: CommandOutput) => {
         try {
           assert.strictEqual(output.stdout, 'Raw output');
-          assert.strictEqual(output.stderr, 'Debug output');
+          assert.strictEqual(output.stderr, ['Executing command cli mock output with options {"options":{"_":[],"debug":true,"output":"text"}}', 'Debug output'].join(os.EOL));
           done();
         }
         catch (e) {
@@ -649,20 +649,6 @@ describe('Cli', () => {
       .then(_ => {
         try {
           assert(promptStub.called);
-          done();
-        }
-        catch (e) {
-          done(e);
-        }
-      }, e => done(e));
-  });
-
-  it('logs command name when executing command with output in debug mode', (done) => {
-    Cli
-      .executeCommandWithOutput(mockCommand, { options: { debug: true, _: [] } })
-      .then(_ => {
-        try {
-          assert(cliLogStub.calledWith('Executing command cli mock with options {"options":{"debug":true,"_":[]}}'));
           done();
         }
         catch (e) {
