@@ -1,6 +1,7 @@
 import { Cli, CommandOutput, Logger } from '../../../../cli';
 import Command, {
-  CommandOption
+  CommandOption,
+  CommandError
 } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import Utils from '../../../../Utils';
@@ -40,45 +41,64 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
     return telemetryProps;
   }
 
-  public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getPlan(args, logger)
-      .then((output: CommandOutput): Promise<void> => {
-        const plan: any = JSON.parse(output.stdout);
-        if (this.verbose) {
-          logger.logToStderr(`Updating plan with id ${plan['id']} ...`);
-        }
-    
-        const requestOptions: any = {
-          url: `${this.resource}/v1.0/planner/plans/${plan['id']}`,
-          headers: {
-            'accept': 'application/json',
-            'If-Match': `${plan["@odata.etag"]}`
-          },
-          responseType: 'json',
-          data: {
-            title: args.options.newTitle
-          }
-        };
-    
-        return request.patch(requestOptions);
-      })
-      .then(_ => cb(), (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
+  public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
+    const getPlan = (): Promise<CommandOutput> => {
+      if (this.verbose) {
+        logger.logToStderr(`Retrieving plan ${args.options.id || args.options.title} ...`);
+      }
 
-  private getPlan(args: CommandArgs, logger: Logger): Promise<CommandOutput> {
-    if (this.verbose) {
-      logger.logToStderr(`Retrieving a plan...`);
-    }
+      const options: PlanGetCommandOptions = {
+        ...args.options,
+        output: 'json',
+        debug: this.debug,
+        verbose: this.verbose
+      };
 
-    const options: PlanGetCommandOptions = {
-      ...args.options,
-      output: 'json',
-      debug: this.debug,
-      verbose: this.verbose
+      return Cli.executeCommandWithOutput(planGetCommand as Command, { options: { ...options, _: [] } });
     };
 
-    return Cli.executeCommandWithOutput(planGetCommand as Command, { options: { ...options, _: [] } });
+    const updatePlan = (plan: any): Promise<void> => {
+      if (this.verbose) {
+        logger.logToStderr(`Updating plan with id ${plan['id']} ...`);
+      }
+
+      const requestOptions: any = {
+        url: `${this.resource}/v1.0/planner/plans/${plan['id']}`,
+        headers: {
+          'accept': 'application/json',
+          'If-Match': `${plan["@odata.etag"]}`
+        },
+        responseType: 'json',
+        data: {
+          title: args.options.newTitle
+        }
+      };
+
+      return request.patch(requestOptions);
+    };
+
+    getPlan()
+      .then((output: CommandOutput): void => {
+        if (!output.stdout) {
+          cb(new CommandError(`No plan found`));
+          return;
+        }
+        let plans: any = JSON.parse(output.stdout);
+        if(!Array.isArray(plans)) {
+          plans = [plans];
+        }
+        const promises = [];
+        for (let index = 0; index < plans.length; index++) {
+          promises.push(updatePlan(plans[index]));
+        }
+
+        Promise.all(promises).then(() => {
+          cb();
+        })
+          .catch((err) => {
+            this.handleRejectedODataJsonPromise(err, logger, cb);
+          });
+      }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
   public options(): CommandOption[] {
@@ -114,7 +134,7 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
     }
 
     if (args.options.id && args.options.title) {
-      return 'Specify either id or title';
+      return 'Specify either id or title but not both';
     }
 
     if (args.options.title && !args.options.ownerGroupId && !args.options.ownerGroupName) {

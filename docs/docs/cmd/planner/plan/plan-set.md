@@ -32,17 +32,17 @@ m365 planner plan set [options]
 Set new title _MyNewPlan_ for Microsoft Planner plan with id _gndWOTSK60GfPQfiDDj43JgACDCb_
 
 ```sh
-m365 planner plan set -i gndWOTSK60GfPQfiDDj43JgACDCb --newTitle MyNewPlan
+m365 planner plan set -i "gndWOTSK60GfPQfiDDj43JgACDCb" --newTitle "MyNewPlan"
 ```
 
 Set new title _MyNewPlan_ for Microsoft Planner plan with original title _MyPlan_ for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_
 
 ```sh
-m365 planner plan set --title "MyPlan" --ownerGroupId "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4" --newTitle MyNewPlan
+m365 planner plan set --title "MyPlan" --ownerGroupId "233e43d0-dc6a-482e-9b4e-0de7a7bce9b4" --newTitle "MyNewPlan"
 ```
 
 Set new title _MyNewPlan_ for Microsoft Planner plan with original title _MyPlan_ for Group _My Planner Group_
 
 ```sh
-m365 planner plan get --title "MyPlan" --ownerGroupName "My Planner Group" --newTitle MyNewPlan
+m365 planner plan get --title "MyPlan" --ownerGroupName "My Planner Group" --newTitle "MyNewPlan"
 ```
