@@ -1,4 +1,5 @@
 import * as assert from 'assert';
+import * as fs from 'fs';
 import * as sinon from 'sinon';
 import appInsights from '../../../../appInsights';
 import auth from '../../../../Auth';
@@ -48,7 +49,10 @@ describe(commands.APP_ADD, () => {
     Utils.restore([
       request.get,
       request.patch,
-      request.post
+      request.post,
+      fs.existsSync,
+      fs.readFileSync,
+      fs.writeFileSync
     ]);
     (command as any).manifest = undefined;
   });
@@ -2989,6 +2993,852 @@ describe(commands.APP_ADD, () => {
           objectId: '3a0388de-2988-4a97-a068-ff4e2b218752',
           tenantId: ''
         }));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`creates AAD app reg with just the name. Doesn't save the app info if not requested`, (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Creates the file it doesn't exist`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [{
+            appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+            name: 'My AAD app'
+          }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Writes to the existing empty file`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => '');
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [{
+            appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+            name: 'My AAD app'
+          }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+      "apps": [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        }
+      ]
+    }));
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [
+            {
+              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+              "name": "M365 app"
+            },
+            {
+              appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+              name: 'My AAD app'
+            }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`saves app info in the .m365rc.json file in the current folder when requested. Adds to the existing file contents (debug)`, (done) => {
+    let fileContents: string | undefined;
+    let filePath: string | undefined;
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => JSON.stringify({
+      "apps": [
+        {
+          "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+          "name": "M365 app"
+        }
+      ]
+    }));
+    sinon.stub(fs, 'writeFileSync').callsFake((_, contents) => {
+      filePath = _.toString();
+      fileContents = contents as string;
+    });
+
+    command.action(logger, {
+      options: {
+        debug: true,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert.strictEqual(filePath, '.m365rc.json');
+        assert.strictEqual(fileContents, JSON.stringify({
+          apps: [
+            {
+              "appId": "74ad36da-3704-4e67-ba08-8c8e833f3c52",
+              "name": "M365 app"
+            },
+            {
+              appId: 'bc724b77-da87-43a9-b385-6ebaaf969db8',
+              name: 'My AAD app'
+            }]
+        }, null, 2));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`doesn't save app info in the .m365rc.json file when there was error reading file contents`, (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => { throw new Error('An error has occurred'); });
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`doesn't save app info in the .m365rc.json file when file has invalid JSON`, (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => true);
+    sinon.stub(fs, 'readFileSync').callsFake(_ => '{');
+    const fsWriteFileSyncSpy = sinon.spy(fs, 'writeFileSync');
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
+        assert(fsWriteFileSyncSpy.notCalled);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it(`doesn't fail execution when error occurred while saving app info`, (done) => {
+    sinon.stub(request, 'get').callsFake(_ => Promise.reject('Issues GET request'));
+    sinon.stub(request, 'patch').callsFake(_ => Promise.reject('Issued PATCH request'));
+    sinon.stub(request, 'post').callsFake(opts => {
+      if (opts.url === 'https://graph.microsoft.com/v1.0/myorganization/applications' &&
+        JSON.stringify(opts.data) === JSON.stringify({
+          "displayName": "My AAD app",
+          "signInAudience": "AzureADMyOrg"
+        })) {
+        return Promise.resolve({
+          "id": "5b31c38c-2584-42f0-aa47-657fb3a84230",
+          "deletedDateTime": null,
+          "appId": "bc724b77-da87-43a9-b385-6ebaaf969db8",
+          "applicationTemplateId": null,
+          "createdDateTime": "2020-12-31T14:44:13.7945807Z",
+          "displayName": "My AAD app",
+          "description": null,
+          "groupMembershipClaims": null,
+          "identifierUris": [],
+          "isDeviceOnlyAuthSupported": null,
+          "isFallbackPublicClient": null,
+          "notes": null,
+          "optionalClaims": null,
+          "publisherDomain": "contoso.onmicrosoft.com",
+          "signInAudience": "AzureADMyOrg",
+          "tags": [],
+          "tokenEncryptionKeyId": null,
+          "verifiedPublisher": {
+            "displayName": null,
+            "verifiedPublisherId": null,
+            "addedDateTime": null
+          },
+          "spa": {
+            "redirectUris": []
+          },
+          "defaultRedirectUri": null,
+          "addIns": [],
+          "api": {
+            "acceptMappedClaims": null,
+            "knownClientApplications": [],
+            "requestedAccessTokenVersion": null,
+            "oauth2PermissionScopes": [],
+            "preAuthorizedApplications": []
+          },
+          "appRoles": [],
+          "info": {
+            "logoUrl": null,
+            "marketingUrl": null,
+            "privacyStatementUrl": null,
+            "supportUrl": null,
+            "termsOfServiceUrl": null
+          },
+          "keyCredentials": [],
+          "parentalControlSettings": {
+            "countriesBlockedForMinors": [],
+            "legalAgeGroupRule": "Allow"
+          },
+          "passwordCredentials": [],
+          "publicClient": {
+            "redirectUris": []
+          },
+          "requiredResourceAccess": [],
+          "web": {
+            "homePageUrl": null,
+            "logoutUrl": null,
+            "redirectUris": [],
+            "implicitGrantSettings": {
+              "enableAccessTokenIssuance": false,
+              "enableIdTokenIssuance": false
+            }
+          }
+        });
+      }
+
+      return Promise.reject(`Invalid POST request: ${JSON.stringify(opts, null, 2)}`);
+    });
+    sinon.stub(fs, 'existsSync').callsFake(_ => false);
+    sinon.stub(fs, 'writeFileSync').callsFake(_ => { throw new Error('Error occurred while saving app info'); });
+
+    command.action(logger, {
+      options: {
+        debug: false,
+        name: 'My AAD app',
+        save: true
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(typeof err, 'undefined');
         done();
       }
       catch (e) {

@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import { v4 } from 'uuid';
 import auth from '../../../../Auth';
 import { Logger } from '../../../../cli';
@@ -8,6 +9,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import Utils from '../../../../Utils';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
+import { M365RcJson } from '../../../base/M365RcJson';
 import commands from '../../commands';
 
 interface ServicePrincipalInfo {
@@ -48,6 +50,7 @@ interface Options extends GlobalOptions {
   name?: string;
   platform?: string;
   redirectUris?: string;
+  save?: boolean;
   scopeAdminConsentDescription?: string;
   scopeAdminConsentDisplayName?: string;
   scopeConsentBy?: string;
@@ -60,6 +63,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
   private static aadApplicationPlatform: string[] = ['spa', 'web', 'publicClient'];
   private static aadAppScopeConsentBy: string[] = ['admins', 'adminsAndUsers'];
   private manifest: any;
+  private appName: string = '';
 
   public get name(): string {
     return commands.APP_ADD;
@@ -89,18 +93,23 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
     this
       .resolveApis(args, logger)
       .then(apis => this.createAppRegistration(args, apis, logger))
+      .then(appInfo => {
+        // based on the assumption that we're adding AAD app to the current
+        // directory. If we in the future extend the command with allowing
+        // users to create AAD app in a different directory, we'll need to
+        // adjust this
+        appInfo.tenantId = Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken);
+        return Promise.resolve(appInfo);
+      })
       .then(appInfo => this.updateAppFromManifest(args, appInfo))
       .then(appInfo => this.configureUri(args, appInfo, logger))
       .then(appInfo => this.configureSecret(args, appInfo, logger))
+      .then(appInfo => this.saveAppInfo(args, appInfo, logger))
       .then((_appInfo: AppInfo): void => {
         const appInfo: any = {
           appId: _appInfo.appId,
           objectId: _appInfo.id,
-          // based on the assumption that we're adding AAD app to the current
-          // directory. If we in the future extend the command with allowing
-          // users to create AAD app in a different directory, we'll need to
-          // adjust this
-          tenantId: Utils.getTenantIdFromAccessToken(auth.service.accessTokens[auth.defaultResource].accessToken)
+          tenantId: _appInfo.tenantId
         };
         if (_appInfo.secret) {
           appInfo.secret = _appInfo.secret;
@@ -120,6 +129,7 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
     if (!applicationInfo.displayName && this.manifest) {
       applicationInfo.displayName = this.manifest.name;
     }
+    this.appName = applicationInfo.displayName;
 
     if (apis.length > 0) {
       applicationInfo.requiredResourceAccess = apis;
@@ -443,6 +453,54 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       });
   }
 
+  private saveAppInfo(args: CommandArgs, appInfo: AppInfo, logger: Logger): Promise<AppInfo> {
+    if (!args.options.save) {
+      return Promise.resolve(appInfo);
+    }
+
+    const filePath: string = '.m365rc.json';
+
+    if (this.verbose) {
+      logger.logToStderr(`Saving Azure AD app registration information to the ${filePath} file...`);
+    }
+
+    let m365rc: M365RcJson = {};
+    if (fs.existsSync(filePath)) {
+      if (this.debug) {
+        logger.logToStderr(`Reading existing ${filePath}...`);
+      }
+
+      try {
+        const fileContents: string = fs.readFileSync(filePath, 'utf8');
+        if (fileContents) {
+          m365rc = JSON.parse(fileContents);
+        }
+      }
+      catch (e) {
+        logger.logToStderr(`Error reading ${filePath}: ${e}. Please add app info to ${filePath} manually.`);
+        return Promise.resolve(appInfo);
+      }
+    }
+
+    if (!m365rc.apps) {
+      m365rc.apps = [];
+    }
+
+    m365rc.apps.push({
+      appId: appInfo.appId,
+      name: this.appName
+    });
+
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(m365rc, null, 2));
+    }
+    catch (e) {
+      logger.logToStderr(`Error writing ${filePath}: ${e}. Please add app info to ${filePath} manually.`);
+    }
+
+    return Promise.resolve(appInfo);
+  }
+
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
@@ -488,6 +546,9 @@ class AadAppAddCommand extends GraphItemsListCommand<ServicePrincipalInfo> {
       },
       {
         option: '--manifest [manifest]'
+      },
+      {
+        option: '--save'
       }
     ];
 
