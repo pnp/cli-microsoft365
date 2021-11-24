@@ -39,6 +39,8 @@
 - updated 'aad o365group add' to fail for invalid values [#2654](https://github.com/pnp/cli-microsoft365/issues/2654)
 - added more layouts to spo page add/set [#2821](https://github.com/pnp/cli-microsoft365/issues/2821)
 - extended 'aad app add' with save [#2815](https://github.com/pnp/cli-microsoft365/issues/2815)
+- extended 'spfx project upgrade' with support for SPFx@1.13.1 [#2849](https://github.com/pnp/cli-microsoft365/issues/2849)
+- extended 'spfx doctor' with support for SPFx@1.13.1 [#2849](https://github.com/pnp/cli-microsoft365/issues/2849)
 
 ## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 
