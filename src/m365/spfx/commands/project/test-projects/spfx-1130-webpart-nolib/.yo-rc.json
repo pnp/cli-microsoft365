@@ -1,0 +1,17 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "environment": "spo",
+    "skipFeatureDeployment": false,
+    "isDomainIsolated": false,
+    "componentType": "webpart",
+    "framework": "none",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.13.0",
+    "libraryName": "spfx-1130-webpart-nolib",
+    "libraryId": "91f91854-149d-4104-a03a-b222a789d3ce",
+    "packageManager": "npm"
+  }
+}
