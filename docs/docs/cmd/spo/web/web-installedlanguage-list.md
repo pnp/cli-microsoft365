@@ -11,7 +11,7 @@ m365 spo web installedlanguage list [options]
 ## Options
 
 `-u, --webUrl <webUrl>`
-: URL of the parent site for which to retrieve the list of installed languages
+: URL of the site for which to retrieve the list of installed languages
 
 --8<-- "docs/cmd/_global.md"
 
