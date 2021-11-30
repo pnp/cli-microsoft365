@@ -1,5 +1,13 @@
 # Release notes
 
+## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
+
+### New commands
+
+**Microsoft Search:**
+
+- [search externalconnection add](../cmd/search/externalconnection/externalconnection-add.md) - adds a new external connection to be defined for Microsoft Search [#2662](https://github.com/pnp/cli-microsoft365/issues/2662)
+
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
 ### New commands
