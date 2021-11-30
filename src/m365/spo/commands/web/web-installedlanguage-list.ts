@@ -14,7 +14,7 @@ interface Options extends GlobalOptions {
   webUrl: string;
 }
 
-class SpoWebInstalledLanguageListCommand extends SpoCommand {
+class SpoWebInstallEdlanguageListCommand extends SpoCommand {
   public get name(): string {
     return commands.WEB_INSTALLEDLANGUAGE_LIST;
   }
@@ -66,4 +66,4 @@ class SpoWebInstalledLanguageListCommand extends SpoCommand {
   }
 }
 
-module.exports = new SpoWebInstalledLanguageListCommand();
+module.exports = new SpoWebInstallEdlanguageListCommand();
