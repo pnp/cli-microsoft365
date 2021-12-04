@@ -10,6 +10,7 @@ import commands from '../../commands';
 import request from '../../../../request';
 import { Options as PlanGetCommandOptions } from '../plan/plan-get';
 import * as planGetCommand from '../plan/plan-get';
+//import { Plan } from './Plan';
 
 interface CommandArgs {
   options: Options;
@@ -29,7 +30,7 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
   }
 
   public get description(): string {
-    return 'Set a Microsoft Planner plan';
+    return 'Update title of a specified plan';
   }
 
   public getTelemetryProperties(args: CommandArgs): any {
@@ -42,42 +43,7 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (error?: any) => void): void {
-    const getPlan = (): Promise<CommandOutput> => {
-      if (this.verbose) {
-        logger.logToStderr(`Retrieving plan ${args.options.id || args.options.title} ...`);
-      }
-
-      const options: PlanGetCommandOptions = {
-        ...args.options,
-        output: 'json',
-        debug: this.debug,
-        verbose: this.verbose
-      };
-
-      return Cli.executeCommandWithOutput(planGetCommand as Command, { options: { ...options, _: [] } });
-    };
-
-    const updatePlan = (plan: any): Promise<void> => {
-      if (this.verbose) {
-        logger.logToStderr(`Updating plan with id ${plan['id']} ...`);
-      }
-
-      const requestOptions: any = {
-        url: `${this.resource}/v1.0/planner/plans/${plan['id']}`,
-        headers: {
-          'accept': 'application/json',
-          'If-Match': `${plan["@odata.etag"]}`
-        },
-        responseType: 'json',
-        data: {
-          title: args.options.newTitle
-        }
-      };
-
-      return request.patch(requestOptions);
-    };
-
-    getPlan()
+    this.getPlan(logger, args)
       .then((output: CommandOutput): void => {
         if (!output.stdout) {
           cb(new CommandError(`No plan found`));
@@ -89,7 +55,7 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
         }
         const promises = [];
         for (let index = 0; index < plans.length; index++) {
-          promises.push(updatePlan(plans[index]));
+          promises.push(this.updatePlan(logger, args, plans[index]));
         }
 
         Promise.all(promises).then(() => {
@@ -99,6 +65,41 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
             this.handleRejectedODataJsonPromise(err, logger, cb);
           });
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  private getPlan(logger: Logger,args: CommandArgs): Promise<CommandOutput> {
+    if (this.verbose) {
+      logger.logToStderr(`Retrieving plan ${args.options.id || args.options.title} ...`);
+    }
+
+    const options: PlanGetCommandOptions = {
+      ...args.options,
+      output: 'json',
+      debug: this.debug,
+      verbose: this.verbose
+    };
+
+    return Cli.executeCommandWithOutput(planGetCommand as Command, { options: { ...options, _: [] } });
+  }
+
+  private updatePlan(logger: Logger,args: CommandArgs, plan: any): Promise<void> {
+    if (this.verbose) {
+      logger.logToStderr(`Updating plan with id ${plan['id']} ...`);
+    }
+
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/planner/plans/${plan['id']}`,
+      headers: {
+        'accept': 'application/json;odata.metadata=none',
+        'If-Match': `${plan["@odata.etag"]}`
+      },
+      responseType: 'json',
+      data: {
+        title: args.options.newTitle
+      }
+    };
+
+    return request.patch(requestOptions);
   }
 
   public options(): CommandOption[] {
@@ -125,10 +126,6 @@ class PlannerPlanSetCommand extends GraphItemsListCommand<any> {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.newTitle) {
-      return 'Specify the new title';
-    }
-
     if (!args.options.id && !args.options.title) {
       return 'Specify either id or title';
     }
