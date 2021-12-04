@@ -14,7 +14,7 @@ m365 planner plan set [options]
 : ID of the plan. Specify either `id` or `title` but not both.
 
 `-t,--title [title]`
-: Title of the plan. Specify either `id` or `title` but not both.
+: Title of the plan. Specify either `id` or `title` but not both. When `title` is set, specify either `ownerGroupId` or `ownerGroupName`
 
 `--newTitle <newTitle>`
 : New title of the plan.
@@ -32,7 +32,7 @@ m365 planner plan set [options]
 Set new title _MyNewPlan_ for Microsoft Planner plan with id _gndWOTSK60GfPQfiDDj43JgACDCb_
 
 ```sh
-m365 planner plan set -i "gndWOTSK60GfPQfiDDj43JgACDCb" --newTitle "MyNewPlan"
+m365 planner plan set --id "gndWOTSK60GfPQfiDDj43JgACDCb" --newTitle "MyNewPlan"
 ```
 
 Set new title _MyNewPlan_ for Microsoft Planner plan with original title _MyPlan_ for Group _233e43d0-dc6a-482e-9b4e-0de7a7bce9b4_
