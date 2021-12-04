@@ -1,5 +1,21 @@
 # Release notes
 
+## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad app get](../cmd/aad/app/app-get.md) - gets an Azure AD app registration [#2835](https://github.com/pnp/cli-microsoft365/issues/2835)
+
+**Microsoft Search:**
+
+- [search externalconnection add](../cmd/search/externalconnection/externalconnection-add.md) - adds a new external connection to be defined for Microsoft Search [#2662](https://github.com/pnp/cli-microsoft365/issues/2662)
+
+**SharePoint:**
+
+- [spo web installedlanguage list](../cmd/spo/web/web-installedlanguage-list.md) - lists all installed languages on site [#2833](https://github.com/pnp/cli-microsoft365/issues/2833)
+
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
 ### New commands
@@ -39,6 +55,8 @@
 - updated 'aad o365group add' to fail for invalid values [#2654](https://github.com/pnp/cli-microsoft365/issues/2654)
 - added more layouts to spo page add/set [#2821](https://github.com/pnp/cli-microsoft365/issues/2821)
 - extended 'aad app add' with save [#2815](https://github.com/pnp/cli-microsoft365/issues/2815)
+- extended 'spfx project upgrade' with support for SPFx@1.13.1 [#2849](https://github.com/pnp/cli-microsoft365/issues/2849)
+- extended 'spfx doctor' with support for SPFx@1.13.1 [#2849](https://github.com/pnp/cli-microsoft365/issues/2849)
 
 ## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 

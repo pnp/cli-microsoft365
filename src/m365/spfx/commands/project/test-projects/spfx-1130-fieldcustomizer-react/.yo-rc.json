@@ -1,0 +1,18 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "environment": "spo",
+    "skipFeatureDeployment": false,
+    "isDomainIsolated": false,
+    "componentType": "extension",
+    "extensionType": "FieldCustomizer",
+    "framework": "react",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.13.0",
+    "libraryName": "spfx-1130-fieldcustomizer-react",
+    "libraryId": "6926ef6a-f7a5-480e-88fd-10ff8189e398",
+    "packageManager": "npm"
+  }
+}

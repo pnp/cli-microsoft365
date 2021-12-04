@@ -1,0 +1,17 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "environment": "spo",
+    "skipFeatureDeployment": false,
+    "isDomainIsolated": false,
+    "componentType": "webpart",
+    "framework": "react",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.13.0",
+    "libraryName": "spfx-1130-webpart-react",
+    "libraryId": "2508cba2-e870-4f43-9578-0b573c290abb",
+    "packageManager": "npm"
+  }
+}

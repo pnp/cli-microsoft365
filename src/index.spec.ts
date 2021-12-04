@@ -10,6 +10,7 @@ import * as oneDriveCommands from './m365/onedrive/commands';
 import * as outlookCommands from './m365/outlook/commands';
 import * as paCommands from './m365/pa/commands';
 import * as plannerCommands from './m365/planner/commands';
+import * as searchCommands from './m365/search/commands';
 import * as spfxCommands from './m365/spfx/commands';
 import * as spoCommands from './m365/spo/commands';
 import * as teamsCommands from './m365/teams/commands';
@@ -30,6 +31,7 @@ describe('Lazy loading commands', () => {
       outlookCommands.default,
       paCommands.default,
       plannerCommands.default,
+      searchCommands.default,
       spfxCommands.default,
       spoCommands.default,
       teamsCommands.default,
