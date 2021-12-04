@@ -4,9 +4,17 @@
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad app get](../cmd/aad/app/app-get.md) - gets an Azure AD app registration [#2835](https://github.com/pnp/cli-microsoft365/issues/2835)
+
 **Microsoft Search:**
 
 - [search externalconnection add](../cmd/search/externalconnection/externalconnection-add.md) - adds a new external connection to be defined for Microsoft Search [#2662](https://github.com/pnp/cli-microsoft365/issues/2662)
+
+**SharePoint:**
+
+- [spo web installedlanguage list](../cmd/spo/web/web-installedlanguage-list.md) - lists all installed languages on site [#2833](https://github.com/pnp/cli-microsoft365/issues/2833)
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
