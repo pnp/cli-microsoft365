@@ -15,6 +15,7 @@ interface CommandArgs {
 export interface Options extends GlobalOptions {
   id?: string;
   userName?: string;
+  email?: string;
   properties?: string;
 }
 
@@ -36,12 +37,26 @@ class AadUserGetCommand extends GraphCommand {
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
+    const queryParam: string = (args.options.id || args.options.userName) ? "?" : "&";
+
     const properties: string = args.options.properties ?
-      `?$select=${args.options.properties.split(',').map(p => encodeURIComponent(p.trim())).join(',')}` :
+      `${queryParam}$select=${args.options.properties.split(',').map(p => encodeURIComponent(p.trim())).join(',')}` :
       '';
 
+    let requestUrl: string = `${this.resource}/v1.0/users`;
+
+    if (args.options.id) {
+      requestUrl += `/${encodeURIComponent(args.options.id as string)}${properties}`;
+    }
+    else if (args.options.userName) {
+      requestUrl += `/${encodeURIComponent(args.options.userName as string)}${properties}`;
+    }
+    else if (args.options.email) {
+      requestUrl += `?$filter=mail eq '${encodeURIComponent(args.options.email as string)}'${properties}`;
+    }
+
     const requestOptions: any = {
-      url: `${this.resource}/v1.0/users/${encodeURIComponent(args.options.id ? args.options.id : args.options.userName as string)}${properties}`,
+      url: requestUrl,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },
@@ -50,7 +65,20 @@ class AadUserGetCommand extends GraphCommand {
 
     request
       .get(requestOptions)
-      .then((res: any): void => {
+      .then((res: any): Promise<any> => {
+        if (args.options.email) {
+          if (res.value.length > 0) {
+            return Promise.resolve(res.value[0]);
+          }
+          else {
+            return Promise.reject(`User with email ${args.options.email} does not exist`);
+          }
+        }
+        else {
+          return Promise.resolve(res);
+        }
+      })
+      .then((res: any): any => {
         logger.log(res);
         cb();
       }, (err: any) => this.handleRejectedODataJsonPromise(err, logger, cb));
@@ -65,6 +93,9 @@ class AadUserGetCommand extends GraphCommand {
         option: '-n, --userName [userName]'
       },
       {
+        option: '--email [email]'
+      },
+      {
         option: '-p, --properties [properties]'
       }
     ];
@@ -74,12 +105,14 @@ class AadUserGetCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.id && !args.options.userName) {
-      return 'Specify either id or userName';
+    if (!args.options.id && !args.options.userName && !args.options.email) {
+      return 'Specify id, userName or email, one is required';
     }
 
-    if (args.options.id && args.options.userName) {
-      return 'Specify either id or userName but not both';
+    if ((args.options.id && args.options.email) ||
+      (args.options.id && args.options.userName) ||
+      (args.options.userName && args.options.email)) {
+      return 'Use either id, userName or email, but not all';
     }
 
     if (args.options.id &&
