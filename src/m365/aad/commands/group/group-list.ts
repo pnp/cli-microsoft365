@@ -25,6 +25,21 @@ class AadGroupListCommand extends GraphItemsListCommand<Group>   {
     this
       .getAllItems(`${this.resource}/v1.0/groups`, logger, true)
       .then((): void => {
+        this.items.forEach(group => {
+          if (group.groupTypes && group.groupTypes.length > 0 && group.groupTypes[0] === "Unified") {
+            group.groupTypes = ["Microsoft 365"];
+          }
+          else if (group.mailEnabled && group.securityEnabled) {
+            group.groupTypes = ["Mail enabled security"];
+          }
+          else if (group.securityEnabled) {
+            group.groupTypes = ["Security"];
+          }
+          else if (group.mailEnabled) {
+            group.groupTypes = ["Distribution"];
+          }
+        });
+
         logger.log(this.items);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));

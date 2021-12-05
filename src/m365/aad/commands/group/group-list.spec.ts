@@ -70,45 +70,48 @@ describe(commands.GROUP_LIST, () => {
           "value": [
             {
               "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
-              "deletedDateTime": null,
-              "classification": null,
-              "createdDateTime": "2021-03-13T14:04:39Z",
-              "creationOptions": [
-                "ProvisionGroupHomepage",
-                "HubSiteId:00000000-0000-0000-0000-000000000000",
-                "SPSiteLanguage:1033"
-              ],
               "description": "Code Challenge",
               "displayName": "Code Challenge",
-              "expirationDateTime": null,
               "groupTypes": [
                 "Unified"
               ],
-              "isAssignableToRole": null,
               "mail": "CodeChallenge@dev1802.onmicrosoft.com",
               "mailEnabled": true,
               "mailNickname": "CodeChallenge",
-              "membershipRule": null,
-              "membershipRuleProcessingState": null,
-              "onPremisesDomainName": null,
-              "onPremisesLastSyncDateTime": null,
-              "onPremisesNetBiosName": null,
-              "onPremisesSamAccountName": null,
-              "onPremisesSecurityIdentifier": null,
-              "onPremisesSyncEnabled": null,
-              "preferredDataLocation": null,
-              "preferredLanguage": null,
-              "proxyAddresses": [
-                "SMTP:CodeChallenge@dev1802.onmicrosoft.com"
+              "securityEnabled": false
+            },
+            {
+              "id": "2f64f70d-386b-489f-805a-670cad739fde",
+              "description": "The Jumping Jacks",
+              "displayName": "The Jumping Jacks",
+              "groupTypes": [
               ],
-              "renewedDateTime": "2021-03-13T14:04:39Z",
-              "resourceBehaviorOptions": [],
-              "resourceProvisioningOptions": [],
-              "securityEnabled": false,
-              "securityIdentifier": "S-1-12-1-14818455-1270970368-10757248-1844749995",
-              "theme": null,
-              "visibility": "Private",
-              "onPremisesProvisioningErrors": []
+              "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "TheJumpingJacks",
+              "securityEnabled": true
+            },
+            {
+              "id": "ff0554cc-8aa8-40f2-a369-ed604503fb79",
+              "description": "Emergency Response",
+              "displayName": "Emergency Response",
+              "groupTypes": [
+              ],
+              "mail": null,
+              "mailEnabled": false,
+              "mailNickname": "00000000-0000-0000-0000-000000000000",
+              "securityEnabled": true
+            },
+            {
+              "id": "0a0bf25a-2de0-40de-9908-c96941a2615b",
+              "description": "Free Birds",
+              "displayName": "Free Birds",
+              "groupTypes": [
+              ],
+              "mail": "FreeBirds@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "FreeBirds",
+              "securityEnabled": false
             }
           ]
         });
@@ -122,45 +125,51 @@ describe(commands.GROUP_LIST, () => {
         assert(loggerLogSpy.calledWith([
           {
             "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
-            "deletedDateTime": null,
-            "classification": null,
-            "createdDateTime": "2021-03-13T14:04:39Z",
-            "creationOptions": [
-              "ProvisionGroupHomepage",
-              "HubSiteId:00000000-0000-0000-0000-000000000000",
-              "SPSiteLanguage:1033"
-            ],
             "description": "Code Challenge",
             "displayName": "Code Challenge",
-            "expirationDateTime": null,
             "groupTypes": [
-              "Unified"
+              "Microsoft 365"
             ],
-            "isAssignableToRole": null,
             "mail": "CodeChallenge@dev1802.onmicrosoft.com",
             "mailEnabled": true,
             "mailNickname": "CodeChallenge",
-            "membershipRule": null,
-            "membershipRuleProcessingState": null,
-            "onPremisesDomainName": null,
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesNetBiosName": null,
-            "onPremisesSamAccountName": null,
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "preferredLanguage": null,
-            "proxyAddresses": [
-              "SMTP:CodeChallenge@dev1802.onmicrosoft.com"
+            "securityEnabled": false
+          },
+          {
+            "id": "2f64f70d-386b-489f-805a-670cad739fde",
+            "description": "The Jumping Jacks",
+            "displayName": "The Jumping Jacks",
+            "groupTypes": [
+              "Mail enabled security"
             ],
-            "renewedDateTime": "2021-03-13T14:04:39Z",
-            "resourceBehaviorOptions": [],
-            "resourceProvisioningOptions": [],
-            "securityEnabled": false,
-            "securityIdentifier": "S-1-12-1-14818455-1270970368-10757248-1844749995",
-            "theme": null,
-            "visibility": "Private",
-            "onPremisesProvisioningErrors": []
+            "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
+            "mailEnabled": true,
+            "mailNickname": "TheJumpingJacks",
+            "securityEnabled": true
+          },
+          {
+            "id": "ff0554cc-8aa8-40f2-a369-ed604503fb79",
+            "description": "Emergency Response",
+            "displayName": "Emergency Response",
+            "groupTypes": [
+              "Security"
+            ],
+            "mail": null,
+            "mailEnabled": false,
+            "mailNickname": "00000000-0000-0000-0000-000000000000",
+            "securityEnabled": true
+          },
+          {
+            "id": "0a0bf25a-2de0-40de-9908-c96941a2615b",
+            "description": "Free Birds",
+            "displayName": "Free Birds",
+            "groupTypes": [
+              "Distribution"
+            ],
+            "mail": "FreeBirds@dev1802.onmicrosoft.com",
+            "mailEnabled": true,
+            "mailNickname": "FreeBirds",
+            "securityEnabled": false
           }
         ]));
         done();
@@ -178,45 +187,48 @@ describe(commands.GROUP_LIST, () => {
           "value": [
             {
               "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
-              "deletedDateTime": null,
-              "classification": null,
-              "createdDateTime": "2021-03-13T14:04:39Z",
-              "creationOptions": [
-                "ProvisionGroupHomepage",
-                "HubSiteId:00000000-0000-0000-0000-000000000000",
-                "SPSiteLanguage:1033"
-              ],
               "description": "Code Challenge",
               "displayName": "Code Challenge",
-              "expirationDateTime": null,
               "groupTypes": [
                 "Unified"
               ],
-              "isAssignableToRole": null,
               "mail": "CodeChallenge@dev1802.onmicrosoft.com",
               "mailEnabled": true,
               "mailNickname": "CodeChallenge",
-              "membershipRule": null,
-              "membershipRuleProcessingState": null,
-              "onPremisesDomainName": null,
-              "onPremisesLastSyncDateTime": null,
-              "onPremisesNetBiosName": null,
-              "onPremisesSamAccountName": null,
-              "onPremisesSecurityIdentifier": null,
-              "onPremisesSyncEnabled": null,
-              "preferredDataLocation": null,
-              "preferredLanguage": null,
-              "proxyAddresses": [
-                "SMTP:CodeChallenge@dev1802.onmicrosoft.com"
+              "securityEnabled": false
+            },
+            {
+              "id": "2f64f70d-386b-489f-805a-670cad739fde",
+              "description": "The Jumping Jacks",
+              "displayName": "The Jumping Jacks",
+              "groupTypes": [
               ],
-              "renewedDateTime": "2021-03-13T14:04:39Z",
-              "resourceBehaviorOptions": [],
-              "resourceProvisioningOptions": [],
-              "securityEnabled": false,
-              "securityIdentifier": "S-1-12-1-14818455-1270970368-10757248-1844749995",
-              "theme": null,
-              "visibility": "Private",
-              "onPremisesProvisioningErrors": []
+              "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "TheJumpingJacks",
+              "securityEnabled": true
+            },
+            {
+              "id": "ff0554cc-8aa8-40f2-a369-ed604503fb79",
+              "description": "Emergency Response",
+              "displayName": "Emergency Response",
+              "groupTypes": [
+              ],
+              "mail": null,
+              "mailEnabled": false,
+              "mailNickname": "00000000-0000-0000-0000-000000000000",
+              "securityEnabled": true
+            },
+            {
+              "id": "0a0bf25a-2de0-40de-9908-c96941a2615b",
+              "description": "Free Birds",
+              "displayName": "Free Birds",
+              "groupTypes": [
+              ],
+              "mail": "FreeBirds@dev1802.onmicrosoft.com",
+              "mailEnabled": true,
+              "mailNickname": "FreeBirds",
+              "securityEnabled": false
             }
           ]
         });
@@ -229,45 +241,51 @@ describe(commands.GROUP_LIST, () => {
         assert(loggerLogSpy.calledWith([
           {
             "id": "00e21c97-7800-4bc1-8024-a400aba6f46d",
-            "deletedDateTime": null,
-            "classification": null,
-            "createdDateTime": "2021-03-13T14:04:39Z",
-            "creationOptions": [
-              "ProvisionGroupHomepage",
-              "HubSiteId:00000000-0000-0000-0000-000000000000",
-              "SPSiteLanguage:1033"
-            ],
             "description": "Code Challenge",
             "displayName": "Code Challenge",
-            "expirationDateTime": null,
             "groupTypes": [
-              "Unified"
+              "Microsoft 365"
             ],
-            "isAssignableToRole": null,
             "mail": "CodeChallenge@dev1802.onmicrosoft.com",
             "mailEnabled": true,
             "mailNickname": "CodeChallenge",
-            "membershipRule": null,
-            "membershipRuleProcessingState": null,
-            "onPremisesDomainName": null,
-            "onPremisesLastSyncDateTime": null,
-            "onPremisesNetBiosName": null,
-            "onPremisesSamAccountName": null,
-            "onPremisesSecurityIdentifier": null,
-            "onPremisesSyncEnabled": null,
-            "preferredDataLocation": null,
-            "preferredLanguage": null,
-            "proxyAddresses": [
-              "SMTP:CodeChallenge@dev1802.onmicrosoft.com"
+            "securityEnabled": false
+          },
+          {
+            "id": "2f64f70d-386b-489f-805a-670cad739fde",
+            "description": "The Jumping Jacks",
+            "displayName": "The Jumping Jacks",
+            "groupTypes": [
+              "Mail enabled security"
             ],
-            "renewedDateTime": "2021-03-13T14:04:39Z",
-            "resourceBehaviorOptions": [],
-            "resourceProvisioningOptions": [],
-            "securityEnabled": false,
-            "securityIdentifier": "S-1-12-1-14818455-1270970368-10757248-1844749995",
-            "theme": null,
-            "visibility": "Private",
-            "onPremisesProvisioningErrors": []
+            "mail": "TheJumpingJacks@dev1802.onmicrosoft.com",
+            "mailEnabled": true,
+            "mailNickname": "TheJumpingJacks",
+            "securityEnabled": true
+          },
+          {
+            "id": "ff0554cc-8aa8-40f2-a369-ed604503fb79",
+            "description": "Emergency Response",
+            "displayName": "Emergency Response",
+            "groupTypes": [
+              "Security"
+            ],
+            "mail": null,
+            "mailEnabled": false,
+            "mailNickname": "00000000-0000-0000-0000-000000000000",
+            "securityEnabled": true
+          },
+          {
+            "id": "0a0bf25a-2de0-40de-9908-c96941a2615b",
+            "description": "Free Birds",
+            "displayName": "Free Birds",
+            "groupTypes": [
+              "Distribution"
+            ],
+            "mail": "FreeBirds@dev1802.onmicrosoft.com",
+            "mailEnabled": true,
+            "mailNickname": "FreeBirds",
+            "securityEnabled": false
           }
         ]));
         done();
