@@ -48,7 +48,7 @@ If you want to schedule the script directly, you can go ahead without the need o
     }
 
     #Getting current Tenant Status and do the needed operations
-    $workLoads = m365 tenant status list --query "value[?Status != 'ServiceOperational']"  --output json  | ConvertFrom-Json
+    $workLoads = m365 tenant status list --query "[?Status != 'ServiceOperational']"  --output json  | ConvertFrom-Json
     $currentOutageServices = (m365 spo listitem list --webUrl $webURL --title $listName --fields "Title, Workload, Id"  --output json).Replace("ID", "_ID") | ConvertFrom-Json
 
     #Checking for any new outages
