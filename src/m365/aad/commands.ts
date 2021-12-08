@@ -50,5 +50,6 @@ export default {
   SP_GET: `${prefix} sp get`,
   USER_GET: `${prefix} user get`,
   USER_LIST: `${prefix} user list`,
+  USER_PASSWORD_VALIDATE: `${prefix} user password validate`,
   USER_SET: `${prefix} user set`
 };
