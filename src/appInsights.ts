@@ -22,7 +22,7 @@ appInsights.defaultClient.commonProperties = {
   env: env
 };
 appInsights.defaultClient.context.tags['ai.session.id'] = crypto.randomBytes(24).toString('base64');
-delete appInsights.defaultClient.context.tags['ai.cloud.roleInstance'];
+appInsights.defaultClient.context.tags['ai.cloud.roleInstance'] = crypto.createHash('sha256').update(appInsights.defaultClient.context.tags['ai.cloud.roleInstance']).digest('hex');
 delete appInsights.defaultClient.context.tags['ai.cloud.role'];
 
 export default appInsights.defaultClient;
