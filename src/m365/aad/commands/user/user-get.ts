@@ -7,6 +7,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
+import { User } from './User';
 
 interface CommandArgs {
   options: Options;
@@ -65,7 +66,7 @@ class AadUserGetCommand extends GraphCommand {
 
     request
       .get(requestOptions)
-      .then((res: any): Promise<any> => {
+      .then((res: any): Promise<User> => {
         if (args.options.email) {
           if (res.value.length > 0) {
             return Promise.resolve(res.value[0]);
