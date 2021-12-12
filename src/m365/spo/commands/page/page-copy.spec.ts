@@ -359,4 +359,4 @@ describe(commands.PAGE_COPY, () => {
     const actual = command.validate({ options: { webUrl: 'https://contoso.sharepoint.com' } });
     assert.strictEqual(actual, true);
   });
-}); 
+});
