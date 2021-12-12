@@ -7,7 +7,7 @@ import request from '../../../../request';
 import Utils from '../../../../Utils';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { User } from './User';
+import { User } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
