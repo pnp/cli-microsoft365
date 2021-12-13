@@ -423,6 +423,7 @@ nav:
         - site get: 'cmd/spo/site/site-get.md'
         - site groupify: 'cmd/spo/site/site-groupify.md'
         - site list: 'cmd/spo/site/site-list.md'
+        - site recyclebinitem list: 'cmd/spo/site/site-recyclebinitem-list.md'
         - site remove: 'cmd/spo/site/site-remove.md'
         - site rename: 'cmd/spo/site/site-rename.md'
         - site set: 'cmd/spo/site/site-set.md'
