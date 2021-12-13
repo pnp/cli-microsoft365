@@ -1,10 +1,16 @@
 import { Logger } from '../../../../cli';
+import { CommandOption } from '../../../../Command';
 import GlobalOptions from '../../../../GlobalOptions';
 import { AzmgmtItemsListCommand } from '../../../base/AzmgmtItemsListCommand';
 import commands from '../../commands';
 
 interface CommandArgs {
-  options: GlobalOptions;
+  options: Options;
+}
+
+interface Options extends GlobalOptions {
+  environment?: string;
+  asAdmin: boolean;
 }
 
 class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string; displayName: string; properties: { displayName: string } }> {
@@ -20,8 +26,14 @@ class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string; displayNam
     return ['name', 'displayName'];
   }
 
+  public getTelemetryProperties(args: CommandArgs): any {
+    const telemetryProps: any = super.getTelemetryProperties(args);
+    telemetryProps.asAdmin = args.options.asAdmin === true;
+    return telemetryProps;
+  }
+
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    const url: string = `${this.resource}providers/Microsoft.PowerApps/apps?api-version=2017-08-01`;
+    const url: string = `${this.resource}providers/Microsoft.PowerApps${args.options.asAdmin ? '/scopes/admin' : ''}${args.options.environment ? '/environments/' + encodeURIComponent(args.options.environment) : ''}/apps?api-version=2017-08-01`;
 
     this
       .getAllItems(url, logger, true)
@@ -42,6 +54,29 @@ class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string; displayNam
         cb();
       }, (rawRes: any): void => this.handleRejectedODataJsonPromise(rawRes, logger, cb));
   }
+
+  public options(): CommandOption[] {
+    const options: CommandOption[] = [
+      {
+        option: '-e, --environment [environment]'
+      },
+      {
+        option: '--asAdmin'
+      }
+    ];
+
+    const parentOptions: CommandOption[] = super.options();
+    return options.concat(parentOptions);
+  }
+
+  public validate(args: CommandArgs): boolean | string {
+    if (args.options.asAdmin && !args.options.environment) {
+      return 'When specifying the admin option the environment option is required as well';
+    }
+
+    return true;
+  }
+
 }
 
 module.exports = new PaAppListCommand();
