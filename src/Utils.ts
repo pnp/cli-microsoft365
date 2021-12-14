@@ -46,6 +46,10 @@ export default class Utils {
     });
   }
 
+  public static isValidGuidArray(guids: string[]): boolean {
+    return guids.every(guid => this.isValidGuid(guid));
+  }
+
   public static isValidGuid(guid: string): boolean {
     const guidRegEx: RegExp = new RegExp(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
 
