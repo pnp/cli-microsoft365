@@ -63,7 +63,7 @@ describe(commands.USER_HIBP, () => {
     assert.strictEqual(actual, true);
   });
 
-  it('checks user is pwned using userName', (done) => {
+  it.only('checks user is pwned using userName', (done) => {
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://haveibeenpwned.com/api/v3/breachedaccount/${encodeURIComponent('account-exists@hibp-integration-tests.com')}`) {
         // this is the actual truncated response as the API would return
@@ -75,6 +75,11 @@ describe(commands.USER_HIBP, () => {
 
     command.action(logger, { options: { debug: true, userName: 'account-exists@hibp-integration-tests.com', apiKey: '2975xc539c304xf797f665x43f8x557x' } }, () => {
       try {
+
+        if (loggerLogSpy.getCall(0)) {
+          console.log(loggerLogSpy.getCall(0).args); // eslint-disable-line no-console
+        }
+
         assert(loggerLogSpy.calledWith([{ "Name": "Adobe" }]));
         done();
       }
