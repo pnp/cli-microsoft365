@@ -2,6 +2,7 @@ const prefix: string = 'aad';
 
 export default {
   APP_ADD: `${prefix} app add`,
+  APP_GET: `${prefix} app get`,
   APP_SET: `${prefix} app set`,
   APP_ROLE_ADD: `${prefix} app role add`,
   APP_ROLE_LIST: `${prefix} app role list`,
@@ -45,6 +46,7 @@ export default {
   SITECLASSIFICATION_ENABLE: `${prefix} siteclassification enable`,
   SITECLASSIFICATION_GET: `${prefix} siteclassification get`,
   SITECLASSIFICATION_SET: `${prefix} siteclassification set`,
+  SP_ADD: `${prefix} sp add`,
   SP_GET: `${prefix} sp get`,
   USER_GET: `${prefix} user get`,
   USER_LIST: `${prefix} user list`,

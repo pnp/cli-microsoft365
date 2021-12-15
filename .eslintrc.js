@@ -30,6 +30,7 @@ const dictionary = [
   'in',
   'init',
   'install',
+  'installed',
   'is',
   'issue',
   'list',

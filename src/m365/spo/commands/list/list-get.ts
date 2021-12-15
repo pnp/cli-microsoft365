@@ -18,6 +18,7 @@ interface Options extends GlobalOptions {
   id?: string;
   title?: string;
   properties?: string;
+  withPermissions?: boolean;
 }
 
 class SpoListGetCommand extends SpoCommand {
@@ -34,6 +35,7 @@ class SpoListGetCommand extends SpoCommand {
     telemetryProps.id = (!(!args.options.id)).toString();
     telemetryProps.title = (!(!args.options.title)).toString();
     telemetryProps.properties = (!(!args.options.properties)).toString();
+    telemetryProps.withPermissions = typeof args.options.withPermissions !== 'undefined';
     return telemetryProps;
   }
 
@@ -51,11 +53,11 @@ class SpoListGetCommand extends SpoCommand {
       requestUrl = `${args.options.webUrl}/_api/web/lists/GetByTitle('${encodeURIComponent(args.options.title as string)}')`;
     }
 
-    const propertiesSelect: string = args.options.properties ? `?$select=${encodeURIComponent(args.options.properties)}` : ``;
+    let propertiesSelect: string = args.options.properties ? `?$select=${encodeURIComponent(args.options.properties)}` : ``;
+    propertiesSelect += args.options.withPermissions ? `${args.options.properties ? '&' : '?'}$expand=HasUniqueRoleAssignments,RoleAssignments/Member,RoleAssignments/RoleDefinitionBindings` : ``;
 
     const requestOptions: any = {
       url: requestUrl + propertiesSelect,
-      method: 'GET',
       headers: {
         'accept': 'application/json;odata=nometadata'
       },
@@ -66,7 +68,6 @@ class SpoListGetCommand extends SpoCommand {
       .get<ListInstance>(requestOptions)
       .then((listInstance: ListInstance): void => {
         logger.log(listInstance);
-
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
@@ -84,6 +85,9 @@ class SpoListGetCommand extends SpoCommand {
       },
       {
         option: '-p, --properties [properties]'
+      },
+      {
+        option: '--withPermissions'
       }
     ];
 

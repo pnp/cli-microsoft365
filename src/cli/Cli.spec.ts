@@ -829,6 +829,25 @@ describe('Cli', () => {
     }
   });
 
+  it('properly handles new line characters in JSON output', (done) => {
+    const input = {
+      "_ObjectIdentity_": "b61700a0-9062-3000-659e-7f5738e3385a|908bed80-a04a-4433-b4a0-883d9847d110:1b11f502-9eb0-401a-b164-68933e6e9443\nSiteProperties\nhttps%3a%2f%2fm365x954810.sharepoint.com%2fsites%2fsite1617"
+    };
+    const expected = [
+      '{',
+      '  "_ObjectIdentity_": "b61700a0-9062-3000-659e-7f5738e3385a|908bed80-a04a-4433-b4a0-883d9847d110:1b11f502-9eb0-401a-b164-68933e6e9443\\\\\\nSiteProperties\\\\\\nhttps%3a%2f%2fm365x954810.sharepoint.com%2fsites%2fsite1617"',
+      '}'
+    ].join('\n');
+    const actual = (Cli as any).formatOutput(input, { output: 'json' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
   it('formats simple output as text', (done) => {
     const o = false;
     const actual = (Cli as any).formatOutput(o, { output: 'text' });

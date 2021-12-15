@@ -661,6 +661,31 @@ describe(commands.PAGE_SET, () => {
     assert.strictEqual(actual, true);
   });
 
+  it('passes validation if layout type is SingleWebPartAppPage', () => {
+    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'SingleWebPartAppPage' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if layout type is RepostPage', () => {
+    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'RepostPage' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if layout type is HeaderlessSearchResults', () => {
+    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'HeaderlessSearchResults' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if layout type is Spaces', () => {
+    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Spaces' } });
+    assert.strictEqual(actual, true);
+  });
+
+  it('passes validation if layout type is Topic', () => {
+    const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', layoutType: 'Topic' } });
+    assert.strictEqual(actual, true);
+  });
+
   it('fails validation if promote type is invalid', () => {
     const actual = command.validate({ options: { name: 'page.aspx', webUrl: 'https://contoso.sharepoint.com', promoteAs: 'invalid' } });
     assert.notStrictEqual(actual, true);

@@ -24,9 +24,6 @@ This command only works with app-only permissions. You will need to create your 
 
 The difference between `fromDateTime` and `toDateTime` cannot exceed a period of 90 days
 
-!!! attention
-    This command is based on an API that is currently in preview and is subject to change once the API reached general availability.
-
 ## Examples
 
 Get details about direct routing calls made between 2020-10-31 and today

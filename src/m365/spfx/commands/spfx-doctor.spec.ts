@@ -797,7 +797,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^10.0.0 required')));
+        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^10 required')));
         assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
         done();
       }
@@ -824,7 +824,7 @@ describe(commands.DOCTOR, () => {
 
     command.action(logger, { options: { debug: false } }, () => {
       try {
-        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^8.0.0 || ^10.0.0 required')));
+        assert(loggerLogSpy.calledWith(getStatus(1, 'Node v12.0.0 found, v^8 || ^10 required')));
         assert(loggerLogSpy.calledWith('- Install Node.js v10'), 'No fix provided');
         done();
       }
@@ -901,7 +901,7 @@ describe(commands.DOCTOR, () => {
     command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(1, 'yo not found')));
-        assert(loggerLogSpy.calledWith('- npm i -g yo'), 'No fix provided');
+        assert(loggerLogSpy.calledWith('- npm i -g yo@3'), 'No fix provided');
         done();
       }
       catch (e) {
@@ -958,7 +958,7 @@ describe(commands.DOCTOR, () => {
     command.action(logger, { options: { debug: false } }, () => {
       try {
         assert(loggerLogSpy.calledWith(getStatus(1, 'gulp not found')));
-        assert(loggerLogSpy.calledWith('- npm i -g gulp'), 'No fix provided');
+        assert(loggerLogSpy.calledWith('- npm i -g gulp@3'), 'No fix provided');
         done();
       }
       catch (e) {

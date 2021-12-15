@@ -695,11 +695,12 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user@contoso.onmicrosoft.com'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
-              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
+              userPrincipalName: 'user@contoso.onmicrosoft.com'
             }
           ]
         });
@@ -792,21 +793,23 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1@contoso.onmicrosoft.com'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
-              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
+              userPrincipalName: 'user1@contoso.onmicrosoft.com'
             }
           ]
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
-              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8b'
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8b',
+              userPrincipalName: 'user2@contoso.onmicrosoft.com'
             }
           ]
         });
@@ -815,7 +818,7 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, () => {
+    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, () => {
       try {
         assert(groupCreated);
         done();
@@ -872,11 +875,12 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user@contoso.onmicrosoft.com'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
-              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
+              userPrincipalName: 'user@contoso.onmicrosoft.com'
             }
           ]
         });
@@ -969,21 +973,23 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1@contoso.onmicrosoft.com'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
-              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a'
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
+              userPrincipalName: 'user1@contoso.onmicrosoft.com'
             }
           ]
         });
       }
 
-      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2@contoso.onmicrosoft.com'&$select=id`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
         return Promise.resolve({
           value: [
             {
-              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8b'
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8b',
+              userPrincipalName: 'user2@contoso.onmicrosoft.com'
             }
           ]
         });
@@ -992,9 +998,141 @@ describe(commands.O365GROUP_ADD, () => {
       return Promise.reject('Invalid request');
     });
 
-    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user@contoso.onmicrosoft.com' } }, () => {
+    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, () => {
       try {
         assert(groupCreated);
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails when an invalid user is specified as owner', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+        return Promise.resolve({
+          value: [
+            {
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
+              userPrincipalName: 'user1@contoso.onmicrosoft.com'
+            }
+          ]
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+        return Promise.resolve({
+          value: []
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
+      try {
+        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails when an invalid user is specified as owner (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+        return Promise.resolve({
+          value: [
+            {
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
+              userPrincipalName: 'user1@contoso.onmicrosoft.com'
+            }
+          ]
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+        return Promise.resolve({
+          value: []
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', owners: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
+      try {
+        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails when an invalid user is specified as member', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+        return Promise.resolve({
+          value: [
+            {
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
+              userPrincipalName: 'user1@contoso.onmicrosoft.com'
+            }
+          ]
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+        return Promise.resolve({
+          value: []
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: false, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
+      try {
+        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails when an invalid user is specified as member (debug)', (done) => {
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user1%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+        return Promise.resolve({
+          value: [
+            {
+              id: '949b16c1-a032-453e-a8ae-89a52bfc1d8a',
+              userPrincipalName: 'user1@contoso.onmicrosoft.com'
+            }
+          ]
+        });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/users?$filter=userPrincipalName eq 'user2%40contoso.onmicrosoft.com'&$select=id,userPrincipalName`) {
+        return Promise.resolve({
+          value: []
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    command.action(logger, { options: { debug: true, displayName: 'My group', description: 'My awesome group', mailNickname: 'my_group', members: 'user1@contoso.onmicrosoft.com,user2@contoso.onmicrosoft.com' } }, (err?: any) => {
+      try {
+        assert.strictEqual(err.message, "Cannot proceed with group creation. The following users provided are invalid : user2@contoso.onmicrosoft.com");
         done();
       }
       catch (e) {

@@ -39,7 +39,7 @@ class TeamsReportPstncallsCommand extends GraphCommand {
     const toDateTimeParameter: string = encodeURIComponent(args.options.toDateTime ? args.options.toDateTime : new Date().toISOString());
 
     const requestOptions: any = {
-      url: `${this.resource}/beta/communications/callRecords/getPstnCalls(fromDateTime=${encodeURIComponent(args.options.fromDateTime)},toDateTime=${toDateTimeParameter})`,
+      url: `${this.resource}/v1.0/communications/callRecords/getPstnCalls(fromDateTime=${encodeURIComponent(args.options.fromDateTime)},toDateTime=${toDateTimeParameter})`,
       headers: {
         accept: 'application/json;odata.metadata=none'
       },

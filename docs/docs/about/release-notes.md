@@ -1,11 +1,43 @@
 # Release notes
 
+## [v4.3.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.3.0)
+
+### New commands
+
+**Azure Active Directory:**
+
+- [aad app get](../cmd/aad/app/app-get.md) - gets an Azure AD app registration [#2835](https://github.com/pnp/cli-microsoft365/issues/2835)
+
+**Microsoft Search:**
+
+- [search externalconnection add](../cmd/search/externalconnection/externalconnection-add.md) - adds a new external connection to be defined for Microsoft Search [#2662](https://github.com/pnp/cli-microsoft365/issues/2662)
+
+**SharePoint:**
+
+- [spo web installedlanguage list](../cmd/spo/web/web-installedlanguage-list.md) - lists all installed languages on site [#2833](https://github.com/pnp/cli-microsoft365/issues/2833)
+
+### Changes
+
+- added support for upgrading SPFx projects to v1.14.0-beta.4 [#2865](https://github.com/pnp/cli-microsoft365/issues/2865)
+- extended 'cli doctor' with cli configuration [#2601](https://github.com/pnp/cli-microsoft365/issues/2601)
+- removed value wrapper from JMESPath [#2858](https://github.com/pnp/cli-microsoft365/issues/2858)
+- updated completion PS filename in docs [#2862](https://github.com/pnp/cli-microsoft365/issues/2862)
+
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
 ### New commands
 
+**Azure Active Directory:**
+
+- [aad sp add](../cmd/aad/sp/sp-add.md) - adds a service principal to a registered Azure AD app [#2583](https://github.com/pnp/cli-microsoft365/issues/2583)
+
+**File:**
+
+- [file list](../cmd/file/file-list.md) - Retrieves files from the specified folder and site [#2804](https://github.com/pnp/cli-microsoft365/issues/2804)
+
 **SharePoint:**
 
+- [spo contenttype list](../cmd/spo/contenttype/contenttype-list.md) - lists content types from specified site [#2777](https://github.com/pnp/cli-microsoft365/issues/2777)
 - [spo listitem attachment list](../cmd/spo/listitem/listitem-attachment-list.md) - gets the attachments associated to a list item [#2730](https://github.com/pnp/cli-microsoft365/issues/2730)
 
 ### Changes
@@ -14,6 +46,24 @@
 - updated 'aad oauth2grant add' to use MS Graph [#2712](https://github.com/pnp/cli-microsoft365/issues/2712)
 - updated 'aad oauth2grant set' to use MS Graph [#2711](https://github.com/pnp/cli-microsoft365/issues/2711)
 - added the 'Use CLI for Microsoft 365 access token' sample [#2731](https://github.com/pnp/cli-microsoft365/issues/2731)
+- updated the 'teams report pstncalls' command to MS Graph v1.0 [#2679](https://github.com/pnp/cli-microsoft365/issues/2679)
+- added siteUrl to 'file add' [#2655](https://github.com/pnp/cli-microsoft365/issues/2655)
+- upgraded MkDocs to 7.1.7 [#2498](https://github.com/pnp/cli-microsoft365/issues/2498)
+- added the 'Export all channels from a team' sample [#2793](https://github.com/pnp/cli-microsoft365/pull/2793)
+- updated main Node.js version to v16 [#2799](https://github.com/pnp/cli-microsoft365/pull/2799)
+- updated asciinema video on all pages [#2663](https://github.com/pnp/cli-microsoft365/issues/2663)
+- fixed 'spo site remove' to remove orphaned groupified sites [#2706](https://github.com/pnp/cli-microsoft365/issues/2706)
+- extended spfx doctor with support for SPFx@1.13.0 [#2802](https://github.com/pnp/cli-microsoft365/issues/2802)
+- fixed issue with \n in JSON output [#2807](https://github.com/pnp/cli-microsoft365/issues/2807)
+- updated 'teams report directroutingcalls' to Graph v1.0 [#2680](https://github.com/pnp/cli-microsoft365/issues/2680)
+- fixed the 'Export all flows in environment' sample [#2805](https://github.com/pnp/cli-microsoft365/issues/2805)
+- extended 'spo list get' with --withPermissions [#2796](https://github.com/pnp/cli-microsoft365/issues/2796)
+- fixed slow tests [#2825](https://github.com/pnp/cli-microsoft365/issues/2825)
+- updated 'aad o365group add' to fail for invalid values [#2654](https://github.com/pnp/cli-microsoft365/issues/2654)
+- added more layouts to spo page add/set [#2821](https://github.com/pnp/cli-microsoft365/issues/2821)
+- extended 'aad app add' with save [#2815](https://github.com/pnp/cli-microsoft365/issues/2815)
+- extended 'spfx project upgrade' with support for SPFx@1.13.1 [#2849](https://github.com/pnp/cli-microsoft365/issues/2849)
+- extended 'spfx doctor' with support for SPFx@1.13.1 [#2849](https://github.com/pnp/cli-microsoft365/issues/2849)
 
 ## [v4.1.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.1.0)
 

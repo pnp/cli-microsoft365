@@ -8,16 +8,18 @@ Microsoft 365 CLI cmdlets to the rescue, it will help you resubmit the flow runs
 
 This script will resubmit all failed flow runs of a Power Automate flow created in an environment. Pass the Flow environment id and the flow guid as parameter while running the script.
 
-```powershell tab="PowerShell"
-$flowEnvironment = $args[0]
-$flowGUID = $args[1]
-$flowRuns = m365 flow run list --environment $flowEnvironment --flow $flowGUID --output json | ConvertFrom-Json
-foreach ($run in $flowRuns) {
-  if ($run.status -eq "Failed") {
-    Write-Output "Run details: " $run
-    #Resubmit all the failed flows
-    m365 flow run resubmit --environment $flowEnvironment --flow $flowGUID --name $run.name --confirm
-    Write-Output "Run resubmitted successfully"
-  }
-}
-```
+=== "PowerShell"
+
+    ```powershell
+    $flowEnvironment = $args[0]
+    $flowGUID = $args[1]
+    $flowRuns = m365 flow run list --environment $flowEnvironment --flow $flowGUID --output json | ConvertFrom-Json
+    foreach ($run in $flowRuns) {
+      if ($run.status -eq "Failed") {
+        Write-Output "Run details: " $run
+        #Resubmit all the failed flows
+        m365 flow run resubmit --environment $flowEnvironment --flow $flowGUID --name $run.name --confirm
+        Write-Output "Run resubmitted successfully"
+      }
+    }
+    ```

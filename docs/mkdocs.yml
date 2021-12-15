@@ -1,9 +1,10 @@
 site_name: CLI for Microsoft 365
 site_url: https://pnp.github.io/cli-microsoft365/
 nav:
-  - Home: 'index.md'
-  - v4 Upgrade Guidance: 'v4-upgrade-guidance.md'
-  - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
+  - Home:
+    - 'index.md'
+    - v4 Upgrade Guidance: 'v4-upgrade-guidance.md'
+    - v3 Upgrade Guidance: 'v3-upgrade-guidance.md'
   - User Guide:
     - 'Installing the CLI': 'user-guide/installing-cli.md'
     - 'Using the CLI': 'user-guide/using-cli.md'
@@ -22,6 +23,7 @@ nav:
     - Azure Active Directory (aad):
       - app:
         - app add: 'cmd/aad/app/app-add.md'
+        - app get: 'cmd/aad/app/app-get.md'
         - app set: 'cmd/aad/app/app-set.md'
         - app role add: 'cmd/aad/app/app-role-add.md'
         - app role delete: 'cmd/aad/app/app-role-delete.md'
@@ -73,6 +75,7 @@ nav:
         - siteclassification get: 'cmd/aad/siteclassification/siteclassification-get.md'
         - siteclassification set: 'cmd/aad/siteclassification/siteclassification-set.md'
       - service principal (sp):
+        - sp add: 'cmd/aad/sp/sp-add.md'
         - sp get: 'cmd/aad/sp/sp-get.md'
       - user:
         - user get: 'cmd/aad/user/user-get.md'
@@ -99,6 +102,7 @@ nav:
       - add: 'cmd/file/file-add.md'
       - convert:
         - convert pdf: 'cmd/file/convert/convert-pdf.md'
+      - list: 'cmd/file/file-list.md'
     - Microsoft Graph (graph):
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
@@ -181,8 +185,9 @@ nav:
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
     - Search:
-      -externalConnections:
-        - externalConnections list: 'cmd/search/externalConnections/externalConnections-list.md'
+      - externalconnection:
+        - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
+        - externalconnection list: 'cmd/search/externalconnection/externalconnection-list.md'
     - Skype (skype):
       - report:
         - report activitycounts: 'cmd/skype/report/report-activitycounts.md'
@@ -228,6 +233,7 @@ nav:
         - contenttype remove: 'cmd/spo/contenttype/contenttype-remove.md'
         - contenttype field remove: 'cmd/spo/contenttype/contenttype-field-remove.md'
         - contenttype field set: 'cmd/spo/contenttype/contenttype-field-set.md'
+        - contenttype list: 'cmd/spo/contenttype/contenttype-list.md'
       - contenttypehub:
         - contenttypehub get: 'cmd/spo/contenttypehub/contenttypehub-get.md'
       - customaction:
@@ -469,6 +475,7 @@ nav:
         - web add: 'cmd/spo/web/web-add.md'
         - web clientsidewebpart list: 'cmd/spo/web/web-clientsidewebpart-list.md'
         - web get: 'cmd/spo/web/web-get.md'
+        - web installedlanguage list: 'cmd/spo/web/web-installedlanguage-list.md'
         - web list: 'cmd/spo/web/web-list.md'
         - web reindex: 'cmd/spo/web/web-reindex.md'
         - web remove: 'cmd/spo/web/web-remove.md'
@@ -668,6 +675,7 @@ nav:
       - 'Create a Microsoft Teams team and bulk add members from CSV file': 'sample-scripts/teams/create-team-and-add-members-and-owners.md'
       - 'Deploy a Microsoft Teams personal app and add it to users': 'sample-scripts/teams/install-personal-app.md'
       - 'Deploy Microsoft Teams app from Azure DevOps': 'sample-scripts/teams/deploy-teams-app.md'
+      - 'Export all channels from a Microsoft Teams team': 'sample-scripts/teams/export-all-channels-teams.md'
       - 'Export conversations from Microsoft Teams Channels': 'sample-scripts/teams/export-teams-conversations.md'
       - 'Get all the Teams a specific user is part of': 'sample-scripts/teams/get-all-teams-specific-user-is-part-of.md'
       - 'Govern orphaned Microsoft Teams': 'sample-scripts/teams/govern-orphan-teams.md'
@@ -694,29 +702,29 @@ theme:
   palette:
     primary: 'red'
   logo: 'images/pnp-cli-microsoft365-white.svg'
-  feature:
-    tabs: true
+  features:
+    - navigation.tabs
 google_analytics:
   - 'UA-110480857-1'
   - 'auto'
 extra_css:
-  - 'css/styles.css'
+  - 'css/styles2.css'
 markdown_extensions:
   - admonition
-  - codehilite:
-      guess_lang: false
   - toc:
       permalink: true
-  - pymdownx.superfences
+  - pymdownx.highlight
   - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed
   - def_list
 extra:
   social:
-    - type: 'twitter'
+    - icon: fontawesome/brands/github
       link: 'https://twitter.com/m365pnp'
-    - type: 'youtube'
+    - icon: fontawesome/brands/youtube
       link: 'http://aka.ms/sppnp-videos'
-    - type: 'link'
+    - icon: fontawesome/solid/link
       link: 'https://aka.ms/sppnp'
 repo_url: http://github.com/pnp/cli-microsoft365
 edit_uri: blob/main/docs/docs

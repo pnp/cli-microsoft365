@@ -1,0 +1,17 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "environment": "spo",
+    "skipFeatureDeployment": false,
+    "isDomainIsolated": false,
+    "componentType": "extension",
+    "extensionType": "ApplicationCustomizer",
+    "componentName": "HelloWorld",
+    "componentDescription": "HelloWorld",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "version": "1.13.0",
+    "libraryName": "spfx-1130-applicationcustomizer",
+    "libraryId": "3be0ce15-c459-43eb-8448-8389ba6eaea5",
+    "packageManager": "npm"
+  }
+}
