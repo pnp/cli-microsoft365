@@ -459,7 +459,7 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
-  it('correctly adds planner bucket with title, bucketId, planName, and ownerGroupId', (done) => {
+  it('correctly adds planner task with title, bucketId, planName, and ownerGroupId', (done) => {
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/plans?$filter=(owner eq '0d0402ee-970f-4951-90b5-2f24519d2e40')`) {
@@ -540,7 +540,7 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
-  it('correctly adds planner bucket with title, bucketId, planId, and assignedToUserIds', (done) => {
+  it('correctly adds planner task with title, bucketId, planId, and assignedToUserIds', (done) => {
     const options: any = {
       title: 'My Planner Task',
       planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
@@ -559,7 +559,7 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
-  it('correctly adds planner bucket with title, bucketId, planId, and assignedToUserNames', (done) => {
+  it('correctly adds planner task with title, bucketId, planId, and assignedToUserNames', (done) => {
     Utils.restore(request.get);
     Utils.restore(request.post);
 
@@ -595,6 +595,45 @@ describe(commands.TASK_ADD, () => {
     command.action(logger, { options: options } as any, () => {
       try {
         assert(loggerLogSpy.calledWith(taskAddResponseWithAssignments));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('correctly adds planner task with title, bucketId, planId, and description', (done) => {
+    Utils.restore(request.get);
+    Utils.restore(request.patch);
+
+    const options: any = {
+      title: 'My Planner Task',
+      planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+      bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+      description: 'My Task Description'
+    };
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
+        return Promise.resolve({
+          "@odata.etag": "TestEtag"
+        });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'patch').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
+        return Promise.resolve("");
+      }
+      return Promise.reject('Invalid Request');
+    });
+
+    command.action(logger, { options: options } as any, () => {
+      try {
+        assert(loggerLogSpy.calledWith(taskAddResponse));
         done();
       }
       catch (e) {
@@ -673,7 +712,6 @@ describe(commands.TASK_ADD, () => {
     });
   });
 
-
   it('fails validation when ownerGroupName not found', (done) => {
     Utils.restore(request.get);
     sinon.stub(request, 'get').callsFake((opts) => {
@@ -723,6 +761,36 @@ describe(commands.TASK_ADD, () => {
     }, (err?: any) => {
       try {
         assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`The specified plan does not exist`)));
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
+  it('fails validation when task details endpoint fails', (done) => {
+    Utils.restore(request.get);
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
+        return Promise.resolve({ });
+      }
+
+      return Promise.reject('Invalid request');
+    });
+
+
+    command.action(logger, {
+      options: {
+        title: 'My Planner Task',
+        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
+        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
+        description: 'My Task Description'
+      }
+    }, (err?: any) => {
+      try {
+        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Error fetching task details`)));
         done();
       }
       catch (e) {

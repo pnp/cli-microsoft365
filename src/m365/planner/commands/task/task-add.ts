@@ -24,6 +24,7 @@ interface Options extends GlobalOptions {
   percentComplete?: number;
   assignedToUserIds?: string;
   assignedToUserNames?: string;
+  description?: string;
   orderHint?: string;
 }
 
@@ -50,6 +51,7 @@ class PlannerTaskAddCommand extends GraphCommand {
     telemetryProps.percentComplete = typeof args.options.percentComplete !== 'undefined';
     telemetryProps.assignedToUserIds = typeof args.options.assignedToUserIds !== 'undefined';
     telemetryProps.assignedToUserNames = typeof args.options.assignedToUserNames !== 'undefined';
+    telemetryProps.description = typeof args.options.description !== 'undefined';
     telemetryProps.orderHint = typeof args.options.orderHint !== 'undefined';
     return telemetryProps;
   }
@@ -82,14 +84,62 @@ class PlannerTaskAddCommand extends GraphCommand {
               orderHint: args.options.orderHint
             }
           };
-  
-          return request.post(requestOptions);
+
+          return request
+            .post(requestOptions)
+            .then(async (newTask: any) => {
+              const taskId = newTask['id'];
+
+              if (args.options.description) {
+                const etag = await this.getTaskDetails(taskId);
+
+                const requestOptionsTaskDetails: any = {
+                  url: `${this.resource}/v1.0/planner/tasks/${taskId}/details`,
+                  headers: {
+                    'accept': 'application/json;odata.metadata=none',
+                    'If-Match': etag
+                  },
+                  responseType: 'json',
+                  data: {
+                    description: args.options.description
+                  }
+                };
+
+                await request.patch(requestOptionsTaskDetails);
+
+                return newTask;
+              } 
+
+              return newTask;
+            });
         })
       )
       .then((res: any): void => {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
+  }
+
+  private getTaskDetails(taskId: string): Promise<any> {
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
+      headers: {
+        accept: 'application/json'
+      },
+      responseType: 'json'
+    };
+
+    return request
+      .get(requestOptions)
+      .then((response: any) => {
+        const etag: string | undefined = response['@odata.etag'];
+
+        if (!etag) {
+          return Promise.reject(`Error fetching task details`);
+        }
+
+        return Promise.resolve(etag);
+      });
   }
 
   private async generateUserAssignments(args: CommandArgs, logger: Logger) {
@@ -260,6 +310,9 @@ class PlannerTaskAddCommand extends GraphCommand {
       },
       {
         option: "--assignedToUserNames [assignedToUserNames]"
+      },
+      {
+        option: "--description [description]"
       },
       {
         option: "--orderHint [orderHint]"

@@ -49,6 +49,9 @@ m365 planner task add [options]
 `--assignedToUserNames [assignedToUserNames]`
 : The comma-separated UPNs of the assignees the task is assigned to. Specify either `bucketId` or `bucketName` but not both.
 
+`--description [description]`
+: Description of the task
+
 `--orderHint [orderHint]`
 : Hint used to order items of this type in a list view. The format is defined as outlined [here](https://docs.microsoft.com/en-us/graph/api/resources/planner-order-hint-format?view=graph-rest-1.0).
 
