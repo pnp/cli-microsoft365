@@ -7,6 +7,7 @@
 **Azure Active Directory:**
 
 - [aad app get](../cmd/aad/app/app-get.md) - gets an Azure AD app registration [#2835](https://github.com/pnp/cli-microsoft365/issues/2835)
+- [aad user password validate](../cmd/aad/user/user-password-validate.md) - checks a user's password against the organization's password validation policy [#2846](https://github.com/pnp/cli-microsoft365/issues/2846)
 
 **Microsoft Search:**
 
@@ -22,6 +23,8 @@
 - extended 'cli doctor' with cli configuration [#2601](https://github.com/pnp/cli-microsoft365/issues/2601)
 - removed value wrapper from JMESPath [#2858](https://github.com/pnp/cli-microsoft365/issues/2858)
 - updated completion PS filename in docs [#2862](https://github.com/pnp/cli-microsoft365/issues/2862)
+- added the 'Copy list items between SharePoint lists' script [#2652](https://github.com/pnp/cli-microsoft365/issues/2652)
+- updated Node version Readme.md Build instructions [#2873](https://github.com/pnp/cli-microsoft365/issues/2873)
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
