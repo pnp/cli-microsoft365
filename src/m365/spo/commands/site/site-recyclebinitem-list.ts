@@ -16,7 +16,7 @@ interface Options extends GlobalOptions {
   secondary?: boolean;
 }
 
-class SpoSiteRecyclebinitemList extends SpoCommand {
+class SpoSiteRecycleBinItemListCommand extends SpoCommand {
   public get name(): string {
     return commands.SITE_RECYCLEBINITEM_LIST;
   }
@@ -89,4 +89,4 @@ class SpoSiteRecyclebinitemList extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteRecyclebinitemList();
+module.exports = new SpoSiteRecycleBinItemListCommand();
