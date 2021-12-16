@@ -73,7 +73,9 @@ class Request {
       decompress: true,
       responseType: 'text',
       /* c8 ignore next */
-      transformResponse: [data => data]
+      transformResponse: [data => data],
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity
     });
     // since we're stubbing requests, request interceptor is never called in
     // tests, so let's exclude it from coverage
