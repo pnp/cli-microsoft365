@@ -38,6 +38,38 @@ describe(commands.TASK_ADD, () => {
     "appliedCategories": {},
     "assignments": {}
   };
+  
+  const taskAddResponseWithDetails = {
+    "planId": "8QZEH7b3wkS_bGQobscsM5gADCBb",
+    "bucketId": "IK8tuFTwQEa5vTonM7ZMRZgAKdno",
+    "title": "My Planner Task",
+    "orderHint": "8585622710787367671",
+    "assigneePriority": "",
+    "percentComplete": 0,
+    "startDateTime": null,
+    "createdDateTime": "2021-12-12T19:03:26.7408136Z",
+    "dueDateTime": null,
+    "hasDescription": false,
+    "previewType": "automatic",
+    "completedDateTime": null,
+    "completedBy": null,
+    "referenceCount": 0,
+    "checklistItemCount": 0,
+    "activeChecklistItemCount": 0,
+    "conversationThreadId": null,
+    "id": "Z-RLQGfppU6H3663DBzfs5gAMD3o",
+    "createdBy": {
+      "user": {
+        "displayName": null,
+        "id": "dd8b99a7-77c6-4238-a609-396d27844921"
+      }
+    },
+    "appliedCategories": {},
+    "assignments": {},
+    "description": "My Task Description",
+    "references": {},
+    "checklist": {}
+  };
 
   const taskAddResponseWithAssignments = {
     "@odata.etag": "W/\"JzEtVGFzayAgQEBAQEBAQEBAQEBAQEBARCc=\"",
@@ -180,21 +212,6 @@ describe(commands.TASK_ADD, () => {
 
   it('has a description', () => {
     assert.notStrictEqual(command.description, null);
-  });
-
-  it('defines correct properties for the default output', () => {
-    assert.deepStrictEqual(command.defaultProperties(), ['title', 'planId', 'bucketId']);
-  });
-
-  it('fails validation if title is not provided.', (done) => {
-    const actual = command.validate({
-      options: {
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno'
-      }
-    });
-    assert.notStrictEqual(actual, true);
-    done();
   });
 
   it('fails validation if neither the planId nor planName are provided.', (done) => {
@@ -615,10 +632,28 @@ describe(commands.TASK_ADD, () => {
     };
 
     sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details` &&
+        JSON.stringify(opts.headers) === JSON.stringify({
+          'accept': 'application/json'
+        })) {
         return Promise.resolve({
           "@odata.etag": "TestEtag"
         });
+      }
+
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details` &&
+        JSON.stringify(opts.headers) === JSON.stringify({
+          'accept': 'application/json;odata.metadata=none'
+        })) {
+        return Promise.resolve({
+          "description": "My Task Description",
+          "references": {},
+          "checklist": {}
+        });
+      }
+      
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
+        return Promise.resolve(taskAddResponseWithDetails);
       }
 
       return Promise.reject('Invalid request');
@@ -633,7 +668,7 @@ describe(commands.TASK_ADD, () => {
 
     command.action(logger, { options: options } as any, () => {
       try {
-        assert(loggerLogSpy.calledWith(taskAddResponse));
+        assert(loggerLogSpy.calledWith(taskAddResponseWithDetails));
         done();
       }
       catch (e) {
@@ -774,7 +809,7 @@ describe(commands.TASK_ADD, () => {
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
-        return Promise.resolve({ });
+        return Promise.resolve(undefined);
       }
 
       return Promise.reject('Invalid request');

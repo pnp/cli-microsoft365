@@ -5,7 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { User } from '@microsoft/microsoft-graph-types';
+import { PlannerTask, User, PlannerAssignment, PlannerPlan, Group } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -45,7 +45,6 @@ class PlannerTaskAddCommand extends GraphCommand {
     telemetryProps.ownerGroupName = typeof args.options.ownerGroupName !== 'undefined';
     telemetryProps.bucketId = typeof args.options.bucketId !== 'undefined';
     telemetryProps.bucketName = typeof args.options.bucketName !== 'undefined';
-    telemetryProps.title = typeof args.options.title !== 'undefined';
     telemetryProps.startDateTime = typeof args.options.startDateTime !== 'undefined';
     telemetryProps.dueDateTime = typeof args.options.dueDateTime !== 'undefined';
     telemetryProps.percentComplete = typeof args.options.percentComplete !== 'undefined';
@@ -56,75 +55,79 @@ class PlannerTaskAddCommand extends GraphCommand {
     return telemetryProps;
   }
 
-  public defaultProperties(): string[] | undefined {
-    return ['title', 'planId', 'bucketId'];
-  }
-
   public commandAction(logger: Logger, args: CommandArgs, cb: () => void): void {
-    this
-      .getPlanId(args)
-      .then((planId: string) => 
-        this.getBucketId(args, planId).then(async (bucketId: string) => {
-          const assignments: { [userId: string]: any; } = await this.generateUserAssignments(args, logger);
+    this.getPlanId(args)
+      .then(planId => {
+        args.options.planId = planId;
+        return this.getBucketId(args, planId);
+      })
+      .then(bucketId => {
+        args.options.bucketId = bucketId;
+        return this.generateUserAssignments(args);
+      })
+      .then(assignments => {
+        const requestOptions: any = {
+          url: `${this.resource}/v1.0/planner/tasks`,
+          headers: {
+            'accept': 'application/json;odata.metadata=none'
+          },
+          responseType: 'json',
+          data: {
+            planId: args.options.planId,
+            bucketId: args.options.bucketId,
+            title: args.options.title,
+            startDateTime: args.options.startDateTime,
+            dueDateTime: args.options.dueDateTime,
+            percentComplete: args.options.percentComplete,
+            assignments: assignments,
+            orderHint: args.options.orderHint
+          }
+        };
 
-          const requestOptions: any = {
-            url: `${this.resource}/v1.0/planner/tasks`,
-            headers: {
-              'accept': 'application/json;odata.metadata=none'
-            },
-            responseType: 'json',
-            data: {
-              planId: planId,
-              bucketId: bucketId,
-              title: args.options.title,
-              startDateTime: args.options.startDateTime,
-              dueDateTime: args.options.dueDateTime,
-              percentComplete: args.options.percentComplete,
-              assignments: assignments,
-              orderHint: args.options.orderHint
-            }
-          };
-
-          return request
-            .post(requestOptions)
-            .then(async (newTask: any) => {
-              const taskId = newTask['id'];
-
-              if (args.options.description) {
-                const etag = await this.getTaskDetails(taskId);
-
-                const requestOptionsTaskDetails: any = {
-                  url: `${this.resource}/v1.0/planner/tasks/${taskId}/details`,
-                  headers: {
-                    'accept': 'application/json;odata.metadata=none',
-                    'If-Match': etag
-                  },
-                  responseType: 'json',
-                  data: {
-                    description: args.options.description
-                  }
-                };
-
-                await request.patch(requestOptionsTaskDetails);
-
-                return newTask;
-              } 
-
-              return newTask;
+        return request.post(requestOptions) as PlannerTask;
+      })
+      .then(newTask => { 
+        const taskId = newTask.id as string;
+  
+        if (args.options.description) {
+          return this.getTaskDetails(taskId, true)
+            .then(taskDetails => {
+              const requestOptionsTaskDetails: any = {
+                url: `${this.resource}/v1.0/planner/tasks/${taskId}/details`,
+                headers: {
+                  'accept': 'application/json;odata.metadata=none',
+                  'If-Match': taskDetails['@odata.etag']
+                },
+                responseType: 'json',
+                data: {
+                  description: args.options.description
+                }
+              };
+      
+              return request.patch(requestOptionsTaskDetails);              
+            })
+            .then(() => {
+              return this.getTaskDetails(taskId);
+            })
+            .then(taskDetails => {
+              return { ...newTask, ...taskDetails };
             });
-        })
-      )
+        } 
+        else {
+          return newTask;
+        }  
+      })
       .then((res: any): void => {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getTaskDetails(taskId: string): Promise<any> {
+  private getTaskDetails(taskId: string, withOdata: boolean = false): Promise<any> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
       headers: {
-        accept: 'application/json'
+        accept: `application/json${withOdata ? '' : ';odata.metadata=none'}`
       },
       responseType: 'json'
     };
@@ -132,32 +135,39 @@ class PlannerTaskAddCommand extends GraphCommand {
     return request
       .get(requestOptions)
       .then((response: any) => {
-        const etag: string | undefined = response['@odata.etag'];
+        const taskDetails: any | undefined = response;
 
-        if (!etag) {
+        if (!taskDetails) {
           return Promise.reject(`Error fetching task details`);
         }
 
-        return Promise.resolve(etag);
+        return Promise.resolve(taskDetails);
       });
   }
 
-  private async generateUserAssignments(args: CommandArgs, logger: Logger) {
-    const assignments: { [userId: string]: any; } = {};
+  private generateUserAssignments(args: CommandArgs): Promise<{ [userId: string]: PlannerAssignment; }> {
+    const assignments: { [userId: string]: PlannerAssignment; } = {};
 
     if (args.options.assignedToUserNames) {
-      const userIds = await this.getUserIds(logger, args.options.assignedToUserNames);
-      userIds.map(x => assignments[x] = {
-        "@odata.type": "microsoft.graph.plannerAssignment", "orderHint": " !"
-      });
-    }
+      return this.getUserIds(args.options.assignedToUserNames)
+        .then((userIds) => {
+          userIds.map(x => assignments[x] = {
+            orderHint: " !"
+          });
 
-    if (args.options.assignedToUserIds) {
-      args.options.assignedToUserIds.split(',').map(x => assignments[x] = {
-        "@odata.type": "microsoft.graph.plannerAssignment", "orderHint": " !"
-      });
+          return Promise.resolve(assignments);
+        });
     }
-    return assignments;
+    else if (args.options.assignedToUserIds) {
+      args.options.assignedToUserIds.split(',').map(x => assignments[x] = {
+        orderHint: " !"
+      });
+
+      return Promise.resolve(assignments);
+    } 
+    else {
+      return Promise.resolve(assignments);
+    }
   }
 
   private getBucketId(args: CommandArgs, planId: string): Promise<string> {
@@ -202,15 +212,15 @@ class PlannerTaskAddCommand extends GraphCommand {
           responseType: 'json'
         };
 
-        return request.get<{ value: { id: string; title: string; }[] }>(requestOptions);
+        return request.get<{ value: PlannerPlan[] }>(requestOptions);
       }).then((response) => {
-        const plan: { id: string; title: string; } | undefined = response.value.find(val => val.title === args.options.planName);
+        const plan: PlannerPlan | undefined = response.value.find(val => val.title === args.options.planName);
 
         if (!plan) {
           return Promise.reject(`The specified plan does not exist`);
         }
 
-        return Promise.resolve(plan.id);
+        return Promise.resolve(plan.id as string);
       });
   }
 
@@ -228,24 +238,23 @@ class PlannerTaskAddCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: { id: string; }[] }>(requestOptions)
+      .get<{ value: Group[] }>(requestOptions)
       .then(response => {
-        const group: { id: string; } | undefined = response.value[0];
+        const group: Group | undefined = response.value[0];
 
         if (!group) {
           return Promise.reject(`The specified owner group does not exist`);
         }
 
-        return Promise.resolve(group.id);
+        return Promise.resolve(group.id as string);
       });
   }
 
-  private getUserIds(logger: Logger, users: string): Promise<string[]> {
+  private getUserIds(users: string): Promise<string[]> {
     const userArr: string[] = users.split(',').map(o => o.trim());
-    let promises: Promise<{ value: User[] }>[] = [];
     let userIds: string[] = [];
 
-    promises = userArr.map(user => {
+    const promises: Promise<{ value: User[] }>[] = userArr.map(user => {
       const requestOptions: any = {
         url: `${this.resource}/v1.0/users?$filter=userPrincipalName eq '${Utils.encodeQueryParameter(user)}'&$select=id,userPrincipalName`,
         headers: {
@@ -276,7 +285,7 @@ class PlannerTaskAddCommand extends GraphCommand {
   public options(): CommandOption[] {
     const options: CommandOption[] = [
       {
-        option: '-t, --title <title>'
+        option: "-t, --title <title>"
       },
       {
         option: "--planId [planId]"
@@ -324,10 +333,6 @@ class PlannerTaskAddCommand extends GraphCommand {
   }
 
   public validate(args: CommandArgs): boolean | string {
-    if (!args.options.title) {
-      return 'Specify a task title';
-    }
-
     if (!args.options.planId && !args.options.planName) {
       return 'Specify either planId or planName';
     }

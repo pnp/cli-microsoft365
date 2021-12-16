@@ -32,22 +32,22 @@ m365 planner task add [options]
 : Bucket Name to which the task belongs. The bucket needs to exist in the selected plan. Specify either `bucketId` or `bucketName` but not both.
 
 `--startDateTime [startDateTime]`
-: The date and time when the task started. 
+: The date and time when the task started. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
 
 `--dueDateTime [dueDateTime]`
-: The date and time when the task is due. 
+: The date and time when the task is due. This should be defined as a valid ISO 8601 string. `2021-12-16T18:28:48.6964197Z`
 
 `--percentComplete [percentComplete]`
 : Percentage of task completion. Number between 0 and 100.
-- When set to 0, the task is considered _Not started_. 
-- When set between 1 and 99, the task is considered _In progress_. 
-- When set to 100, the task is considered _Completed_.
+  - When set to 0, the task is considered _Not started_. 
+  - When set between 1 and 99, the task is considered _In progress_. 
+  - When set to 100, the task is considered _Completed_.
 
 `--assignedToUserIds [assignedToUserIds]`
-: The comma-separated IDs of the assignees the task is assigned to. Specify either `bucketId` or `bucketName` but not both.
+: The comma-separated IDs of the assignees the task is assigned to. Specify either `assignedToUserIds` or `assignedToUserNames` but not both.
 
 `--assignedToUserNames [assignedToUserNames]`
-: The comma-separated UPNs of the assignees the task is assigned to. Specify either `bucketId` or `bucketName` but not both.
+: The comma-separated UPNs of the assignees the task is assigned to. Specify either `assignedToUserIds` or `assignedToUserNames` but not both.
 
 `--description [description]`
 : Description of the task
