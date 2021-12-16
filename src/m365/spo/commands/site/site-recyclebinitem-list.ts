@@ -16,9 +16,9 @@ interface Options extends GlobalOptions {
   secondary?: boolean;
 }
 
-class SpoSiteRecyclebinList extends SpoCommand {
+class SpoSiteRecyclebinitemList extends SpoCommand {
   public get name(): string {
-    return commands.SITE_RECYCLEBIN_LIST;
+    return commands.SITE_RECYCLEBINITEM_LIST;
   }
 
   public get description(): string {
@@ -26,7 +26,7 @@ class SpoSiteRecyclebinList extends SpoCommand {
   }
 
   public defaultProperties(): string[] | undefined {
-    return ['Title'];
+    return ['Id', 'Title', 'DirName'];
   }
 
   public commandAction(logger: Logger, args: CommandArgs, cb: (err?: any) => void): void {
@@ -39,7 +39,7 @@ class SpoSiteRecyclebinList extends SpoCommand {
     let requestUrl: string = `${args.options.siteUrl}/_api/site/RecycleBin?$filter=(ItemState eq ${state})`;
 
     if (typeof args.options.type !== 'undefined') {
-      requestUrl += `and (ItemType eq ${args.options.type})`;
+      requestUrl += ` and (ItemType eq ${args.options.type})`;
     }
 
     const requestOptions: any = {
@@ -89,4 +89,4 @@ class SpoSiteRecyclebinList extends SpoCommand {
   }
 }
 
-module.exports = new SpoSiteRecyclebinList();
+module.exports = new SpoSiteRecyclebinitemList();
