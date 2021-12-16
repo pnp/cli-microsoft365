@@ -25,6 +25,7 @@
 - updated completion PS filename in docs [#2862](https://github.com/pnp/cli-microsoft365/issues/2862)
 - added the 'Copy list items between SharePoint lists' script [#2652](https://github.com/pnp/cli-microsoft365/issues/2652)
 - updated Node version Readme.md Build instructions [#2873](https://github.com/pnp/cli-microsoft365/issues/2873)
+- fixed the maxBodyLength issue [#2863](https://github.com/pnp/cli-microsoft365/issues/2863)
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
