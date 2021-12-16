@@ -74,6 +74,10 @@ class PaAppListCommand extends AzmgmtItemsListCommand<{ name: string; displayNam
       return 'When specifying the admin option the environment option is required as well';
     }
 
+    if (args.options.environment && !args.options.asAdmin) {
+      return 'When specifying the environment option the admin option is required as well';
+    }
+
     return true;
   }
 

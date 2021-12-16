@@ -3536,6 +3536,11 @@ describe(commands.APP_LIST, () => {
     assert.notStrictEqual(actual, true);
   });
 
+  it('fails validation if environment specified without admin', () => {
+    const actual = command.validate({ options: { environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6' } });
+    assert.notStrictEqual(actual, true);
+  });
+
   it('passes validation if asAdmin specified with environment', () => {
     const actual = command.validate({ options: { asAdmin: true, environment: 'Default-d87a7535-dd31-4437-bfe1-95340acd55c6'} });
     assert.strictEqual(actual, true);
