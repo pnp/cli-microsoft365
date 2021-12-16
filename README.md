@@ -179,7 +179,7 @@ m365 spo site get --url https://contoso.sharepoint.com --output text
 
 ## Build
 
-To build and run this CLI locally, you will need [`node`](https://nodejs.org) `>= 14.0.0` installed.
+To build and run this CLI locally, you will need [`node`](https://nodejs.org) `>= 16.0.0` installed.
 
 ```sh
 # Clone this repository

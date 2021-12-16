@@ -413,7 +413,7 @@ describe(commands.PROJECT_UPGRADE, () => {
     sinon.stub(command as any, 'getProjectVersion').callsFake(_ => '1.5.0');
 
     command.action(logger, { options: { toVersion: '1.5.0' } } as any, (err?: any) => {
-      assert.strictEqual(typeof(err), 'undefined', 'Returns error');
+      assert.strictEqual(typeof (err), 'undefined', 'Returns error');
       assert(log.indexOf(`Project doesn't need to be upgraded`) > -1, `Doesn't return info message`);
     });
   });
@@ -2506,6 +2506,62 @@ describe(commands.PROJECT_UPGRADE, () => {
   });
   //#endregion
 
+  //#region 1.13.1
+  it('e2e: shows correct number of findings for upgrading application customizer 1.13.1 project to 1.14.0-beta.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-applicationcustomizer'));
+
+    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 10);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading field customizer react 1.13.1 project to 1.14.0-beta.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-fieldcustomizer-react'));
+
+    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 9);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading list view command set 1.13.1 project to 1.14.0-beta.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-listviewcommandset'));
+
+    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 10);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading no framework web part 1.13.1 project to 1.14.0-beta.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-nolib'));
+
+    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 12);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading react web part 1.13.1 project to 1.14.0-beta.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-react'));
+
+    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 12);
+    });
+  });
+
+  it('e2e: shows correct number of findings for upgrading web part with optional dependencies 1.13.1 project to 1.14.0-beta.4', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-optionaldeps'));
+
+    command.action(logger, { options: { toVersion: '1.14.0-beta.4', output: 'json', preview: true } } as any, () => {
+      const findings: FindingToReport[] = log[0];
+      assert.strictEqual(findings.length, 22);
+    });
+  });
+  //#endregion
+
   //#region superseded rules
   it('ignores superseded findings (1.1.0 > 1.2.0)', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-110-webpart-react'));
@@ -2552,13 +2608,13 @@ describe(commands.PROJECT_UPGRADE, () => {
     });
   });
 
-  // it('upgrades project to the latest preview version using the preview option', () => {
-  //   sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1120-webpart-nolib'));
+  it('upgrades project to the latest preview version using the preview option', () => {
+    sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-1131-webpart-nolib'));
 
-  //   command.action(logger, { options: { preview: true } } as any, () => {
-  //     assert(log[0].indexOf('1.13.0') > -1);
-  //   });
-  // });
+    command.action(logger, { options: { preview: true } } as any, () => {
+      assert(log[0].indexOf('1.14.0') > -1);
+    });
+  });
 
   it('returns markdown report with output format md', () => {
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph'));
@@ -2579,13 +2635,13 @@ describe(commands.PROJECT_UPGRADE, () => {
   it('writes CodeTour upgrade report to .tours folder when in tour output mode. Creates the folder when it does not exist', () => {
     const projectPath: string = 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph';
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
-    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => {});
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     const existsSyncOriginal = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake(path => {
       if (path.toString().indexOf('.tours') > -1) {
         return false;
       }
-      
+
       return existsSyncOriginal(path);
     });
     const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
@@ -2599,13 +2655,13 @@ describe(commands.PROJECT_UPGRADE, () => {
   it('writes CodeTour upgrade report to .tours folder when in tour output mode. Does not create the folder when it already exists', () => {
     const projectPath: string = 'src/m365/spfx/commands/project/test-projects/spfx-151-webpart-react-graph';
     sinon.stub(command as any, 'getProjectRoot').callsFake(_ => path.join(process.cwd(), projectPath));
-    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => {});
+    const writeFileSyncStub: sinon.SinonStub = sinon.stub(fs, 'writeFileSync').callsFake(_ => { });
     const existsSyncOriginal = fs.existsSync;
     sinon.stub(fs, 'existsSync').callsFake(path => {
       if (path.toString().indexOf('.tours') > -1) {
         return true;
       }
-      
+
       return existsSyncOriginal(path);
     });
     const mkDirSyncStub: sinon.SinonStub = sinon.stub(fs, 'mkdirSync').callsFake(_ => '');
