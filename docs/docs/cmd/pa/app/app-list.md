@@ -25,7 +25,7 @@ pa app list [options]
 
 If the environment with the name you specified doesn't exist, you will get the `Access to the environment 'xyz' is denied.` error.
 
-By default, the `app list` command returns only your apps. To list all apps, use the `asAdmin` option and make sure to specify the `environment` option.
+By default, the `app list` command returns only your apps. To list all apps, use the `asAdmin` option and make sure to specify the `environment` option. You cannot specify only one of the options, when specifying the `environment` option the the `asAdmin` option has to be present as well.
 
 ## Examples
 
@@ -33,12 +33,6 @@ List all your apps
 
 ```sh
 m365 pa app list
-```
-
-List all your apps in a given environment
-
-```sh
-m365 pa app list --environment Default-d87a7535-dd31-4437-bfe1-95340acd55c5
 ```
 
 List all apps in a given environment
