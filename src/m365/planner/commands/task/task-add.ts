@@ -5,7 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { PlannerTask, User, PlannerAssignment, PlannerPlan, Group } from '@microsoft/microsoft-graph-types';
+import { PlannerTask, User, PlannerAssignment, PlannerPlan, Group, PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -90,13 +90,13 @@ class PlannerTaskAddCommand extends GraphCommand {
         const taskId = newTask.id as string;
   
         if (args.options.description) {
-          return this.getTaskDetails(taskId, true)
-            .then(taskDetails => {
+          return this.getTaskDetailsEtag(taskId)
+            .then(etag => {
               const requestOptionsTaskDetails: any = {
                 url: `${this.resource}/v1.0/planner/tasks/${taskId}/details`,
                 headers: {
                   'accept': 'application/json;odata.metadata=none',
-                  'If-Match': taskDetails['@odata.etag']
+                  'If-Match': etag
                 },
                 responseType: 'json',
                 data: {
@@ -123,11 +123,11 @@ class PlannerTaskAddCommand extends GraphCommand {
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
   }
 
-  private getTaskDetails(taskId: string, withOdata: boolean = false): Promise<any> {
+  private getTaskDetails(taskId: string): Promise<PlannerTaskDetails> {
     const requestOptions: any = {
       url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
       headers: {
-        accept: `application/json${withOdata ? '' : ';odata.metadata=none'}`
+        accept: 'application/json;odata.metadata=none'
       },
       responseType: 'json'
     };
@@ -135,13 +135,35 @@ class PlannerTaskAddCommand extends GraphCommand {
     return request
       .get(requestOptions)
       .then((response: any) => {
-        const taskDetails: any | undefined = response;
+        const taskDetails: PlannerTaskDetails | undefined = response;
 
         if (!taskDetails) {
           return Promise.reject(`Error fetching task details`);
         }
 
         return Promise.resolve(taskDetails);
+      });
+  }
+
+  private getTaskDetailsEtag(taskId: string): Promise<string> {
+    const requestOptions: any = {
+      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
+      headers: {
+        accept: 'application/json'
+      },
+      responseType: 'json'
+    };
+
+    return request
+      .get(requestOptions)
+      .then((response: any) => {
+        const etag: string | undefined = response ? response['@odata.etag'] : undefined;
+
+        if (!etag) {
+          return Promise.reject(`Error fetching task details`);
+        }
+
+        return Promise.resolve(etag);
       });
   }
 
