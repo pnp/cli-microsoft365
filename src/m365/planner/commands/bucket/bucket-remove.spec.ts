@@ -491,6 +491,51 @@ describe(commands.BUCKET_REMOVE, () => {
     });
   });
 
+  it('should handle Microsoft graph error response', (done) => {
+
+    sinon.stub(request, 'get').callsFake((opts) => {
+      if ((opts.url as string).indexOf(`planner/plans/buckets/IObYKVZEVEK9qDa5RmeszskAJwCp`) > -1) {
+        return Promise.resolve(bucketListResponse);
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    sinon.stub(request, 'delete').callsFake((opts) => {
+      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/IObYKVZEVEK9qDa5RmeszskAJwCp`) {
+        return Promise.reject({
+          "error": {
+            "code": "",
+            "message": "The requested item is not found.",
+            "innerError": {
+              "date": "2021-12-17T00:01:25",
+              "request-id": "cb693e6b-878c-4e20-91a2-fe45741638ef",
+              "client-request-id": "ee0e1b98-65c8-90e8-a42b-a498e2fa1d64"
+            }
+          }
+        });
+      }
+      return Promise.reject('Invalid request');
+    });
+
+    Utils.restore(Cli.prompt);
+    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
+      cb({ continue: true });
+    });
+    command.action(logger, {
+      options: {
+        bucketId: 'IObYKVZEVEK9qDa5RmeszskAJwCp'
+      }
+    } as any, (err?: any) => {
+      try {
+        assert.strictEqual(err.message, "The specified bucket does not exist in the Microsoft Planner");
+        done();
+      }
+      catch (e) {
+        done(e);
+      }
+    });
+  });
+
   it('fails validation if the bucketId is not provided', (done) => {
     const actual = command.validate({
       options: {
@@ -581,43 +626,6 @@ describe(commands.BUCKET_REMOVE, () => {
       }
     });
     assert.notStrictEqual(actual, true);
-  });
-
-  it('should handle Microsoft graph error response', (done) => {
-    sinon.stub(request, 'delete').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/buckets/IObYKVZEVEK9qDa5RmeszskAJwCp`) {
-        return Promise.reject({
-          "error": {
-            "code": "",
-            "message": "The requested item is not found.",
-            "innerError": {
-              "date": "2021-12-17T00:01:25",
-              "request-id": "cb693e6b-878c-4e20-91a2-fe45741638ef",
-              "client-request-id": "ee0e1b98-65c8-90e8-a42b-a498e2fa1d64"
-            }
-          }
-        });
-      }
-      return Promise.reject('Invalid request');
-    });
-
-    Utils.restore(Cli.prompt);
-    sinon.stub(Cli, 'prompt').callsFake((options: any, cb: (result: { continue: boolean }) => void) => {
-      cb({ continue: true });
-    });
-    command.action(logger, {
-      options: {
-        bucketId: 'IObYKVZEVEK9qDa5RmeszskAJwCp'
-      }
-    } as any, (err?: any) => {
-      try {
-        assert.strictEqual(err.message, "The specified bucket does not exist in the Microsoft Planner");
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
   });
 
   it('prompts before removing the specified bucket when confirm option not passed', (done) => {
