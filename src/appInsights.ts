@@ -19,10 +19,11 @@ const env: string = process.env.CLIMICROSOFT365_ENV !== undefined ? process.env.
 appInsights.defaultClient.commonProperties = {
   version: version,
   node: process.version,
-  env: env
+  env: env,
+  ci: Boolean(process.env.CI).toString()
 };
 appInsights.defaultClient.context.tags['ai.session.id'] = crypto.randomBytes(24).toString('base64');
-delete appInsights.defaultClient.context.tags['ai.cloud.roleInstance'];
+appInsights.defaultClient.context.tags['ai.cloud.roleInstance'] = crypto.createHash('sha256').update(appInsights.defaultClient.context.tags['ai.cloud.roleInstance']).digest('hex');
 delete appInsights.defaultClient.context.tags['ai.cloud.role'];
 
 export default appInsights.defaultClient;

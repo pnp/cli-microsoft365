@@ -77,4 +77,4 @@ Command completion is based on the static `commands.json` file located in the fo
 
 ### Disable PowerShell completion
 
-To disable CLI for Microsoft 365 command completion in your PowerShell profile, open the profile file in a code editor, and remove the reference to the `Register-O365CLICompletion.ps1` script. Restart PowerShell for the changes to take effect.
+To disable CLI for Microsoft 365 command completion in your PowerShell profile, open the profile file in a code editor, and remove the reference to the `Register-CLIM365Completion.ps1` script. Restart PowerShell for the changes to take effect.

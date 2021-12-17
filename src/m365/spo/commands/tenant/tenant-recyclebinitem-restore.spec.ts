@@ -294,7 +294,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -351,7 +351,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
@@ -408,7 +408,7 @@ describe(commands.TENANT_RECYCLEBINITEM_RESTORE, () => {
       return Promise.reject('Invalid request');
     });
 
-    sinon.stub(global as NodeJS.Global, 'setTimeout').callsFake((fn) => {
+    sinon.stub(global, 'setTimeout').callsFake((fn) => {
       fn();
       return {} as any;
     });
