@@ -31,7 +31,7 @@ This script helps you to list all external users in all SharePoint Online sites.
 
       Write-host "Retrieving all external users ..."
 
-      $users = m365 spo user list --webUrl $site.Url --output json --query "value[?contains(LoginName,'#ext#')]" | ConvertFrom-Json
+      $users = m365 spo user list --webUrl $site.Url --output json --query "[?contains(LoginName,'#ext#')]" | ConvertFrom-Json
 
       foreach ($user in $users) {
         $externalUserObject = m365 spo externaluser list --siteUrl $site.url -o json --query "[?AcceptedAs == '$($user.Email)']" | ConvertFrom-Json

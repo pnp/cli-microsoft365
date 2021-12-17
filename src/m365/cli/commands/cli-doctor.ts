@@ -1,6 +1,6 @@
 import * as os from 'os';
 import auth, { AuthType } from '../../../Auth';
-import { Logger } from '../../../cli';
+import { Cli, Logger } from '../../../cli';
 import Command from '../../../Command';
 import Utils from '../../../Utils';
 import commands from '../commands';
@@ -18,6 +18,7 @@ interface CliDiagnosticInfo {
   cliEnvironment: string;
   nodeVersion: string;
   cliVersion: string;
+  cliConfig: any;
   roles: string[];
   scopes: string[];
 }
@@ -54,6 +55,7 @@ class CliDoctorCommand extends Command {
       cliAadAppTenant: Utils.isValidGuid(auth.service.tenant) ? 'single' : auth.service.tenant,
       authMode: AuthType[auth.service.authType],
       cliEnvironment: process.env.CLIMICROSOFT365_ENV ? process.env.CLIMICROSOFT365_ENV : '',
+      cliConfig: Cli.getInstance().config.all,
       roles: roles,
       scopes: scopes
     };
