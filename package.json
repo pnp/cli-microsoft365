@@ -177,6 +177,7 @@
     "applicationinsights": "^2.2.0",
     "axios": "^0.24.0",
     "chalk": "^4.1.2",
+    "csv-stringify": "^6.0.4",
     "easy-table": "^1.2.0",
     "inquirer": "^8.2.0",
     "jmespath": "^0.15.0",

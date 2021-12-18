@@ -11,6 +11,7 @@ import { Logger } from '.';
 import appInsights from '../appInsights';
 import Command, { CommandArgs, CommandError } from '../Command';
 import config from '../config';
+import GlobalOptions from '../GlobalOptions';
 import request from '../request';
 import { settingsNames } from '../settingsNames';
 import Utils from '../Utils';
@@ -426,7 +427,7 @@ export class Cli {
     return minimist(args, minimistOptions);
   }
 
-  private static formatOutput(logStatement: any, options: any): any {
+  private static formatOutput(logStatement: any, options: GlobalOptions): any {
     if (logStatement instanceof Date) {
       return logStatement.toString();
     }
@@ -496,11 +497,11 @@ export class Cli {
       return logStatement.join(os.EOL);
     }
 
-    // if output type has been set to 'text', process the retrieved
+    // if output type has been set to 'text' or 'csv', process the retrieved
     // data so that returned objects contain only default properties specified
     // on the current command. If there is no current command or the
     // command doesn't specify default properties, return original data
-    if (options.output === 'text') {
+    if (options.output === 'text' || options.output === 'csv') {
       const cli: Cli = Cli.getInstance();
       const currentCommand: CommandInfo | undefined = cli.commandToExecute;
 
@@ -522,6 +523,23 @@ export class Cli {
             Utils.filterObject(s, currentCommand.defaultProperties as string[]));
         }
       }
+    }
+
+    if (options.output === 'csv') {
+      const { stringify } = require('csv-stringify/sync');
+
+      /* 
+        https://csv.js.org/stringify/options/
+        header: Display the column names on the first line if the columns option is provided or discovered.
+        escape: Single character used for escaping; only apply to characters matching the quote and the escape options default to ".
+        quote: The quote characters surrounding a field, defaults to the " (double quotation marks), an empty quote value will preserve the original field, whether it contains quotation marks or not.
+        quoted: Boolean, default to false, quote all the non-empty fields even if not required.
+        quotedEmpty: Quote empty strings and overrides quoted_string on empty strings when defined; default is false.
+      */
+
+      return stringify(logStatement, {
+        header: true
+      });
     }
 
     // display object as a list of key-value pairs

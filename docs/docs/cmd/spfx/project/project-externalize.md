@@ -20,7 +20,7 @@ m365 spfx project externalize [options]
 : JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 
 `-o, --output [output]`
-: Output type. `json,text,md`. Default `text`
+: Output type. `json,text,csv,md`. Default `json`
 
 `--verbose`
 : Runs command with verbose logging

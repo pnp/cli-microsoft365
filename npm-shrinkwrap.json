@@ -17,6 +17,7 @@
         "applicationinsights": "^2.2.0",
         "axios": "^0.24.0",
         "chalk": "^4.1.2",
+        "csv-stringify": "^6.0.4",
         "easy-table": "^1.2.0",
         "inquirer": "^8.2.0",
         "jmespath": "^0.15.0",
@@ -1784,6 +1785,11 @@
       "version": "0.3.8",
       "resolved": "https://registry.npmjs.org/cssom/-/cssom-0.3.8.tgz",
       "integrity": "sha512-b0tGHbfegbhPJpxpiBPU2sCkigAqtM9O121le6bbOlgyV+NyGyCmVfJ6QW9eRjz8CpNfWEOYBIMIGRYkLwsIYg=="
+    },
+    "node_modules/csv-stringify": {
+      "version": "6.0.4",
+      "resolved": "https://registry.npmjs.org/csv-stringify/-/csv-stringify-6.0.4.tgz",
+      "integrity": "sha512-Z3EbRQWwkOV3Qc2fQnJmfjrxRgAwH9AncnNK2jmtTvBvFjj/hESZUGm42YvTh9kMw2OOGPHQn5Yt0EbqoRtUVQ=="
     },
     "node_modules/d3-format": {
       "version": "1.4.5",
@@ -7552,6 +7558,11 @@
           "integrity": "sha512-b0tGHbfegbhPJpxpiBPU2sCkigAqtM9O121le6bbOlgyV+NyGyCmVfJ6QW9eRjz8CpNfWEOYBIMIGRYkLwsIYg=="
         }
       }
+    },
+    "csv-stringify": {
+      "version": "6.0.4",
+      "resolved": "https://registry.npmjs.org/csv-stringify/-/csv-stringify-6.0.4.tgz",
+      "integrity": "sha512-Z3EbRQWwkOV3Qc2fQnJmfjrxRgAwH9AncnNK2jmtTvBvFjj/hESZUGm42YvTh9kMw2OOGPHQn5Yt0EbqoRtUVQ=="
     },
     "d3-format": {
       "version": "1.4.5",

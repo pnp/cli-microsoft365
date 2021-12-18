@@ -834,6 +834,45 @@ describe('Cli', () => {
     }
   });
 
+  it('formats object with array as csv', (done) => {
+    const input = 
+    [{
+      "header1": "value1item1",
+      "header2": "value2item1"
+    },
+    {
+      "header1": "value1item2",
+      "header2": "value2item2"
+    }
+    ];
+    const expected = "header1,header2\nvalue1item1,value2item1\nvalue1item2,value2item2\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
+  it('formats a simple object as csv', (done) => {
+    const input = 
+    {
+      "header1": "value1item1",
+      "header2": "value2item1"
+    };
+    const expected = "header1,header2\nvalue1item1,value2item1\n";
+    const actual = (Cli as any).formatOutput(input, { output: 'csv' });
+    try {
+      assert.strictEqual(actual, expected);
+      done();
+    }
+    catch (e) {
+      done(e);
+    }
+  });
+
   it('formats simple output as text', (done) => {
     const o = false;
     const actual = (Cli as any).formatOutput(o, { output: 'text' });
