@@ -1,10 +1,10 @@
 # CLI for Microsoft 365 output mode
 
-CLI for Microsoft 365 commands can present their output either as plain-text or as JSON. Following is information on these two output modes along with information when to use which.
+CLI for Microsoft 365 commands can present their output either as plain-text, JSON, or as CSV. Following is information on these two output modes along with information when to use which.
 
 ## Choose the command output mode
 
-All commands in CLI for Microsoft 365 can present their output as plain-text or as JSON. By default, all commands use the JSON output mode, but by setting the `--output`, or `-o` for short, option to `text`, you can change the output mode for that command to text.
+All commands in CLI for Microsoft 365 can present their output as plain-text, JSON, or as CSV. By default, all commands use the JSON output mode, but by setting the `--output`, or `-o` for short, option to `text`, you can change the output mode for that command to text. By setting the output option to `csv`, you can change the output mode for that command to csv.
 
 ## JSON output mode
 
@@ -86,7 +86,7 @@ $ m365 spo app list -o json
 ```
 
 !!! tip
-    Some `list` commands return different output in text and JSON mode. For readability, in the text mode they only include a few properties, so that the output can be formatted as a table and will fit on the screen. In JSON mode however, they will include all available properties so that it's possible to process the full set of information about the particular object. For more details, refer to the help of the particular command.
+Some `list` commands return different output in text and JSON mode. For readability, in the text mode they only include a few properties, so that the output can be formatted as a table and will fit on the screen. In JSON mode however, they will include all available properties so that it's possible to process the full set of information about the particular object. For more details, refer to the help of the particular command.
 
 ### Verbose and debug output in JSON mode
 

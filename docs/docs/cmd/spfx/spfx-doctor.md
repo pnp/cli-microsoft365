@@ -20,7 +20,7 @@ m365 spfx doctor [options]
 : JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 
 `-o, --output [output]`
-: Output type. `json,text,md`. Default `text`
+: Output type. `json,text,csv,md`. Default `json`
 
 `--verbose`
 : Runs command with verbose logging
@@ -29,7 +29,7 @@ m365 spfx doctor [options]
 : Runs command with debug logging
 
 !!! important
-    Checks ran by this command are based on what is officially supported by Microsoft. It's possible that using different package managers or packages versions will work just fine.
+Checks ran by this command are based on what is officially supported by Microsoft. It's possible that using different package managers or packages versions will work just fine.
 
 ## Remarks
 

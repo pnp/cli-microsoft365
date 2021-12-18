@@ -23,7 +23,7 @@ m365 spfx project rename [options]
 : JMESPath query string. See [http://jmespath.org/](http://jmespath.org/) for more information and examples
 
 `-o, --output [output]`
-: Output type. `json,text,md`. Default `text`
+: Output type. `json,text,csv,md`. Default `json`
 
 `--verbose`
 : Runs command with verbose logging
@@ -32,7 +32,7 @@ m365 spfx project rename [options]
 : Runs command with debug logging
 
 !!! important
-    Run this command in the folder where the project that you want to rename is located.
+Run this command in the folder where the project that you want to rename is located.
 
 ## Remarks
 
