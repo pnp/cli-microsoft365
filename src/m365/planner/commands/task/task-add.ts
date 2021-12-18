@@ -96,7 +96,8 @@ class PlannerTaskAddCommand extends GraphCommand {
                 url: `${this.resource}/v1.0/planner/tasks/${taskId}/details`,
                 headers: {
                   'accept': 'application/json;odata.metadata=none',
-                  'If-Match': etag
+                  'If-Match': etag,
+                  'Prefer': 'return=representation'
                 },
                 responseType: 'json',
                 data: {
@@ -106,11 +107,8 @@ class PlannerTaskAddCommand extends GraphCommand {
       
               return request.patch(requestOptionsTaskDetails);              
             })
-            .then(() => {
-              return this.getTaskDetails(taskId);
-            })
             .then(taskDetails => {
-              return { ...newTask, ...taskDetails };
+              return { ...newTask, ...taskDetails as PlannerTaskDetails };
             });
         } 
         else {
@@ -121,28 +119,6 @@ class PlannerTaskAddCommand extends GraphCommand {
         logger.log(res);
         cb();
       }, (err: any): void => this.handleRejectedODataJsonPromise(err, logger, cb));
-  }
-
-  private getTaskDetails(taskId: string): Promise<PlannerTaskDetails> {
-    const requestOptions: any = {
-      url: `${this.resource}/v1.0/planner/tasks/${encodeURIComponent(taskId)}/details`,
-      headers: {
-        accept: 'application/json;odata.metadata=none'
-      },
-      responseType: 'json'
-    };
-
-    return request
-      .get(requestOptions)
-      .then((response: any) => {
-        const taskDetails: PlannerTaskDetails | undefined = response;
-
-        if (!taskDetails) {
-          return Promise.reject(`Error fetching task details`);
-        }
-
-        return Promise.resolve(taskDetails);
-      });
   }
 
   private getTaskDetailsEtag(taskId: string): Promise<string> {

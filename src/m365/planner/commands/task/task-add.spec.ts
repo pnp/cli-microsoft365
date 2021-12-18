@@ -640,17 +640,6 @@ describe(commands.TASK_ADD, () => {
           "@odata.etag": "TestEtag"
         });
       }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details` &&
-        JSON.stringify(opts.headers) === JSON.stringify({
-          'accept': 'application/json;odata.metadata=none'
-        })) {
-        return Promise.resolve({
-          "description": "My Task Description",
-          "references": {},
-          "checklist": {}
-        });
-      }
       
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks`) {
         return Promise.resolve(taskAddResponseWithDetails);
@@ -661,7 +650,11 @@ describe(commands.TASK_ADD, () => {
 
     sinon.stub(request, 'patch').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
-        return Promise.resolve("");
+        return Promise.resolve({
+          "description": "My Task Description",
+          "references": {},
+          "checklist": {}
+        });
       }
       return Promise.reject('Invalid Request');
     });
@@ -809,48 +802,6 @@ describe(commands.TASK_ADD, () => {
 
     sinon.stub(request, 'get').callsFake((opts) => {
       if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details`) {
-        return Promise.resolve(undefined);
-      }
-
-      return Promise.reject('Invalid request');
-    });
-
-
-    command.action(logger, {
-      options: {
-        title: 'My Planner Task',
-        planId: '8QZEH7b3wkS_bGQobscsM5gADCBb',
-        bucketId: 'IK8tuFTwQEa5vTonM7ZMRZgAKdno',
-        description: 'My Task Description'
-      }
-    }, (err?: any) => {
-      try {
-        assert.strictEqual(JSON.stringify(err), JSON.stringify(new CommandError(`Error fetching task details`)));
-        done();
-      }
-      catch (e) {
-        done(e);
-      }
-    });
-  });
-
-  it('fails validation when task details endpoint fails but odata works', (done) => {
-    Utils.restore(request.get);
-
-    sinon.stub(request, 'get').callsFake((opts) => {
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details` &&
-        JSON.stringify(opts.headers) === JSON.stringify({
-          'accept': 'application/json'
-        })) {
-        return Promise.resolve({
-          "@odata.etag": "TestEtag"
-        });
-      }
-
-      if (opts.url === `https://graph.microsoft.com/v1.0/planner/tasks/Z-RLQGfppU6H3663DBzfs5gAMD3o/details` &&
-        JSON.stringify(opts.headers) === JSON.stringify({
-          'accept': 'application/json;odata.metadata=none'
-        })) {
         return Promise.resolve(undefined);
       }
 
