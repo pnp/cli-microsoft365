@@ -34,7 +34,7 @@ class Request {
       });
       // since we're stubbing requests, response interceptor is never called in
       // tests, so let's exclude it from coverage
-      /* c8 ignore next 22 */
+      /* c8 ignore next 26 */
       this.req.interceptors.response.use((response: AxiosResponse): AxiosResponse => {
         if (this._logger) {
           this._logger.logToStderr('Response:');
@@ -43,7 +43,10 @@ class Request {
             response.headers['content-type'].indexOf('json') > -1) {
             properties.push('data');
           }
-          this._logger.logToStderr(JSON.stringify(Utils.filterObject(response, properties), null, 2));
+          this._logger.logToStderr(JSON.stringify({
+            url: response.config.url,
+            ...Utils.filterObject(response, properties)
+          }, null, 2));
         }
         return response;
       }, (error: AxiosError): void => {
@@ -51,6 +54,7 @@ class Request {
           const properties: string[] = ['status', 'statusText', 'headers'];
           this._logger.logToStderr('Request error:');
           this._logger.logToStderr(JSON.stringify({
+            url: error.config.url,
             ...Utils.filterObject(error.response, properties),
             error: (error as any).error
           }, null, 2));
