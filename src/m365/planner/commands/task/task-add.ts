@@ -5,7 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { PlannerTask, User, PlannerPlan, Group, PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
+import { PlannerTask, User, PlannerPlan, Group, PlannerTaskDetails, PlannerBucket } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -84,38 +84,10 @@ class PlannerTaskAddCommand extends GraphCommand {
           }
         };
 
-        logger.log(requestOptions);
-
         return request.post(requestOptions) as PlannerTask;
       })
       .then(newTask => { 
-        const taskId = newTask.id as string;
-  
-        if (args.options.description) {
-          return this.getTaskDetailsEtag(taskId)
-            .then(etag => {
-              const requestOptionsTaskDetails: any = {
-                url: `${this.resource}/v1.0/planner/tasks/${taskId}/details`,
-                headers: {
-                  'accept': 'application/json;odata.metadata=none',
-                  'If-Match': etag,
-                  'Prefer': 'return=representation'
-                },
-                responseType: 'json',
-                data: {
-                  description: args.options.description
-                }
-              };
-      
-              return request.patch(requestOptionsTaskDetails);              
-            })
-            .then(taskDetails => {
-              return { ...newTask, ...taskDetails as PlannerTaskDetails };
-            });
-        } 
-        else {
-          return newTask;
-        }  
+        return this.updateTaskDetails(args.options, newTask);  
       })
       .then((res: any): void => {
         logger.log(res);
@@ -145,11 +117,41 @@ class PlannerTaskAddCommand extends GraphCommand {
       });
   }
 
+  private updateTaskDetails(options: Options, newTask: PlannerTask): Promise<PlannerTask & PlannerTaskDetails> {
+    const taskId = newTask.id as string;
+
+    if (options.description) {
+      return this.getTaskDetailsEtag(taskId)
+        .then(etag => {
+          const requestOptionsTaskDetails: any = {
+            url: `${this.resource}/v1.0/planner/tasks/${taskId}/details`,
+            headers: {
+              'accept': 'application/json;odata.metadata=none',
+              'If-Match': etag,
+              'Prefer': 'return=representation'
+            },
+            responseType: 'json',
+            data: {
+              description: options.description
+            }
+          };
+  
+          return request.patch(requestOptionsTaskDetails);              
+        })
+        .then(taskDetails => {
+          return { ...newTask, ...taskDetails as PlannerTaskDetails };
+        });
+    } 
+    else {
+      return Promise.resolve(newTask);
+    }  
+  }
+
   private generateUserAssignments(args: CommandArgs): Promise<{ [userId: string]: { [property: string]: string }; }> {
     const assignments: { [userId: string]: { [property: string]: string } } = {};
 
-    if (args.options.assignedToUserNames) {
-      return this.getUserIds(args.options.assignedToUserNames)
+    if (args.options.assignedToUserNames || args.options.assignedToUserIds) {
+      return this.getUserIds(args.options)
         .then((userIds) => {
           userIds.map(x => assignments[x] = {
             "@odata.type": "#microsoft.graph.plannerAssignment",
@@ -159,13 +161,6 @@ class PlannerTaskAddCommand extends GraphCommand {
           return Promise.resolve(assignments);
         });
     }
-    else if (args.options.assignedToUserIds) {
-      args.options.assignedToUserIds.split(',').map(x => assignments[x] = {
-        orderHint: " !"
-      });
-
-      return Promise.resolve(assignments);
-    } 
     else {
       return Promise.resolve(assignments);
     }
@@ -185,15 +180,15 @@ class PlannerTaskAddCommand extends GraphCommand {
     };
 
     return request
-      .get<{ value: { id: string; name: string; }[] }>(requestOptions)
+      .get<{ value: PlannerBucket[] }>(requestOptions)
       .then((response) => {
-        const bucket: { id: string; name: string; } | undefined = response.value.find(val => val.name === args.options.bucketName);
+        const bucket: PlannerBucket | undefined = response.value.find(val => val.name === args.options.bucketName);
     
         if (!bucket) {
           return Promise.reject(`The specified bucket does not exist`);
         }
     
-        return Promise.resolve(bucket.id);
+        return Promise.resolve(bucket.id as string);
       });
   }
 
@@ -251,8 +246,14 @@ class PlannerTaskAddCommand extends GraphCommand {
       });
   }
 
-  private getUserIds(users: string): Promise<string[]> {
-    const userArr: string[] = users.split(',').map(o => o.trim());
+  private getUserIds(options: Options): Promise<string[]> {
+    if (options.assignedToUserIds) {
+      return Promise.resolve(options.assignedToUserIds.split(','));
+    }
+
+    // Hitting this section means assignedToUserNames won't be undefined
+    const userNames = options.assignedToUserNames as string;
+    const userArr: string[] = userNames.split(',').map(o => o.trim());
     let userIds: string[] = [];
 
     const promises: Promise<{ value: User[] }>[] = userArr.map(user => {

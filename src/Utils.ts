@@ -47,7 +47,7 @@ export default class Utils {
   }
 
   public static isValidGuidArray(guids: string[]): boolean {
-    return guids.filter(guid => !this.isValidGuid(guid)).length === 0;
+    return guids.every(guid => this.isValidGuid(guid));
   }
 
   public static isValidGuid(guid: string): boolean {
