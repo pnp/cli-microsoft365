@@ -5,7 +5,7 @@ import GlobalOptions from '../../../../GlobalOptions';
 import request from '../../../../request';
 import GraphCommand from '../../../base/GraphCommand';
 import commands from '../../commands';
-import { PlannerTask, User, PlannerAssignment, PlannerPlan, Group, PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
+import { PlannerTask, User, PlannerPlan, Group, PlannerTaskDetails } from '@microsoft/microsoft-graph-types';
 
 interface CommandArgs {
   options: Options;
@@ -84,6 +84,8 @@ class PlannerTaskAddCommand extends GraphCommand {
           }
         };
 
+        logger.log(requestOptions);
+
         return request.post(requestOptions) as PlannerTask;
       })
       .then(newTask => { 
@@ -143,13 +145,14 @@ class PlannerTaskAddCommand extends GraphCommand {
       });
   }
 
-  private generateUserAssignments(args: CommandArgs): Promise<{ [userId: string]: PlannerAssignment; }> {
-    const assignments: { [userId: string]: PlannerAssignment; } = {};
+  private generateUserAssignments(args: CommandArgs): Promise<{ [userId: string]: { [property: string]: string }; }> {
+    const assignments: { [userId: string]: { [property: string]: string } } = {};
 
     if (args.options.assignedToUserNames) {
       return this.getUserIds(args.options.assignedToUserNames)
         .then((userIds) => {
           userIds.map(x => assignments[x] = {
+            "@odata.type": "#microsoft.graph.plannerAssignment",
             orderHint: " !"
           });
 
