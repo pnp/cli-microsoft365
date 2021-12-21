@@ -9,6 +9,10 @@
 - [aad app get](../cmd/aad/app/app-get.md) - gets an Azure AD app registration [#2835](https://github.com/pnp/cli-microsoft365/issues/2835)
 - [aad user password validate](../cmd/aad/user/user-password-validate.md) - checks a user's password against the organization's password validation policy [#2846](https://github.com/pnp/cli-microsoft365/issues/2846)
 
+**Microsoft 365 apps:**
+
+- [app permission list](../cmd/app/permission/permission-list.md) - lists API permissions for the current AAD app [#2841](https://github.com/pnp/cli-microsoft365/issues/2841)
+
 **Microsoft Search:**
 
 - [search externalconnection add](../cmd/search/externalconnection/externalconnection-add.md) - adds a new external connection to be defined for Microsoft Search [#2662](https://github.com/pnp/cli-microsoft365/issues/2662)
@@ -26,6 +30,9 @@
 - added the 'Copy list items between SharePoint lists' script [#2652](https://github.com/pnp/cli-microsoft365/issues/2652)
 - updated Node version Readme.md Build instructions [#2873](https://github.com/pnp/cli-microsoft365/issues/2873)
 - fixed the maxBodyLength issue [#2863](https://github.com/pnp/cli-microsoft365/issues/2863)
+- extended 'pa app list' with environment [#2872](https://github.com/pnp/cli-microsoft365/issues/2872)
+- updated social links in the docs [#2885](https://github.com/pnp/cli-microsoft365/issues/2885)
+- added csv output mode [#2836](https://github.com/pnp/cli-microsoft365/issues/2836)
 
 ## [v4.2.0](https://github.com/pnp/cli-microsoft365/releases/tag/v4.2.0)
 
