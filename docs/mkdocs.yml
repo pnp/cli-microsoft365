@@ -104,6 +104,27 @@ nav:
       - convert:
         - convert pdf: 'cmd/file/convert/convert-pdf.md'
       - list: 'cmd/file/file-list.md'
+    - Microsoft 365 apps (app):
+      - permission:
+        - permission add: 'cmd/app/permission/permission-list.md'
+    - Microsoft 365 tenant (tenant):
+      - auditlog:
+        - auditlog report: 'cmd/tenant/auditlog/auditlog-report.md'
+      - id:
+        - id get: 'cmd/tenant/id/id-get.md'
+      - report:
+        - report activeusercounts: 'cmd/tenant/report/report-activeusercounts.md'
+        - report activeuserdetail: 'cmd/tenant/report/report-activeuserdetail.md'
+        - report office365activationcounts: 'cmd/tenant/report/report-office365activationcounts.md'
+        - report office365activationsuserdetail: 'cmd/tenant/report/report-office365activationsuserdetail.md'
+        - report office365activationsusercounts: 'cmd/tenant/report/report-office365activationsusercounts.md'
+        - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
+      - service:
+        - service list: 'cmd/tenant/service/service-list.md'
+        - service message list: 'cmd/tenant/service/service-message-list.md'
+        - service report historicalservicestatus: 'cmd/tenant/service/service-report-historicalservicestatus.md'
+      - status:
+        - status list: 'cmd/tenant/status/status-list.md'
     - Microsoft Graph (graph):
       - schemaextension:
         - schemaextension add: 'cmd/graph/schemaextension/schemaextension-add.md'
@@ -141,7 +162,7 @@ nav:
         - report mailboxusagemailboxcount: 'cmd/outlook/report/report-mailboxusagemailboxcount.md'
         - report mailboxusagequotastatusmailboxcounts: 'cmd/outlook/report/report-mailboxusagequotastatusmailboxcounts.md'
         - report mailboxusagestorage: 'cmd/outlook/report/report-mailboxusagestorage.md'
-    - Microsoft Planner (planner):
+    - Planner (planner):
       - bucket:
         - bucket add: 'cmd/planner/bucket/bucket-add.md'
         - bucket list: 'cmd/planner/bucket/bucket-list.md'
@@ -185,7 +206,7 @@ nav:
         - run get: 'cmd/flow/run/run-get.md'
         - run list: 'cmd/flow/run/run-list.md'
         - run resubmit: 'cmd/flow/run/run-resubmit.md'
-    - Search:
+    - Search (search):
       - externalconnection:
         - externalconnection add: 'cmd/search/externalconnection/externalconnection-add.md'
     - Skype (skype):
@@ -480,7 +501,7 @@ nav:
         - web reindex: 'cmd/spo/web/web-reindex.md'
         - web remove: 'cmd/spo/web/web-remove.md'
         - web set: 'cmd/spo/web/web-set.md'
-    - Microsoft Teams (teams):
+    - Teams (teams):
       - app:
         - app install: 'cmd/teams/app/app-install.md'
         - app list: 'cmd/teams/app/app-list.md'
@@ -544,24 +565,6 @@ nav:
         - user app add: 'cmd/teams/user/user-app-add.md'
         - user app list: 'cmd/teams/user/user-app-list.md'
         - user app remove: 'cmd/teams/user/user-app-remove.md'
-    - Microsoft 365 (tenant):
-      - auditlog:
-        - auditlog report: 'cmd/tenant/auditlog/auditlog-report.md'
-      - id:
-        - id get: 'cmd/tenant/id/id-get.md'
-      - report:
-        - report activeusercounts: 'cmd/tenant/report/report-activeusercounts.md'
-        - report activeuserdetail: 'cmd/tenant/report/report-activeuserdetail.md'
-        - report office365activationcounts: 'cmd/tenant/report/report-office365activationcounts.md'
-        - report office365activationsuserdetail: 'cmd/tenant/report/report-office365activationsuserdetail.md'
-        - report office365activationsusercounts: 'cmd/tenant/report/report-office365activationsusercounts.md'
-        - report servicesusercounts: 'cmd/tenant/report/report-servicesusercounts.md'
-      - service:
-        - service list: 'cmd/tenant/service/service-list.md'
-        - service message list: 'cmd/tenant/service/service-message-list.md'
-        - service report historicalservicestatus: 'cmd/tenant/service/service-report-historicalservicestatus.md'
-      - status:
-        - status list: 'cmd/tenant/status/status-list.md'
     - To Do (todo):
       - list:
         - list add: 'cmd/todo/list/list-add.md'
