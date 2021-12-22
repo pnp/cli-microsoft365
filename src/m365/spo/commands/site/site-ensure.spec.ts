@@ -63,7 +63,7 @@ describe(commands.SITE_ENSURE, () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
         return Promise.reject({
-          error: new CommandError('Request failed with status code 404')
+          error: new CommandError('404 FILE NOT FOUND')
         });
       }
 
@@ -101,7 +101,7 @@ describe(commands.SITE_ENSURE, () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command, args): Promise<any> => {
       if (command === spoWebGetCommand) {
         return Promise.reject({
-          error: new CommandError('Request failed with status code 404')
+          error: new CommandError('404 FILE NOT FOUND')
         });
       }
 
@@ -688,7 +688,7 @@ describe(commands.SITE_ENSURE, () => {
     sinon.stub(Cli, 'executeCommandWithOutput').callsFake((command): Promise<any> => {
       if (command === spoWebGetCommand) {
         return Promise.reject({
-          error: new CommandError('Request failed with status code 404')
+          error: new CommandError('404 FILE NOT FOUND')
         });
       }
 
