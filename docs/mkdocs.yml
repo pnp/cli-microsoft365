@@ -522,6 +522,7 @@ nav:
       - chat:
         - chat list: 'cmd/teams/chat/chat-list.md'
         - chat member list: 'cmd/teams/chat/chat-member-list.md'
+        - chat message list: 'cmd/teams/chat/chat-message-list.md'
       - conversationmember:
         - conversationmember add: 'cmd/teams/conversationmember/conversationmember-add.md'
         - conversationmember list: 'cmd/teams/conversationmember/conversationmember-list.md'
