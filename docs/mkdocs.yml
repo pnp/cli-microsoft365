@@ -519,6 +519,7 @@ nav:
         - channel remove: 'cmd/teams/channel/channel-remove.md'
         - channel set: 'cmd/teams/channel/channel-set.md'
       - chat:
+        - chat list: 'cmd/teams/chat/chat-list.md'
         - chat member list: 'cmd/teams/chat/chat-member-list.md'
       - conversationmember:
         - conversationmember add: 'cmd/teams/conversationmember/conversationmember-add.md'
