@@ -109,7 +109,7 @@ class SpoSiteEnsureCommand extends SpoCommand {
           logger.logToStderr(err.stderr);
         }
 
-        if (err.error.message !== 'Request failed with status code 404') {
+        if (err.error.message !== '404 FILE NOT FOUND') {
           return Promise.reject(err);
         }
 
