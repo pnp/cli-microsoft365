@@ -199,7 +199,7 @@ describe(commands.CHAT_LIST, () => {
     });
   });
 
-  it('correctly handles error when listing messages', (done) => {
+  it('correctly handles error when listing chat conversations', (done) => {
     sinon.stub(request, 'get').callsFake(() => {
       return Promise.reject('An error has occurred');
     });

@@ -5,7 +5,6 @@ import {
 import GlobalOptions from '../../../../GlobalOptions';
 import { GraphItemsListCommand } from '../../../base/GraphItemsListCommand';
 import commands from '../../commands';
-import { Message } from '../../Message';
 
 interface CommandArgs {
   options: Options;
@@ -15,7 +14,7 @@ interface Options extends GlobalOptions {
   chatId: string;
 }
 
-class TeamsChatListCommand extends GraphItemsListCommand<Message> {
+class TeamsChatListCommand extends GraphItemsListCommand<any> {
   public get name(): string {
     return commands.CHAT_LIST;
   }
